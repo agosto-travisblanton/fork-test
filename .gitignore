@@ -1,2 +1,5 @@
 Vagrantfile
 .vagrant
+*.pyc
+*.log
+*.log-journal
