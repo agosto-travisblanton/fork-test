@@ -1,0 +1,51 @@
+[run]
+branch = True
+include =
+    appengine_config.py
+    app_config.py
+    decorators.py
+    env_setup.py
+    export/*.py
+    goodyear_env.py
+    handlers/*.py
+    i18n/*.py
+    i18n_util.py
+    migration/*.py
+    models.py
+    monitor/*.py
+    pa/*.py
+    reports/*.py
+    routes.py
+    settings.py
+    strategy.py
+    utils/*.py
+
+
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain about missing debug-only code:
+    def __repr__
+    if self\.debug
+
+    # Don't complain if tests don't hit defensive assertion code:
+    raise AssertionError
+    raise NotImplementedError
+
+    # Don't complain if non-runnable code isn't run:
+    if 0:
+    if __name__ == .__main__.:
+
+    # Don't check for code we can't run in the local environment
+    .*on_integration_server.*
+    .*on_production_server.*
+    .*on_stage_server.*
+
+ignore_errors = True
+
+[html]
+directory = coverage_html_report
+

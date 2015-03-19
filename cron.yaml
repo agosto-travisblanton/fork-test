@@ -1,0 +1,14 @@
+cron:
+- description: Daily exception report
+  url: /_ereporter?sender=gcp.admin@agosto.com  # The sender must be an app admin.
+  schedule: every day 19:00
+  timezone: US/Central
+
+- description: Daily report scheduling
+  url: /export/schedule
+  schedule: every day 16:45
+  timezone: US/Central
+
+- description: Every 1 hour check for leaks for each vehicle
+  url: /predictive_analytics/check_leaks_cron
+  schedule: every 1 hours
