@@ -36,6 +36,15 @@ application = WSGIApplication(
             handler='handlers.warmup.WarmupHandler',
             name='warmup',
         ),
+
+        ############################################################
+        # device registration
+        ############################################################
+        Route(
+            r'/register',
+            handler='handlers.device_registration.DeviceRegistrationHandler',
+            name='device-registration',
+        ),
     ]
 )
 

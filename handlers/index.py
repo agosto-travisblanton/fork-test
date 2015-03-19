@@ -7,4 +7,6 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 class IndexHandler(RequestHandler):
     def get(self):
-        self.response.out.write("Warmed Up")
+        self.response.out.write('Hello from skykit-display-device!')
+
+
