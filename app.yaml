@@ -1,4 +1,4 @@
-application: proactiveservices-int  # DO NOT CHANGE THIS!  To deploy to other environments, use the command line
+application: skykit-display-device-int  # DO NOT CHANGE THIS!  To deploy to other environments, use the command line
 version: snapshot
 runtime: python27
 api_version: 1
@@ -20,10 +20,6 @@ libraries:
 - name: django
   version: "1.3"
 - name: webapp2
-  version: latest
-- name: numpy
-  version: latest
-- name: PIL
   version: latest
 - name: pycrypto
   version: latest
