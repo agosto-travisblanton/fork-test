@@ -10,11 +10,7 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 class DeviceEnrollmentHandler(RequestHandler):
     def get(self):
         chrome_os_devices_api = ChromeOsDevicesApi()
-        chrome_os_devices = chrome_os_devices_api.list()
-        # GET https://www.googleapis.com/admin/directory/v1/customer/customerId/devices/chromeos
-
-        # PUT https://www.googleapis.com/admin/directory/v1/customer/customerId/devices/chromeos/deviceId
-
+        chrome_os_devices = chrome_os_devices_api.list('my_customer')
         self.response.out.write('Hello from skykit-display-device/device registration!')
         json_response(self.response, None)
 
