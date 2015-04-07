@@ -1,6 +1,6 @@
-
 import json
 import logging
+import requests
 
 from app_config import config
 
@@ -20,17 +20,17 @@ class GoogleCloudMessaging(object):
         pass
         self.HEADERS['Authorization'] = 'key={0}'.format(config.PUBLIC_API_SERVER_KEY)
 
-    def sendMessage(self, registration_ids, message):
+    def notify(self, registration_ids, data_dictionary, test_mode=False):
         cloud_message_payload_dictionary = {
-            "data": {
-                "message": message
-            },
+            "data": data_dictionary,
             "registration_ids": registration_ids
         }
+        if test_mode:
+            cloud_message_payload_dictionary['dry_run'] = True
         json_payload = json.dumps(cloud_message_payload_dictionary)
-        logging.info('>>> Google Cloud Messaging::JSON payload: {0}'.format(json_payload))
-        urlfetch.set_default_fetch_deadline(60)
-        return urlfetch.fetch(url=self.URL_CLOUD_MESSAGING_SEND,
-                              payload=json_payload,
-                              method=urlfetch.POST,
-                              headers=self.HEADERS)
+        logging.info('>>> GCM JSON payload: {0}'.format(json_payload))
+        response = requests.post(self.URL_CLOUD_MESSAGING_SEND, json_payload, timeout=60, headers=self.HEADERS)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise RuntimeError('Unable to notify devices via GCM.  HTTP status code: {0}'.format(response.status_code))
