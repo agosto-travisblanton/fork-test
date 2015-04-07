@@ -1,8 +1,7 @@
-from pprint import pprint
+from time import sleep, gmtime, strftime
 
 from agar.test import BaseTest
 from chrome_os_devices_api import ChromeOsDevicesApi
-from time import sleep, gmtime, strftime
 
 
 class TestChromeOsDevicesApi(BaseTest):

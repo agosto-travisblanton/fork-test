@@ -63,3 +63,12 @@ app_CLIENT_ID = _CLIENT_ID()
 #     return None
 # app_CLIENT_SECRET = _CLIENT_SECRET()
 
+def _PUBLIC_API_SERVER_KEY():
+    if on_development_server or not on_server:
+        return 'AIzaSyAzS-hwl5dV-Wn4g5opG_34gGYplgJT1Fc'
+    if on_integration_server:
+        return 'AIzaSyAzS-hwl5dV-Wn4g5opG_34gGYplgJT1Fc'
+    if on_production_server:
+        return ''
+    return None
+app_PUBLIC_API_SERVER_KEY = _PUBLIC_API_SERVER_KEY()

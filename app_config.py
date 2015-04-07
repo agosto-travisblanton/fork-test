@@ -18,6 +18,7 @@ class AppConfig(Config):
     SERVICE_ACCOUNT_EMAIL = None
     CLIENT_ID = None
     # CLIENT_SECRET = None
+    PUBLIC_API_SERVER_KEY = None
 
 
 config = AppConfig.get_config()

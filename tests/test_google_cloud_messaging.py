@@ -1,0 +1,19 @@
+from agar.test import BaseTest
+from google_cloud_messaging import GoogleCloudMessaging
+from app_config import config
+
+__author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
+
+
+class TestGoogleCloudMessaging(BaseTest):
+    def setUp(self):
+        super(TestGoogleCloudMessaging, self).setUp()
+        self.google_cloud_messaging = GoogleCloudMessaging()
+
+    def testConstruction(self):
+        expected_authorization_header = 'key={0}'.format(config.PUBLIC_API_SERVER_KEY)
+        self.assertEqual(expected_authorization_header,
+                         self.google_cloud_messaging.HEADERS['Authorization'])
+
+    def testSendMessage(self):
+        pass
