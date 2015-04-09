@@ -41,7 +41,7 @@ application = WSGIApplication(
         # device registration
         ############################################################
         Route(
-            r'/enroll',
+            r'/api/v1/devices',
             handler='handlers.device_enrollment.DeviceEnrollmentHandler',
             name='device-enrollment',
         ),

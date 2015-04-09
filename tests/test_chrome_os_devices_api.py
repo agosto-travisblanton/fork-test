@@ -2,6 +2,7 @@ from time import sleep, gmtime, strftime
 
 from agar.test import BaseTest
 from chrome_os_devices_api import ChromeOsDevicesApi
+from pprint import pprint
 
 
 class TestChromeOsDevicesApi(BaseTest):
@@ -17,6 +18,7 @@ class TestChromeOsDevicesApi(BaseTest):
 
     def testList(self):
         devices = self.chrome_os_devices_api.list(self.SKYKIT_COM_CUSTOMER_ID)
+        pprint(devices)
         self.assertIsNotNone(devices)
         self.assertTrue(len(devices) > 0)
 

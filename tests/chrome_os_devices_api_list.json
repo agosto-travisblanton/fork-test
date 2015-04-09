@@ -1,0 +1,301 @@
+[
+  {
+    "activeTimeRanges": [
+      {
+        "activeTime": 900011,
+        "date": "2015-03-30"
+      },
+      {
+        "activeTime": 420001,
+        "date": "2015-04-01"
+      },
+      {
+        "activeTime": 270002,
+        "date": "2015-04-03"
+      }
+    ],
+    "annotatedLocation": "Location updated at Tue, 07 Apr 2015 20:32:07 +0000 from unit test.",
+    "annotatedUser": "administrator-04-07-2015-20-32-09@skykit.com",
+    "bootMode": "Verified",
+    "deviceId": "6daf712b-7a65-4450-abcd-45027a47a716",
+    "etag": "HYgr1caUwpEwo3v4AgNBAROtXtc/PHwlYzXuMJ2rrc2jZQlrIUYDeiI",
+    "ethernetMacAddress": "c454443a18a1",
+    "firmwareVersion": "",
+    "kind": "admin#directory#chromeosdevice",
+    "lastEnrollmentTime": "2014-08-15T21:23:48.905Z",
+    "lastSync": "2015-04-07T19:37:39.375Z",
+    "macAddress": "54271e4af1e7",
+    "model": "ASUS Chromebox",
+    "notes": "Notes updated at Tue, 07 Apr 2015 20:32:10 +0000 from unit test.",
+    "orgUnitPath": "/SKD Automated Test/SKD Automated Deployed",
+    "osVersion": "41.0.2272.89",
+    "platformVersion": "6680.64.0 (Official Build) stable-channel panther",
+    "recentUsers": [
+      {
+        "email": "administrator@skykit.com",
+        "type": "USER_TYPE_MANAGED"
+      }
+    ],
+    "serialNumber": "E3MSCX004781",
+    "status": "ACTIVE"
+  },
+  {
+    "activeTimeRanges": [
+      {
+        "activeTime": 2340021,
+        "date": "2015-04-02"
+      },
+      {
+        "activeTime": 2730022,
+        "date": "2015-04-03"
+      },
+      {
+        "activeTime": 600008,
+        "date": "2015-04-05"
+      },
+      {
+        "activeTime": 900009,
+        "date": "2015-04-06"
+      },
+      {
+        "activeTime": 1230008,
+        "date": "2015-04-07"
+      }
+    ],
+    "annotatedLocation": "Eden Prairie",
+    "annotatedUser": "administrator@skykit.com",
+    "bootMode": "Verified",
+    "deviceId": "4f099e50-6028-422b-85d2-3a629a45bf38",
+    "etag": "HYgr1caUwpEwo3v4AgNBAROtXtc/XlvzTBqBH3HnjIeLtWGwJs8aQOo",
+    "ethernetMacAddress": "c454443a7c93",
+    "firmwareVersion": "",
+    "kind": "admin#directory#chromeosdevice",
+    "lastEnrollmentTime": "2015-04-02T20:51:19.833Z",
+    "lastSync": "2015-04-07T15:19:48.762Z",
+    "macAddress": "54271e619346",
+    "model": "ASUS Chromebox",
+    "notes": "Chris Davis Dev box",
+    "orgUnitPath": "/Agosto/Experimental",
+    "osVersion": "41.0.2272.102",
+    "platformVersion": "",
+    "serialNumber": "E3MSCX007891",
+    "status": "ACTIVE"
+  },
+  {
+    "activeTimeRanges": [
+      {
+        "activeTime": 1170010,
+        "date": "2015-03-30"
+      },
+      {
+        "activeTime": 660005,
+        "date": "2015-03-31"
+      }
+    ],
+    "annotatedLocation": "Agosto HQ Reception Area",
+    "annotatedUser": "administrator@skykit.com",
+    "bootMode": "Verified",
+    "deviceId": "964f4e0b-a06a-4ba8-97ab-5db2ba9f9cbd",
+    "etag": "HYgr1caUwpEwo3v4AgNBAROtXtc/o2XSMdRFbLA9eBHg9di7acqSTPA",
+    "ethernetMacAddress": "c454443bebe3",
+    "firmwareVersion": "Google_Panther.4920.24.26",
+    "kind": "admin#directory#chromeosdevice",
+    "lastEnrollmentTime": "2014-08-06T19:27:01.969Z",
+    "lastSync": "2015-04-07T19:50:15.118Z",
+    "macAddress": "54271e6950ed",
+    "model": "ASUS Chromebox",
+    "notes": "",
+    "orgUnitPath": "/Agosto/Production",
+    "osVersion": "40.0.2214.115",
+    "platformVersion": "6457.107.0 (Official Build) stable-channel panther",
+    "recentUsers": [
+      {
+        "email": "thomas.blade@skykit.com",
+        "type": "USER_TYPE_MANAGED"
+      }
+    ],
+    "serialNumber": "E3MSCX012112",
+    "status": "ACTIVE"
+  },
+  {
+    "activeTimeRanges": [
+      {
+        "activeTime": 2700010,
+        "date": "2015-03-09"
+      },
+      {
+        "activeTime": 270004,
+        "date": "2015-03-13"
+      },
+      {
+        "activeTime": 660004,
+        "date": "2015-03-16"
+      },
+      {
+        "activeTime": 3690022,
+        "date": "2015-03-17"
+      },
+      {
+        "activeTime": 4050016,
+        "date": "2015-03-18"
+      },
+      {
+        "activeTime": 1920013,
+        "date": "2015-03-19"
+      },
+      {
+        "activeTime": 3720020,
+        "date": "2015-03-20"
+      },
+      {
+        "activeTime": 690003,
+        "date": "2015-03-21"
+      }
+    ],
+    "annotatedLocation": "",
+    "annotatedUser": "",
+    "bootMode": "Verified",
+    "deviceId": "54eb08ad-dee3-41c2-acbc-a9c55af9a5fa",
+    "etag": "HYgr1caUwpEwo3v4AgNBAROtXtc/whHIpWZ8L3RJAATTxkh1PfTlgR8",
+    "ethernetMacAddress": "c454443bec05",
+    "firmwareVersion": "Google_Panther.4920.24.26",
+    "kind": "admin#directory#chromeosdevice",
+    "lastEnrollmentTime": "2014-05-11T00:06:58.963Z",
+    "lastSync": "2015-03-21T17:14:14.613Z",
+    "macAddress": "54271e6972cb",
+    "model": "ASUS Chromebox",
+    "notes": "Chromebox labeled Dallas",
+    "orgUnitPath": "/Agosto/Production",
+    "osVersion": "41.0.2272.89",
+    "platformVersion": "6680.64.0 (Official Build) stable-channel panther",
+    "serialNumber": "E3MSCX012563",
+    "status": "ACTIVE"
+  },
+  {
+    "activeTimeRanges": [
+      {
+        "activeTime": 120000,
+        "date": "2015-04-02"
+      },
+      {
+        "activeTime": 1440009,
+        "date": "2015-04-07"
+      }
+    ],
+    "annotatedLocation": "Eden Prairie, MN",
+    "annotatedUser": "Chris Davis",
+    "bootMode": "Verified",
+    "deviceId": "6f8eb050-fcde-427e-8275-12d0293e9b9d",
+    "etag": "HYgr1caUwpEwo3v4AgNBAROtXtc/whnuteDjRY6iN-RreUGGnMcnQ40",
+    "ethernetMacAddress": "c454443c2371",
+    "firmwareVersion": "Google_Panther.4920.24.26",
+    "kind": "admin#directory#chromeosdevice",
+    "lastEnrollmentTime": "2014-05-05T15:50:33.949Z",
+    "lastSync": "2015-04-07T20:17:34.893Z",
+    "macAddress": "54271ea4cb2b",
+    "model": "ASUS Chromebox",
+    "notes": "Other Dev Box",
+    "orgUnitPath": "/Agosto/Experimental",
+    "osVersion": "40.0.2214.93",
+    "platformVersion": "6457.83.0 (Official Build) stable-channel panther",
+    "serialNumber": "E4MSCX002190",
+    "status": "ACTIVE"
+  },
+  {
+    "activeTimeRanges": [
+      {
+        "activeTime": 30000,
+        "date": "2014-09-30"
+      }
+    ],
+    "annotatedLocation": "Mountain View, CA",
+    "annotatedUser": "administrator@skykit.com",
+    "bootMode": "Verified",
+    "deviceId": "15febd03-9244-4b6b-97b5-0c3e553c84e9",
+    "etag": "HYgr1caUwpEwo3v4AgNBAROtXtc/1FAIa-HHoDGbyH9yjL3uby1ssAI",
+    "ethernetMacAddress": "c454445956aa",
+    "firmwareVersion": "",
+    "kind": "admin#directory#chromeosdevice",
+    "lastEnrollmentTime": "2014-09-30T15:08:46.487Z",
+    "lastSync": "2014-10-07T17:45:58.526Z",
+    "macAddress": "b8ee654ee062",
+    "model": "ASUS Chromebox",
+    "notes": "GTC 2014",
+    "orgUnitPath": "/Google/Production",
+    "osVersion": "37.0.2062.119",
+    "platformVersion": "5978.80.0 (Official Build) stable-channel panther",
+    "serialNumber": "E4MSCX020369",
+    "status": "ACTIVE"
+  },
+  {
+    "annotatedLocation": "Mountain View, CA",
+    "annotatedUser": "administrator@skykit.com",
+    "deviceId": "bc7fa7eb-96d3-4236-92ea-62361999676a",
+    "etag": "HYgr1caUwpEwo3v4AgNBAROtXtc/n-qigQibTdqtS6FQUu_IYQ0jVzo",
+    "kind": "admin#directory#chromeosdevice",
+    "lastEnrollmentTime": "2014-09-19T23:33:42.267Z",
+    "lastSync": "2014-10-07T17:43:23.574Z",
+    "model": "ASUS Chromebox",
+    "notes": "GTC 2014",
+    "orgUnitPath": "/Google/Production",
+    "serialNumber": "E4MSCX020384",
+    "status": "ACTIVE"
+  },
+  {
+    "activeTimeRanges": [
+      {
+        "activeTime": 30000,
+        "date": "2014-09-19"
+      }
+    ],
+    "annotatedLocation": "Mountain View, CA",
+    "annotatedUser": "administrator@skykit.com",
+    "bootMode": "Verified",
+    "deviceId": "132e235a-b346-4a37-a100-de49fa753a2a",
+    "etag": "HYgr1caUwpEwo3v4AgNBAROtXtc/MaVxpRLnkvd666dNKMtnDzrbxf4",
+    "ethernetMacAddress": "c45444596b9b",
+    "firmwareVersion": "Google_Panther.4920.24.25",
+    "kind": "admin#directory#chromeosdevice",
+    "lastEnrollmentTime": "2014-09-19T23:39:36.260Z",
+    "lastSync": "2014-10-02T21:39:26.955Z",
+    "macAddress": "b8ee654ed845",
+    "model": "ASUS Chromebox",
+    "notes": "GTC 2014",
+    "orgUnitPath": "/Google/Production",
+    "osVersion": "37.0.2062.119",
+    "platformVersion": "5978.80.0 (Official Build) stable-channel panther",
+    "serialNumber": "E4MSCX020413",
+    "status": "ACTIVE"
+  },
+  {
+    "annotatedLocation": "Mountain View, CA",
+    "annotatedUser": "administrator@skykit.com",
+    "bootMode": "Verified",
+    "deviceId": "8862a415-6aea-4d9a-a5ba-4522ab439469",
+    "etag": "HYgr1caUwpEwo3v4AgNBAROtXtc/blZmyikIL9FamTCbRN0RxDddEtU",
+    "ethernetMacAddress": "c454445956ca",
+    "kind": "admin#directory#chromeosdevice",
+    "lastEnrollmentTime": "2014-09-19T23:57:28.398Z",
+    "lastSync": "2014-10-07T17:49:55.536Z",
+    "macAddress": "b8ee654ec93b",
+    "model": "ASUS Chromebox",
+    "notes": "GTC 2014",
+    "orgUnitPath": "/Google/Production",
+    "osVersion": "37.0.2062.119",
+    "platformVersion": "5978.80.0 (Official Build) stable-channel panther",
+    "serialNumber": "E4MSCX020416",
+    "status": "ACTIVE"
+  },
+  {
+    "annotatedUser": "gtc-integration@skykit.com",
+    "deviceId": "2e68cbcc-2267-47b8-818a-10e00419bf36",
+    "etag": "HYgr1caUwpEwo3v4AgNBAROtXtc/08f7D9J_gNulZle7uH2CCs2JqB4",
+    "kind": "admin#directory#chromeosdevice",
+    "lastEnrollmentTime": "2014-09-30T15:20:32.711Z",
+    "lastSync": "2014-11-19T19:54:33.609Z",
+    "model": "ASUS Chromebox",
+    "orgUnitPath": "/Google/Production",
+    "serialNumber": "E5MSCX020664",
+    "status": "ACTIVE"
+  }
+]

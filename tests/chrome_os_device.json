@@ -1,0 +1,26 @@
+{
+  "activeTimeRanges": [
+    {
+      "activeTime": 30000,
+      "date": "2014-09-19"
+    }
+  ],
+  "annotatedLocation": "Mountain View, CA",
+  "annotatedUser": "administrator@skykit.com",
+  "bootMode": "Verified",
+  "deviceId": "132e235a-b346-4a37-a100-de49fa753a2a",
+  "etag": "HYgr1caUwpEwo3v4AgNBAROtXtc/MaVxpRLnkvd666dNKMtnDzrbxf4",
+  "ethernetMacAddress": "c45444596b9b",
+  "firmwareVersion": "Google_Panther.4920.24.25",
+  "kind": "admin#directory#chromeosdevice",
+  "lastEnrollmentTime": "2014-09-19T23:39:36.260Z",
+  "lastSync": "2014-10-02T21:39:26.955Z",
+  "macAddress": "b8ee654ed845",
+  "model": "ASUS Chromebox",
+  "notes": "GTC 2014",
+  "orgUnitPath": "/Google/Production",
+  "osVersion": "37.0.2062.119",
+  "platformVersion": "5978.80.0 (Official Build) stable-channel panther",
+  "serialNumber": "E4MSCX020413",
+  "status": "ACTIVE"
+}
