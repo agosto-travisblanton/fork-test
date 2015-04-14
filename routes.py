@@ -43,7 +43,12 @@ application = WSGIApplication(
         Route(
             r'/api/v1/devices',
             handler='handlers.device_enrollment.DeviceEnrollmentHandler',
-            name='device-enrollment',
+            name='devices',
+        ),
+        Route(
+            r'/api/v1/devices/<device_id>',
+            handler='handlers.device_enrollment.DeviceEnrollmentHandler',
+            name='devices-mutator',
         ),
     ]
 )

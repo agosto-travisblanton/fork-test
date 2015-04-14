@@ -24,19 +24,29 @@ class DeviceEnrollmentHandler(RequestHandler):
     def post(self):
         pass
 
-    def put(self):
-        device_id = self.request.get('device_id')
+    def put(self, device_id):
         if device_id:
             chrome_os_device = ChromeOsDevice.get_by_device_id(device_id)
             if chrome_os_device is None:
                 chrome_os_device = ChromeOsDevice(device_id=device_id)
-            gcm_registration_id = self.request.get('gcm_registration_id')
+            request_json = json.loads(self.request.body)
+            gcm_registration_id = request_json.get('gcmRegistrationId')
             if gcm_registration_id:
                 chrome_os_device.gcm_registration_id = gcm_registration_id
             chrome_os_device.put()
+            self.response.headers.pop('Content-Type', None)
             self.response.set_status(204)
         else:
             self.abort(422, 'A device_id is required to update an existing ChromeOS device entity.')
 
-    def delete(self):
-        pass
+    def delete(self, device_id):
+        if device_id:
+            chrome_os_device = ChromeOsDevice.get_by_device_id(device_id)
+            if chrome_os_device is None:
+                self.abort(422, 'Unable to retrieve ChromeOS device by device ID: {0}'.format(device_id))
+            else:
+                chrome_os_device.key().remove()
+                self.response.headers.pop('Content-Type', None)
+                self.response.set_status(204)
+        else:
+            self.abort(422, 'A device_id is required to update an existing ChromeOS device entity.')
