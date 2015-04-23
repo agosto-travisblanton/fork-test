@@ -50,6 +50,11 @@ application = WSGIApplication(
             handler='handlers.device_enrollment.DeviceEnrollmentHandler',
             name='devices-mutator',
         ),
+        Route(
+            r'/api/v1/devices/<device_id>/commands',
+            handler='handlers.device_control.DeviceCommandsHandler',
+            name='device-commands',
+        ),
     ]
 )
 
