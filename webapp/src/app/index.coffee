@@ -1,4 +1,14 @@
-angular.module 'skykitDisplayDeviceManagement', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'restangular', 'ui.router', 'ui.bootstrap']
+angular.module 'skykitDisplayDeviceManagement', [
+  'ngAnimate',
+  'ngCookies',
+  'ngTouch',
+  'ngSanitize',
+  'ngMaterial',
+  'restangular',
+  'ui.router',
+  'ui.bootstrap',
+  'hSweetAlert'
+]
   .config ($stateProvider, $urlRouterProvider) ->
     $stateProvider
       .state "home",
