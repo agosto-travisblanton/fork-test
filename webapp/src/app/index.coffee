@@ -3,7 +3,6 @@ angular.module 'skykitDisplayDeviceManagement', [
   'ngCookies',
   'ngTouch',
   'ngSanitize',
-  'ngMaterial',
   'restangular',
   'ui.router',
   'ui.bootstrap',
