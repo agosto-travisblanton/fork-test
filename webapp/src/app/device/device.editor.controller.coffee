@@ -5,7 +5,7 @@ angular.module "skykitDisplayDeviceManagement"
 
   @onClickSaveButton = () ->
     $log.info 'Hello?'
-    sweet.show 'Sweet Jebus'
+    sweet.show 'Sweet Jebus', 'You\'ve done it!', 'success'
 
 
   @

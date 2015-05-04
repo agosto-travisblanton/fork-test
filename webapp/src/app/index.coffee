@@ -9,7 +9,10 @@ angular.module 'skykitDisplayDeviceManagement', [
 ]
 .config ($stateProvider, $urlRouterProvider) ->
   $stateProvider
-  .state("home", {url: "/", templateUrl: "app/main/main.html", controller: "MainCtrl"})
+  .state("home",
+    {
+      url: "/", templateUrl: "app/main/main.html", controller: "MainCtrl"
+    })
   .state("domain",
     {
       url: "/domain", templateUrl: "app/domain/domain.html", controller: "DomainCtrl"
