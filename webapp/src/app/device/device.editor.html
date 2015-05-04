@@ -1,0 +1,57 @@
+<div id="wrapper">
+
+  <div ng-include="'app/components/navbar/navbar.html'"></div>
+
+  <div id="page-wrapper">
+    <div class="container-fluid">
+
+      <!-- Page Heading -->
+      <div class="row">
+        <div class="col-lg-12">
+          <h1 class="page-header">
+            Domain
+            <small>Subtitle</small>
+          </h1>
+
+          <!--<ol class="breadcrumb">-->
+          <!--<li class="active">-->
+          <!--<i class="fa fa-dashboard"></i> Dashboard-->
+          <!--</li>-->
+          <!--</ol>-->
+        </div>
+      </div>
+      <!-- /.row -->
+
+      <div class="row">
+        <div class="col-lg-12">
+          <fieldset>
+            <legend>Device</legend>
+            <form>
+              <div class="form-group">
+                <label for="deviceName">Device name</label>
+                <input type="text" class="form-control" id="deviceName" placeholder="Enter device name">
+              </div>
+
+              <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" class="form-control" id="location" placeholder="Enter location">
+              </div>
+
+              <div class="form-group">
+                <label for="macAddress">MAC address</label>
+                <input type="text" class="form-control" id="macAddress" placeholder="Enter MAC address">
+              </div>
+
+              <div class="form-group">
+                <label for="deviceID">Device ID</label>
+                <input type="text" class="form-control" id="deviceID" placeholder="Enter device ID">
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-default" ng-click="deviceEdit.onClickSaveButton()">Save</button>
+            </form>
+          </fieldset>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
