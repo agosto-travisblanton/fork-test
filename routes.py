@@ -22,11 +22,11 @@ application = WSGIApplication(
         ############################################################
         # index
         ############################################################
-        Route(
-            r'/',
-            handler="handlers.index.IndexHandler",
-            name='index',
-        ),
+        # Route(
+        #     r'/',
+        #     handler="handlers.index.IndexHandler",
+        #     name='index',
+        # ),
 
         ############################################################
         # warmup

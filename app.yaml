@@ -25,10 +25,6 @@ libraries:
   version: latest
 
 handlers:
-- url: /admin/.*
-  script: google.appengine.ext.admin.application
-  login: admin
-
 - url: /(robots\.txt)
   static_files: static/\1
   upload: static/(.*)
@@ -37,58 +33,35 @@ handlers:
   script: google.appengine.ext.ereporter.report_generator.application
   login: admin
 
-- url: /favicon\.ico
-  static_files: static/app/images/favicon\.ico
-  upload: static/app/images/favicon\.ico
+- url: /favicon.ico
+  static_files: static/favicon.ico
+  upload: static/favicon.ico
 
 - url: /bower_components
   static_dir: static/app/bower_components
 
 - url: /scripts
-  static_dir: static/app/scripts
+  static_dir: static/scripts
 
 - url: /styles
-  static_dir: static/app/styles
+  static_dir: static/styles
 
 - url: /img
-  static_dir: static/app/images
+  static_dir: static/assets/images
 
 - url: /fonts
-  static_dir: static/app/fonts
+  static_dir: static/fonts
 
 - url: /images
-  static_dir: static/app/images
-
-- url: /views
-  static_dir: static/app/views
-
-- url: /mapreduce/pipeline/images
-  static_dir: mapreduce/lib/pipeline/ui/images
-
-- url: /mapreduce(/.*)?
-  script: mapreduce.main.mapreduce_app
-  login: admin
-
-- url: /events
-  script: routes.application
-
-- url: /dev/views
-  static_dir: templates/dev/views
-
-- url: /dev/scripts
-  static_dir: templates/dev/scripts
-
-- url: /dev
-  login: admin
-  script: routes.application
+  static_dir: static/assets/images
 
 - url: /migrate
   login: admin
   script: routes.application
 
-- url: /tasks
-  login: admin
-  script: routes.application
+- url: /
+  static_files: static/index.html
+  upload: static/index.html
 
 - url: /.*
   script: routes.application
