@@ -38,7 +38,7 @@ handlers:
   login: admin
 
 - url: /favicon\.ico
-  static_files: static/app/images/favicon.ico
+  static_files: static/app/images/favicon\.ico
   upload: static/app/images/favicon\.ico
 
 - url: /bower_components
@@ -110,7 +110,7 @@ skip_files:
 - ^tests/.*
 - ^simtests/.*
 - ^static/app/node_modules/.*
-- ^.hg/.*
+- ^.git/.*
 - ^.idea/.*
 - ^.*~
 - ^.*\.py[co]
