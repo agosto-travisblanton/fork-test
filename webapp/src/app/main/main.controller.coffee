@@ -2,3 +2,6 @@
 
 angular.module "skykitDisplayDeviceManagement"
   .controller "MainCtrl", ($scope) ->
+
+
+    @
