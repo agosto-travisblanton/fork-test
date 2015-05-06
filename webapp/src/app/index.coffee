@@ -10,7 +10,6 @@ skykitDisplayDeviceManagement = angular.module('skykitDisplayDeviceManagement', 
   'hSweetAlert'
 ])
 
-
 skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider) ->
   $stateProvider.state("home", {url: "/", templateUrl: "app/main/main.html", controller: "MainCtrl"})
   $stateProvider.state("domain", {url: "/domain", templateUrl: "app/domain/domain.html", controller: "DomainCtrl"})
@@ -25,6 +24,18 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider) ->
     templateUrl: "app/tenant/tenants.html",
     controller: "TenantsCtrl",
     controllerAs: 'tenantsCtrl'
+  })
+  $stateProvider.state("newTenant", {
+    url: "/tenants/new",
+    templateUrl: "app/tenant/tenant-detail.html",
+    controller: "TenantDetailsCtrl",
+    controllerAs: 'tenantDetailsCtrl'
+  })
+  $stateProvider.state("editTenant", {
+    url: "/tenants/:tenantKey",
+    templateUrl: "app/tenant/tenant-detail.html",
+    controller: "TenantDetailsCtrl",
+    controllerAs: 'tenantDetailsCtrl'
   })
   $stateProvider.state("apiTest", {
     url: "/api_testing",
