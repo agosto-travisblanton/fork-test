@@ -1,3 +1,5 @@
+import json
+from pprint import pprint
 from agar.test import BaseTest, WebTest
 from models import Tenant
 from routes import application
@@ -13,10 +15,20 @@ class TestTenantsHandler(BaseTest, WebTest):
         pass
 
     def testGet_ReturnsOKStatus(self):
+        self.loadTenants()
         request_parameters = {}
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.get(uri, params=request_parameters)
         self.assertOK(response)
+
+    def testGet_ReturnsJsonResources(self):
+        self.loadTenants()
+        request_parameters = {}
+        uri = application.router.build(None, 'tenants', None, {})
+        response = self.app.get(uri, params=request_parameters)
+        response_json = json.loads(response.body)
+        pprint(response_json)
+        self.assertEqual(len(response_json), 5)
 
     def testPost_ReturnsCreatedStatus(self):
         request_parameters = {'tenant': {'name': 'ABC Flooring, Inc.'}}
@@ -51,3 +63,8 @@ class TestTenantsHandler(BaseTest, WebTest):
         uri = application.router.build(None, 'tenants-mutator', None, {'tenant_id': 'd836248623876'})
         response = self.app.delete(uri)
         self.assertEqual(204, response.status_code)
+
+    def loadTenants(self):
+        for x in range(5):
+            tenant = Tenant(name="Testing tenant {0}".format(x))
+            tenant.put()
