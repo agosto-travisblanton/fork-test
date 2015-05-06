@@ -20,6 +20,12 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider) ->
     controller: "DeviceEditorCtrl",
     controllerAs: 'deviceEdit'
   })
+  $stateProvider.state("apiTest", {
+    url: "/api_testing",
+    templateUrl: "app/api_test/api_test.html",
+    controller: "ApiTestCtrl",
+    controllerAs: 'apiTest'
+  })
   $urlRouterProvider.otherwise '/'
 
 

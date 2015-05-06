@@ -5,8 +5,7 @@ angular.module('skykitDisplayDeviceManagement').factory 'DevicesService', ($http
   class DevicesService
     @uriBase = 'v1/devices'
 
-    all: ->
-      devices = Restangular.all @uriBase
-      devices
+    getDeviceByMacAddress: (macAddress) ->
+      Restangular.oneUrl('api/v1/devices', "api/v1/devices?mac_address=#{macAddress}").get()
 
   new DevicesService()

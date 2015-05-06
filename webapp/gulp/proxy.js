@@ -18,22 +18,6 @@
 var httpProxy = require('http-proxy');
 var chalk = require('chalk');
 
-/*
- * Location of your backend server
- */
-var proxyTarget = 'http://server/context/';
-
-var proxy = httpProxy.createProxyServer({
-  target: proxyTarget
-});
-
-proxy.on('error', function (error, req, res) {
-  res.writeHead(500, {
-    'Content-Type': 'text/plain'
-  });
-
-  console.error(chalk.red('[Proxy]'), error);
-});
 
 /*
  * The proxy middleware is an Express middleware added to BrowserSync to
@@ -56,12 +40,18 @@ function proxyMiddleware(req, res, next) {
   }
 }
 
+/*
+ * Location of your backend server
+ */
+var proxyTarget = 'http://localhost:8080/';
+var proxy = httpProxy.createProxyServer({target: proxyTarget});
+proxy.on('error', function (error, req, res) {
+  res.writeHead(500, {'Content-Type': 'text/plain'});
+  console.error(chalk.red('[Proxy]'), error);
+});
+
 // Enables proxying middleware
-module.exports = function() {
-  return [proxyMiddleware];
-};
+module.exports = [proxyMiddleware];
 
 // Disables proxying middleware
-//module.exports = function() {
-//  return [];
-//};
+//module.exports = [];

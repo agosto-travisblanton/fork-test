@@ -18,8 +18,19 @@
       <div class="row">
         <div class="col-lg-12">
           <fieldset>
-            <legend>Device</legend>
+            <legend>Find device by MAC address</legend>
+            <form>
+              <div class="form-group">
+                <label for="macAddress">MAC address</label>
+                <input type="text" class="form-control" id="macAddress" placeholder="Enter MAC address"
+                  ng_model="apiTest.macAddress">
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-default"
+                      ng-click="apiTest.onClickFindByMacAddressButton()">Query</button>
+            </form>
           </fieldset>
+
         </div>
       </div>
     </div>
