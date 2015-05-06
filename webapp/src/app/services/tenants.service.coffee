@@ -8,4 +8,8 @@ angular.module('skykitDisplayDeviceManagement').factory 'TenantsService', ($log,
       promise = Restangular.service('tenants').post(tenant)
       promise
 
+    getAllTenants: () ->
+      promise = Restangular.service('tenants').get()
+      promise
+
   new TenantsService()
