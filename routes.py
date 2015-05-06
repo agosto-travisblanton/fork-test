@@ -52,13 +52,13 @@ application = WSGIApplication(
         ############################################################
         Route(
             r'/api/v1/tenants',
-            handler='handlers.tenant.TenantsHandler',
+            handler='handlers.tenants_handler.TenantsHandler',
             name='tenants',
             methods=['GET', 'POST']
         ),
         Route(
             r'/api/v1/tenants/<tenant_id>',
-            handler='handlers.tenant.TenantsHandler',
+            handler='handlers.tenants_handler.TenantsHandler',
             name='tenants-mutator',
             methods=['PUT', 'DELETE']
         ),

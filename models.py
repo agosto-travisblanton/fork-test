@@ -6,6 +6,20 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 
 @ae_ndb_serializer
+class Tenant(ndb.Model):
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    updated = ndb.DateTimeProperty(auto_now=True)
+    name = ndb.StringProperty(required=True, indexed=True)
+
+    @classmethod
+    def find_by_name(cls, name):
+        if name:
+            key = Tenant.query(Tenant.name == name).get(keys_only=True)
+            if None is not key:
+                return key.get()
+
+
+@ae_ndb_serializer
 class ChromeOsDevice(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)

@@ -20,6 +20,12 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider) ->
     controller: "DeviceEditorCtrl",
     controllerAs: 'deviceEdit'
   })
+  $stateProvider.state("tenants", {
+    url: "/tenants",
+    templateUrl: "app/tenant/tenants.html",
+    controller: "TenantsCtrl",
+    controllerAs: 'tenantsCtrl'
+  })
   $stateProvider.state("apiTest", {
     url: "/api_testing",
     templateUrl: "app/api_test/api_test.html",
@@ -30,7 +36,7 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider) ->
 
 
 skykitDisplayDeviceManagement.config (RestangularProvider) ->
-  RestangularProvider.setBaseUrl '/api'
+  RestangularProvider.setBaseUrl '/api/v1'
   RestangularProvider.setDefaultHeaders {
     'Content-Type': 'application/json'
     'Accept': 'application/json'
