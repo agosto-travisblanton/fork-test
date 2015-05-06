@@ -2,20 +2,16 @@
 
 skykitDisplayDeviceManagement = angular.module "skykitDisplayDeviceManagement"
 
-skykitDisplayDeviceManagement.controller "TenantsCtrl", ($scope, $log, sweet, TenantsService) ->
-#  TODO Wire up TenantsService to call backend for list of tenants ie., getAllTenants
-  @tenants = [
-  ]
+skykitDisplayDeviceManagement.controller "TenantsCtrl", ($scope, $log, $state, TenantsService) ->
+  @tenants = []
 
-  $scope.tenant_list = @tenants
+  @initialize = () ->
+    promise = TenantsService.fetchAllTenants()
+    promise.then (data) =>
+      @tenants = data
+#      $scope.$apply()
 
-#  $scope.editItem = (item) ->
-#    $rootScope.item = item
-#    return
-#
-#
-#  promise = TenantsService.getAllTenants()
-
-
+  @editItem = (item) ->
+    $state.go( 'editTenant', { tenantKey: item.key } )
 
   @

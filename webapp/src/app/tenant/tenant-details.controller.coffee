@@ -2,13 +2,12 @@
 
 skykitDisplayDeviceManagement = angular.module "skykitDisplayDeviceManagement"
 
-skykitDisplayDeviceManagement.controller "TenantDetailsCtrl", ($scope, $log, sweet, TenantsService) ->
+skykitDisplayDeviceManagement.controller "TenantDetailsCtrl", ($scope, $log, $state, TenantsService) ->
   @currentTenant = {tenant: {name: undefined}}
 
   @onClickSaveButton = () ->
     promise = TenantsService.createTenant @currentTenant
     promise.then (data) ->
-      sweet.show 'Sweet Jebus', 'You\'ve done it!', 'success'
-
+      $state.go 'tenants'
 
   @
