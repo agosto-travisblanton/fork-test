@@ -1,14 +1,19 @@
 import json
-from webapp2 import RequestHandler, uri_for
+
+from webapp2 import RequestHandler
+
 from models import Tenant
+from restler.serializers import json_response
 
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 
 class TenantsHandler(RequestHandler):
+
     def get(self):
-        pass
+        tenants = Tenant.query().fetch(50)
+        json_response(self.response, tenants)
 
     def post(self):
         if self.request.body is not None:
