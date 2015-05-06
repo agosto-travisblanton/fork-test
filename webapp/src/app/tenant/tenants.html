@@ -27,7 +27,8 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="item in list">
+            <tr ng-hide="tenant_list.length"><td>No tenants</td></tr>
+            <tr ng-repeat="item in tenant_list">
               <td>{{item.name}}</td>
             </tr>
             </tbody>
