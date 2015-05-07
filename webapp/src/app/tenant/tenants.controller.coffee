@@ -9,9 +9,8 @@ skykitDisplayDeviceManagement.controller "TenantsCtrl", ($scope, $log, $state, T
     promise = TenantsService.fetchAllTenants()
     promise.then (data) =>
       @tenants = data
-#      $scope.$apply()
 
   @editItem = (item) ->
-    $state.go( 'editTenant', { tenantKey: item.key } )
+    $state.go('editTenant', {tenantKey: item.key})
 
   @
