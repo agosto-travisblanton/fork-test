@@ -11,9 +11,6 @@ class TestTenantsHandler(BaseTest, WebTest):
     def setUp(self):
         super(TestTenantsHandler, self).setUp()
 
-    def tearDown(self):
-        pass
-
     def testGet_ReturnsOKStatus(self):
         self.loadTenants()
         request_parameters = {}
