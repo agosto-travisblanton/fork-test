@@ -4,6 +4,14 @@ from restler.decorators import ae_ndb_serializer
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
+class TenantEntityGroup(ndb.Model):
+    name = ndb.StringProperty(required=True)
+
+    @classmethod
+    def singleton(cls):
+        return TenantEntityGroup.get_or_insert('tenantEntityGroup',
+                                               name='tenantEntityGroup')
+
 
 @ae_ndb_serializer
 class Tenant(ndb.Model):

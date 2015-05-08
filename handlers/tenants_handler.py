@@ -2,7 +2,7 @@ import json
 
 from webapp2 import RequestHandler
 
-from models import Tenant
+from models import Tenant, TenantEntityGroup
 from restler.serializers import json_response
 
 
@@ -10,15 +10,16 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 
 class TenantsHandler(RequestHandler):
-
     def get(self):
-        tenants = Tenant.query().fetch(50)
+        tenants = Tenant.query(ancestor=TenantEntityGroup.singleton().key).fetch(50)
         json_response(self.response, tenants)
 
     def post(self):
         if self.request.body is not None:
             request_json = json.loads(self.request.body)
-            tenant = Tenant(name=request_json['tenant']['name'])
+            tenant_entity_group = TenantEntityGroup.singleton()
+            tenant = Tenant(parent=tenant_entity_group.key,
+                            name=request_json['tenant']['name'])
             tenant_key = tenant.put()
             tenant_uri = self.request.app.router.build(None,
                                                        'tenants-mutator',
