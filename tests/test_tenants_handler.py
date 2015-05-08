@@ -1,7 +1,7 @@
 import json
 from pprint import pprint
 from agar.test import BaseTest, WebTest
-from models import Tenant
+from models import Tenant, TenantEntityGroup
 from routes import application
 
 
@@ -63,5 +63,7 @@ class TestTenantsHandler(BaseTest, WebTest):
 
     def loadTenants(self):
         for x in range(5):
-            tenant = Tenant(name="Testing tenant {0}".format(x))
+            tenant_entity_group = TenantEntityGroup.singleton()
+            tenant = Tenant(parent=tenant_entity_group.key,
+                            name="Testing tenant {0}".format(x))
             tenant.put()
