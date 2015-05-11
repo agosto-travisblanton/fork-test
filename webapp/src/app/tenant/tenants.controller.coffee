@@ -11,6 +11,6 @@ skykitDisplayDeviceManagement.controller "TenantsCtrl", ($scope, $log, $state, T
       @tenants = data
 
   @editItem = (item) ->
-    $state.go('editTenant', {tenantKey: item.$$hashKey})
+    $state.go('editTenant', {tenantKey: item.key})
 
   @

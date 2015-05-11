@@ -10,7 +10,7 @@ skykitDisplayDeviceManagement = angular.module('skykitDisplayDeviceManagement', 
   'hSweetAlert'
 ])
 
-skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider) ->
+skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   $stateProvider.state("home", {url: "/", templateUrl: "app/main/main.html", controller: "MainCtrl"})
   $stateProvider.state("domain", {url: "/domain", templateUrl: "app/domain/domain.html", controller: "DomainCtrl"})
   $stateProvider.state("deviceEdit", {
@@ -44,11 +44,11 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider) ->
     controllerAs: 'apiTest'
   })
   $urlRouterProvider.otherwise '/'
-
-
-skykitDisplayDeviceManagement.config (RestangularProvider) ->
   RestangularProvider.setBaseUrl '/api/v1'
   RestangularProvider.setDefaultHeaders {
     'Content-Type': 'application/json'
     'Accept': 'application/json'
+  }
+  RestangularProvider.setRestangularFields {
+    id: 'key'
   }

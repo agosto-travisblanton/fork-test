@@ -25,21 +25,26 @@ class TenantsHandler(RequestHandler):
             request_json = json.loads(self.request.body)
             tenant_entity_group = TenantEntityGroup.singleton()
             tenant = Tenant(parent=tenant_entity_group.key,
-                            name=request_json['tenant']['name'])
+                            name=request_json['name'])
             tenant_key = tenant.put()
             tenant_uri = self.request.app.router.build(None,
-                                                       'tenant-mutator',
+                                                       'tenant-accessor',
                                                        None,
-                                                       {'tenant_id': tenant_key.urlsafe()})
+                                                       {'tenant_key': tenant_key.urlsafe()})
             self.response.headers['Location'] = tenant_uri
             self.response.headers.pop('Content-Type', None)
             self.response.set_status(201)
 
-    def put(self, tenant_id):
+    def put(self, tenant_key):
+        tenant_key = ndb.Key(urlsafe=tenant_key)
+        tenant = tenant_key.get()
+        request_json = json.loads(self.request.body)
+        tenant.name = request_json.get('name')
+        tenant.put()
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
 
-    def delete(self, tenant_id):
+    def delete(self, tenant_key):
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
 

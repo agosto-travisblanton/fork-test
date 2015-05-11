@@ -4,8 +4,11 @@ angular.module('skykitDisplayDeviceManagement').factory 'TenantsService', ($log,
 
   class TenantsService
 
-    createTenant: (tenant) ->
-      promise = Restangular.service('tenants').post(tenant)
+    save: (tenant) ->
+      if tenant.key != undefined
+        promise = tenant.put()
+      else
+        promise = Restangular.service('tenants').post(tenant)
       promise
 
     fetchAllTenants: () ->
@@ -13,6 +16,7 @@ angular.module('skykitDisplayDeviceManagement').factory 'TenantsService', ($log,
       promise
 
     getTenantByKey: (tenantKey) ->
-#      Restangular.oneUrl('api/v1/tenants', "api/v1/tenants?tenantKey=#{tenantKey}").get()
+      promise = Restangular.oneUrl('tenants', "api/v1/tenants/#{tenantKey}").get()
+      promise
 
   new TenantsService()

@@ -3,15 +3,17 @@
 skykitDisplayDeviceManagement = angular.module "skykitDisplayDeviceManagement"
 
 skykitDisplayDeviceManagement.controller "TenantDetailsCtrl", ($scope, $log, $state, $stateParams, TenantsService) ->
-  @currentTenant = {tenant: {name: undefined}}
+  @currentTenant = {key: undefined, name: undefined}
   @editMode = !!$stateParams.tenantKey
 
   if @editMode
-    @currentTenant = {tenant: {name: 'foo', key: '32343234'}} #TenantsService.getTenantByKey($stateParams.tenantKey)
+    promise = TenantsService.getTenantByKey($stateParams.tenantKey)
+    promise.then (data) =>
+      @currentTenant = data
 
   @onClickSaveButton = () ->
-    promise = TenantsService.createTenant @currentTenant
-    promise.then (data) ->
+    promise = TenantsService.save @currentTenant
+    promise.then (data) =>
       $state.go 'tenants'
 
   @
