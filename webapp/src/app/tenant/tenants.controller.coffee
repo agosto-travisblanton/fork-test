@@ -13,4 +13,9 @@ skykitDisplayDeviceManagement.controller "TenantsCtrl", ($scope, $log, $state, T
   @editItem = (item) ->
     $state.go('editTenant', {tenantKey: item.key})
 
+  @deleteItem = (item) ->
+    promise = TenantsService.delete item.key
+    promise.then () =>
+      $state.go 'tenants'
+
   @

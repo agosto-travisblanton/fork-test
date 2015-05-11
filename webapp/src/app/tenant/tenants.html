@@ -30,7 +30,9 @@
             <tbody>
             <tr ng-hide="tenantsCtrl.tenants.length"><td>No tenants</td></tr>
             <tr ng-repeat="item in tenantsCtrl.tenants">
-              <td style="width:20%">{{item.name}}</td><td><a class="btn" ng-click="tenantsCtrl.editItem(item)"><i class="glyphicon glyphicon-edit"></i></a></td>
+              <td style="width:20%">{{item.name}}</td>
+              <td><a class="btn" ng-click="tenantsCtrl.editItem(item)"><i class="glyphicon glyphicon-edit"></i></a>
+              <a class="btn" ng-click="tenantsCtrl.deleteItem(item)"><i class="glyphicon glyphicon-trash"></i></a></td>
             </tr>
             </tbody>
           </table>

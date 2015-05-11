@@ -83,6 +83,24 @@ class TestTenantsHandler(BaseTest, WebTest):
         response = self.app.delete(uri)
         self.assertEqual(204, response.status_code)
 
+    def testDelete_DeletesTenant(self):
+        tenant_keys = self.loadTenants()
+        url_safe_tenant_key = tenant_keys[0].urlsafe()
+        request_parameters = {}
+
+        uri = application.router.build(None, 'tenant-accessor', None, {'tenant_key': url_safe_tenant_key})
+        response = self.app.get(uri, params=request_parameters)
+        response_json = json.loads(response.body)
+        self.assertIsNotNone(response_json)
+
+        uri = application.router.build(None, 'tenant-mutator', None, {'tenant_key': url_safe_tenant_key})
+        self.app.delete(uri)
+
+        uri = application.router.build(None, 'tenant-accessor', None, {'tenant_key': url_safe_tenant_key})
+        response = self.app.get(uri, params=request_parameters)
+        response_json = json.loads(response.body)
+        self.assertIsNone(response_json)
+
     def loadTenants(self):
         tenant_keys = []
         for x in range(5):

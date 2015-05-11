@@ -45,6 +45,8 @@ class TenantsHandler(RequestHandler):
         self.response.set_status(204)
 
     def delete(self, tenant_key):
+        tenant_key = ndb.Key(urlsafe=tenant_key)
+        tenant = tenant_key.get()
+        tenant.key.delete()
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
-
