@@ -14,9 +14,6 @@ class TenantsHandler(RequestHandler):
         tenants = Tenant.query(ancestor=TenantEntityGroup.singleton().key).fetch(50)
         json_response(self.response, tenants)
 
-    def get(self, tenant_id):
-        pass
-
     def post(self):
         if self.request.body is not None:
             request_json = json.loads(self.request.body)
@@ -25,7 +22,7 @@ class TenantsHandler(RequestHandler):
                             name=request_json['tenant']['name'])
             tenant_key = tenant.put()
             tenant_uri = self.request.app.router.build(None,
-                                                       'tenants-mutator',
+                                                       'tenant-mutator',
                                                        None,
                                                        {'tenant_id': tenant_key.urlsafe()})
             self.response.headers['Location'] = tenant_uri

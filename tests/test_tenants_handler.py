@@ -14,7 +14,7 @@ class TestTenantsHandler(BaseTest, WebTest):
     def testGetById_ReturnsTenant(self):
         self.loadTenants()
         request_parameters = {}
-        uri = application.router.build(None, 'tenant', None, {})
+        uri = application.router.build(None, 'tenants', None, {})
         response = self.app.get(uri, params=request_parameters)
 
     def testGet_ReturnsOKStatus(self):
@@ -52,18 +52,18 @@ class TestTenantsHandler(BaseTest, WebTest):
         response = self.app.post_json(uri, params=request_parameters)
         actual = Tenant.find_by_name(request_parameters['tenant']['name'])
         tenant_uri = application.router.build(None,
-                                              'tenants-mutator',
+                                              'tenant-mutator',
                                               None,
                                               {'tenant_id': actual.key.urlsafe()})
         self.assertTrue(tenant_uri in response.headers.get('Location'))
 
     def testPut_ReturnsNoContentStatus(self):
-        uri = application.router.build(None, 'tenants-mutator', None, {'tenant_id': 'd836248623876'})
+        uri = application.router.build(None, 'tenant-mutator', None, {'tenant_id': 'd836248623876'})
         response = self.app.put_json(uri)
         self.assertEqual(204, response.status_code)
 
     def testDelete_ReturnsNoContentStatus(self):
-        uri = application.router.build(None, 'tenants-mutator', None, {'tenant_id': 'd836248623876'})
+        uri = application.router.build(None, 'tenant-mutator', None, {'tenant_id': 'd836248623876'})
         response = self.app.delete(uri)
         self.assertEqual(204, response.status_code)
 
