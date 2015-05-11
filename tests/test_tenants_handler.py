@@ -11,6 +11,12 @@ class TestTenantsHandler(BaseTest, WebTest):
     def setUp(self):
         super(TestTenantsHandler, self).setUp()
 
+    def testGetById_ReturnsTenant(self):
+        self.loadTenants()
+        request_parameters = {}
+        uri = application.router.build(None, 'tenant', None, {})
+        response = self.app.get(uri, params=request_parameters)
+
     def testGet_ReturnsOKStatus(self):
         self.loadTenants()
         request_parameters = {}

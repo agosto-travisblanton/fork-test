@@ -9,7 +9,12 @@
       <div class="row">
         <div class="col-lg-12">
           <h1 class="page-header">
-            Tenant Detail
+            <div ng-hide="tenantDetailsCtrl.editMode">
+              Add
+            </div>
+            <div ng-show="tenantDetailsCtrl.editMode">
+              Edit
+            </div>
           </h1>
         </div>
       </div>
@@ -17,18 +22,30 @@
 
       <div class="row">
         <div class="col-lg-12">
-          <fieldset>
-            <legend>Tenant</legend>
-            <form>
-              <div class="form-group">
-                <label for="tenantName">Name</label>
-                <input type="text" class="form-control" id="tenantName" placeholder="Enter tenant name"
-                       ng-model="tenantDetailsCtrl.currentTenant.tenant.name">
+
+            <fieldset>
+
+              <div ng-hide="tenantDetailsCtrl.editMode">
+                <legend>New Tenant</legend>
               </div>
-              <button type="submit" class="btn btn-primary btn-default"
-                      ng-click="tenantDetailsCtrl.onClickSaveButton()">Save</button>
-            </form>
-          </fieldset>
+
+              <div ng-show="tenantDetailsCtrl.editMode">
+                <legend>Existing Tenant</legend>
+              </div>
+
+
+              <form>
+                <div class="form-group">
+                  <label for="tenantName">Name</label>
+                  <input type="text" class="form-control" id="tenantName" placeholder="Enter tenant name"
+                         ng-model="tenantDetailsCtrl.currentTenant.tenant.name">
+                </div>
+                <button type="submit" class="btn btn-primary btn-default"
+                        ng-click="tenantDetailsCtrl.onClickSaveButton()">Save</button>
+              </form>
+            </fieldset>
+
+
         </div>
       </div>
     </div>
