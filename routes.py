@@ -59,8 +59,8 @@ application = WSGIApplication(
         Route(
             r'/api/v1/tenants/<tenant_id>',
             handler='handlers.tenants_handler.TenantsHandler',
-            name='tenants-mutator',
-            methods=['PUT', 'DELETE']
+            name='tenant-mutator',
+            methods=['PUT', 'DELETE', 'GET']
         ),
     ]
 )

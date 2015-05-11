@@ -14,6 +14,9 @@ class TenantsHandler(RequestHandler):
         tenants = Tenant.query(ancestor=TenantEntityGroup.singleton().key).fetch(50)
         json_response(self.response, tenants)
 
+    def get(self, tenant_id):
+        pass
+
     def post(self):
         if self.request.body is not None:
             request_json = json.loads(self.request.body)
