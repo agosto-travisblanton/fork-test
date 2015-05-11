@@ -48,36 +48,38 @@ class TestTenantsHandler(BaseTest, WebTest):
         self.assertEqual(len(response_json), 5)
 
     def testPost_ReturnsCreatedStatus(self):
-        request_parameters = {'tenant': {'name': 'ABC Flooring, Inc.'}}
+        request_parameters = {'name': 'ABC Flooring, Inc.'}
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.post_json(uri, params=request_parameters)
         self.assertEqual(201, response.status_code)
 
     def testPost_CreateNewTenant(self):
-        request_parameters = {'tenant': {'name': 'ABC Flooring, Inc.'}}
+        request_parameters = {'name': 'ABC Flooring, Inc.'}
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.post_json(uri, params=request_parameters)
-        actual = Tenant.find_by_name(request_parameters['tenant']['name'])
+        actual = Tenant.find_by_name(request_parameters['name'])
         self.assertIsNotNone(actual)
 
     def testPost_CreateNewTenant_SetsLocationHeader(self):
-        request_parameters = {'tenant': {'name': 'ABC Flooring, Inc.'}}
+        request_parameters = {'name': 'ABC Flooring, Inc.'}
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.post_json(uri, params=request_parameters)
-        actual = Tenant.find_by_name(request_parameters['tenant']['name'])
+        actual = Tenant.find_by_name(request_parameters['name'])
         tenant_uri = application.router.build(None,
                                               'tenant-mutator',
                                               None,
-                                              {'tenant_id': actual.key.urlsafe()})
+                                              {'tenant_key': actual.key.urlsafe()})
         self.assertTrue(tenant_uri in response.headers.get('Location'))
 
     def testPut_ReturnsNoContentStatus(self):
-        uri = application.router.build(None, 'tenant-mutator', None, {'tenant_id': 'd836248623876'})
-        response = self.app.put_json(uri)
+        tenant_keys = self.loadTenants()
+        uri = application.router.build(None, 'tenant-mutator', None, {'tenant_key': tenant_keys[0].urlsafe()})
+        response = self.app.put_json(uri, {'name' : 'foobar'})
         self.assertEqual(204, response.status_code)
 
     def testDelete_ReturnsNoContentStatus(self):
-        uri = application.router.build(None, 'tenant-mutator', None, {'tenant_id': 'd836248623876'})
+        tenant_keys = self.loadTenants()
+        uri = application.router.build(None, 'tenant-mutator', None, {'tenant_key': tenant_keys[0].urlsafe()})
         response = self.app.delete(uri)
         self.assertEqual(204, response.status_code)
 
