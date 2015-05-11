@@ -1,18 +1,24 @@
 import json
+from google.appengine.ext import ndb
 
 from webapp2 import RequestHandler
 
 from models import Tenant, TenantEntityGroup
 from restler.serializers import json_response
+from strategy import TENANT_STRATEGY
 
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 
 class TenantsHandler(RequestHandler):
-    def get(self):
-        tenants = Tenant.query(ancestor=TenantEntityGroup.singleton().key).fetch(50)
-        json_response(self.response, tenants)
+    def get(self, tenant_key=None):
+        if tenant_key == None:
+            result = Tenant.query(ancestor=TenantEntityGroup.singleton().key).fetch(50)
+        else:
+            tenant_key = ndb.Key(urlsafe=tenant_key)
+            result = tenant_key.get()
+        json_response(self.response, result, strategy=TENANT_STRATEGY)
 
     def post(self):
         if self.request.body is not None:
