@@ -28,7 +28,7 @@ class TenantsHandler(RequestHandler):
                             name=request_json['name'])
             tenant_key = tenant.put()
             tenant_uri = self.request.app.router.build(None,
-                                                       'tenant-accessor',
+                                                       'manage-tenant',
                                                        None,
                                                        {'tenant_key': tenant_key.urlsafe()})
             self.response.headers['Location'] = tenant_uri
