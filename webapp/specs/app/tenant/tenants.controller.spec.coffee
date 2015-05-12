@@ -51,3 +51,25 @@ describe 'TenantsCtrl', ->
       controller.editItem(tenant)
       expect($state.go).toHaveBeenCalledWith 'editTenant', {tenantKey: tenant.key}
 
+  describe '.deleteItem', ->
+    tenant = {
+      key: 'dhjad897d987fadafg708fg7d'
+      name: 'Foobar3'
+      created: '2015-05-10 22:15:10'
+      updated: '2015-05-10 22:15:10'
+    }
+
+    beforeEach ->
+      promise = new skykitDisplayDeviceManagement.q.Mock
+      spyOn(TenantsService, 'delete').and.returnValue promise
+      spyOn $state, 'go'
+
+    it 'call TenantsService.delete to retrieve all tenants', ->
+      controller.deleteItem tenant
+      promise.resolve()
+      expect(TenantsService.delete).toHaveBeenCalledWith tenant.key
+
+    it "the 'then' handler caches the retrieved tenants in the controller", ->
+      controller.deleteItem tenant
+      promise.resolve()
+      expect($state.go).toHaveBeenCalledWith 'tenants'
