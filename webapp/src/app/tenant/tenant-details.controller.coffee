@@ -1,8 +1,8 @@
 'use strict'
 
-skykitDisplayDeviceManagement = angular.module "skykitDisplayDeviceManagement"
+appModule = angular.module('skykitDisplayDeviceManagement')
 
-skykitDisplayDeviceManagement.controller "TenantDetailsCtrl", ($scope, $log, $state, $stateParams, TenantsService) ->
+appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, $state) ->
   @currentTenant = {key: undefined, name: undefined}
   @editMode = !!$stateParams.tenantKey
 
