@@ -64,7 +64,7 @@ describe 'TenantsCtrl', ->
       spyOn(TenantsService, 'delete').and.returnValue promise
       spyOn $state, 'go'
 
-    it 'call TenantsService.delete to retrieve all tenants', ->
+    it 'call TenantsService.delete tenant', ->
       controller.deleteItem tenant
       promise.resolve()
       expect(TenantsService.delete).toHaveBeenCalledWith tenant
