@@ -19,8 +19,8 @@ angular.module('skykitDisplayDeviceManagement').factory 'TenantsService', ($log,
       promise = Restangular.oneUrl('tenants', "api/v1/tenants/#{tenantKey}").get()
       promise
 
-    delete: (tenantKey) ->
-      promise = Restangular.oneUrl('tenants', "api/v1/tenants/#{tenantKey}").remove()
+    delete: (tenant) ->
+      promise = Restangular.oneUrl('tenants', "api/v1/tenants/#{tenant.key}").remove()
       promise
 
   new TenantsService()
