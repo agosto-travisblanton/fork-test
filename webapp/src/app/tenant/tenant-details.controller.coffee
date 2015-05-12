@@ -13,7 +13,7 @@ appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, $state)
 
   @onClickSaveButton = () ->
     promise = TenantsService.save @currentTenant
-    promise.then (data) =>
+    promise.then (data) ->
       $state.go 'tenants'
 
   @

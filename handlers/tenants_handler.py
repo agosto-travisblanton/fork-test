@@ -36,8 +36,8 @@ class TenantsHandler(RequestHandler):
             self.response.set_status(201)
 
     def put(self, tenant_key):
-        tenant_key = ndb.Key(urlsafe=tenant_key)
-        tenant = tenant_key.get()
+        key = ndb.Key(urlsafe=tenant_key)
+        tenant = key.get()
         request_json = json.loads(self.request.body)
         tenant.name = request_json.get('name')
         tenant.put()
@@ -45,8 +45,9 @@ class TenantsHandler(RequestHandler):
         self.response.set_status(204)
 
     def delete(self, tenant_key):
-        tenant_key = ndb.Key(urlsafe=tenant_key)
-        tenant = tenant_key.get()
-        tenant.key.delete()
+        key = ndb.Key(urlsafe=tenant_key)
+        tenant = key.get()
+        if tenant:
+            tenant.key.delete()
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)

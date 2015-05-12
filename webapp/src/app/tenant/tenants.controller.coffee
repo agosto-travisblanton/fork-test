@@ -15,7 +15,7 @@ appModule.controller "TenantsCtrl", ($state, TenantsService) ->
 
   @deleteItem = (item) ->
     promise = TenantsService.delete item
-    promise.then () =>
+    promise.then () ->
       $state.go 'tenants'
 
   @

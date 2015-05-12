@@ -22,7 +22,8 @@ appModule.factory 'TenantsService', (Restangular) ->
       promise
 
     delete: (tenant) ->
-      promise = Restangular.oneUrl('tenants', "api/v1/tenants/#{tenant.key}").remove()
-      promise
+      if tenant.key != undefined
+        promise = tenant.remove()
+        promise
 
   new TenantsService()
