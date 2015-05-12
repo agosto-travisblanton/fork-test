@@ -1,74 +1,66 @@
 'use strict'
 
 describe 'TenantsService', ->
-  $controller = undefined
-  controller = undefined
-  $state = undefined
   TenantsService = undefined
+  Restangular = undefined
   promise = undefined
-
 
   beforeEach module('skykitDisplayDeviceManagement')
 
-  beforeEach inject (_TenantsService_, _$state_) ->
-    $controller = _$controller_
-    $state = _$state_
+  beforeEach inject (_TenantsService_, _Restangular_) ->
     TenantsService = _TenantsService_
+    Restangular = _Restangular_
+    promise = new skykitDisplayDeviceManagement.q.Mock
 
-#  describe 'initialization', ->
-#    it 'tenants should be an empty array', ->
-#      expect(angular.isArray(controller.tenants)).toBeTruthy()
-#
-#  describe '.initialize', ->
-#    tenants = [
-#      {key: 'dhjad897d987fadafg708fg7d', name: 'Foobar1', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
-#      {key: 'dhjad897d987fadafg708y67d', name: 'Foobar2', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
-#      {key: 'dhjad897d987fadafg708hb55', name: 'Foobar3', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
-#    ]
-#
-#    beforeEach ->
-#      promise = new skykitDisplayDeviceManagement.q.Mock
-#      spyOn(TenantsService, 'fetchAllTenants').and.returnValue promise
-#
-#    it 'call TenantsService.fetchAllTenants to retrieve all tenants', ->
-#      controller.initialize()
-#      promise.resolve tenants
-#      expect(TenantsService.fetchAllTenants).toHaveBeenCalled()
-#
-#    it "the 'then' handler caches the retrieved tenants in the controller", ->
-#      controller.initialize()
-#      promise.resolve tenants
-#      expect(controller.tenants).toBe tenants
-#
-#  describe '.editItem', ->
-#    tenant = {key: 'dhjad897d987fadafg708hb55'}
-#
-#    beforeEach ->
-#      spyOn $state, 'go'
-#
-#    it "route to the 'editTenant' named route, passing the supplied tenant key", ->
-#      controller.editItem(tenant)
-#      expect($state.go).toHaveBeenCalledWith 'editTenant', {tenantKey: tenant.key}
-#
-#  describe '.deleteItem', ->
-#    tenant = {
-#      key: 'dhjad897d987fadafg708fg7d'
-#      name: 'Foobar3'
-#      created: '2015-05-10 22:15:10'
-#      updated: '2015-05-10 22:15:10'
-#    }
-#
-#    beforeEach ->
-#      promise = new skykitDisplayDeviceManagement.q.Mock
-#      spyOn(TenantsService, 'delete').and.returnValue promise
-#      spyOn $state, 'go'
-#
-#    it 'call TenantsService.delete to retrieve all tenants', ->
-#      controller.deleteItem tenant
-#      promise.resolve()
-#      expect(TenantsService.delete).toHaveBeenCalledWith tenant.key
-#
-#    it "the 'then' handler caches the retrieved tenants in the controller", ->
-#      controller.deleteItem tenant
-#      promise.resolve()
-#      expect($state.go).toHaveBeenCalledWith 'tenants'
+  describe '.save', ->
+    it 'update an existing tenant, returning a promise', ->
+      tenant = {
+        key: 'kdfalkdsjfakjdf98ad87fa87df0'
+        put: ->
+      }
+      spyOn(tenant, 'put').and.returnValue promise
+      actual = TenantsService.save tenant
+      expect(tenant.put).toHaveBeenCalled()
+      expect(actual).toBe promise
+
+    it 'insert a new tenant, returning a promise', ->
+      tenant = {name: 'Foobar'}
+      tenantRestangularService = { post: (tenant) -> }
+      spyOn(Restangular, 'service').and.returnValue tenantRestangularService
+      spyOn(tenantRestangularService, 'post').and.returnValue promise
+      actual = TenantsService.save tenant
+      expect(Restangular.service).toHaveBeenCalledWith 'tenants'
+      expect(tenantRestangularService.post).toHaveBeenCalledWith tenant
+      expect(actual).toBe promise
+
+  describe '.fetchAllTenants', ->
+    it 'retrieve all tenants, returning a promise', ->
+      tenantRestangularService = { getList: -> }
+      spyOn(Restangular, 'all').and.returnValue tenantRestangularService
+      spyOn(tenantRestangularService, 'getList').and.returnValue promise
+      actual = TenantsService.fetchAllTenants()
+      expect(Restangular.all).toHaveBeenCalledWith 'tenants'
+      expect(tenantRestangularService.getList).toHaveBeenCalled()
+      expect(actual).toBe promise
+
+  describe '.getTenantByKey', ->
+    it 'retrieve tenant by key, returning a promise', ->
+      tenantKey = 'dhYUYdfhdjfhlasddf7898a7sdfdas78d67'
+      tenantRestangularService = { get: -> }
+      spyOn(Restangular, 'oneUrl').and.returnValue tenantRestangularService
+      spyOn(tenantRestangularService, 'get').and.returnValue promise
+      actual = TenantsService.getTenantByKey tenantKey
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'tenants', "api/v1/tenants/#{tenantKey}"
+      expect(tenantRestangularService.get).toHaveBeenCalled()
+      expect(actual).toBe promise
+
+  describe '.delete', ->
+    it 'delete tenant, returning a promise', ->
+      tenant = {key: 'dhYUYdfhdjfhlasddf7898a7sdfdas78d67', name: 'Foobar'}
+      tenantRestangularService = { remove: -> }
+      spyOn(Restangular, 'oneUrl').and.returnValue tenantRestangularService
+      spyOn(tenantRestangularService, 'remove').and.returnValue promise
+      actual = TenantsService.delete tenant
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'tenants', "api/v1/tenants/#{tenant.key}"
+      expect(tenantRestangularService.remove).toHaveBeenCalled()
+      expect(actual).toBe promise

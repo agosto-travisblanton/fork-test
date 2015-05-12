@@ -67,7 +67,7 @@ describe 'TenantsCtrl', ->
     it 'call TenantsService.delete to retrieve all tenants', ->
       controller.deleteItem tenant
       promise.resolve()
-      expect(TenantsService.delete).toHaveBeenCalledWith tenant.key
+      expect(TenantsService.delete).toHaveBeenCalledWith tenant
 
     it "the 'then' handler caches the retrieved tenants in the controller", ->
       controller.deleteItem tenant
