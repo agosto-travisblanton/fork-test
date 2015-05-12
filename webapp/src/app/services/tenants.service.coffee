@@ -1,6 +1,8 @@
 'use strict'
 
-angular.module('skykitDisplayDeviceManagement').factory 'TenantsService', ($log, Restangular) ->
+appModule = angular.module('skykitDisplayDeviceManagement')
+
+appModule.factory 'TenantsService', (Restangular) ->
 
   class TenantsService
 
