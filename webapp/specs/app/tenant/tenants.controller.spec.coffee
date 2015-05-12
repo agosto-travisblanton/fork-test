@@ -62,14 +62,15 @@ describe 'TenantsCtrl', ->
     beforeEach ->
       promise = new skykitDisplayDeviceManagement.q.Mock
       spyOn(TenantsService, 'delete').and.returnValue promise
-      spyOn $state, 'go'
+      spyOn controller, 'initialize'
 
     it 'call TenantsService.delete tenant', ->
       controller.deleteItem tenant
       promise.resolve()
       expect(TenantsService.delete).toHaveBeenCalledWith tenant
 
-    it "the 'then' handler caches the retrieved tenants in the controller", ->
+    it "the 'then' handler calls initialize to re-fetch all tenants", ->
       controller.deleteItem tenant
       promise.resolve()
-      expect($state.go).toHaveBeenCalledWith 'tenants'
+      expect(controller.initialize).toHaveBeenCalled
+

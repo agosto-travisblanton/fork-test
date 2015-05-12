@@ -1,5 +1,5 @@
 import json
-from pprint import pprint
+
 from agar.test import BaseTest, WebTest
 from models import Tenant, TenantEntityGroup
 from routes import application

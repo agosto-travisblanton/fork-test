@@ -49,6 +49,10 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     'Content-Type': 'application/json'
     'Accept': 'application/json'
   }
+  RestangularProvider.setRequestInterceptor (elem, operation) ->
+    if operation == 'remove'
+      return undefined
+    elem
   RestangularProvider.setRestangularFields {
     id: 'key'
   }

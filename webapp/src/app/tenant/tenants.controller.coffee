@@ -13,9 +13,9 @@ appModule.controller "TenantsCtrl", ($state, TenantsService) ->
   @editItem = (item) ->
     $state.go 'editTenant', {tenantKey: item.key}
 
-  @deleteItem = (item) ->
+  @deleteItem = (item) =>
     promise = TenantsService.delete item
-    promise.then () ->
-      $state.go 'tenants'
+    promise.then () =>
+      @initialize()
 
   @

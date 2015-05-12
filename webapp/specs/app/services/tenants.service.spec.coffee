@@ -58,9 +58,9 @@ describe 'TenantsService', ->
     it 'delete tenant, returning a promise', ->
       tenant = {key: 'dhYUYdfhdjfhlasddf7898a7sdfdas78d67', name: 'Foobar'}
       tenantRestangularService = { remove: -> }
-      spyOn(Restangular, 'oneUrl').and.returnValue tenantRestangularService
+      spyOn(Restangular, 'one').and.returnValue tenantRestangularService
       spyOn(tenantRestangularService, 'remove').and.returnValue promise
       actual = TenantsService.delete tenant
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'tenants', "api/v1/tenants/#{tenant.key}"
+      expect(Restangular.one).toHaveBeenCalledWith 'tenants', tenant.key
       expect(tenantRestangularService.remove).toHaveBeenCalled()
       expect(actual).toBe promise
