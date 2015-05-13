@@ -7,6 +7,7 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 
 class TestGoogleCloudMessaging(BaseTest):
+
     def setUp(self):
         super(TestGoogleCloudMessaging, self).setUp()
         self.google_cloud_messaging = GoogleCloudMessaging()

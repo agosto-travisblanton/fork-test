@@ -46,6 +46,22 @@ application = WSGIApplication(
             handler='handlers.device_control.DeviceCommandsHandler',
             name='device-commands',
         ),
+
+        ############################################################
+        # Tenants
+        ############################################################
+        Route(
+            r'/api/v1/tenants',
+            handler='handlers.tenants_handler.TenantsHandler',
+            name='tenants',
+            methods=['GET', 'POST']
+        ),
+        Route(
+            r'/api/v1/tenants/<tenant_key>',
+            handler='handlers.tenants_handler.TenantsHandler',
+            name='manage-tenant',
+            methods=['GET', 'PUT', 'DELETE']
+        )
     ]
 )
 

@@ -36,19 +36,18 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
     #     response = self.app.post_json(uri, params=request_parameters)
     #     self.assertOK(response)
 
-    def testPost_CommandProcessorException_ReturnsUnprocessibleEntityStatus(self):
-        patched_device_commands_processor = patch('device_commands_processor.DeviceCommandsProcessor')
+    # def testPost_CommandProcessorException_ReturnsUnprocessibleEntityStatus(self):
+    #     patched_device_commands_processor = patch('device_commands_processor.DeviceCommandsProcessor')
         # self.addCleanup(patched_device_commands_processor.stop)
         # device_commands_processor_mock = patched_device_commands_processor.start()
         # device_commands_processor_mock_instance = device_commands_processor_mock.return_value
         # device_commands_processor_mock_instance.execute.side_effect = Exception('KABOOOOOOMMM!')
-        request_parameters = {'command': 'reset', 'payload': {}}
-        uri = application.router.build(None, 'device-commands', None, {'device_id': self.device_id})
-        with patch.object('device_commands_processor.DeviceCommandsProcessor',
-                   'execute',
-                   side_effect=Exception('KABOOOOOOMMM!')):
-            resp = self.app.post_json(uri, params=request_parameters)
-
+        # request_parameters = {'command': 'reset', 'payload': {}}
+        # uri = application.router.build(None, 'device-commands', None, {'device_id': self.device_id})
+        # with patch.object('device_commands_processor.DeviceCommandsProcessor',
+        #            'execute',
+        #            side_effect=Exception('KABOOOOOOMMM!')):
+        #     resp = self.app.post_json(uri, params=request_parameters)
 
     # def testPut_ReturnsOKStatus(self):
     #     patched_device_commands_processor = patch('device_commands_processor.DeviceCommandsProcessor')
