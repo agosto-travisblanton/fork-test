@@ -18,6 +18,14 @@ class Tenant(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     name = ndb.StringProperty(required=True, indexed=True)
+    admin_email = ndb.StringProperty(required=True)
+    content_server_url = ndb.StringProperty(required=True)
+    content_server_api_key = ndb.StringProperty(required=True)
+    chrome_device_domain = ndb.StringProperty()
+    # make a random UUID for the content_server_api_key to send back to player
+    # import uuid
+    # uuid.uuid4()
+    # UUID('16fd2706-8baf-433b-82eb-8c7fada847da')
 
     @classmethod
     def find_by_name(cls, name):

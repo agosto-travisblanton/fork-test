@@ -7,6 +7,10 @@ from routes import application
 
 class TestTenantsHandler(BaseTest, WebTest):
     APPLICATION = application
+    ADMIN_EMAIL = "foo{0}@bar.com"
+    API_KEY = "SOME_KEY_{0}"
+    CONTENT_SERVER_URL = 'https://www.content.com'
+
 
     def setUp(self):
         super(TestTenantsHandler, self).setUp()
@@ -61,7 +65,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         self.assertIsNotNone(actual)
 
     def testPost_CreateNewTenant_SetsLocationHeader(self):
-        request_parameters = {'name': 'ABC Flooring, Inc.'}
+        request_parameters = {'name': 'ABC Flooring, Inc.', 'admin_email': 'foo@boo.com'}
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.post_json(uri, params=request_parameters)
         actual = Tenant.find_by_name(request_parameters['name'])
@@ -74,7 +78,7 @@ class TestTenantsHandler(BaseTest, WebTest):
     def testPut_ReturnsNoContentStatus(self):
         tenant_keys = self.loadTenants()
         uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': tenant_keys[0].urlsafe()})
-        response = self.app.put_json(uri, {'name' : 'foobar'})
+        response = self.app.put_json(uri, {'name': 'foobar'})
         self.assertEqual(204, response.status_code)
 
     def testDelete_ReturnsNoContentStatus(self):
@@ -106,7 +110,10 @@ class TestTenantsHandler(BaseTest, WebTest):
         for x in range(5):
             tenant_entity_group = TenantEntityGroup.singleton()
             tenant = Tenant(parent=tenant_entity_group.key,
-                            name="Testing tenant {0}".format(x))
+                            name="Testing tenant {0}".format(x),
+                            admin_email=self.ADMIN_EMAIL.format(x),
+                            content_server_api_key=self.API_KEY.format(x),
+                            content_server_url=self.CONTENT_SERVER_URL)
             tenant_key = tenant.put()
             tenant_keys.append(tenant_key)
         return tenant_keys
