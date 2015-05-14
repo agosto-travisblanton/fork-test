@@ -23,9 +23,13 @@ class TenantsHandler(RequestHandler):
     def post(self):
         if self.request.body is not None:
             request_json = json.loads(self.request.body)
-            tenant_entity_group = TenantEntityGroup.singleton()
-            tenant = Tenant(parent=tenant_entity_group.key,
-                            name=request_json['name'])
+            name = request_json['name']
+            admin_email = request_json['admin_email']
+            content_server_url = request_json['content_server_url']
+            chrome_device_domain = request_json['chrome_device_domain']
+            if chrome_device_domain is not None:
+                chrome_device_domain = request_json['chrome_device_domain']
+            tenant = Tenant.create(name, admin_email, content_server_url, chrome_device_domain)
             tenant_key = tenant.put()
             tenant_uri = self.request.app.router.build(None,
                                                        'manage-tenant',

@@ -5,6 +5,7 @@ from restler.decorators import ae_ndb_serializer
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
+
 class TenantEntityGroup(ndb.Model):
     name = ndb.StringProperty(required=True)
 
@@ -23,10 +24,6 @@ class Tenant(ndb.Model):
     content_server_url = ndb.StringProperty(required=True)
     content_server_api_key = ndb.StringProperty(required=True)
     chrome_device_domain = ndb.StringProperty()
-    # make a random UUID for the content_server_api_key to send back to player
-    # import uuid
-    # uuid.uuid4()
-    # UUID('16fd2706-8baf-433b-82eb-8c7fada847da')
 
     @classmethod
     def find_by_name(cls, name):
@@ -37,11 +34,14 @@ class Tenant(ndb.Model):
 
     @classmethod
     def create(cls, name, admin_email, content_server_url, chrome_device_domain):
-        return cls(name=name,
+        tenant_entity_group = TenantEntityGroup.singleton()
+        return cls(parent=tenant_entity_group.key,
+                   name=name,
                    admin_email=admin_email,
                    content_server_url=content_server_url,
-                   content_server_api_key=uuid.uuid4(),
+                   content_server_api_key=str(uuid.uuid4()),
                    chrome_device_domain=chrome_device_domain)
+
 
 @ae_ndb_serializer
 class ChromeOsDevice(ndb.Model):
@@ -56,5 +56,3 @@ class ChromeOsDevice(ndb.Model):
             chrome_os_device_key = ChromeOsDevice.query(ChromeOsDevice.device_id == device_id).get(keys_only=True)
             if None is not chrome_os_device_key:
                 return chrome_os_device_key.get()
-
-

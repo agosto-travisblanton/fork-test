@@ -11,7 +11,6 @@ class TestTenantsHandler(BaseTest, WebTest):
     API_KEY = "SOME_KEY_{0}"
     CONTENT_SERVER_URL = 'https://www.content.com'
 
-
     def setUp(self):
         super(TestTenantsHandler, self).setUp()
 
@@ -52,20 +51,29 @@ class TestTenantsHandler(BaseTest, WebTest):
         self.assertEqual(len(response_json), 5)
 
     def testPost_ReturnsCreatedStatus(self):
-        request_parameters = {'name': 'ABC Flooring, Inc.'}
+        request_parameters = {'name': 'ABC Flooring, Inc.',
+                              'admin_email': 'foo@bar.com',
+                              'content_server_url': 'https://www.foo.com',
+                              'chrome_device_domain': ''}
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.post_json(uri, params=request_parameters)
         self.assertEqual(201, response.status_code)
 
     def testPost_CreateNewTenant(self):
-        request_parameters = {'name': 'ABC Flooring, Inc.'}
+        request_parameters = {'name': 'ABC Flooring, Inc.',
+                              'admin_email': 'foo@bar.com',
+                              'content_server_url': 'https://www.foo.com',
+                              'chrome_device_domain': ''}
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.post_json(uri, params=request_parameters)
         actual = Tenant.find_by_name(request_parameters['name'])
         self.assertIsNotNone(actual)
 
     def testPost_CreateNewTenant_SetsLocationHeader(self):
-        request_parameters = {'name': 'ABC Flooring, Inc.', 'admin_email': 'foo@boo.com'}
+        request_parameters = {'name': 'ABC Flooring, Inc.',
+                              'admin_email': 'foo@bar.com',
+                              'content_server_url': 'https://www.foo.com',
+                              'chrome_device_domain': ''}
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.post_json(uri, params=request_parameters)
         actual = Tenant.find_by_name(request_parameters['name'])
