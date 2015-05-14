@@ -29,6 +29,9 @@ python get-pip.py
 wget -nv https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.20.zip -O google_appengine.zip && unzip -q google_appengine.zip; rm google_appengine.zip
 mv google_appengine /usr
 
+pip install --download=/tmp -r /vagrant/requirements.txt
+pip install --use-wheel --no-index --find-links=/tmp --exists-action=b -r /vagrant/requirements.txt
+
 # edit the etc/hosts file to avoid the loopback created on 127.0.0.1 due to virutal box using it
 cp /etc/hosts /tmp/hosts.orig
 echo "0.0.0.0  localhost" > /tmp/hosts.new
