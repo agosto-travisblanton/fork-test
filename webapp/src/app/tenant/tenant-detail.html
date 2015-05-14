@@ -35,6 +35,27 @@
                 <input type="text" class="form-control" id="tenantName" placeholder="Enter tenant name"
                        ng-model="tenantDetailsCtrl.currentTenant.name" autofocus>
               </div>
+              <div class="form-group">
+                <label for="adminEmail">Admin Email</label>
+                <input type="text" class="form-control" id="adminEmail" placeholder="Enter admin email"
+                       ng-model="tenantDetailsCtrl.currentTenant.admin_email">
+              </div>
+              <div class="form-group">
+                <label for="chromeDeviceDomain">Chrome Device Domain</label>
+                <input type="text" class="form-control" id="chromeDeviceDomain" placeholder="Enter chrome device domain"
+                       ng-model="tenantDetailsCtrl.currentTenant.chrome_device_domain">
+              </div>
+              <div class="form-group">
+                <label for="contentServerUrl">Content Server Url</label>
+                <input type="text" class="form-control" id="contentServerUrl" placeholder="Enter content server url"
+                       ng-model="tenantDetailsCtrl.currentTenant.content_server_url">
+              </div>
+              <div ng-show="tenantDetailsCtrl.editMode">
+                <div class="form-group">
+                  <label>Content Server API Key</label><br>
+                  {{tenantDetailsCtrl.currentTenant.content_server_api_key}}
+                </div>
+              </div>
               <button type="submit" class="btn btn-primary btn-default"
                       ng-click="tenantDetailsCtrl.onClickSaveButton()">Save
               </button>
