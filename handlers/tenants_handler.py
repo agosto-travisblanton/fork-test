@@ -27,8 +27,6 @@ class TenantsHandler(RequestHandler):
             admin_email = request_json['admin_email']
             content_server_url = request_json['content_server_url']
             chrome_device_domain = request_json['chrome_device_domain']
-            if chrome_device_domain is not None:
-                chrome_device_domain = request_json['chrome_device_domain']
             tenant = Tenant.create(name, admin_email, content_server_url, chrome_device_domain)
             tenant_key = tenant.put()
             tenant_uri = self.request.app.router.build(None,
