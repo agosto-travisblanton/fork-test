@@ -31,7 +31,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-hide="tenantsCtrl.tenants.length"><td>No tenants</td></tr>
+            <tr ng-hide="tenantsCtrl.tenants.length"><td colspan="4">No tenants</td></tr>
             <tr ng-repeat="item in tenantsCtrl.tenants">
               <td style="width:20%">{{item.name}}</td>
               <td style="width:30%">{{item.content_server_url}}</td>

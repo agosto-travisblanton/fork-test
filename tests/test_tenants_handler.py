@@ -85,8 +85,26 @@ class TestTenantsHandler(BaseTest, WebTest):
     def testPut_ReturnsNoContentStatus(self):
         tenant_keys = self.loadTenants()
         uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': tenant_keys[0].urlsafe()})
-        response = self.app.put_json(uri, {'name': 'foobar'})
+        response = self.app.put_json(uri, {'name': 'foobar',
+                                           'admin_email': 'foo@bar.com',
+                                           'content_server_url': 'https://www.foo.com',
+                                           'chrome_device_domain': '',
+                                           'active': True})
         self.assertEqual(204, response.status_code)
+
+    def testPut_UpdatesSelectedProperties(self):
+        tenant_keys = self.loadTenants()
+        uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': tenant_keys[0].urlsafe()})
+        expected = tenant_keys[0].get()
+        self.assertEqual(expected.name, 'Testing tenant 0')
+        self.assertEqual(expected.active, True)
+        self.app.put_json(uri, {'name': 'foobar',
+                                'admin_email': 'foo@bar.com',
+                                'content_server_url': 'https://www.foo.com',
+                                'chrome_device_domain': '',
+                                'active': False})
+        self.assertEqual(expected.name, 'foobar')
+        self.assertEqual(expected.active, False)
 
     def testDelete_ReturnsNoContentStatus(self):
         tenant_keys = self.loadTenants()
