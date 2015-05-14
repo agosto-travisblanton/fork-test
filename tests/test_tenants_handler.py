@@ -47,7 +47,6 @@ class TestTenantsHandler(BaseTest, WebTest):
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.get(uri, params=request_parameters)
         response_json = json.loads(response.body)
-        # pprint(response_json)
         self.assertEqual(len(response_json), 5)
 
     def testPost_ReturnsCreatedStatus(self):
@@ -95,11 +94,10 @@ class TestTenantsHandler(BaseTest, WebTest):
         response = self.app.delete(uri)
         self.assertEqual(204, response.status_code)
 
-    def testDelete_DeletesTenant(self):
+    def testDelete_SoftDeletesTenant(self):
         tenant_keys = self.loadTenants()
         url_safe_tenant_key = tenant_keys[0].urlsafe()
         request_parameters = {}
-
         uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': url_safe_tenant_key})
         response = self.app.get(uri, params=request_parameters)
         response_json = json.loads(response.body)
@@ -111,7 +109,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': url_safe_tenant_key})
         response = self.app.get(uri, params=request_parameters)
         response_json = json.loads(response.body)
-        self.assertIsNone(response_json)
+        self.assertEqual(response_json.get('active'), False)
 
     def loadTenants(self):
         tenant_keys = []

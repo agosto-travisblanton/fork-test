@@ -50,6 +50,7 @@ class TenantsHandler(RequestHandler):
         key = ndb.Key(urlsafe=tenant_key)
         tenant = key.get()
         if tenant:
-            tenant.key.delete()
+            tenant.active = False
+            tenant.put
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
