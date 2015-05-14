@@ -42,3 +42,12 @@ class TestTenantModel(BaseTest):
         generated_key = tenant_created.content_server_api_key
         print "Generated api key: ", generated_key
         self.assertIsNotNone(generated_key)
+
+    def testCreate_SetsTenantActiveByDefault(self):
+        tenant = Tenant.create(name=self.NAME,
+                               admin_email=self.ADMIN_EMAIL,
+                               content_server_url=self.CONTENT_SERVER_URL,
+                               chrome_device_domain=self.CHROME_DEVICE_DOMAIN)
+        tenant.put()
+        tenant_created = Tenant.find_by_name(self.NAME)
+        self.assertTrue(tenant_created.active)

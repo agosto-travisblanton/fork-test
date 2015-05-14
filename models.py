@@ -24,6 +24,8 @@ class Tenant(ndb.Model):
     content_server_url = ndb.StringProperty(required=True)
     content_server_api_key = ndb.StringProperty(required=True)
     chrome_device_domain = ndb.StringProperty()
+    active = ndb.BooleanProperty(default=True, required=True, indexed=False)
+
 
     @classmethod
     def find_by_name(cls, name):
