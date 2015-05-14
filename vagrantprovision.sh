@@ -37,4 +37,5 @@ cp /tmp/hosts.new /etc/hosts
 
 #update path
 echo "export PATH=$PATH:/usr/google_appengine/:/usr/bin/env" > /etc/profile.d/gae_setup.sh
+echo "export APPENGINE_SDK=/usr/google_appengine" >>/etc/profile.d/gae_setup.sh
 echo "Install complete"
