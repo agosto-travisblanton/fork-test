@@ -1,7 +1,7 @@
-import httplib2
 from apiclient import discovery
 from oauth2client.client import SignedJwtAssertionCredentials
-
+# from googleapiclient import discovery
+from httplib2 import Http
 from app_config import config
 
 
@@ -29,10 +29,10 @@ class ChromeOsDevicesApi(object):
 
     def __init__(self, admin_to_impersonate_email_address):
         self.credentials = SignedJwtAssertionCredentials(config.SERVICE_ACCOUNT_EMAIL,
-                                                         config.PRIVATE_KEY,
+                                                         private_key=config.PRIVATE_KEY,
                                                          scope=self.DIRECTORY_SERVICE_SCOPES,
                                                          sub=admin_to_impersonate_email_address)
-        self.authorized_http = self.credentials.authorize(httplib2.Http())
+        self.authorized_http = self.credentials.authorize(Http())
         self.discovery_service = discovery.build('admin', 'directory_v1', http=self.authorized_http)
 
     # https://developers.google.com/admin-sdk/directory/v1/reference/chromeosdevices/list
@@ -48,17 +48,25 @@ class ChromeOsDevicesApi(object):
         chromeosdevices_api = self.discovery_service.chromeosdevices()
         while True:
             # https://google-api-client-libraries.appspot.com/documentation/admin/directory_v1/python/latest/admin_directory_v1.chromeosdevices.html#list
-            request = chromeosdevices_api.list(customerId=customer_id,
-                                               orderBy='serialNumber',
-                                               projection=self.PROJECTION_FULL,
-                                               pageToken=page_token,
-                                               maxResults=self.MAX_RESULTS,
-                                               sortOrder=self.SORT_ORDER_ASCENDING,
-                                               query=None)
+            if page_token is None:
+                request = chromeosdevices_api.list(customerId=customer_id,
+                                                   orderBy='serialNumber',
+                                                   projection=self.PROJECTION_FULL,
+                                                   maxResults=self.MAX_RESULTS,
+                                                   sortOrder=self.SORT_ORDER_ASCENDING)
+            else:
+                request = chromeosdevices_api.list(customerId=customer_id,
+                                                   orderBy='serialNumber',
+                                                   projection=self.PROJECTION_FULL,
+                                                   pageToken=page_token,
+                                                   maxResults=self.MAX_RESULTS,
+                                                   sortOrder=self.SORT_ORDER_ASCENDING)
             current_page_json = request.execute()
-            results.extend(current_page_json[self.KEY_CHROMEOSDEVICES])
+            chrome_os_devices = current_page_json.get(self.KEY_CHROMEOSDEVICES)
             page_token = current_page_json.get(self.KEY_NEXTPAGETOKEN)
-            if not page_token:
+            if chrome_os_devices is not None:
+                results.extend(chrome_os_devices)
+            if page_token is None:
                 break
         return results
 
@@ -67,8 +75,8 @@ class ChromeOsDevicesApi(object):
         """
         Retrieve the metadata for a specific Chrome OS device.
 
-        :param customer_id:
-        :param device_id:
+        :param customer_id: The customer identifier.
+        :param device_id: The device key value.
         :return:
         """
         chromeosdevices_api = self.discovery_service.chromeosdevices()

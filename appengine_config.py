@@ -25,7 +25,7 @@ app_APP_NAME = _APP_NAME()
 
 
 def _SECRET_KEY_FILE():
-    return '{}/privatekeys/{}.pem'.format(app_APP_ROOT, app_APP_NAME)
+    return '{}/privatekeys/{}.p12'.format(app_APP_ROOT, app_APP_NAME)
 app_SECRET_KEY_FILE = _SECRET_KEY_FILE()
 
 def _PRIVATE_KEY():

@@ -23,10 +23,9 @@ class TestChromeOsDevicesApi(BaseTest):
         self.assertTrue(len(devices) > 0)
 
     def testGet(self):
-        devices = self.chrome_os_devices_api.list(self.SKYKIT_COM_CUSTOMER_ID)
-        device_id = devices[0].get('deviceId')
-        device = self.chrome_os_devices_api.get(self.SKYKIT_COM_CUSTOMER_ID, device_id)
+        device = self.chrome_os_devices_api.get(self.SKYKIT_COM_CUSTOMER_ID, self.TESTING_DEVICE_ID)
         self.assertIsNotNone(device)
+        pprint(device)
 
     def testUpdateOrgUnitPath(self):
         org_unit_path_changing_to = self.ORG_UNIT_DEPLOYED
