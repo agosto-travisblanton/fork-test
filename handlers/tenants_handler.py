@@ -23,9 +23,11 @@ class TenantsHandler(RequestHandler):
     def post(self):
         if self.request.body is not None:
             request_json = json.loads(self.request.body)
-            tenant_entity_group = TenantEntityGroup.singleton()
-            tenant = Tenant(parent=tenant_entity_group.key,
-                            name=request_json['name'])
+            name = request_json['name']
+            admin_email = request_json['admin_email']
+            content_server_url = request_json['content_server_url']
+            chrome_device_domain = request_json['chrome_device_domain']
+            tenant = Tenant.create(name, admin_email, content_server_url, chrome_device_domain)
             tenant_key = tenant.put()
             tenant_uri = self.request.app.router.build(None,
                                                        'manage-tenant',
@@ -40,6 +42,10 @@ class TenantsHandler(RequestHandler):
         tenant = key.get()
         request_json = json.loads(self.request.body)
         tenant.name = request_json.get('name')
+        tenant.active = request_json.get('active')
+        tenant.admin_email = request_json.get('admin_email')
+        tenant.chrome_device_domain = request_json.get('chrome_device_domain')
+        tenant.content_server_url = request_json.get('content_server_url')
         tenant.put()
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
@@ -48,6 +54,7 @@ class TenantsHandler(RequestHandler):
         key = ndb.Key(urlsafe=tenant_key)
         tenant = key.get()
         if tenant:
-            tenant.key.delete()
+            tenant.active = False
+            tenant.put
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
