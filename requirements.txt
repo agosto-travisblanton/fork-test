@@ -1,6 +1,5 @@
 django==1.3
 webapp2
 pycrypto
+pyOpenSSL
 google-api-python-client==1.4.0
-py
-pytest
