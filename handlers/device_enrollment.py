@@ -16,11 +16,19 @@ class DeviceEnrollmentHandler(RequestHandler):
     def get(self):
         expected_mac_address = self.request.get('mac_address')
         chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
-        chrome_os_devices_string = chrome_os_devices_api.list('my_customer')
-        chrome_os_devices = json.loads(chrome_os_devices_string)
-        loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == expected_mac_address)
-        chrome_os_device = next(loop_comprehension, None)
-        json_response(self.response, chrome_os_device)
+        chrome_os_devices = chrome_os_devices_api.list('my_customer')
+        if chrome_os_devices is not None:
+            loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == expected_mac_address)
+            chrome_os_device = next(loop_comprehension, None)
+            if chrome_os_device is not None:
+                json_response(self.response, chrome_os_device)
+            else:
+                message = 'A ChromeOS device was not found to be associated with the MAC address: {0}.'.format(
+                    expected_mac_address)
+                self.abort(404, message)
+        else:
+            message = 'Unable to retrieve a list of ChromeOS devices.'
+            self.abort(404, message)
 
     def post(self):
         pass
