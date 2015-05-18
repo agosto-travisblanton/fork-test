@@ -82,7 +82,7 @@ skip_files:
 - ^local/.*
 - ^tests/.*
 - ^simtests/.*
-- ^static/app/node_modules/.*
+- ^webapp/.*
 - ^.git/.*
 - ^.idea/.*
 - ^.*~
