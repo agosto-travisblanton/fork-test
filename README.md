@@ -8,6 +8,11 @@
 
 ## Development ##
 
+## Vagrant ##
+1. `vagrant up`
+1. `vagrant ssh`
+1. `cd /vagrant`
+1. `dev_appserver.py .` 
 
 ## Deployment to App Engine ##
 
