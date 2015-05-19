@@ -81,14 +81,14 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         #            side_effect=Exception('KABOOOOOOMMM!')):
         #     resp = self.app.post_json(uri, params=request_parameters)
 
-    def testPut_ReturnsOKStatus(self):
-        patched_device_commands_processor = patch('device_commands_processor.DeviceCommandsProcessor')
-        self.addCleanup(patched_device_commands_processor.stop)
-        device_commands_processor_mock = patched_device_commands_processor.start()
-        request_parameters = {}
-        uri = application.router.build(None, 'device-commands', None, {'device_id': self.device_id})
-        response = self.app.put(uri, params=request_parameters)
-        self.assertOK(response)
+    # def testPut_ReturnsOKStatus(self):
+    #     patched_device_commands_processor = patch('device_commands_processor.DeviceCommandsProcessor')
+    #     self.addCleanup(patched_device_commands_processor.stop)
+    #     device_commands_processor_mock = patched_device_commands_processor.start()
+    #     request_parameters = {}
+    #     uri = application.router.build(None, 'device-commands', None, {'device_id': self.device_id})
+    #     response = self.app.put(uri, params=request_parameters)
+    #     self.assertOK(response)
 
     # def testDelete_ReturnsOKStatus(self):
     #     patched_device_commands_processor = patch('device_commands_processor.DeviceCommandsProcessor')
