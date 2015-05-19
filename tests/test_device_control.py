@@ -1,3 +1,5 @@
+from env_setup import setup_test_paths; setup_test_paths()
+
 from agar.test import BaseTest, WebTest
 from mock import patch
 from models import ChromeOsDevice
