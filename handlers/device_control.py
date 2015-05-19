@@ -1,6 +1,6 @@
 import json
 from webapp2 import RequestHandler
-from device_commands_processor import (updateDevice, checkSchedule, registerDevice, resetDevice, changeChannel)
+from device_commands_processor import (update_device, check_schedule, register_device, reset_device, change_channel)
 from models import ChromeOsDevice
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
@@ -19,11 +19,11 @@ class DeviceCommandsHandler(RequestHandler):
                         request_json = json.loads(self.request.body)
                         command = request_json['command']
                         payload = request_json['payload']
-                        if command == 'changeChannel':
-                            changeChannel(chrome_os_device.gcm_registration_id, payload)
+                        if command == 'change_channel':
+                            change_channel(chrome_os_device.gcm_registration_id, payload)
                             self.response.set_status(200)
                         else:
-                            self.response.set_status(403, 'unrecognized command')
+                            self.response.set_status(403, 'forbidden command')
                     self.response.headers.pop('Content-Type', None)
                 except Exception, e:
                     self.abort(422, 'An error occurred while processing the device command: {0}'.format(e.message))

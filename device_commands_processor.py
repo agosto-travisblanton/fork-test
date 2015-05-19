@@ -3,21 +3,21 @@ from google_cloud_messaging import GoogleCloudMessaging
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 
-def registerDevice():
+def register_device():
     pass
 
 
-def resetDevice():
+def reset_device():
     pass
 
 
-def updateDevice():
+def update_device():
     pass
 
 
-def checkSchedule():
+def check_schedule():
     pass
 
 
-def changeChannel(gcm_registration_id, payload):
+def change_channel(gcm_registration_id, payload):
     pass

@@ -19,18 +19,34 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         # self.addCleanup(self.patched_device_commands_processor.stop)
 
     def testPost_KnownCommandReturnOKStatus(self):
-        request_parameters = {'command': 'changeChannel',
+        request_parameters = {'command': 'change_channel',
                               'payload': {'channel': {'name': 'Quality On Demand','program': 'Program 1'}}}
         uri = application.router.build(None, 'device-commands', None, {'device_id': self.device_id})
         response = self.app.post_json(uri, params=request_parameters)
         self.assertOK(response)
 
-    def testPost_KnownCommandReturnOKStatus(self):
+    def testPost_UnknownCommandReturnsForbiddenStatus(self):
         request_parameters = {'command': 'unknown',
-                              'payload': {'channel': {'name': 'Quality On Demand','program': 'Program 1'}}}
+                              'payload': {}}
         uri = application.router.build(None, 'device-commands', None, {'device_id': self.device_id})
-        response = self.app.post_json(uri, params=request_parameters)
+        response = self.app.post_json(uri, params=request_parameters, expect_errors=True)
         self.assertForbidden(response)
+        with self.assertRaises(Exception) as context:
+            self.app.post_json(uri, params=request_parameters)
+        self.assertTrue('Bad response: 403 forbidden command' in str(context.exception))
+
+    # def testPost_InvokesProcessorMethod(self):
+    #     patched_device_commands_processor = patch('change_channel')
+    #     self.addCleanup(patched_device_commands_processor.stop)
+    #     device_commands_processor_mock = patched_device_commands_processor.start()
+    #     command = 'change_channel'
+    #     payload = {'channel': {'name': 'Quality On Demand','program': 'Program 1'}}
+    #     request_parameters = {'command': command, 'payload': payload}
+    #     uri = application.router.build(None, 'device-commands', None, {'device_id': self.device_id})
+    #     # with patch.object('device_commands_processor.DeviceCommandsProcessor', 'change_channel', return_value=None) \
+    #     #         as mock_command:
+    #     #     self.app.post_json(uri, params=request_parameters)
+    #     # mock_command.assert_called_once_with(command, payload)
 
     # def testGet_ReturnsOKStatus(self):
     #     patched_device_commands_processor = patch('device_commands_processor.DeviceCommandsProcessor')
@@ -65,15 +81,15 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         #            side_effect=Exception('KABOOOOOOMMM!')):
         #     resp = self.app.post_json(uri, params=request_parameters)
 
-    # def testPut_ReturnsOKStatus(self):
-    #     patched_device_commands_processor = patch('device_commands_processor.DeviceCommandsProcessor')
-    #     self.addCleanup(patched_device_commands_processor.stop)
-    #     device_commands_processor_mock = patched_device_commands_processor.start()
-    #     request_parameters = {}
-    #     uri = application.router.build(None, 'device-commands', None, {'device_id': self.device_id})
-    #     response = self.app.put(uri, params=request_parameters)
-    #     self.assertOK(response)
-    #
+    def testPut_ReturnsOKStatus(self):
+        patched_device_commands_processor = patch('device_commands_processor.DeviceCommandsProcessor')
+        self.addCleanup(patched_device_commands_processor.stop)
+        device_commands_processor_mock = patched_device_commands_processor.start()
+        request_parameters = {}
+        uri = application.router.build(None, 'device-commands', None, {'device_id': self.device_id})
+        response = self.app.put(uri, params=request_parameters)
+        self.assertOK(response)
+
     # def testDelete_ReturnsOKStatus(self):
     #     patched_device_commands_processor = patch('device_commands_processor.DeviceCommandsProcessor')
     #     self.addCleanup(patched_device_commands_processor.stop)
