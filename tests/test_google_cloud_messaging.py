@@ -1,3 +1,5 @@
+from env_setup import setup_test_paths; setup_test_paths()
+
 from agar.test import BaseTest
 from google_cloud_messaging import GoogleCloudMessaging
 from app_config import config

@@ -1,5 +1,3 @@
-import json
-import sys
 from agar.test import BaseTest, WebTest
 from mock import patch
 from models import ChromeOsDevice
@@ -89,7 +87,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
     #     uri = application.router.build(None, 'device-commands', None, {'device_id': self.device_id})
     #     response = self.app.put(uri, params=request_parameters)
     #     self.assertOK(response)
-
+    #
     # def testDelete_ReturnsOKStatus(self):
     #     patched_device_commands_processor = patch('device_commands_processor.DeviceCommandsProcessor')
     #     self.addCleanup(patched_device_commands_processor.stop)
