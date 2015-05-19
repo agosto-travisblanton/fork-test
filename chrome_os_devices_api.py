@@ -1,6 +1,5 @@
-from apiclient import discovery
 from oauth2client.client import SignedJwtAssertionCredentials
-# from googleapiclient import discovery
+from googleapiclient import discovery
 from httplib2 import Http
 from app_config import config
 
