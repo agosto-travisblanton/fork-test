@@ -18,3 +18,6 @@ def updateDevice():
 def checkSchedule():
     pass
 
+
+def changeChannel(gcm_registration_id, payload):
+    pass
