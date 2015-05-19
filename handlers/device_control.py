@@ -32,7 +32,6 @@ class DeviceCommandsHandler(RequestHandler):
         else:
             self.abort(422, 'A device_id is required to send commands to an existing ChromeOS device entity.')
 
-
     def put(self, device_id):
         pass
 
