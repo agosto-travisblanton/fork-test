@@ -17,13 +17,17 @@ class DeviceCommandsHandler(RequestHandler):
             try:
                 if self.request.body is not None:
                     request_json = json.loads(self.request.body)
-                    command = request_json['command']
-                    payload = request_json['payload']
-                    if command == 'change_channel':
-                        change_channel(chrome_os_device.gcm_registration_id, payload)
-                        self.response.set_status(200)
+                    command = request_json.get('command')
+                    if command:
+                        payload = request_json.get('payload')
+                        if command == 'change_channel':
+                            change_channel(chrome_os_device.gcm_registration_id, payload)
+                            self.response.set_status(200)
+                        else:
+                            self.response.set_status(422, 'Unrecognized command')
                     else:
-                        self.response.set_status(422, 'Unrecognized command')
+                        self.response.set_status(422, 'No command provided')
+
             except Exception, e:
                 self.response.set_status(422, 'An error occurred while processing the device command: {0}'.
                                          format(e.message))

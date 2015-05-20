@@ -1,4 +1,6 @@
-from env_setup import setup_test_paths; setup_test_paths()
+from env_setup import setup_test_paths;
+
+setup_test_paths()
 
 from agar.test import BaseTest
 from models import Tenant
@@ -15,7 +17,7 @@ class TestTenantModel(BaseTest):
     def setUp(self):
         super(TestTenantModel, self).setUp()
 
-    def testFindByName_ReturnsMatchingTenant(self):
+    def test_find_by_name_returns_matching_tenant(self):
         tenant = Tenant.create(name=self.NAME,
                                admin_email=self.ADMIN_EMAIL,
                                content_server_url=self.CONTENT_SERVER_URL,
@@ -25,7 +27,7 @@ class TestTenantModel(BaseTest):
         self.assertEqual(actual.key, expected_key)
         self.assertEqual(actual.name, self.NAME)
 
-    def testFindByName_ReturnsNone_WhenNoMatchingTenantFound(self):
+    def test_find_by_name_returns_none_when_no_matching_tenant_found(self):
         tenant = Tenant.create(name=self.NAME,
                                admin_email=self.ADMIN_EMAIL,
                                content_server_url=self.CONTENT_SERVER_URL,
@@ -34,7 +36,7 @@ class TestTenantModel(BaseTest):
         actual = Tenant.find_by_name('barfood tenant')
         self.assertIsNone(actual)
 
-    def testCreate_AutoGeneratesContentServerApiKey(self):
+    def test_create_auto_generates_content_server_api_key(self):
         tenant = Tenant.create(name=self.NAME,
                                admin_email=self.ADMIN_EMAIL,
                                content_server_url=self.CONTENT_SERVER_URL,
@@ -45,7 +47,7 @@ class TestTenantModel(BaseTest):
         print "Generated api key: ", generated_key
         self.assertIsNotNone(generated_key)
 
-    def testCreate_SetsTenantActiveByDefault(self):
+    def test_create_sets_tenant_active_by_default(self):
         tenant = Tenant.create(name=self.NAME,
                                admin_email=self.ADMIN_EMAIL,
                                content_server_url=self.CONTENT_SERVER_URL,

@@ -1,4 +1,6 @@
-from env_setup import setup_test_paths; setup_test_paths()
+from env_setup import setup_test_paths;
+
+setup_test_paths()
 
 from time import sleep, gmtime, strftime
 
@@ -18,20 +20,20 @@ class TestChromeOsDevicesApi(BaseTest):
         super(TestChromeOsDevicesApi, self).setUp()
         self.chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
 
-    def testList(self):
+    def test_list(self):
         devices = self.chrome_os_devices_api.list(self.SKYKIT_COM_CUSTOMER_ID)
         pprint(devices)
         self.assertIsNotNone(devices)
         self.assertTrue(len(devices) > 0)
 
-    def testGet(self):
+    def test_get(self):
         device = self.chrome_os_devices_api.get(self.SKYKIT_COM_CUSTOMER_ID, self.TESTING_DEVICE_ID)
         self.assertIsNotNone(device)
         pprint(device)
 
-    def testUpdateOrgUnitPath(self):
+    def test_update_org_unit_path(self):
         org_unit_path_changing_to = self.ORG_UNIT_DEPLOYED
-        if self.findByDeviceIdAndOrgUnit(self.TESTING_DEVICE_ID, self.ORG_UNIT_DEPLOYED):
+        if self.find_by_device_id_and_org_unit(self.TESTING_DEVICE_ID, self.ORG_UNIT_DEPLOYED):
             org_unit_path_changing_to = self.ORG_UNIT_DISTRIBUTOR
         self.chrome_os_devices_api.update(self.SKYKIT_COM_CUSTOMER_ID,
                                           self.TESTING_DEVICE_ID,
@@ -40,7 +42,7 @@ class TestChromeOsDevicesApi(BaseTest):
         device = self.chrome_os_devices_api.get(self.SKYKIT_COM_CUSTOMER_ID, self.TESTING_DEVICE_ID)
         self.assertEqual(org_unit_path_changing_to, device.get('orgUnitPath'))
 
-    def testUpdateNotes(self):
+    def test_update_notes(self):
         new_notes = 'Notes updated at {0} from unit test.'.format(strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime()))
         self.chrome_os_devices_api.update(self.SKYKIT_COM_CUSTOMER_ID,
                                           self.TESTING_DEVICE_ID,
@@ -49,8 +51,9 @@ class TestChromeOsDevicesApi(BaseTest):
         device = self.chrome_os_devices_api.get(self.SKYKIT_COM_CUSTOMER_ID, self.TESTING_DEVICE_ID)
         self.assertEqual(new_notes, device.get('notes'))
 
-    def testUpdateAnnotatedLocation(self):
-        new_location = 'Location updated at {0} from unit test.'.format(strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime()))
+    def test_update_annotated_location(self):
+        new_location = 'Location updated at {0} from unit test.'.format(
+            strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime()))
         self.chrome_os_devices_api.update(self.SKYKIT_COM_CUSTOMER_ID,
                                           self.TESTING_DEVICE_ID,
                                           annotated_location=new_location)
@@ -58,7 +61,7 @@ class TestChromeOsDevicesApi(BaseTest):
         device = self.chrome_os_devices_api.get(self.SKYKIT_COM_CUSTOMER_ID, self.TESTING_DEVICE_ID)
         self.assertEqual(new_location, device.get('annotatedLocation'))
 
-    def testUpdateAnnotatedUser(self):
+    def test_update_annotated_user(self):
         new_user = 'administrator-{0}@skykit.com'.format(strftime("%m-%d-%Y-%H-%M-%S", gmtime()))
         self.chrome_os_devices_api.update(self.SKYKIT_COM_CUSTOMER_ID,
                                           self.TESTING_DEVICE_ID,
@@ -67,7 +70,7 @@ class TestChromeOsDevicesApi(BaseTest):
         device = self.chrome_os_devices_api.get(self.SKYKIT_COM_CUSTOMER_ID, self.TESTING_DEVICE_ID)
         self.assertEqual(new_user, device.get('annotatedUser'))
 
-    def findByDeviceIdAndOrgUnit(self, device_id, org_unit):
+    def find_by_device_id_and_org_unit(self, device_id, org_unit):
         device = self.chrome_os_devices_api.get(self.SKYKIT_COM_CUSTOMER_ID, device_id)
         if device.get('orgUnitPath') == org_unit:
             return device

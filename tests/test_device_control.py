@@ -46,3 +46,9 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertTrue('Bad response: 422 Unable to find an existing ChromeOS device entity by device ID: foobar'
                         in str(context.exception))
 
+    def test_post_no_command_returns_422_error(self):
+        request_parameters = {'payload': {}}
+        uri = application.router.build(None, 'device-commands', None, {'device_id': self.device_id})
+        with self.assertRaises(Exception) as context:
+            self.app.post_json(uri, params=request_parameters)
+        self.assertTrue('Bad response: 422 No command provided' in str(context.exception))
