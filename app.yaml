@@ -28,6 +28,7 @@ handlers:
 - url: /(robots\.txt)
   static_files: static/\1
   upload: static/(.*)
+  login: required
 
 - url: /_ereporter.*
   script: google.appengine.ext.ereporter.report_generator.application
@@ -62,10 +63,12 @@ handlers:
 - url: /
   static_files: static/index.html
   upload: static/index.html
+  login: required
 
 - url: /.*
   script: routes.application
   secure: optional
+  login: required
 
 
 
