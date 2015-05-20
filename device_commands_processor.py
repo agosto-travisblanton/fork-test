@@ -20,4 +20,8 @@ def check_schedule():
 
 
 def change_channel(gcm_registration_id, payload):
-    pass
+    registration_ids = [gcm_registration_id]
+    data_dictionary = {'command': 'change_channel', 'payload': payload}
+    google_cloud_messaging = GoogleCloudMessaging()
+    google_cloud_messaging.notify(registration_ids, data_dictionary, test_mode=False)
+
