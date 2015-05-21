@@ -1,4 +1,6 @@
-from env_setup import setup_test_paths; setup_test_paths()
+from env_setup import setup_test_paths;
+
+setup_test_paths()
 
 import json
 
@@ -13,7 +15,7 @@ class TestDeviceEnrollmentHandler(BaseTest, WebTest):
 
     def setUp(self):
         super(TestDeviceEnrollmentHandler, self).setUp()
-        self.chrome_os_device_json = json.loads(self.loadFileContents('tests/chrome_os_device.json'))
+        self.chrome_os_device_json = json.loads(self.load_file_contents('tests/chrome_os_device.json'))
         self.gcm_id = 'd23784972038845ab3948459'
         self.patched_chrome_os_devices_api = patch('chrome_os_devices_api.ChromeOsDevicesApi')
         self.chrome_os_devices_api_mock = self.patched_chrome_os_devices_api.start()
@@ -26,7 +28,7 @@ class TestDeviceEnrollmentHandler(BaseTest, WebTest):
             self.patched_chrome_os_devices_api.stop()
 
     # def testDeviceEnrollmentGet_ReturnsOKStatus(self):
-    #     request_parameters = {'mac_address': self.chrome_os_device_json.get('macAddress'), 'gcm_id': self.gcm_id}
+    # request_parameters = {'mac_address': self.chrome_os_device_json.get('macAddress'), 'gcm_id': self.gcm_id}
     #     self.chrome_os_devices_api_mock_instance.list.return_value = self.loadFileContents(
     #         'tests/chrome_os_devices_api_list.json')
     #     uri = application.router.build(None, 'devices', None, {})
@@ -59,12 +61,13 @@ class TestDeviceEnrollmentHandler(BaseTest, WebTest):
     #     self.assertEquals(self.chrome_os_device_json.get('serialNumber'), body.get('serialNumber'))
     #     self.assertEquals(self.chrome_os_device_json.get('status'), body.get('status'))
 
-    def testDeviceEnrollmentPut_ReturnsNoContent(self):
+    def test_device_enrollment_put_returns_no_content(self):
         chrome_os_device = ChromeOsDevice(device_id=self.chrome_os_device_json.get('deviceId'),
                                           gcm_registration_id='d23784972038845ab3963412')
         chrome_os_device.put()
         request_body = {'gcmRegistrationId': self.gcm_id}
-        self.chrome_os_devices_api_mock_instance.get.return_value = self.loadFileContents('tests/chrome_os_device.json')
+        self.chrome_os_devices_api_mock_instance.get.return_value = self.load_file_contents(
+            'tests/chrome_os_device.json')
         response = self.app.put('/api/v1/devices/{0}'.format(self.chrome_os_device_json.get('deviceId')),
                                 json.dumps(request_body))
         self.assertEqual('204 No Content', response.status)
@@ -78,48 +81,51 @@ class TestDeviceEnrollmentHandler(BaseTest, WebTest):
     #     with self.assertRaises(AppError):
     #         self.app.put('/api/v1/devices/3278273', json.dumps(request_body))
 
-    def testDeviceEnrollmentPut_UpdatesGcmRegistrationId(self):
+    def test_device_enrollment_put_updates_gcm_registration_id(self):
         chrome_os_device = ChromeOsDevice(device_id=self.chrome_os_device_json.get('deviceId'),
                                           gcm_registration_id='d23784972038845ab3963412')
         key = chrome_os_device.put()
         request_body = {'gcmRegistrationId': self.gcm_id}
-        self.chrome_os_devices_api_mock_instance.get.return_value = self.loadFileContents('tests/chrome_os_device.json')
+        self.chrome_os_devices_api_mock_instance.get.return_value = self.load_file_contents(
+            'tests/chrome_os_device.json')
         url = '/api/v1/devices/{0}'.format(self.chrome_os_device_json.get('deviceId'))
         self.app.put(url, json.dumps(request_body))
         actual = key.get()
         self.assertEqual(self.gcm_id, actual.gcm_registration_id)
 
-    def testDeviceEnrollmentPut_CreatesChromeOsDeviceUpdatesGcmRegistrationId(self):
+    def test_device_enrollment_put_creates_chrome_os_device_updates_gcm_registration_id(self):
         request_body = {'gcmRegistrationId': self.gcm_id}
-        self.chrome_os_devices_api_mock_instance.get.return_value = self.loadFileContents('tests/chrome_os_device.json')
+        self.chrome_os_devices_api_mock_instance.get.return_value = self.load_file_contents(
+            'tests/chrome_os_device.json')
         url = '/api/v1/devices/{0}'.format(self.chrome_os_device_json.get('deviceId'))
         self.app.put(url, json.dumps(request_body))
         actual = ChromeOsDevice.get_by_device_id(self.chrome_os_device_json.get('deviceId'))
         self.assertIsNotNone(actual)
         self.assertEqual(self.gcm_id, actual.gcm_registration_id)
 
-    def testDeviceEnrollmentDelete_ReturnsNoContent(self):
+    def test_device_enrollment_delete_returns_no_content(self):
         chrome_os_device = ChromeOsDevice(device_id=self.chrome_os_device_json.get('deviceId'),
                                           gcm_registration_id='d23784972038845ab3963412')
         chrome_os_device.put()
-        self.chrome_os_devices_api_mock_instance.get.return_value = self.loadFileContents('tests/chrome_os_device.json')
+        self.chrome_os_devices_api_mock_instance.get.return_value = self.load_file_contents(
+            'tests/chrome_os_device.json')
         url = '/api/v1/devices/{0}'.format(self.chrome_os_device_json.get('deviceId'))
         response = self.app.delete(url)
         self.assertEqual('204 No Content', response.status)
-        # actual = ChromeOsDevice.get_by_device_id(self.chrome_os_device_json.get('deviceId'))
-        # self.assertIsNone(actual)
 
-    def testDeviceEnrollmentDelete_RemovesChromeOsDeviceEntity(self):
+    def test_device_enrollment_delete_removes_chrome_os_device_entity(self):
         chrome_os_device = ChromeOsDevice(device_id=self.chrome_os_device_json.get('deviceId'),
                                           gcm_registration_id='d23784972038845ab3963412')
         chrome_os_device.put()
-        self.chrome_os_devices_api_mock_instance.get.return_value = self.loadFileContents('tests/chrome_os_device.json')
+        self.chrome_os_devices_api_mock_instance.get.return_value = self.load_file_contents(
+            'tests/chrome_os_device.json')
         url = '/api/v1/devices/{0}'.format(self.chrome_os_device_json.get('deviceId'))
         self.app.delete(url)
         actual = ChromeOsDevice.get_by_device_id(self.chrome_os_device_json.get('deviceId'))
         self.assertIsNone(actual)
 
-    def loadFileContents(self, file_name):
+    @staticmethod
+    def load_file_contents(file_name):
         with open(file_name, 'r') as json_file:
             data = json_file.read().replace('\n', '')
         return data
