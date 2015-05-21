@@ -8,7 +8,8 @@ appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, $state)
     name: undefined,
     admin_email: undefined,
     content_server_url: undefined,
-    chrome_device_domain: undefined
+    chrome_device_domain: undefined,
+    active: true
   }
 
   @editMode = !!$stateParams.tenantKey
