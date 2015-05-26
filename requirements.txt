@@ -3,4 +3,5 @@ google-api-python-client==1.4.0
 pycrypto
 pyOpenSSL
 py
+selenium
 webapp2
