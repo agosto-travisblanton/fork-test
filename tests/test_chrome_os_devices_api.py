@@ -22,14 +22,14 @@ class TestChromeOsDevicesApi(BaseTest):
 
     def test_list(self):
         devices = self.chrome_os_devices_api.list(self.SKYKIT_COM_CUSTOMER_ID)
-        pprint(devices)
+        # pprint(devices)
         self.assertIsNotNone(devices)
         self.assertTrue(len(devices) > 0)
 
     def test_get(self):
         device = self.chrome_os_devices_api.get(self.SKYKIT_COM_CUSTOMER_ID, self.TESTING_DEVICE_ID)
         self.assertIsNotNone(device)
-        pprint(device)
+        # pprint(device)
 
     def test_update_org_unit_path(self):
         org_unit_path_changing_to = self.ORG_UNIT_DEPLOYED
