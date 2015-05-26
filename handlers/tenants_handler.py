@@ -13,8 +13,9 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 class TenantsHandler(RequestHandler):
     def get(self, tenant_key=None):
-        if tenant_key == None:
-            result = Tenant.query(ancestor=TenantEntityGroup.singleton().key).fetch(50)
+        if None == tenant_key:
+            result = Tenant.query(ancestor=TenantEntityGroup.singleton().key).fetch(100)
+            result = filter(lambda x: x.active is True, result)
         else:
             tenant_key = ndb.Key(urlsafe=tenant_key)
             result = tenant_key.get()
@@ -27,7 +28,8 @@ class TenantsHandler(RequestHandler):
             admin_email = request_json['admin_email']
             content_server_url = request_json['content_server_url']
             chrome_device_domain = request_json['chrome_device_domain']
-            tenant = Tenant.create(name, admin_email, content_server_url, chrome_device_domain)
+            active = request_json['active']
+            tenant = Tenant.create(name, admin_email, content_server_url, chrome_device_domain, active)
             tenant_key = tenant.put()
             tenant_uri = self.request.app.router.build(None,
                                                        'manage-tenant',
@@ -55,6 +57,6 @@ class TenantsHandler(RequestHandler):
         tenant = key.get()
         if tenant:
             tenant.active = False
-            tenant.put
+            tenant.put()
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
