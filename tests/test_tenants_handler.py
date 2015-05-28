@@ -56,7 +56,8 @@ class TestTenantsHandler(BaseTest, WebTest):
         request_parameters = {'name': 'ABC Flooring, Inc.',
                               'admin_email': 'foo@bar.com',
                               'content_server_url': 'https://www.foo.com',
-                              'chrome_device_domain': ''}
+                              'chrome_device_domain': '',
+                              'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.post_json(uri, params=request_parameters)
         self.assertEqual(201, response.status_code)
@@ -65,7 +66,8 @@ class TestTenantsHandler(BaseTest, WebTest):
         request_parameters = {'name': 'ABC Flooring, Inc.',
                               'admin_email': 'foo@bar.com',
                               'content_server_url': 'https://www.foo.com',
-                              'chrome_device_domain': ''}
+                              'chrome_device_domain': '',
+                              'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         self.app.post_json(uri, params=request_parameters)
         actual = Tenant.find_by_name(request_parameters['name'])
@@ -75,7 +77,8 @@ class TestTenantsHandler(BaseTest, WebTest):
         request_parameters = {'name': 'ABC Flooring, Inc.',
                               'admin_email': 'foo@bar.com',
                               'content_server_url': 'https://www.foo.com',
-                              'chrome_device_domain': ''}
+                              'chrome_device_domain': '',
+                              'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.post_json(uri, params=request_parameters)
         actual = Tenant.find_by_name(request_parameters['name'])
