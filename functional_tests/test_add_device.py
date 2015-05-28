@@ -1,4 +1,5 @@
 import unittest
+from time import sleep
 from func_test_config import BaseTest
 
 __author__ = 'Aaron Olson <aaron.olson@agosto.com>'
@@ -8,12 +9,9 @@ class AddDevice(BaseTest):
     def test_add_device(self):
         driver = self.driver
         driver.get(self.base_url + "")
-        driver.save_screenshot(self.screenshot_dir + "tenant.png")
-
-        driver.find_element_by_id("submit-login").click()
 
         driver.find_element_by_xpath("//a[@id='navbar-domains']/i[2]").click()
-        driver.find_element_by_id("navbar-domains").click()
+        sleep(.5)
         driver.find_element_by_id("skykit-domain").click()
         driver.find_element_by_id("button-add-device").click()
         driver.find_element_by_id("device-name").send_keys("R2D2")
