@@ -10,7 +10,7 @@ from models import ChromeOsDevice
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 
-class DeviceEnrollmentHandler(RequestHandler):
+class DeviceResourceHandler(RequestHandler):
     ADMIN_ACCOUNT_TO_IMPERSONATE = 'administrator@skykit.com'
 
     def get(self):

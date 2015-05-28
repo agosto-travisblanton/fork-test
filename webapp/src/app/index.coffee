@@ -43,6 +43,12 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     controller: "ApiTestCtrl",
     controllerAs: 'apiTest'
   })
+  $stateProvider.state("remote_control", {
+    url: "/remote_control",
+    templateUrl: "app/remote_control/index.html",
+    controller: "RemoteControlCtrl",
+    controllerAs: 'remoteControlCtrl'
+  })
   $urlRouterProvider.otherwise '/'
   RestangularProvider.setBaseUrl '/api/v1'
   RestangularProvider.setDefaultHeaders {

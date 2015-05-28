@@ -21,7 +21,8 @@ class TestTenantModel(BaseTest):
         tenant = Tenant.create(name=self.NAME,
                                admin_email=self.ADMIN_EMAIL,
                                content_server_url=self.CONTENT_SERVER_URL,
-                               chrome_device_domain=self.CHROME_DEVICE_DOMAIN)
+                               chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
+                               active=True)
         expected_key = tenant.put()
         actual = Tenant.find_by_name(self.NAME)
         self.assertEqual(actual.key, expected_key)
@@ -31,7 +32,8 @@ class TestTenantModel(BaseTest):
         tenant = Tenant.create(name=self.NAME,
                                admin_email=self.ADMIN_EMAIL,
                                content_server_url=self.CONTENT_SERVER_URL,
-                               chrome_device_domain=self.CHROME_DEVICE_DOMAIN)
+                               chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
+                               active=True)
         tenant.put()
         actual = Tenant.find_by_name('barfood tenant')
         self.assertIsNone(actual)
@@ -40,7 +42,8 @@ class TestTenantModel(BaseTest):
         tenant = Tenant.create(name=self.NAME,
                                admin_email=self.ADMIN_EMAIL,
                                content_server_url=self.CONTENT_SERVER_URL,
-                               chrome_device_domain=self.CHROME_DEVICE_DOMAIN)
+                               chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
+                               active=True)
         tenant.put()
         tenant_created = Tenant.find_by_name(self.NAME)
         generated_key = tenant_created.content_server_api_key
@@ -51,7 +54,8 @@ class TestTenantModel(BaseTest):
         tenant = Tenant.create(name=self.NAME,
                                admin_email=self.ADMIN_EMAIL,
                                content_server_url=self.CONTENT_SERVER_URL,
-                               chrome_device_domain=self.CHROME_DEVICE_DOMAIN)
+                               chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
+                               active=True)
         tenant.put()
         tenant_created = Tenant.find_by_name(self.NAME)
         self.assertTrue(tenant_created.active)
