@@ -1,21 +1,29 @@
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
-import unittest, time, re
+import unittest
+import os
+
+__author__ = 'Aaron Olson <aaron.olson@agosto.com>'
 
 class BaseTest(unittest.TestCase):
 
     def setUp(self):
-        self.driver = webdriver.PhantomJS('/usr/bin/phantomjs')
-        self.driver.implicitly_wait(3)
+        if os.path.exists('/usr/bin/phantomjs'):
+            self.driver = webdriver.PhantomJS('/usr/bin/phantomjs')
+        else:
+            self.driver = webdriver.Chrome('/Users/agosto/Downloads/chromedriver')
+        self.driver.implicitly_wait(1)
         self.base_url = "http://0.0.0.0:8080/"
         self.verificationErrors = []
         self.accept_next_alert = True
         self.driver.maximize_window()
-        self.screenshot_dir = "/vagrant/functional_tests/.screenshots/"
+        if os.path.exists('/vagrant/functional_tests/.screenshots/'):
+            self.screenshot_dir = "/vagrant/functional_tests/.screenshots/"
+        else:
+            self.screenshot_dir = "~/Pictures"
+        self.driver.get(self.base_url + "")
+        self.driver.find_element_by_id("submit-login").click()
 
     def is_element_present(self, how, what):
         try: self.driver.find_element(by=how, value=what)
