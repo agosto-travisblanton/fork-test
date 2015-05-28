@@ -2,7 +2,7 @@
 
 appModule = angular.module 'skykitDisplayDeviceManagement'
 
-appModule.controller "RemoteControlCtrl", () ->
+appModule.controller "RemoteControlCtrl", (DevicesService) ->
   @devices = []
   @currentDevice = {
     id: undefined,
