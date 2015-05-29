@@ -1,7 +1,5 @@
 import unittest
-import re
 from time import sleep
-from selenium .common.exceptions import NoSuchElementException
 from func_test_config import BaseTest
 
 
@@ -20,6 +18,7 @@ class AddTenant(BaseTest):
         driver.find_element_by_id("chromeDeviceDomain").send_keys("Tatooine")
         driver.find_element_by_id("contentServerUrl").send_keys("jedi.com")
         driver.find_element_by_xpath("//button[@type='submit']").click()
+        sleep(.3)
 
         self.assertTrue(driver.find_element_by_class_name("tenant-name").text == u"Luke")
         self.assertTrue(driver.find_element_by_class_name("tenant-admin-email").text == u"luke.skywalker@agosto.com")
@@ -41,6 +40,7 @@ class AddTenant(BaseTest):
         driver.find_element_by_id("contentServerUrl").send_keys("yoda.com")
         driver.find_element_by_css_selector("div.form-group.ng-binding > label").click()
         driver.find_element_by_xpath("//button[@type='submit']").click()
+        sleep(.3)
 
         self.assertTrue(driver.find_element_by_class_name("tenant-name").text == u"Yoda")
         self.assertTrue(driver.find_element_by_class_name("tenant-admin-email").text == u"yoda@agosto.com")
@@ -49,9 +49,6 @@ class AddTenant(BaseTest):
     def test_3_delete_tenant(self):
         driver = self.driver
         driver.find_element_by_id("navbar-tenants").click()
-        #row_count = len(driver.find_elements_by_xpath("//table[name='tenant-table']/tbody/tr"))
-        row_count = len(driver.find_elements_by_xpath("/html/body/div/div/div[2]/div/div[2]/div/table/tbody/tr"))
-        print row_count
         driver.find_element_by_name("delete-tenant").click()
 
 

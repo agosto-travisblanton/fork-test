@@ -12,7 +12,12 @@ class BaseTest(unittest.TestCase):
         if os.path.exists('/usr/bin/phantomjs'):
             self.driver = webdriver.PhantomJS('/usr/bin/phantomjs')
         else:
-            self.driver = webdriver.Chrome('/Users/agosto/Downloads/chromedriver')
+            chromedriver = 'chromedriver'
+            for root, dirs, files in os.walk(r'/Users'):
+                if chromedriver in files:
+                    local_driver_location = os.path.abspath(os.path.join(root, chromedriver))
+
+            self.driver = webdriver.Chrome(local_driver_location)
         self.driver.implicitly_wait(1)
         self.base_url = "http://0.0.0.0:8080/"
         self.verificationErrors = []
