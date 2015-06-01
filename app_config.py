@@ -19,6 +19,8 @@ class AppConfig(Config):
     CLIENT_ID = None
     # CLIENT_SECRET = None
     PUBLIC_API_SERVER_KEY = None
+    API_TOKEN = None
+
 
 
 config = AppConfig.get_config()

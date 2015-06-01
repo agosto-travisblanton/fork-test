@@ -31,10 +31,25 @@ application = WSGIApplication(
         ############################################################
         # device registration
         ############################################################
+        # Route(
+        #     r'/api/v1/devices',
+        #     handler='handlers.device_resource_handler.DeviceResourceHandler',
+        #     name='devices',
+        # ),
+
         Route(
             r'/api/v1/devices',
             handler='handlers.device_resource_handler.DeviceResourceHandler',
             name='devices',
+            handler_method='get_list',
+            methods=['GET']
+        ),
+        Route(
+            r'/api/v1/devices',
+            handler='handlers.device_resource_handler.DeviceResourceHandler',
+            name='device-creator',
+            handler_method='post',
+            methods=['POST']
         ),
         Route(
             r'/api/v1/devices/<device_id>',
