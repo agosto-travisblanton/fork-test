@@ -100,4 +100,8 @@ def _CONTENT_MANAGER_API_SERVER_KEY():
     return '6C346588BD4C6D722A1165B43C51C'
 
 
+def _CONTENT_MANAGER_API_URL():
+    return 'https://some-url'
+
+
 app_API_TOKEN = _API_TOKEN()

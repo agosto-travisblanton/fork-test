@@ -20,6 +20,7 @@ class AppConfig(Config):
     # CLIENT_SECRET = None
     PUBLIC_API_SERVER_KEY = None
     CONTENT_MANAGER_API_SERVER_KEY = None
+    CONTENT_MANAGER_API_URL = None
     API_TOKEN = None
 
 

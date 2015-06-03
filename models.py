@@ -26,7 +26,6 @@ class Tenant(ndb.Model):
     chrome_device_domain = ndb.StringProperty()
     active = ndb.BooleanProperty(default=True, required=True, indexed=False)
 
-
     @classmethod
     def find_by_name(cls, name):
         if name:
