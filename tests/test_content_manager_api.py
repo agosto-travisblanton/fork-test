@@ -9,9 +9,13 @@ from content_manager_api import ContentManagerApi
 
 
 class TestContentManagerApi(BaseTest):
-    def setUp(self):
-        super(TestContentManagerApi, self).setUp()
-        self.content_manager_api = ContentManagerApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
+    ADMIN_ACCOUNT_TO_IMPERSONATE = 'administrator@skykit.com'
 
-    def test_create_tenant(self):
-        pass
+
+def setUp(self):
+    super(TestContentManagerApi, self).setUp()
+    self.content_manager_api = ContentManagerApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
+
+
+def test_create_tenant(self):
+    pass

@@ -2,11 +2,11 @@ import json
 from google.appengine.ext import ndb
 
 from webapp2 import RequestHandler
+from content_manager_api import ContentManagerApi
 
 from models import Tenant, TenantEntityGroup
 from restler.serializers import json_response
 from strategy import TENANT_STRATEGY
-
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
@@ -26,18 +26,24 @@ class TenantsHandler(RequestHandler):
             request_json = json.loads(self.request.body)
             name = request_json['name']
             admin_email = request_json['admin_email']
-            content_server_url = request_json['content_server_url']
-            chrome_device_domain = request_json['chrome_device_domain']
-            active = request_json['active']
-            tenant = Tenant.create(name, admin_email, content_server_url, chrome_device_domain, active)
-            tenant_key = tenant.put()
-            tenant_uri = self.request.app.router.build(None,
-                                                       'manage-tenant',
-                                                       None,
-                                                       {'tenant_key': tenant_key.urlsafe()})
-            self.response.headers['Location'] = tenant_uri
-            self.response.headers.pop('Content-Type', None)
-            self.response.set_status(201)
+            content_manager_api = ContentManagerApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
+            content_server_api_key = content_manager_api.create_tenant(name, admin_email)
+            if content_server_api_key:
+                content_server_url = request_json['content_server_url']
+                chrome_device_domain = request_json['chrome_device_domain']
+                active = request_json['active']
+                tenant = Tenant.create(name, admin_email, content_server_url, content_server_api_key,
+                                       chrome_device_domain, active)
+                tenant_key = tenant.put()
+                tenant_uri = self.request.app.router.build(None,
+                                                           'manage-tenant',
+                                                           None,
+                                                           {'tenant_key': tenant_key.urlsafe()})
+                self.response.headers['Location'] = tenant_uri
+                self.response.headers.pop('Content-Type', None)
+                self.response.set_status(201)
+            else:
+                self.response.set_status(422, 'Unable to obtain content server key')
 
     def put(self, tenant_key):
         key = ndb.Key(urlsafe=tenant_key)
