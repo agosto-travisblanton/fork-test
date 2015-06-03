@@ -12,6 +12,8 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 
 class TenantsHandler(RequestHandler):
+    ADMIN_ACCOUNT_TO_IMPERSONATE = 'administrator@skykit.com'
+
     def get(self, tenant_key=None):
         if None == tenant_key:
             result = Tenant.query(ancestor=TenantEntityGroup.singleton().key).fetch(100)
@@ -26,7 +28,7 @@ class TenantsHandler(RequestHandler):
             request_json = json.loads(self.request.body)
             name = request_json['name']
             admin_email = request_json['admin_email']
-            content_manager_api = ContentManagerApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
+            content_manager_api = ContentManagerApi()
             content_server_api_key = content_manager_api.create_tenant(name, admin_email)
             if content_server_api_key:
                 content_server_url = request_json['content_server_url']
