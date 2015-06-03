@@ -21,6 +21,7 @@ class TestTenantModel(BaseTest):
         tenant = Tenant.create(name=self.NAME,
                                admin_email=self.ADMIN_EMAIL,
                                content_server_url=self.CONTENT_SERVER_URL,
+                               content_server_api_key='',
                                chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
                                active=True)
         expected_key = tenant.put()
@@ -32,28 +33,18 @@ class TestTenantModel(BaseTest):
         tenant = Tenant.create(name=self.NAME,
                                admin_email=self.ADMIN_EMAIL,
                                content_server_url=self.CONTENT_SERVER_URL,
+                               content_server_api_key='',
                                chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
                                active=True)
         tenant.put()
         actual = Tenant.find_by_name('barfood tenant')
         self.assertIsNone(actual)
 
-    def test_create_auto_generates_content_server_api_key(self):
-        tenant = Tenant.create(name=self.NAME,
-                               admin_email=self.ADMIN_EMAIL,
-                               content_server_url=self.CONTENT_SERVER_URL,
-                               chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
-                               active=True)
-        tenant.put()
-        tenant_created = Tenant.find_by_name(self.NAME)
-        generated_key = tenant_created.content_server_api_key
-        print "Generated api key: ", generated_key
-        self.assertIsNotNone(generated_key)
-
     def test_create_sets_tenant_active_by_default(self):
         tenant = Tenant.create(name=self.NAME,
                                admin_email=self.ADMIN_EMAIL,
                                content_server_url=self.CONTENT_SERVER_URL,
+                               content_server_api_key='',
                                chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
                                active=True)
         tenant.put()
