@@ -23,7 +23,7 @@ class DeviceCommandsHandler(RequestHandler):
                         if command == 'change_channel':
                             change_channel(chrome_os_device.gcm_registration_id, payload)
                             self.response.set_status(200)
-                        if command == 'content_change_notification':
+                        elif command == 'content_change_notification':
                             content_change_notification(chrome_os_device.gcm_registration_id, payload)
                             self.response.set_status(200)
 
