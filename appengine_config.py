@@ -72,3 +72,8 @@ def _PUBLIC_API_SERVER_KEY():
         return ''
     return None
 app_PUBLIC_API_SERVER_KEY = _PUBLIC_API_SERVER_KEY()
+
+def _API_TOKEN():
+    return '6C346588BD4C6D722A1165B43C51C'
+app_API_TOKEN = _API_TOKEN()
+
