@@ -8,7 +8,7 @@ import json
 from agar.test import BaseTest, WebTest
 from models import Tenant, TenantEntityGroup
 from routes import application
-from mockito import when, mock, verify, any as any_matcher
+from mockito import when, verify, any as any_matcher
 
 
 class TestTenantsHandler(BaseTest, WebTest):
