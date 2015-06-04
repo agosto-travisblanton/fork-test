@@ -8,7 +8,7 @@ import json
 from agar.test import BaseTest, WebTest
 from models import Tenant, TenantEntityGroup
 from routes import application
-from mockito import when
+from mockito import when, mock, verify, any as any_matcher
 
 
 class TestTenantsHandler(BaseTest, WebTest):
@@ -53,6 +53,19 @@ class TestTenantsHandler(BaseTest, WebTest):
         response = self.app.get(uri, params=request_parameters)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 5)
+
+    def test_post_content_manager_api_collaboration(self):
+        name = u'ABC'
+        admin_email = u'foo@bar.com'
+        when(ContentManagerApi).create_tenant(name, admin_email).thenReturn('some key')
+        request_parameters = {'name': name,
+                              'admin_email': admin_email,
+                              'content_server_url': 'https://www.foo.com',
+                              'chrome_device_domain': '',
+                              'active': True}
+        uri = application.router.build(None, 'tenants', None, {})
+        self.app.post_json(uri, params=request_parameters)
+        verify(ContentManagerApi, times=1).create_tenant(any_matcher(''), any_matcher(''))
 
     def test_post_returns_created_status(self):
         name = u'ABC'

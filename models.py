@@ -34,6 +34,14 @@ class Tenant(ndb.Model):
                 return key.get()
 
     @classmethod
+    def is_unique(cls, name):
+        name = cls.find_by_name(name)
+        if cls.find_by_name(name) is not None:
+            return True
+        else:
+            return False
+
+    @classmethod
     def create(cls, name, admin_email, content_server_url, content_server_api_key, chrome_device_domain, active):
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
