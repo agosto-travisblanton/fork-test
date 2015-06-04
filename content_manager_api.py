@@ -23,10 +23,13 @@ class ContentManagerApi(object):
         }
         json_payload = json.dumps(tenant)
         response = requests.post(self.CONTENT_MANAGER_API_URL, json_payload, timeout=60, headers=self.HEADERS)
-        if response.status_code == 200:
+        if response.status_code == 201:
             response_json = response.json()
-            content_key = response_json.get(u'tenant_key')
-            return content_key
+            return response_json.get(u'tenant_key')
+        elif response.status_code == 400:
+            return None
+        elif response.status_code == 422:
+            return None
         else:
-            raise RuntimeError('Unable to post tenant to Content Manager. HTTP status code: {0}'.
+            raise RuntimeError('Unable to create tenant in Content Manager. Unexpected http status code: {0}'.
                                format(response.status_code))
