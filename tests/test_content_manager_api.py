@@ -1,3 +1,4 @@
+from app_config import config
 from env_setup import setup_test_paths
 
 setup_test_paths()
@@ -23,7 +24,7 @@ class TestContentManagerApi(BaseTest):
         response = requests.Response()
         response.status_code = 201
         when(response).json().thenReturn(json_response)
-        when(requests).post(ContentManagerApi.CONTENT_MANAGER_API_URL,
+        when(requests).post(config.CONTENT_MANAGER_API_URL,
                             any_matcher(),
                             timeout=60,
                             headers=ContentManagerApi.HEADERS).thenReturn(response)
@@ -35,7 +36,7 @@ class TestContentManagerApi(BaseTest):
         response = requests.Response()
         response.status_code = 422
         when(response).json().thenReturn(json_response)
-        when(requests).post(ContentManagerApi.CONTENT_MANAGER_API_URL,
+        when(requests).post(config.CONTENT_MANAGER_API_URL,
                             any_matcher(),
                             timeout=60,
                             headers=ContentManagerApi.HEADERS).thenReturn(response)
@@ -47,7 +48,7 @@ class TestContentManagerApi(BaseTest):
         response = requests.Response()
         response.status_code = 400
         when(response).json().thenReturn(json_response)
-        when(requests).post(ContentManagerApi.CONTENT_MANAGER_API_URL,
+        when(requests).post(config.CONTENT_MANAGER_API_URL,
                             any_matcher(),
                             timeout=60,
                             headers=ContentManagerApi.HEADERS).thenReturn(response)
@@ -59,7 +60,7 @@ class TestContentManagerApi(BaseTest):
         response = requests.Response()
         response.status_code = 0
         when(response).json().thenReturn(json_response)
-        when(requests).post(ContentManagerApi.CONTENT_MANAGER_API_URL,
+        when(requests).post(config.CONTENT_MANAGER_API_URL,
                             any_matcher(),
                             timeout=60,
                             headers=ContentManagerApi.HEADERS).thenReturn(response)

@@ -1,20 +1,19 @@
-__author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
-
+from app_config import config
 import json
 import requests
+
+__author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 class ContentManagerApi(object):
     """ Facade around our Content Manager API. """
-    CONTENT_MANAGER_API_SERVER_KEY = '6C346588BD4C6D722A1165B43C51C'
-    CONTENT_MANAGER_API_URL = 'https://some-url'
 
     HEADERS = {
         'Content-Type': 'application/json'
     }
 
     def __init__(self):
-        self.HEADERS['Authorization'] = 'key={0}'.format(self.CONTENT_MANAGER_API_SERVER_KEY)
+        self.HEADERS['Authorization'] = 'key={0}'.format(config.CONTENT_MANAGER_API_SERVER_KEY)
 
     def create_tenant(self, name, admin_email):
         tenant = {
@@ -22,7 +21,7 @@ class ContentManagerApi(object):
             "admin_email": admin_email
         }
         json_payload = json.dumps(tenant)
-        response = requests.post(self.CONTENT_MANAGER_API_URL, json_payload, timeout=60, headers=self.HEADERS)
+        response = requests.post(config.CONTENT_MANAGER_API_URL, json_payload, timeout=60, headers=self.HEADERS)
         if response.status_code == 201:
             response_json = response.json()
             return response_json.get(u'tenant_key')
