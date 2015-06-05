@@ -1,3 +1,4 @@
+from content_manager_api import ContentManagerApi
 from env_setup import setup_test_paths;
 
 setup_test_paths()
@@ -7,6 +8,7 @@ import json
 from agar.test import BaseTest, WebTest
 from models import Tenant, TenantEntityGroup
 from routes import application
+from mockito import when, verify, any as any_matcher
 
 
 class TestTenantsHandler(BaseTest, WebTest):
@@ -52,9 +54,25 @@ class TestTenantsHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 5)
 
+    def test_post_content_manager_api_collaboration(self):
+        name = u'ABC'
+        admin_email = u'foo@bar.com'
+        when(ContentManagerApi).create_tenant(name, admin_email).thenReturn('some key')
+        request_parameters = {'name': name,
+                              'admin_email': admin_email,
+                              'content_server_url': 'https://www.foo.com',
+                              'chrome_device_domain': '',
+                              'active': True}
+        uri = application.router.build(None, 'tenants', None, {})
+        self.app.post_json(uri, params=request_parameters)
+        verify(ContentManagerApi, times=1).create_tenant(any_matcher(''), any_matcher(''))
+
     def test_post_returns_created_status(self):
-        request_parameters = {'name': 'ABC Flooring, Inc.',
-                              'admin_email': 'foo@bar.com',
+        name = u'ABC'
+        admin_email = u'foo@bar.com'
+        when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(str('some key'))
+        request_parameters = {'name': name,
+                              'admin_email': admin_email,
                               'content_server_url': 'https://www.foo.com',
                               'chrome_device_domain': '',
                               'active': True}
@@ -62,9 +80,12 @@ class TestTenantsHandler(BaseTest, WebTest):
         response = self.app.post_json(uri, params=request_parameters)
         self.assertEqual(201, response.status_code)
 
-    def test_post_create_new_tenant(self):
-        request_parameters = {'name': 'ABC Flooring, Inc.',
-                              'admin_email': 'foo@bar.com',
+    def test_post_create_new_tenant_persists_object(self):
+        name = u'ABC'
+        admin_email = u'foo@bar.com'
+        when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(str('some key'))
+        request_parameters = {'name': name,
+                              'admin_email': admin_email,
                               'content_server_url': 'https://www.foo.com',
                               'chrome_device_domain': '',
                               'active': True}
@@ -74,8 +95,11 @@ class TestTenantsHandler(BaseTest, WebTest):
         self.assertIsNotNone(actual)
 
     def test_post_create_new_tenant_sets_location_header(self):
-        request_parameters = {'name': 'ABC Flooring, Inc.',
-                              'admin_email': 'foo@bar.com',
+        name = u'ABC'
+        admin_email = u'foo@bar.com'
+        when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(str('some key'))
+        request_parameters = {'name': name,
+                              'admin_email': admin_email,
                               'content_server_url': 'https://www.foo.com',
                               'chrome_device_domain': '',
                               'active': True}
@@ -87,6 +111,20 @@ class TestTenantsHandler(BaseTest, WebTest):
                                               None,
                                               {'tenant_key': actual.key.urlsafe()})
         self.assertTrue(tenant_uri in response.headers.get('Location'))
+
+    def test_post_create_when_content_manager_fails_to_return_key(self):
+        name = u'ABC'
+        admin_email = u'foo@bar.com'
+        when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(None)
+        request_parameters = {'name': name,
+                              'admin_email': admin_email,
+                              'content_server_url': 'https://www.foo.com',
+                              'chrome_device_domain': '',
+                              'active': True}
+        uri = application.router.build(None, 'tenants', None, {})
+        with self.assertRaises(Exception) as context:
+            self.app.post_json(uri, params=request_parameters)
+        self.assertTrue('422 Unable to obtain content server key' in str(context.exception))
 
     def test_put_returns_no_content_status(self):
         tenant_keys = self.load_tenants()

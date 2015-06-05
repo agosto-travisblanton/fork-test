@@ -10,7 +10,6 @@ class AppConfig(Config):
     """
     _prefix = 'app'
 
-
     APP_ROOT = None
     APP_NAME = ''
     SECRET_KEY_FILE = None
@@ -20,7 +19,8 @@ class AppConfig(Config):
     # CLIENT_SECRET = None
     PUBLIC_API_SERVER_KEY = None
     API_TOKEN = None
-
+    CONTENT_MANAGER_API_SERVER_KEY = None
+    CONTENT_MANAGER_API_URL = None
 
 
 config = AppConfig.get_config()

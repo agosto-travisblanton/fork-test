@@ -26,7 +26,6 @@ class Tenant(ndb.Model):
     chrome_device_domain = ndb.StringProperty()
     active = ndb.BooleanProperty(default=True, required=True, indexed=False)
 
-
     @classmethod
     def find_by_name(cls, name):
         if name:
@@ -35,13 +34,21 @@ class Tenant(ndb.Model):
                 return key.get()
 
     @classmethod
-    def create(cls, name, admin_email, content_server_url, chrome_device_domain, active):
+    def is_unique(cls, name):
+        name = cls.find_by_name(name)
+        if cls.find_by_name(name) is not None:
+            return True
+        else:
+            return False
+
+    @classmethod
+    def create(cls, name, admin_email, content_server_url, content_server_api_key, chrome_device_domain, active):
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
                    name=name,
                    admin_email=admin_email,
                    content_server_url=content_server_url,
-                   content_server_api_key=str(uuid.uuid4()),
+                   content_server_api_key=content_server_api_key,
                    chrome_device_domain=chrome_device_domain,
                    active=active)
 
