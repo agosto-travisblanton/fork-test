@@ -94,6 +94,21 @@ class TestTenantsHandler(BaseTest, WebTest):
         actual = Tenant.find_by_name(request_parameters['name'])
         self.assertIsNotNone(actual)
 
+    def test_post_create_new_tenant_persists_key_from_content_server(self):
+        name = u'ABC'
+        admin_email = u'foo@bar.com'
+        content_server_api_key = u'key me up jeeves'
+        when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(content_server_api_key)
+        request_parameters = {'name': name,
+                              'admin_email': admin_email,
+                              'content_server_url': 'https://www.foo.com',
+                              'chrome_device_domain': '',
+                              'active': True}
+        uri = application.router.build(None, 'tenants', None, {})
+        self.app.post_json(uri, params=request_parameters)
+        actual = Tenant.find_by_name(request_parameters['name'])
+        self.assertTrue(actual.content_server_api_key == content_server_api_key)
+
     def test_post_create_new_tenant_sets_location_header(self):
         name = u'ABC'
         admin_email = u'foo@bar.com'
