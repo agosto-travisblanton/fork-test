@@ -1,0 +1,68 @@
+application: skykit-display-device-int
+module: migration
+version: snapshot
+runtime: python27
+api_version: 1
+threadsafe: true
+#instance_class: B4_1G
+#basic_scaling:
+#  max_instances: 200
+#  idle_timeout: 10m
+
+env_variables:
+  DJANGO_SETTINGS_MODULE: 'settings'
+
+builtins:
+- deferred: on
+- remote_api: on
+- appstats: on
+
+libraries:
+- name: django
+  version: "1.3"
+- name: webapp2
+  version: latest
+- name: numpy
+  version: latest
+- name: PIL
+  version: latest
+- name: pycrypto
+  version: latest
+
+handlers:
+- url: /_ah/start
+  script: routes_migration.application
+  secure: optional
+
+- url: /mapreduce/pipeline/images
+  static_dir: pipeline/ui/images
+
+- url: /mapreduce(/.*)?
+  script: mapreduce.main.APP
+  login: admin
+
+- url: /migration/.*
+  script: routes_migration.application
+  login: admin
+
+skip_files:
+- ^coverage/.*
+- ^coverage_html_report/.*
+- ^monitor/.*
+- ^events/.*
+- ^pa/.*
+- ^scripts/.*
+- ^images/readme.md
+- ^local/.*
+- ^tests/.*
+- ^simtests/.*
+- ^static/app/node_modules/.*
+- ^.hg/.*
+- ^.idea/.*
+- ^.*~
+- ^.*\.py[co]
+- ^.*\.po
+- ^.*\.pot
+- ^\.DS_Store.*
+- ^.*\.egg-info
+- ^(.*/)?.*static/node_modules/.*
