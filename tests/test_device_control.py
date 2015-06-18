@@ -11,7 +11,8 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         super(TestDeviceCommandsHandler, self).setUp()
         self.device_id = '132e235a-b346-4a37-a100-de49fa753a2a'
         self.chrome_os_device = ChromeOsDevice(device_id=self.device_id,
-                                               gcm_registration_id='d23784972038845ab3963412')
+                                               gcm_registration_id='d23784972038845ab3963412',
+                                               tenant_code='Acme')
         self.chrome_os_device.put()
 
     def test_post_known_command_returns_ok_status(self):
