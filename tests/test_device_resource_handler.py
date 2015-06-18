@@ -56,7 +56,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertTrue('404 Not Found' in error.exception.message)
 
     def test_device_resource_handler_post_returns_created_status(self):
-        request_body = {'macAddress': self.chrome_os_device_json.get('macAddress'), 'gcm_registration_id': '123'}
+        request_body = {'macAddress': self.chrome_os_device_json.get('macAddress'), 'gcm_registration_id': '123',
+                        'tenant_code': 'Acme'}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
         self.assertEqual('201 Created', response.status)
@@ -64,7 +65,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_device_resource_handler_post_persists_gcm_registration_id(self):
         mac_address = self.chrome_os_device_json.get('macAddress')
         gcm_registration_id = '123'
-        request_body = {'macAddress': mac_address, 'gcm_registration_id': gcm_registration_id}
+        request_body = {'macAddress': mac_address, 'gcm_registration_id': gcm_registration_id, 'tenant_code': 'Acme'}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
         chrome_os_device_key = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id). \
@@ -74,7 +75,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_device_resource_put_returns_no_content(self):
         gcm_registration_id = 'd23784972038845ab3963412'
-        request_body = {'gcmRegistrationId': gcm_registration_id}
+        request_body = {'gcmRegistrationId': gcm_registration_id, 'tenantCode': 'Acme'}
         when(ChromeOsDevicesApi).get(self.CUSTOMER_ID, any_matcher(str)).thenReturn(self.chrome_os_device_json)
         response = self.app.put('/api/v1/devices/{0}'.format(self.chrome_os_device_json.get('deviceId')),
                                 json.dumps(request_body))
@@ -82,7 +83,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_device_resource_put_updates_gcm_registration_id(self):
         gcm_registration_id = 'd23784972038845ab3963412'
-        request_body = {'gcmRegistrationId': gcm_registration_id}
+        request_body = {'gcmRegistrationId': gcm_registration_id, 'tenantCode': 'Acme'}
         when(ChromeOsDevicesApi).get(self.CUSTOMER_ID, any_matcher(str)).thenReturn(self.chrome_os_device_json)
         device_id = self.chrome_os_device_json.get('deviceId')
         url = '/api/v1/devices/{0}'.format(device_id)
@@ -101,7 +102,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_device_resource_delete_returns_no_content(self):
         chrome_os_device = ChromeOsDevice(device_id=self.chrome_os_device_json.get('deviceId'),
-                                          gcm_registration_id='d23784972038845ab3963412')
+                                          gcm_registration_id='d23784972038845ab3963412',
+                                          tenant_code='Acme')
         chrome_os_device.put()
         when(ChromeOsDevicesApi).get(self.CUSTOMER_ID, any_matcher(str)).thenReturn(self.chrome_os_device_json)
         url = '/api/v1/devices/{0}'.format(self.chrome_os_device_json.get('deviceId'))

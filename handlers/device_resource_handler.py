@@ -63,7 +63,10 @@ class DeviceResourceHandler(RequestHandler):
                     model = ChromeOsDevice.get_by_device_id(device_id)
                     if model is None:
                         gcm_registration_id = request_json.get('gcm_registration_id')
-                        model = ChromeOsDevice(device_id=device_id, gcm_registration_id=gcm_registration_id)
+                        tenant_code = request_json.get('tenant_code')
+                        model = ChromeOsDevice(device_id=device_id,
+                                               gcm_registration_id=gcm_registration_id,
+                                               tenant_code=tenant_code)
                     model.put()
                     self.response.set_status(201)
 
@@ -80,6 +83,9 @@ class DeviceResourceHandler(RequestHandler):
             gcm_registration_id = request_json.get('gcmRegistrationId')
             if gcm_registration_id:
                 chrome_os_device.gcm_registration_id = gcm_registration_id
+            tenant_code = request_json.get('tenantCode')
+            if tenant_code:
+                chrome_os_device.tenant_code = tenant_code
             chrome_os_device.put()
             self.response.headers.pop('Content-Type', None)
             self.response.set_status(204)

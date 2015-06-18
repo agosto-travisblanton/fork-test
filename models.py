@@ -59,6 +59,7 @@ class ChromeOsDevice(ndb.Model):
     updated = ndb.DateTimeProperty(auto_now=True)
     device_id = ndb.StringProperty(required=True, indexed=True)
     gcm_registration_id = ndb.StringProperty(required=True)
+    tenant_code = ndb.StringProperty(required=True)
 
     @classmethod
     def get_by_device_id(cls, device_id):
