@@ -62,6 +62,20 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
         self.assertEqual('201 Created', response.status)
 
+    def test_device_resource_handler_post_returns_unprocessable_entity_status_for_empty_request_body(self):
+        when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
+        with self.assertRaises(Exception) as context:
+            self.app.post('/api/v1/devices', headers=self.headers)
+        self.assertTrue('422 Did not receive request body' in str(context.exception))
+
+    def test_device_resource_handler_post_returns_unprocessable_entity_status_for_unassociated_device(self):
+        request_body = {'macAddress': 'bogusMacAddress', 'gcm_registration_id': '123',
+                        'tenant_code': 'Acme'}
+        when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
+        with self.assertRaises(Exception) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
+        self.assertTrue('422 Chrome OS device not associated with this customer id' in str(context.exception))
+
     def test_device_resource_handler_post_persists_gcm_registration_id(self):
         mac_address = self.chrome_os_device_json.get('macAddress')
         gcm_registration_id = '123'

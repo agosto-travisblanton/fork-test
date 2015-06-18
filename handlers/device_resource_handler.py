@@ -49,7 +49,7 @@ class DeviceResourceHandler(RequestHandler):
             json_response(self.response, {'error': message}, status_code=404)
 
     def post(self):
-        if self.request.body is not None:
+        if self.request.body is not str('') and self.request.body is not None:
             request_json = json.loads(self.request.body)
             device_mac_address = request_json.get(u'macAddress')
             chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
@@ -69,6 +69,12 @@ class DeviceResourceHandler(RequestHandler):
                                                tenant_code=tenant_code)
                     model.put()
                     self.response.set_status(201)
+                else:
+                    self.response.set_status(422,
+                                             'Chrome OS device not associated with this customer id ( {0}'.format(
+                                                 self.CUSTOMER_ID))
+        else:
+            self.response.set_status(422, 'Did not receive request body.')
 
     def put(self, device_id):
         chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
