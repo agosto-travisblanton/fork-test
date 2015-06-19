@@ -4,11 +4,11 @@
 
 ### Register Device ###
 
-Using the following post:
+Using the following API call:
 
 ![Screen Shot 2015-06-19 at 2.33.43 PM.png](https://bitbucket.org/repo/L8AoyM/images/1866246453-Screen%20Shot%202015-06-19%20at%202.33.43%20PM.png)
 
-where the following JSON is posted:
+where the following JSON is posted to the server:
 
 {
 
