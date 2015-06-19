@@ -2,6 +2,8 @@
 
 ## API ##
 
+### Register Device ###
+
 
 ## Vagrant ##
 1. `vagrant up`
