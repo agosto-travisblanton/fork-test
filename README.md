@@ -1,12 +1,7 @@
 # SkyKit Display Device Management #
 
-## Project setup ##
+## API ##
 
-
-## Running tests ##
-
-
-## Development ##
 
 ## Vagrant ##
 1. `vagrant up`
@@ -21,4 +16,4 @@
 
 ## Deployment to App Engine ##
 
-From the project root directory: `appcfg.py -A skykit-display-device-int update .`
+From the project root directory: `appcfg.py --oauth2 -A skykit-display-device-int update .`
