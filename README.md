@@ -4,9 +4,11 @@
 
 ### Register Device ###
 
+Using the following post:
+
 ![Screen Shot 2015-06-19 at 2.33.43 PM.png](https://bitbucket.org/repo/L8AoyM/images/1866246453-Screen%20Shot%202015-06-19%20at%202.33.43%20PM.png)
 
-with the following payload:
+where the following JSON is posted:
 
 {
 
@@ -18,8 +20,9 @@ with the following payload:
 
 }
 
-Returns the following uri in **Location** of header:
-
+Will, if successful will:
+* Return a `201 Created`
+* Return the following uri in **location** of header: 
 https://skykit-display-device-int.appspot.com/api/v1/devices/ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgICAgIAKDA
 
 which, in turn, can be used with a GET to return the device representation using:
