@@ -5,13 +5,16 @@
 ### Register Device ###
 
 ![Screen Shot 2015-06-19 at 2.33.43 PM.png](https://bitbucket.org/repo/L8AoyM/images/1866246453-Screen%20Shot%202015-06-19%20at%202.33.43%20PM.png)
+
 with the following payload:
 {
 "macAddress": "c45444596b9b",
 "gcm_registration_id": "blah blah",
 "tenant_code": "some_tenant"
 }
+
 Returns the following uri in **Location** of header:
+
 https://skykit-display-device-int.appspot.com/api/v1/devices/ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgICAgIAKDA
 
 
