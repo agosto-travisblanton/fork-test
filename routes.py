@@ -48,7 +48,8 @@ application = WSGIApplication(
         Route(
             r'/api/v1/devices/<device_id>',
             handler='handlers.device_resource_handler.DeviceResourceHandler',
-            name='devices-mutator',
+            name='manage-device',
+            methods=['GET', 'PUT', 'DELETE']
         ),
         Route(
             r'/api/v1/devices/<device_id>/commands',
