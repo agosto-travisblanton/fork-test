@@ -63,12 +63,12 @@ handlers:
 - url: /
   static_files: static/index.html
   upload: static/index.html
-  login: required
+#  login: required
 
 - url: /.*
   script: routes.application
-  secure: optional
-  login: required
+#  secure: optional
+#  login: required
 
 
 
