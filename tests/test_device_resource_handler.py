@@ -124,61 +124,48 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertTrue('123' == chrome_os_device_key.get().gcm_registration_id)
 
     def test_device_resource_put_returns_no_content(self):
-        gcm_registration_id = 'd23784972038845ab3963412'
-        request_body = {'gcmRegistrationId': gcm_registration_id, 'tenantCode': 'Acme'}
-        when(ChromeOsDevicesApi).get(self.CUSTOMER_ID, any_matcher(str)).thenReturn(self.chrome_os_device_json)
-        response = self.app.put('/api/v1/devices/{0}'.format(self.chrome_os_device_json.get('deviceId')),
-                                json.dumps(request_body))
+        device_key = self.load_device()
+        request_body = {'gcmRegistrationId': 'd23784972038845ab3963412', 'tenantCode': 'Acme'}
+        when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
+        response = self.app.put('/api/v1/devices/{0}'.format(device_key.urlsafe()), json.dumps(request_body))
         self.assertEqual('204 No Content', response.status)
 
     def test_device_resource_put_updates_gcm_registration_id(self):
-        gcm_registration_id = 'd23784972038845ab3963412'
-        request_body = {'gcmRegistrationId': gcm_registration_id, 'tenantCode': 'Acme'}
-        when(ChromeOsDevicesApi).get(self.CUSTOMER_ID, any_matcher(str)).thenReturn(self.chrome_os_device_json)
-        device_id = self.chrome_os_device_json.get('deviceId')
-        url = '/api/v1/devices/{0}'.format(device_id)
-        self.app.put(url, json.dumps(request_body))
-        actual = ChromeOsDevice.get_by_device_id(device_id)
-        self.assertEqual(gcm_registration_id, actual.gcm_registration_id)
+        device_key = self.load_device()
+        request_body = {'gcmRegistrationId': 'd23784972038845ab3963412', 'tenantCode': 'Acme'}
+        when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
+        response = self.app.put('/api/v1/devices/{0}'.format(device_key.urlsafe()), json.dumps(request_body))
+        actual = device_key.get()
+        self.assertEqual('d23784972038845ab3963412', actual.gcm_registration_id)
 
     def test_device_resource_put_for_failed_device_lookup(self):
+        device_key = self.load_device()
         request_body = {'gcmRegistrationId': 'd23784972038845ab3963412'}
-        when(ChromeOsDevicesApi).get(any_matcher(str), any_matcher(str)).thenReturn(None)
-        device_id = self.chrome_os_device_json.get('deviceId')
+        when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(None)
         with self.assertRaises(Exception) as context:
-            self.app.put('/api/v1/devices/{0}'.format(device_id), json.dumps(request_body))
-        self.assertTrue('422 Unable to retrieve Chrome OS device by device ID: {0}'.format(device_id) in
-                        str(context.exception))
+            self.app.put('/api/v1/devices/{0}'.format(device_key.urlsafe()), json.dumps(request_body))
+        self.assertTrue(
+            '422 Unable to retrieve Chrome OS device by device id: 132e235a-b346-4a37-a100-de49fa753a2a' in str(
+                context.exception))
 
     def test_device_resource_delete_returns_no_content(self):
         chrome_os_device = ChromeOsDevice(device_id=self.chrome_os_device_json.get('deviceId'),
                                           gcm_registration_id='d23784972038845ab3963412',
-                                          tenant_code='Acme')
-        chrome_os_device.put()
-        when(ChromeOsDevicesApi).get(self.CUSTOMER_ID, any_matcher(str)).thenReturn(self.chrome_os_device_json)
-        url = '/api/v1/devices/{0}'.format(self.chrome_os_device_json.get('deviceId'))
+                                          tenant_code='some tenant code')
+        key = chrome_os_device.put()
+        url = '/api/v1/devices/{0}'.format(key.urlsafe())
         response = self.app.delete(url)
         self.assertEqual('204 No Content', response.status)
 
     def test_device_resource_delete_removes_chrome_os_device_entity(self):
         chrome_os_device = ChromeOsDevice(device_id=self.chrome_os_device_json.get('deviceId'),
-                                          gcm_registration_id='d23784972038845ab3963412')
-        chrome_os_device.put()
-        when(ChromeOsDevicesApi).get(self.CUSTOMER_ID, any_matcher(str)).thenReturn(self.chrome_os_device_json)
-        device_id = self.chrome_os_device_json.get('deviceId')
-        url = '/api/v1/devices/{0}'.format(device_id)
+                                          gcm_registration_id='d23784972038845ab3963412',
+                                          tenant_code='some tenant code')
+        key = chrome_os_device.put()
+        url = '/api/v1/devices/{0}'.format(key.urlsafe())
         self.app.delete(url)
-        actual = ChromeOsDevice.get_by_device_id(device_id)
+        actual = key.get()
         self.assertIsNone(actual)
-
-    def test_device_resource_delete_removes_chrome_os_device_entity(self):
-        when(ChromeOsDevicesApi).get(self.CUSTOMER_ID, any_matcher(str)).thenReturn(self.chrome_os_device_json)
-        bogus_device_id = 'bogus_device_id'
-        url = '/api/v1/devices/{0}'.format(bogus_device_id)
-        with self.assertRaises(Exception) as context:
-            self.app.delete(url)
-        self.assertTrue('422 Unable to retrieve ChromeOS device by device ID: {0}'.format(bogus_device_id) in
-                        str(context.exception))
 
     @staticmethod
     def load_file_contents(file_name):
@@ -193,5 +180,4 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             gcm_registration_id='some gcm registration id',
             tenant_code='some tenant code'
         )
-        key = device.put()
-        return key
+        return device.put()

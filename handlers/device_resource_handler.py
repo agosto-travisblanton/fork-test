@@ -97,31 +97,32 @@ class DeviceResourceHandler(RequestHandler):
         else:
             self.response.set_status(422, 'Did not receive request body.')
 
-    def put(self, device_id):
+    def put(self, device_urlsafe_key):
+        device_key = ndb.Key(urlsafe=device_urlsafe_key)
+        local_device = device_key.get()
         chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
-        registered_chrome_os_device = chrome_os_devices_api.get(self.CUSTOMER_ID, device_id)
+        registered_chrome_os_device = chrome_os_devices_api.get(self.CUSTOMER_ID, local_device.device_id)
         if registered_chrome_os_device is None:
-            self.response.set_status(422, 'Unable to retrieve Chrome OS device by device ID: {0}'.format(device_id))
+            self.response.set_status(422, 'Unable to retrieve Chrome OS device by device id: {0}'.
+                                     format(local_device.device_id))
         else:
-            chrome_os_device = ChromeOsDevice.get_by_device_id(device_id)
-            if chrome_os_device is None:
-                chrome_os_device = ChromeOsDevice(device_id=device_id)
             request_json = json.loads(self.request.body)
             gcm_registration_id = request_json.get('gcmRegistrationId')
             if gcm_registration_id:
-                chrome_os_device.gcm_registration_id = gcm_registration_id
+                local_device.gcm_registration_id = gcm_registration_id
             tenant_code = request_json.get('tenantCode')
             if tenant_code:
-                chrome_os_device.tenant_code = tenant_code
-            chrome_os_device.put()
+                local_device.tenant_code = tenant_code
+            local_device.put()
             self.response.headers.pop('Content-Type', None)
             self.response.set_status(204)
 
-    def delete(self, device_id):
-        chrome_os_device = ChromeOsDevice.get_by_device_id(device_id)
-        if chrome_os_device is None:
-            self.response.set_status(422, 'Unable to retrieve ChromeOS device by device ID: {0}'.format(device_id))
+    def delete(self, device_urlsafe_key):
+        device_key = ndb.Key(urlsafe=device_urlsafe_key)
+        local_device = device_key.get()
+        if local_device is None:
+            self.response.set_status(422, 'Unable to retrieve ChromeOS device by device ID: {0}'.format(local_device.device_id))
         else:
-            chrome_os_device.key.delete()
+            local_device.key.delete()
             self.response.headers.pop('Content-Type', None)
             self.response.set_status(204)
