@@ -78,8 +78,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertTrue('404 Not Found' in error.exception.message)
 
     def test_device_resource_handler_post_returns_created_status(self):
-        request_body = {'macAddress': self.chrome_os_device_json.get('macAddress'), 'gcm_registration_id': '123',
-                        'tenant_code': 'Acme'}
+        request_body = {'macAddress': self.chrome_os_device_json.get('macAddress'),
+                        'gcmRegistrationId': '123',
+                        'tenantCode': 'Acme'}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
         self.assertEqual('201 Created', response.status)
@@ -88,16 +89,16 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         gcm_registration_id = '123'
         tenant_code = 'Acme'
         request_body = {'macAddress': self.chrome_os_device_json.get('macAddress'),
-                        'gcm_registration_id': gcm_registration_id,
-                        'tenant_code': tenant_code}
+                        'gcmRegistrationId': gcm_registration_id,
+                        'tenantCode': tenant_code}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
         location_uri = str(response.headers['Location'])
         response = self.app.get(location_uri, params={})
         self.assertOK(response)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json.get('gcm_registration_id'), gcm_registration_id)
-        self.assertEqual(response_json.get('tenant_code'), tenant_code)
+        self.assertEqual(response_json.get('gcmRegistrationId'), gcm_registration_id)
+        self.assertEqual(response_json.get('tenantCode'), tenant_code)
 
     def test_device_resource_handler_post_returns_unprocessable_entity_status_for_empty_request_body(self):
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
@@ -106,8 +107,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertTrue('422 Did not receive request body' in str(context.exception))
 
     def test_device_resource_handler_post_returns_unprocessable_entity_status_for_unassociated_device(self):
-        request_body = {'macAddress': 'bogusMacAddress', 'gcm_registration_id': '123',
-                        'tenant_code': 'Acme'}
+        request_body = {'macAddress': 'bogusMacAddress',
+                        'gcmRegistrationId': '123',
+                        'tenantCode': 'Acme'}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         with self.assertRaises(Exception) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
@@ -116,7 +118,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_device_resource_handler_post_persists_gcm_registration_id(self):
         mac_address = self.chrome_os_device_json.get('macAddress')
         gcm_registration_id = '123'
-        request_body = {'macAddress': mac_address, 'gcm_registration_id': gcm_registration_id, 'tenant_code': 'Acme'}
+        request_body = {'macAddress': mac_address,
+                        'gcmRegistrationId': gcm_registration_id,
+                        'tenantCode': 'Acme'}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
         chrome_os_device_key = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id). \

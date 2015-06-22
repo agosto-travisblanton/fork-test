@@ -77,8 +77,8 @@ class DeviceResourceHandler(RequestHandler):
                     device_id = chrome_os_device.get('deviceId')
                     device = ChromeOsDevice.get_by_device_id(device_id)
                     if device is None:
-                        gcm_registration_id = request_json.get('gcm_registration_id')
-                        tenant_code = request_json.get('tenant_code')
+                        gcm_registration_id = request_json.get('gcmRegistrationId')
+                        tenant_code = request_json.get('tenantCode')
                         device = ChromeOsDevice(device_id=device_id,
                                                 gcm_registration_id=gcm_registration_id,
                                                 tenant_code=tenant_code)
@@ -86,7 +86,7 @@ class DeviceResourceHandler(RequestHandler):
                     device_uri = self.request.app.router.build(None,
                                                                'manage-device',
                                                                None,
-                                                               {'device_id': device_key.urlsafe()})
+                                                               {'device_urlsafe_key': device_key.urlsafe()})
                     self.response.headers['Location'] = device_uri
                     self.response.headers.pop('Content-Type', None)
                     self.response.set_status(201)
