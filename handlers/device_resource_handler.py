@@ -30,6 +30,7 @@ class DeviceResourceHandler(RequestHandler):
         result['updated'] = local_device.updated.strftime('%Y-%m-%d %H:%M:%S')
         json_response(self.response, result)
 
+    @api_token_required
     def get_list(self):
         device_mac_address = self.request.get('macAddress')
         if not device_mac_address:

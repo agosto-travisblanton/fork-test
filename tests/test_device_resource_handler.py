@@ -60,7 +60,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response = self.app.get('/api/v1/devices', params={}, headers=self.headers)
         self.assertOK(response)
 
-    def test_device_resource_handler_get_all_devices_returns_404(self):
+    def test_device_resource_handler_get_all_devices_returns_not_found(self):
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(None)
         with self.assertRaises(AppError) as error:
             self.app.get('/api/v1/devices', params={}, headers=self.headers)
@@ -71,6 +71,13 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         response = self.app.get('/api/v1/devices', params=request_parameters, headers=self.headers)
         self.assertOK(response)
+
+    def test_device_resource_handler_get_by_mac_address_no_authorization_header_returns_forbidden(self):
+        request_parameters = {'macAddress': self.chrome_os_device_json.get('macAddress')}
+        when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
+        with self.assertRaises(AppError) as error:
+            self.app.get('/api/v1/devices', params=request_parameters, headers={})
+        self.assertTrue('403 Forbidden' in error.exception.message)
 
     def test_device_resource_handler_get_by_mac_address_with_bogus_mac_address(self):
         request_parameters = {'macAddress': 'bogus'}
