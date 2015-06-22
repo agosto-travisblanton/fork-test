@@ -1,61 +1,62 @@
 import logging
+from app_config import config
 from restler.serializers import json_response
 
 
-def identity_required(handler_method):
-    from models import User, Tenant
-
-    def identify(self, *args, **kwargs):
-        user_key = None
-
-        if hasattr(self, 'session'):
-            user_key = self.session.get('user_key')
-
-        if not user_key:
-            user_key = self.request.params.get('user_key')
-
-        self.user = self.validate_and_get(user_key, User, abort_on_not_found=True)
-        if self.user is None:
-            logging.error('Missing user')
-            json_response(self.response, {'error': 'No user logged in'}, status_code=403)
-            return
-
-        self.tenant = self.user.tenant
-        handler_method(self, *args, **kwargs)
-
-    return identify
-
-
-def gae_supported_numpy(test_method):
-    import numpy
-    from utils.print_utils import StderrLogger
-
-    def check_numpy(self, *args, **kwargs):
-        npv = numpy.version.full_version
-        if npv != '1.6.1':
-            logger = StderrLogger()
-            logger.warning("Found local numpy version {}. App engine only supports version 1.6.1. "
-                           "You may falsely green bar!".format(npv))
-        test_method(self, *args, **kwargs)
-
-    return check_numpy
-
-
-def no_in_context_cache(function):
-    """
-    Disables in-context caching. NOTE: Will not work on functions that get pickled.
-    :param function:
-    :return: function that wraps the existing function which disables ndb in-context caching.
-    """
-    from google.appengine.ext import ndb
-
-    def disable_cache(*args, **kwargs):
-        ctx = ndb.get_context()
-        ctx.set_cache_policy(lambda key: False)
-        return function(*args, **kwargs)
-
-    return disable_cache
-
+# def identity_required(handler_method):
+#     from models import User, Tenant
+#
+#     def identify(self, *args, **kwargs):
+#         user_key = None
+#
+#         if hasattr(self, 'session'):
+#             user_key = self.session.get('user_key')
+#
+#         if not user_key:
+#             user_key = self.request.params.get('user_key')
+#
+#         self.user = self.validate_and_get(user_key, User, abort_on_not_found=True)
+#         if self.user is None:
+#             logging.error('Missing user')
+#             json_response(self.response, {'error': 'No user logged in'}, status_code=403)
+#             return
+#
+#         self.tenant = self.user.tenant
+#         handler_method(self, *args, **kwargs)
+#
+#     return identify
+#
+#
+# def gae_supported_numpy(test_method):
+#     import numpy
+#     from utils.print_utils import StderrLogger
+#
+#     def check_numpy(self, *args, **kwargs):
+#         npv = numpy.version.full_version
+#         if npv != '1.6.1':
+#             logger = StderrLogger()
+#             logger.warning("Found local numpy version {}. App engine only supports version 1.6.1. "
+#                            "You may falsely green bar!".format(npv))
+#         test_method(self, *args, **kwargs)
+#
+#     return check_numpy
+#
+#
+# def no_in_context_cache(function):
+#     """
+#     Disables in-context caching. NOTE: Will not work on functions that get pickled.
+#     :param function:
+#     :return: function that wraps the existing function which disables ndb in-context caching.
+#     """
+#     from google.appengine.ext import ndb
+#
+#     def disable_cache(*args, **kwargs):
+#         ctx = ndb.get_context()
+#         ctx.set_cache_policy(lambda key: False)
+#         return function(*args, **kwargs)
+#
+#     return disable_cache
+#
 
 def log_memory(function):
     """
@@ -81,3 +82,22 @@ def log_memory(function):
         return ret_value
 
     return log
+
+
+
+def api_token_required(handler_method):
+
+    def authorize(self, *args, **kwargs):
+        api_token = self.request.headers.get('Authorization')
+        if api_token is None:
+            logging.error('No API token supplied in the HTTP request.')
+            json_response(self.response, {'error': 'No API token supplied in the HTTP request.'}, status_code=403)
+            return
+        elif not api_token == config.API_TOKEN:
+            logging.error('HTTP request API token is invalid.')
+            json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=403)
+            return
+
+        handler_method(self, *args, **kwargs)
+
+    return authorize

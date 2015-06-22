@@ -2,6 +2,7 @@ import json
 
 from webapp2 import RequestHandler
 from google.appengine.ext import ndb
+from decorators import api_token_required
 
 from restler.serializers import json_response
 from chrome_os_devices_api import ChromeOsDevicesApi
@@ -14,20 +15,22 @@ class DeviceResourceHandler(RequestHandler):
     ADMIN_ACCOUNT_TO_IMPERSONATE = 'administrator@skykit.com'
     CUSTOMER_ID = 'my_customer'
 
-    def get(self, device_id):
-        device_key = ndb.Key(urlsafe=device_id)
+    @api_token_required
+    def get(self, device_urlsafe_key):
+        device_key = ndb.Key(urlsafe=device_urlsafe_key)
         local_device = device_key.get()
         chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
-        chrome_os_device = chrome_os_devices_api.get(self.CUSTOMER_ID,
-                                                     local_device.device_id)
-        result = {
-            'gcmRegistrationId': local_device.gcm_registration_id
-        }
+        chrome_os_device = chrome_os_devices_api.get(self.CUSTOMER_ID, local_device.device_id)
+        result = {}
         if chrome_os_device:
             result = chrome_os_device
-            result['gcmRegistrationId'] = local_device.gcm_registration_id
+        result['gcmRegistrationId'] = local_device.gcm_registration_id
+        result['tenantCode'] = local_device.tenant_code
+        result['created'] = local_device.created.strftime('%Y-%m-%d %H:%M:%S')
+        result['updated'] = local_device.updated.strftime('%Y-%m-%d %H:%M:%S')
         json_response(self.response, result)
 
+    @api_token_required
     def get_list(self):
         device_mac_address = self.request.get('macAddress')
         if not device_mac_address:
@@ -63,6 +66,7 @@ class DeviceResourceHandler(RequestHandler):
             message = 'Unable to retrieve a list of ChromeOS devices.'
             json_response(self.response, {'error': message}, status_code=404)
 
+    @api_token_required
     def post(self):
         if self.request.body is not str('') and self.request.body is not None:
             request_json = json.loads(self.request.body)
@@ -77,8 +81,8 @@ class DeviceResourceHandler(RequestHandler):
                     device_id = chrome_os_device.get('deviceId')
                     device = ChromeOsDevice.get_by_device_id(device_id)
                     if device is None:
-                        gcm_registration_id = request_json.get('gcm_registration_id')
-                        tenant_code = request_json.get('tenant_code')
+                        gcm_registration_id = request_json.get('gcmRegistrationId')
+                        tenant_code = request_json.get('tenantCode')
                         device = ChromeOsDevice(device_id=device_id,
                                                 gcm_registration_id=gcm_registration_id,
                                                 tenant_code=tenant_code)
@@ -86,7 +90,7 @@ class DeviceResourceHandler(RequestHandler):
                     device_uri = self.request.app.router.build(None,
                                                                'manage-device',
                                                                None,
-                                                               {'device_id': device_key.urlsafe()})
+                                                               {'device_urlsafe_key': device_key.urlsafe()})
                     self.response.headers['Location'] = device_uri
                     self.response.headers.pop('Content-Type', None)
                     self.response.set_status(201)
@@ -97,31 +101,34 @@ class DeviceResourceHandler(RequestHandler):
         else:
             self.response.set_status(422, 'Did not receive request body.')
 
-    def put(self, device_id):
+    @api_token_required
+    def put(self, device_urlsafe_key):
+        device_key = ndb.Key(urlsafe=device_urlsafe_key)
+        local_device = device_key.get()
         chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
-        registered_chrome_os_device = chrome_os_devices_api.get(self.CUSTOMER_ID, device_id)
+        registered_chrome_os_device = chrome_os_devices_api.get(self.CUSTOMER_ID, local_device.device_id)
         if registered_chrome_os_device is None:
-            self.response.set_status(422, 'Unable to retrieve Chrome OS device by device ID: {0}'.format(device_id))
+            self.response.set_status(422, 'Unable to retrieve Chrome OS device by device id: {0}'.
+                                     format(local_device.device_id))
         else:
-            chrome_os_device = ChromeOsDevice.get_by_device_id(device_id)
-            if chrome_os_device is None:
-                chrome_os_device = ChromeOsDevice(device_id=device_id)
             request_json = json.loads(self.request.body)
             gcm_registration_id = request_json.get('gcmRegistrationId')
             if gcm_registration_id:
-                chrome_os_device.gcm_registration_id = gcm_registration_id
+                local_device.gcm_registration_id = gcm_registration_id
             tenant_code = request_json.get('tenantCode')
             if tenant_code:
-                chrome_os_device.tenant_code = tenant_code
-            chrome_os_device.put()
+                local_device.tenant_code = tenant_code
+            local_device.put()
             self.response.headers.pop('Content-Type', None)
             self.response.set_status(204)
 
-    def delete(self, device_id):
-        chrome_os_device = ChromeOsDevice.get_by_device_id(device_id)
-        if chrome_os_device is None:
-            self.response.set_status(422, 'Unable to retrieve ChromeOS device by device ID: {0}'.format(device_id))
+    @api_token_required
+    def delete(self, device_urlsafe_key):
+        device_key = ndb.Key(urlsafe=device_urlsafe_key)
+        local_device = device_key.get()
+        if local_device is None:
+            self.response.set_status(422, 'Unable to retrieve ChromeOS device by device ID: {0}'.format(local_device.device_id))
         else:
-            chrome_os_device.key.delete()
+            local_device.key.delete()
             self.response.headers.pop('Content-Type', None)
             self.response.set_status(204)
