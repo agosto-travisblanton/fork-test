@@ -33,14 +33,15 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_device_resource_handler_get_by_id_returns_device_representation(self):
         device_key = self.load_device()
+        when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
         request_parameters = {}
-        uri = application.router.build(None, 'manage-device', None, {'device_id': device_key.urlsafe()})
+        uri = application.router.build(None, 'manage-device', None, {'device_urlsafe_key': device_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters)
         response_json = json.loads(response.body)
         expected = device_key.get()
-        self.assertEqual(response_json.get('device_id'), expected.device_id)
-        self.assertEqual(response_json.get('gcm_registration_id'), expected.gcm_registration_id)
-        self.assertEqual(response_json.get('tenant_code'), expected.tenant_code)
+        self.assertEqual(response_json.get('deviceId'), expected.device_id)
+        self.assertEqual(response_json.get('gcmRegistrationId'), expected.gcm_registration_id)
+        self.assertEqual(response_json.get('tenantCode'), expected.tenant_code)
         self.assertEqual(response_json.get('created'), expected.created.strftime('%Y-%m-%d %H:%M:%S'))
         self.assertEqual(response_json.get('updated'), expected.updated.strftime('%Y-%m-%d %H:%M:%S'))
 
@@ -188,9 +189,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     @staticmethod
     def load_device():
         device = ChromeOsDevice(
-            device_id='some device id',
+            device_id='132e235a-b346-4a37-a100-de49fa753a2a',
             gcm_registration_id='some gcm registration id',
             tenant_code='some tenant code'
         )
-        device_key = device.put()
-        return device_key
+        key = device.put()
+        return key

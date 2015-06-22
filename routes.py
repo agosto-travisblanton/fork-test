@@ -46,7 +46,7 @@ application = WSGIApplication(
             methods=['POST']
         ),
         Route(
-            r'/api/v1/devices/<device_id>',
+            r'/api/v1/devices/<device_urlsafe_key>',
             handler='handlers.device_resource_handler.DeviceResourceHandler',
             name='manage-device',
             methods=['GET', 'PUT', 'DELETE']

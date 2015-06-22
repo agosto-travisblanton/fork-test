@@ -14,18 +14,18 @@ class DeviceResourceHandler(RequestHandler):
     ADMIN_ACCOUNT_TO_IMPERSONATE = 'administrator@skykit.com'
     CUSTOMER_ID = 'my_customer'
 
-    def get(self, device_id):
-        device_key = ndb.Key(urlsafe=device_id)
+    def get(self, device_urlsafe_key):
+        device_key = ndb.Key(urlsafe=device_urlsafe_key)
         local_device = device_key.get()
         chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
-        chrome_os_device = chrome_os_devices_api.get(self.CUSTOMER_ID,
-                                                     local_device.device_id)
-        result = {
-            'gcmRegistrationId': local_device.gcm_registration_id
-        }
+        chrome_os_device = chrome_os_devices_api.get(self.CUSTOMER_ID, local_device.device_id)
+        result = {}
         if chrome_os_device:
             result = chrome_os_device
-            result['gcmRegistrationId'] = local_device.gcm_registration_id
+        result['gcmRegistrationId'] = local_device.gcm_registration_id
+        result['tenantCode'] = local_device.tenant_code
+        result['created'] = local_device.created.strftime('%Y-%m-%d %H:%M:%S')
+        result['updated'] = local_device.updated.strftime('%Y-%m-%d %H:%M:%S')
         json_response(self.response, result)
 
     def get_list(self):
