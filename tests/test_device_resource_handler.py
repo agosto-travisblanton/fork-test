@@ -24,10 +24,11 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             'Authorization': config.API_TOKEN
         }
 
-    def test_device_resource_handler_get_by_id_returns_ok_status(self):
+    def test_device_resource_handler_get_by_key_returns_ok(self):
         device_key = self.load_device()
+        when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
         request_parameters = {}
-        uri = application.router.build(None, 'manage-device', None, {'device_id': device_key.urlsafe()})
+        uri = application.router.build(None, 'manage-device', None, {'device_urlsafe_key': device_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters)
         self.assertOK(response)
 
