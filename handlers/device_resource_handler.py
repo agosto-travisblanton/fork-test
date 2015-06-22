@@ -1,14 +1,13 @@
 import json
 
 from webapp2 import RequestHandler
+from google.appengine.ext import ndb
 
 from restler.serializers import json_response
 from chrome_os_devices_api import ChromeOsDevicesApi
 from models import ChromeOsDevice
-from google.appengine.ext import ndb
 
-
-__author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
+__author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
 
 class DeviceResourceHandler(RequestHandler):
@@ -17,7 +16,16 @@ class DeviceResourceHandler(RequestHandler):
 
     def get(self, device_id):
         device_key = ndb.Key(urlsafe=device_id)
-        result = device_key.get()
+        local_device = device_key.get()
+        chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
+        chrome_os_device = chrome_os_devices_api.get(self.CUSTOMER_ID,
+                                                     local_device.device_id)
+        result = {
+            'gcmRegistrationId': local_device.gcm_registration_id
+        }
+        if chrome_os_device:
+            result = chrome_os_device
+            result['gcmRegistrationId'] = local_device.gcm_registration_id
         json_response(self.response, result)
 
     def get_list(self):
