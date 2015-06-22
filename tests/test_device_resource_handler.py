@@ -29,15 +29,24 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
         request_parameters = {}
         uri = application.router.build(None, 'manage-device', None, {'device_urlsafe_key': device_key.urlsafe()})
-        response = self.app.get(uri, params=request_parameters)
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
         self.assertOK(response)
+
+    def test_device_resource_handler_get_by_key_no_authorization_header_returns_forbidden(self):
+        device_key = self.load_device()
+        when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
+        request_parameters = {}
+        uri = application.router.build(None, 'manage-device', None, {'device_urlsafe_key': device_key.urlsafe()})
+        with self.assertRaises(AppError) as error:
+            self.app.get(uri, params=request_parameters, headers={})
+        self.assertTrue('403 Forbidden' in error.exception.message)
 
     def test_device_resource_handler_get_by_id_returns_device_representation(self):
         device_key = self.load_device()
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
         request_parameters = {}
         uri = application.router.build(None, 'manage-device', None, {'device_urlsafe_key': device_key.urlsafe()})
-        response = self.app.get(uri, params=request_parameters)
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
         expected = device_key.get()
         self.assertEqual(response_json.get('deviceId'), expected.device_id)
@@ -94,7 +103,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
         location_uri = str(response.headers['Location'])
-        response = self.app.get(location_uri, params={})
+        response = self.app.get(location_uri, params={}, headers=self.headers)
         self.assertOK(response)
         response_json = json.loads(response.body)
         self.assertEqual(response_json.get('gcmRegistrationId'), gcm_registration_id)

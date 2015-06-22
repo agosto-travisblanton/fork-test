@@ -2,6 +2,7 @@ import json
 
 from webapp2 import RequestHandler
 from google.appengine.ext import ndb
+from decorators import api_token_required
 
 from restler.serializers import json_response
 from chrome_os_devices_api import ChromeOsDevicesApi
@@ -14,6 +15,7 @@ class DeviceResourceHandler(RequestHandler):
     ADMIN_ACCOUNT_TO_IMPERSONATE = 'administrator@skykit.com'
     CUSTOMER_ID = 'my_customer'
 
+    @api_token_required
     def get(self, device_urlsafe_key):
         device_key = ndb.Key(urlsafe=device_urlsafe_key)
         local_device = device_key.get()
