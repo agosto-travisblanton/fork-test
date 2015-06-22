@@ -66,6 +66,7 @@ class DeviceResourceHandler(RequestHandler):
             message = 'Unable to retrieve a list of ChromeOS devices.'
             json_response(self.response, {'error': message}, status_code=404)
 
+    @api_token_required
     def post(self):
         if self.request.body is not str('') and self.request.body is not None:
             request_json = json.loads(self.request.body)
@@ -100,6 +101,7 @@ class DeviceResourceHandler(RequestHandler):
         else:
             self.response.set_status(422, 'Did not receive request body.')
 
+    @api_token_required
     def put(self, device_urlsafe_key):
         device_key = ndb.Key(urlsafe=device_urlsafe_key)
         local_device = device_key.get()
@@ -120,6 +122,7 @@ class DeviceResourceHandler(RequestHandler):
             self.response.headers.pop('Content-Type', None)
             self.response.set_status(204)
 
+    @api_token_required
     def delete(self, device_urlsafe_key):
         device_key = ndb.Key(urlsafe=device_urlsafe_key)
         local_device = device_key.get()
