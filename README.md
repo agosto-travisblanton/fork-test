@@ -20,6 +20,11 @@ where the following JSON is posted to the server:
 
 }
 
+The Request header should have the following authorization key:
+
+![Screen Shot 2015-06-22 at 4.27.10 PM.png](https://bitbucket.org/repo/L8AoyM/images/2887177670-Screen%20Shot%202015-06-22%20at%204.27.10%20PM.png)
+
+
 will return a `422` if failure occurs, but should, if successful:
 
 * Return a `201 Created`; and
