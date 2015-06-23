@@ -21,7 +21,6 @@ Retrieve all devices from Skykit Device Management
 
     + Headers
 
-            Content-Type: application/json
 
     + Body
 
@@ -51,7 +50,6 @@ Retrieve all devices from Skykit Device Management
 
     + Headers
 
-            Content-Type: application/json
 
     + Body
 
@@ -59,8 +57,12 @@ Retrieve all devices from Skykit Device Management
                 "error": "HTTP request API token is invalid."
             }
 
-### GET /api/v1/devices?macAddress=38b1db95806d
+### GET /api/v1/devices?macAddress={mac_address}
 Retrieve a specific Skykit device/display by MAC address.
+
++ Parameters
+
+    + mac_address: `38b1db95806d` (required, string) - The device's MAC address for wireless or Ethernet networking.
 
 + Request (application/json)
 
@@ -104,7 +106,6 @@ Retrieve a specific Skykit device/display by MAC address.
 
     + Headers
 
-            Content-Type: application/json
 
     + Body
 
@@ -113,7 +114,11 @@ Retrieve a specific Skykit device/display by MAC address.
             }
 
 
-### GET /api/v1/devices/ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgID4woQKDA
+### GET /api/v1/devices/{urlsafe_key}
+
++ Parameters
+
+    + urlsafe_key: `ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgID4woQKDA` (required, string) - The device's entity key.
 
 + Request (application/json)
 
@@ -128,8 +133,6 @@ Retrieve a specific Skykit device/display by MAC address.
 
     + Headers
 
-            Alternate-Protocol: 443:quic,p=1
-            Cache-Control: no-cache
 
     + Body
 
