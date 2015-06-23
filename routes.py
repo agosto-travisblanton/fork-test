@@ -53,7 +53,7 @@ application = WSGIApplication(
         ),
         Route(
             r'/api/v1/devices/<device_urlsafe_key>/commands',
-            handler='handlers.device_control.DeviceCommandsHandler',
+            handler='handlers.device_commands_handler.DeviceCommandsHandler',
             name='device-commands',
         ),
 
