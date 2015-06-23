@@ -1,5 +1,6 @@
 import json
 from webapp2 import RequestHandler
+from decorators import api_token_required
 from device_commands_processor import (change_intent)
 from models import ChromeOsDevice
 
@@ -8,6 +9,7 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 class DeviceCommandsHandler(RequestHandler):
 
+    @api_token_required
     def post(self, device_urlsafe_key):
         chrome_os_device = ChromeOsDevice.get_by_device_id(device_urlsafe_key)
         self.response.headers.pop('Content-Type', None)
