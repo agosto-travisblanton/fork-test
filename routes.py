@@ -52,7 +52,7 @@ application = WSGIApplication(
             methods=['GET', 'PUT', 'DELETE']
         ),
         Route(
-            r'/api/v1/devices/<device_id>/commands',
+            r'/api/v1/devices/<device_urlsafe_key>/commands',
             handler='handlers.device_control.DeviceCommandsHandler',
             name='device-commands',
         ),
