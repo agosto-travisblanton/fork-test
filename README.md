@@ -14,9 +14,9 @@ where the following JSON is posted to the server:
 
 "macAddress": "c45444596b9b",
 
-"gcm_registration_id": "blah blah",
+"gcmRegistrationId": "blah blah",
 
-"tenant_code": "some_tenant"
+"tenantCode": "some_tenant"
 
 }
 
