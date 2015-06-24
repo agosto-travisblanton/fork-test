@@ -15,6 +15,7 @@ from models import ChromeOsDevice
 class TestDeviceResourceHandler(BaseTest, WebTest):
     APPLICATION = application
     CUSTOMER_ID = 'my_customer'
+    REGISTERED_CHROME_MAC_ADDRESS_NOT_IN_PROVISIONING = '54271e619346'
 
     def setUp(self):
         super(TestDeviceResourceHandler, self).setUp()
@@ -151,6 +152,24 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             get(keys_only=True)
         self.assertIsNotNone(chrome_os_device_key)
         self.assertTrue('123' == chrome_os_device_key.get().gcm_registration_id)
+
+    def test_device_resource_handler_post_returns_no_content_with_registered_device_stored_locally(self):
+        local_device = ChromeOsDevice(device_id='132e235a-b346-4a37-a100-de49fa753a2a',
+                                      gcm_registration_id='8d70a8d78a6dfa6df76dfas7',
+                                      tenant_code='acme')
+        local_device.put()
+        request_body = {'macAddress': 'c45444596b9b',
+                        'gcmRegistrationId': '8d70a8d78a6dfa6df76dfas7',
+                        'tenantCode': 'Acme'}
+        response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
+        self.assertEqual('204 No Content', response.status)
+
+    def test_device_resource_handler_post_returns_created_with_registered_device_not_stored_locally(self):
+        request_body = {'macAddress': self.REGISTERED_CHROME_MAC_ADDRESS_NOT_IN_PROVISIONING,
+                        'gcmRegistrationId': '123',
+                        'tenantCode': 'Acme'}
+        response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
+        self.assertEqual('201 Created', response.status)
 
     def test_device_resource_put_returns_no_content(self):
         device_key = self.load_device()

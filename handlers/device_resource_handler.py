@@ -78,22 +78,27 @@ class DeviceResourceHandler(RequestHandler):
                                       x.get('ethernetMacAddress') == device_mac_address)
                 chrome_os_device = next(loop_comprehension, None)
                 if chrome_os_device is not None:
+                    gcm_registration_id = request_json.get('gcmRegistrationId')
+                    tenant_code = request_json.get('tenantCode')
                     device_id = chrome_os_device.get('deviceId')
-                    device = ChromeOsDevice.get_by_device_id(device_id)
-                    if device is None:
-                        gcm_registration_id = request_json.get('gcmRegistrationId')
-                        tenant_code = request_json.get('tenantCode')
-                        device = ChromeOsDevice(device_id=device_id,
-                                                gcm_registration_id=gcm_registration_id,
-                                                tenant_code=tenant_code)
-                    device_key = device.put()
+                    local_device = ChromeOsDevice.get_by_device_id(device_id)
+                    if local_device is None:
+                        local_device = ChromeOsDevice(device_id=device_id,
+                                                      gcm_registration_id=gcm_registration_id,
+                                                      tenant_code=tenant_code)
+                        self.response.set_status(201)
+                    else:
+                        local_device.gcm_registration_id = gcm_registration_id
+                        local_device.tenant_code = tenant_code
+                        self.response.set_status(204)
+
+                    device_key = local_device.put()
                     device_uri = self.request.app.router.build(None,
                                                                'manage-device',
                                                                None,
                                                                {'device_urlsafe_key': device_key.urlsafe()})
                     self.response.headers['Location'] = device_uri
                     self.response.headers.pop('Content-Type', None)
-                    self.response.set_status(201)
                 else:
                     self.response.set_status(422,
                                              'Chrome OS device not associated with this customer id ( {0}'.format(
@@ -127,7 +132,8 @@ class DeviceResourceHandler(RequestHandler):
         device_key = ndb.Key(urlsafe=device_urlsafe_key)
         local_device = device_key.get()
         if local_device is None:
-            self.response.set_status(422, 'Unable to retrieve ChromeOS device by device ID: {0}'.format(local_device.device_id))
+            self.response.set_status(422, 'Unable to retrieve ChromeOS device by device ID: {0}'.format(
+                local_device.device_id))
         else:
             local_device.key.delete()
             self.response.headers.pop('Content-Type', None)
