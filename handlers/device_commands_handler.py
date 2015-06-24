@@ -19,7 +19,7 @@ class DeviceCommandsHandler(RequestHandler):
         try:
             key = ndb.Key(urlsafe=device_urlsafe_key)
             chrome_os_device = key.get()
-        except Exception:
+        except Exception, e:
             pass
         if chrome_os_device:
             try:
