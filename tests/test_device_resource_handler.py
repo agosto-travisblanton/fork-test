@@ -165,7 +165,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual('204 No Content', response.status)
 
     def test_device_resource_handler_post_returns_created_with_registered_device_not_stored_locally(self):
-        request_body = {'macAddress': '54271e619346',
+        request_body = {'macAddress': self.REGISTERED_CHROME_MAC_ADDRESS_NOT_IN_PROVISIONING,
                         'gcmRegistrationId': '123',
                         'tenantCode': 'Acme'}
         response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
