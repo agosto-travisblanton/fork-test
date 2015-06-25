@@ -30,8 +30,8 @@ class TenantsHandler(RequestHandler):
             name = request_json['name']
             admin_email = request_json['admin_email']
             tenant_code = request_json['tenant_code']
-            content_manager_api = ContentManagerApi()
-            content_manager_tenant_key = content_manager_api.create_tenant(name, admin_email)
+            # content_manager_api = ContentManagerApi()
+            content_manager_tenant_key = 'some key' #content_manager_api.create_tenant(name, admin_email)
             if content_manager_tenant_key:
                 content_server_url = request_json['content_server_url']
                 chrome_device_domain = request_json['chrome_device_domain']
