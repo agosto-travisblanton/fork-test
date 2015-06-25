@@ -52,7 +52,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         expected = device_key.get()
         self.assertEqual(response_json.get('deviceId'), expected.device_id)
         self.assertEqual(response_json.get('gcmRegistrationId'), expected.gcm_registration_id)
-        self.assertEqual(response_json.get('tenantCode'), expected.tenant_code)
         self.assertEqual(response_json.get('created'), expected.created.strftime('%Y-%m-%d %H:%M:%S'))
         self.assertEqual(response_json.get('updated'), expected.updated.strftime('%Y-%m-%d %H:%M:%S'))
 
@@ -123,7 +122,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertOK(response)
         response_json = json.loads(response.body)
         self.assertEqual(response_json.get('gcmRegistrationId'), gcm_registration_id)
-        self.assertEqual(response_json.get('tenantCode'), tenant_code)
 
     def test_device_resource_handler_post_returns_unprocessable_entity_status_for_empty_request_body(self):
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
@@ -155,8 +153,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_device_resource_handler_post_returns_no_content_with_registered_device_stored_locally(self):
         local_device = ChromeOsDevice(device_id='132e235a-b346-4a37-a100-de49fa753a2a',
-                                      gcm_registration_id='8d70a8d78a6dfa6df76dfas7',
-                                      tenant_code='acme')
+                                      gcm_registration_id='8d70a8d78a6dfa6df76dfas7')
         local_device.put()
         request_body = {'macAddress': 'c45444596b9b',
                         'gcmRegistrationId': '8d70a8d78a6dfa6df76dfas7',
@@ -212,8 +209,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_device_resource_delete_returns_no_content(self):
         chrome_os_device = ChromeOsDevice(device_id=self.chrome_os_device_json.get('deviceId'),
-                                          gcm_registration_id='d23784972038845ab3963412',
-                                          tenant_code='some tenant code')
+                                          gcm_registration_id='d23784972038845ab3963412')
         key = chrome_os_device.put()
         url = '/api/v1/devices/{0}'.format(key.urlsafe())
         response = self.app.delete(url, headers=self.headers)
@@ -221,8 +217,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_device_resource_delete_no_authorization_header_returns_forbidden(self):
         chrome_os_device = ChromeOsDevice(device_id=self.chrome_os_device_json.get('deviceId'),
-                                          gcm_registration_id='d23784972038845ab3963412',
-                                          tenant_code='some tenant code')
+                                          gcm_registration_id='d23784972038845ab3963412')
         key = chrome_os_device.put()
         url = '/api/v1/devices/{0}'.format(key.urlsafe())
         with self.assertRaises(Exception) as context:
@@ -231,8 +226,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_device_resource_delete_removes_chrome_os_device_entity(self):
         chrome_os_device = ChromeOsDevice(device_id=self.chrome_os_device_json.get('deviceId'),
-                                          gcm_registration_id='d23784972038845ab3963412',
-                                          tenant_code='some tenant code')
+                                          gcm_registration_id='d23784972038845ab3963412')
         key = chrome_os_device.put()
         url = '/api/v1/devices/{0}'.format(key.urlsafe())
         self.app.delete(url, headers=self.headers)
@@ -249,7 +243,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def load_device():
         device = ChromeOsDevice(
             device_id='132e235a-b346-4a37-a100-de49fa753a2a',
-            gcm_registration_id='some gcm registration id',
-            tenant_code='some tenant code'
+            gcm_registration_id='some gcm registration id'
         )
         return device.put()

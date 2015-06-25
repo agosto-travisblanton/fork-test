@@ -9,6 +9,7 @@ from agar.test import BaseTest, WebTest
 from models import Tenant, TenantEntityGroup
 from routes import application
 from mockito import when, verify, any as any_matcher
+from app_config import config
 
 
 class TestTenantsHandler(BaseTest, WebTest):
@@ -19,6 +20,9 @@ class TestTenantsHandler(BaseTest, WebTest):
 
     def setUp(self):
         super(TestTenantsHandler, self).setUp()
+        self.headers = {
+            'Authorization': config.API_TOKEN
+        }
 
     def test_get_by_id_returns_ok_status(self):
         tenant_keys = self.load_tenants()
@@ -59,12 +63,14 @@ class TestTenantsHandler(BaseTest, WebTest):
         admin_email = u'foo@bar.com'
         when(ContentManagerApi).create_tenant(name, admin_email).thenReturn('some key')
         request_parameters = {'name': name,
+                              'tenant_code': 'acme',
                               'admin_email': admin_email,
                               'content_server_url': 'https://www.foo.com',
+                              'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'chrome_device_domain': '',
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
-        self.app.post_json(uri, params=request_parameters)
+        self.app.post(uri, json.dumps(request_parameters), headers=self.headers)
         verify(ContentManagerApi, times=1).create_tenant(any_matcher(''), any_matcher(''))
 
     def test_post_returns_created_status(self):
@@ -72,9 +78,11 @@ class TestTenantsHandler(BaseTest, WebTest):
         admin_email = u'foo@bar.com'
         when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(str('some key'))
         request_parameters = {'name': name,
+                              'tenant_code': 'acme',
                               'admin_email': admin_email,
                               'content_server_url': 'https://www.foo.com',
                               'chrome_device_domain': '',
+                              'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.post_json(uri, params=request_parameters)
@@ -85,8 +93,10 @@ class TestTenantsHandler(BaseTest, WebTest):
         admin_email = u'foo@bar.com'
         when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(str('some key'))
         request_parameters = {'name': name,
+                              'tenant_code': 'acme',
                               'admin_email': admin_email,
                               'content_server_url': 'https://www.foo.com',
+                              'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'chrome_device_domain': '',
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
@@ -100,22 +110,26 @@ class TestTenantsHandler(BaseTest, WebTest):
         content_server_api_key = u'key me up jeeves'
         when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(content_server_api_key)
         request_parameters = {'name': name,
+                              'tenant_code': 'acme',
                               'admin_email': admin_email,
                               'content_server_url': 'https://www.foo.com',
+                              'content_server_api_key': content_server_api_key,
                               'chrome_device_domain': '',
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         self.app.post_json(uri, params=request_parameters)
         actual = Tenant.find_by_name(request_parameters['name'])
-        self.assertTrue(actual.content_server_api_key == content_server_api_key)
+        self.assertEqual(content_server_api_key, actual.content_server_api_key)
 
     def test_post_create_new_tenant_sets_location_header(self):
         name = u'ABC'
         admin_email = u'foo@bar.com'
         when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(str('some key'))
         request_parameters = {'name': name,
+                              'tenant_code': 'acme',
                               'admin_email': admin_email,
                               'content_server_url': 'https://www.foo.com',
+                              'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'chrome_device_domain': '',
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
@@ -132,6 +146,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         admin_email = u'foo@bar.com'
         when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(None)
         request_parameters = {'name': name,
+                              'tenant_code': 'acme',
                               'admin_email': admin_email,
                               'content_server_url': 'https://www.foo.com',
                               'chrome_device_domain': '',
@@ -145,6 +160,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         tenant_keys = self.load_tenants()
         uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': tenant_keys[0].urlsafe()})
         response = self.app.put_json(uri, {'name': 'foobar',
+                                           'tenant_code': 'acme',
                                            'admin_email': 'foo@bar.com',
                                            'content_server_url': 'https://www.foo.com',
                                            'chrome_device_domain': '',
@@ -193,6 +209,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         for x in range(5):
             tenant_entity_group = TenantEntityGroup.singleton()
             tenant = Tenant(parent=tenant_entity_group.key,
+                            tenant_code='acme',
                             name="Testing tenant {0}".format(x),
                             admin_email=self.ADMIN_EMAIL.format(x),
                             content_server_api_key=self.API_KEY.format(x),
