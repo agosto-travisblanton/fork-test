@@ -1,4 +1,7 @@
+import json
 from env_setup import setup_test_paths;
+from restler.serializers import to_json
+from strategy import CHROME_OS_DEVICE_STRATEGY
 
 setup_test_paths()
 
@@ -45,3 +48,15 @@ class TestChromeOsDeviceModel(BaseTest):
                                                  device_id=self.TESTING_DEVICE_ID,
                                                  gcm_registration_id=self.TEST_GCM_REGISTRATION_ID)
         self.assertIsNotNone(chrome_os_device)
+
+    def test_json_serialization_strategy(self):
+        chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
+                                                 device_id=self.TESTING_DEVICE_ID,
+                                                 gcm_registration_id=self.TEST_GCM_REGISTRATION_ID)
+        chrome_os_device.put()
+        context = {}
+        json_representation = json.loads(to_json(chrome_os_device, CHROME_OS_DEVICE_STRATEGY))   #, context=context)
+        self.assertEqual(self.TESTING_DEVICE_ID, json_representation['device_id'])
+        self.assertEqual(self.TEST_GCM_REGISTRATION_ID, json_representation['gcm_registration_id'])
+        self.assertIsNotNone(json_representation['created'])
+        self.assertIsNotNone(json_representation['updated'])
