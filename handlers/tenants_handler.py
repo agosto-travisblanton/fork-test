@@ -1,9 +1,10 @@
 import json
+
 from google.appengine.ext import ndb
 
 from webapp2 import RequestHandler
-from content_manager_api import ContentManagerApi
 
+from content_manager_api import ContentManagerApi
 from models import Tenant, TenantEntityGroup
 from restler.serializers import json_response
 from strategy import TENANT_STRATEGY
@@ -28,14 +29,21 @@ class TenantsHandler(RequestHandler):
             request_json = json.loads(self.request.body)
             name = request_json['name']
             admin_email = request_json['admin_email']
+            tenant_code = request_json['tenant_code']
             content_manager_api = ContentManagerApi()
             content_manager_tenant_key = content_manager_api.create_tenant(name, admin_email)
             if content_manager_tenant_key:
                 content_server_url = request_json['content_server_url']
                 chrome_device_domain = request_json['chrome_device_domain']
+                content_server_api_key = request_json['content_server_api_key']
                 active = request_json['active']
-                tenant = Tenant.create(name, admin_email, content_server_url, content_manager_tenant_key,
-                                       chrome_device_domain, active)
+                tenant = Tenant.create(name=name,
+                                       tenant_code=tenant_code,
+                                       admin_email=admin_email,
+                                       content_server_url=content_server_url,
+                                       content_server_api_key=content_server_api_key,
+                                       chrome_device_domain=chrome_device_domain,
+                                       active=active)
                 tenant_key = tenant.put()
                 tenant_uri = self.request.app.router.build(None,
                                                            'manage-tenant',

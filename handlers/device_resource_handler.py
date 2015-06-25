@@ -25,7 +25,6 @@ class DeviceResourceHandler(RequestHandler):
         if chrome_os_device:
             result = chrome_os_device
         result['gcmRegistrationId'] = local_device.gcm_registration_id
-        result['tenantCode'] = local_device.tenant_code
         result['created'] = local_device.created.strftime('%Y-%m-%d %H:%M:%S')
         result['updated'] = local_device.updated.strftime('%Y-%m-%d %H:%M:%S')
         json_response(self.response, result)
@@ -79,17 +78,14 @@ class DeviceResourceHandler(RequestHandler):
                 chrome_os_device = next(loop_comprehension, None)
                 if chrome_os_device is not None:
                     gcm_registration_id = request_json.get('gcmRegistrationId')
-                    tenant_code = request_json.get('tenantCode')
                     device_id = chrome_os_device.get('deviceId')
                     local_device = ChromeOsDevice.get_by_device_id(device_id)
                     if local_device is None:
                         local_device = ChromeOsDevice(device_id=device_id,
-                                                      gcm_registration_id=gcm_registration_id,
-                                                      tenant_code=tenant_code)
+                                                      gcm_registration_id=gcm_registration_id)
                         self.response.set_status(201)
                     else:
                         local_device.gcm_registration_id = gcm_registration_id
-                        local_device.tenant_code = tenant_code
                         self.response.set_status(204)
 
                     device_key = local_device.put()
@@ -120,9 +116,6 @@ class DeviceResourceHandler(RequestHandler):
             gcm_registration_id = request_json.get('gcmRegistrationId')
             if gcm_registration_id:
                 local_device.gcm_registration_id = gcm_registration_id
-            tenant_code = request_json.get('tenantCode')
-            if tenant_code:
-                local_device.tenant_code = tenant_code
             local_device.put()
             self.response.headers.pop('Content-Type', None)
             self.response.set_status(204)
