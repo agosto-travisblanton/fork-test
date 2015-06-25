@@ -30,8 +30,8 @@ class TenantsHandler(RequestHandler):
             name = request_json['name']
             admin_email = request_json['admin_email']
             tenant_code = request_json['tenant_code']
-            content_manager_api = ContentManagerApi()
-            content_manager_tenant_key = content_manager_api.create_tenant(name, admin_email)
+            # content_manager_api = ContentManagerApi()
+            content_manager_tenant_key = 'some key' #content_manager_api.create_tenant(name, admin_email)
             if content_manager_tenant_key:
                 content_server_url = request_json['content_server_url']
                 chrome_device_domain = request_json['chrome_device_domain']
@@ -59,11 +59,13 @@ class TenantsHandler(RequestHandler):
         key = ndb.Key(urlsafe=tenant_key)
         tenant = key.get()
         request_json = json.loads(self.request.body)
+        tenant.tenant_code = request_json.get('tenant_code')
         tenant.name = request_json.get('name')
-        tenant.active = request_json.get('active')
         tenant.admin_email = request_json.get('admin_email')
-        tenant.chrome_device_domain = request_json.get('chrome_device_domain')
         tenant.content_server_url = request_json.get('content_server_url')
+        tenant.content_server_api_key = request_json.get('content_server_api_key')
+        tenant.chrome_device_domain = request_json.get('chrome_device_domain')
+        tenant.active = request_json.get('active')
         tenant.put()
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
