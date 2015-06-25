@@ -163,7 +163,8 @@ class TestTenantsHandler(BaseTest, WebTest):
                                            'tenant_code': 'acme',
                                            'admin_email': 'foo@bar.com',
                                            'content_server_url': 'https://www.foo.com',
-                                           'chrome_device_domain': '',
+                                           'content_server_api_key': 'some key',
+                                           'chrome_device_domain': 'some domain',
                                            'active': True})
         self.assertEqual(204, response.status_code)
 
@@ -174,9 +175,11 @@ class TestTenantsHandler(BaseTest, WebTest):
         self.assertEqual(expected.name, 'Testing tenant 0')
         self.assertEqual(expected.active, True)
         self.app.put_json(uri, {'name': 'foobar',
+                                'tenant_code': 'acme',
                                 'admin_email': 'foo@bar.com',
                                 'content_server_url': 'https://www.foo.com',
-                                'chrome_device_domain': '',
+                                'content_server_api_key': 'some key',
+                                'chrome_device_domain': 'some domain',
                                 'active': False})
         self.assertEqual(expected.name, 'foobar')
         self.assertEqual(expected.active, False)
