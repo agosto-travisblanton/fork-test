@@ -26,5 +26,5 @@ CHROME_OS_DEVICE_FIELDS = [
 CHROME_OS_DEVICE_STRATEGY = ModelStrategy(ChromeOsDevice) + CHROME_OS_DEVICE_FIELDS
 CHROME_OS_DEVICE_STRATEGY += [
     {'key': lambda chrome_os_device, field_name, context: chrome_os_device.key.urlsafe()},
-    {'tenant_code': lambda chrome_os_device, field_name, context: chrome_os_device.key.parent().get().tenant_code}
+    {'tenant': lambda chrome_os_device, field_name, context: chrome_os_device.key.parent().get()}
 ]
