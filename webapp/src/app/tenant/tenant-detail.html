@@ -44,6 +44,7 @@
                          required
                          placeholder="Enter tenant name"
                          ng-model="tenantDetailsCtrl.currentTenant.name"
+                         ng-change="tenantDetailsCtrl.autoGenerateTenantCode()"
                          autofocus>
                 </div>
                 <div class="col-sm-4">
@@ -115,7 +116,7 @@
               </div>
               <div class="form-group"
                    ng-class="{ 'has-error' : tenantForm.contentServerUrl.$invalid && !tenantForm.contentServerUrl.$pristine }">
-                <label for="contentServerUrl" class="col-sm-2 control-label">Content Server Url</label>
+                <label for="contentServerUrl" class="col-sm-2 control-label">Content Server URL</label>
 
                 <div class="col-sm-6">
                   <input type="text"
