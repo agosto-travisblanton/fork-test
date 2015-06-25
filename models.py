@@ -19,7 +19,7 @@ class TenantEntityGroup(ndb.Model):
 class Tenant(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
-    # tenant_code = ndb.StringProperty(required=True)
+    tenant_code = ndb.StringProperty(required=True, indexed=True)
     name = ndb.StringProperty(required=True, indexed=True)
     admin_email = ndb.StringProperty(required=True)
     content_server_url = ndb.StringProperty(required=True)
@@ -43,9 +43,10 @@ class Tenant(ndb.Model):
             return False
 
     @classmethod
-    def create(cls, name, admin_email, content_server_url, content_server_api_key, chrome_device_domain, active):
+    def create(cls, tenant_code, name, admin_email, content_server_url, content_server_api_key, chrome_device_domain, active):
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
+                   tenant_code=tenant_code,
                    name=name,
                    admin_email=admin_email,
                    content_server_url=content_server_url,

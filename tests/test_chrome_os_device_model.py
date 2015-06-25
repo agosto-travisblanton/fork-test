@@ -15,20 +15,23 @@ class TestChromeOsDeviceModel(BaseTest):
     ADMIN_EMAIL = 'foo@bar.com'
     CONTENT_SERVER_URL = 'https://www.content.com'
     CHROME_DEVICE_DOMAIN = 'bar.com'
+    CONTENT_SERVER_API_KEY = 'API KEY'
+    TENANT_CODE = 'foobar'
 
     def setUp(self):
         super(TestChromeOsDeviceModel, self).setUp()
         self.tenant = Tenant.create(name=self.NAME,
-                               admin_email=self.ADMIN_EMAIL,
-                               content_server_url=self.CONTENT_SERVER_URL,
-                               content_server_api_key='',
-                               chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
-                               active=True)
+                                    tenant_code=self.TENANT_CODE,
+                                    admin_email=self.ADMIN_EMAIL,
+                                    content_server_url=self.CONTENT_SERVER_URL,
+                                    content_server_api_key=self.CONTENT_SERVER_API_KEY,
+                                    chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
+                                    active=True)
         self.tenant_key = self.tenant.put()
 
     def test_get_by_device_id(self):
         chrome_os_device = ChromeOsDevice(device_id=self.TESTING_DEVICE_ID,
-                                          gcm_registration_id=self.TEST_GCM_REGISTRATION_ID, tenant_code='Acme')
+                                          gcm_registration_id=self.TEST_GCM_REGISTRATION_ID)
         expected_key = chrome_os_device.put()
         actual = ChromeOsDevice.get_by_device_id(self.TESTING_DEVICE_ID)
         self.assertEqual(actual.key, expected_key)
