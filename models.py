@@ -19,6 +19,7 @@ class TenantEntityGroup(ndb.Model):
 class Tenant(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
+    # tenant_code = ndb.StringProperty(required=True)
     name = ndb.StringProperty(required=True, indexed=True)
     admin_email = ndb.StringProperty(required=True)
     content_server_url = ndb.StringProperty(required=True)
@@ -59,7 +60,6 @@ class ChromeOsDevice(ndb.Model):
     updated = ndb.DateTimeProperty(auto_now=True)
     device_id = ndb.StringProperty(required=True, indexed=True)
     gcm_registration_id = ndb.StringProperty(required=True)
-    tenant_code = ndb.StringProperty(required=True)
 
     @classmethod
     def get_by_device_id(cls, device_id):
@@ -67,3 +67,9 @@ class ChromeOsDevice(ndb.Model):
             chrome_os_device_key = ChromeOsDevice.query(ChromeOsDevice.device_id == device_id).get(keys_only=True)
             if None is not chrome_os_device_key:
                 return chrome_os_device_key.get()
+
+    @classmethod
+    def create(cls, tenant_key, device_id, gcm_registration_id):
+        return cls(parent=tenant_key,
+                   device_id=device_id,
+                   gcm_registration_id=gcm_registration_id)
