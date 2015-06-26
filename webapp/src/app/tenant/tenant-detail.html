@@ -9,10 +9,10 @@
         <div class="col-lg-12">
           <h1 class="page-header">
             <div ng-hide="tenantDetailsCtrl.editMode">
-              Add
+              Add new tenant
             </div>
             <div ng-show="tenantDetailsCtrl.editMode">
-              Edit
+              Edit existing tenant
             </div>
           </h1>
         </div>
@@ -21,12 +21,7 @@
       <div class="row">
         <div class="col-lg-12">
           <fieldset>
-            <div ng-hide="tenantDetailsCtrl.editMode">
-              <legend>New tenant</legend>
-            </div>
-            <div ng-show="tenantDetailsCtrl.editMode">
-              <legend>Existing tenant</legend>
-            </div>
+            <legend>Tenant properties</legend>
 
             <form name="tenantForm"
                   class="form-horizontal"
@@ -36,7 +31,7 @@
                    ng-class="{ 'has-error' : tenantForm.name.$invalid && !tenantForm.name.$pristine }">
                 <label for="name" class="col-sm-2 control-label">Name</label>
 
-                <div class="col-sm-6">
+                <div class="col-sm-4">
                   <input type="text"
                          class="form-control"
                          name="name"
@@ -47,7 +42,7 @@
                          ng-change="tenantDetailsCtrl.autoGenerateTenantCode()"
                          autofocus>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-6">
                   <p ng-show="tenantForm.name.$invalid && !tenantForm.name.$pristine"
                      class="help-block">
                     The tenant name is required.
@@ -56,9 +51,9 @@
               </div>
               <div class="form-group"
                    ng-class="{ 'has-error' : tenantForm.tenantCode.$invalid && !tenantForm.tenantCode.$pristine }">
-                <label for="tenantCode" class="col-sm-2 control-label">Tenant Code</label>
+                <label for="tenantCode" class="col-sm-2 control-label">Tenant code</label>
 
-                <div class="col-sm-6">
+                <div class="col-sm-4">
                   <input type="text"
                          class="form-control"
                          name="tenantCode"
@@ -67,7 +62,7 @@
                          placeholder="Enter tenant code (must match tenant code in Google Device Management)"
                          ng-model="tenantDetailsCtrl.currentTenant.tenant_code">
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-6">
                   <p ng-show="tenantForm.tenantCode.$invalid && !tenantForm.tenantCode.$pristine"
                      class="help-block">
                     The tenant lookup code is required.
@@ -76,9 +71,9 @@
               </div>
               <div class="form-group"
                    ng-class="{ 'has-error' : tenantForm.adminEmail.$invalid && !tenantForm.adminEmail.$pristine }">
-                <label for="adminEmail" class="col-sm-2 control-label">Admin Email</label>
+                <label for="adminEmail" class="col-sm-2 control-label">Admin email address</label>
 
-                <div class="col-sm-6">
+                <div class="col-sm-4">
                   <input type="text"
                          required
                          class="form-control"
@@ -87,7 +82,7 @@
                          placeholder="Enter admin email"
                          ng-model="tenantDetailsCtrl.currentTenant.admin_email">
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-6">
                   <p ng-show="tenantForm.adminEmail.$invalid && !tenantForm.adminEmail.$pristine"
                      class="help-block">
                     The tenant admin email address is required.
@@ -96,9 +91,9 @@
               </div>
               <div class="form-group"
                    ng-class="{ 'has-error' : tenantForm.chromeDeviceDomain.$invalid && !tenantForm.chromeDeviceDomain.$pristine }">
-                <label for="chromeDeviceDomain" class="col-sm-2 control-label">Chrome Device Domain</label>
+                <label for="chromeDeviceDomain" class="col-sm-2 control-label">Chrome device domain</label>
 
-                <div class="col-sm-6">
+                <div class="col-sm-4">
                   <input type="text"
                          required
                          class="form-control"
@@ -107,7 +102,7 @@
                          placeholder="Enter Chrome device domain"
                          ng-model="tenantDetailsCtrl.currentTenant.chrome_device_domain">
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-6">
                   <p ng-show="tenantForm.chromeDeviceDomain.$invalid && !tenantForm.chromeDeviceDomain.$pristine"
                      class="help-block">
                     The Chrome device domain is required.
@@ -116,9 +111,9 @@
               </div>
               <div class="form-group"
                    ng-class="{ 'has-error' : tenantForm.contentServerUrl.$invalid && !tenantForm.contentServerUrl.$pristine }">
-                <label for="contentServerUrl" class="col-sm-2 control-label">Content Server URL</label>
+                <label for="contentServerUrl" class="col-sm-2 control-label">Content server URL</label>
 
-                <div class="col-sm-6">
+                <div class="col-sm-4">
                   <input type="text"
                          required
                          class="form-control"
@@ -127,7 +122,7 @@
                          placeholder="Enter content server URL"
                          ng-model="tenantDetailsCtrl.currentTenant.content_server_url">
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-6">
                   <p ng-show="tenantForm.contentServerUrl.$invalid && !tenantForm.contentServerUrl.$pristine"
                      class="help-block">
                     The content server URL is required.
@@ -136,9 +131,9 @@
               </div>
               <div class="form-group"
                    ng-class="{ 'has-error' : tenantForm.contentServerApiKey.$invalid && !tenantForm.contentServerApiKey.$pristine }">
-                <label for="contentServerApiKey" class="col-sm-2 control-label">Content Server API key</label>
+                <label for="contentServerApiKey" class="col-sm-2 control-label">Content server API key</label>
 
-                <div class="col-sm-6">
+                <div class="col-sm-4">
                   <input type="text"
                          required
                          class="form-control"
@@ -147,7 +142,7 @@
                          placeholder="Enter content server API key"
                          ng-model="tenantDetailsCtrl.currentTenant.content_server_api_key">
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-6">
                   <p ng-show="tenantForm.contentServerApiKey.$invalid && !tenantForm.contentServerApiKey.$pristine"
                      class="help-block">
                     The content server API key is required.
@@ -161,16 +156,9 @@
                          ng-model="tenantDetailsCtrl.currentTenant.active"> <label for="active">Active</label>
                 </div>
               </div>
-              <div ng-show="tenantDetailsCtrl.editMode">
-                <div class="form-group">
-                  <label>Content Server API Key</label><br>
-                  {{tenantDetailsCtrl.currentTenant.content_server_api_key}}
-                </div>
-              </div>
-
               <div class="form-group">
-                <hr>
-                <div class="col-sm-offset-2 col-sm-6">
+                <div class="col-sm-offset-2 col-sm-10">
+                  <hr>
                   <button type="submit"
                           class="btn btn-primary btn-default"
                           ng-disabled="tenantForm.$invalid">
