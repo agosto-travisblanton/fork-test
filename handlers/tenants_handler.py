@@ -33,10 +33,10 @@ class TenantsHandler(RequestHandler):
             # content_manager_api = ContentManagerApi()
             content_manager_tenant_key = 'some key' #content_manager_api.create_tenant(name, admin_email)
             if content_manager_tenant_key:
-                content_server_url = request_json['content_server_url']
-                chrome_device_domain = request_json['chrome_device_domain']
-                content_server_api_key = request_json['content_server_api_key']
-                active = request_json['active']
+                content_server_url = request_json.get('content_server_url')
+                chrome_device_domain = request_json.get('chrome_device_domain')
+                content_server_api_key = request_json.get('content_server_api_key')
+                active = request_json.get('active')
                 tenant = Tenant.create(name=name,
                                        tenant_code=tenant_code,
                                        admin_email=admin_email,
