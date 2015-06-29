@@ -29,6 +29,11 @@ describe 'TenantDetailsCtrl', ->
       expect(controller.currentTenant).toBeDefined()
       expect(controller.currentTenant.key).toBeUndefined()
       expect(controller.currentTenant.name).toBeUndefined()
+      expect(controller.currentTenant.tenant_code).toBeUndefined()
+      expect(controller.currentTenant.admin_email).toBeUndefined()
+      expect(controller.currentTenant.content_server_url).toBeUndefined()
+      expect(controller.currentTenant.chrome_device_domain).toBeUndefined()
+      expect(controller.currentTenant.active).toBeTruthy()
 
     it 'editMode should be set to true', ->
       $stateParams = {tenantKey: 'fahdsfyudsyfauisdyfoiusydfu'}
@@ -70,3 +75,21 @@ describe 'TenantDetailsCtrl', ->
       controller.onClickSaveButton()
       promise.resolve()
       expect($state.go).toHaveBeenCalledWith('tenants')
+
+  describe '.autoGenerateTenantCode', ->
+    beforeEach ->
+      $stateParams = {}
+      controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
+
+    it 'generates a new tenant code when key is undefined', ->
+      controller.currentTenant.key = undefined
+      controller.currentTenant.name = 'Foobar Inc.'
+      controller.autoGenerateTenantCode()
+      expect(controller.currentTenant.tenant_code).toBe 'foobar_inc'
+
+    it 'skips generating a new tenant code when key is defined', ->
+      controller.currentTenant.key = 'd8ad97ad87afg897f987g0f8'
+      controller.currentTenant.name = 'Foobar Inc.'
+      controller.currentTenant.tenant_code = 'barfoo_company'
+      controller.autoGenerateTenantCode()
+      expect(controller.currentTenant.tenant_code).toBe 'barfoo_company'
