@@ -1,6 +1,5 @@
 import json
 import logging
-
 import requests
 
 from app_config import config
@@ -27,11 +26,12 @@ class GoogleCloudMessaging(object):
         if test_mode:
             cloud_message_payload_dictionary['dry_run'] = True
         json_payload = json.dumps(cloud_message_payload_dictionary)
-        logging.info('>>> GCM JSON payload: {0}'.format(json_payload))
+        # logging.info('>>> GCM JSON payload: {0}'.format(json_payload))
+        response = None
         try:
-            response = requests.post(self.URL_CLOUD_MESSAGING_SEND, json_payload, timeout=60, headers=self.HEADERS)
+            response = requests.post(self.URL_CLOUD_MESSAGING_SEND, json=json_payload, headers=self.HEADERS)
         except Exception, e:
-            print e.message
+            logging.exception(e)
 
         if response and response.status_code == 200:
             return response.json()
