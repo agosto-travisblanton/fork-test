@@ -6,6 +6,8 @@ from webapp2 import RequestHandler
 
 from decorators import api_token_required
 from device_commands_processor import (change_intent)
+from models import ChromeOsDevice
+
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>. Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -17,8 +19,8 @@ class DeviceCommandsHandler(RequestHandler):
         self.response.headers.pop('Content-Type', None)
         chrome_os_device = None
         try:
-            key = ndb.Key(urlsafe=device_urlsafe_key)
-            chrome_os_device = key.get()
+            device_key = ndb.Key(urlsafe=device_urlsafe_key)
+            chrome_os_device = device_key.get()
         except Exception, e:
             pass
         if chrome_os_device:

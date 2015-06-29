@@ -56,6 +56,14 @@ def _SERVICE_ACCOUNT_EMAIL():
 
 app_SERVICE_ACCOUNT_EMAIL = _SERVICE_ACCOUNT_EMAIL()
 
+def _GCM_TEST_MODE():
+    if on_development_server or not on_server:
+        return True
+    else:
+        return False
+    return None
+
+app_GCM_TEST_MODE = _GCM_TEST_MODE()
 
 def _CLIENT_ID():
     if on_development_server or not on_server:
