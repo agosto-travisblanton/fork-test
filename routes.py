@@ -1,3 +1,4 @@
+from agar.env import on_development_server
 from env_setup import setup
 setup()
 
@@ -74,6 +75,19 @@ application = WSGIApplication(
         )
     ]
 )
+
+
+# if on_development_server:
+#     import sys
+#
+#     from google.appengine.tools.devappserver2.python import sandbox
+#     sandbox._WHITE_LIST_C_MODULES += ['_ssl', '_socket']
+#
+#     from lib import copy_of_stdlib_socket.py as patched_socket
+#
+#     sys.modules['socket'] = patched_socket
+#     socket = patched_socket
+
 
 # if not on_production_server:
 #     dev_routes = [
