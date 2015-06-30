@@ -24,8 +24,19 @@ class TestContentManagerApi(BaseTest):
     def setUp(self):
         super(TestContentManagerApi, self).setUp()
         self.content_manager_api = ContentManagerApi()
-        self.name = u'ABC'
-        self.admin_email = u'foo@bar.com'
+        self.tenant = Tenant.create(tenant_code=self.TENANT_CODE,
+                               name=self.NAME,
+                               admin_email=self.ADMIN_EMAIL,
+                               content_server_url=self.CONTENT_SERVER_URL,
+                               content_server_api_key=self.CONTENT_SERVER_API_KEY,
+                               chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
+                               active=True)
+        self.tenant_key = self.tenant.put()
+        self.device = ChromeOsDevice.create(tenant_key=self.tenant_key,
+                                       device_id='f7ds8970dfasd8f70ad987',
+                                       gcm_registration_id='fad7f890ad7f8ad0s7fa8sd7fa809sd7fas89d7f0sa98df7as89d7fs8f')
+        self.device_key = self.device.put()
+
 
     def test_create_tenant_returns_tenant_key_when_status_code_created(self):
         json_response = {'tenant_key': 'some key'}
@@ -33,7 +44,7 @@ class TestContentManagerApi(BaseTest):
             post(any_matcher(HttpClientRequest)). \
             thenReturn(HttpClientResponse(status_code=201,
                                           content=json.dumps(json_response)))
-        tenant_key = self.content_manager_api.create_tenant(self.name, self.admin_email)
+        tenant_key = self.content_manager_api.create_tenant(self.tenant)
         self.assertIsNotNone(tenant_key)
 
     def test_create_tenant_returns_none_when_status_code_unprocessable_entity(self):
@@ -42,53 +53,29 @@ class TestContentManagerApi(BaseTest):
             post(any_matcher(HttpClientRequest)). \
             thenReturn(HttpClientResponse(status_code=422,
                                           content=json.dumps(json_response)))
-        tenant_key = self.content_manager_api.create_tenant(self.name, self.admin_email)
+        tenant_key = self.content_manager_api.create_tenant(self.tenant)
         self.assertIsNone(tenant_key)
 
     def test_create_tenant_returns_none_when_status_code_bad_request(self):
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=400))
-        tenant_key = self.content_manager_api.create_tenant(self.name, self.admin_email)
+        tenant_key = self.content_manager_api.create_tenant(self.tenant)
         self.assertIsNone(tenant_key)
 
     def test_create_tenant_throws_error_when_cannot_create_tenant_in_content_manager(self):
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=0))
         with self.assertRaises(Exception) as context:
-            self.content_manager_api.create_tenant(self.name, self.admin_email)
+            self.content_manager_api.create_tenant(self.tenant)
         self.assertTrue('Unable to create tenant in Content Manager. Unexpected http status code: 0'
                         in str(context.exception))
 
     def test_create_device_success(self):
-        tenant = Tenant.create(tenant_code=self.TENANT_CODE,
-                               name=self.NAME,
-                               admin_email=self.ADMIN_EMAIL,
-                               content_server_url=self.CONTENT_SERVER_URL,
-                               content_server_api_key=self.CONTENT_SERVER_API_KEY,
-                               chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
-                               active=True)
-        tenant_key = tenant.put()
-        device = ChromeOsDevice.create(tenant_key=tenant_key,
-                                       device_id='f7ds8970dfasd8f70ad987',
-                                       gcm_registration_id='fad7f890ad7f8ad0s7fa8sd7fa809sd7fas89d7f0sa98df7as89d7fs8f')
-        device.put()
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=201))
-        result = self.content_manager_api.create_device(device)
+        result = self.content_manager_api.create_device(self.device)
         self.assertIsNone(result)
 
     def test_create_device_raises_error(self):
-        tenant = Tenant.create(tenant_code=self.TENANT_CODE,
-                               name=self.NAME,
-                               admin_email=self.ADMIN_EMAIL,
-                               content_server_url=self.CONTENT_SERVER_URL,
-                               content_server_api_key=self.CONTENT_SERVER_API_KEY,
-                               chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
-                               active=True)
-        tenant_key = tenant.put()
-        device = ChromeOsDevice.create(tenant_key=tenant_key,
-                                       device_id='f7ds8970dfasd8f70ad987',
-                                       gcm_registration_id='fad7f890ad7f8ad0s7fa8sd7fa809sd7fas89d7f0sa98df7as89d7fs8f')
-        device.put()
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=422))
         with self.assertRaises(RuntimeError) as context:
-            self.content_manager_api.create_device(device)
+            self.content_manager_api.create_device(self.device)
         self.assertTrue(
             'Unable to create device in Content Manager. Unexpected http status code: 422' in str(context.exception))

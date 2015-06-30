@@ -16,17 +16,16 @@ class ContentManagerApi(object):
     def __init__(self):
         self.HEADERS['Authorization'] = 'key={0}'.format(config.CONTENT_MANAGER_API_SERVER_KEY)
 
-    def create_tenant(self, name, admin_email):
+    def create_tenant(self, tenant):
         """
 
-        :param name:
-        :param admin_email:
+        :param tenant:
         :return:
         """
 
         payload = {
-            "name": name,
-            "admin_email": admin_email
+            "name": tenant.tenant_code,
+            "admin_email": tenant.admin_email
         }
         http_client_response = HttpClient().post(HttpClientRequest(url=config.CONTENT_MANAGER_API_URL,
                                                                    payload=(json.dumps(payload)),
