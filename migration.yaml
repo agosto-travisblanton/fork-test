@@ -1,13 +1,13 @@
-application: proactiveservices-int
+application: skykit-display-device-int
 module: migration
 version: snapshot
 runtime: python27
 api_version: 1
 threadsafe: true
-instance_class: B2
-basic_scaling:
-  max_instances: 200
-  idle_timeout: 10m
+#instance_class: B4_1G
+#basic_scaling:
+#  max_instances: 200
+#  idle_timeout: 10m
 
 env_variables:
   DJANGO_SETTINGS_MODULE: 'settings'
@@ -35,10 +35,10 @@ handlers:
   secure: optional
 
 - url: /mapreduce/pipeline/images
-  static_dir: mapreduce/lib/pipeline/ui/images
+  static_dir: pipeline/ui/images
 
 - url: /mapreduce(/.*)?
-  script: mapreduce.main.mapreduce_app
+  script: mapreduce.main.APP
   login: admin
 
 - url: /migration/.*
@@ -49,6 +49,7 @@ skip_files:
 - ^coverage/.*
 - ^coverage_html_report/.*
 - ^monitor/.*
+- ^events/.*
 - ^pa/.*
 - ^scripts/.*
 - ^images/readme.md

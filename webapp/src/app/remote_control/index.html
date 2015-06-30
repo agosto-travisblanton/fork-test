@@ -1,0 +1,29 @@
+<div id="wrapper" ng-init="remoteControlCtrl.initialize()">
+  <div ng-include="'app/components/navbar/navbar.html'"></div>
+  <div id="page-wrapper">
+    <div class="container-fluid">
+      <!-- Page Heading -->
+      <div class="row">
+        <div class="col-lg-12">
+          <h1 class="page-header">
+            Remote control
+          </h1>
+        </div>
+      </div>
+      <div class="row" data-ng-controller="RemoteControlCtrl">
+        <div class="col-lg-4">
+          <label for="device">Choose a device:</label>
+          <select id="device" data-ng-model="remoteControlCtrl.currentDevice"
+                  data-ng-options="c.name for c in remoteControlCtrl.devices">
+            <option value=''>Select device</option>
+          </select>
+        </div>
+        <div class="col-lg-8">
+          <div ng-show="remoteControlCtrl.currentDevice.name != undefined">
+            selected device: {{ remoteControlCtrl.currentDevice}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -14,22 +14,16 @@ from utils.web_util import build_uri
 from webapp2 import RequestHandler
 import logging
 import traceback
-
-from entity_toucher import DbEntityToucher
-from migration_example import MigrationExample
-from migration_example_exception import MigrationExampleException
-import migration_elf_913
-import migration_elf_1048
-
+from migrations import SomethingMigration
 
 MIGRATIONS = [
-    MigrationExample(),
-    MigrationExampleException(),
-    DbEntityToucher(name='Touch all SensorReadings', kind_name='SensorReading'),
-    DbEntityToucher(name='Touch all Customers', kind_name='Customer'),
-    migration_elf_913.DbEntityToucher(name='ELF-913', kind_name='SensorReading'),
-    migration_elf_1048.Migration1(name='ELF-1048-1 (touch all SensorReadings within past 30 days)'),
-    migration_elf_1048.Migration2(name='ELF-1048-2 (touch all SensorReadings older than ~30 days)'),
+    SomethingMigration(),
+    # MigrationExampleException(),
+    # DbEntityToucher(name='Touch all SensorReadings', kind_name='SensorReading'),
+    # DbEntityToucher(name='Touch all Customers', kind_name='Customer'),
+    # migration_elf_913.DbEntityToucher(name='ELF-913', kind_name='SensorReading'),
+    # migration_elf_1048.Migration1(name='ELF-1048-1 (touch all SensorReadings within past 30 days)'),
+    # migration_elf_1048.Migration2(name='ELF-1048-2 (touch all SensorReadings older than ~30 days)'),
 ]
 
 MIGRATIONS_MAP = {migration.name: migration for migration in MIGRATIONS}
@@ -49,7 +43,7 @@ def _get_migration_context(name):
         context['color'] = 'LightCyan'
     else:
         if migration_status.start_date is not None:
-            context['start_date' ] = migration_status.start_date.isoformat(' ')
+            context['start_date'] = migration_status.start_date.isoformat(' ')
         if migration_status.finish_date is not None:
             context['finish_date'] = migration_status.finish_date.isoformat(' ')
         context['state'] = migration_status.state

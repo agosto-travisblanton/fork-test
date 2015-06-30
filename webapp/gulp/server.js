@@ -3,9 +3,7 @@
 var gulp = require('gulp');
 var browserSync = require('browser-sync');
 var browserSyncSpa = require('browser-sync-spa');
-
 var util = require('util');
-
 var middleware = require('./proxy');
 
 module.exports = function(options) {

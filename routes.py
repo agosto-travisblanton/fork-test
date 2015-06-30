@@ -1,3 +1,4 @@
+from agar.env import on_development_server
 from env_setup import setup
 setup()
 
@@ -20,15 +21,6 @@ if os.environ.get('CURRENT_VERSION_ID'):
 application = WSGIApplication(
     [
         ############################################################
-        # index
-        ############################################################
-        Route(
-            r'/',
-            handler="handlers.index.IndexHandler",
-            name='index',
-        ),
-
-        ############################################################
         # warmup
         ############################################################
         Route(
@@ -42,21 +34,48 @@ application = WSGIApplication(
         ############################################################
         Route(
             r'/api/v1/devices',
-            handler='handlers.device_enrollment.DeviceEnrollmentHandler',
+            handler='handlers.device_resource_handler.DeviceResourceHandler',
             name='devices',
+            handler_method='get_list',
+            methods=['GET']
         ),
         Route(
-            r'/api/v1/devices/<device_id>',
-            handler='handlers.device_enrollment.DeviceEnrollmentHandler',
-            name='devices-mutator',
+            r'/api/v1/devices',
+            handler='handlers.device_resource_handler.DeviceResourceHandler',
+            name='device-creator',
+            handler_method='post',
+            methods=['POST']
         ),
         Route(
-            r'/api/v1/devices/<device_id>/commands',
-            handler='handlers.device_control.DeviceCommandsHandler',
+            r'/api/v1/devices/<device_urlsafe_key>',
+            handler='handlers.device_resource_handler.DeviceResourceHandler',
+            name='manage-device',
+            methods=['GET', 'PUT', 'DELETE']
+        ),
+        Route(
+            r'/api/v1/devices/<device_urlsafe_key>/commands',
+            handler='handlers.device_commands_handler.DeviceCommandsHandler',
             name='device-commands',
         ),
+
+        ############################################################
+        # Tenants
+        ############################################################
+        Route(
+            r'/api/v1/tenants',
+            handler='handlers.tenants_handler.TenantsHandler',
+            name='tenants',
+            methods=['GET', 'POST']
+        ),
+        Route(
+            r'/api/v1/tenants/<tenant_key>',
+            handler='handlers.tenants_handler.TenantsHandler',
+            name='manage-tenant',
+            methods=['GET', 'PUT', 'DELETE']
+        )
     ]
 )
+
 
 # if not on_production_server:
 #     dev_routes = [
