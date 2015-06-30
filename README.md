@@ -11,11 +11,13 @@ Using the following API call:
 where the following JSON is posted to the server:
 
 {
+
   "macAddress": "54271e619346",
  
  "gcmRegistrationId": "8d70a8d78a6dfa6df76dfas7",
 
   "tenantCode": "foobar"
+
 }
 
 The Request header should have **6C346588BD4C6D722A1165B43C51C** as the *Authorization* key as follows:
