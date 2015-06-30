@@ -1,6 +1,7 @@
 import json
 import logging
-import requests
+
+from google.appengine.api import urlfetch
 
 from app_config import config
 
@@ -26,17 +27,17 @@ class GoogleCloudMessaging(object):
         if test_mode:
             cloud_message_payload_dictionary['dry_run'] = True
         json_payload = json.dumps(cloud_message_payload_dictionary)
-        # logging.info('>>> GCM JSON payload: {0}'.format(json_payload))
         response = None
         try:
-            response = requests.post(self.URL_CLOUD_MESSAGING_SEND,
-                                     json=json_payload,
-                                     headers=self.HEADERS,
-                                     verify=True)
+            response = urlfetch.fetch(url=self.URL_CLOUD_MESSAGING_SEND,
+                                      payload=json_payload,
+                                      method=urlfetch.POST,
+                                      headers=self.HEADERS,
+                                      validate_certificate=False)
         except Exception, e:
             logging.exception(e)
 
-        if response and response.status_code == 200:
-            return response.json()
-        else:
-            raise RuntimeError('Unable to notify devices via GCM.  HTTP status code: {0}'.format(response.status_code))
+        if not response.status_code == 200:
+            error_message = 'Unable to notify devices via GCM.  HTTP status code: {0}'.format(response.status_code)
+            logging.error(error_message)
+            raise RuntimeError(error_message)

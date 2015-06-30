@@ -61,9 +61,9 @@ def _GCM_TEST_MODE():
         return True
     else:
         return False
-    return None
 
 app_GCM_TEST_MODE = _GCM_TEST_MODE()
+
 
 def _CLIENT_ID():
     if on_development_server or not on_server:
@@ -73,7 +73,6 @@ def _CLIENT_ID():
     if on_production_server:
         return ''
     return None
-
 
 app_CLIENT_ID = _CLIENT_ID()
 
