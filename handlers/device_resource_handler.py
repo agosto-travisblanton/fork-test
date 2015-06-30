@@ -6,7 +6,7 @@ from decorators import api_token_required
 
 from restler.serializers import json_response
 from chrome_os_devices_api import ChromeOsDevicesApi
-from models import ChromeOsDevice
+from models import ChromeOsDevice, Tenant
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -70,6 +70,8 @@ class DeviceResourceHandler(RequestHandler):
         if self.request.body is not str('') and self.request.body is not None:
             request_json = json.loads(self.request.body)
             device_mac_address = request_json.get(u'macAddress')
+            tenant_code = request_json.get(u'tenantCode')
+            tenant_key = Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
             chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
             chrome_os_devices = chrome_os_devices_api.list(self.CUSTOMER_ID)
             if chrome_os_devices is not None:
@@ -81,7 +83,8 @@ class DeviceResourceHandler(RequestHandler):
                     device_id = chrome_os_device.get('deviceId')
                     local_device = ChromeOsDevice.get_by_device_id(device_id)
                     if local_device is None:
-                        local_device = ChromeOsDevice(device_id=device_id,
+                        local_device = ChromeOsDevice(parent=tenant_key,
+                                                      device_id=device_id,
                                                       gcm_registration_id=gcm_registration_id)
                         self.response.set_status(201)
                     else:

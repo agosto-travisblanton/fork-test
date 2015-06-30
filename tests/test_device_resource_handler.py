@@ -9,16 +9,30 @@ from agar.test import BaseTest, WebTest
 from chrome_os_devices_api import ChromeOsDevicesApi
 from mockito import when, any as any_matcher
 from routes import application
-from models import ChromeOsDevice
+from models import ChromeOsDevice, Tenant
 
 
 class TestDeviceResourceHandler(BaseTest, WebTest):
     APPLICATION = application
     CUSTOMER_ID = 'my_customer'
     REGISTERED_CHROME_MAC_ADDRESS_NOT_IN_PROVISIONING = '54271e619346'
+    NAME = 'foobar tenant'
+    ADMIN_EMAIL = 'foo@bar.com'
+    CONTENT_SERVER_URL = 'https://www.content.com'
+    CONTENT_SERVER_API_KEY = 'API KEY'
+    CHROME_DEVICE_DOMAIN = 'bar.com'
+    TENANT_CODE = 'foobar'
 
     def setUp(self):
         super(TestDeviceResourceHandler, self).setUp()
+        self.tenant = Tenant.create(tenant_code=self.TENANT_CODE,
+                                    name=self.NAME,
+                                    admin_email=self.ADMIN_EMAIL,
+                                    content_server_url=self.CONTENT_SERVER_URL,
+                                    content_server_api_key=self.CONTENT_SERVER_API_KEY,
+                                    chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
+                                    active=True)
+        self.tenant_key = self.tenant.put()
         self.chrome_os_device_json = json.loads(self.load_file_contents('tests/chrome_os_device.json'))
         self.chrome_os_device_list_json = json.loads(self.load_file_contents('tests/chrome_os_devices_api_list.json'))
         self.headers = {
@@ -150,6 +164,19 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             get(keys_only=True)
         self.assertIsNotNone(chrome_os_device_key)
         self.assertTrue('123' == chrome_os_device_key.get().gcm_registration_id)
+
+    def test_device_resource_handler_post_links_tenant_as_chrome_os_device_parent(self):
+        mac_address = self.chrome_os_device_json.get('macAddress')
+        gcm_registration_id = '123'
+        request_body = {'macAddress': mac_address,
+                        'gcmRegistrationId': gcm_registration_id,
+                        'tenantCode': self.tenant.tenant_code}
+        when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
+        self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
+        chrome_os_device_key = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id). \
+            get(keys_only=True)
+        parent_tenant_key = chrome_os_device_key.parent()
+        self.assertIsNotNone(parent_tenant_key)
 
     def test_device_resource_handler_post_returns_no_content_with_registered_device_stored_locally(self):
         local_device = ChromeOsDevice(device_id='132e235a-b346-4a37-a100-de49fa753a2a',
