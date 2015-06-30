@@ -2,11 +2,10 @@ from env_setup import setup_test_paths
 
 setup_test_paths()
 
+import json
 from http_client import HttpClient, HttpClientRequest, HttpClientResponse
 from models import Tenant, ChromeOsDevice
-from app_config import config
 from agar.test import BaseTest
-import requests
 from content_manager_api import ContentManagerApi
 
 from mockito import when, any as any_matcher
@@ -30,49 +29,29 @@ class TestContentManagerApi(BaseTest):
 
     def test_create_tenant_returns_tenant_key_when_status_code_created(self):
         json_response = {'tenant_key': 'some key'}
-        response = requests.Response()
-        response.status_code = 201
-        when(response).json().thenReturn(json_response)
-        when(requests).post(config.CONTENT_MANAGER_API_URL,
-                            any_matcher(),
-                            timeout=60,
-                            headers=ContentManagerApi.HEADERS).thenReturn(response)
+        when(HttpClient). \
+            post(any_matcher(HttpClientRequest)). \
+            thenReturn(HttpClientResponse(status_code=201,
+                                          content=json.dumps(json_response)))
         tenant_key = self.content_manager_api.create_tenant(self.name, self.admin_email)
         self.assertIsNotNone(tenant_key)
 
     def test_create_tenant_returns_none_when_status_code_unprocessable_entity(self):
         json_response = {'tenant_key': 'some key'}
-        response = requests.Response()
-        response.status_code = 422
-        when(response).json().thenReturn(json_response)
-        when(requests).post(config.CONTENT_MANAGER_API_URL,
-                            any_matcher(),
-                            timeout=60,
-                            headers=ContentManagerApi.HEADERS).thenReturn(response)
+        when(HttpClient). \
+            post(any_matcher(HttpClientRequest)). \
+            thenReturn(HttpClientResponse(status_code=422,
+                                          content=json.dumps(json_response)))
         tenant_key = self.content_manager_api.create_tenant(self.name, self.admin_email)
         self.assertIsNone(tenant_key)
 
     def test_create_tenant_returns_none_when_status_code_bad_request(self):
-        json_response = {'tenant_key': 'some key'}
-        response = requests.Response()
-        response.status_code = 400
-        when(response).json().thenReturn(json_response)
-        when(requests).post(config.CONTENT_MANAGER_API_URL,
-                            any_matcher(),
-                            timeout=60,
-                            headers=ContentManagerApi.HEADERS).thenReturn(response)
+        when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=400))
         tenant_key = self.content_manager_api.create_tenant(self.name, self.admin_email)
         self.assertIsNone(tenant_key)
 
     def test_create_tenant_throws_error_when_cannot_create_tenant_in_content_manager(self):
-        json_response = {'tenant_key': 'some key'}
-        response = requests.Response()
-        response.status_code = 0
-        when(response).json().thenReturn(json_response)
-        when(requests).post(config.CONTENT_MANAGER_API_URL,
-                            any_matcher(),
-                            timeout=60,
-                            headers=ContentManagerApi.HEADERS).thenReturn(response)
+        when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=0))
         with self.assertRaises(Exception) as context:
             self.content_manager_api.create_tenant(self.name, self.admin_email)
         self.assertTrue('Unable to create tenant in Content Manager. Unexpected http status code: 0'
@@ -111,5 +90,5 @@ class TestContentManagerApi(BaseTest):
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=422))
         with self.assertRaises(RuntimeError) as context:
             self.content_manager_api.create_device(device)
-        self.assertTrue('Unable to create device in Content Manager. Unexpected http status code: 422' in str(context.exception))
-
+        self.assertTrue(
+            'Unable to create device in Content Manager. Unexpected http status code: 422' in str(context.exception))
