@@ -21,6 +21,7 @@ class AppConfig(Config):
     API_TOKEN = None
     CONTENT_MANAGER_API_SERVER_KEY = None
     CONTENT_MANAGER_API_URL = None
+    GCM_TEST_MODE = None
 
 
 config = AppConfig.get_config()

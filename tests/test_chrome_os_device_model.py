@@ -1,10 +1,9 @@
-import json
-from env_setup import setup_test_paths;
-from restler.serializers import to_json
-from strategy import CHROME_OS_DEVICE_STRATEGY
-
+from env_setup import setup_test_paths
 setup_test_paths()
 
+import json
+from restler.serializers import to_json
+from strategy import CHROME_OS_DEVICE_STRATEGY
 from agar.test import BaseTest
 from models import ChromeOsDevice, Tenant
 

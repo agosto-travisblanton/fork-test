@@ -1,8 +1,9 @@
-from app_config import config
 from env_setup import setup_test_paths
 
 setup_test_paths()
 
+
+from app_config import config
 import json
 from webtest import AppError
 from agar.test import BaseTest, WebTest

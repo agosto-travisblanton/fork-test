@@ -23,6 +23,8 @@ libraries:
   version: latest
 - name: pycrypto
   version: latest
+- name: ssl
+  version: latest
 
 handlers:
 - url: /(robots\.txt)

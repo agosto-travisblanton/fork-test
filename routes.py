@@ -1,3 +1,4 @@
+from agar.env import on_development_server
 from env_setup import setup
 setup()
 
@@ -74,6 +75,7 @@ application = WSGIApplication(
         )
     ]
 )
+
 
 # if not on_production_server:
 #     dev_routes = [

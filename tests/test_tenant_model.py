@@ -1,4 +1,5 @@
 from env_setup import setup_test_paths
+
 setup_test_paths()
 
 from agar.test import BaseTest
