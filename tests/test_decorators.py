@@ -1,10 +1,9 @@
-from webapp2 import WSGIApplication, Route
+from env_setup import setup_test_paths
+setup_test_paths()
 
 from app_config import config
-from env_setup import setup_test_paths
 from webtest import AppError
-
-setup_test_paths()
+from webapp2 import WSGIApplication, Route
 
 from agar.test import BaseTest, WebTest
 

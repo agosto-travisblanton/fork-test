@@ -1,10 +1,9 @@
-from content_manager_api import ContentManagerApi
-from env_setup import setup_test_paths;
+from env_setup import setup_test_paths
 
 setup_test_paths()
 
 import json
-
+from content_manager_api import ContentManagerApi
 from agar.test import BaseTest, WebTest
 from models import Tenant, TenantEntityGroup
 from routes import application

@@ -1,12 +1,10 @@
-from env_setup import setup_test_paths;
-
+from env_setup import setup_test_paths
 setup_test_paths()
 
 from time import sleep, gmtime, strftime
 
 from agar.test import BaseTest
 from chrome_os_devices_api import ChromeOsDevicesApi
-from pprint import pprint
 
 
 class TestChromeOsDevicesApi(BaseTest):

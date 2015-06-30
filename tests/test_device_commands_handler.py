@@ -1,5 +1,7 @@
-import json
+from env_setup import setup_test_paths
+setup_test_paths()
 
+import json
 from agar.test import BaseTest, WebTest
 from app_config import config
 from models import ChromeOsDevice

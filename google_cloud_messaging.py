@@ -37,7 +37,7 @@ class GoogleCloudMessaging(object):
         except Exception, e:
             logging.exception(e)
 
-        if not response.status_code == 200:
+        if response.status_code != 200:
             error_message = 'Unable to notify devices via GCM.  HTTP status code: {0}'.format(response.status_code)
             logging.error(error_message)
             raise RuntimeError(error_message)

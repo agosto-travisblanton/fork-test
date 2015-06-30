@@ -1,8 +1,7 @@
-from app_config import config
 from env_setup import setup_test_paths
-
 setup_test_paths()
 
+from app_config import config
 from agar.test import BaseTest
 import requests
 from content_manager_api import ContentManagerApi
