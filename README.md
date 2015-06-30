@@ -37,7 +37,8 @@ This uri, in turn, in the form of */api/v1/devices/**<device_id>***, can be used
 
 ![Screen Shot 2015-06-30 at 10.17.59 AM.png](https://bitbucket.org/repo/L8AoyM/images/4006508056-Screen%20Shot%202015-06-30%20at%2010.17.59%20AM.png)
 
-where the ***<device_id>*** is something like the uuid: ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgICAgIAKDA
+where the ***<device_id>*** is something like the uuid: ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgIDat5cKDA
+
 
 ## Vagrant ##
 1. `vagrant up`
