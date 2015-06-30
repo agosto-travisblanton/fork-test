@@ -2,8 +2,6 @@ from env_setup import setup_test_paths
 
 setup_test_paths()
 
-
-from app_config import config
 import json
 from webtest import AppError
 from agar.test import BaseTest, WebTest
@@ -11,6 +9,7 @@ from chrome_os_devices_api import ChromeOsDevicesApi
 from mockito import when, any as any_matcher
 from routes import application
 from models import ChromeOsDevice, Tenant
+from app_config import config
 
 
 class TestDeviceResourceHandler(BaseTest, WebTest):
@@ -23,6 +22,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     CONTENT_SERVER_API_KEY = 'API KEY'
     CHROME_DEVICE_DOMAIN = 'bar.com'
     TENANT_CODE = 'foobar'
+    TESTING_DEVICE_ID = '832e235a-b346-4a37-a100-de49fa753a2a'
+    TEST_GCM_REGISTRATION_ID = '8d70a8d78a6dfa6df76dfasd'
 
     def setUp(self):
         super(TestDeviceResourceHandler, self).setUp()
@@ -34,6 +35,12 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                     chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
                                     active=True)
         self.tenant_key = self.tenant.put()
+
+        self.chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
+                                                      device_id=self.TESTING_DEVICE_ID,
+                                                      gcm_registration_id=self.TEST_GCM_REGISTRATION_ID)
+        self.chrome_os_device_key = self.chrome_os_device.put()
+
         self.chrome_os_device_json = json.loads(self.load_file_contents('tests/chrome_os_device.json'))
         self.chrome_os_device_list_json = json.loads(self.load_file_contents('tests/chrome_os_devices_api_list.json'))
         self.headers = {
@@ -41,18 +48,18 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         }
 
     def test_device_resource_handler_get_by_key_returns_ok(self):
-        device_key = self.load_device()
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
         request_parameters = {}
-        uri = application.router.build(None, 'manage-device', None, {'device_urlsafe_key': device_key.urlsafe()})
+        uri = application.router.build(None, 'manage-device', None, {'device_urlsafe_key':
+                                                                         self.chrome_os_device_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters, headers=self.headers)
         self.assertOK(response)
 
     def test_device_resource_handler_get_by_key_no_authorization_header_returns_forbidden(self):
-        device_key = self.load_device()
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
         request_parameters = {}
-        uri = application.router.build(None, 'manage-device', None, {'device_urlsafe_key': device_key.urlsafe()})
+        uri = application.router.build(None, 'manage-device', None, {'device_urlsafe_key':
+                                                                         self.chrome_os_device_key.urlsafe()})
         with self.assertRaises(AppError) as error:
             self.app.get(uri, params=request_parameters, headers={})
         self.assertTrue('403 Forbidden' in error.exception.message)
@@ -61,12 +68,13 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         device_key = self.load_device()
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
         request_parameters = {}
-        uri = application.router.build(None, 'manage-device', None, {'device_urlsafe_key': device_key.urlsafe()})
+        uri = application.router.build(None, 'manage-device', None, {'device_urlsafe_key':
+                                                                         self.chrome_os_device_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
         expected = device_key.get()
         self.assertEqual(response_json.get('deviceId'), expected.device_id)
-        self.assertEqual(response_json.get('gcmRegistrationId'), expected.gcm_registration_id)
+        self.assertEqual(response_json.get('gcmRegistrationId'), self.TEST_GCM_REGISTRATION_ID)
         self.assertEqual(response_json.get('created'), expected.created.strftime('%Y-%m-%d %H:%M:%S'))
         self.assertEqual(response_json.get('updated'), expected.updated.strftime('%Y-%m-%d %H:%M:%S'))
 
@@ -111,7 +119,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_device_resource_handler_post_returns_created_status(self):
         request_body = {'macAddress': self.chrome_os_device_json.get('macAddress'),
                         'gcmRegistrationId': '123',
-                        'tenantCode': 'Acme'}
+                        'tenantCode': 'acme'
+                        }
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
         self.assertEqual('201 Created', response.status)
@@ -124,7 +133,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             self.app.post('/api/v1/devices', json.dumps(request_body), headers={})
         self.assertTrue('403 Forbidden' in error.exception.message)
 
-    def test_device_resource_handler_post_returns_gettable_device_representation_via_uri_in_location_header(self):
+    def test_device_resource_handler_post_returns_device_uri_in_location_header(self):
         gcm_registration_id = '123'
         tenant_code = 'Acme'
         request_body = {'macAddress': self.chrome_os_device_json.get('macAddress'),
@@ -133,10 +142,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
         location_uri = str(response.headers['Location'])
-        response = self.app.get(location_uri, params={}, headers=self.headers)
-        self.assertOK(response)
-        response_json = json.loads(response.body)
-        self.assertEqual(response_json.get('gcmRegistrationId'), gcm_registration_id)
+        location_uri_components = location_uri.split('/')
+        self.assertEqual(location_uri_components[5], "devices")
+        key_length = len(location_uri_components[6])
+        self.assertEqual(key_length, 48)
 
     def test_device_resource_handler_post_returns_unprocessable_entity_status_for_empty_request_body(self):
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
