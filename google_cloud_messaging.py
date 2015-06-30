@@ -29,7 +29,10 @@ class GoogleCloudMessaging(object):
         # logging.info('>>> GCM JSON payload: {0}'.format(json_payload))
         response = None
         try:
-            response = requests.post(self.URL_CLOUD_MESSAGING_SEND, json=json_payload, headers=self.HEADERS)
+            response = requests.post(self.URL_CLOUD_MESSAGING_SEND,
+                                     json=json_payload,
+                                     headers=self.HEADERS,
+                                     verify=True)
         except Exception, e:
             logging.exception(e)
 
