@@ -24,7 +24,12 @@ class DeviceResourceHandler(RequestHandler):
         result = {}
         if chrome_os_device:
             result = chrome_os_device
-        result['gcmRegistrationId'] = local_device.gcm_registration_id
+        tenant= local_device.key.parent().get()
+        result['tenantCode']=tenant.tenant_code
+        result['contentServerUrl']=tenant.content_server_url
+        result['contentServerApiKey']=tenant.content_server_api_key
+        result['chromeDeviceDomain']=tenant.chrome_device_domain
+        result["gcmRegistrationId"] = local_device.gcm_registration_id
         result['created'] = local_device.created.strftime('%Y-%m-%d %H:%M:%S')
         result['updated'] = local_device.updated.strftime('%Y-%m-%d %H:%M:%S')
         json_response(self.response, result)
