@@ -75,7 +75,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json.get('gcmRegistrationId'), expected.gcm_registration_id)
         self.assertEqual(response_json.get('created'), expected.created.strftime('%Y-%m-%d %H:%M:%S'))
         self.assertEqual(response_json.get('updated'), expected.updated.strftime('%Y-%m-%d %H:%M:%S'))
-        self.assertEqual(response_json.get('api_key'), expected.api_key)
+        self.assertEqual(response_json.get('apiKey'), expected.api_key)
 
     def test_device_resource_handler_get_all_devices_returns_ok(self):
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)

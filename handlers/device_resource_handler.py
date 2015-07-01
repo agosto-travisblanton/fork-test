@@ -31,7 +31,7 @@ class DeviceResourceHandler(RequestHandler):
         result["gcmRegistrationId"] = local_device.gcm_registration_id
         result['created'] = local_device.created.strftime('%Y-%m-%d %H:%M:%S')
         result['updated'] = local_device.updated.strftime('%Y-%m-%d %H:%M:%S')
-        result['api_key'] = local_device.api_key
+        result['apiKey'] = local_device.api_key
         json_response(self.response, result)
 
     @api_token_required
