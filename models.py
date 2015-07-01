@@ -61,6 +61,7 @@ class ChromeOsDevice(ndb.Model):
     updated = ndb.DateTimeProperty(auto_now=True)
     device_id = ndb.StringProperty(required=True, indexed=True)
     gcm_registration_id = ndb.StringProperty(required=True)
+    api_key = ndb.StringProperty(required=True, indexed=True)
 
     @classmethod
     def get_by_device_id(cls, device_id):
@@ -71,6 +72,8 @@ class ChromeOsDevice(ndb.Model):
 
     @classmethod
     def create(cls, tenant_key, device_id, gcm_registration_id):
+        api_key = str(uuid.uuid4())
         return cls(parent=tenant_key,
                    device_id=device_id,
-                   gcm_registration_id=gcm_registration_id)
+                   gcm_registration_id=gcm_registration_id,
+                   api_key=api_key)

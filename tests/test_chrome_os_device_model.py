@@ -1,4 +1,5 @@
 from env_setup import setup_test_paths
+
 setup_test_paths()
 
 import json
@@ -32,8 +33,9 @@ class TestChromeOsDeviceModel(BaseTest):
         self.tenant_key = self.tenant.put()
 
     def test_get_by_device_id(self):
-        chrome_os_device = ChromeOsDevice(device_id=self.TESTING_DEVICE_ID,
-                                          gcm_registration_id=self.TEST_GCM_REGISTRATION_ID)
+        chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
+                                                 device_id=self.TESTING_DEVICE_ID,
+                                                 gcm_registration_id=self.TEST_GCM_REGISTRATION_ID)
         expected_key = chrome_os_device.put()
         actual = ChromeOsDevice.get_by_device_id(self.TESTING_DEVICE_ID)
         self.assertEqual(actual.key, expected_key)
