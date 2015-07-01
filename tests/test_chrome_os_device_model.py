@@ -49,7 +49,6 @@ class TestChromeOsDeviceModel(BaseTest):
                                                  gcm_registration_id=self.TEST_GCM_REGISTRATION_ID)
         self.assertIsNotNone(chrome_os_device)
         self.assertIsNotNone(chrome_os_device.api_key)
-        print chrome_os_device.api_key
 
     def test_json_serialization_strategy(self):
         chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
