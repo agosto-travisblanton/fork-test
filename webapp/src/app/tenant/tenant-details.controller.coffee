@@ -10,7 +10,6 @@ appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, $state)
     admin_email: undefined,
     content_server_url: undefined,
     chrome_device_domain: undefined,
-    content_server_api_key: undefined,
     active: true
   }
 

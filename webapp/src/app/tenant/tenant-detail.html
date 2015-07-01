@@ -129,26 +129,6 @@
                   </p>
                 </div>
               </div>
-              <div class="form-group"
-                   ng-class="{ 'has-error' : tenantForm.contentServerApiKey.$invalid && !tenantForm.contentServerApiKey.$pristine }">
-                <label for="contentServerApiKey" class="col-sm-2 control-label">Content server API key</label>
-
-                <div class="col-sm-4">
-                  <input type="text"
-                         required
-                         class="form-control"
-                         name="contentServerApiKey"
-                         id="contentServerApiKey"
-                         placeholder="Enter content server API key"
-                         ng-model="tenantDetailsCtrl.currentTenant.content_server_api_key">
-                </div>
-                <div class="col-sm-6">
-                  <p ng-show="tenantForm.contentServerApiKey.$invalid && !tenantForm.contentServerApiKey.$pristine"
-                     class="help-block">
-                    The content server API key is required.
-                  </p>
-                </div>
-              </div>
               <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-6">
                   <input type="checkbox"
