@@ -4,7 +4,7 @@ from google.appengine.ext import ndb
 
 from webapp2 import RequestHandler
 
-from content_manager_api import ContentManagerApi
+#from content_manager_api import ContentManagerApi
 from models import Tenant, TenantEntityGroup
 from restler.serializers import json_response
 from strategy import TENANT_STRATEGY

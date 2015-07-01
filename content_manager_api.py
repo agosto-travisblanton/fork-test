@@ -18,8 +18,9 @@ class ContentManagerApi(object):
 
     def create_tenant(self, tenant):
         """
+        Create a new tenant in the Content Manager system.
 
-        :param tenant:
+        :param tenant: A Tenant entity.
         :return:
         """
 
@@ -59,5 +60,5 @@ class ContentManagerApi(object):
         http_client_request = HttpClientRequest(url=url, payload=json.dumps(payload), headers=self.HEADERS)
         http_client_response = HttpClient().post(http_client_request)
         if http_client_response.status_code != 201:
-            raise RuntimeError('Unable to create device in Content Manager. Unexpected http status code: {0}'.
+            raise RuntimeError('Unable to create a device in Content Manager. Unexpected http status code: {0}'.
                                format(http_client_response.status_code))

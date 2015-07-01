@@ -78,4 +78,4 @@ class TestContentManagerApi(BaseTest):
         with self.assertRaises(RuntimeError) as context:
             self.content_manager_api.create_device(self.device)
         self.assertTrue(
-            'Unable to create device in Content Manager. Unexpected http status code: 422' in str(context.exception))
+            'Unable to create a device in Content Manager. Unexpected http status code: 422' in str(context.exception))
