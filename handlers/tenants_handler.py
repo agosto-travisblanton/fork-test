@@ -4,7 +4,7 @@ from google.appengine.ext import ndb
 
 from webapp2 import RequestHandler
 
-from content_manager_api import ContentManagerApi
+#from content_manager_api import ContentManagerApi
 from models import Tenant, TenantEntityGroup
 from restler.serializers import json_response
 from strategy import TENANT_STRATEGY
@@ -27,9 +27,9 @@ class TenantsHandler(RequestHandler):
     def post(self):
         if self.request.body is not None:
             request_json = json.loads(self.request.body)
-            name = request_json['name']
-            admin_email = request_json['admin_email']
-            tenant_code = request_json['tenant_code']
+            name = request_json.get('name')
+            admin_email = request_json.get('admin_email')
+            tenant_code = request_json.get('tenant_code')
             # content_manager_api = ContentManagerApi()
             content_manager_tenant_key = 'some key' #content_manager_api.create_tenant(name, admin_email)
             if content_manager_tenant_key:
