@@ -24,7 +24,6 @@ class TestTenantModel(BaseTest):
                                name=self.NAME,
                                admin_email=self.ADMIN_EMAIL,
                                content_server_url=self.CONTENT_SERVER_URL,
-                               content_server_api_key=self.CONTENT_SERVER_API_KEY,
                                chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
                                active=True)
         expected_key = tenant.put()
@@ -37,7 +36,6 @@ class TestTenantModel(BaseTest):
                                name=self.NAME,
                                admin_email=self.ADMIN_EMAIL,
                                content_server_url=self.CONTENT_SERVER_URL,
-                               content_server_api_key='',
                                chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
                                active=True)
         tenant.put()
@@ -49,7 +47,6 @@ class TestTenantModel(BaseTest):
                                name=self.NAME,
                                admin_email=self.ADMIN_EMAIL,
                                content_server_url=self.CONTENT_SERVER_URL,
-                               content_server_api_key='',
                                chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
                                active=True)
         tenant.put()
@@ -61,7 +58,6 @@ class TestTenantModel(BaseTest):
                                name=self.NAME,
                                admin_email=self.ADMIN_EMAIL,
                                content_server_url=self.CONTENT_SERVER_URL,
-                               content_server_api_key=self.CONTENT_SERVER_API_KEY,
                                chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
                                active=True)
         tenant.put()
@@ -70,6 +66,5 @@ class TestTenantModel(BaseTest):
         self.assertEqual(self.TENANT_CODE, tenant_created.tenant_code)
         self.assertEqual(self.ADMIN_EMAIL, tenant_created.admin_email)
         self.assertEqual(self.CONTENT_SERVER_URL, tenant_created.content_server_url)
-        self.assertEqual(self.CONTENT_SERVER_API_KEY, tenant_created.content_server_api_key)
         self.assertEqual(self.CHROME_DEVICE_DOMAIN, tenant_created.chrome_device_domain)
         self.assertEqual(self.NAME, tenant_created.name)

@@ -51,11 +51,11 @@ class ContentManagerApi(object):
         :return:
         """
 
-        tenant = chrome_os_device.key.parent().get()
         payload = {
             "device_key": chrome_os_device.key.urlsafe(),
-            "player_cms_api_key": tenant.content_server_api_key
+            "api_key": chrome_os_device.api_key
         }
+        tenant = chrome_os_device.key.parent().get()
         url = "{content_manager_base_url}/api/v1/devices".format(content_manager_base_url=tenant.content_server_url)
         http_client_request = HttpClientRequest(url=url, payload=json.dumps(payload), headers=self.HEADERS)
         http_client_response = HttpClient().post(http_client_request)
