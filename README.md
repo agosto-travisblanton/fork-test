@@ -35,9 +35,9 @@ https://skykit-display-device-int.appspot.com/api/v1/devices/ahtzfnNreWtpdC1kaXN
 
 This uri, in turn, in the form of */api/v1/devices/**<device_urlsafe_key>***, can be used via a GET to return the device representation using the following API call:
 
-![Screen Shot 2015-06-30 at 10.17.59 AM.png](https://bitbucket.org/repo/L8AoyM/images/4006508056-Screen%20Shot%202015-06-30%20at%2010.17.59%20AM.png)
+https://skykit-display-device-int.appspot.com/api/v1/devices/ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyVgsSEVRlbmFudEVudGl0eUdyb3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgIDyiAoMCxIOQ2hyb21lT3NEZXZpY2UYgICAgIDDlQoM
 
-where the ***<device_urlsafe_key>*** is something like the uuid: ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgIDat5cKDA
+where the ***<device_urlsafe_key>*** is: ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyVgsSEVRlbmFudEVudGl0eUdyb3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgIDyiAoMCxIOQ2hyb21lT3NEZXZpY2UYgICAgIDDlQoM
 
 
 ## Vagrant ##
