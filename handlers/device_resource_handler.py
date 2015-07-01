@@ -2,8 +2,8 @@ import json
 
 from webapp2 import RequestHandler
 from google.appengine.ext import ndb
-from decorators import api_token_required
 
+from decorators import api_token_required
 from restler.serializers import json_response
 from chrome_os_devices_api import ChromeOsDevicesApi
 from models import ChromeOsDevice, Tenant
@@ -24,11 +24,10 @@ class DeviceResourceHandler(RequestHandler):
         result = {}
         if chrome_os_device:
             result = chrome_os_device
-        tenant= local_device.key.parent().get()
-        result['tenantCode']=tenant.tenant_code
-        result['contentServerUrl']=tenant.content_server_url
-        result['contentServerApiKey']=tenant.content_server_api_key
-        result['chromeDeviceDomain']=tenant.chrome_device_domain
+        tenant = local_device.key.parent().get()
+        result['tenantCode'] = tenant.tenant_code
+        result['contentServerUrl'] = tenant.content_server_url
+        result['chromeDeviceDomain'] = tenant.chrome_device_domain
         result["gcmRegistrationId"] = local_device.gcm_registration_id
         result['created'] = local_device.created.strftime('%Y-%m-%d %H:%M:%S')
         result['updated'] = local_device.updated.strftime('%Y-%m-%d %H:%M:%S')
@@ -88,9 +87,9 @@ class DeviceResourceHandler(RequestHandler):
                     device_id = chrome_os_device.get('deviceId')
                     local_device = ChromeOsDevice.get_by_device_id(device_id)
                     if local_device is None:
-                        local_device = ChromeOsDevice(parent=tenant_key,
-                                                      device_id=device_id,
-                                                      gcm_registration_id=gcm_registration_id)
+                        local_device = ChromeOsDevice.create(tenant_key=tenant_key,
+                                                             device_id=device_id,
+                                                             gcm_registration_id=gcm_registration_id)
                         self.response.set_status(201)
                     else:
                         local_device.gcm_registration_id = gcm_registration_id

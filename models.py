@@ -23,7 +23,6 @@ class Tenant(ndb.Model):
     name = ndb.StringProperty(required=True, indexed=True)
     admin_email = ndb.StringProperty(required=True)
     content_server_url = ndb.StringProperty(required=True)
-    content_server_api_key = ndb.StringProperty(required=True)
     chrome_device_domain = ndb.StringProperty()
     active = ndb.BooleanProperty(default=True, required=True, indexed=False)
 
@@ -43,14 +42,13 @@ class Tenant(ndb.Model):
             return False
 
     @classmethod
-    def create(cls, tenant_code, name, admin_email, content_server_url, content_server_api_key, chrome_device_domain, active):
+    def create(cls, tenant_code, name, admin_email, content_server_url, chrome_device_domain, active):
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
                    tenant_code=tenant_code,
                    name=name,
                    admin_email=admin_email,
                    content_server_url=content_server_url,
-                   content_server_api_key=content_server_api_key,
                    chrome_device_domain=chrome_device_domain,
                    active=active)
 
@@ -61,6 +59,7 @@ class ChromeOsDevice(ndb.Model):
     updated = ndb.DateTimeProperty(auto_now=True)
     device_id = ndb.StringProperty(required=True, indexed=True)
     gcm_registration_id = ndb.StringProperty(required=True)
+    api_key = ndb.StringProperty(required=True, indexed=True)
 
     @classmethod
     def get_by_device_id(cls, device_id):
@@ -71,6 +70,8 @@ class ChromeOsDevice(ndb.Model):
 
     @classmethod
     def create(cls, tenant_key, device_id, gcm_registration_id):
+        api_key = str(uuid.uuid4())
         return cls(parent=tenant_key,
                    device_id=device_id,
-                   gcm_registration_id=gcm_registration_id)
+                   gcm_registration_id=gcm_registration_id,
+                   api_key=api_key)

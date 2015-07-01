@@ -25,18 +25,16 @@ class TestContentManagerApi(BaseTest):
         super(TestContentManagerApi, self).setUp()
         self.content_manager_api = ContentManagerApi()
         self.tenant = Tenant.create(tenant_code=self.TENANT_CODE,
-                               name=self.NAME,
-                               admin_email=self.ADMIN_EMAIL,
-                               content_server_url=self.CONTENT_SERVER_URL,
-                               content_server_api_key=self.CONTENT_SERVER_API_KEY,
-                               chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
-                               active=True)
+                                    name=self.NAME,
+                                    admin_email=self.ADMIN_EMAIL,
+                                    content_server_url=self.CONTENT_SERVER_URL,
+                                    chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
+                                    active=True)
         self.tenant_key = self.tenant.put()
         self.device = ChromeOsDevice.create(tenant_key=self.tenant_key,
-                                       device_id='f7ds8970dfasd8f70ad987',
-                                       gcm_registration_id='fad7f890ad7f8ad0s7fa8sd7fa809sd7fas89d7f0sa98df7as89d7fs8f')
+                                            device_id='f7ds8970dfasd8f70ad987',
+                                            gcm_registration_id='fad7f890ad7f8ad0s7fa8sd7fa809sd7fas89d7f0sa98df7as89d7fs8f')
         self.device_key = self.device.put()
-
 
     def test_create_tenant_returns_tenant_key_when_status_code_created(self):
         json_response = {'tenant_key': 'some key'}

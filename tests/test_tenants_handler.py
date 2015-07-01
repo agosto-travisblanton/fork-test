@@ -5,9 +5,9 @@ setup_test_paths()
 import json
 from content_manager_api import ContentManagerApi
 from agar.test import BaseTest, WebTest
-from models import Tenant, TenantEntityGroup
+from models import Tenant
 from routes import application
-from mockito import when, verify, any as any_matcher
+from mockito import when
 from app_config import config
 
 
@@ -87,23 +87,6 @@ class TestTenantsHandler(BaseTest, WebTest):
         self.app.post_json(uri, params=request_parameters)
         actual = Tenant.find_by_name(request_parameters['name'])
         self.assertIsNotNone(actual)
-
-    def test_post_create_new_tenant_persists_key_from_content_server(self):
-        name = u'ABC'
-        admin_email = u'foo@bar.com'
-        content_server_api_key = u'key me up jeeves'
-        when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(content_server_api_key)
-        request_parameters = {'name': name,
-                              'tenant_code': 'acme',
-                              'admin_email': admin_email,
-                              'content_server_url': 'https://www.foo.com',
-                              'content_server_api_key': content_server_api_key,
-                              'chrome_device_domain': '',
-                              'active': True}
-        uri = application.router.build(None, 'tenants', None, {})
-        self.app.post_json(uri, params=request_parameters)
-        actual = Tenant.find_by_name(request_parameters['name'])
-        self.assertEqual(content_server_api_key, actual.content_server_api_key)
 
     def test_post_create_new_tenant_sets_location_header(self):
         name = u'ABC'
@@ -212,13 +195,12 @@ class TestTenantsHandler(BaseTest, WebTest):
     def load_tenants(self):
         tenant_keys = []
         for x in range(5):
-            tenant_entity_group = TenantEntityGroup.singleton()
-            tenant = Tenant(parent=tenant_entity_group.key,
-                            tenant_code='acme',
-                            name="Testing tenant {0}".format(x),
-                            admin_email=self.ADMIN_EMAIL.format(x),
-                            content_server_api_key=self.API_KEY.format(x),
-                            content_server_url=self.CONTENT_SERVER_URL)
+            tenant = Tenant.create(tenant_code='acme',
+                                   name="Testing tenant {0}".format(x),
+                                   admin_email=self.ADMIN_EMAIL.format(x),
+                                   content_server_url=self.CONTENT_SERVER_URL,
+                                   chrome_device_domain='testing.skykit.com',
+                                   active=True)
             tenant_key = tenant.put()
             tenant_keys.append(tenant_key)
         return tenant_keys
