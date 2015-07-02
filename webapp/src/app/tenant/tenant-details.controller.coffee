@@ -30,8 +30,8 @@ appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, $state)
       newTenantCode = ''
       if @currentTenant.name
         newTenantCode = @currentTenant.name.toLowerCase()
-        newTenantCode = newTenantCode.replace(/\s+/, '_')
-        newTenantCode = newTenantCode.replace(/\W+/, '')
+        newTenantCode = newTenantCode.replace(/\s+/g, '_')
+        newTenantCode = newTenantCode.replace(/\W+/g, '')
       @currentTenant.tenant_code = newTenantCode
 
   @

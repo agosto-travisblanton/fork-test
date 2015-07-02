@@ -83,9 +83,9 @@ describe 'TenantDetailsCtrl', ->
 
     it 'generates a new tenant code when key is undefined', ->
       controller.currentTenant.key = undefined
-      controller.currentTenant.name = 'Foobar Inc.'
+      controller.currentTenant.name = 'Super Duper Foobar Inc.'
       controller.autoGenerateTenantCode()
-      expect(controller.currentTenant.tenant_code).toBe 'foobar_inc'
+      expect(controller.currentTenant.tenant_code).toBe 'super_duper_foobar_inc'
 
     it 'skips generating a new tenant code when key is defined', ->
       controller.currentTenant.key = 'd8ad97ad87afg897f987g0f8'
