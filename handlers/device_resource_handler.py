@@ -91,17 +91,16 @@ class DeviceResourceHandler(RequestHandler):
                     device_id = chrome_os_device.get('deviceId')
                     local_device = ChromeOsDevice.get_by_device_id(device_id)
                     if local_device is None:
-                        logging.info("Attempting to create a ChromeOsDevice")
                         local_device = ChromeOsDevice.create(tenant_key=tenant_key,
                                                              device_id=device_id,
                                                              gcm_registration_id=gcm_registration_id)
                         self.response.set_status(201)
                     else:
-                        logging.info("Attempting to update a ChromeOsDevice")
                         local_device.gcm_registration_id = gcm_registration_id
                         self.response.set_status(204)
-
                     device_key = local_device.put()
+                    logging.info("ChromeOsDevice.key: ".format(str(device_key.urlsafe())))
+                    logging.info("ChromeOsDevice.key.parent() key: ".format(str(device_key.parent())))
                     device_uri = self.request.app.router.build(None,
                                                                'manage-device',
                                                                None,
