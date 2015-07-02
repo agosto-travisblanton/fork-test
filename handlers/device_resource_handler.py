@@ -80,6 +80,7 @@ class DeviceResourceHandler(RequestHandler):
             device_mac_address = request_json.get(u'macAddress')
             tenant_code = request_json.get(u'tenantCode')
             tenant_key = Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
+            logging.info('Retrieved tenant key: {0} by tenant code: {1}'.format(str(tenant_key), tenant_code))
             chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
             chrome_os_devices = chrome_os_devices_api.list(self.CUSTOMER_ID)
             if chrome_os_devices is not None:
