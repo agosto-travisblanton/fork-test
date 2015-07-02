@@ -77,39 +77,52 @@ class DeviceResourceHandler(RequestHandler):
     @api_token_required
     def post(self):
         if self.request.body is not str('') and self.request.body is not None:
+            status = 201
+            error_message = None
             logging.info('Request body: {0}'.format(self.request.body))
             request_json = json.loads(self.request.body)
             device_mac_address = request_json.get(u'macAddress')
             tenant_code = request_json.get(u'tenantCode')
-            tenant_key = Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
-            logging.info('Retrieved tenant key: {0} by tenant code: {1}'.format(str(tenant_key), tenant_code))
-            chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
-            chrome_os_devices = chrome_os_devices_api.list(self.CUSTOMER_ID)
-            if chrome_os_devices is not None:
-                loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == device_mac_address or
-                                      x.get('ethernetMacAddress') == device_mac_address)
-                chrome_os_device = next(loop_comprehension, None)
-                if chrome_os_device is not None:
-                    gcm_registration_id = request_json.get('gcmRegistrationId')
-                    device_id = chrome_os_device.get('deviceId')
-                    local_device = ChromeOsDevice.create(tenant_key=tenant_key,
-                                                         device_id=device_id,
-                                                         gcm_registration_id=gcm_registration_id)
-                    device_key = local_device.put()
-                    logging.info("ChromeOsDevice.key: {0}".format(str(device_key.urlsafe())))
-                    logging.info("ChromeOsDevice.key.parent() key: {0}".format(str(device_key.parent())))
-                    device_uri = self.request.app.router.build(None,
-                                                               'manage-device',
-                                                               None,
-                                                               {'device_urlsafe_key': device_key.urlsafe()})
-                    self.response.headers['Location'] = device_uri
-                    self.response.headers.pop('Content-Type', None)
-                    self.response.set_status(201)
-                else:
-                    logging.info("Problem creating a ChromeOsDevice. ")
-                    self.response.set_status(422,
-                                             'Chrome OS device not associated with this customer id ( {0}'.format(
-                                                 self.CUSTOMER_ID))
+            gcm_registration_id = request_json.get(u'gcmRegistrationId')
+            if device_mac_address is None or device_mac_address == '':
+                status = 400
+                error_message = 'The macAddress parameter was not valid.'
+            if tenant_code is None or tenant_code == '':
+                status = 400
+                error_message = 'The tenantCode parameter was not valid.'
+            if gcm_registration_id is None or gcm_registration_id == '':
+                status = 400
+                error_message = 'The gcmRegistrationId parameter was not valid.'
+            if status == 201:
+                tenant_key = Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
+                logging.info('Retrieved tenant key: {0} by tenant code: {1}'.format(str(tenant_key), tenant_code))
+                chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
+                chrome_os_devices = chrome_os_devices_api.list(self.CUSTOMER_ID)
+                if chrome_os_devices is not None:
+                    loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == device_mac_address or
+                                          x.get('ethernetMacAddress') == device_mac_address)
+                    chrome_os_device = next(loop_comprehension, None)
+                    if chrome_os_device is not None:
+                        device_id = chrome_os_device.get('deviceId')
+                        local_device = ChromeOsDevice.create(tenant_key=tenant_key,
+                                                             device_id=device_id,
+                                                             gcm_registration_id=gcm_registration_id)
+                        device_key = local_device.put()
+                        logging.info("ChromeOsDevice.key: {0}".format(str(device_key.urlsafe())))
+                        logging.info("ChromeOsDevice.key.parent() key: {0}".format(str(device_key.parent())))
+                        device_uri = self.request.app.router.build(None,
+                                                                   'manage-device',
+                                                                   None,
+                                                                   {'device_urlsafe_key': device_key.urlsafe()})
+                        self.response.headers['Location'] = device_uri
+                        self.response.headers.pop('Content-Type', None)
+                        self.response.set_status(status)
+                    else:
+                        self.response.set_status(422,
+                                                 'Chrome OS device not associated with this customer id ( {0}'.format(
+                                                     self.CUSTOMER_ID))
+            else:
+                json_response(self.response, {'error': error_message}, status_code=status)
         else:
             logging.info("Problem creating a ChromeOsDevice. No request body.")
             self.response.set_status(422, 'Did not receive request body.')
