@@ -2,6 +2,7 @@ import json
 import logging
 
 from webapp2 import RequestHandler
+
 from google.appengine.ext import ndb
 
 from decorators import api_token_required
@@ -90,16 +91,9 @@ class DeviceResourceHandler(RequestHandler):
                 if chrome_os_device is not None:
                     gcm_registration_id = request_json.get('gcmRegistrationId')
                     device_id = chrome_os_device.get('deviceId')
-                    local_device = ChromeOsDevice.get_by_device_id(device_id)
-                    logging.info('ChromeOsDevice retrieved by device_id: {}'.format(str(local_device)))
-                    if local_device is None:
-                        local_device = ChromeOsDevice.create(tenant_key=tenant_key,
-                                                             device_id=device_id,
-                                                             gcm_registration_id=gcm_registration_id)
-                        self.response.set_status(201)
-                    else:
-                        local_device.gcm_registration_id = gcm_registration_id
-                        self.response.set_status(204)
+                    local_device = ChromeOsDevice.create(tenant_key=tenant_key,
+                                                         device_id=device_id,
+                                                         gcm_registration_id=gcm_registration_id)
                     device_key = local_device.put()
                     logging.info("ChromeOsDevice.key: {0}".format(str(device_key.urlsafe())))
                     logging.info("ChromeOsDevice.key.parent() key: {0}".format(str(device_key.parent())))
@@ -109,6 +103,7 @@ class DeviceResourceHandler(RequestHandler):
                                                                {'device_urlsafe_key': device_key.urlsafe()})
                     self.response.headers['Location'] = device_uri
                     self.response.headers.pop('Content-Type', None)
+                    self.response.set_status(201)
                 else:
                     logging.info("Problem creating a ChromeOsDevice. ")
                     self.response.set_status(422,
