@@ -1,4 +1,5 @@
 import json
+import logging
 
 from webapp2 import RequestHandler
 from google.appengine.ext import ndb
@@ -45,6 +46,8 @@ class DeviceResourceHandler(RequestHandler):
     def get_all_devices(self):
         chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
         chrome_os_devices = chrome_os_devices_api.list(self.CUSTOMER_ID)
+        # TODO loop through the list then for each device_id see if we have a device_id using a query.
+        #
         if chrome_os_devices is not None:
             json_response(self.response, chrome_os_devices)
             self.response.set_status(200)
@@ -88,11 +91,13 @@ class DeviceResourceHandler(RequestHandler):
                     device_id = chrome_os_device.get('deviceId')
                     local_device = ChromeOsDevice.get_by_device_id(device_id)
                     if local_device is None:
+                        logging.info("Attempting to create a ChromeOsDevice")
                         local_device = ChromeOsDevice.create(tenant_key=tenant_key,
                                                              device_id=device_id,
                                                              gcm_registration_id=gcm_registration_id)
                         self.response.set_status(201)
                     else:
+                        logging.info("Attempting to update a ChromeOsDevice")
                         local_device.gcm_registration_id = gcm_registration_id
                         self.response.set_status(204)
 
@@ -104,10 +109,12 @@ class DeviceResourceHandler(RequestHandler):
                     self.response.headers['Location'] = device_uri
                     self.response.headers.pop('Content-Type', None)
                 else:
+                    logging.info("Problem creating a ChromeOsDevice. ")
                     self.response.set_status(422,
                                              'Chrome OS device not associated with this customer id ( {0}'.format(
                                                  self.CUSTOMER_ID))
         else:
+            logging.info("Problem creating a ChromeOsDevice. No request body.")
             self.response.set_status(422, 'Did not receive request body.')
 
     @api_token_required

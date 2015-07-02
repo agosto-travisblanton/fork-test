@@ -1,3 +1,4 @@
+import logging
 from google.appengine.ext import ndb
 import uuid
 
@@ -71,7 +72,10 @@ class ChromeOsDevice(ndb.Model):
     @classmethod
     def create(cls, tenant_key, device_id, gcm_registration_id):
         api_key = str(uuid.uuid4())
-        return cls(parent=tenant_key,
+        logging.info("Attempting create ChromeOsDevice inside model")
+        return_value = cls(parent=tenant_key,
                    device_id=device_id,
                    gcm_registration_id=gcm_registration_id,
                    api_key=api_key)
+        logging.info("return value = {0}".format(str(return_value)))
+        return return_value
