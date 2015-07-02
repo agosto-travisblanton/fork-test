@@ -99,8 +99,8 @@ class DeviceResourceHandler(RequestHandler):
                         local_device.gcm_registration_id = gcm_registration_id
                         self.response.set_status(204)
                     device_key = local_device.put()
-                    logging.info("ChromeOsDevice.key: ".format(str(device_key.urlsafe())))
-                    logging.info("ChromeOsDevice.key.parent() key: ".format(str(device_key.parent())))
+                    logging.info("ChromeOsDevice.key: {0}".format(str(device_key.urlsafe())))
+                    logging.info("ChromeOsDevice.key.parent() key: {0}".format(str(device_key.parent())))
                     device_uri = self.request.app.router.build(None,
                                                                'manage-device',
                                                                None,
