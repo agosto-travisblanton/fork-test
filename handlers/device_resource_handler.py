@@ -16,6 +16,18 @@ class DeviceResourceHandler(RequestHandler):
     CUSTOMER_ID = 'my_customer'
 
     @api_token_required
+    def get_devices_by_tenant(self, tenant_urlsafe_key):
+        tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
+        tenant = tenant_key.get()
+        if tenant:
+            chrome_os_devices = ChromeOsDevice.query(ancestor=tenant_key).fetch()
+            json_response(self.response, chrome_os_devices)
+            self.response.set_status(200)
+        else:
+            message = 'Unable to retrieve the parent tenant by key: {}'.format(tenant_urlsafe_key)
+            json_response(self.response, {'error': message}, status_code=404)
+
+    @api_token_required
     def get(self, device_urlsafe_key):
         device_key = ndb.Key(urlsafe=device_urlsafe_key)
         local_device = device_key.get()
