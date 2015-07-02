@@ -91,6 +91,7 @@ class DeviceResourceHandler(RequestHandler):
                     gcm_registration_id = request_json.get('gcmRegistrationId')
                     device_id = chrome_os_device.get('deviceId')
                     local_device = ChromeOsDevice.get_by_device_id(device_id)
+                    logging.info('ChromeOsDevice retrieved by device_id: {}'.format(str(local_device)))
                     if local_device is None:
                         local_device = ChromeOsDevice.create(tenant_key=tenant_key,
                                                              device_id=device_id,
