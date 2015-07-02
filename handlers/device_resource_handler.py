@@ -122,7 +122,7 @@ class DeviceResourceHandler(RequestHandler):
                                                  'Chrome OS device not associated with this customer id ( {0}'.format(
                                                      self.CUSTOMER_ID))
             else:
-                json_response(self.response, {'error': error_message}, status_code=status)
+                self.response.set_status(status, error_message)
         else:
             logging.info("Problem creating a ChromeOsDevice. No request body.")
             self.response.set_status(422, 'Did not receive request body.')
