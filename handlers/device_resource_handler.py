@@ -77,6 +77,7 @@ class DeviceResourceHandler(RequestHandler):
     @api_token_required
     def post(self):
         if self.request.body is not str('') and self.request.body is not None:
+            logging.info('Request body: {0}'.format(self.request.body))
             request_json = json.loads(self.request.body)
             device_mac_address = request_json.get(u'macAddress')
             tenant_code = request_json.get(u'tenantCode')
