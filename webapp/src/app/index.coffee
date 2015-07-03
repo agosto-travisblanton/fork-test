@@ -7,7 +7,8 @@ skykitDisplayDeviceManagement = angular.module('skykitDisplayDeviceManagement', 
   'ngSanitize',
   'restangular',
   'ui.router',
-  'hSweetAlert'
+  'hSweetAlert',
+  'ui.bootstrap'
 ])
 
 skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
