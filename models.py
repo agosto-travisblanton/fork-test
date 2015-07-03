@@ -1,5 +1,7 @@
-from google.appengine.ext import ndb
+import logging
 import uuid
+
+from google.appengine.ext import ndb
 
 from restler.decorators import ae_ndb_serializer
 
@@ -70,8 +72,11 @@ class ChromeOsDevice(ndb.Model):
 
     @classmethod
     def create(cls, tenant_key, device_id, gcm_registration_id):
+        logging.info("ChromeOsDevice.create....")
+        logging.info("  Tenant key: {0}".format(str(tenant_key)))
         api_key = str(uuid.uuid4())
-        return cls(parent=tenant_key,
-                   device_id=device_id,
-                   gcm_registration_id=gcm_registration_id,
-                   api_key=api_key)
+        chrome_os_device = cls(parent=tenant_key,
+                               device_id=device_id,
+                               gcm_registration_id=gcm_registration_id,
+                               api_key=api_key)
+        return chrome_os_device

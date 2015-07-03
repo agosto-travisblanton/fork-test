@@ -1,6 +1,8 @@
 import json
+import logging
 
 from webapp2 import RequestHandler
+
 from google.appengine.ext import ndb
 
 from decorators import api_token_required
@@ -57,6 +59,8 @@ class DeviceResourceHandler(RequestHandler):
     def get_all_devices(self):
         chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
         chrome_os_devices = chrome_os_devices_api.list(self.CUSTOMER_ID)
+        # TODO loop through the list then for each device_id see if we have a device_id using a query.
+        #
         if chrome_os_devices is not None:
             json_response(self.response, chrome_os_devices)
             self.response.set_status(200)
@@ -85,41 +89,54 @@ class DeviceResourceHandler(RequestHandler):
     @api_token_required
     def post(self):
         if self.request.body is not str('') and self.request.body is not None:
+            status = 201
+            error_message = None
+            logging.info('Request body: {0}'.format(self.request.body))
             request_json = json.loads(self.request.body)
             device_mac_address = request_json.get(u'macAddress')
             tenant_code = request_json.get(u'tenantCode')
-            tenant_key = Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
-            chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
-            chrome_os_devices = chrome_os_devices_api.list(self.CUSTOMER_ID)
-            if chrome_os_devices is not None:
-                loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == device_mac_address or
-                                      x.get('ethernetMacAddress') == device_mac_address)
-                chrome_os_device = next(loop_comprehension, None)
-                if chrome_os_device is not None:
-                    gcm_registration_id = request_json.get('gcmRegistrationId')
-                    device_id = chrome_os_device.get('deviceId')
-                    local_device = ChromeOsDevice.get_by_device_id(device_id)
-                    if local_device is None:
+            gcm_registration_id = request_json.get(u'gcmRegistrationId')
+            if device_mac_address is None or device_mac_address == '':
+                status = 400
+                error_message = 'The macAddress parameter was not valid.'
+            if tenant_code is None or tenant_code == '':
+                status = 400
+                error_message = 'The tenantCode parameter was not valid.'
+            if gcm_registration_id is None or gcm_registration_id == '':
+                status = 400
+                error_message = 'The gcmRegistrationId parameter was not valid.'
+            if status == 201:
+                tenant_key = Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
+                logging.info('Retrieved tenant key: {0} by tenant code: {1}'.format(str(tenant_key), tenant_code))
+                chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
+                chrome_os_devices = chrome_os_devices_api.list(self.CUSTOMER_ID)
+                if chrome_os_devices is not None:
+                    loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == device_mac_address or
+                                          x.get('ethernetMacAddress') == device_mac_address)
+                    chrome_os_device = next(loop_comprehension, None)
+                    if chrome_os_device is not None:
+                        device_id = chrome_os_device.get('deviceId')
                         local_device = ChromeOsDevice.create(tenant_key=tenant_key,
                                                              device_id=device_id,
                                                              gcm_registration_id=gcm_registration_id)
-                        self.response.set_status(201)
+                        device_key = local_device.put()
+                        logging.info("ChromeOsDevice.key: {0}".format(str(device_key.urlsafe())))
+                        logging.info("ChromeOsDevice.key.parent() key: {0}".format(str(device_key.parent())))
+                        device_uri = self.request.app.router.build(None,
+                                                                   'manage-device',
+                                                                   None,
+                                                                   {'device_urlsafe_key': device_key.urlsafe()})
+                        self.response.headers['Location'] = device_uri
+                        self.response.headers.pop('Content-Type', None)
+                        self.response.set_status(status)
                     else:
-                        local_device.gcm_registration_id = gcm_registration_id
-                        self.response.set_status(204)
-
-                    device_key = local_device.put()
-                    device_uri = self.request.app.router.build(None,
-                                                               'manage-device',
-                                                               None,
-                                                               {'device_urlsafe_key': device_key.urlsafe()})
-                    self.response.headers['Location'] = device_uri
-                    self.response.headers.pop('Content-Type', None)
-                else:
-                    self.response.set_status(422,
-                                             'Chrome OS device not associated with this customer id ( {0}'.format(
-                                                 self.CUSTOMER_ID))
+                        self.response.set_status(422,
+                                                 'Chrome OS device not associated with this customer id ( {0}'.format(
+                                                     self.CUSTOMER_ID))
+            else:
+                self.response.set_status(status, error_message)
         else:
+            logging.info("Problem creating a ChromeOsDevice. No request body.")
             self.response.set_status(422, 'Did not receive request body.')
 
     @api_token_required

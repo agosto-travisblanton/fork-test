@@ -29,16 +29,17 @@ class TestChromeOsDevicesApi(BaseTest):
         self.assertIsNotNone(device)
         # pprint(device)
 
-    def test_update_org_unit_path(self):
-        org_unit_path_changing_to = self.ORG_UNIT_DEPLOYED
-        if self.find_by_device_id_and_org_unit(self.TESTING_DEVICE_ID, self.ORG_UNIT_DEPLOYED):
-            org_unit_path_changing_to = self.ORG_UNIT_DISTRIBUTOR
-        self.chrome_os_devices_api.update(self.SKYKIT_COM_CUSTOMER_ID,
-                                          self.TESTING_DEVICE_ID,
-                                          org_unit_path=org_unit_path_changing_to)
-        sleep(1)
-        device = self.chrome_os_devices_api.get(self.SKYKIT_COM_CUSTOMER_ID, self.TESTING_DEVICE_ID)
-        self.assertEqual(org_unit_path_changing_to, device.get('orgUnitPath'))
+    # TODO Figure out how to test this without making a live change to OU every time we ran our tests :-(
+    # def test_update_org_unit_path(self):
+    #     org_unit_path_changing_to = self.ORG_UNIT_DEPLOYED
+    #     if self.find_by_device_id_and_org_unit(self.TESTING_DEVICE_ID, self.ORG_UNIT_DEPLOYED):
+    #         org_unit_path_changing_to = self.ORG_UNIT_DISTRIBUTOR
+    #     self.chrome_os_devices_api.update(self.SKYKIT_COM_CUSTOMER_ID,
+    #                                       self.TESTING_DEVICE_ID,
+    #                                       org_unit_path=org_unit_path_changing_to)
+    #     sleep(1)
+    #     device = self.chrome_os_devices_api.get(self.SKYKIT_COM_CUSTOMER_ID, self.TESTING_DEVICE_ID)
+    #     self.assertEqual(org_unit_path_changing_to, device.get('orgUnitPath'))
 
     def test_update_notes(self):
         new_notes = 'Notes updated at {0} from unit test.'.format(strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime()))
