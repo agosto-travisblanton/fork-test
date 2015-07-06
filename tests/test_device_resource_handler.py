@@ -24,6 +24,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     TENANT_CODE = 'foobar'
     TESTING_DEVICE_ID = '832e235a-b346-4a37-a100-de49fa753a2a'
     TEST_GCM_REGISTRATION_ID = '8d70a8d78a6dfa6df76dfasd'
+    MAC_ADDRESS = '54271e619346'
 
     def setUp(self):
         super(TestDeviceResourceHandler, self).setUp()
@@ -36,7 +37,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.tenant_key = self.tenant.put()
         self.chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
                                                       device_id=self.TESTING_DEVICE_ID,
-                                                      gcm_registration_id=self.TEST_GCM_REGISTRATION_ID)
+                                                      gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                                      mac_address=self.MAC_ADDRESS)
         self.chrome_os_device_key = self.chrome_os_device.put()
 
         self.chrome_os_device_json = json.loads(self.load_file_contents('tests/chrome_os_device.json'))
@@ -59,7 +61,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         device = ChromeOsDevice(
             api_key='some key',
             device_id=self.TESTING_DEVICE_ID,
-            gcm_registration_id=self.TEST_GCM_REGISTRATION_ID)
+            gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+            mac_address=self.MAC_ADDRESS)
         key = device.put()
         uri = application.router.build(None, 'manage-device', None, {'device_urlsafe_key': key.urlsafe()})
         with self.assertRaises(AppError):
@@ -215,7 +218,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         """
         device = ChromeOsDevice.create(tenant_key=self.tenant_key,
                                        device_id='132e235a-b346-4a37-a100-de49fa753a2a',
-                                       gcm_registration_id='8d70a8d78a6dfa6df76dfas7')
+                                       gcm_registration_id='8d70a8d78a6dfa6df76dfas7',
+                                       mac_address='54271e619346')
         device.put()
         request_body = {'macAddress': 'c45444596b9b',
                         'gcmRegistrationId': '8d70a8d78a6dfa6df76dfas7',
@@ -272,7 +276,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_device_resource_delete_returns_no_content(self):
         chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
                                                  device_id=self.chrome_os_device_json.get('deviceId'),
-                                                 gcm_registration_id='d23784972038845ab3963412')
+                                                 gcm_registration_id='d23784972038845ab3963412',
+                                                 mac_address=self.MAC_ADDRESS)
         key = chrome_os_device.put()
         url = '/api/v1/devices/{0}'.format(key.urlsafe())
         response = self.app.delete(url, headers=self.headers)
@@ -281,7 +286,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_device_resource_delete_no_authorization_header_returns_forbidden(self):
         chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
                                                  device_id=self.chrome_os_device_json.get('deviceId'),
-                                                 gcm_registration_id='d23784972038845ab3963412')
+                                                 gcm_registration_id='d23784972038845ab3963412',
+                                                 mac_address=self.MAC_ADDRESS)
         key = chrome_os_device.put()
         url = '/api/v1/devices/{0}'.format(key.urlsafe())
         with self.assertRaises(Exception) as context:
@@ -291,7 +297,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_device_resource_delete_removes_chrome_os_device_entity(self):
         chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
                                                  device_id=self.chrome_os_device_json.get('deviceId'),
-                                                 gcm_registration_id='d23784972038845ab3963412')
+                                                 gcm_registration_id='d23784972038845ab3963412',
+                                                 mac_address=self.MAC_ADDRESS)
         key = chrome_os_device.put()
         url = '/api/v1/devices/{0}'.format(key.urlsafe())
         self.app.delete(url, headers=self.headers)
@@ -308,5 +315,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def create_chrome_os_device(tenant_key):
         device = ChromeOsDevice.create(tenant_key=tenant_key,
                                        device_id='132e235a-b346-4a37-a100-de49fa753a2a',
-                                       gcm_registration_id='some gcm registration id')
+                                       gcm_registration_id='some gcm registration id',
+                                       mac_address='54271e619346')
         return device.put()

@@ -130,7 +130,8 @@ class DeviceResourceHandler(RequestHandler):
                         device_id = chrome_os_device.get('deviceId')
                         local_device = ChromeOsDevice.create(tenant_key=tenant_key,
                                                              device_id=device_id,
-                                                             gcm_registration_id=gcm_registration_id)
+                                                             gcm_registration_id=gcm_registration_id,
+                                                             mac_address=device_mac_address)
                         device_key = local_device.put()
                         logging.info("ChromeOsDevice.key: {0}".format(str(device_key.urlsafe())))
                         logging.info("ChromeOsDevice.key.parent() key: {0}".format(str(device_key.parent())))
