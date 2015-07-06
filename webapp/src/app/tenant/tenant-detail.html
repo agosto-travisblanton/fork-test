@@ -165,6 +165,8 @@
                                     <thead>
                                     <tr>
                                         <th>Key</th>
+                                        <th>Device ID</th>
+                                        <th>MAC address</th>
                                         <th></th>
                                     </tr>
                                     </thead>
@@ -173,7 +175,14 @@
                                         <td name="no-tenants" colspan="2" class="text-center text-danger">No devices</td>
                                     </tr>
                                     <tr ng-repeat="device in tenantDetailsCtrl.currentTenantDevices | orderBy:'-created' ">
-                                        <td class="tenant-device-key">{{device.key}}</td>
+                                        <td class="tenant-device-key">
+                                          {{ device.key | limitTo: 6 }}...{{ device.key | limitTo: 6 : device.key.length - 6}}
+                                        </td>
+                                        <td class="tenant-device-id">
+                                          {{ device.device_id }}
+                                        </td>
+                                        <td class="tenant-device-mac-address">
+                                        </td>
                                         <td class="text-center">
                                         </td>
                                     </tr>
