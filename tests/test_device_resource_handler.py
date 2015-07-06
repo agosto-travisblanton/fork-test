@@ -208,7 +208,11 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         parent_tenant_key = chrome_os_device_key.parent()
         self.assertIsNotNone(parent_tenant_key)
 
-    def test_device_resource_handler_post_returns_no_content_with_registered_device_stored_locally(self):
+    def test_device_resource_handler_post_returns_created_with_registered_device_stored_locally(self):
+        """
+        Test case demonstrating that the POST method is not idempotent and will create a new registered device
+        each time it is invoked.
+        """
         device = ChromeOsDevice.create(tenant_key=self.tenant_key,
                                        device_id='132e235a-b346-4a37-a100-de49fa753a2a',
                                        gcm_registration_id='8d70a8d78a6dfa6df76dfas7')

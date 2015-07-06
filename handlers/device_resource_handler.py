@@ -9,6 +9,7 @@ from decorators import api_token_required
 from restler.serializers import json_response
 from chrome_os_devices_api import ChromeOsDevicesApi
 from models import ChromeOsDevice, Tenant
+from strategy import CHROME_OS_DEVICE_STRATEGY
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -16,6 +17,18 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob
 class DeviceResourceHandler(RequestHandler):
     ADMIN_ACCOUNT_TO_IMPERSONATE = 'administrator@skykit.com'
     CUSTOMER_ID = 'my_customer'
+
+    @api_token_required
+    def get_devices_by_tenant(self, tenant_urlsafe_key):
+        tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
+        tenant = tenant_key.get()
+        if tenant is not None:
+            chrome_os_devices = ChromeOsDevice.query(ancestor=tenant_key).fetch()
+            json_response(self.response, chrome_os_devices, strategy=CHROME_OS_DEVICE_STRATEGY)
+            self.response.set_status(200)
+        else:
+            message = 'Unable to retrieve the parent tenant by key: {0}'.format(tenant_urlsafe_key)
+            json_response(self.response, {'error': message}, status_code=404)
 
     @api_token_required
     def get(self, device_urlsafe_key):
