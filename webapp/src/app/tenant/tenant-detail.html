@@ -172,7 +172,7 @@
                                     </thead>
                                     <tbody>
                                     <tr ng-hide="tenantDetailsCtrl.currentTenantDevices.length">
-                                        <td name="no-tenants" colspan="2" class="text-center text-danger">No devices</td>
+                                        <td name="no-tenants" colspan="3" class="text-center text-danger">No devices</td>
                                     </tr>
                                     <tr ng-repeat="device in tenantDetailsCtrl.currentTenantDevices | orderBy:'-created' ">
                                         <td class="tenant-device-key">
