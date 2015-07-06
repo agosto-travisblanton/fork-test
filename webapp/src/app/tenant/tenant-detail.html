@@ -176,7 +176,9 @@
                                     </tr>
                                     <tr ng-repeat="device in tenantDetailsCtrl.currentTenantDevices | orderBy:'-created' ">
                                         <td class="tenant-device-key">
-                                          {{ device.key | limitTo: 6 }}...{{ device.key | limitTo: 6 : device.key.length - 6}}
+                                          <code>
+                                            {{ device.key | limitTo: 10 }}...{{ device.key | limitTo: 10 : device.key.length - 10}}
+                                          </code>
                                         </td>
                                         <td class="tenant-device-id">
                                           {{ device.device_id }}
