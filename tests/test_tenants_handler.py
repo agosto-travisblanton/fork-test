@@ -27,14 +27,14 @@ class TestTenantsHandler(BaseTest, WebTest):
         tenant_keys = self.load_tenants()
         request_parameters = {}
         uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': tenant_keys[0].urlsafe()})
-        response = self.app.get(uri, params=request_parameters)
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
         self.assertOK(response)
 
     def test_get_by_id_returns_tenant_representation(self):
         tenant_keys = self.load_tenants()
         request_parameters = {}
         uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': tenant_keys[0].urlsafe()})
-        response = self.app.get(uri, params=request_parameters)
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
         expected = tenant_keys[0].get()
         self.assertEqual(response_json.get('key'), expected.key.urlsafe())
@@ -46,14 +46,14 @@ class TestTenantsHandler(BaseTest, WebTest):
         self.load_tenants()
         request_parameters = {}
         uri = application.router.build(None, 'tenants', None, {})
-        response = self.app.get(uri, params=request_parameters)
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
         self.assertOK(response)
 
     def test_get_returns_json_resources(self):
         self.load_tenants()
         request_parameters = {}
         uri = application.router.build(None, 'tenants', None, {})
-        response = self.app.get(uri, params=request_parameters)
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 5)
 
@@ -69,7 +69,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
-        response = self.app.post_json(uri, params=request_parameters)
+        response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
         self.assertEqual(201, response.status_code)
 
     def test_post_create_new_tenant_persists_object(self):
@@ -84,7 +84,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'chrome_device_domain': '',
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
-        self.app.post_json(uri, params=request_parameters)
+        self.app.post_json(uri, params=request_parameters, headers=self.headers)
         actual = Tenant.find_by_name(request_parameters['name'])
         self.assertIsNotNone(actual)
 
@@ -100,7 +100,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'chrome_device_domain': '',
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
-        response = self.app.post_json(uri, params=request_parameters)
+        response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
         actual = Tenant.find_by_name(request_parameters['name'])
         tenant_uri = application.router.build(None,
                                               'manage-tenant',
@@ -144,13 +144,16 @@ class TestTenantsHandler(BaseTest, WebTest):
     def test_put_returns_no_content_status(self):
         tenant_keys = self.load_tenants()
         uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': tenant_keys[0].urlsafe()})
-        response = self.app.put_json(uri, {'name': 'foobar',
-                                           'tenant_code': 'acme',
-                                           'admin_email': 'foo@bar.com',
-                                           'content_server_url': 'https://www.foo.com',
-                                           'content_server_api_key': 'some key',
-                                           'chrome_device_domain': 'some domain',
-                                           'active': True})
+        entity_body = {
+            'name': 'foobar',
+            'tenant_code': 'acme',
+            'admin_email': 'foo@bar.com',
+            'content_server_url': 'https://www.foo.com',
+            'content_server_api_key': 'some key',
+            'chrome_device_domain': 'some domain',
+            'active': True
+        }
+        response = self.app.put_json(uri, entity_body, headers=self.headers)
         self.assertEqual(204, response.status_code)
 
     def test_put_updates_selected_properties(self):
@@ -159,20 +162,23 @@ class TestTenantsHandler(BaseTest, WebTest):
         expected = tenant_keys[0].get()
         self.assertEqual(expected.name, 'Testing tenant 0')
         self.assertEqual(expected.active, True)
-        self.app.put_json(uri, {'name': 'foobar',
-                                'tenant_code': 'acme',
-                                'admin_email': 'foo@bar.com',
-                                'content_server_url': 'https://www.foo.com',
-                                'content_server_api_key': 'some key',
-                                'chrome_device_domain': 'some domain',
-                                'active': False})
+        entity_body = {
+            'name': 'foobar',
+            'tenant_code': 'acme',
+            'admin_email': 'foo@bar.com',
+            'content_server_url': 'https://www.foo.com',
+            'content_server_api_key': 'some key',
+            'chrome_device_domain': 'some domain',
+            'active': False
+        }
+        self.app.put_json(uri, entity_body, headers=self.headers)
         self.assertEqual(expected.name, 'foobar')
         self.assertEqual(expected.active, False)
 
     def test_delete_returns_no_content_status(self):
         tenant_keys = self.load_tenants()
         uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': tenant_keys[0].urlsafe()})
-        response = self.app.delete(uri)
+        response = self.app.delete(uri, headers=self.headers)
         self.assertEqual(204, response.status_code)
 
     def test_delete_soft_deletes_tenant(self):
@@ -180,15 +186,15 @@ class TestTenantsHandler(BaseTest, WebTest):
         url_safe_tenant_key = tenant_keys[0].urlsafe()
         request_parameters = {}
         uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': url_safe_tenant_key})
-        response = self.app.get(uri, params=request_parameters)
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
         self.assertIsNotNone(response_json)
 
         uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': url_safe_tenant_key})
-        self.app.delete(uri)
+        self.app.delete(uri, headers=self.headers)
 
         uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': url_safe_tenant_key})
-        response = self.app.get(uri, params=request_parameters)
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
         self.assertEqual(response_json.get('active'), False)
 
