@@ -19,14 +19,24 @@ class DeviceResourceHandler(RequestHandler):
 
     @api_token_required
     def get(self, device_urlsafe_key):
-        device_key = ndb.Key(urlsafe=device_urlsafe_key)
+        try:
+            device_key = ndb.Key(urlsafe=device_urlsafe_key)
+        except Exception, e:
+            logging.exception(e)
+            logging.info('Unrecognized device with device key: {0}'.format(device_urlsafe_key))
+            return self.response.set_status(404)
         local_device = device_key.get()
         chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
         chrome_os_device = chrome_os_devices_api.get(self.CUSTOMER_ID, local_device.device_id)
         result = {}
         if chrome_os_device:
             result = chrome_os_device
-        tenant = local_device.key.parent().get()
+        try:
+            tenant = local_device.key.parent().get()
+        except Exception, e:
+            logging.exception(e)
+            logging.info('No tenant for device key: {0}'.format(device_urlsafe_key))
+            return self.response.set_status(400)
         result['tenantCode'] = tenant.tenant_code
         result['contentServerUrl'] = tenant.content_server_url
         result['chromeDeviceDomain'] = tenant.chrome_device_domain
@@ -34,6 +44,7 @@ class DeviceResourceHandler(RequestHandler):
         result['created'] = local_device.created.strftime('%Y-%m-%d %H:%M:%S')
         result['updated'] = local_device.updated.strftime('%Y-%m-%d %H:%M:%S')
         result['apiKey'] = local_device.api_key
+        result['key'] = device_urlsafe_key
         json_response(self.response, result)
 
     @api_token_required
