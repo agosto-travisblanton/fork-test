@@ -7,22 +7,27 @@ describe 'TenantDetailsCtrl', ->
   $state = undefined
   $stateParams = undefined
   TenantsService = undefined
-  promise = undefined
+  DevicesService = undefined
+  tenantsServicePromise = undefined
+  devicesServicePromise = undefined
 
   beforeEach module('skykitDisplayDeviceManagement')
 
-  beforeEach inject (_$controller_, _TenantsService_, _$state_) ->
+  beforeEach inject (_$controller_, _TenantsService_, _DevicesService_, _$state_) ->
     $controller = _$controller_
     $state = _$state_
     $stateParams = {}
     TenantsService = _TenantsService_
+    DevicesService = _DevicesService_
     scope = {}
 
 
   describe 'initialization', ->
     beforeEach ->
-      promise = new skykitDisplayDeviceManagement.q.Mock
-      spyOn(TenantsService, 'getTenantByKey').and.returnValue(promise)
+      tenantsServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      devicesServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      spyOn(TenantsService, 'getTenantByKey').and.returnValue(tenantsServicePromise)
+      spyOn(DevicesService, 'getDevicesByTenant').and.returnValue(devicesServicePromise)
 
     it 'currentTenant should be set', ->
       controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
@@ -35,45 +40,60 @@ describe 'TenantDetailsCtrl', ->
       expect(controller.currentTenant.chrome_device_domain).toBeUndefined()
       expect(controller.currentTenant.active).toBeTruthy()
 
-    it 'editMode should be set to true', ->
-      $stateParams = {tenantKey: 'fahdsfyudsyfauisdyfoiusydfu'}
-      controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
-      expect(controller.editMode).toBeTruthy()
+    describe 'editing an existing tenant', ->
+      it 'editMode should be set to true', ->
+        $stateParams = {tenantKey: 'fahdsfyudsyfauisdyfoiusydfu'}
+        controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
+        expect(controller.editMode).toBeTruthy()
 
-    it 'editMode should be set to false', ->
-      $stateParams = {}
-      controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
-      expect(controller.editMode).toBeFalsy()
+      it 'retrieve tenant by key from TenantsService', ->
+        $stateParams = {tenantKey: 'fahdsfyudsyfauisdyfoiusydfu'}
+        controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
+        tenant = {key: 'fahdsfyudsyfauisdyfoiusydfu', name: 'Foobar'}
+        tenantsServicePromise.resolve(tenant)
+        expect(TenantsService.getTenantByKey).toHaveBeenCalledWith($stateParams.tenantKey)
+        expect(controller.currentTenant).toBe(tenant)
 
-    it 'when editMode is true, retrieve tenant by key', ->
-      $stateParams = {tenantKey: 'fahdsfyudsyfauisdyfoiusydfu'}
-      controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
-      tenant = {key: 'fahdsfyudsyfauisdyfoiusydfu', name: 'Foobar'}
-      promise.resolve(tenant)
-      expect(TenantsService.getTenantByKey).toHaveBeenCalledWith($stateParams.tenantKey)
-      expect(controller.currentTenant).toBe(tenant)
+      it 'retrieve tenant\'s devices by tenant key from DevicesService', ->
+        $stateParams = {tenantKey: 'fahdsfyudsyfauisdyfoiusydfu'}
+        controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
+        devices = [{key: 'f8sa76d78fa978d6fa7dg7ds55'}, {key: 'f8sa76d78fa978d6fa7dg7ds56'}]
+        devicesServicePromise.resolve(devices)
+        expect(DevicesService.getDevicesByTenant).toHaveBeenCalledWith($stateParams.tenantKey)
+        expect(controller.currentTenantDevices).toBe(devices)
 
-    it 'when editMode is false, do not call TenantsService.getTenantByKey', ->
-      $stateParams = {}
-      controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
-      expect(TenantsService.getTenantByKey).not.toHaveBeenCalled()
+    describe 'creating a new tenant', ->
+      it 'editMode should be set to false', ->
+        $stateParams = {}
+        controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
+        expect(controller.editMode).toBeFalsy()
+
+      it 'do not call TenantsService.getTenantByKey', ->
+        $stateParams = {}
+        controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
+        expect(TenantsService.getTenantByKey).not.toHaveBeenCalled()
+
+      it 'do not call Devices.getDevicesByTenant', ->
+        $stateParams = {}
+        controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
+        expect(DevicesService.getDevicesByTenant).not.toHaveBeenCalled()
 
   describe '.onClickSaveButton', ->
     beforeEach ->
-      promise = new skykitDisplayDeviceManagement.q.Mock
-      spyOn(TenantsService, 'save').and.returnValue(promise)
+      tenantsServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      spyOn(TenantsService, 'save').and.returnValue(tenantsServicePromise)
       spyOn($state, 'go')
       $stateParams = {}
       controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
 
     it 'call TenantsService.save, pass the current tenant', ->
       controller.onClickSaveButton()
-      promise.resolve()
+      tenantsServicePromise.resolve()
       expect(TenantsService.save).toHaveBeenCalledWith(controller.currentTenant)
 
     it "the 'then' handler routes navigation back to 'tenants'", ->
       controller.onClickSaveButton()
-      promise.resolve()
+      tenantsServicePromise.resolve()
       expect($state.go).toHaveBeenCalledWith('tenants')
 
   describe '.autoGenerateTenantCode', ->
