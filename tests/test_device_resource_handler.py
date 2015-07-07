@@ -15,7 +15,6 @@ from app_config import config
 class TestDeviceResourceHandler(BaseTest, WebTest):
     APPLICATION = application
     CUSTOMER_ID = 'my_customer'
-    REGISTERED_CHROME_MAC_ADDRESS_NOT_IN_PROVISIONING = '54271e619346'
     NAME = 'foobar tenant'
     ADMIN_EMAIL = 'foo@bar.com'
     CONTENT_SERVER_URL = 'https://www.content.com'
@@ -227,12 +226,13 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
         self.assertEqual('201 Created', response.status)
 
-    def test_device_resource_handler_post_returns_created_with_registered_device_not_stored_locally(self):
-        request_body = {'macAddress': self.REGISTERED_CHROME_MAC_ADDRESS_NOT_IN_PROVISIONING,
+    def test_device_resource_handler_post_returns_bad_request_with_registered_device(self):
+        request_body = {'macAddress': self.MAC_ADDRESS,
                         'gcmRegistrationId': '123',
                         'tenantCode': 'Acme'}
-        response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
-        self.assertEqual('201 Created', response.status)
+        with self.assertRaises(Exception):
+            response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
+            self.assertBadRequest(response)
 
     def test_device_resource_put_returns_no_content(self):
         device_key = self.create_chrome_os_device(self.tenant_key)

@@ -106,6 +106,10 @@ class DeviceResourceHandler(RequestHandler):
             logging.info('Request body: {0}'.format(self.request.body))
             request_json = json.loads(self.request.body)
             device_mac_address = request_json.get(u'macAddress')
+            device_exists = ChromeOsDevice.query(ChromeOsDevice.mac_address == device_mac_address).count() > 0
+            if device_exists:
+                status = 400
+                error_message = 'Cannot create because MAC address has already been assigned to this device.'
             tenant_code = request_json.get(u'tenantCode')
             gcm_registration_id = request_json.get(u'gcmRegistrationId')
             if device_mac_address is None or device_mac_address == '':
