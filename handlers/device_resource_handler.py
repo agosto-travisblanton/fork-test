@@ -89,7 +89,7 @@ class DeviceResourceHandler(RequestHandler):
                                   x.get('ethernetMacAddress') == lowercase_device_mac_address)
             chrome_os_device = next(loop_comprehension, None)
             if chrome_os_device is not None:
-                json_response(self.response, chrome_os_device)
+                json_response(self.response, chrome_os_device[0])
             else:
                 message = 'A ChromeOS device was not found to be associated with the MAC address: {0}.'.format(
                     device_mac_address)
