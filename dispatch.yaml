@@ -1,4 +1,3 @@
-#dispatch:
-#  - url: "*/migration/*"
-#    module: migration
-
+dispatch:
+  - url: "*/migration/*"
+    module: migration
