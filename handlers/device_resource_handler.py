@@ -89,6 +89,17 @@ class DeviceResourceHandler(RequestHandler):
                                   x.get('ethernetMacAddress') == lowercase_device_mac_address)
             chrome_os_device = next(loop_comprehension, None)
             if chrome_os_device is not None:
+                local_device = ChromeOsDevice.get_by_device_id(chrome_os_device.get('deviceId'))
+                if local_device is not None:
+                    tenant = local_device.key.parent().get()
+                    chrome_os_device['tenantCode'] = tenant.tenant_code
+                    chrome_os_device['contentServerUrl'] = tenant.content_server_url
+                    chrome_os_device['chromeDeviceDomain'] = tenant.chrome_device_domain
+                    chrome_os_device["gcmRegistrationId"] = local_device.gcm_registration_id
+                    chrome_os_device['created'] = local_device.created.strftime('%Y-%m-%d %H:%M:%S')
+                    chrome_os_device['updated'] = local_device.updated.strftime('%Y-%m-%d %H:%M:%S')
+                    chrome_os_device['apiKey'] = local_device.api_key
+                    chrome_os_device['key'] = local_device.key.urlsafe()
                 json_response(self.response, chrome_os_device)
             else:
                 message = 'A ChromeOS device was not found to be associated with the MAC address: {0}.'.format(
