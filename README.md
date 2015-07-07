@@ -1,31 +1,26 @@
-# SkyKit Display Device Management #
+# SkyKit Provisioning API #
 
-## API ##
+Each GET, PUT, POST, DELETE **request header** should have **6C346588BD4C6D722A1165B43C51C** as the *Authorization* key as follows:
 
-### Register Device ###
+![Screen Shot 2015-06-22 at 4.27.10 PM.png](https://bitbucket.org/repo/L8AoyM/images/2887177670-Screen%20Shot%202015-06-22%20at%204.27.10%20PM.png)
 
-Using the following API call:
+## Create Device ##
 
-![Screen Shot 2015-06-19 at 2.33.43 PM.png](https://bitbucket.org/repo/L8AoyM/images/1866246453-Screen%20Shot%202015-06-19%20at%202.33.43%20PM.png)
+### POST ###
 
-where the following JSON is posted to the server:
+The following is an example of a **request body** JSON that could be posted to the provisioning server to create a device:
 
 {
 
   "macAddress": "54271e619346",
- 
- "gcmRegistrationId": "8d70a8d78a6dfa6df76dfas7",
+
+  "gcmRegistrationId": "8d70a8d78a6dfa6df76dfas7",
 
   "tenantCode": "foobar"
 
 }
 
-The Request header should have **6C346588BD4C6D722A1165B43C51C** as the *Authorization* key as follows:
-
-![Screen Shot 2015-06-22 at 4.27.10 PM.png](https://bitbucket.org/repo/L8AoyM/images/2887177670-Screen%20Shot%202015-06-22%20at%204.27.10%20PM.png)
-
-
-will return a `422` if failure occurs, but should, if successful:
+The **response** will be a `422` if failure occurs, but should, if successful:
 
 * Return a `201 Created`; and
 
@@ -38,6 +33,28 @@ This uri, in turn, in the form of */api/v1/devices/**<device_urlsafe_key>***, ca
 https://skykit-display-device-int.appspot.com/api/v1/devices/ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyVgsSEVRlbmFudEVudGl0eUdyb3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgIDyiAoMCxIOQ2hyb21lT3NEZXZpY2UYgICAgIDDlQoM
 
 where the ***<device_urlsafe_key>*** is: ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyVgsSEVRlbmFudEVudGl0eUdyb3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgIDyiAoMCxIOQ2hyb21lT3NEZXZpY2UYgICAgIDDlQoM
+
+## Update Device ##
+
+### PUT ###
+
+The Url would be for a PUT would be something like:
+PUT   /api/v1/devices/<device_urlsafe_key>
+
+where the ***<device_urlsafe_key>*** might be something like: ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyVgsSEVRlbmFudEVudGl0eUdyb3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgIDyiAoMCxIOQ2hyb21lT3NEZXZpY2UYgICAgIDDlQoM
+
+
+The following is an example of a **request body** JSON that could be sent to the provisioning server to update a device:
+
+{
+
+  "macAddress": "54271e619346",
+
+  "gcmRegistrationId": "8d70a8d78a6dfa6df76dfas7",
+
+  "tenantCode": "foobar"
+
+}
 
 
 ## Vagrant ##
