@@ -141,7 +141,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_device_resource_handler_post_returns_created_status(self):
         request_body = {'macAddress': self.chrome_os_device_json.get('macAddress'),
                         'gcmRegistrationId': '123',
-                        'tenantCode': 'acme'
+                        'tenantCode': 'foobar'
                         }
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
@@ -157,17 +157,16 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_device_resource_handler_post_returns_device_uri_in_location_header(self):
         gcm_registration_id = '123'
-        tenant_code = 'Acme'
         request_body = {'macAddress': self.chrome_os_device_json.get('macAddress'),
                         'gcmRegistrationId': gcm_registration_id,
-                        'tenantCode': tenant_code}
+                        'tenantCode': self.TENANT_CODE}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
         location_uri = str(response.headers['Location'])
         location_uri_components = location_uri.split('/')
         self.assertEqual(location_uri_components[5], "devices")
         key_length = len(location_uri_components[6])
-        self.assertEqual(key_length, 48)
+        self.assertEqual(key_length, 118)
 
     def test_device_resource_handler_post_returns_unprocessable_entity_status_for_empty_request_body(self):
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
@@ -178,7 +177,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_device_resource_handler_post_returns_unprocessable_entity_status_for_unassociated_device(self):
         request_body = {'macAddress': 'bogusMacAddress',
                         'gcmRegistrationId': '123',
-                        'tenantCode': 'Acme'}
+                        'tenantCode': 'foobar'}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         with self.assertRaises(Exception) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
@@ -189,7 +188,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         gcm_registration_id = '123'
         request_body = {'macAddress': mac_address,
                         'gcmRegistrationId': gcm_registration_id,
-                        'tenantCode': 'Acme'}
+                        'tenantCode': self.TENANT_CODE}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
         chrome_os_device_key = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id). \
@@ -210,22 +209,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         parent_tenant_key = chrome_os_device_key.parent()
         self.assertIsNotNone(parent_tenant_key)
 
-    def test_device_resource_handler_post_returns_created_with_registered_device_stored_locally(self):
-        """
-        Test case demonstrating that the POST method is not idempotent and will create a new registered device
-        each time it is invoked.
-        """
-        device = ChromeOsDevice.create(tenant_key=self.tenant_key,
-                                       device_id='132e235a-b346-4a37-a100-de49fa753a2a',
-                                       gcm_registration_id='8d70a8d78a6dfa6df76dfas7',
-                                       mac_address='54271e619346')
-        device.put()
-        request_body = {'macAddress': 'c45444596b9b',
-                        'gcmRegistrationId': '8d70a8d78a6dfa6df76dfas7',
-                        'tenantCode': 'Acme'}
-        response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
-        self.assertEqual('201 Created', response.status)
-
     def test_device_resource_handler_post_returns_bad_request_with_registered_device(self):
         request_body = {'macAddress': self.MAC_ADDRESS,
                         'gcmRegistrationId': '123',
@@ -234,9 +217,36 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
             self.assertBadRequest(response)
 
+    def test_device_resource_handler_post_returns_bad_request_with_invalid_tenant(self):
+        mac_address = self.chrome_os_device_json.get('macAddress')
+        request_body = {'macAddress': mac_address,
+                        'gcmRegistrationId': '123',
+                        'tenantCode': 'invalid_tenant'}
+        when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
+        with self.assertRaises(Exception) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
+        self.assertTrue('400 Invalid or inactive tenant for device.' in str(context.exception))
+
+    def test_device_resource_handler_post_returns_bad_request_with_inactive_tenant(self):
+        inactive_tenant = Tenant.create(tenant_code='inactive_tenant',
+                                        name='Inactive Tenant, Inc',
+                                        admin_email='boo@inactive_tenant.com',
+                                        content_server_url=self.CONTENT_SERVER_URL,
+                                        chrome_device_domain='inactive_tenant.com',
+                                        active=False)
+        inactive_tenant_key = inactive_tenant.put()
+        mac_address = self.chrome_os_device_json.get('macAddress')
+        request_body = {'macAddress': mac_address,
+                        'gcmRegistrationId': '123',
+                        'tenantCode': inactive_tenant_key.get().tenant_code}
+        when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
+        with self.assertRaises(Exception) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
+        self.assertTrue('400 Invalid or inactive tenant for device.' in str(context.exception))
+
     def test_device_resource_put_returns_no_content(self):
         device_key = self.create_chrome_os_device(self.tenant_key)
-        request_body = {'gcmRegistrationId': 'd23784972038845ab3963412', 'tenantCode': 'Acme'}
+        request_body = {'gcmRegistrationId': 'd23784972038845ab3963412', 'tenantCode': 'acme'}
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
         response = self.app.put('/api/v1/devices/{0}'.format(device_key.urlsafe()),
                                 json.dumps(request_body),

@@ -130,9 +130,11 @@ class DeviceResourceHandler(RequestHandler):
             if gcm_registration_id is None or gcm_registration_id == '':
                 status = 400
                 error_message = 'The gcmRegistrationId parameter was not valid.'
+            tenant_key = Tenant.query(Tenant.tenant_code == tenant_code, Tenant.active == True).get(keys_only=True)
+            if tenant_key is None:
+                status = 400
+                error_message = 'Invalid or inactive tenant for device.'
             if status == 201:
-                tenant_key = Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
-                logging.info('Retrieved tenant key: {0} by tenant code: {1}'.format(str(tenant_key), tenant_code))
                 chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
                 chrome_os_devices = chrome_os_devices_api.list(self.CUSTOMER_ID)
                 if chrome_os_devices is not None:
@@ -146,8 +148,6 @@ class DeviceResourceHandler(RequestHandler):
                                                              gcm_registration_id=gcm_registration_id,
                                                              mac_address=device_mac_address)
                         device_key = local_device.put()
-                        logging.info("ChromeOsDevice.key: {0}".format(str(device_key.urlsafe())))
-                        logging.info("ChromeOsDevice.key.parent() key: {0}".format(str(device_key.parent())))
                         device_uri = self.request.app.router.build(None,
                                                                    'manage-device',
                                                                    None,
