@@ -89,6 +89,17 @@ class DeviceResourceHandler(RequestHandler):
                                   x.get('ethernetMacAddress') == lowercase_device_mac_address)
             chrome_os_device = next(loop_comprehension, None)
             if chrome_os_device is not None:
+                local_device = ChromeOsDevice.get_by_device_id(chrome_os_device.get('deviceId'))
+                if local_device is not None:
+                    tenant = local_device.key.parent().get()
+                    chrome_os_device['tenantCode'] = tenant.tenant_code
+                    chrome_os_device['contentServerUrl'] = tenant.content_server_url
+                    chrome_os_device['chromeDeviceDomain'] = tenant.chrome_device_domain
+                    chrome_os_device["gcmRegistrationId"] = local_device.gcm_registration_id
+                    chrome_os_device['created'] = local_device.created.strftime('%Y-%m-%d %H:%M:%S')
+                    chrome_os_device['updated'] = local_device.updated.strftime('%Y-%m-%d %H:%M:%S')
+                    chrome_os_device['apiKey'] = local_device.api_key
+                    chrome_os_device['key'] = local_device.key.urlsafe()
                 json_response(self.response, chrome_os_device)
             else:
                 message = 'A ChromeOS device was not found to be associated with the MAC address: {0}.'.format(
@@ -106,6 +117,10 @@ class DeviceResourceHandler(RequestHandler):
             logging.info('Request body: {0}'.format(self.request.body))
             request_json = json.loads(self.request.body)
             device_mac_address = request_json.get(u'macAddress')
+            device_exists = ChromeOsDevice.query(ChromeOsDevice.mac_address == device_mac_address).count() > 0
+            if device_exists:
+                status = 400
+                error_message = 'Cannot create because MAC address has already been assigned to this device.'
             tenant_code = request_json.get(u'tenantCode')
             gcm_registration_id = request_json.get(u'gcmRegistrationId')
             if device_mac_address is None or device_mac_address == '':
@@ -130,7 +145,8 @@ class DeviceResourceHandler(RequestHandler):
                         device_id = chrome_os_device.get('deviceId')
                         local_device = ChromeOsDevice.create(tenant_key=tenant_key,
                                                              device_id=device_id,
-                                                             gcm_registration_id=gcm_registration_id)
+                                                             gcm_registration_id=gcm_registration_id,
+                                                             mac_address=device_mac_address)
                         device_key = local_device.put()
                         logging.info("ChromeOsDevice.key: {0}".format(str(device_key.urlsafe())))
                         logging.info("ChromeOsDevice.key.parent() key: {0}".format(str(device_key.parent())))
