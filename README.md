@@ -68,16 +68,20 @@ DELETE   /api/v1/devices/<device_urlsafe_key>
 where the ***<device_urlsafe_key>*** might be something like: ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyVgsSEVRlbmFudEVudGl0eUdyb3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgIDyiAoMCxIOQ2hyb21lT3NEZXZpY2UYgICAgIDDlQoM
 
 
+## Get Device ##
 
-## Vagrant ##
-1. `vagrant up`
-1. `vagrant ssh`
-1. `cd /vagrant`
-1. `dev_appserver.py .` 
+### GET ###
 
-## Tests ##
-1. Run all:  `python manage.py pytest tests`
-1. Specific: `python manage.py pytest tests/test_tenants_handler.py`
+The Url would be for a PUT would be something like:
+PUT   /api/v1/devices/<device_urlsafe_key>
+
+where the ***<device_urlsafe_key>*** might be something like: ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyVgsSEVRlbmFudEVudGl0eUdyb3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgMC1mwoMCxIOQ2hyb21lT3NEZXZpY2UYgICAgJCihwoM
+
+The response JSON will include the following fields:
+
+![Screen Shot 2015-07-07 at 2.12.53 PM.png](https://bitbucket.org/repo/L8AoyM/images/1854249404-Screen%20Shot%202015-07-07%20at%202.12.53%20PM.png)
+
+**key** is our device key.
 
 
 ## Deployment to App Engine ##
