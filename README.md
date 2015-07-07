@@ -58,6 +58,17 @@ The following is an example of a **request body** JSON that could be sent to the
 }
 
 
+## Delete Device ##
+
+### DELETE ###
+
+The Url would be for a PUT would be something like:
+DELETE   /api/v1/devices/<device_urlsafe_key>
+
+where the ***<device_urlsafe_key>*** might be something like: ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyVgsSEVRlbmFudEVudGl0eUdyb3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgIDyiAoMCxIOQ2hyb21lT3NEZXZpY2UYgICAgIDDlQoM
+
+
+
 ## Vagrant ##
 1. `vagrant up`
 1. `vagrant ssh`
