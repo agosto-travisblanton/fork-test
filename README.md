@@ -6,8 +6,7 @@ Each GET, PUT, POST, DELETE **request header** should have **6C346588BD4C6D722A1
 ![Screen Shot 2015-06-22 at 4.27.10 PM.png](https://bitbucket.org/repo/L8AoyM/images/2887177670-Screen%20Shot%202015-06-22%20at%204.27.10%20PM.png)
 
 ## Create Device ##
-<hr>
-
+___________________________________________________________________________________________________
 ### POST ###
 
 The following is an example of a **request body** JSON that could be posted to the provisioning server to create a device:
@@ -37,6 +36,7 @@ https://skykit-display-device-int.appspot.com/api/v1/devices/ahtzfnNreWtpdC1kaXN
 where the ***<device_urlsafe_key>*** is: ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyVgsSEVRlbmFudEVudGl0eUdyb3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgIDyiAoMCxIOQ2hyb21lT3NEZXZpY2UYgICAgIDDlQoM
 
 ## Update Device ##
+___________________________________________________________________________________________________
 
 ### PUT ###
 
@@ -60,6 +60,7 @@ The following is an example of a **request body** JSON that could be sent to the
 
 
 ## Delete Device ##
+___________________________________________________________________________________________________
 
 ### DELETE ###
 
@@ -70,6 +71,7 @@ where the ***<device_urlsafe_key>*** might be something like: ahtzfnNreWtpdC1kaX
 
 
 ## Get Device ##
+___________________________________________________________________________________________________
 
 ### GET ###
 
@@ -84,6 +86,8 @@ The response JSON will include the following fields:
 
 **key** is our device key.
 
+___________________________________________________________________________________________________
+___________________________________________________________________________________________________
 
 ## Deployment to App Engine ##
 
