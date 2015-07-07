@@ -71,8 +71,6 @@ class DeviceResourceHandler(RequestHandler):
     def get_all_devices(self):
         chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
         chrome_os_devices = chrome_os_devices_api.list(self.CUSTOMER_ID)
-        # TODO loop through the list then for each device_id see if we have a device_id using a query.
-        #
         if chrome_os_devices is not None:
             json_response(self.response, chrome_os_devices)
             self.response.set_status(200)
