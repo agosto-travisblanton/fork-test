@@ -37,7 +37,8 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
     def test_post_known_command_returns_ok_status(self):
         device = ChromeOsDevice.create(tenant_key=self.tenant_key,
                                        device_id='f7ds8970dfasd8f70ad987',
-                                       gcm_registration_id='fad7f890ad7f8ad0s7fa8sd7fa809sd7fas89d7f0sa98df7as89d7fs8f')
+                                       gcm_registration_id='fad7f890ad7f8ad0s7fa8sd7fa809sd7fas89d7f0sa98df7as89d7fs8f',
+                                       mac_address='54271e619346')
         device_key = device.put()
         request_body = {'intent': 'https://www.content-manager/something'}
         uri = application.router.build(None,
