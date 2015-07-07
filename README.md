@@ -6,6 +6,7 @@ Each GET, PUT, POST, DELETE **request header** should have **6C346588BD4C6D722A1
 ![Screen Shot 2015-06-22 at 4.27.10 PM.png](https://bitbucket.org/repo/L8AoyM/images/2887177670-Screen%20Shot%202015-06-22%20at%204.27.10%20PM.png)
 
 ## Create Device ##
+<hr>
 
 ### POST ###
 
