@@ -188,8 +188,8 @@ class DeviceResourceHandler(RequestHandler):
         device_key = ndb.Key(urlsafe=device_urlsafe_key)
         local_device = device_key.get()
         if local_device is None:
-            self.response.set_status(422, 'Unable to retrieve ChromeOS device by device ID: {0}'.format(
-                local_device.device_id))
+            self.response.set_status(422, 'Unable to retrieve ChromeOS device with device key: {0}'.format(
+                device_urlsafe_key))
         else:
             local_device.key.delete()
             self.response.headers.pop('Content-Type', None)
