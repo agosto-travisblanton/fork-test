@@ -39,16 +39,23 @@ class DeviceResourceHandler(RequestHandler):
             logging.info('Unrecognized device with device key: {0}'.format(device_urlsafe_key))
             return self.response.set_status(404)
         local_device = device_key.get()
+        if local_device is None:
+            logging.info('Unrecognized device with device key: {0}'.format(device_urlsafe_key))
+            return self.response.set_status(404)
         chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
         chrome_os_device = chrome_os_devices_api.get(self.CUSTOMER_ID, local_device.device_id)
         result = {}
         if chrome_os_device:
             result = chrome_os_device
-        try:
-            tenant = local_device.key.parent().get()
-        except Exception, e:
-            logging.exception(e)
-            logging.info('No tenant for device key: {0}'.format(device_urlsafe_key))
+        if local_device.key.parent():
+            try:
+                tenant = local_device.key.parent().get()
+            except Exception, e:
+                logging.exception(e)
+                logging.info('No parent tenant for device key: {0}'.format(device_urlsafe_key))
+                return self.response.set_status(400)
+        else:
+            logging.info('No parent tenant for device key: {0}'.format(device_urlsafe_key))
             return self.response.set_status(400)
         result['tenantCode'] = tenant.tenant_code
         result['contentServerUrl'] = tenant.content_server_url
