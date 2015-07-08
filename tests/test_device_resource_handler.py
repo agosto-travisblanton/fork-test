@@ -21,7 +21,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     CONTENT_SERVER_API_KEY = 'API KEY'
     CHROME_DEVICE_DOMAIN = 'bar.com'
     TENANT_CODE = 'foobar'
-    TESTING_DEVICE_ID = '832e235a-b346-4a37-a100-de49fa753a2a'
+    TESTING_DEVICE_ID = '4f099e50-6028-422b-85d2-3a629a45bf38'
     TEST_GCM_REGISTRATION_ID = '8d70a8d78a6dfa6df76dfasd'
     MAC_ADDRESS = '54271e619346'
 
@@ -109,33 +109,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(None)
         with self.assertRaises(AppError) as error:
             self.app.get('/api/v1/devices', params={}, headers=self.headers)
-        self.assertTrue('404 Not Found' in error.exception.message)
-
-    def test_device_resource_handler_get_by_mac_address(self):
-        request_parameters = {'macAddress': self.chrome_os_device_json.get('macAddress')}
-        when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
-        response = self.app.get('/api/v1/devices', params=request_parameters, headers=self.headers)
-        self.assertOK(response)
-
-    def test_device_resource_handler_get_by_mac_address_no_authorization_header_returns_forbidden(self):
-        request_parameters = {'macAddress': self.chrome_os_device_json.get('macAddress')}
-        when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
-        with self.assertRaises(AppError) as error:
-            self.app.get('/api/v1/devices', params=request_parameters, headers={})
-        self.assertTrue('403 Forbidden' in error.exception.message)
-
-    def test_device_resource_handler_get_by_mac_address_with_bogus_mac_address(self):
-        request_parameters = {'macAddress': 'bogus'}
-        when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
-        with self.assertRaises(AppError) as error:
-            self.app.get('/api/v1/devices', params=request_parameters, headers=self.headers)
-        self.assertTrue('404 Not Found' in error.exception.message)
-
-    def test_device_resource_handler_get_by_mac_address_with_no_chrome_os_devices_returned(self):
-        request_parameters = {'macAddress': self.chrome_os_device_json.get('macAddress')}
-        when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(None)
-        with self.assertRaises(AppError) as error:
-            self.app.get('/api/v1/devices', params=request_parameters, headers=self.headers)
         self.assertTrue('404 Not Found' in error.exception.message)
 
     def test_device_resource_handler_post_returns_created_status(self):
@@ -304,6 +277,44 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.app.delete(url, headers=self.headers)
         actual = key.get()
         self.assertIsNone(actual)
+
+    def test_device_resource_handler_get_by_mac_address_returns_ok(self):
+        request_parameters = {'macAddress': self.MAC_ADDRESS}
+        when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
+        response = self.app.get('/api/v1/devices', params=request_parameters, headers=self.headers)
+        self.assertOK(response)
+
+    def test_device_resource_handler_get_by_mac_address_returns_not_found_when_not_stored(self):
+        mac_address = '54271e6972cb' # MAC address Google knows about, but we have not registered.
+        request_parameters = {'macAddress': mac_address}
+        when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
+        with self.assertRaises(AppError) as context:
+            self.app.get('/api/v1/devices', params=request_parameters, headers=self.headers)
+        self.assertTrue(
+            "Device not stored for deviceId 54eb08ad-dee3-41c2-acbc-a9c55af9a5fa and MAC address {0}".format(
+                mac_address)
+            in str(context.exception.message))
+
+    def test_device_resource_handler_get_by_mac_address_no_authorization_header_returns_forbidden(self):
+        request_parameters = {'macAddress': self.chrome_os_device_json.get('macAddress')}
+        when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
+        with self.assertRaises(AppError) as error:
+            self.app.get('/api/v1/devices', params=request_parameters, headers={})
+        self.assertTrue('403 Forbidden' in error.exception.message)
+
+    def test_device_resource_handler_get_by_mac_address_with_bogus_mac_address(self):
+        request_parameters = {'macAddress': 'bogus'}
+        when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
+        with self.assertRaises(AppError) as error:
+            self.app.get('/api/v1/devices', params=request_parameters, headers=self.headers)
+        self.assertTrue('404 Not Found' in error.exception.message)
+
+    def test_device_resource_handler_get_by_mac_address_with_no_chrome_os_devices_returned(self):
+        request_parameters = {'macAddress': self.chrome_os_device_json.get('macAddress')}
+        when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(None)
+        with self.assertRaises(AppError) as error:
+            self.app.get('/api/v1/devices', params=request_parameters, headers=self.headers)
+        self.assertTrue('404 Not Found' in error.exception.message)
 
     @staticmethod
     def load_file_contents(file_name):
