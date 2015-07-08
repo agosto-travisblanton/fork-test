@@ -57,4 +57,4 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
                                        {'device_urlsafe_key': 'bogus key'})
         with self.assertRaises(Exception) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.headers)
-        self.assertTrue('Bad response: 422 Unable to find ChromeOS device by key' in str(context.exception))
+        self.assertTrue('Bad response: 404 Unable to find ChromeOS device by key' in str(context.exception))

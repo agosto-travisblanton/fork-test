@@ -56,11 +56,13 @@ def _SERVICE_ACCOUNT_EMAIL():
 
 app_SERVICE_ACCOUNT_EMAIL = _SERVICE_ACCOUNT_EMAIL()
 
+
 def _GCM_TEST_MODE():
     if on_development_server or not on_server:
         return True
     else:
         return False
+
 
 app_GCM_TEST_MODE = _GCM_TEST_MODE()
 
@@ -73,6 +75,7 @@ def _CLIENT_ID():
     if on_production_server:
         return ''
     return None
+
 
 app_CLIENT_ID = _CLIENT_ID()
 
@@ -88,9 +91,9 @@ app_CLIENT_ID = _CLIENT_ID()
 
 def _PUBLIC_API_SERVER_KEY():
     if on_development_server or not on_server:
-        return 'AIzaSyAzS-hwl5dV-Wn4g5opG_34gGYplgJT1Fc'
+        return 'AIzaSyCXKJrn9dVpePXGsfVdyfHxxaaesRuLm0w'
     if on_integration_server:
-        return 'AIzaSyAzS-hwl5dV-Wn4g5opG_34gGYplgJT1Fc'
+        return 'AIzaSyCXKJrn9dVpePXGsfVdyfHxxaaesRuLm0w'
     if on_production_server:
         return ''
     return None

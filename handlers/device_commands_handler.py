@@ -41,4 +41,4 @@ class DeviceCommandsHandler(RequestHandler):
         else:
             error_message = 'Unable to find ChromeOS device by key: {0}'.format(device_urlsafe_key)
             logging.exception(error_message)
-            self.response.set_status(422, error_message)
+            self.response.set_status(404, error_message)
