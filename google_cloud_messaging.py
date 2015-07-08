@@ -17,7 +17,8 @@ class GoogleCloudMessaging(object):
     }
 
     def __init__(self):
-        self.HEADERS['Authorization'] = 'key={0}'.format(config.PUBLIC_API_SERVER_KEY)
+        # self.HEADERS['Authorization'] = 'key={0}'.format(config.PUBLIC_API_SERVER_KEY)
+        self.HEADERS['Authorization'] = 'key={0}'.format('AIzaSyCXKJrn9dVpePXGsfVdyfHxxaaesRuLm0w')
 
     def notify(self, registration_ids, data_dictionary, test_mode=False):
         cloud_message_payload_dictionary = {
