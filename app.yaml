@@ -55,7 +55,7 @@ handlers:
 - url: /fonts
   static_dir: static/fonts
 
-- url: /images
+- url: /assets/images
   static_dir: static/assets/images
 
 - url: /migrate

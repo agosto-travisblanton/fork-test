@@ -6,7 +6,6 @@ TENANT_FIELDS = [
     'tenant_code',
     'admin_email',
     'content_server_url',
-    'content_server_api_key',
     'chrome_device_domain',
     'active',
     'created',
@@ -20,6 +19,7 @@ TENANT_STRATEGY += [
 CHROME_OS_DEVICE_FIELDS = [
     'device_id',
     'gcm_registration_id',
+    'api_key',
     'created',
     'updated'
 ]

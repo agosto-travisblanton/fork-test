@@ -2,7 +2,7 @@
 
 appModule = angular.module('skykitDisplayDeviceManagement')
 
-appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, $state) ->
+appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, DevicesService, $state) ->
   @currentTenant = {
     key: undefined,
     name: undefined,
@@ -10,16 +10,18 @@ appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, $state)
     admin_email: undefined,
     content_server_url: undefined,
     chrome_device_domain: undefined,
-    content_server_api_key: undefined,
     active: true
   }
-
+  @currentTenantDevices = []
   @editMode = !!$stateParams.tenantKey
 
   if @editMode
-    promise = TenantsService.getTenantByKey($stateParams.tenantKey)
-    promise.then (data) =>
+    tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey)
+    tenantPromise.then (data) =>
       @currentTenant = data
+    devicesPromise = DevicesService.getDevicesByTenant($stateParams.tenantKey)
+    devicesPromise.then (data) =>
+      @currentTenantDevices = data
 
   @onClickSaveButton = () ->
     promise = TenantsService.save @currentTenant
@@ -31,8 +33,8 @@ appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, $state)
       newTenantCode = ''
       if @currentTenant.name
         newTenantCode = @currentTenant.name.toLowerCase()
-        newTenantCode = newTenantCode.replace(/\s+/, '_')
-        newTenantCode = newTenantCode.replace(/\W+/, '')
+        newTenantCode = newTenantCode.replace(/\s+/g, '_')
+        newTenantCode = newTenantCode.replace(/\W+/g, '')
       @currentTenant.tenant_code = newTenantCode
 
   @

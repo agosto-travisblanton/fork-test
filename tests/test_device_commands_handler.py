@@ -1,10 +1,11 @@
 from env_setup import setup_test_paths
+
 setup_test_paths()
 
 import json
 from agar.test import BaseTest, WebTest
 from app_config import config
-from models import ChromeOsDevice
+from models import ChromeOsDevice, Tenant
 from routes import application
 import device_commands_processor
 from mockito import when, any as any_matcher
@@ -13,16 +14,32 @@ from mockito import when, any as any_matcher
 class TestDeviceCommandsHandler(BaseTest, WebTest):
     APPLICATION = application
 
+    NAME = 'foobar tenant'
+    ADMIN_EMAIL = 'foo@bar.com'
+    CONTENT_SERVER_URL = 'https://www.content.com'
+    CONTENT_SERVER_API_KEY = 'API KEY'
+    CHROME_DEVICE_DOMAIN = 'bar.com'
+    TENANT_CODE = 'foobar'
+
     def setUp(self):
         super(TestDeviceCommandsHandler, self).setUp()
         self.headers = {
             'Authorization': config.API_TOKEN
         }
+        self.tenant = Tenant.create(name=self.NAME,
+                                    tenant_code=self.TENANT_CODE,
+                                    admin_email=self.ADMIN_EMAIL,
+                                    content_server_url=self.CONTENT_SERVER_URL,
+                                    chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
+                                    active=True)
+        self.tenant_key = self.tenant.put()
 
     def test_post_known_command_returns_ok_status(self):
-        chrome_os_device = ChromeOsDevice(device_id='132e235a-b346-4a37-a100-de49fa753a2a',
-                                          gcm_registration_id='d23784972038845ab3963412')
-        device_key = chrome_os_device.put()
+        device = ChromeOsDevice.create(tenant_key=self.tenant_key,
+                                       device_id='f7ds8970dfasd8f70ad987',
+                                       gcm_registration_id='fad7f890ad7f8ad0s7fa8sd7fa809sd7fas89d7f0sa98df7as89d7fs8f',
+                                       mac_address='54271e619346')
+        device_key = device.put()
         request_body = {'intent': 'https://www.content-manager/something'}
         uri = application.router.build(None,
                                        'device-commands',

@@ -7,7 +7,8 @@ skykitDisplayDeviceManagement = angular.module('skykitDisplayDeviceManagement', 
   'ngSanitize',
   'restangular',
   'ui.router',
-  'hSweetAlert'
+  'hSweetAlert',
+  'ui.bootstrap'
 ])
 
 skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
@@ -37,6 +38,12 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     controller: "TenantDetailsCtrl",
     controllerAs: 'tenantDetailsCtrl'
   })
+  $stateProvider.state("editDevice", {
+    url: "/devices/:deviceKey",
+    templateUrl: "app/device/device-detail.html",
+    controller: "DeviceDetailsCtrl",
+    controllerAs: 'deviceDetailsCtrl'
+  })
   $stateProvider.state("apiTest", {
     url: "/api_testing",
     templateUrl: "app/api_test/api_test.html",
@@ -50,15 +57,20 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     controllerAs: 'remoteControlCtrl'
   })
   $urlRouterProvider.otherwise '/'
+
   RestangularProvider.setBaseUrl '/api/v1'
+
   RestangularProvider.setDefaultHeaders {
     'Content-Type': 'application/json'
     'Accept': 'application/json'
+    'Authorization': '6C346588BD4C6D722A1165B43C51C'
   }
-  RestangularProvider.setRequestInterceptor (elem, operation) ->
+
+  RestangularProvider.addRequestInterceptor (elem, operation) ->
     if operation == 'remove'
       return undefined
     elem
+
   RestangularProvider.setRestangularFields {
     id: 'key'
   }
