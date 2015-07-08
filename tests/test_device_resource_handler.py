@@ -116,7 +116,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_device_resource_handler_post_returns_created_status(self):
         request_body = {'macAddress': self.chrome_os_device_json.get('macAddress'),
                         'gcmRegistrationId': '123',
-                        'tenantCode': 'foobar'
+                        'tenantCode': self.TENANT_CODE
                         }
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.valid_authorization_header)
@@ -125,7 +125,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_device_resource_handler_post_no_authorization_header_returns_forbidden(self):
         request_body = {'macAddress': self.chrome_os_device_json.get('macAddress'),
                         'gcmRegistrationId': '123',
-                        'tenantCode': 'Acme'}
+                        'tenantCode': self.TENANT_CODE}
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.bad_authorization_header)
         self.assertTrue('403 Forbidden' in context.exception.message)
@@ -152,7 +152,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_device_resource_handler_post_returns_unprocessable_entity_status_for_unassociated_device(self):
         request_body = {'macAddress': 'bogusMacAddress',
                         'gcmRegistrationId': '123',
-                        'tenantCode': 'foobar'}
+                        'tenantCode': self.TENANT_CODE}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         with self.assertRaises(Exception) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.valid_authorization_header)
