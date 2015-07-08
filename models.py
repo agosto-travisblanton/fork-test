@@ -26,7 +26,7 @@ class Tenant(ndb.Model):
     admin_email = ndb.StringProperty(required=True)
     content_server_url = ndb.StringProperty(required=True)
     chrome_device_domain = ndb.StringProperty()
-    active = ndb.BooleanProperty(default=True, required=True, indexed=False)
+    active = ndb.BooleanProperty(default=True, required=True, indexed=True)
 
     @classmethod
     def find_by_name(cls, name):
