@@ -32,10 +32,6 @@ handlers:
   upload: static/(.*)
   login: required
 
-- url: /_ereporter.*
-  script: google.appengine.ext.ereporter.report_generator.application
-  login: admin
-
 - url: /favicon.ico
   static_files: static/favicon.ico
   upload: static/favicon.ico
@@ -59,20 +55,20 @@ handlers:
   static_dir: static/assets/images
 
 - url: /migrate
-  login: admin
   script: routes.application
+  login: admin
+  secure: always
 
 - url: /
   static_files: static/index.html
   upload: static/index.html
-#  login: required
+  login: required
+  secure: always
+  auth_fail_action: redirect
 
 - url: /.*
   script: routes.application
-#  secure: optional
-#  login: required
-
-
+  secure: always
 
 skip_files:
 - ^coverage/.*
