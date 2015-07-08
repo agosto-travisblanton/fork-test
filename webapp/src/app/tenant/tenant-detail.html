@@ -115,18 +115,19 @@
                       server URL</label>
 
                     <div class="col-sm-4">
-                      <input type="text"
+                      <input type="url"
                              required
                              class="form-control"
                              name="contentServerUrl"
                              id="contentServerUrl"
                              placeholder="Enter content server URL"
-                             ng-model="tenantDetailsCtrl.currentTenant.content_server_url">
+                             ng-model="tenantDetailsCtrl.currentTenant.content_server_url"
+                             ng-pattern="/^https:\/\/\S+$/">
                     </div>
                     <div class="col-sm-6">
                       <p ng-show="tenantForm.contentServerUrl.$invalid && !tenantForm.contentServerUrl.$pristine"
                          class="help-block">
-                        The content server URL is required.
+                        The content server URL is required to be a secure URL.
                       </p>
                     </div>
                   </div>
