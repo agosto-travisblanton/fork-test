@@ -21,7 +21,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     CONTENT_SERVER_API_KEY = 'API KEY'
     CHROME_DEVICE_DOMAIN = 'bar.com'
     TENANT_CODE = 'foobar'
-    # TESTING_DEVICE_ID = '832e235a-b346-4a37-a100-de49fa753a2a'
     TESTING_DEVICE_ID = '4f099e50-6028-422b-85d2-3a629a45bf38'
     TEST_GCM_REGISTRATION_ID = '8d70a8d78a6dfa6df76dfasd'
     MAC_ADDRESS = '54271e619346'
