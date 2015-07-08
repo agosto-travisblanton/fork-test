@@ -106,6 +106,7 @@ The request body includes the *intent* as follows:
 
 }
 
+A 422 is returned a error occurs posting to the GCM. A 404 is returned if the device can't be found for the given device key.
 ___________________________________________________________________________________________________
 ___________________________________________________________________________________________________
 
