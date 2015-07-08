@@ -86,6 +86,26 @@ The response JSON will include the following fields:
 
 **key** is our device key.
 
+
+
+## Device Change Intent ##
+___________________________________________________________________________________________________
+
+### POST ###
+
+The Url would be for a PUT would be something like:
+PUT   /api/v1/devices/<device_urlsafe_key>/commands
+
+where the ***<device_urlsafe_key>*** might be something like: ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyVgsSEVRlbmFudEVudGl0eUdyb3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgMC1mwoMCxIOQ2hyb21lT3NEZXZpY2UYgICAgJCihwoM
+
+
+The request body includes the *intent* as follows:
+{
+
+  "intent": "https://www.content-manager/something"
+
+}
+
 ___________________________________________________________________________________________________
 ___________________________________________________________________________________________________
 
