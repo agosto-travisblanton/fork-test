@@ -1,0 +1,527 @@
+<div id="wrapper">
+
+  <div ng-include="'app/components/navbar/navbar.html'"></div>
+
+  <div id="page-wrapper">
+    <div class="container-fluid">
+
+      <div class="row">
+        <div class="col-lg-12">
+          <h1 class="page-header">
+            Device key: {{ deviceDetailsCtrl.currentDevice.key | limitTo: 10 }}...{{ deviceDetailsCtrl.currentDevice.key
+            | limitTo: 10 : deviceDetailsCtrl.currentDevice.key.length - 10}}
+          </h1>
+        </div>
+      </div>
+
+      <div>
+        <tabset>
+          <tab heading="General">
+            <div style="margin-top: 1px;">&nbsp;</div>
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Device properties</h3>
+              </div>
+              <div class="panel-body">
+                <form name="deviceForm"
+                      class="form-horizontal"
+                      ng-submit="deviceDetailsCtrl.onClickSaveButton()"
+                      novalidate>
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.key.$invalid && !deviceForm.key.$pristine }">
+                    <label for="key" class="col-sm-3 control-label">Key</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="key"
+                             id="key"
+                             readonly
+                             value="{{ deviceDetailsCtrl.currentDevice.key | limitTo: 10 }}...{{ deviceDetailsCtrl.currentDevice.key | limitTo: 10 : deviceDetailsCtrl.currentDevice.key.length - 10}}">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.key.$invalid && !deviceForm.key.$pristine"
+                         class="help-block">
+                        The device key is required.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.gcmRegistrationId.$invalid && !deviceForm.gcmRegistrationId.$pristine }">
+                    <label for="gcmRegistrationId" class="col-sm-3 control-label">GCM registration ID</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="gcmRegistrationId"
+                             id="gcmRegistrationId"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.gcmRegistrationId">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.gcmRegistrationId.$invalid && !deviceForm.gcmRegistrationId.$pristine"
+                         class="help-block">
+                        The device GCM registration ID is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.annotatedUser.$invalid && !deviceForm.annotatedUser.$pristine }">
+                    <label for="annotatedUser" class="col-sm-3 control-label">Annotated user</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="annotatedUser"
+                             id="annotatedUser"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.annotatedUser">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.annotatedUser.$invalid && !deviceForm.annotatedUser.$pristine"
+                         class="help-block">
+                        The device annotated user is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.apiKey.$invalid && !deviceForm.apiKey.$pristine }">
+                    <label for="apiKey" class="col-sm-3 control-label">API key</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="apiKey"
+                             id="apiKey"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.apiKey">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.apiKey.$invalid && !deviceForm.apiKey.$pristine"
+                         class="help-block">
+                        The device API key is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.deviceId.$invalid && !deviceForm.deviceId.$pristine }">
+                    <label for="deviceId" class="col-sm-3 control-label">Device ID</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="deviceId"
+                             id="deviceId"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.deviceId">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.deviceId.$invalid && !deviceForm.deviceId.$pristine"
+                         class="help-block">
+                        The device ID is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.bootMode.$invalid && !deviceForm.bootMode.$pristine }">
+                    <label for="bootMode" class="col-sm-3 control-label">Boot mode</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="bootMode"
+                             id="bootMode"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.bootMode">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.bootMode.$invalid && !deviceForm.bootMode.$pristine"
+                         class="help-block">
+                        The device boot mode is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.chromeDeviceDomain.$invalid && !deviceForm.chromeDeviceDomain.$pristine }">
+                    <label for="chromeDeviceDomain" class="col-sm-3 control-label">Chrome device domain</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="chromeDeviceDomain"
+                             id="chromeDeviceDomain"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.chromeDeviceDomain">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.chromeDeviceDomain.$invalid && !deviceForm.chromeDeviceDomain.$pristine"
+                         class="help-block">
+                        The Chrome device domain is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.contentServerUrl.$invalid && !deviceForm.contentServerUrl.$pristine }">
+                    <label for="contentServerUrl" class="col-sm-3 control-label">Content server URL</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="contentServerUrl"
+                             id="contentServerUrl"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.contentServerUrl">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.contentServerUrl.$invalid && !deviceForm.contentServerUrl.$pristine"
+                         class="help-block">
+                        The device content server URL is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.etag.$invalid && !deviceForm.etag.$pristine }">
+                    <label for="etag" class="col-sm-3 control-label">Etag</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="etag"
+                             id="etag"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.etag">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.etag.$invalid && !deviceForm.etag.$pristine"
+                         class="help-block">
+                        The device Etag is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.ethernetMacAddress.$invalid && !deviceForm.ethernetMacAddress.$pristine }">
+                    <label for="ethernetMacAddress" class="col-sm-3 control-label">Ethernet MAC address</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="ethernetMacAddress"
+                             id="ethernetMacAddress"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.ethernetMacAddress">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.ethernetMacAddress.$invalid && !deviceForm.ethernetMacAddress.$pristine"
+                         class="help-block">
+                        The device ethernet MAC address is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.macAddress.$invalid && !deviceForm.macAddress.$pristine }">
+                    <label for="macAddress" class="col-sm-3 control-label">MAC address</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="macAddress"
+                             id="macAddress"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.macAddress">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.macAddress.$invalid && !deviceForm.macAddress.$pristine"
+                         class="help-block">
+                        The device MAC address is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.firmwareVersion.$invalid && !deviceForm.firmwareVersion.$pristine }">
+                    <label for="firmwareVersion" class="col-sm-3 control-label">Firmware version</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="firmwareVersion"
+                             id="firmwareVersion"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.firmwareVersion">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.firmwareVersion.$invalid && !deviceForm.firmwareVersion.$pristine"
+                         class="help-block">
+                        The device firmware version is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.kind.$invalid && !deviceForm.kind.$pristine }">
+                    <label for="kind" class="col-sm-3 control-label">Kind</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="kind"
+                             id="kind"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.kind">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.kind.$invalid && !deviceForm.kind.$pristine"
+                         class="help-block">
+                        The device kind is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.lastEnrollmentTime.$invalid && !deviceForm.lastEnrollmentTime.$pristine }">
+                    <label for="lastEnrollmentTime" class="col-sm-3 control-label">Last enrollment timestamp</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="lastEnrollmentTime"
+                             id="lastEnrollmentTime"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.lastEnrollmentTime">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.lastEnrollmentTime.$invalid && !deviceForm.lastEnrollmentTime.$pristine"
+                         class="help-block">
+                        The device last enrollment timestamp is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.lastSync.$invalid && !deviceForm.lastSync.$pristine }">
+                    <label for="lastSync" class="col-sm-3 control-label">Last sync timestamp</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="lastSync"
+                             id="lastSync"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.lastSync">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.lastSync.$invalid && !deviceForm.lastSync.$pristine"
+                         class="help-block">
+                        The device last sync timestamp is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.model.$invalid && !deviceForm.model.$pristine }">
+                    <label for="model" class="col-sm-3 control-label">Model</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="model"
+                             id="model"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.model">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.model.$invalid && !deviceForm.model.$pristine"
+                         class="help-block">
+                        The device model is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.orgUnitPath.$invalid && !deviceForm.orgUnitPath.$pristine }">
+                    <label for="orgUnitPath" class="col-sm-3 control-label">Organizational unit path</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="orgUnitPath"
+                             id="orgUnitPath"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.orgUnitPath">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.orgUnitPath.$invalid && !deviceForm.orgUnitPath.$pristine"
+                         class="help-block">
+                        The device organizational unit path is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.osVersion.$invalid && !deviceForm.osVersion.$pristine }">
+                    <label for="osVersion" class="col-sm-3 control-label">Operating system version</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="osVersion"
+                             id="osVersion"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.osVersion">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.osVersion.$invalid && !deviceForm.osVersion.$pristine"
+                         class="help-block">
+                        The device OS version is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.platformVersion.$invalid && !deviceForm.platformVersion.$pristine }">
+                    <label for="platformVersion" class="col-sm-3 control-label">Platform version</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="platformVersion"
+                             id="platformVersion"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.platformVersion">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.platformVersion.$invalid && !deviceForm.platformVersion.$pristine"
+                         class="help-block">
+                        The device platform version is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.serialNumber.$invalid && !deviceForm.serialNumber.$pristine }">
+                    <label for="serialNumber" class="col-sm-3 control-label">Serial number</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="serialNumber"
+                             id="serialNumber"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.serialNumber">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.serialNumber.$invalid && !deviceForm.serialNumber.$pristine"
+                         class="help-block">
+                        The device serial number is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.status.$invalid && !deviceForm.status.$pristine }">
+                    <label for="status" class="col-sm-3 control-label">Status</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="status"
+                             id="status"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.status">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.status.$invalid && !deviceForm.status.$pristine"
+                         class="help-block">
+                        The device status is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.tenantCode.$invalid && !deviceForm.tenantCode.$pristine }">
+                    <label for="tenantCode" class="col-sm-3 control-label">Tenant code</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="tenantCode"
+                             id="tenantCode"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.tenantCode">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.tenantCode.$invalid && !deviceForm.tenantCode.$pristine"
+                         class="help-block">
+                        The device tenant code is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.created.$invalid && !deviceForm.created.$pristine }">
+                    <label for="created" class="col-sm-3 control-label">Created timestamp</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="created"
+                             id="created"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.created">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.created.$invalid && !deviceForm.created.$pristine"
+                         class="help-block">
+                        The device created timestamp is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : deviceForm.updated.$invalid && !deviceForm.updated.$pristine }">
+                    <label for="updated" class="col-sm-3 control-label">Updated timestamp</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="updated"
+                             id="updated"
+                             readonly
+                             ng-model="deviceDetailsCtrl.currentDevice.updated">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="deviceForm.updated.$invalid && !deviceForm.updated.$pristine"
+                         class="help-block">
+                        The device updated timestamp is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <!--<div class="form-group">-->
+                  <!--<div class="col-sm-offset-2 col-sm-10">-->
+                  <!--<button type="submit"-->
+                  <!--class="btn btn-primary btn-default"-->
+                  <!--ng-disabled="deviceForm.$invalid">-->
+                  <!--<i class="fa fa-fw fa-save"></i> Save-->
+                  <!--</button>-->
+                  <!--</div>-->
+                  <!--</div>-->
+                </form>
+              </div>
+            </div>
+            <!-- END panel -->
+          </tab>
+        </tabset>
+      </div>
+    </div>
+  </div>
+</div>

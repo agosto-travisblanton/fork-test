@@ -38,6 +38,12 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     controller: "TenantDetailsCtrl",
     controllerAs: 'tenantDetailsCtrl'
   })
+  $stateProvider.state("editDevice", {
+    url: "/devices/:deviceKey",
+    templateUrl: "app/device/device-detail.html",
+    controller: "DeviceDetailsCtrl",
+    controllerAs: 'deviceDetailsCtrl'
+  })
   $stateProvider.state("apiTest", {
     url: "/api_testing",
     templateUrl: "app/api_test/api_test.html",
