@@ -95,7 +95,7 @@ def _PUBLIC_API_SERVER_KEY():
     if on_integration_server:
         return 'AIzaSyCXKJrn9dVpePXGsfVdyfHxxaaesRuLm0w'
     if on_production_server:
-        return ''
+        return 'AIzaSyBcZQf7qcJibJmBKHDaqgdRwf2XQ3MZFiY'
     return None
 
 
