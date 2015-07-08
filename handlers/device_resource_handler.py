@@ -57,7 +57,8 @@ class DeviceResourceHandler(RequestHandler):
         result['created'] = local_device.created.strftime('%Y-%m-%d %H:%M:%S')
         result['updated'] = local_device.updated.strftime('%Y-%m-%d %H:%M:%S')
         result['apiKey'] = local_device.api_key
-        result['key'] = device_urlsafe_key
+        result['active'] = tenant.active
+        result['key'] = local_device.key.urlsafe()
         json_response(self.response, result)
 
     @api_token_required
@@ -168,7 +169,7 @@ class DeviceResourceHandler(RequestHandler):
                 self.response.set_status(status, error_message)
         else:
             logging.info("Problem creating a ChromeOsDevice. No request body.")
-            self.response.set_status(422, 'Did not receive request body.')
+            self.response.set_status(400, 'Did not receive request body.')
 
     @api_token_required
     def put(self, device_urlsafe_key):

@@ -42,17 +42,18 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
         self.chrome_os_device_json = json.loads(self.load_file_contents('tests/chrome_os_device.json'))
         self.chrome_os_device_list_json = json.loads(self.load_file_contents('tests/chrome_os_devices_api_list.json'))
-        self.headers = {
+        self.valid_authorization_header = {
             'Authorization': config.API_TOKEN
         }
+        self.bad_authorization_header = {}
 
     def test_device_resource_handler_get_by_key_returns_not_found_for_bogus_key(self):
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
         request_parameters = {}
         uri = application.router.build(None, 'manage-device', None, {'device_urlsafe_key': 'bogus key'})
-        with self.assertRaises(AppError):
-            response = self.app.get(uri, params=request_parameters, headers=self.headers)
-            self.assertNotFound(response)
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
+        self.assertTrue('404 Not Found' in context.exception.message)
 
     def test_device_resource_handler_get_by_key_returns_bad_request_for_missing_parent_tenant(self):
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
@@ -64,33 +65,33 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             mac_address=self.MAC_ADDRESS)
         key = device.put()
         uri = application.router.build(None, 'manage-device', None, {'device_urlsafe_key': key.urlsafe()})
-        with self.assertRaises(AppError):
-            response = self.app.get(uri, params=request_parameters, headers=self.headers)
-            self.assertBadRequest(response)
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
+        self.assertTrue('400 Bad Request' in context.exception.message)
 
     def test_device_resource_handler_get_by_key_returns_ok(self):
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
         request_parameters = {}
         uri = application.router.build(None, 'manage-device', None, {'device_urlsafe_key':
                                                                          self.chrome_os_device_key.urlsafe()})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
         self.assertOK(response)
 
-    def test_device_resource_handler_get_by_key_no_authorization_header_returns_forbidden(self):
+    def test_device_resource_handler_no_authorization_header_returns_forbidden(self):
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
         request_parameters = {}
         uri = application.router.build(None, 'manage-device', None, {'device_urlsafe_key':
                                                                          self.chrome_os_device_key.urlsafe()})
-        with self.assertRaises(AppError) as error:
-            self.app.get(uri, params=request_parameters, headers={})
-        self.assertTrue('403 Forbidden' in error.exception.message)
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.bad_authorization_header)
+        self.assertTrue('403 Forbidden' in context.exception.message)
 
     def test_device_resource_handler_get_by_id_returns_device_representation(self):
         device_key = self.create_chrome_os_device(self.tenant_key)
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
         request_parameters = {}
         uri = application.router.build(None, 'manage-device', None, {'device_urlsafe_key': device_key.urlsafe()})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
         response_json = json.loads(response.body)
         expected = device_key.get()
         self.assertEqual(response_json.get('deviceId'), expected.device_id)
@@ -98,18 +99,19 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json.get('created'), expected.created.strftime('%Y-%m-%d %H:%M:%S'))
         self.assertEqual(response_json.get('updated'), expected.updated.strftime('%Y-%m-%d %H:%M:%S'))
         self.assertEqual(response_json.get('apiKey'), expected.api_key)
+        self.assertEqual(response_json.get('active'), True)
         self.assertEqual(response_json.get('key'), device_key.urlsafe())
 
     def test_device_resource_handler_get_all_devices_returns_ok(self):
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
-        response = self.app.get('/api/v1/devices', params={}, headers=self.headers)
+        response = self.app.get('/api/v1/devices', params={}, headers=self.valid_authorization_header)
         self.assertOK(response)
 
     def test_device_resource_handler_get_all_devices_returns_not_found(self):
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(None)
-        with self.assertRaises(AppError) as error:
-            self.app.get('/api/v1/devices', params={}, headers=self.headers)
-        self.assertTrue('404 Not Found' in error.exception.message)
+        with self.assertRaises(AppError) as context:
+            self.app.get('/api/v1/devices', params={}, headers=self.valid_authorization_header)
+        self.assertTrue('404 Not Found' in context.exception.message)
 
     def test_device_resource_handler_post_returns_created_status(self):
         request_body = {'macAddress': self.chrome_os_device_json.get('macAddress'),
@@ -117,16 +119,16 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'tenantCode': 'foobar'
                         }
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
-        response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
+        response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.valid_authorization_header)
         self.assertEqual('201 Created', response.status)
 
     def test_device_resource_handler_post_no_authorization_header_returns_forbidden(self):
         request_body = {'macAddress': self.chrome_os_device_json.get('macAddress'),
                         'gcmRegistrationId': '123',
                         'tenantCode': 'Acme'}
-        with self.assertRaises(AppError) as error:
-            self.app.post('/api/v1/devices', json.dumps(request_body), headers={})
-        self.assertTrue('403 Forbidden' in error.exception.message)
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.bad_authorization_header)
+        self.assertTrue('403 Forbidden' in context.exception.message)
 
     def test_device_resource_handler_post_returns_device_uri_in_location_header(self):
         gcm_registration_id = '123'
@@ -134,7 +136,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'gcmRegistrationId': gcm_registration_id,
                         'tenantCode': self.TENANT_CODE}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
-        response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
+        response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.valid_authorization_header)
         location_uri = str(response.headers['Location'])
         location_uri_components = location_uri.split('/')
         self.assertEqual(location_uri_components[5], "devices")
@@ -144,8 +146,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_device_resource_handler_post_returns_unprocessable_entity_status_for_empty_request_body(self):
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         with self.assertRaises(Exception) as context:
-            self.app.post('/api/v1/devices', headers=self.headers)
-        self.assertTrue('422 Did not receive request body' in str(context.exception))
+            self.app.post('/api/v1/devices', headers=self.valid_authorization_header)
+        self.assertTrue('400 Did not receive request body' in str(context.exception))
 
     def test_device_resource_handler_post_returns_unprocessable_entity_status_for_unassociated_device(self):
         request_body = {'macAddress': 'bogusMacAddress',
@@ -153,7 +155,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'tenantCode': 'foobar'}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         with self.assertRaises(Exception) as context:
-            self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
+            self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.valid_authorization_header)
         self.assertTrue('422 Chrome OS device not associated with this customer id' in str(context.exception))
 
     def test_device_resource_handler_post_persists_gcm_registration_id(self):
@@ -163,7 +165,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'gcmRegistrationId': gcm_registration_id,
                         'tenantCode': self.TENANT_CODE}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
-        self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
+        self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.valid_authorization_header)
         chrome_os_device_key = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id). \
             get(keys_only=True)
         self.assertIsNotNone(chrome_os_device_key)
@@ -176,7 +178,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'gcmRegistrationId': gcm_registration_id,
                         'tenantCode': self.tenant.tenant_code}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
-        self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
+        self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.valid_authorization_header)
         chrome_os_device_key = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id). \
             get(keys_only=True)
         parent_tenant_key = chrome_os_device_key.parent()
@@ -185,10 +187,11 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_device_resource_handler_post_returns_bad_request_with_registered_device(self):
         request_body = {'macAddress': self.MAC_ADDRESS,
                         'gcmRegistrationId': '123',
-                        'tenantCode': 'Acme'}
-        with self.assertRaises(Exception):
-            response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
-            self.assertBadRequest(response)
+                        'tenantCode': self.TENANT_CODE}
+        with self.assertRaises(Exception) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.valid_authorization_header)
+        self.assertTrue('400 Cannot create because MAC address has already been assigned to this device'
+                        in str(context.exception.message))
 
     def test_device_resource_handler_post_returns_bad_request_with_invalid_tenant(self):
         mac_address = self.chrome_os_device_json.get('macAddress')
@@ -197,7 +200,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'tenantCode': 'invalid_tenant'}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         with self.assertRaises(Exception) as context:
-            self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
+            self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.valid_authorization_header)
         self.assertTrue('400 Invalid or inactive tenant for device.' in str(context.exception))
 
     def test_device_resource_handler_post_returns_bad_request_with_inactive_tenant(self):
@@ -214,7 +217,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'tenantCode': inactive_tenant_key.get().tenant_code}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         with self.assertRaises(Exception) as context:
-            self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.headers)
+            self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.valid_authorization_header)
         self.assertTrue('400 Invalid or inactive tenant for device.' in str(context.exception))
 
     def test_device_resource_put_returns_no_content(self):
@@ -223,24 +226,26 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
         response = self.app.put('/api/v1/devices/{0}'.format(device_key.urlsafe()),
                                 json.dumps(request_body),
-                                headers=self.headers)
+                                headers=self.valid_authorization_header)
         self.assertEqual('204 No Content', response.status)
 
     def test_device_resource_put_no_authorization_header_returns_forbidden(self):
-        device_key = self.create_chrome_os_device(self.tenant_key)
-        request_body = {'gcmRegistrationId': 'd23784972038845ab3963412', 'tenantCode': 'Acme'}
+        request_body = {'gcmRegistrationId': '123',
+                        'tenantCode': self.TENANT_CODE}
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
         with self.assertRaises(Exception) as context:
-            self.app.put('/api/v1/devices/{0}'.format(device_key.urlsafe()), json.dumps(request_body), headers={})
+            self.app.put('/api/v1/devices/{0}'.format(self.chrome_os_device_key.urlsafe()),
+                         json.dumps(request_body), headers=self.bad_authorization_header)
         self.assertTrue('403 Forbidden' in str(context.exception))
 
     def test_device_resource_put_updates_gcm_registration_id(self):
         device_key = self.create_chrome_os_device(self.tenant_key)
-        request_body = {'gcmRegistrationId': 'd23784972038845ab3963412', 'tenantCode': 'Acme'}
+        request_body = {'gcmRegistrationId': 'd23784972038845ab3963412',
+                        'tenantCode': self.TENANT_CODE}
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
         self.app.put('/api/v1/devices/{0}'.format(device_key.urlsafe()),
                      json.dumps(request_body),
-                     headers=self.headers)
+                     headers=self.valid_authorization_header)
         actual = device_key.get()
         self.assertEqual('d23784972038845ab3963412', actual.gcm_registration_id)
 
@@ -251,79 +256,63 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         with self.assertRaises(Exception) as context:
             self.app.put('/api/v1/devices/{0}'.format(device_key.urlsafe()),
                          json.dumps(request_body),
-                         headers=self.headers)
+                         headers=self.valid_authorization_header)
         self.assertTrue(
             '422 Unable to retrieve Chrome OS device by device id: 132e235a-b346-4a37-a100-de49fa753a2a' in str(
                 context.exception))
 
     def test_device_resource_delete_returns_no_content(self):
-        chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
-                                                 device_id=self.chrome_os_device_json.get('deviceId'),
-                                                 gcm_registration_id='d23784972038845ab3963412',
-                                                 mac_address=self.MAC_ADDRESS)
-        key = chrome_os_device.put()
-        url = '/api/v1/devices/{0}'.format(key.urlsafe())
-        response = self.app.delete(url, headers=self.headers)
+        url = '/api/v1/devices/{0}'.format(self.chrome_os_device_key.urlsafe())
+        response = self.app.delete(url, headers=self.valid_authorization_header)
         self.assertEqual('204 No Content', response.status)
 
     def test_device_resource_delete_no_authorization_header_returns_forbidden(self):
-        chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
-                                                 device_id=self.chrome_os_device_json.get('deviceId'),
-                                                 gcm_registration_id='d23784972038845ab3963412',
-                                                 mac_address=self.MAC_ADDRESS)
-        key = chrome_os_device.put()
-        url = '/api/v1/devices/{0}'.format(key.urlsafe())
+        url = '/api/v1/devices/{0}'.format(self.chrome_os_device_key.urlsafe())
         with self.assertRaises(Exception) as context:
-            self.app.delete(url, headers={})
+            self.app.delete(url, headers=self.bad_authorization_header)
         self.assertTrue('403 Forbidden' in str(context.exception))
 
     def test_device_resource_delete_removes_chrome_os_device_entity(self):
-        chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
-                                                 device_id=self.chrome_os_device_json.get('deviceId'),
-                                                 gcm_registration_id='d23784972038845ab3963412',
-                                                 mac_address=self.MAC_ADDRESS)
-        key = chrome_os_device.put()
-        url = '/api/v1/devices/{0}'.format(key.urlsafe())
-        self.app.delete(url, headers=self.headers)
-        actual = key.get()
+        url = '/api/v1/devices/{0}'.format(self.chrome_os_device_key.urlsafe())
+        self.app.delete(url, headers=self.valid_authorization_header)
+        actual = self.chrome_os_device_key.get()
         self.assertIsNone(actual)
 
     def test_device_resource_handler_get_by_mac_address_returns_ok(self):
         request_parameters = {'macAddress': self.MAC_ADDRESS}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
-        response = self.app.get('/api/v1/devices', params=request_parameters, headers=self.headers)
+        response = self.app.get('/api/v1/devices', params=request_parameters, headers=self.valid_authorization_header)
         self.assertOK(response)
 
     def test_device_resource_handler_get_by_mac_address_returns_not_found_when_not_stored(self):
-        mac_address = '54271e6972cb' # MAC address Google knows about, but we have not registered.
+        mac_address = '54271e6972cb'  # MAC address Google knows about, but we have not registered.
         request_parameters = {'macAddress': mac_address}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         with self.assertRaises(AppError) as context:
-            self.app.get('/api/v1/devices', params=request_parameters, headers=self.headers)
+            self.app.get('/api/v1/devices', params=request_parameters, headers=self.valid_authorization_header)
         self.assertTrue(
             "Device not stored for deviceId 54eb08ad-dee3-41c2-acbc-a9c55af9a5fa and MAC address {0}".format(
-                mac_address)
-            in str(context.exception.message))
+                mac_address) in str(context.exception.message))
 
     def test_device_resource_handler_get_by_mac_address_no_authorization_header_returns_forbidden(self):
-        request_parameters = {'macAddress': self.chrome_os_device_json.get('macAddress')}
+        request_parameters = {'macAddress': self.MAC_ADDRESS}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         with self.assertRaises(AppError) as error:
-            self.app.get('/api/v1/devices', params=request_parameters, headers={})
+            self.app.get('/api/v1/devices', params=request_parameters, headers=self.bad_authorization_header)
         self.assertTrue('403 Forbidden' in error.exception.message)
 
     def test_device_resource_handler_get_by_mac_address_with_bogus_mac_address(self):
         request_parameters = {'macAddress': 'bogus'}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
         with self.assertRaises(AppError) as error:
-            self.app.get('/api/v1/devices', params=request_parameters, headers=self.headers)
+            self.app.get('/api/v1/devices', params=request_parameters, headers=self.valid_authorization_header)
         self.assertTrue('404 Not Found' in error.exception.message)
 
     def test_device_resource_handler_get_by_mac_address_with_no_chrome_os_devices_returned(self):
-        request_parameters = {'macAddress': self.chrome_os_device_json.get('macAddress')}
+        request_parameters = {'macAddress': self.MAC_ADDRESS}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(None)
         with self.assertRaises(AppError) as error:
-            self.app.get('/api/v1/devices', params=request_parameters, headers=self.headers)
+            self.app.get('/api/v1/devices', params=request_parameters, headers=self.valid_authorization_header)
         self.assertTrue('404 Not Found' in error.exception.message)
 
     @staticmethod
