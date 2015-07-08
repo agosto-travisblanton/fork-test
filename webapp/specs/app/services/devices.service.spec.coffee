@@ -23,3 +23,14 @@ describe 'DevicesService', ->
       expect(restangularServiceStub.doGET).toHaveBeenCalledWith 'devices'
       expect(actual).toBe promise
 
+  describe '.getDeviceByKey', ->
+    it 'retrieve device associated with supplied key, returning a promise', ->
+      deviceKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFudEVudGl0eUdyb3VwDAsSBlRlbmFudBiAgICAgMCvCgw'
+      deviceRestangularService = { get: -> }
+      spyOn(Restangular, 'oneUrl').and.returnValue deviceRestangularService
+      spyOn(deviceRestangularService, 'get').and.returnValue promise
+      actual = DevicesService.getDeviceByKey deviceKey
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{deviceKey}"
+      expect(deviceRestangularService.get).toHaveBeenCalled()
+      expect(actual).toBe promise
+
