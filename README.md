@@ -35,6 +35,18 @@ https://skykit-display-device-int.appspot.com/api/v1/devices/ahtzfnNreWtpdC1kaXN
 
 where the ***<device_urlsafe_key>*** is: ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyVgsSEVRlbmFudEVudGl0eUdyb3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgIDyiAoMCxIOQ2hyb21lT3NEZXZpY2UYgICAgIDDlQoM
 
+### Return Codes ###
+* 403 Forbidden - when api key is not in the request header.
+* 400 Bad Request - when device already registered in our NDB datastore.
+* 400 Bad Request - when no MAC address in request body
+* 400 Bad Request - when no tenant code in request body
+* 400 Bad Request - when invalid tenant in request body
+* 400 Bad Request - when no GCM registration ID in request body
+* 422 Unprocessable Entity - when no device not associated with this customer id
+* 201 Create - when device is successfully registered in our NDB datastore
+
+
+
 ## Update Device ##
 ___________________________________________________________________________________________________
 
@@ -86,6 +98,13 @@ The response JSON will include the following fields:
 
 **key** is our device key.
 
+### Return Codes ###
+* 403 Forbidden - when api key is not in the request header.
+* 404 Not Found - when the device is not found in our NDB datastore.
+* 400 Bad Request - when no parent tenant exists for the requested device in our NDB datastore.
+* 422 Unprocessable Entity - when an error occurs posting to the GCM. 
+
+
 
 
 ## Get Device by MAC Address ##
@@ -103,6 +122,11 @@ The response JSON will include a full device representation:
 ![Screen Shot 2015-07-09 at 1.38.44 PM.png](https://bitbucket.org/repo/L8AoyM/images/2900401397-Screen%20Shot%202015-07-09%20at%201.38.44%20PM.png)
 
 **key** is our device key.
+
+### Return Codes ###
+* 403 Forbidden - when api key is not in the request header.
+* 404 Not Found - when unable to retrieve device from Google API or from our NDB datastore.
+
 
 
 ## Device Change Intent ##
