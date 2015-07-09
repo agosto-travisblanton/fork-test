@@ -21,9 +21,9 @@ The following is an example of a **request body** JSON that could be posted to t
 
 }
 
-The **response** will be a `422` if failure occurs, but should, if successful:
+If successful, the response will:
 
-* Return a `201 Created`; and
+* Return a `201 Created` status; and
 
 * Return the following uri in **location** of the header: 
 
@@ -69,6 +69,10 @@ The following is an example of a **request body** JSON that could be sent to the
   "tenantCode": "foobar"
 
 }
+
+### Return Codes ###
+* 404 Unprocessable Entity - when Unable to retrieve Chrome OS device by the given device id
+* 204 No Content - when device is successfully registered in our NDB datastore
 
 
 ## Delete Device ##
