@@ -124,7 +124,14 @@ The request body includes the *intent* as follows:
 
 }
 
-A 422 is returned a error occurs posting to the GCM. A 404 is returned if the device can't be found for the given device key.
+### Return Codes ###
+403 Forbidden - when api key is not in the request header.
+404 Not Found - when the device is not found in our NDB datastore.
+422 - when an error occurs posting to the GCM. 
+
+
+
+
 ___________________________________________________________________________________________________
 ___________________________________________________________________________________________________
 
