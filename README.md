@@ -88,6 +88,21 @@ The response JSON will include the following fields:
 
 
 
+## Get Device by MAC Address ##
+___________________________________________________________________________________________________
+
+### GET ###
+
+The Url would be for a PUT would be something like:
+PUT   /api/v1/devices?macAddress=<MAC address>
+
+where the ***<MAC address>*** might be something like: 54271e6950ed
+
+The response JSON will include a full device representation:
+
+![Screen Shot 2015-07-09 at 1.38.44 PM.png](https://bitbucket.org/repo/L8AoyM/images/2900401397-Screen%20Shot%202015-07-09%20at%201.38.44%20PM.png)
+
+
 ## Device Change Intent ##
 ___________________________________________________________________________________________________
 
