@@ -76,7 +76,7 @@ ________________________________________________________________________________
 ### GET ###
 
 The Url would be for a PUT would be something like:
-PUT   /api/v1/devices/<device_urlsafe_key>
+GET   /api/v1/devices/<device_urlsafe_key>
 
 where the ***<device_urlsafe_key>*** might be something like: ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyVgsSEVRlbmFudEVudGl0eUdyb3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgMC1mwoMCxIOQ2hyb21lT3NEZXZpY2UYgICAgJCihwoM
 
@@ -94,7 +94,7 @@ ________________________________________________________________________________
 ### GET ###
 
 The Url would be for a PUT would be something like:
-PUT   /api/v1/devices?macAddress=<MAC address>
+GET   /api/v1/devices?macAddress=<MAC address>
 
 where the ***<MAC address>*** might be something like: 54271e6950ed
 
