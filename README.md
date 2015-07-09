@@ -117,6 +117,7 @@ where the ***<device_urlsafe_key>*** might be something like: ahtzfnNreWtpdC1kaX
 
 
 The request body includes the *intent* as follows:
+
 {
 
   "intent": "http://skykit.com/skdchromeapp/reset"
