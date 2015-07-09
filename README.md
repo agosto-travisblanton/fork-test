@@ -71,7 +71,7 @@ The following is an example of a **request body** JSON that could be sent to the
 }
 
 ### Return Codes ###
-* 404 Unprocessable Entity - when Unable to retrieve Chrome OS device by the given device id
+* 404 Not Found - when Unable to retrieve Chrome OS device by the given device id
 * 204 No Content - when device is successfully registered in our NDB datastore
 
 
