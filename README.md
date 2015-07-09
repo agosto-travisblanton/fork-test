@@ -102,6 +102,8 @@ The response JSON will include a full device representation:
 
 ![Screen Shot 2015-07-09 at 1.38.44 PM.png](https://bitbucket.org/repo/L8AoyM/images/2900401397-Screen%20Shot%202015-07-09%20at%201.38.44%20PM.png)
 
+**key** is our device key.
+
 
 ## Device Change Intent ##
 ___________________________________________________________________________________________________
