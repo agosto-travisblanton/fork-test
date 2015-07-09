@@ -180,13 +180,24 @@ class DeviceResourceHandler(RequestHandler):
 
     @api_token_required
     def put(self, device_urlsafe_key):
-        device_key = ndb.Key(urlsafe=device_urlsafe_key)
-        local_device = device_key.get()
+        status = 204
+        message = None
+        try:
+            device_key = ndb.Key(urlsafe=device_urlsafe_key)
+            local_device = device_key.get()
+        except Exception, e:
+            logging.exception(e)
+            status = 404
+            message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
+            return self.response.set_status(status, message)
+        if local_device is None:
+            status = 404
+            message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
         chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
         registered_chrome_os_device = chrome_os_devices_api.get(self.CUSTOMER_ID, local_device.device_id)
         if registered_chrome_os_device is None:
-            self.response.set_status(422, 'Unable to retrieve Chrome OS device by device id: {0}'.
-                                     format(local_device.device_id))
+            status = 404
+            message = 'Unrecognized device id in Google API'
         else:
             request_json = json.loads(self.request.body)
             gcm_registration_id = request_json.get('gcmRegistrationId')
@@ -194,7 +205,7 @@ class DeviceResourceHandler(RequestHandler):
                 local_device.gcm_registration_id = gcm_registration_id
             local_device.put()
             self.response.headers.pop('Content-Type', None)
-            self.response.set_status(204)
+        self.response.set_status(status, message)
 
     @api_token_required
     def delete(self, device_urlsafe_key):
