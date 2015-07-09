@@ -209,12 +209,23 @@ class DeviceResourceHandler(RequestHandler):
 
     @api_token_required
     def delete(self, device_urlsafe_key):
-        device_key = ndb.Key(urlsafe=device_urlsafe_key)
-        local_device = device_key.get()
+        status = 204
+        message = None
+        try:
+            device_key = ndb.Key(urlsafe=device_urlsafe_key)
+            local_device = device_key.get()
+        except Exception, e:
+            logging.exception(e)
+            status = 404
+            message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
+            return self.response.set_status(status, message)
         if local_device is None:
-            self.response.set_status(422, 'Unable to retrieve ChromeOS device with device key: {0}'.format(
+            status = 404
+            message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
+        if local_device is None:
+            self.response.set_status(404, 'Unrecognized device with key: {0}'.format(
                 device_urlsafe_key))
         else:
             local_device.key.delete()
             self.response.headers.pop('Content-Type', None)
-            self.response.set_status(204)
+        self.response.set_status(status, message)

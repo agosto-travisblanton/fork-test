@@ -297,6 +297,14 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         actual = self.chrome_os_device_key.get()
         self.assertIsNone(actual)
 
+    def test_device_resource_delete_bogus_key_returns_not_found(self):
+        bogus_key = 'ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyVgsSEVRlbmFudEVudGl0eUdyb' \
+                    + '3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgMC1mwoMCxIOQ2hyb21lT3NEZXZpY2UYgICAgJCihwoM'
+        url = '/api/v1/devices/{0}'.format(bogus_key)
+        with self.assertRaises(Exception) as context:
+          self.app.delete(url, headers=self.valid_authorization_header)
+        self.assertTrue("404 Unrecognized device with key: {0}".format(bogus_key) in str(context.exception))
+
     def test_device_resource_handler_get_by_mac_address_returns_ok(self):
         request_parameters = {'macAddress': self.MAC_ADDRESS}
         when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
