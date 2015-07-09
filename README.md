@@ -135,6 +135,11 @@ The request body includes the *intent* as follows:
 ___________________________________________________________________________________________________
 ___________________________________________________________________________________________________
 
-## Deployment to App Engine ##
+## Deployment to App Engine INT Environment ##
 
 From the project root directory: `appcfg.py --oauth2 -A skykit-display-device-int update .`
+
+[SkyKit Provisioning](https://skykit-display-device-int.appspot.com/#)
+
+
+![Screen Shot 2015-07-09 at 1.47.58 PM.png](https://bitbucket.org/repo/L8AoyM/images/2941350824-Screen%20Shot%202015-07-09%20at%201.47.58%20PM.png)
