@@ -113,5 +113,24 @@ def _CONTENT_MANAGER_API_SERVER_KEY():
 def _CONTENT_MANAGER_API_URL():
     return 'https://some-url'
 
+def _IMPERSONATION_ADMIN_EMAIL_ADDRESS():
+    if on_development_server or not on_server:
+        return 'administrator@skykit.com'
+    if on_integration_server:
+        return 'administrator@skykit.com'
+    if on_production_server:
+        return 'skykit.api@skykit.agosto.com'
+    return None
+
+def _GOOGLE_CUSTOMER_ID():
+    #TODO figure out if this is tied to the domain. This info comes from Thomas Blade.
+    if on_development_server or not on_server:
+        return 'my_customer'
+    if on_integration_server:
+        return 'my_customer'
+    if on_production_server:
+        return 'my_customer'
+    return None
+
 
 app_API_TOKEN = _API_TOKEN()

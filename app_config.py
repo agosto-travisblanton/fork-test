@@ -22,6 +22,8 @@ class AppConfig(Config):
     CONTENT_MANAGER_API_SERVER_KEY = None
     CONTENT_MANAGER_API_URL = None
     GCM_TEST_MODE = None
+    IMPERSONATION_ADMIN_EMAIL_ADDRESS = None
+    GOOGLE_CUSTOMER_ID = None
 
 
 config = AppConfig.get_config()

@@ -4,6 +4,7 @@ import logging
 from webapp2 import RequestHandler
 
 from google.appengine.ext import ndb
+from app_config import config
 
 from decorators import api_token_required
 from restler.serializers import json_response
@@ -15,9 +16,6 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob
 
 
 class DeviceResourceHandler(RequestHandler):
-    ADMIN_ACCOUNT_TO_IMPERSONATE = 'administrator@skykit.com'
-    CUSTOMER_ID = 'my_customer'
-
     @api_token_required
     def get_devices_by_tenant(self, tenant_urlsafe_key):
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
@@ -42,8 +40,8 @@ class DeviceResourceHandler(RequestHandler):
         if local_device is None:
             logging.info('Unrecognized device with device key: {0}'.format(device_urlsafe_key))
             return self.response.set_status(404)
-        chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
-        chrome_os_device = chrome_os_devices_api.get(self.CUSTOMER_ID, local_device.device_id)
+        chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
+        chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, local_device.device_id)
         result = {}
         if chrome_os_device:
             result = chrome_os_device
@@ -77,8 +75,8 @@ class DeviceResourceHandler(RequestHandler):
             self.get_device_by_mac_address(device_mac_address)
 
     def get_all_devices(self):
-        chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
-        chrome_os_devices = chrome_os_devices_api.list(self.CUSTOMER_ID)
+        chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
+        chrome_os_devices = chrome_os_devices_api.list(config.GOOGLE_CUSTOMER_ID)
         if chrome_os_devices is not None:
             json_response(self.response, chrome_os_devices)
             self.response.set_status(200)
@@ -87,8 +85,8 @@ class DeviceResourceHandler(RequestHandler):
             json_response(self.response, {'error': message}, status_code=404)
 
     def get_device_by_mac_address(self, device_mac_address):
-        chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
-        chrome_os_devices = chrome_os_devices_api.list(self.CUSTOMER_ID)
+        chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
+        chrome_os_devices = chrome_os_devices_api.list(config.GOOGLE_CUSTOMER_ID)
         if chrome_os_devices is not None:
             lowercase_device_mac_address = device_mac_address.lower()
             loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == lowercase_device_mac_address or
@@ -148,8 +146,8 @@ class DeviceResourceHandler(RequestHandler):
                 status = 400
                 error_message = 'Invalid or inactive tenant for device.'
             if status == 201:
-                chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
-                chrome_os_devices = chrome_os_devices_api.list(self.CUSTOMER_ID)
+                chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
+                chrome_os_devices = chrome_os_devices_api.list(config.GOOGLE_CUSTOMER_ID)
                 if chrome_os_devices is not None:
                     loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == device_mac_address or
                                           x.get('ethernetMacAddress') == device_mac_address)
@@ -171,7 +169,7 @@ class DeviceResourceHandler(RequestHandler):
                     else:
                         self.response.set_status(422,
                                                  'Chrome OS device not associated with this customer id ( {0}'.format(
-                                                     self.CUSTOMER_ID))
+                                                     config.GOOGLE_CUSTOMER_ID))
             else:
                 self.response.set_status(status, error_message)
         else:
@@ -193,8 +191,8 @@ class DeviceResourceHandler(RequestHandler):
         if local_device is None:
             status = 404
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
-        chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
-        registered_chrome_os_device = chrome_os_devices_api.get(self.CUSTOMER_ID, local_device.device_id)
+        chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
+        registered_chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, local_device.device_id)
         if registered_chrome_os_device is None:
             status = 404
             message = 'Unrecognized device id in Google API'
