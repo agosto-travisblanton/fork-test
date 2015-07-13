@@ -103,7 +103,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json.get('key'), device_key.urlsafe())
 
     def test_device_resource_handler_get_all_devices_returns_ok(self):
-        when(ChromeOsDevicesApi).list(any_matcher(str)).thenReturn(self.chrome_os_device_list_json)
+        when(ChromeOsDevicesApi).list(any_matcher()).thenReturn(self.chrome_os_device_list_json)
         response = self.app.get('/api/v1/devices', params={}, headers=self.valid_authorization_header)
         self.assertOK(response)
 
