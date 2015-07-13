@@ -59,6 +59,12 @@ handlers:
   login: admin
   secure: always
 
+- url: /api-docs
+  static_files: documentation/api.html
+  upload: documentation/api.html
+  login: required
+  secure: always
+
 - url: /
   static_files: static/index.html
   upload: static/index.html

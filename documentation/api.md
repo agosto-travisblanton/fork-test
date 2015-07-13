@@ -50,12 +50,12 @@ Retrieve all devices from Skykit Device Management
 
     + Headers
 
-
     + Body
 
             {
                 "error": "HTTP request API token is invalid."
             }
+            
 
 ### GET /api/v1/devices?macAddress={mac_address}
 Retrieve a specific Skykit device/display by MAC address.
@@ -106,7 +106,6 @@ Retrieve a specific Skykit device/display by MAC address.
 
     + Headers
 
-
     + Body
 
             {
@@ -126,8 +125,6 @@ Retrieve a specific Skykit device/display by MAC address.
 
             Accept: application/json
             Authorization: 6C346588BD4C6D722A1165B43C51C
-
-
 
 + Response 200 (application/json)
 
@@ -162,8 +159,6 @@ Retrieve a specific Skykit device/display by MAC address.
 + Response 403 (application/json)
 
     + Headers
-
-            Content-Type: application/json
 
     + Body
 
@@ -202,7 +197,102 @@ Create and register a Skykit device/display.
 
     + Headers
 
-            Content-Type: application/json
+    + Body
+
+            {
+                "error": "HTTP request API token is invalid."
+            }
+
+
+### PUT /api/v1/devices/{urlsafe_key}
+
+Update Skykit device/display information.
+
+
++ Parameters
+
+    + urlsafe_key: `ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgID4woQKDA` (required, string) - The device's entity key.
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/json
+            Authorization: 6C346588BD4C6D722A1165B43C51C
+
+    + Body
+
+            {
+				"macAddress":"38b1db95806d",
+				"gcmRegistrationId":"blah blah 3",
+				"tenantCode":"some_tenant 3"
+			}
+
++ Response 204 (application/json)
+
+    + Headers
+
+            Alternate-Protocol: 443:quic,p=1
+            Cache-Control: no-cache
+
++ Response 403 (application/json)
+
+    + Headers
+
+    + Body
+
+            {
+                "error": "HTTP request API token is invalid."
+            }
+			
++ Response 422 (text/html)
+
+    + Headers
+
+    + Body
+
+            Unable to retrieve Chrome OS device by device id: {directory_api_device_id}
+
+
+## Group Tenants
+
+### GET /api/v1/tenants
+Retrieve all tenants from Skykit Device Management
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/json
+            Authorization: 6C346588BD4C6D722A1165B43C51C
+
+
+
++ Response 200 (application/json)
+
+    + Headers
+
+
+    + Body
+
+            [
+               {
+                  "updated":"2015-07-07 18:23:24",
+                  "name":"DemoAgostoQA",
+                  "created":"2015-07-07 18:08:25",
+                  "content_server_url":"https://skykit-display-int.appspot.com/content",
+                  "chrome_device_domain":"skykit.com",
+                  "key":"ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyOwsSEVRlbmFudEVudGl0eUdyb3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgOCslAkM",
+                  "tenant_code":"demoagostoqa",
+                  "active":true,
+                  "admin_email":"skdqa@demo.agosto.com"
+               },
+               ...
+            ]
+
++ Response 403 (application/json)
+
+    + Headers
 
     + Body
 
