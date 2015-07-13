@@ -16,7 +16,6 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob
 
 
 class DeviceResourceHandler(RequestHandler):
-    ADMIN_ACCOUNT_TO_IMPERSONATE = 'administrator@skykit.com'
     CUSTOMER_ID = 'my_customer'
 
     @api_token_required
