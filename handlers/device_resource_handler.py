@@ -43,7 +43,7 @@ class DeviceResourceHandler(RequestHandler):
             logging.info('Unrecognized device with device key: {0}'.format(device_urlsafe_key))
             return self.response.set_status(404)
         chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
-        chrome_os_device = chrome_os_devices_api.get(self.CUSTOMER_ID, local_device.device_id)
+        chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, local_device.device_id)
         result = {}
         if chrome_os_device:
             result = chrome_os_device
@@ -78,7 +78,7 @@ class DeviceResourceHandler(RequestHandler):
 
     def get_all_devices(self):
         chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
-        chrome_os_devices = chrome_os_devices_api.list(self.CUSTOMER_ID)
+        chrome_os_devices = chrome_os_devices_api.list(config.GOOGLE_CUSTOMER_ID)
         if chrome_os_devices is not None:
             json_response(self.response, chrome_os_devices)
             self.response.set_status(200)
@@ -194,7 +194,7 @@ class DeviceResourceHandler(RequestHandler):
             status = 404
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
         chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
-        registered_chrome_os_device = chrome_os_devices_api.get(self.CUSTOMER_ID, local_device.device_id)
+        registered_chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, local_device.device_id)
         if registered_chrome_os_device is None:
             status = 404
             message = 'Unrecognized device id in Google API'
