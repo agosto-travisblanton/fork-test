@@ -16,8 +16,6 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob
 
 
 class DeviceResourceHandler(RequestHandler):
-    CUSTOMER_ID = 'my_customer'
-
     @api_token_required
     def get_devices_by_tenant(self, tenant_urlsafe_key):
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
@@ -171,7 +169,7 @@ class DeviceResourceHandler(RequestHandler):
                     else:
                         self.response.set_status(422,
                                                  'Chrome OS device not associated with this customer id ( {0}'.format(
-                                                     self.CUSTOMER_ID))
+                                                     config.GOOGLE_CUSTOMER_ID))
             else:
                 self.response.set_status(status, error_message)
         else:
