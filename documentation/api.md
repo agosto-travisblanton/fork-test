@@ -252,3 +252,50 @@ Update Skykit device/display information.
     + Body
 
             Unable to retrieve Chrome OS device by device id: {directory_api_device_id}
+
+
+## Group Tenants
+
+### GET /api/v1/tenants
+Retrieve all tenants from Skykit Device Management
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/json
+            Authorization: 6C346588BD4C6D722A1165B43C51C
+
+
+
++ Response 200 (application/json)
+
+    + Headers
+
+
+    + Body
+
+            [
+               {
+                  "updated":"2015-07-07 18:23:24",
+                  "name":"DemoAgostoQA",
+                  "created":"2015-07-07 18:08:25",
+                  "content_server_url":"https://skykit-display-int.appspot.com/content",
+                  "chrome_device_domain":"skykit.com",
+                  "key":"ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyOwsSEVRlbmFudEVudGl0eUdyb3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgOCslAkM",
+                  "tenant_code":"demoagostoqa",
+                  "active":true,
+                  "admin_email":"skdqa@demo.agosto.com"
+               },
+               ...
+            ]
+
++ Response 403 (application/json)
+
+    + Headers
+
+    + Body
+
+            {
+                "error": "HTTP request API token is invalid."
+            }
