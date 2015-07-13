@@ -249,7 +249,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         actual = device_key.get()
         self.assertEqual('d23784972038845ab3963412', actual.gcm_registration_id)
 
-    def test_device_resource_put_for_failed_device_lookup(self):
+    def test_device_resource_put_unrecognized_device_lookup_returns_not_found(self):
         device_key = self.create_chrome_os_device(self.tenant_key)
         request_body = {'gcmRegistrationId': 'd23784972038845ab3963412'}
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(None)
@@ -257,9 +257,28 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             self.app.put('/api/v1/devices/{0}'.format(device_key.urlsafe()),
                          json.dumps(request_body),
                          headers=self.valid_authorization_header)
-        self.assertTrue(
-            '422 Unable to retrieve Chrome OS device by device id: 132e235a-b346-4a37-a100-de49fa753a2a' in str(
-                context.exception))
+        self.assertTrue('404 Unrecognized device id in Google API' in str(context.exception))
+
+    def test_device_resource_put_bogus_key_returns_not_found(self):
+        bogus_key = 'bogus'
+        request_body = {'gcmRegistrationId': 'd23784972038845ab3963412'}
+        when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(None)
+        with self.assertRaises(Exception) as context:
+            self.app.put('/api/v1/devices/{0}'.format(bogus_key),
+                         json.dumps(request_body),
+                         headers=self.valid_authorization_header)
+        self.assertTrue("404 Unrecognized device with key: {0}".format(bogus_key) in str(context.exception))
+
+    def test_device_resource_put_unrecognized_local_device_returns_not_found(self):
+        bogus_key = 'ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyVgsSEVRlbmFudEVudGl0eUdyb' \
+                    + '3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgMC1mwoMCxIOQ2hyb21lT3NEZXZpY2UYgICAgJCihwoM'
+        request_body = {'gcmRegistrationId': 'd23784972038845ab3963412'}
+        when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(None)
+        with self.assertRaises(Exception) as context:
+            self.app.put('/api/v1/devices/{0}'.format(bogus_key),
+                         json.dumps(request_body),
+                         headers=self.valid_authorization_header)
+        self.assertTrue("404 Unrecognized device with key: {0}".format(bogus_key) in str(context.exception))
 
     def test_device_resource_delete_returns_no_content(self):
         url = '/api/v1/devices/{0}'.format(self.chrome_os_device_key.urlsafe())
@@ -277,6 +296,14 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.app.delete(url, headers=self.valid_authorization_header)
         actual = self.chrome_os_device_key.get()
         self.assertIsNone(actual)
+
+    def test_device_resource_delete_bogus_key_returns_not_found(self):
+        bogus_key = 'ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyVgsSEVRlbmFudEVudGl0eUdyb' \
+                    + '3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgMC1mwoMCxIOQ2hyb21lT3NEZXZpY2UYgICAgJCihwoM'
+        url = '/api/v1/devices/{0}'.format(bogus_key)
+        with self.assertRaises(Exception) as context:
+          self.app.delete(url, headers=self.valid_authorization_header)
+        self.assertTrue("404 Unrecognized device with key: {0}".format(bogus_key) in str(context.exception))
 
     def test_device_resource_handler_get_by_mac_address_returns_ok(self):
         request_parameters = {'macAddress': self.MAC_ADDRESS}
