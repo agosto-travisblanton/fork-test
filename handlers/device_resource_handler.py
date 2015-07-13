@@ -88,7 +88,7 @@ class DeviceResourceHandler(RequestHandler):
 
     def get_device_by_mac_address(self, device_mac_address):
         chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
-        chrome_os_devices = chrome_os_devices_api.list(self.CUSTOMER_ID)
+        chrome_os_devices = chrome_os_devices_api.list(config.GOOGLE_CUSTOMER_ID)
         if chrome_os_devices is not None:
             lowercase_device_mac_address = device_mac_address.lower()
             loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == lowercase_device_mac_address or
@@ -149,7 +149,7 @@ class DeviceResourceHandler(RequestHandler):
                 error_message = 'Invalid or inactive tenant for device.'
             if status == 201:
                 chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
-                chrome_os_devices = chrome_os_devices_api.list(self.CUSTOMER_ID)
+                chrome_os_devices = chrome_os_devices_api.list(config.GOOGLE_CUSTOMER_ID)
                 if chrome_os_devices is not None:
                     loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == device_mac_address or
                                           x.get('ethernetMacAddress') == device_mac_address)
