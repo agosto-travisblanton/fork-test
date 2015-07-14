@@ -23,7 +23,7 @@ def _APP_NAME():
     if on_development_server or on_integration_server or not on_server:
         return 'skykit-display-device-int'
     if on_production_server:
-        return 'skykit-display-device'
+        return 'skykit-provisioning'
     return None
 
 
@@ -42,7 +42,6 @@ def _PRIVATE_KEY():
         private_key = f.read()
     return private_key
 
-
 app_PRIVATE_KEY = _PRIVATE_KEY()
 
 
@@ -50,9 +49,8 @@ def _SERVICE_ACCOUNT_EMAIL():
     if on_development_server or on_integration_server or not on_server:
         return '390010375778-87capuus77kispm64q27iah4kl0rorv4@developer.gserviceaccount.com'
     if on_production_server:
-        return ''
+        return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0@developer.gserviceaccount.com'
     return None
-
 
 app_SERVICE_ACCOUNT_EMAIL = _SERVICE_ACCOUNT_EMAIL()
 
@@ -73,7 +71,7 @@ def _CLIENT_ID():
     if on_integration_server:
         return '390010375778-87capuus77kispm64q27iah4kl0rorv4.apps.googleusercontent.com'
     if on_production_server:
-        return ''
+        return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0.apps.googleusercontent.com'
     return None
 
 
@@ -91,13 +89,12 @@ app_CLIENT_ID = _CLIENT_ID()
 
 def _PUBLIC_API_SERVER_KEY():
     if on_development_server or not on_server:
-        return 'AIzaSyCXKJrn9dVpePXGsfVdyfHxxaaesRuLm0w'
+        return 'AIzaSyAzS-hwl5dV-Wn4g5opG_34gGYplgJT1Fc'
     if on_integration_server:
-        return 'AIzaSyCXKJrn9dVpePXGsfVdyfHxxaaesRuLm0w'
+        return 'AIzaSyAzS-hwl5dV-Wn4g5opG_34gGYplgJT1Fc'
     if on_production_server:
         return 'AIzaSyBcZQf7qcJibJmBKHDaqgdRwf2XQ3MZFiY'
     return None
-
 
 app_PUBLIC_API_SERVER_KEY = _PUBLIC_API_SERVER_KEY()
 
@@ -105,13 +102,20 @@ app_PUBLIC_API_SERVER_KEY = _PUBLIC_API_SERVER_KEY()
 def _API_TOKEN():
     return '6C346588BD4C6D722A1165B43C51C'
 
+app_API_TOKEN = _API_TOKEN()
+
 
 def _CONTENT_MANAGER_API_SERVER_KEY():
     return '6C346588BD4C6D722A1165B43C51C'
 
+app_CONTENT_MANAGER_API_SERVER_KEY = _CONTENT_MANAGER_API_SERVER_KEY()
+
 
 def _CONTENT_MANAGER_API_URL():
     return 'https://some-url'
+
+app_CONTENT_MANAGER_API_URL = _CONTENT_MANAGER_API_URL()
+
 
 def _IMPERSONATION_ADMIN_EMAIL_ADDRESS():
     if on_development_server or not on_server:
@@ -122,8 +126,10 @@ def _IMPERSONATION_ADMIN_EMAIL_ADDRESS():
         return 'skykit.api@skykit.agosto.com'
     return None
 
+app_IMPERSONATION_ADMIN_EMAIL_ADDRESS = _IMPERSONATION_ADMIN_EMAIL_ADDRESS()
+
+
 def _GOOGLE_CUSTOMER_ID():
-    #TODO figure out if this is tied to the domain. This info comes from Thomas Blade.
     if on_development_server or not on_server:
         return 'my_customer'
     if on_integration_server:
@@ -132,5 +138,4 @@ def _GOOGLE_CUSTOMER_ID():
         return 'my_customer'
     return None
 
-
-app_API_TOKEN = _API_TOKEN()
+app_GOOGLE_CUSTOMER_ID = _GOOGLE_CUSTOMER_ID()
