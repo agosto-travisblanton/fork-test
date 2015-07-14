@@ -91,9 +91,9 @@ app_CLIENT_ID = _CLIENT_ID()
 
 def _PUBLIC_API_SERVER_KEY():
     if on_development_server or not on_server:
-        return 'AIzaSyCXKJrn9dVpePXGsfVdyfHxxaaesRuLm0w'
+        return 'AIzaSyAzS-hwl5dV-Wn4g5opG_34gGYplgJT1Fc'
     if on_integration_server:
-        return 'AIzaSyCXKJrn9dVpePXGsfVdyfHxxaaesRuLm0w'
+        return 'AIzaSyAzS-hwl5dV-Wn4g5opG_34gGYplgJT1Fc'
     if on_production_server:
         return 'AIzaSyBcZQf7qcJibJmBKHDaqgdRwf2XQ3MZFiY'
     return None
