@@ -123,7 +123,7 @@ def _IMPERSONATION_ADMIN_EMAIL_ADDRESS():
     if on_integration_server:
         return 'administrator@skykit.com'
     if on_production_server:
-        return 'skykit.api@skykit.agosto.com'
+        return 'admin@skykit.agosto.com'
     return None
 
 app_IMPERSONATION_ADMIN_EMAIL_ADDRESS = _IMPERSONATION_ADMIN_EMAIL_ADDRESS()
