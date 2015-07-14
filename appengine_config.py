@@ -98,20 +98,26 @@ def _PUBLIC_API_SERVER_KEY():
         return 'AIzaSyBcZQf7qcJibJmBKHDaqgdRwf2XQ3MZFiY'
     return None
 
-
 app_PUBLIC_API_SERVER_KEY = _PUBLIC_API_SERVER_KEY()
 
 
 def _API_TOKEN():
     return '6C346588BD4C6D722A1165B43C51C'
 
+app_API_TOKEN = _API_TOKEN()
+
 
 def _CONTENT_MANAGER_API_SERVER_KEY():
     return '6C346588BD4C6D722A1165B43C51C'
 
+app_CONTENT_MANAGER_API_SERVER_KEY = _CONTENT_MANAGER_API_SERVER_KEY()
+
 
 def _CONTENT_MANAGER_API_URL():
     return 'https://some-url'
+
+app_CONTENT_MANAGER_API_URL = _CONTENT_MANAGER_API_URL()
+
 
 def _IMPERSONATION_ADMIN_EMAIL_ADDRESS():
     if on_development_server or not on_server:
@@ -121,6 +127,9 @@ def _IMPERSONATION_ADMIN_EMAIL_ADDRESS():
     if on_production_server:
         return 'skykit.api@skykit.agosto.com'
     return None
+
+app_IMPERSONATION_ADMIN_EMAIL_ADDRESS = _IMPERSONATION_ADMIN_EMAIL_ADDRESS()
+
 
 def _GOOGLE_CUSTOMER_ID():
     #TODO figure out if this is tied to the domain. This info comes from Thomas Blade.
@@ -132,5 +141,4 @@ def _GOOGLE_CUSTOMER_ID():
         return 'my_customer'
     return None
 
-
-app_API_TOKEN = _API_TOKEN()
+app_GOOGLE_CUSTOMER_ID = _GOOGLE_CUSTOMER_ID()
