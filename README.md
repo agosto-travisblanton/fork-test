@@ -167,7 +167,7 @@ ________________________________________________________________________________
 
 From the project root directory: `appcfg.py --oauth2 -A skykit-display-device-int update .`
 
-[SkyKit Provisioning](https://skykit-display-device-int.appspot.com/#)
+[SkyKit Provisioning INT](https://skykit-display-device-int.appspot.com/#)
 
 ## Deployment to App Engine PROD Environment ##
 
