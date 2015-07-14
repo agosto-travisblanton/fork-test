@@ -23,7 +23,7 @@ def _APP_NAME():
     if on_development_server or on_integration_server or not on_server:
         return 'skykit-display-device-int'
     if on_production_server:
-        return 'skykit-display-device'
+        return 'skykit-provisioning'
     return None
 
 
@@ -42,7 +42,6 @@ def _PRIVATE_KEY():
         private_key = f.read()
     return private_key
 
-
 app_PRIVATE_KEY = _PRIVATE_KEY()
 
 
@@ -50,9 +49,8 @@ def _SERVICE_ACCOUNT_EMAIL():
     if on_development_server or on_integration_server or not on_server:
         return '390010375778-87capuus77kispm64q27iah4kl0rorv4@developer.gserviceaccount.com'
     if on_production_server:
-        return ''
+        return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0@developer.gserviceaccount.com'
     return None
-
 
 app_SERVICE_ACCOUNT_EMAIL = _SERVICE_ACCOUNT_EMAIL()
 
@@ -73,7 +71,7 @@ def _CLIENT_ID():
     if on_integration_server:
         return '390010375778-87capuus77kispm64q27iah4kl0rorv4.apps.googleusercontent.com'
     if on_production_server:
-        return ''
+        return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0.apps.googleusercontent.com'
     return None
 
 
@@ -132,7 +130,6 @@ app_IMPERSONATION_ADMIN_EMAIL_ADDRESS = _IMPERSONATION_ADMIN_EMAIL_ADDRESS()
 
 
 def _GOOGLE_CUSTOMER_ID():
-    #TODO figure out if this is tied to the domain. This info comes from Thomas Blade.
     if on_development_server or not on_server:
         return 'my_customer'
     if on_integration_server:
