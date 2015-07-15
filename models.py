@@ -18,6 +18,19 @@ class TenantEntityGroup(ndb.Model):
 
 
 @ae_ndb_serializer
+class Distributor(ndb.Model):
+    name = ndb.StringProperty(required=True, indexed=True)
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    updated = ndb.DateTimeProperty(auto_now=True)
+    active = ndb.BooleanProperty(default=True, required=True, indexed=True)
+
+    @classmethod
+    def create(cls, name, active):
+        return cls(name=name,
+                   active=active)
+
+
+@ae_ndb_serializer
 class Tenant(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
