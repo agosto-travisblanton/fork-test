@@ -10,6 +10,7 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 class TestDistributorModel(BaseTest):
     NAME = 'Agosto'
+    ENTITY_GROUP_NAME = 'distributorEntityGroup'
 
     def setUp(self):
         super(TestDistributorModel, self).setUp()
@@ -20,7 +21,7 @@ class TestDistributorModel(BaseTest):
     def test_create_sets_distributor_entity_group_as_parent(self):
         actual = Distributor.find_by_name(self.NAME)
         parent = actual.key.parent().get()
-        self.assertEqual(parent.name, 'distributorEntityGroup')
+        self.assertEqual(parent.name, self.ENTITY_GROUP_NAME)
 
     def test_find_by_name_returns_matching_distributor(self):
         actual = Distributor.find_by_name(self.NAME)
@@ -45,4 +46,3 @@ class TestDistributorModel(BaseTest):
         self.assertTrue(distributor_created.active)
         self.assertEqual(self.NAME, distributor_created.name)
         self.assertTrue(distributor_created.active)
-
