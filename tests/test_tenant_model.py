@@ -3,7 +3,7 @@ from env_setup import setup_test_paths
 setup_test_paths()
 
 from agar.test import BaseTest
-from models import Tenant
+from models import Tenant, TENANT_ENTITY_GROUP_NAME
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
@@ -30,7 +30,7 @@ class TestTenantModel(BaseTest):
     def test_create_sets_tenant_entity_group_as_parent(self):
         actual = Tenant.find_by_name(self.NAME)
         parent = actual.key.parent().get()
-        self.assertEqual(parent.name, self.ENTITY_GROUP_NAME)
+        self.assertEqual(parent.name, TENANT_ENTITY_GROUP_NAME)
 
     def test_find_by_name_returns_matching_tenant(self):
         actual = Tenant.find_by_name(self.NAME)
@@ -62,3 +62,11 @@ class TestTenantModel(BaseTest):
         self.assertEqual(self.CONTENT_SERVER_URL, tenant_created.content_server_url)
         self.assertEqual(self.CHROME_DEVICE_DOMAIN, tenant_created.chrome_device_domain)
         self.assertEqual(self.NAME, tenant_created.name)
+
+    def test_is_unique_returns_false_when_name_is_found(self):
+        uniqueness_check = Tenant.is_unique(self.NAME)
+        self.assertFalse(uniqueness_check)
+
+    def test_is_unique_returns_true_when_name_not_found(self):
+        uniqueness_check = Tenant.is_unique('Foobar')
+        self.assertTrue(uniqueness_check)

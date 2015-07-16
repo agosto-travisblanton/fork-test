@@ -7,14 +7,17 @@ from restler.decorators import ae_ndb_serializer
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
+TENANT_ENTITY_GROUP_NAME = 'tenantEntityGroup'
+DISTRIBUTOR_ENTITY_GROUP_NAME = 'distributorEntityGroup'
+
 
 class TenantEntityGroup(ndb.Model):
     name = ndb.StringProperty(required=True)
 
     @classmethod
     def singleton(cls):
-        return TenantEntityGroup.get_or_insert('tenantEntityGroup',
-                                               name='tenantEntityGroup')
+        return TenantEntityGroup.get_or_insert(TENANT_ENTITY_GROUP_NAME,
+                                               name=TENANT_ENTITY_GROUP_NAME)
 
 
 class DistributorEntityGroup(ndb.Model):
@@ -22,8 +25,8 @@ class DistributorEntityGroup(ndb.Model):
 
     @classmethod
     def singleton(cls):
-        return DistributorEntityGroup.get_or_insert('distributorEntityGroup',
-                                                    name='distributorEntityGroup')
+        return DistributorEntityGroup.get_or_insert(DISTRIBUTOR_ENTITY_GROUP_NAME,
+                                                    name=DISTRIBUTOR_ENTITY_GROUP_NAME)
 
 
 @ae_ndb_serializer
@@ -42,11 +45,11 @@ class Distributor(ndb.Model):
 
     @classmethod
     def is_unique(cls, name):
-        name = cls.find_by_name(name)
-        if cls.find_by_name(name) is not None:
-            return True
-        else:
+        distributor = cls.find_by_name(name)
+        if distributor is not None and name == name:
             return False
+        else:
+            return True
 
     @classmethod
     def create(cls, name, active):
@@ -76,11 +79,11 @@ class Tenant(ndb.Model):
 
     @classmethod
     def is_unique(cls, name):
-        name = cls.find_by_name(name)
-        if cls.find_by_name(name) is not None:
-            return True
-        else:
+        tenant = cls.find_by_name(name)
+        if tenant is not None and name == name:
             return False
+        else:
+            return True
 
     @classmethod
     def create(cls, tenant_code, name, admin_email, content_server_url, chrome_device_domain, active):

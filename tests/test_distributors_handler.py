@@ -1,11 +1,10 @@
 from env_setup import setup_test_paths
-from webtest import AppError
-
 setup_test_paths()
 
 import json
 from agar.test import BaseTest, WebTest
-from models import Distributor
+from webtest import AppError
+from models import Distributor, DISTRIBUTOR_ENTITY_GROUP_NAME
 from routes import application
 from app_config import config
 
@@ -15,7 +14,6 @@ class TestDistributorsHandler(BaseTest, WebTest):
     AGOSTO = 'Agosto'
     TIERNEY_BROS = 'Tierney Bros'
     INACTIVE_DISTRIBUTOR = 'Inactive Distributor'
-    ENTITY_GROUP_NAME = 'distributorEntityGroup'
     FORBIDDEN = '403 Forbidden'
 
     def setUp(self):
@@ -127,7 +125,7 @@ class TestDistributorsHandler(BaseTest, WebTest):
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
         actual = Distributor.find_by_name(request_parameters['name'])
         parent = actual.key.parent().get()
-        self.assertEqual(parent.name, self.ENTITY_GROUP_NAME)
+        self.assertEqual(parent.name, DISTRIBUTOR_ENTITY_GROUP_NAME)
 
     def test_post_fails_with_bad_authorization_token(self):
         request_parameters = {}

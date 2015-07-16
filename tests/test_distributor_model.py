@@ -3,14 +3,13 @@ from env_setup import setup_test_paths
 setup_test_paths()
 
 from agar.test import BaseTest
-from models import Distributor
+from models import Distributor, DISTRIBUTOR_ENTITY_GROUP_NAME
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 class TestDistributorModel(BaseTest):
     NAME = 'Agosto'
-    ENTITY_GROUP_NAME = 'distributorEntityGroup'
 
     def setUp(self):
         super(TestDistributorModel, self).setUp()
@@ -21,7 +20,7 @@ class TestDistributorModel(BaseTest):
     def test_create_sets_distributor_entity_group_as_parent(self):
         actual = Distributor.find_by_name(self.NAME)
         parent = actual.key.parent().get()
-        self.assertEqual(parent.name, self.ENTITY_GROUP_NAME)
+        self.assertEqual(parent.name, DISTRIBUTOR_ENTITY_GROUP_NAME)
 
     def test_find_by_name_returns_matching_distributor(self):
         actual = Distributor.find_by_name(self.NAME)
@@ -46,3 +45,17 @@ class TestDistributorModel(BaseTest):
         self.assertTrue(distributor_created.active)
         self.assertEqual(self.NAME, distributor_created.name)
         self.assertTrue(distributor_created.active)
+
+    def test_is_unique_returns_true_when_name_not_found(self):
+        distributor_created = Distributor.find_by_name(self.NAME)
+        self.assertTrue(distributor_created.active)
+        self.assertEqual(self.NAME, distributor_created.name)
+        self.assertTrue(distributor_created.active)
+
+    def test_is_unique_returns_false_when_name_is_found(self):
+        uniqueness_check = Distributor.is_unique(self.NAME)
+        self.assertFalse(uniqueness_check)
+
+    def test_is_unique_returns_true_when_name_not_found(self):
+        uniqueness_check = Distributor.is_unique('Foobar')
+        self.assertTrue(uniqueness_check)
