@@ -54,7 +54,7 @@ describe 'DistributorsService', ->
       it 'returns a promise', ->
         expect(result).toBe promise
 
-  describe '.fetchAllDistributors', ->
+  describe '.fetchAll', ->
     distributorRestangularService = undefined
     result = undefined
 
@@ -62,7 +62,7 @@ describe 'DistributorsService', ->
       distributorRestangularService = { getList: -> }
       spyOn(Restangular, 'all').and.returnValue distributorRestangularService
       spyOn(distributorRestangularService, 'getList').and.returnValue promise
-      result = DistributorsService.fetchAllDistributors()
+      result = DistributorsService.fetchAll()
 
     it 'obtains Restangular service for distributors', ->
       expect(Restangular.all).toHaveBeenCalledWith 'distributors'

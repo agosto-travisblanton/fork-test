@@ -14,7 +14,7 @@ appModule.factory 'DistributorsService', (Restangular) ->
         promise = Restangular.service(serviceName).post(tenant)
       promise
 
-    fetchAllDistributors: () ->
+    fetchAll: () ->
       promise = Restangular.all(serviceName).getList()
       promise
 
