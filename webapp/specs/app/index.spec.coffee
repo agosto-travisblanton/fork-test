@@ -4,16 +4,25 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
   $rootScope = undefined
   $state = undefined
   $injector = undefined
+  RestangularProvider = undefined
 
   beforeEach ->
+    module "restangular", (_RestangularProvider_) ->
+      RestangularProvider = _RestangularProvider_
+      spyOn(RestangularProvider, 'setBaseUrl').and.callThrough()
+      spyOn(RestangularProvider, 'setDefaultHeaders').and.callThrough()
+      spyOn(RestangularProvider, 'addRequestInterceptor').and.callThrough()
+      spyOn(RestangularProvider, 'setRestangularFields').and.callThrough()
+
     module 'skykitDisplayDeviceManagement'
-    inject((_$rootScope_, _$state_, _$injector_, $templateCache) ->
+
+    inject (_$rootScope_, _$state_, _$injector_, $templateCache) ->
       $rootScope = _$rootScope_
       $state = _$state_
       $injector = _$injector_
       # We need add the template entry into the templateCache if we ever specify a templateUrl
       $templateCache.put 'template.html', ''
-    )
+
 
   describe 'URL resolution', ->
     it 'should resolve \'home\' state', ->
@@ -45,3 +54,23 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
     it 'should resolve \'remote_control\' state', ->
       expect($state.href('remote_control', {})).toEqual('#/remote_control')
 
+  describe 'Restangular configuration', ->
+    it 'sets the base URL', ->
+      expect(RestangularProvider.setBaseUrl).toHaveBeenCalledWith '/api/v1'
+
+    it 'sets the default headers', ->
+      headers = {
+        'Content-Type': 'application/json'
+        'Accept': 'application/json'
+        'Authorization': '6C346588BD4C6D722A1165B43C51C'
+      }
+      expect(RestangularProvider.setDefaultHeaders).toHaveBeenCalledWith headers
+
+    it 'adds a request interceptor', ->
+      expect(RestangularProvider.addRequestInterceptor).toHaveBeenCalled()
+      args = RestangularProvider.addRequestInterceptor.calls.argsFor(0)
+      expect(args[0] instanceof Function).toBeTruthy()
+
+    it 'sets the Restangular fields mapping', ->
+      restangularFieldsMapping = {id: 'key'}
+      expect(RestangularProvider.setRestangularFields).toHaveBeenCalledWith restangularFieldsMapping
