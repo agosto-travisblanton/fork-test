@@ -54,34 +54,61 @@ describe 'DistributorsService', ->
       it 'returns a promise', ->
         expect(result).toBe promise
 
-#  describe '.fetchAllDistributors', ->
-#    it 'retrieve all distributors, returning a promise', ->
-#      distributorRestangularService = { getList: -> }
-#      spyOn(Restangular, 'all').and.returnValue distributorRestangularService
-#      spyOn(distributorRestangularService, 'getList').and.returnValue promise
-#      actual = DistributorsService.fetchAllDistributors()
-#      expect(Restangular.all).toHaveBeenCalledWith 'distributors'
-#      expect(distributorRestangularService.getList).toHaveBeenCalled()
-#      expect(actual).toBe promise
-#
-#  describe '.getDistributorByKey', ->
-#    it 'retrieve distributor by key, returning a promise', ->
-#      distributorKey = 'dhYUYdfhdjfhlasddf7898a7sdfdas78d67'
-#      distributorRestangularService = { get: -> }
-#      spyOn(Restangular, 'oneUrl').and.returnValue distributorRestangularService
-#      spyOn(distributorRestangularService, 'get').and.returnValue promise
-#      actual = DistributorsService.getDistributorByKey distributorKey
-#      expect(Restangular.oneUrl).toHaveBeenCalledWith 'distributors', "api/v1/distributors/#{distributorKey}"
-#      expect(distributorRestangularService.get).toHaveBeenCalled()
-#      expect(actual).toBe promise
-#
-#  describe '.delete', ->
-#    it 'delete distributor, returning a promise', ->
-#      distributor = {key: 'dhYUYdfhdjfhlasddf7898a7sdfdas78d67', name: 'Foobar'}
-#      distributorRestangularService = { remove: -> }
-#      spyOn(Restangular, 'one').and.returnValue distributorRestangularService
-#      spyOn(distributorRestangularService, 'remove').and.returnValue promise
-#      actual = DistributorsService.delete distributor
-#      expect(Restangular.one).toHaveBeenCalledWith 'distributors', distributor.key
-#      expect(distributorRestangularService.remove).toHaveBeenCalled()
-#      expect(actual).toBe promise
+  describe '.fetchAllDistributors', ->
+    distributorRestangularService = undefined
+    result = undefined
+
+    beforeEach ->
+      distributorRestangularService = { getList: -> }
+      spyOn(Restangular, 'all').and.returnValue distributorRestangularService
+      spyOn(distributorRestangularService, 'getList').and.returnValue promise
+      result = DistributorsService.fetchAllDistributors()
+
+    it 'obtains Restangular service for distributors', ->
+      expect(Restangular.all).toHaveBeenCalledWith 'distributors'
+
+    it 'obtains a list of distributors from the Restangular service', ->
+      expect(distributorRestangularService.getList).toHaveBeenCalled()
+
+    it 'returns a promise', ->
+      expect(result).toBe promise
+
+  describe '.getByKey', ->
+    distributorRestangularService = undefined
+    result = undefined
+    distributorKey = 'dhYUYdfhdjfhlasddf7898a7sdfdas78d67'
+
+    beforeEach ->
+      distributorRestangularService = { get: -> }
+      spyOn(Restangular, 'oneUrl').and.returnValue distributorRestangularService
+      spyOn(distributorRestangularService, 'get').and.returnValue promise
+      result = DistributorsService.getByKey(distributorKey)
+
+    it 'obtains Restangular service for distributors', ->
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'distributors', "distributors/#{distributorKey}"
+
+    it 'obtains the distributor from the Restangular service', ->
+      expect(distributorRestangularService.get).toHaveBeenCalled()
+
+    it 'returns a promise', ->
+      expect(result).toBe promise
+
+  describe '.delete', ->
+    distributorRestangularService = undefined
+    result = undefined
+    distributor = {key: 'dhYUYdfhdjfhlasddf7898a7sdfdas78d67', name: 'Foobar'}
+
+    beforeEach ->
+      distributorRestangularService = { remove: -> }
+      spyOn(Restangular, 'one').and.returnValue distributorRestangularService
+      spyOn(distributorRestangularService, 'remove').and.returnValue promise
+      result = DistributorsService.delete distributor
+
+    it 'obtains Restangular service for the particular distributor', ->
+      expect(Restangular.one).toHaveBeenCalledWith 'distributors', distributor.key
+
+    it 'removes the distributor via the Restangular service', ->
+      expect(distributorRestangularService.remove).toHaveBeenCalled()
+
+    it 'returns a promise', ->
+      expect(result).toBe promise
