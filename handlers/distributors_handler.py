@@ -39,3 +39,24 @@ class DistributorsHandler(RequestHandler):
             self.response.headers['Location'] = distributor_uri
             self.response.headers.pop('Content-Type', None)
             self.response.set_status(201)
+
+    @api_token_required
+    def put(self, distributor_key):
+        key = ndb.Key(urlsafe=distributor_key)
+        distributor = key.get()
+        request_json = json.loads(self.request.body)
+        distributor.name = request_json.get('name')
+        distributor.active = request_json.get('active')
+        distributor.put()
+        self.response.headers.pop('Content-Type', None)
+        self.response.set_status(204)
+
+    @api_token_required
+    def delete(self, distributor_key):
+        key = ndb.Key(urlsafe=distributor_key)
+        distributor = key.get()
+        if distributor:
+            distributor.active = False
+            distributor.put()
+        self.response.headers.pop('Content-Type', None)
+        self.response.set_status(204)

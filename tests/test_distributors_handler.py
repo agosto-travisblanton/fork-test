@@ -1,4 +1,5 @@
 from env_setup import setup_test_paths
+from webtest import AppError
 
 setup_test_paths()
 
@@ -15,11 +16,15 @@ class TestDistributorsHandler(BaseTest, WebTest):
     TIERNEY_BROS = 'Tierney Bros'
     INACTIVE_DISTRIBUTOR = 'Inactive Distributor'
     ENTITY_GROUP_NAME = 'distributorEntityGroup'
+    FORBIDDEN = '403 Forbidden'
 
     def setUp(self):
         super(TestDistributorsHandler, self).setUp()
         self.headers = {
             'Authorization': config.API_TOKEN
+        }
+        self.bad_authorization_header = {
+            'Authorization': 'Forget about it!'
         }
         self.agosto = Distributor.create(name=self.AGOSTO,
                                          active=True)
@@ -77,6 +82,13 @@ class TestDistributorsHandler(BaseTest, WebTest):
         self.assertEqual(response_json[1].get('name'), self.TIERNEY_BROS)
         self.assertTrue(response_json[1].get('active'))
 
+    def test_get_fails_with_bad_authorization_token(self):
+        request_parameters = {}
+        uri = application.router.build(None, 'distributors', None, {})
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.bad_authorization_header)
+        self.assertTrue(self.FORBIDDEN in context.exception.message)
+
     def test_post_returns_created_status(self):
         name = u'Acme'
         request_parameters = {'name': name,
@@ -116,3 +128,86 @@ class TestDistributorsHandler(BaseTest, WebTest):
         actual = Distributor.find_by_name(request_parameters['name'])
         parent = actual.key.parent().get()
         self.assertEqual(parent.name, self.ENTITY_GROUP_NAME)
+
+    def test_post_fails_with_bad_authorization_token(self):
+        request_parameters = {}
+        uri = application.router.build(None, 'distributors', None, {})
+        with self.assertRaises(AppError) as context:
+            self.app.post_json(uri, params=request_parameters, headers=self.bad_authorization_header)
+        self.assertTrue(self.FORBIDDEN in context.exception.message)
+
+    def test_put_returns_no_content_status(self):
+        uri = application.router.build(None, 'manage-distributor', None, {'distributor_key': self.agosto_key.urlsafe()})
+        entity_body = {
+            'name': self.AGOSTO,
+            'active': True
+        }
+        response = self.app.put_json(uri, entity_body, headers=self.headers)
+        self.assertEqual(204, response.status_code)
+
+    def test_put_updates_active_property(self):
+        uri = application.router.build(None, 'manage-distributor', None, {'distributor_key': self.agosto_key.urlsafe()})
+        expected = self.agosto_key.get()
+        self.assertEqual(expected.name, self.AGOSTO)
+        self.assertEqual(expected.active, True)
+        active = False
+        entity_body = {
+            'name': self.AGOSTO,
+            'active': active
+        }
+        self.app.put_json(uri, entity_body, headers=self.headers)
+        self.assertEqual(expected.name, self.AGOSTO)
+        self.assertEqual(expected.active, active)
+
+    def test_put_updates_name_property(self):
+        uri = application.router.build(None, 'manage-distributor', None, {'distributor_key': self.agosto_key.urlsafe()})
+        expected = self.agosto_key.get()
+        self.assertEqual(expected.name, self.AGOSTO)
+        self.assertEqual(expected.active, True)
+        new_name = "Super {0}".format(self.AGOSTO)
+        active = True
+        entity_body = {
+            'name': new_name,
+            'active': active
+        }
+        self.app.put_json(uri, entity_body, headers=self.headers)
+        self.assertEqual(expected.name, new_name)
+        self.assertEqual(expected.active, active)
+
+    def test_put_fails_with_bad_authorization_token(self):
+        uri = application.router.build(None, 'manage-distributor', None, {'distributor_key': self.agosto_key.urlsafe()})
+        entity_body = {}
+        with self.assertRaises(AppError) as context:
+            self.app.put_json(uri, entity_body, headers=self.bad_authorization_header)
+        self.assertTrue(self.FORBIDDEN in context.exception.message)
+
+    def test_delete_returns_no_content_status(self):
+        url_safe_distributor_key = self.tierney_bros_key.urlsafe()
+        uri = application.router.build(None, 'manage-distributor', None,
+                                       {'distributor_key': url_safe_distributor_key})
+        response = self.app.delete(uri, headers=self.headers)
+        self.assertEqual(204, response.status_code)
+
+    def test_delete_soft_deletes_distributor(self):
+        url_safe_distributor_key = self.tierney_bros_key.urlsafe()
+        request_parameters = {}
+        uri = application.router.build(None, 'manage-distributor', None, {'distributor_key': url_safe_distributor_key})
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response_json = json.loads(response.body)
+        self.assertIsNotNone(response_json)
+
+        uri = application.router.build(None, 'manage-distributor', None, {'distributor_key': url_safe_distributor_key})
+        self.app.delete(uri, headers=self.headers)
+
+        uri = application.router.build(None, 'manage-distributor', None, {'distributor_key': url_safe_distributor_key})
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json.get('active'), False)
+
+    def test_delete_fails_with_bad_authorization_token(self):
+        url_safe_distributor_key = self.tierney_bros_key.urlsafe()
+        uri = application.router.build(None, 'manage-distributor', None,
+                                       {'distributor_key': url_safe_distributor_key})
+        with self.assertRaises(AppError) as context:
+            self.app.delete(uri, headers=self.bad_authorization_header)
+        self.assertTrue(self.FORBIDDEN in context.exception.message)
