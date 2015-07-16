@@ -1,4 +1,4 @@
-from models import (Tenant, ChromeOsDevice)
+from models import (Tenant, ChromeOsDevice, Distributor)
 from restler.serializers import ModelStrategy
 
 TENANT_FIELDS = [
@@ -15,6 +15,18 @@ TENANT_STRATEGY = ModelStrategy(Tenant) + TENANT_FIELDS
 TENANT_STRATEGY += [
     {'key': lambda o, field_name, context: o.key.urlsafe()},
 ]
+
+DISTRIBUTOR_FIELDS = [
+    'name',
+    'active',
+    'created',
+    'updated'
+]
+DISTRIBUTOR_STRATEGY = ModelStrategy(Distributor) + DISTRIBUTOR_FIELDS
+DISTRIBUTOR_STRATEGY += [
+    {'key': lambda o, field_name, context: o.key.urlsafe()},
+]
+
 
 CHROME_OS_DEVICE_FIELDS = [
     'device_id',
