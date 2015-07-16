@@ -79,6 +79,21 @@ application = WSGIApplication(
             handler='handlers.tenants_handler.TenantsHandler',
             name='manage-tenant',
             methods=['GET', 'PUT', 'DELETE']
+        ),
+        ############################################################
+        # Distributors
+        ############################################################
+        Route(
+            r'/api/v1/distributors',
+            handler='handlers.distributors_handler.DistributorsHandler',
+            name='distributors',
+            methods=['GET', 'POST']
+        ),
+        Route(
+            r'/api/v1/distributors/<distributor_key>',
+            handler='handlers.distributors_handler.DistributorsHandler',
+            name='manage-distributor',
+            methods=['GET', 'PUT', 'DELETE']
         )
     ]
 )
