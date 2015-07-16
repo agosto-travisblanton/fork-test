@@ -12,6 +12,10 @@ describe 'DistributorsService', ->
     Restangular = _Restangular_
     promise = new skykitDisplayDeviceManagement.q.Mock
 
+  describe 'service initialization', ->
+    it 'the current distributor is undefined', ->
+      expect(DistributorsService.currentDistributor).toBeUndefined()
+
   describe '.save', ->
     describe 'existing distributor', ->
       distributor = undefined
