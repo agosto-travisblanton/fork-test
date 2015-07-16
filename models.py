@@ -17,6 +17,15 @@ class TenantEntityGroup(ndb.Model):
                                                name='tenantEntityGroup')
 
 
+class DistributorEntityGroup(ndb.Model):
+    name = ndb.StringProperty(required=True)
+
+    @classmethod
+    def singleton(cls):
+        return DistributorEntityGroup.get_or_insert('distributorEntityGroup',
+                                                    name='distributorEntityGroup')
+
+
 @ae_ndb_serializer
 class Distributor(ndb.Model):
     name = ndb.StringProperty(required=True, indexed=True)
@@ -25,8 +34,25 @@ class Distributor(ndb.Model):
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
 
     @classmethod
+    def find_by_name(cls, name):
+        if name:
+            key = Distributor.query(Distributor.name == name).get(keys_only=True)
+            if None is not key:
+                return key.get()
+
+    @classmethod
+    def is_unique(cls, name):
+        name = cls.find_by_name(name)
+        if cls.find_by_name(name) is not None:
+            return True
+        else:
+            return False
+
+    @classmethod
     def create(cls, name, active):
-        return cls(name=name,
+        distributor_entity_group = DistributorEntityGroup.singleton()
+        return cls(parent=distributor_entity_group.key,
+                   name=name,
                    active=active)
 
 
