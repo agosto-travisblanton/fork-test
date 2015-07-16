@@ -12,8 +12,16 @@ skykitDisplayDeviceManagement = angular.module('skykitDisplayDeviceManagement', 
 ])
 
 skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
-  $stateProvider.state("home", {url: "/", templateUrl: "app/main/main.html", controller: "MainCtrl"})
-  $stateProvider.state("domain", {url: "/domain", templateUrl: "app/domain/domain.html", controller: "DomainCtrl"})
+  $stateProvider.state("home", {
+    url: "/",
+    templateUrl: "app/main/main.html",
+    controller: "MainCtrl"
+  })
+  $stateProvider.state("domain", {
+    url: "/domain",
+    templateUrl: "app/domain/domain.html",
+    controller: "DomainCtrl"
+  })
   $stateProvider.state("deviceEdit", {
     url: "/deviceEdit",
     templateUrl: "app/device/device.editor.html",
