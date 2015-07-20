@@ -5,16 +5,18 @@ describe 'TenantsCtrl', ->
   controller = undefined
   $state = undefined
   TenantsService = undefined
+  sweet = undefined
   promise = undefined
 
 
   beforeEach module('skykitDisplayDeviceManagement')
 
-  beforeEach inject (_$controller_, _TenantsService_, _$state_) ->
+  beforeEach inject (_$controller_, _TenantsService_, _$state_, _sweet_) ->
     $controller = _$controller_
     $state = _$state_
     TenantsService = _TenantsService_
-    controller = $controller 'TenantsCtrl', {$state: $state, TenantsService: TenantsService}
+    sweet = _sweet_
+    controller = $controller 'TenantsCtrl', {$state: $state, TenantsService: TenantsService, sweet: sweet}
 
   describe 'initialization', ->
     it 'tenants should be an empty array', ->
@@ -63,6 +65,8 @@ describe 'TenantsCtrl', ->
       promise = new skykitDisplayDeviceManagement.q.Mock
       spyOn(TenantsService, 'delete').and.returnValue promise
       spyOn controller, 'initialize'
+      spyOn(sweet, 'show').and.callFake (options, callback) ->
+        callback()
 
     it 'call TenantsService.delete tenant', ->
       controller.deleteItem tenant
@@ -73,4 +77,9 @@ describe 'TenantsCtrl', ->
       controller.deleteItem tenant
       promise.resolve()
       expect(controller.initialize).toHaveBeenCalled
+
+    it "the SweetAlert confirmation should be shown", ->
+      controller.deleteItem tenant
+      promise.resolve()
+      expect(sweet.show).toHaveBeenCalled
 
