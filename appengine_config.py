@@ -8,6 +8,7 @@ setup()
 import os
 from agar.env import on_development_server, on_server, on_production_server, on_integration_server
 
+
 ##############################################################################
 # APPLICATION SETTINGS
 ##############################################################################
@@ -42,6 +43,7 @@ def _PRIVATE_KEY():
         private_key = f.read()
     return private_key
 
+
 app_PRIVATE_KEY = _PRIVATE_KEY()
 
 
@@ -51,6 +53,7 @@ def _SERVICE_ACCOUNT_EMAIL():
     if on_production_server:
         return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0@developer.gserviceaccount.com'
     return None
+
 
 app_SERVICE_ACCOUNT_EMAIL = _SERVICE_ACCOUNT_EMAIL()
 
@@ -77,6 +80,7 @@ def _CLIENT_ID():
 
 app_CLIENT_ID = _CLIENT_ID()
 
+
 # def _CLIENT_SECRET():
 #     if on_development_server or not on_server:
 #         return '5uw_Cj78Iygf3rfnJKZ_SVVO'
@@ -96,11 +100,19 @@ def _PUBLIC_API_SERVER_KEY():
         return 'AIzaSyBcZQf7qcJibJmBKHDaqgdRwf2XQ3MZFiY'
     return None
 
+
 app_PUBLIC_API_SERVER_KEY = _PUBLIC_API_SERVER_KEY()
 
 
 def _API_TOKEN():
-    return '6C346588BD4C6D722A1165B43C51C'
+    if on_development_server or not on_server:
+        return '6C346588BD4C6D722A1165B43C51C'
+    if on_integration_server:
+        return '6C346588BD4C6D722A1165B43C51C'
+    if on_production_server:
+        return '6C346588BD4C6D722A1165B43C51C'
+    return None
+
 
 app_API_TOKEN = _API_TOKEN()
 
@@ -108,11 +120,13 @@ app_API_TOKEN = _API_TOKEN()
 def _CONTENT_MANAGER_API_SERVER_KEY():
     return '6C346588BD4C6D722A1165B43C51C'
 
+
 app_CONTENT_MANAGER_API_SERVER_KEY = _CONTENT_MANAGER_API_SERVER_KEY()
 
 
 def _CONTENT_MANAGER_API_URL():
     return 'https://some-url'
+
 
 app_CONTENT_MANAGER_API_URL = _CONTENT_MANAGER_API_URL()
 
@@ -126,6 +140,7 @@ def _IMPERSONATION_ADMIN_EMAIL_ADDRESS():
         return 'skykit.api@skykit.agosto.com'
     return None
 
+
 app_IMPERSONATION_ADMIN_EMAIL_ADDRESS = _IMPERSONATION_ADMIN_EMAIL_ADDRESS()
 
 
@@ -137,5 +152,6 @@ def _GOOGLE_CUSTOMER_ID():
     if on_production_server:
         return 'my_customer'
     return None
+
 
 app_GOOGLE_CUSTOMER_ID = _GOOGLE_CUSTOMER_ID()
