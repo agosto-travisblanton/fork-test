@@ -21,6 +21,7 @@ class TestChromeOsDeviceModel(BaseTest):
     CONTENT_SERVER_API_KEY = 'API KEY'
     TENANT_CODE = 'foobar'
     MAC_ADDRESS='54271e619346'
+    SERIAL_NUMBER='E3MSCX004781'
 
     def setUp(self):
         super(TestChromeOsDeviceModel, self).setUp()
@@ -62,6 +63,28 @@ class TestChromeOsDeviceModel(BaseTest):
         json_representation = json.loads(to_json(chrome_os_device, CHROME_OS_DEVICE_STRATEGY))
         self.assertEqual(self.TESTING_DEVICE_ID, json_representation['device_id'])
         self.assertEqual(self.TEST_GCM_REGISTRATION_ID, json_representation['gcm_registration_id'])
+        self.assertEqual(None, json_representation['serial_number'])
+        self.assertIsNotNone(json_representation['created'])
+        self.assertIsNotNone(json_representation['updated'])
+        self.assertEqual(str(chrome_os_device.api_key), json_representation['api_key'])
+        self.assertEqual(str(self.tenant.name), json_representation['tenant']['name'])
+        self.assertEqual(str(self.tenant.tenant_code), json_representation['tenant']['tenant_code'])
+        self.assertEqual(str(self.tenant.admin_email), json_representation['tenant']['admin_email'])
+        self.assertEqual(str(self.tenant.content_server_url), json_representation['tenant']['content_server_url'])
+        self.assertEqual(str(self.tenant.chrome_device_domain), json_representation['tenant']['chrome_device_domain'])
+        self.assertEqual(self.tenant.active, json_representation['tenant']['active'])
+
+    def test_json_serialization_strategy_with_optional_serial_number(self):
+        chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
+                                                 device_id=self.TESTING_DEVICE_ID,
+                                                 gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                                 mac_address=self.MAC_ADDRESS,
+                                                 serial_number=self.SERIAL_NUMBER)
+        chrome_os_device.put()
+        json_representation = json.loads(to_json(chrome_os_device, CHROME_OS_DEVICE_STRATEGY))
+        self.assertEqual(self.TESTING_DEVICE_ID, json_representation['device_id'])
+        self.assertEqual(self.TEST_GCM_REGISTRATION_ID, json_representation['gcm_registration_id'])
+        self.assertEqual(self.SERIAL_NUMBER, json_representation['serial_number'])
         self.assertIsNotNone(json_representation['created'])
         self.assertIsNotNone(json_representation['updated'])
         self.assertEqual(str(chrome_os_device.api_key), json_representation['api_key'])
