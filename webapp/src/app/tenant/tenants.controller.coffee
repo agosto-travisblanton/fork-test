@@ -19,12 +19,13 @@ appModule.controller "TenantsCtrl", ($state, TenantsService, sweet) ->
       promise.then () =>
         @initialize()
     sweet.show({
-        title: "Are you sure?",
-        text: "This will permanently remove the tenant from the system.",
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: "Yes, remove the tenant!",
-        closeOnConfirm: true}, callback)
+      title: "Are you sure?",
+      text: "This will permanently remove the tenant from the system.",
+      type: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#DD6B55",
+      confirmButtonText: "Yes, remove the tenant!",
+      closeOnConfirm: true
+    }, callback)
 
   @
