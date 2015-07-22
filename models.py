@@ -126,3 +126,32 @@ class ChromeOsDevice(ndb.Model):
                                api_key=api_key,
                                serial_number=serial_number)
         return chrome_os_device
+
+
+@ae_ndb_serializer
+class Display(ndb.Model):
+    tenant_key = ndb.KeyProperty(required=False, indexed=True)
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    updated = ndb.DateTimeProperty(auto_now=True)
+    device_id = ndb.StringProperty(required=True, indexed=True)
+    gcm_registration_id = ndb.StringProperty(required=True)
+    mac_address = ndb.StringProperty(required=True, indexed=True)
+    api_key = ndb.StringProperty(required=True, indexed=True)
+    serial_number = ndb.StringProperty(required=False, indexed=True)
+
+    @classmethod
+    def get_by_device_id(cls, device_id):
+        if device_id:
+            display = Display.query(Display.device_id == device_id).get(keys_only=True)
+            if None is not display:
+                return display.get()
+
+    @classmethod
+    def create(cls, tenant_key, device_id, gcm_registration_id, mac_address, serial_number=None):
+        display = cls(tenant_key=tenant_key,
+                      device_id=device_id,
+                      gcm_registration_id=gcm_registration_id,
+                      mac_address=mac_address,
+                      api_key=str(uuid.uuid4()),
+                      serial_number=serial_number)
+        return display

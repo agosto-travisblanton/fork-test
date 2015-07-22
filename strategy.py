@@ -1,4 +1,4 @@
-from models import (Tenant, ChromeOsDevice, Distributor)
+from models import (Tenant, ChromeOsDevice, Distributor, Display)
 from restler.serializers import ModelStrategy
 
 TENANT_FIELDS = [
@@ -40,4 +40,18 @@ CHROME_OS_DEVICE_STRATEGY = ModelStrategy(ChromeOsDevice) + CHROME_OS_DEVICE_FIE
 CHROME_OS_DEVICE_STRATEGY += [
     {'key': lambda chrome_os_device, field_name, context: chrome_os_device.key.urlsafe()},
     {'tenant': lambda chrome_os_device, field_name, context: chrome_os_device.key.parent().get()}
+]
+
+DISPLAY_FIELDS = [
+    'device_id',
+    'gcm_registration_id',
+    'api_key',
+    'serial_number',
+    'created',
+    'updated'
+]
+DISPLAY_STRATEGY = ModelStrategy(Display) + DISPLAY_FIELDS
+DISPLAY_STRATEGY += [
+    {'key': lambda display, field_name, context: display.key.urlsafe()},
+    {'tenant': lambda display, field_name, context: display.tenant_key}
 ]
