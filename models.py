@@ -130,7 +130,7 @@ class ChromeOsDevice(ndb.Model):
 
 @ae_ndb_serializer
 class Display(ndb.Model):
-    tenant_key = ndb.KeyProperty(required=False, indexed=True)
+    tenant_key = ndb.KeyProperty(required=True, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     device_id = ndb.StringProperty(required=False, indexed=True)
