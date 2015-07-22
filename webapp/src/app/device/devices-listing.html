@@ -1,0 +1,50 @@
+<div id="wrapper"  ng-init="devicesListingCtrl.initialize()">
+
+  <div ng-include="'app/components/navbar/navbar.html'"></div>
+
+  <div id="page-wrapper">
+    <div class="container-fluid">
+
+      <!-- Page Heading -->
+      <div class="row">
+        <div class="col-lg-12">
+          <h1 class="page-header">
+            Devices
+          </h1>
+        </div>
+      </div>
+      <!-- /.row -->
+
+      <div class="row">
+          <table name="tenant-table" class="table table-bordered table-responsive table-striped">
+            <thead>
+            <tr>
+              <th>Key</th>
+              <th>Serial Number</th>
+              <th>MAC address</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-hide="devicesListingCtrl.devices.length">
+              <td class="no-devices" colspan="3">No devices</td>
+            </tr>
+            <!--<tr ng-repeat="item in tenantsCtrl.tenants | orderBy:'-created' ">-->
+              <!--<td class="tenant-name">{{item.name}}</td>-->
+              <!--<td class="tenant-admin-email">{{item.admin_email}}</td>-->
+              <!--<td class="content-server-url">{{item.content_server_url}}</td>-->
+              <!--<td class="text-center">-->
+                <!--<a name="edit-tenant" class="btn"-->
+                   <!--ng-click="tenantsCtrl.editItem(item)"-->
+                   <!--title="Edit tenant"><i class="fa fa-fw fa-edit"></i></a>-->
+                <!--<a name="delete-tenant" class="btn"-->
+                   <!--ng-click="tenantsCtrl.deleteItem(item)"-->
+                   <!--title="Delete tenant"><i class="fa fa-fw fa-trash"></i></a>-->
+              <!--</td>-->
+            <!--</tr>-->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

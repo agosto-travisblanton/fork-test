@@ -34,6 +34,9 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
     it 'should resolve \'deviceEdit\' state', ->
       expect($state.href('deviceEdit', {})).toEqual('#/deviceEdit')
 
+    it 'should resolve \'devices\' state', ->
+      expect($state.href('devices', {})).toEqual('#/devices')
+
     it 'should resolve \'tenants\' state', ->
       expect($state.href('tenants', {})).toEqual('#/tenants')
 

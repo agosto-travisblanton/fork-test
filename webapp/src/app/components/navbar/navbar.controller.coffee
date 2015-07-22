@@ -1,4 +1,3 @@
 'use strict'
 
-angular.module("skykitDisplayDeviceManagement")
-  .controller "NavbarCtrl", ($scope) ->
+angular.module("skykitDisplayDeviceManagement").controller "NavbarCtrl", ($scope) ->
