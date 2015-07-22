@@ -32,6 +32,7 @@ CHROME_OS_DEVICE_FIELDS = [
     'device_id',
     'gcm_registration_id',
     'api_key',
+    'serial_number',
     'created',
     'updated'
 ]
