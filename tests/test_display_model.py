@@ -12,16 +12,16 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 class TestDisplayModel(BaseTest):
-    DEVICE_ID = '132e235a-b346-5b77-a345-de49fa753a2a'
-    GCM_REGISTRATION_ID = '8d70a8d78a6dfa6df76dfasd'
     TENANT_NAME = 'Foobar, Inc'
     TENANT_CODE = 'foobar_inc'
     ADMIN_EMAIL = 'admin@foobar.com'
+    DEVICE_ID = '132e235a-b346-5b77-a345-de49fa753a2a'
+    GCM_REGISTRATION_ID = '8d70a8d78a6dfa6df76dfasd'
     CONTENT_SERVER_URL = 'https://www.content.com'
     CHROME_DEVICE_DOMAIN = 'foobar.com'
     CONTENT_SERVER_API_KEY = 'API KEY'
     MAC_ADDRESS = '54271e619346'
-    SERIAL_NUMBER = 'E3MSCX004781'
+    SERIAL_NUMBER = 'SN0MZCX005783'
 
     def setUp(self):
         super(TestDisplayModel, self).setUp()
@@ -35,9 +35,9 @@ class TestDisplayModel(BaseTest):
 
     def test_get_by_device_id(self):
         display = Display.create(tenant_key=self.tenant_key,
-                                 device_id=self.DEVICE_ID,
                                  gcm_registration_id=self.GCM_REGISTRATION_ID,
-                                 mac_address=self.MAC_ADDRESS)
+                                 mac_address=self.MAC_ADDRESS,
+                                 device_id=self.DEVICE_ID)
         expected_key = display.put()
         actual = Display.get_by_device_id(self.DEVICE_ID)
         self.assertEqual(actual.key, expected_key)
@@ -48,22 +48,23 @@ class TestDisplayModel(BaseTest):
 
     def test_create(self):
         display = Display.create(tenant_key=self.tenant_key,
-                                 device_id=self.DEVICE_ID,
                                  gcm_registration_id=self.GCM_REGISTRATION_ID,
-                                 mac_address=self.MAC_ADDRESS)
+                                 mac_address=self.MAC_ADDRESS,
+                                 device_id=self.DEVICE_ID)
         self.assertIsNotNone(display)
         self.assertIsNotNone(display.api_key)
 
     def test_json_serialization_strategy(self):
         display = Display.create(tenant_key=self.tenant_key,
-                                 device_id=self.DEVICE_ID,
                                  gcm_registration_id=self.GCM_REGISTRATION_ID,
-                                 mac_address=self.MAC_ADDRESS)
+                                 mac_address=self.MAC_ADDRESS,
+                                 device_id=self.DEVICE_ID)
         display.put()
         json_representation = json.loads(to_json(display, DISPLAY_STRATEGY))
         self.assertEqual(self.DEVICE_ID, json_representation['device_id'])
         self.assertEqual(self.GCM_REGISTRATION_ID, json_representation['gcm_registration_id'])
         self.assertEqual(None, json_representation['serial_number'])
+        self.assertTrue(json_representation['managed_device'])
         self.assertIsNotNone(json_representation['created'])
         self.assertIsNotNone(json_representation['updated'])
         self.assertEqual(str(display.api_key), json_representation['api_key'])
@@ -74,23 +75,61 @@ class TestDisplayModel(BaseTest):
         self.assertEqual(str(self.tenant.chrome_device_domain), json_representation['tenant']['chrome_device_domain'])
         self.assertEqual(self.tenant.active, json_representation['tenant']['active'])
 
-    def test_json_serialization_strategy_with_optional_serial_number(self):
+    def test_serialization_with_optional_serial_number(self):
         display = Display.create(tenant_key=self.tenant_key,
-                                 device_id=self.DEVICE_ID,
                                  gcm_registration_id=self.GCM_REGISTRATION_ID,
                                  mac_address=self.MAC_ADDRESS,
-                                 serial_number=self.SERIAL_NUMBER)
+                                 serial_number=self.SERIAL_NUMBER
+                                 )
+        display.put()
+        json_representation = json.loads(to_json(display, DISPLAY_STRATEGY))
+        self.assertEqual(self.SERIAL_NUMBER, json_representation['serial_number'])
+
+    def test_serialization_without_optional_serial_number(self):
+        display = Display.create(tenant_key=self.tenant_key,
+                                 gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                 mac_address=self.MAC_ADDRESS
+                                 )
+        display.put()
+        json_representation = json.loads(to_json(display, DISPLAY_STRATEGY))
+        self.assertEqual(None, json_representation['serial_number'])
+
+    def test_serialization_with_optional_device_id(self):
+        display = Display.create(tenant_key=self.tenant_key,
+                                 gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                 mac_address=self.MAC_ADDRESS,
+                                 device_id=self.DEVICE_ID
+                                 )
         display.put()
         json_representation = json.loads(to_json(display, DISPLAY_STRATEGY))
         self.assertEqual(self.DEVICE_ID, json_representation['device_id'])
-        self.assertEqual(self.GCM_REGISTRATION_ID, json_representation['gcm_registration_id'])
-        self.assertEqual(self.SERIAL_NUMBER, json_representation['serial_number'])
-        self.assertIsNotNone(json_representation['created'])
-        self.assertIsNotNone(json_representation['updated'])
-        self.assertEqual(str(display.api_key), json_representation['api_key'])
-        self.assertEqual(str(self.tenant.name), json_representation['tenant']['name'])
-        self.assertEqual(str(self.tenant.tenant_code), json_representation['tenant']['tenant_code'])
-        self.assertEqual(str(self.tenant.admin_email), json_representation['tenant']['admin_email'])
-        self.assertEqual(str(self.tenant.content_server_url), json_representation['tenant']['content_server_url'])
-        self.assertEqual(str(self.tenant.chrome_device_domain), json_representation['tenant']['chrome_device_domain'])
-        self.assertEqual(self.tenant.active, json_representation['tenant']['active'])
+
+    def test_serialization_without_optional_device_id(self):
+        display = Display.create(tenant_key=self.tenant_key,
+                                 gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                 mac_address=self.MAC_ADDRESS
+                                 )
+        display.put()
+        json_representation = json.loads(to_json(display, DISPLAY_STRATEGY))
+        self.assertEqual(None, json_representation['device_id'])
+
+    def test_serialization_for_unmanaged_display(self):
+        managed_device=False
+        display = Display.create(tenant_key=self.tenant_key,
+                                 gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                 mac_address=self.MAC_ADDRESS,
+                                 device_id=self.DEVICE_ID,
+                                 managed_device=managed_device
+                                 )
+        display.put()
+        json_representation = json.loads(to_json(display, DISPLAY_STRATEGY))
+        self.assertEqual(managed_device, json_representation['managed_device'])
+
+    def test_serialization_without_optional_returns_managed_true_by_default(self):
+        display = Display.create(tenant_key=self.tenant_key,
+                                 gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                 mac_address=self.MAC_ADDRESS
+                                 )
+        display.put()
+        json_representation = json.loads(to_json(display, DISPLAY_STRATEGY))
+        self.assertEqual(True, json_representation['managed_device'])

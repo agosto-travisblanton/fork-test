@@ -133,12 +133,12 @@ class Display(ndb.Model):
     tenant_key = ndb.KeyProperty(required=False, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
-    device_id = ndb.StringProperty(required=True, indexed=True)
+    device_id = ndb.StringProperty(required=False, indexed=True)
     gcm_registration_id = ndb.StringProperty(required=True)
     mac_address = ndb.StringProperty(required=True, indexed=True)
     api_key = ndb.StringProperty(required=True, indexed=True)
     serial_number = ndb.StringProperty(required=False, indexed=True)
-    managed = ndb.BooleanProperty(default=True, required=True, indexed=True)
+    managed_device = ndb.BooleanProperty(default=True, required=True, indexed=True)
 
     @classmethod
     def get_by_device_id(cls, device_id):
@@ -148,11 +148,13 @@ class Display(ndb.Model):
                 return display.get()
 
     @classmethod
-    def create(cls, tenant_key, device_id, gcm_registration_id, mac_address, serial_number=None):
+    def create(cls, tenant_key, gcm_registration_id, mac_address, device_id=None, serial_number=None,
+               managed_device=True):
         display = cls(tenant_key=tenant_key,
                       device_id=device_id,
                       gcm_registration_id=gcm_registration_id,
                       mac_address=mac_address,
                       api_key=str(uuid.uuid4()),
-                      serial_number=serial_number)
+                      serial_number=serial_number,
+                      managed_device=managed_device)
         return display

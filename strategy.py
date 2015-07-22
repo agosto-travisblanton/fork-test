@@ -48,6 +48,7 @@ DISPLAY_FIELDS = [
     'api_key',
     'serial_number',
     'tenant_key',
+    'managed_device',
     'created',
     'updated'
 ]
