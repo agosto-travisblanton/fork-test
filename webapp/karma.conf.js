@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function(config) {
+module.exports = function (config) {
 
   var configuration = {
     // base path, that will be used to resolve files and exclude
@@ -71,11 +71,13 @@ module.exports = function(config) {
     },
 
     coverageReporter: {
-      type : 'html',
-      dir : 'coverage/'
+      instrumenterOptions: {
+        istanbul: {noCompact: true}
+      },
+      type: 'html',
+      dir: 'coverage/'
     }
   };
-
 
   // This block is needed to execute Chrome on Travis
   // If you ever plan to use Chrome and Travis, you can keep it
