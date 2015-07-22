@@ -40,6 +40,8 @@ module.exports = function(config) {
       moduleName: 'gulpAngular'
     },
 
+    reporters: ['progress', 'coverage'],
+
     browsers: ['PhantomJS'],
 
     plugins: [
@@ -63,8 +65,14 @@ module.exports = function(config) {
     colors: true,
 
     preprocessors: {
-      '**/*.coffee': ['coffee'],
+      'src/**/*.coffee': ['coffee', 'coverage'],
+      'specs/**/*.coffee': ['coffee'],
       'src/**/*.html': ['ng-html2js']
+    },
+
+    coverageReporter: {
+      type : 'html',
+      dir : 'coverage/'
     }
   };
 
