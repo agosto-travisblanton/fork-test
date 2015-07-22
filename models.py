@@ -138,6 +138,7 @@ class Display(ndb.Model):
     mac_address = ndb.StringProperty(required=True, indexed=True)
     api_key = ndb.StringProperty(required=True, indexed=True)
     serial_number = ndb.StringProperty(required=False, indexed=True)
+    managed = ndb.BooleanProperty(default=True, required=True, indexed=True)
 
     @classmethod
     def get_by_device_id(cls, device_id):

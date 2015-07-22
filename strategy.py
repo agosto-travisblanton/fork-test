@@ -47,11 +47,12 @@ DISPLAY_FIELDS = [
     'gcm_registration_id',
     'api_key',
     'serial_number',
+    'tenant_key',
     'created',
     'updated'
 ]
 DISPLAY_STRATEGY = ModelStrategy(Display) + DISPLAY_FIELDS
 DISPLAY_STRATEGY += [
-    {'key': lambda display, field_name, context: display.key.urlsafe()},
-    {'tenant': lambda display, field_name, context: display.tenant_key}
+    {'key': lambda o, field_name, context: o.key.urlsafe()},
+    {'tenant': lambda o, field_name, context: o.tenant_key.get()}
 ]
