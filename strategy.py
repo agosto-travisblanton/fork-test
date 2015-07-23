@@ -47,7 +47,7 @@ DISPLAY_FIELDS = [
     'gcm_registration_id',
     'api_key',
     'serial_number',
-    'managed_device',
+    'managed_display',
     'created',
     'updated'
 ]
