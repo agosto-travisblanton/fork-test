@@ -42,6 +42,6 @@ describe 'DevicesService', ->
       actual = DevicesService.getDevices()
       expect(Restangular.all).toHaveBeenCalledWith 'devices'
       parameters = {}
-      expect(deviceRestangularService.getList).toHaveBeenCalledWith parameters
+      expect(deviceRestangularService.getList).toHaveBeenCalled()
       expect(actual).toBe promise
 
