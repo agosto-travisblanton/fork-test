@@ -15,12 +15,12 @@ from app_config import config
 class TestDeviceResourceHandler(BaseTest, WebTest):
     APPLICATION = application
     CUSTOMER_ID = 'my_customer'
-    NAME = 'foobar tenant'
+    TENANT_NAME = 'Foobar, Inc,'
+    TENANT_CODE = 'foobar_inc'
     ADMIN_EMAIL = 'foo@bar.com'
     CONTENT_SERVER_URL = 'https://www.content.com'
     CONTENT_SERVER_API_KEY = 'API KEY'
     CHROME_DEVICE_DOMAIN = 'bar.com'
-    TENANT_CODE = 'foobar'
     DEVICE_ID = '132e235a-b346-4a37-a100-de49fa753a2a'
     GCM_REGISTRATION_ID = '8d70a8d78a6dfa6df76dfasd'
     MAC_ADDRESS = '54271e619346'
@@ -28,7 +28,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def setUp(self):
         super(TestDeviceResourceHandler, self).setUp()
         self.tenant = Tenant.create(tenant_code=self.TENANT_CODE,
-                                    name=self.NAME,
+                                    name=self.TENANT_NAME,
                                     admin_email=self.ADMIN_EMAIL,
                                     content_server_url=self.CONTENT_SERVER_URL,
                                     chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
@@ -293,7 +293,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertTrue(
             "Device not stored for deviceId 54eb08ad-dee3-41c2-acbc-a9c55af9a5fa and MAC address {0}".format(
                 mac_address) in str(context.exception.message))
-        #
 
     def test_device_resource_handler_get_by_mac_address_no_authorization_header_returns_forbidden(self):
         request_parameters = {'macAddress': self.MAC_ADDRESS}
@@ -317,7 +316,12 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertTrue('404 Not Found' in error.exception.message)
 
     def test_device_resource_handler_get_devices_by_tenant(self):
-        pass
+        uri = application.router.build(None, 'devices-by-tenant', None,
+                                       {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
+        response = self.app.get(uri, params={}, headers=self.valid_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertTrue(response_json.count, 1)
+        self.assertTrue(response_json[0]['managed_display'])
 
     @staticmethod
     def load_file_contents(file_name):
@@ -331,12 +335,4 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                  gcm_registration_id=self.GCM_REGISTRATION_ID,
                                  mac_address=self.MAC_ADDRESS,
                                  managed_display=True)
-        return display.put()
-
-    @staticmethod
-    def create_un_managed_display(tenant_key):
-        display = Display.create(tenant_key=tenant_key,
-                                 gcm_registration_id='some gcm registration id',
-                                 mac_address='54271e619346',
-                                 managed_display=False)
         return display.put()

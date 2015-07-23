@@ -10,7 +10,7 @@ from decorators import api_token_required
 from restler.serializers import json_response
 from chrome_os_devices_api import ChromeOsDevicesApi
 from models import Display, Tenant
-from strategy import CHROME_OS_DEVICE_STRATEGY
+from strategy import DISPLAY_STRATEGY
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -21,11 +21,11 @@ class DeviceResourceHandler(RequestHandler):
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
         tenant = tenant_key.get()
         if tenant is not None:
-            chrome_os_devices = Display.query(ancestor=tenant_key).fetch()
-            json_response(self.response, chrome_os_devices, strategy=CHROME_OS_DEVICE_STRATEGY)
+            displays = Display.query(Display.tenant_key == tenant.key ).fetch()
+            json_response(self.response, displays, strategy=DISPLAY_STRATEGY)
             self.response.set_status(200)
         else:
-            message = 'Unable to retrieve the parent tenant by key: {0}'.format(tenant_urlsafe_key)
+            message = 'Unable to retrieve by the device tenant_key: {0}'.format(tenant_urlsafe_key)
             json_response(self.response, {'error': message}, status_code=404)
 
     @api_token_required
@@ -81,28 +81,28 @@ class DeviceResourceHandler(RequestHandler):
 
     def get_display_by_mac_address(self, device_mac_address):
         chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
-        chrome_os_devices = chrome_os_devices_api.list(config.GOOGLE_CUSTOMER_ID)
-        if chrome_os_devices is not None:
+        managed_displays = chrome_os_devices_api.list(config.GOOGLE_CUSTOMER_ID)
+        if managed_displays is not None:
             lowercase_device_mac_address = device_mac_address.lower()
-            loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == lowercase_device_mac_address or
+            loop_comprehension = (x for x in managed_displays if x.get('macAddress') == lowercase_device_mac_address or
                                   x.get('ethernetMacAddress') == lowercase_device_mac_address)
-            chrome_os_device = next(loop_comprehension, None)
-            if chrome_os_device is not None:
-                device_id = chrome_os_device.get('deviceId')
+            managed_display = next(loop_comprehension, None)
+            if managed_display is not None:
+                device_id = managed_display.get('deviceId')
                 local_device = Display.get_by_device_id(device_id)
                 if local_device is not None:
                     tenant = local_device.tenant_key.get()
-                    chrome_os_device['tenantCode'] = tenant.tenant_code
-                    chrome_os_device['contentServerUrl'] = tenant.content_server_url
-                    chrome_os_device['chromeDeviceDomain'] = tenant.chrome_device_domain
-                    chrome_os_device["gcmRegistrationId"] = local_device.gcm_registration_id
-                    chrome_os_device["serialNumber"] = local_device.serial_number
-                    chrome_os_device["managedDevice"] = True
-                    chrome_os_device['created'] = local_device.created.strftime('%Y-%m-%d %H:%M:%S')
-                    chrome_os_device['updated'] = local_device.updated.strftime('%Y-%m-%d %H:%M:%S')
-                    chrome_os_device['apiKey'] = local_device.api_key
-                    chrome_os_device['key'] = local_device.key.urlsafe()
-                    json_response(self.response, chrome_os_device)
+                    managed_display['tenantCode'] = tenant.tenant_code
+                    managed_display['contentServerUrl'] = tenant.content_server_url
+                    managed_display['chromeDeviceDomain'] = tenant.chrome_device_domain
+                    managed_display["gcmRegistrationId"] = local_device.gcm_registration_id
+                    managed_display["serialNumber"] = local_device.serial_number
+                    managed_display["managedDisplay"] = True
+                    managed_display['created'] = local_device.created.strftime('%Y-%m-%d %H:%M:%S')
+                    managed_display['updated'] = local_device.updated.strftime('%Y-%m-%d %H:%M:%S')
+                    managed_display['apiKey'] = local_device.api_key
+                    managed_display['key'] = local_device.key.urlsafe()
+                    json_response(self.response, managed_display)
                 else:
                     message = 'Device not stored for deviceId {0} and MAC address {1}.'.format(
                         device_id, device_mac_address)
