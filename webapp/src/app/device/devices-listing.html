@@ -1,0 +1,45 @@
+<div id="wrapper" ng-init="devicesListingCtrl.initialize()">
+
+  <div ng-include="'app/components/navbar/navbar.html'"></div>
+
+  <div id="page-wrapper">
+    <div class="container-fluid">
+
+      <!-- Page Heading -->
+      <div class="row">
+        <div class="col-lg-12">
+          <div ncy-breadcrumb></div>
+          <h1 class="page-header">
+            Devices
+          </h1>
+        </div>
+      </div>
+      <!-- /.row -->
+
+      <div class="row">
+        <div class="col-lg-12">
+          <table name="tenant-table" class="table table-bordered table-responsive table-striped">
+            <thead>
+            <tr>
+              <th>Key</th>
+              <th>Serial Number</th>
+              <th>MAC address</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-hide="devicesListingCtrl.devices.length">
+              <td class="no-devices" colspan="3">No devices</td>
+            </tr>
+            <tr ng-repeat="device in devicesListingCtrl.devices | orderBy:'-created' ">
+              <td class="device-key">{{ device.key }}</td>
+              <td class="device-key">{{ device.serialNumber }}</td>
+              <td class="device-key">{{ device.macAddress }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

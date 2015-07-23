@@ -23,6 +23,7 @@ module.exports = function (config) {
       'bower_components/restangular/dist/restangular.js',
       'bower_components/angular-bootstrap/ui-bootstrap.js',
       'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+      'bower_components/angular-breadcrumb/dist/angular-breadcrumb.js',
       'src/app/index.coffee',
       'src/app/**/*.coffee',
       'specs/**/*.coffee'

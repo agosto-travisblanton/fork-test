@@ -34,6 +34,9 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
     it 'should resolve \'deviceEdit\' state', ->
       expect($state.href('deviceEdit', {})).toEqual('#/deviceEdit')
 
+    it 'should resolve \'devices\' state', ->
+      expect($state.href('devices', {})).toEqual('#/devices')
+
     it 'should resolve \'tenants\' state', ->
       expect($state.href('tenants', {})).toEqual('#/tenants')
 
@@ -48,11 +51,49 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
       deviceKey = '3741833e781236b4jwdfhhfds98fyasd6fa7d6'
       expect($state.href('editDevice', {deviceKey: deviceKey})).toEqual("#/devices/#{deviceKey}")
 
-    it 'should resolve \'apiTest\' state', ->
-      expect($state.href('apiTest', {})).toEqual('#/api_testing')
-
     it 'should resolve \'remote_control\' state', ->
       expect($state.href('remote_control', {})).toEqual('#/remote_control')
+
+
+  describe 'breadcrumbs', ->
+    describe 'labels', ->
+      it 'should resolve \'home\' state', ->
+        expect($state.get('home').ncyBreadcrumb.label).toBe 'Home page'
+
+      it 'should resolve \'welcome\' state', ->
+        expect($state.get('welcome').ncyBreadcrumb.label).toBe 'Home page'
+
+      it 'should resolve \'domain\' state', ->
+        expect($state.get('domain').ncyBreadcrumb.label).toBe 'Domains'
+
+      it 'should resolve \'deviceEdit\' state', ->
+        expect($state.get('deviceEdit').ncyBreadcrumb.label).toBe 'Edit device'
+
+      it 'should resolve \'tenants\' state', ->
+        expect($state.get('tenants').ncyBreadcrumb.label).toBe 'Tenants'
+
+      it 'should resolve \'newTenant\' state', ->
+        expect($state.get('newTenant').ncyBreadcrumb.label).toBe 'New tenant'
+
+      it 'should resolve \'editTenant\' state', ->
+        expect($state.get('editTenant').ncyBreadcrumb.label).toBe '{{ tenantDetailsCtrl.currentTenant.name }}'
+
+      it 'should resolve \'devices\' state', ->
+        expect($state.get('devices').ncyBreadcrumb.label).toBe 'Devices'
+
+      it 'should resolve \'editDevice\' state', ->
+        expect($state.get('editDevice').ncyBreadcrumb.label).toBe 'Device {{ deviceDetailsCtrl.currentDevice.key }}'
+
+      it 'should resolve \'remote_control\' state', ->
+        expect($state.get('remote_control').ncyBreadcrumb.label).toBe 'Remote control'
+
+    describe 'parents', ->
+      it 'should resolve \'newTenant\' state', ->
+        expect($state.get('newTenant').ncyBreadcrumb.parent).toBe 'tenants'
+
+      it 'should resolve \'editTenant\' state', ->
+        expect($state.get('editTenant').ncyBreadcrumb.parent).toBe 'tenants'
+
 
   describe 'Restangular configuration', ->
     it 'sets the base URL', ->
