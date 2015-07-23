@@ -320,7 +320,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
         response = self.app.get(uri, params={}, headers=self.valid_authorization_header)
         response_json = json.loads(response.body)
-        self.assertTrue(response_json.count, 1)
+        self.assertEqual(len(response_json), 1)
         self.assertTrue(response_json[0]['managed_display'])
 
     @staticmethod
