@@ -95,15 +95,6 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
       label: 'Device {{ deviceDetailsCtrl.currentDevice.key }}'
     }
   })
-  $stateProvider.state("apiTest", {
-    url: "/api_testing",
-    templateUrl: "app/api_test/api_test.html",
-    controller: "ApiTestCtrl",
-    controllerAs: 'apiTest',
-    ncyBreadcrumb: {
-      label: 'API testing'
-    }
-  })
   $stateProvider.state("remote_control", {
     url: "/remote_control",
     templateUrl: "app/remote_control/index.html",
