@@ -8,7 +8,8 @@ skykitDisplayDeviceManagement = angular.module('skykitDisplayDeviceManagement', 
   'restangular',
   'ui.router',
   'hSweetAlert',
-  'ui.bootstrap'
+  'ui.bootstrap',
+  'ncy-angular-breadcrumb'
 ])
 
 skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
@@ -16,66 +17,99 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     url: "/",
     templateUrl: "app/welcome/welcome.html",
     controller: "WelcomeCtrl"
-    controllerAs: 'welcomeCtrl'
+    controllerAs: 'welcomeCtrl',
+    ncyBreadcrumb: {
+      label: 'Home page'
+    }
   })
   $stateProvider.state("welcome", {
     url: "/welcome",
     templateUrl: "app/welcome/welcome.html",
     controller: "WelcomeCtrl"
-    controllerAs: 'welcomeCtrl'
+    controllerAs: 'welcomeCtrl',
+    ncyBreadcrumb: {
+      label: 'Home page'
+    }
   })
   $stateProvider.state("domain", {
     url: "/domain",
     templateUrl: "app/domain/domain.html",
-    controller: "DomainCtrl"
+    controller: "DomainCtrl",
+    ncyBreadcrumb: {
+      label: 'Domains'
+    }
   })
   $stateProvider.state("deviceEdit", {
     url: "/deviceEdit",
     templateUrl: "app/device/device.editor.html",
     controller: "DeviceEditorCtrl",
-    controllerAs: 'deviceEdit'
+    controllerAs: 'deviceEdit',
+    ncyBreadcrumb: {
+      label: 'Edit device'
+    }
   })
   $stateProvider.state("tenants", {
     url: "/tenants",
     templateUrl: "app/tenant/tenants.html",
     controller: "TenantsCtrl",
-    controllerAs: 'tenantsCtrl'
+    controllerAs: 'tenantsCtrl',
+    ncyBreadcrumb: {
+      label: 'Tenants'
+    }
   })
   $stateProvider.state("newTenant", {
     url: "/tenants/new",
     templateUrl: "app/tenant/tenant-detail.html",
     controller: "TenantDetailsCtrl",
-    controllerAs: 'tenantDetailsCtrl'
+    controllerAs: 'tenantDetailsCtrl',
+    ncyBreadcrumb: {
+      label: 'New tenant'
+    }
   })
   $stateProvider.state("editTenant", {
     url: "/tenants/:tenantKey",
     templateUrl: "app/tenant/tenant-detail.html",
     controller: "TenantDetailsCtrl",
-    controllerAs: 'tenantDetailsCtrl'
+    controllerAs: 'tenantDetailsCtrl',
+    ncyBreadcrumb: {
+      label: 'View tenant'
+    }
   })
   $stateProvider.state("devices", {
     url: "/devices",
     templateUrl: "app/device/devices-listing.html",
     controller: "DevicesListingCtrl",
-    controllerAs: 'devicesListingCtrl'
+    controllerAs: 'devicesListingCtrl',
+    ncyBreadcrumb: {
+      label: 'Devices'
+    }
   })
   $stateProvider.state("editDevice", {
     url: "/devices/:deviceKey",
     templateUrl: "app/device/device-detail.html",
     controller: "DeviceDetailsCtrl",
-    controllerAs: 'deviceDetailsCtrl'
+    controllerAs: 'deviceDetailsCtrl',
+    ncyBreadcrumb: {
+      label: 'View device'
+    }
   })
   $stateProvider.state("apiTest", {
     url: "/api_testing",
     templateUrl: "app/api_test/api_test.html",
     controller: "ApiTestCtrl",
-    controllerAs: 'apiTest'
+    controllerAs: 'apiTest',
+    ncyBreadcrumb: {
+      label: 'API testing'
+    }
   })
   $stateProvider.state("remote_control", {
     url: "/remote_control",
     templateUrl: "app/remote_control/index.html",
     controller: "RemoteControlCtrl",
-    controllerAs: 'remoteControlCtrl'
+    controllerAs: 'remoteControlCtrl',
+    ncyBreadcrumb: {
+      label: 'Remote control'
+    }
   })
   $urlRouterProvider.otherwise '/'
 
