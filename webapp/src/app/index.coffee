@@ -63,7 +63,8 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     controller: "TenantDetailsCtrl",
     controllerAs: 'tenantDetailsCtrl',
     ncyBreadcrumb: {
-      label: 'New tenant'
+      label: 'New tenant',
+      parent: 'tenants'
     }
   })
   $stateProvider.state("editTenant", {
@@ -72,7 +73,8 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     controller: "TenantDetailsCtrl",
     controllerAs: 'tenantDetailsCtrl',
     ncyBreadcrumb: {
-      label: 'View tenant'
+      label: '{{ tenantDetailsCtrl.currentTenant.name }}',
+      parent: 'tenants'
     }
   })
   $stateProvider.state("devices", {
