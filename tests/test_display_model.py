@@ -64,7 +64,7 @@ class TestDisplayModel(BaseTest):
         self.assertEqual(self.DEVICE_ID, json_representation['device_id'])
         self.assertEqual(self.GCM_REGISTRATION_ID, json_representation['gcm_registration_id'])
         self.assertEqual(None, json_representation['serial_number'])
-        self.assertTrue(json_representation['managed_device'])
+        self.assertTrue(json_representation['managed_display'])
         self.assertIsNotNone(json_representation['created'])
         self.assertIsNotNone(json_representation['updated'])
         self.assertEqual(str(display.api_key), json_representation['api_key'])
@@ -114,16 +114,16 @@ class TestDisplayModel(BaseTest):
         self.assertEqual(None, json_representation['device_id'])
 
     def test_serialization_for_unmanaged_display(self):
-        managed_device=False
+        managed_display = False
         display = Display.create(tenant_key=self.tenant_key,
                                  gcm_registration_id=self.GCM_REGISTRATION_ID,
                                  mac_address=self.MAC_ADDRESS,
                                  device_id=self.DEVICE_ID,
-                                 managed_device=managed_device
+                                 managed_display=managed_display
                                  )
         display.put()
         json_representation = json.loads(to_json(display, DISPLAY_STRATEGY))
-        self.assertEqual(managed_device, json_representation['managed_device'])
+        self.assertEqual(managed_display, json_representation['managed_display'])
 
     def test_serialization_without_optional_returns_managed_true_by_default(self):
         display = Display.create(tenant_key=self.tenant_key,
@@ -132,4 +132,4 @@ class TestDisplayModel(BaseTest):
                                  )
         display.put()
         json_representation = json.loads(to_json(display, DISPLAY_STRATEGY))
-        self.assertEqual(True, json_representation['managed_device'])
+        self.assertEqual(True, json_representation['managed_display'])

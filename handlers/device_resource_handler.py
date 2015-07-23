@@ -31,58 +31,55 @@ class DeviceResourceHandler(RequestHandler):
     @api_token_required
     def get(self, device_urlsafe_key):
         try:
-            device_key = ndb.Key(urlsafe=device_urlsafe_key)
+            key = ndb.Key(urlsafe=device_urlsafe_key)
         except Exception, e:
             logging.exception(e)
-            logging.info('Unrecognized local display with key: {0}'.format(device_urlsafe_key))
             return self.response.set_status(404)
-        local_display = device_key.get()
-        if local_display is None:
-            logging.info('Failed to retrieve local display with key: {0}'.format(device_urlsafe_key))
+        stored_display = key.get()
+        if stored_display is None:
             return self.response.set_status(404)
         chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
-        chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, local_display.device_id)
+        managed_display = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, stored_display.device_id)
         result = {}
-        if chrome_os_device:
-            result = chrome_os_device
+        if managed_display:
+            result = managed_display
         try:
-            tenant = local_display.tenant_key.get()
+            tenant = stored_display.tenant_key.get()
         except Exception, e:
             logging.exception(e)
-            logging.info('No tenant for display with key: {0}'.format(device_urlsafe_key))
             return self.response.set_status(400)
         result['tenantCode'] = tenant.tenant_code
         result['contentServerUrl'] = tenant.content_server_url
         result['chromeDeviceDomain'] = tenant.chrome_device_domain
-        result["gcmRegistrationId"] = local_display.gcm_registration_id
-        result["serialNumber"] = local_display.serial_number
-        result["managedDevice"] = local_display.managed_device
-        result['created'] = local_display.created.strftime('%Y-%m-%d %H:%M:%S')
-        result['updated'] = local_display.updated.strftime('%Y-%m-%d %H:%M:%S')
-        result['apiKey'] = local_display.api_key
+        result["gcmRegistrationId"] = stored_display.gcm_registration_id
+        result["serialNumber"] = stored_display.serial_number
+        result["managedDisplay"] = stored_display.managed_display
+        result['created'] = stored_display.created.strftime('%Y-%m-%d %H:%M:%S')
+        result['updated'] = stored_display.updated.strftime('%Y-%m-%d %H:%M:%S')
+        result['apiKey'] = stored_display.api_key
         result['active'] = tenant.active
-        result['key'] = local_display.key.urlsafe()
+        result['key'] = stored_display.key.urlsafe()
         json_response(self.response, result)
 
     @api_token_required
     def get_list(self):
-        device_mac_address = self.request.get('macAddress')
-        if not device_mac_address:
-            self.get_all_devices()
+        mac_address = self.request.get('macAddress')
+        if not mac_address:
+            self.get_all_managed_displays()
         else:
-            self.get_device_by_mac_address(device_mac_address)
+            self.get_display_by_mac_address(mac_address)
 
-    def get_all_devices(self):
+    def get_all_managed_displays(self):
         chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
-        chrome_os_devices = chrome_os_devices_api.list(config.GOOGLE_CUSTOMER_ID)
-        if chrome_os_devices is not None:
-            json_response(self.response, chrome_os_devices)
+        managed_chrome_os_devices = chrome_os_devices_api.list(config.GOOGLE_CUSTOMER_ID)
+        if managed_chrome_os_devices is not None:
+            json_response(self.response, managed_chrome_os_devices)
             self.response.set_status(200)
         else:
             message = 'Unable to retrieve a list of ChromeOS devices.'
             json_response(self.response, {'error': message}, status_code=404)
 
-    def get_device_by_mac_address(self, device_mac_address):
+    def get_display_by_mac_address(self, device_mac_address):
         chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
         chrome_os_devices = chrome_os_devices_api.list(config.GOOGLE_CUSTOMER_ID)
         if chrome_os_devices is not None:
@@ -111,7 +108,7 @@ class DeviceResourceHandler(RequestHandler):
                         device_id, device_mac_address)
                     json_response(self.response, {'error': message}, status_code=404)
             else:
-                message = 'A ChromeOS device was not found to be associated with the MAC address: {0}.'.format(
+                message = 'A ChromeOS display was not found to be associated with the MAC address: {0}.'.format(
                     device_mac_address)
                 json_response(self.response, {'error': message}, status_code=404)
         else:
@@ -123,16 +120,15 @@ class DeviceResourceHandler(RequestHandler):
         if self.request.body is not str('') and self.request.body is not None:
             status = 201
             error_message = None
-            logging.info('Request body: {0}'.format(self.request.body))
             request_json = json.loads(self.request.body)
-            device_mac_address = request_json.get(u'macAddress')
-            device_exists = Display.query(Display.mac_address == device_mac_address).count() > 0
+            display_mac_address = request_json.get(u'macAddress')
+            device_exists = Display.query(Display.mac_address == display_mac_address).count() > 0
             if device_exists:
                 status = 400
-                error_message = 'Cannot create because MAC address has already been assigned to this device.'
+                error_message = 'Cannot create because MAC address has already been assigned to this display.'
             tenant_code = request_json.get(u'tenantCode')
             gcm_registration_id = request_json.get(u'gcmRegistrationId')
-            if device_mac_address is None or device_mac_address == '':
+            if display_mac_address is None or display_mac_address == '':
                 status = 400
                 error_message = 'The macAddress parameter was not valid.'
             if tenant_code is None or tenant_code == '':
@@ -144,31 +140,32 @@ class DeviceResourceHandler(RequestHandler):
             tenant_key = Tenant.query(Tenant.tenant_code == tenant_code, Tenant.active == True).get(keys_only=True)
             if tenant_key is None:
                 status = 400
-                error_message = 'Invalid or inactive tenant for device.'
+                error_message = 'Invalid or inactive tenant for display.'
             if status == 201:
                 chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
-                chrome_os_devices = chrome_os_devices_api.list(config.GOOGLE_CUSTOMER_ID)
-                if chrome_os_devices is not None:
-                    loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == device_mac_address or
-                                          x.get('ethernetMacAddress') == device_mac_address)
-                    chrome_os_device = next(loop_comprehension, None)
-                    if chrome_os_device is not None:
-                        device_id = chrome_os_device.get('deviceId')
-                        local_device = Display.create(tenant_key=tenant_key,
-                                                      device_id=device_id,
-                                                      gcm_registration_id=gcm_registration_id,
-                                                      mac_address=device_mac_address)
-                        device_key = local_device.put()
-                        device_uri = self.request.app.router.build(None,
-                                                                   'manage-device',
-                                                                   None,
-                                                                   {'device_urlsafe_key': device_key.urlsafe()})
-                        self.response.headers['Location'] = device_uri
+                managed_displays = chrome_os_devices_api.list(config.GOOGLE_CUSTOMER_ID)
+                if managed_displays is not None:
+                    loop_comprehension = (x for x in managed_displays if x.get('macAddress') == display_mac_address or
+                                          x.get('ethernetMacAddress') == display_mac_address)
+                    managed_display = next(loop_comprehension, None)
+                    if managed_display is not None:
+                        device_id = managed_display.get('deviceId')
+                        display = Display.create(tenant_key=tenant_key,
+                                                 device_id=device_id,
+                                                 gcm_registration_id=gcm_registration_id,
+                                                 mac_address=display_mac_address,
+                                                 managed_display=True)
+                        key = display.put()
+                        display_uri = self.request.app.router.build(None,
+                                                                    'manage-device',
+                                                                    None,
+                                                                    {'device_urlsafe_key': key.urlsafe()})
+                        self.response.headers['Location'] = display_uri
                         self.response.headers.pop('Content-Type', None)
                         self.response.set_status(status)
                     else:
                         self.response.set_status(422,
-                                                 'Chrome OS device not associated with this customer id ( {0}'.format(
+                                                 'Chrome OS display not associated with this customer id ( {0}'.format(
                                                      config.GOOGLE_CUSTOMER_ID))
             else:
                 self.response.set_status(status, error_message)
@@ -181,27 +178,27 @@ class DeviceResourceHandler(RequestHandler):
         status = 204
         message = None
         try:
-            device_key = ndb.Key(urlsafe=device_urlsafe_key)
-            local_device = device_key.get()
+            key = ndb.Key(urlsafe=device_urlsafe_key)
+            display = key.get()
         except Exception, e:
             logging.exception(e)
             status = 404
-            message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
+            message = 'Unrecognized display with key: {0}'.format(device_urlsafe_key)
             return self.response.set_status(status, message)
-        if local_device is None:
+        if display is None:
             status = 404
-            message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
+            message = 'Unrecognized display with key: {0}'.format(device_urlsafe_key)
         chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
-        registered_chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, local_device.device_id)
-        if registered_chrome_os_device is None:
+        managed_chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, display.device_id)
+        if managed_chrome_os_device is None:
             status = 404
-            message = 'Unrecognized device id in Google API'
+            message = 'Unrecognized display id in Google API'
         else:
             request_json = json.loads(self.request.body)
             gcm_registration_id = request_json.get('gcmRegistrationId')
             if gcm_registration_id:
-                local_device.gcm_registration_id = gcm_registration_id
-            local_device.put()
+                display.gcm_registration_id = gcm_registration_id
+            display.put()
             self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
 
@@ -210,20 +207,20 @@ class DeviceResourceHandler(RequestHandler):
         status = 204
         message = None
         try:
-            device_key = ndb.Key(urlsafe=device_urlsafe_key)
-            local_device = device_key.get()
+            key = ndb.Key(urlsafe=device_urlsafe_key)
+            display = key.get()
         except Exception, e:
             logging.exception(e)
             status = 404
-            message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
+            message = 'Unrecognized display with key: {0}'.format(device_urlsafe_key)
             return self.response.set_status(status, message)
-        if local_device is None:
+        if display is None:
             status = 404
-            message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
-        if local_device is None:
-            self.response.set_status(404, 'Unrecognized device with key: {0}'.format(
+            message = 'Unrecognized display with key: {0}'.format(device_urlsafe_key)
+        if display is None:
+            self.response.set_status(404, 'Unrecognized display with key: {0}'.format(
                 device_urlsafe_key))
         else:
-            local_device.key.delete()
+            display.key.delete()
             self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
