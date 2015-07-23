@@ -8,7 +8,7 @@ from agar.test import BaseTest, WebTest
 from chrome_os_devices_api import ChromeOsDevicesApi
 from mockito import when, any as any_matcher
 from routes import application
-from models import ChromeOsDevice, Tenant
+from models import Display, Tenant
 from app_config import config
 
 
@@ -34,10 +34,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                     chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
                                     active=True)
         self.tenant_key = self.tenant.put()
-        self.chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
-                                                      device_id=self.TESTING_DEVICE_ID,
-                                                      gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
-                                                      mac_address=self.MAC_ADDRESS)
+        self.chrome_os_device = Display.create(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
         self.chrome_os_device_key = self.chrome_os_device.put()
 
         self.chrome_os_device_json = json.loads(self.load_file_contents('tests/chrome_os_device.json'))
@@ -54,20 +54,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
         self.assertTrue('404 Not Found' in context.exception.message)
-
-    def test_device_resource_handler_get_by_key_returns_bad_request_for_missing_parent_tenant(self):
-        when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
-        request_parameters = {}
-        device = ChromeOsDevice(
-            api_key='some key',
-            device_id=self.TESTING_DEVICE_ID,
-            gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
-            mac_address=self.MAC_ADDRESS)
-        key = device.put()
-        uri = application.router.build(None, 'manage-device', None, {'device_urlsafe_key': key.urlsafe()})
-        with self.assertRaises(AppError) as context:
-            self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
-        self.assertTrue('400 Bad Request' in context.exception.message)
 
     def test_device_resource_handler_get_by_key_returns_ok(self):
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
@@ -87,7 +73,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertTrue('403 Forbidden' in context.exception.message)
 
     def test_device_resource_handler_get_by_id_returns_device_representation(self):
-        device_key = self.create_chrome_os_device(self.tenant_key)
+        device_key = self.create_managed_display(self.tenant_key)
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
         request_parameters = {}
         uri = application.router.build(None, 'manage-device', None, {'device_urlsafe_key': device_key.urlsafe()})
@@ -95,6 +81,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         expected = device_key.get()
         self.assertEqual(response_json.get('deviceId'), expected.device_id)
+        self.assertEqual(response_json.get('managedDevice'), expected.managed_device)
+        self.assertEqual(response_json.get('serialNumber'), expected.serial_number)
         self.assertEqual(response_json.get('gcmRegistrationId'), expected.gcm_registration_id)
         self.assertEqual(response_json.get('created'), expected.created.strftime('%Y-%m-%d %H:%M:%S'))
         self.assertEqual(response_json.get('updated'), expected.updated.strftime('%Y-%m-%d %H:%M:%S'))
@@ -141,7 +129,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         location_uri_components = location_uri.split('/')
         self.assertEqual(location_uri_components[5], "devices")
         key_length = len(location_uri_components[6])
-        self.assertEqual(key_length, 118)
+        self.assertEqual(key_length, 39)
 
     def test_device_resource_handler_post_returns_unprocessable_entity_status_for_empty_request_body(self):
         when(ChromeOsDevicesApi).list(any_matcher()).thenReturn(self.chrome_os_device_list_json)
@@ -166,23 +154,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'tenantCode': self.TENANT_CODE}
         when(ChromeOsDevicesApi).list(any_matcher()).thenReturn(self.chrome_os_device_list_json)
         self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.valid_authorization_header)
-        chrome_os_device_key = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id). \
+        chrome_os_device_key = Display.query(Display.gcm_registration_id == gcm_registration_id). \
             get(keys_only=True)
         self.assertIsNotNone(chrome_os_device_key)
         self.assertTrue('123' == chrome_os_device_key.get().gcm_registration_id)
-
-    def test_device_resource_handler_post_links_tenant_as_chrome_os_device_parent(self):
-        mac_address = self.chrome_os_device_json.get('macAddress')
-        gcm_registration_id = '123'
-        request_body = {'macAddress': mac_address,
-                        'gcmRegistrationId': gcm_registration_id,
-                        'tenantCode': self.tenant.tenant_code}
-        when(ChromeOsDevicesApi).list(any_matcher()).thenReturn(self.chrome_os_device_list_json)
-        self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.valid_authorization_header)
-        chrome_os_device_key = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id). \
-            get(keys_only=True)
-        parent_tenant_key = chrome_os_device_key.parent()
-        self.assertIsNotNone(parent_tenant_key)
 
     def test_device_resource_handler_post_returns_bad_request_with_registered_device(self):
         request_body = {'macAddress': self.MAC_ADDRESS,
@@ -221,7 +196,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertTrue('400 Invalid or inactive tenant for device.' in str(context.exception))
 
     def test_device_resource_put_returns_no_content(self):
-        device_key = self.create_chrome_os_device(self.tenant_key)
+        device_key = self.create_managed_display(self.tenant_key)
         request_body = {'gcmRegistrationId': 'd23784972038845ab3963412', 'tenantCode': 'acme'}
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
         response = self.app.put('/api/v1/devices/{0}'.format(device_key.urlsafe()),
@@ -239,7 +214,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertTrue('403 Forbidden' in str(context.exception))
 
     def test_device_resource_put_updates_gcm_registration_id(self):
-        device_key = self.create_chrome_os_device(self.tenant_key)
+        device_key = self.create_managed_display(self.tenant_key)
         request_body = {'gcmRegistrationId': 'd23784972038845ab3963412',
                         'tenantCode': self.TENANT_CODE}
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)
@@ -250,7 +225,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual('d23784972038845ab3963412', actual.gcm_registration_id)
 
     def test_device_resource_put_unrecognized_device_lookup_returns_not_found(self):
-        device_key = self.create_chrome_os_device(self.tenant_key)
+        device_key = self.create_managed_display(self.tenant_key)
         request_body = {'gcmRegistrationId': 'd23784972038845ab3963412'}
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(None)
         with self.assertRaises(Exception) as context:
@@ -302,7 +277,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                     + '3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgMC1mwoMCxIOQ2hyb21lT3NEZXZpY2UYgICAgJCihwoM'
         url = '/api/v1/devices/{0}'.format(bogus_key)
         with self.assertRaises(Exception) as context:
-          self.app.delete(url, headers=self.valid_authorization_header)
+            self.app.delete(url, headers=self.valid_authorization_header)
         self.assertTrue("404 Unrecognized device with key: {0}".format(bogus_key) in str(context.exception))
 
     def test_device_resource_handler_get_by_mac_address_returns_ok(self):
@@ -311,7 +286,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response = self.app.get('/api/v1/devices', params=request_parameters, headers=self.valid_authorization_header)
         self.assertOK(response)
 
-    def test_device_resource_handler_get_by_mac_address_returns_not_found_when_not_stored(self):
+    # def test_device_resource_handler_get_by_mac_address_returns_not_found_when_not_stored(self):
         mac_address = '54271e6972cb'  # MAC address Google knows about, but we have not registered.
         request_parameters = {'macAddress': mac_address}
         when(ChromeOsDevicesApi).list(any_matcher()).thenReturn(self.chrome_os_device_list_json)
@@ -349,9 +324,18 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         return data
 
     @staticmethod
-    def create_chrome_os_device(tenant_key):
-        device = ChromeOsDevice.create(tenant_key=tenant_key,
-                                       device_id='132e235a-b346-4a37-a100-de49fa753a2a',
-                                       gcm_registration_id='some gcm registration id',
-                                       mac_address='54271e619346')
-        return device.put()
+    def create_managed_display(tenant_key):
+        display = Display.create(tenant_key=tenant_key,
+                                 device_id='132e235a-b346-4a37-a100-de49fa753a2a',
+                                 gcm_registration_id='some gcm registration id',
+                                 mac_address='54271e619346',
+                                 managed_device=True)
+        return display.put()
+
+    @staticmethod
+    def create_un_managed_display(tenant_key):
+        display = Display.create(tenant_key=tenant_key,
+                                 gcm_registration_id='some gcm registration id',
+                                 mac_address='54271e619346',
+                                 managed_device=False)
+        return display.put()
