@@ -92,7 +92,7 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     controller: "DeviceDetailsCtrl",
     controllerAs: 'deviceDetailsCtrl',
     ncyBreadcrumb: {
-      label: 'View device'
+      label: 'Device {{ deviceDetailsCtrl.currentDevice.key }}'
     }
   })
   $stateProvider.state("apiTest", {
