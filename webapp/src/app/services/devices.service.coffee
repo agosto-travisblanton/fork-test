@@ -17,5 +17,9 @@ angular.module('skykitDisplayDeviceManagement').factory 'DevicesService', ($http
         promise = Restangular.one('tenants', tenantKey).doGET('devices')
         promise
 
+    getDevices: ->
+      params = {}
+      promise = Restangular.all('devices').customGETLIST 'devices', params
+      promise
 
   new DevicesService()
