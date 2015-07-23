@@ -75,6 +75,26 @@ class TestDisplayModel(BaseTest):
         self.assertEqual(str(self.tenant.chrome_device_domain), json_representation['tenant']['chrome_device_domain'])
         self.assertEqual(self.tenant.active, json_representation['tenant']['active'])
 
+    def test_json_serialization_strategy_for_optional_chrome_os_device_properties(self):
+        display = Display.create(tenant_key=self.tenant_key,
+                                 gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                 mac_address=self.MAC_ADDRESS,
+                                 device_id=self.DEVICE_ID)
+        display.put()
+        json_representation = json.loads(to_json(display, DISPLAY_STRATEGY))
+        self.assertIsNone(json_representation['status'])
+        self.assertIsNone(json_representation['last_sync'])
+        self.assertIsNone(json_representation['kind'])
+        self.assertIsNone(json_representation['ethernet_mac_address'])
+        self.assertIsNone(json_representation['org_unit_path'])
+        self.assertIsNone(json_representation['annotated_user'])
+        self.assertIsNone(json_representation['boot_mode'])
+        self.assertIsNone(json_representation['last_enrollment_time'])
+        self.assertIsNone(json_representation['platform_version'])
+        self.assertIsNone(json_representation['model'])
+        self.assertIsNone(json_representation['os_version'])
+        self.assertIsNone(json_representation['firmware_version'])
+
     def test_serialization_with_optional_serial_number(self):
         display = Display.create(tenant_key=self.tenant_key,
                                  gcm_registration_id=self.GCM_REGISTRATION_ID,
@@ -113,7 +133,7 @@ class TestDisplayModel(BaseTest):
         json_representation = json.loads(to_json(display, DISPLAY_STRATEGY))
         self.assertEqual(None, json_representation['device_id'])
 
-    def test_serialization_for_unmanaged_display(self):
+    def test_serialization_for_un_managed_display(self):
         managed_display = False
         display = Display.create(tenant_key=self.tenant_key,
                                  gcm_registration_id=self.GCM_REGISTRATION_ID,

@@ -139,6 +139,18 @@ class Display(ndb.Model):
     api_key = ndb.StringProperty(required=True, indexed=True)
     serial_number = ndb.StringProperty(required=False, indexed=True)
     managed_display = ndb.BooleanProperty(default=True, required=True, indexed=True)
+    status = ndb.StringProperty(required=False, indexed=False)
+    last_sync = ndb.StringProperty(required=False, indexed=False)
+    kind = ndb.StringProperty(required=False, indexed=False)
+    ethernet_mac_address = ndb.StringProperty(required=False, indexed=False)
+    org_unit_path = ndb.StringProperty(required=False, indexed=False)
+    annotated_user = ndb.StringProperty(required=False, indexed=False)
+    boot_mode = ndb.StringProperty(required=False, indexed=False)
+    last_enrollment_time = ndb.StringProperty(required=False, indexed=False)
+    platform_version = ndb.StringProperty(required=False, indexed=False)
+    model = ndb.StringProperty(required=False, indexed=False)
+    os_version = ndb.StringProperty(required=False, indexed=False)
+    firmware_version = ndb.StringProperty(required=False, indexed=False)
 
     @classmethod
     def get_by_device_id(cls, device_id):
