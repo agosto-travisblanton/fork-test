@@ -145,6 +145,8 @@ class Display(ndb.Model):
     ethernet_mac_address = ndb.StringProperty(required=False, indexed=False)
     org_unit_path = ndb.StringProperty(required=False, indexed=False)
     annotated_user = ndb.StringProperty(required=False, indexed=False)
+    annotated_location = ndb.StringProperty(required=False, indexed=False)
+    notes = ndb.StringProperty(required=False, indexed=False)
     boot_mode = ndb.StringProperty(required=False, indexed=False)
     last_enrollment_time = ndb.StringProperty(required=False, indexed=False)
     platform_version = ndb.StringProperty(required=False, indexed=False)
