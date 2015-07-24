@@ -66,6 +66,17 @@ application = WSGIApplication(
         ),
 
         ############################################################
+        # Displays registration
+        ############################################################
+        Route(
+            r'/api/v1/displays',
+            handler='handlers.displays_handler.DisplaysHandler',
+            name='displays-retrieval',
+            handler_method='get_list',
+            methods=['GET']
+        ),
+
+        ############################################################
         # Tenants
         ############################################################
         Route(
