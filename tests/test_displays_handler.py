@@ -1,3 +1,4 @@
+import json
 from pprint import pprint
 from env_setup import setup_test_paths
 
@@ -46,7 +47,24 @@ class TestDisplaysHandler(BaseTest, WebTest):
         request_parameters = {}
         uri = application.router.build(None, 'displays-retrieval', None, {})
         response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
-        pprint(response.body)
+        response_json = json.loads(response.body)
+        self.assertEqual(len(response_json['objects']), 10)
+
+    def test_get_list_mac_address_query_parameter_http_status_ok(self):
+        displays = self.__build_list_displays(tenant_key=self.tenant_key, number_to_build=20)
+        request_parameters = {'macAddress': displays[1].mac_address}
+        uri = application.router.build(None, 'displays-retrieval', None, {})
+        response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
+        self.assertOK(response)
+
+    def test_get_list_mac_address_query_parameter_entity_body_json(self):
+        displays = self.__build_list_displays(tenant_key=self.tenant_key, number_to_build=20)
+        request_parameters = {'macAddress': displays[1].mac_address}
+        uri = application.router.build(None, 'displays-retrieval', None, {})
+        response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(len(response_json['objects']), 1)
+
 
     # def test_device_resource_handler_get_by_key_returns_not_found_for_bogus_key(self):
     #     when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)

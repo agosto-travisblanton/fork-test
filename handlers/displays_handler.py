@@ -1,13 +1,12 @@
 import json
 import logging
 
-from google.appengine.ext.ndb import Cursor
 from webapp2 import RequestHandler
-
 from google.appengine.ext import ndb
 
 from app_config import config
 from decorators import api_token_required
+from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
 from chrome_os_devices_api import ChromeOsDevicesApi
 from models import Display, Tenant
@@ -16,30 +15,21 @@ from strategy import DISPLAY_STRATEGY
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
 
-class DisplaysHandler(RequestHandler):
+class DisplaysHandler(RequestHandler, PagingListHandlerMixin, KeyValidatorMixin):
 
     @api_token_required
     def get_list(self):
         mac_address = self.request.get('macAddress')
         if not mac_address:
-            displays, next_cursor, more = self.__get_all_displays()
+            query = Display.query()
         else:
-            displays, next_cursor, more = self.__filter_by_mac_address(mac_address)
-        json_response(self.response, displays, strategy=DISPLAY_STRATEGY)
+            query = Display.query(ndb.OR(Display.mac_address == mac_address,
+                                    Display.ethernet_mac_address == mac_address))
+        query_forward = query.order(Display.key)
+        query_reverse = query.order(-Display.key)
+        result_data = self.fetch_page(query_forward, query_reverse)
+        json_response(self.response, result_data, strategy=DISPLAY_STRATEGY)
 
-    def __get_all_displays(self):
-        start_cursor = Cursor(urlsafe=self.request.get('cursor'))
-        user_supplied_page_size = self.request.get('pageSize')
-        page_size = user_supplied_page_size if user_supplied_page_size else 10
-        return Display.query().fetch_page(page_size, start_cursor=start_cursor)
-
-    def __filter_by_mac_address(self, mac_address):
-        start_cursor = Cursor(urlsafe=self.request.get('cursor'))
-        user_supplied_page_size = self.request.get('pageSize')
-        page_size = user_supplied_page_size if user_supplied_page_size else 10
-        return Display.query(ndb.OR(Display.mac_address == mac_address,
-                                    Display.ethernet_mac_address == mac_address)).fetch_page(page_size,
-                                                                                             start_cursor=start_cursor)
 
     # @api_token_required
     # def get_devices_by_tenant(self, tenant_urlsafe_key):

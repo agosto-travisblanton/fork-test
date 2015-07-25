@@ -142,7 +142,7 @@ class Display(ndb.Model):
     status = ndb.StringProperty(required=False, indexed=False)
     last_sync = ndb.StringProperty(required=False, indexed=False)
     kind = ndb.StringProperty(required=False, indexed=False)
-    ethernet_mac_address = ndb.StringProperty(required=False, indexed=False)
+    ethernet_mac_address = ndb.StringProperty(required=False, indexed=True)
     org_unit_path = ndb.StringProperty(required=False, indexed=False)
     annotated_user = ndb.StringProperty(required=False, indexed=False)
     annotated_location = ndb.StringProperty(required=False, indexed=False)
