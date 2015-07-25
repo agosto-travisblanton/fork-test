@@ -35,6 +35,9 @@ class TestDisplaysHandler(BaseTest, WebTest):
         }
         self.invalid_authorization_header = {}
 
+    ##################################################################################################################
+    ## get_list
+    ##################################################################################################################
     def test_get_list_no_query_parameters_http_status_ok(self):
         displays = self.__build_list_displays(tenant_key=self.tenant_key, number_to_build=20)
         request_parameters = {}
@@ -65,6 +68,23 @@ class TestDisplaysHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json['objects']), 1)
 
+    ##################################################################################################################
+    ## get_displays_by_tenant
+    ##################################################################################################################
+    def test_get_displays_by_tenant_http_status_ok(self):
+        displays = self.__build_list_displays(tenant_key=self.tenant_key, number_to_build=20)
+        request_parameters = {}
+        uri = application.router.build(None, 'displays-by-tenant', None, {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
+        response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
+        self.assertOK(response)
+
+    def test_get_displays_by_tenant_entity_body_json(self):
+        displays = self.__build_list_displays(tenant_key=self.tenant_key, number_to_build=20)
+        request_parameters = {}
+        uri = application.router.build(None, 'displays-by-tenant', None, {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
+        response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(len(response_json['objects']), 10)
 
     # def test_device_resource_handler_get_by_key_returns_not_found_for_bogus_key(self):
     #     when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.chrome_os_device_json)

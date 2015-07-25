@@ -75,6 +75,13 @@ application = WSGIApplication(
             handler_method='get_list',
             methods=['GET']
         ),
+        Route(
+            r'/api/v1/tenants/<tenant_urlsafe_key>/displays',
+            handler='handlers.displays_handler.DisplaysHandler',
+            name='displays-by-tenant',
+            handler_method='get_displays_by_tenant',
+            methods=['GET']
+        ),
 
         ############################################################
         # Tenants

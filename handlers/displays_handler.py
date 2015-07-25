@@ -30,18 +30,14 @@ class DisplaysHandler(RequestHandler, PagingListHandlerMixin, KeyValidatorMixin)
         result_data = self.fetch_page(query_forward, query_reverse)
         json_response(self.response, result_data, strategy=DISPLAY_STRATEGY)
 
-
-    # @api_token_required
-    # def get_devices_by_tenant(self, tenant_urlsafe_key):
-    #     tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
-    #     tenant = tenant_key.get()
-    #     if tenant is not None:
-    #         displays = Display.query(Display.tenant_key == tenant.key ).fetch()
-    #         json_response(self.response, displays, strategy=DISPLAY_STRATEGY)
-    #         self.response.set_status(200)
-    #     else:
-    #         message = 'Unable to retrieve by the device tenant_key: {0}'.format(tenant_urlsafe_key)
-    #         json_response(self.response, {'error': message}, status_code=404)
+    @api_token_required
+    def get_displays_by_tenant(self, tenant_urlsafe_key):
+        tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
+        query = Display.query(Display.tenant_key == tenant_key)
+        query_forward = query.order(Display.key)
+        query_reverse = query.order(-Display.key)
+        result_data = self.fetch_page(query_forward, query_reverse)
+        json_response(self.response, result_data, strategy=DISPLAY_STRATEGY)
 
     # @api_token_required
     # def get(self, device_urlsafe_key):
