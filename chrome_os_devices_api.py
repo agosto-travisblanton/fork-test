@@ -192,20 +192,18 @@ def refresh_display_by_mac_address(display_urlsafe_key=None, device_mac_address=
                                page_token=new_page_token)
 
 
-def refresh_display_by_device_id(display_urlsafe_key=None, device_id=None):
+def refresh_display(display_urlsafe_key=None):
     """
     A function that is meant to be run asynchronously to update the Display entity
     with ChromeOsDevice information from Directory API using the device ID to match.
     """
     if display_urlsafe_key is None:
         raise deferred.PermanentTaskFailure('The Display URL-safe key parameter is None.  It is required.')
-    if device_id is None:
-        raise deferred.PermanentTaskFailure('The device ID parameter is None.  It is required.')
+    display_key = ndb.Key(urlsafe=display_urlsafe_key)
+    display = display_key.get()
     chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
-    chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, device_id)
+    chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, display.device_id)
     if chrome_os_device is not None:
-        display_key = ndb.Key(urlsafe=display_urlsafe_key)
-        display = display_key.get()
         display.device_id = chrome_os_device.get('deviceId')
         display.mac_address = chrome_os_device.get('macAddress')
         display.serial_number = chrome_os_device.get('serialNumber')
@@ -227,20 +225,17 @@ def refresh_display_by_device_id(display_urlsafe_key=None, device_id=None):
         display.put()
 
 
-def update_chrome_os_device(display_urlsafe_key=None, device_id=None):
+def update_chrome_os_device(display_urlsafe_key=None):
     """
     A function that is meant to be run asynchronously to update the ChromeOsDevice
     information from Directory API with information found on the Display entity.
     """
     if display_urlsafe_key is None:
         raise deferred.PermanentTaskFailure('The Display URL-safe key parameter is None.  It is required.')
-    if device_id is None:
-        raise deferred.PermanentTaskFailure('The device ID parameter is None.  It is required.')
-    display_key = ndb.Key(urlsafe=display_urlsafe_key)
-    display = display_key.get()
+    display = ndb.Key(urlsafe=display_urlsafe_key).get()
     chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
     chrome_os_devices_api.update(config.GOOGLE_CUSTOMER_ID,
-                                 device_id,
+                                 display.device_id,
                                  annotated_user=display.annotated_user,
                                  annotated_location=display.annotated_location,
                                  notes=display.notes,

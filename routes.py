@@ -66,7 +66,7 @@ application = WSGIApplication(
         ),
 
         ############################################################
-        # Displays registration
+        # Displays
         ############################################################
         Route(
             r'/api/v1/displays',
@@ -81,6 +81,19 @@ application = WSGIApplication(
             name='displays-by-tenant',
             handler_method='get_displays_by_tenant',
             methods=['GET']
+        ),
+        Route(
+            r'/api/v1/displays/<display_urlsafe_key>',
+            handler='handlers.displays_handler.DisplaysHandler',
+            name='manage-display',
+            methods=['GET', 'PUT', 'DELETE']
+        ),
+        Route(
+            r'/api/v1/displays',
+            handler='handlers.displays_handler.DisplaysHandler',
+            name='display-creator',
+            handler_method='post',
+            methods=['POST']
         ),
 
         ############################################################
