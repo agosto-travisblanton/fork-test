@@ -101,7 +101,7 @@ class TestDisplaysHandler(BaseTest, WebTest):
     def test_get_display_by_key_http_status_ok(self):
         request_parameters = {}
         uri = application.router.build(None,
-                                       'manage-device',
+                                       'manage-display',
                                        None,
                                        {'display_urlsafe_key': self.managed_display_key.urlsafe()})
         when(deferred).defer(any_matcher(refresh_display),
@@ -112,7 +112,7 @@ class TestDisplaysHandler(BaseTest, WebTest):
     def test_get_display_by_key_entity_body_json(self):
         request_parameters = {}
         uri = application.router.build(None,
-                                       'manage-device',
+                                       'manage-display',
                                        None,
                                        {'display_urlsafe_key': self.managed_display_key.urlsafe()})
         when(deferred).defer(any_matcher(refresh_display),
