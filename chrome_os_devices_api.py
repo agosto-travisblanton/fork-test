@@ -1,8 +1,10 @@
+from google.appengine.ext import ndb
+from google.appengine.ext.deferred import deferred
+
 from oauth2client.client import SignedJwtAssertionCredentials
 from googleapiclient import discovery
 from httplib2 import Http
 from app_config import config
-
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
@@ -35,7 +37,7 @@ class ChromeOsDevicesApi(object):
         self.discovery_service = discovery.build('admin', 'directory_v1', http=self.authorized_http)
 
     # https://developers.google.com/admin-sdk/directory/v1/reference/chromeosdevices/list
-    def list(self, customer_id):
+    def list(self, customer_id, page_token=None):
         """
         Obtain a list of Chrome OS devices associated with a customer.
 
@@ -43,7 +45,6 @@ class ChromeOsDevicesApi(object):
         :return: An array of Chrome OS devices.
         """
         results = []
-        page_token = None
         chromeosdevices_api = self.discovery_service.chromeosdevices()
         while True:
             # https://google-api-client-libraries.appspot.com/documentation/admin/directory_v1/python/latest/admin_directory_v1.chromeosdevices.html#list
@@ -68,6 +69,37 @@ class ChromeOsDevicesApi(object):
             if page_token is None:
                 break
         return results
+
+    # https://developers.google.com/admin-sdk/directory/v1/reference/chromeosdevices/list
+    def cursor_list(self, customer_id, next_page_token=None):
+        """
+        Obtain a list of Chrome OS devices associated with a customer.
+
+        :param customer_id: An identifier for a customer.
+        :return: An array of Chrome OS devices.
+        """
+        results = []
+        chromeosdevices_api = self.discovery_service.chromeosdevices()
+        # https://google-api-client-libraries.appspot.com/documentation/admin/directory_v1/python/latest/admin_directory_v1.chromeosdevices.html#list
+        if next_page_token is None:
+            request = chromeosdevices_api.list(customerId=customer_id,
+                                               orderBy='serialNumber',
+                                               projection=self.PROJECTION_FULL,
+                                               maxResults=self.MAX_RESULTS,
+                                               sortOrder=self.SORT_ORDER_ASCENDING)
+        else:
+            request = chromeosdevices_api.list(customerId=customer_id,
+                                               orderBy='serialNumber',
+                                               projection=self.PROJECTION_FULL,
+                                               pageToken=next_page_token,
+                                               maxResults=self.MAX_RESULTS,
+                                               sortOrder=self.SORT_ORDER_ASCENDING)
+        current_page_json = request.execute()
+        chrome_os_devices = current_page_json.get(self.KEY_CHROMEOSDEVICES)
+        next_page_token = current_page_json.get(self.KEY_NEXTPAGETOKEN)
+        if chrome_os_devices is not None:
+            results.extend(chrome_os_devices)
+        return results, next_page_token
 
     # https://developers.google.com/admin-sdk/directory/v1/reference/chromeosdevices/get
     def get(self, customer_id, device_id):
@@ -111,3 +143,100 @@ class ChromeOsDevicesApi(object):
                                                  deviceId=device_id,
                                                  body=resource_json)
             request.execute()
+
+
+def refresh_display_by_mac_address(display_urlsafe_key=None, device_mac_address=None, page_token=None):
+    """
+    A function that is meant to be run asynchronously to update the Display entity
+    with ChromeOsDevice information from Directory API using the MAC address to match.
+    """
+    if display_urlsafe_key is None:
+        raise deferred.PermanentTaskFailure('The Display URL-safe key parameter is None.  It is required.')
+    if device_mac_address is None:
+        raise deferred.PermanentTaskFailure('The device MAC address parameter is None.  It is required.')
+    chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
+    chrome_os_devices, new_page_token = chrome_os_devices_api.cursor_list(customer_id=config.GOOGLE_CUSTOMER_ID,
+                                                                          next_page_token=page_token)
+    if chrome_os_devices is not None and len(chrome_os_devices) > 0:
+        lowercase_device_mac_address = device_mac_address.lower()
+        loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == lowercase_device_mac_address or
+                              x.get('ethernetMacAddress') == lowercase_device_mac_address)
+        chrome_os_device = next(loop_comprehension, None)
+        if chrome_os_device is not None:
+            display_key = ndb.Key(urlsafe=display_urlsafe_key)
+            display = display_key.get()
+            display.device_id = chrome_os_device.get('deviceId')
+            display.mac_address = chrome_os_device.get('macAddress')
+            display.serial_number = chrome_os_device.get('serialNumber')
+            display.managed_display = chrome_os_device.get('managedDisplay')
+            display.status = chrome_os_device.get('status')
+            display.last_sync = chrome_os_device.get('lastSync')
+            display.kind = chrome_os_device.get('kind')
+            display.ethernet_mac_address = chrome_os_device.get('ethernetMacAddress')
+            display.org_unit_path = chrome_os_device.get('orgUnitPath')
+            display.annotated_user = chrome_os_device.get('annotatedUser')
+            display.annotated_location = chrome_os_device.get('annotatedLocation')
+            display.notes = chrome_os_device.get('notes')
+            display.boot_mode = chrome_os_device.get('bootMode')
+            display.last_enrollment_time = chrome_os_device.get('lastEnrollmentTime')
+            display.platform_version = chrome_os_device.get('platformVersion')
+            display.model = chrome_os_device.get('model')
+            display.os_version = chrome_os_device.get('osVersion')
+            display.firmware_version = chrome_os_device.get('firmwareVersion')
+            display.put()
+        else:
+            if new_page_token is not None:
+                deferred.defer(refresh_display_by_mac_address,
+                               display_urlsafe_key=display_urlsafe_key,
+                               device_mac_address=device_mac_address,
+                               page_token=new_page_token)
+
+
+def refresh_display(display_urlsafe_key=None):
+    """
+    A function that is meant to be run asynchronously to update the Display entity
+    with ChromeOsDevice information from Directory API using the device ID to match.
+    """
+    if display_urlsafe_key is None:
+        raise deferred.PermanentTaskFailure('The Display URL-safe key parameter is None.  It is required.')
+    display_key = ndb.Key(urlsafe=display_urlsafe_key)
+    display = display_key.get()
+    chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
+    chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, display.device_id)
+    if chrome_os_device is not None:
+        display.device_id = chrome_os_device.get('deviceId')
+        display.mac_address = chrome_os_device.get('macAddress')
+        display.serial_number = chrome_os_device.get('serialNumber')
+        display.managed_display = chrome_os_device.get('managedDisplay')
+        display.status = chrome_os_device.get('status')
+        display.last_sync = chrome_os_device.get('lastSync')
+        display.kind = chrome_os_device.get('kind')
+        display.ethernet_mac_address = chrome_os_device.get('ethernetMacAddress')
+        display.org_unit_path = chrome_os_device.get('orgUnitPath')
+        display.annotated_user = chrome_os_device.get('annotatedUser')
+        display.annotated_location = chrome_os_device.get('annotatedLocation')
+        display.notes = chrome_os_device.get('notes')
+        display.boot_mode = chrome_os_device.get('bootMode')
+        display.last_enrollment_time = chrome_os_device.get('lastEnrollmentTime')
+        display.platform_version = chrome_os_device.get('platformVersion')
+        display.model = chrome_os_device.get('model')
+        display.os_version = chrome_os_device.get('osVersion')
+        display.firmware_version = chrome_os_device.get('firmwareVersion')
+        display.put()
+
+
+def update_chrome_os_device(display_urlsafe_key=None):
+    """
+    A function that is meant to be run asynchronously to update the ChromeOsDevice
+    information from Directory API with information found on the Display entity.
+    """
+    if display_urlsafe_key is None:
+        raise deferred.PermanentTaskFailure('The Display URL-safe key parameter is None.  It is required.')
+    display = ndb.Key(urlsafe=display_urlsafe_key).get()
+    chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
+    chrome_os_devices_api.update(config.GOOGLE_CUSTOMER_ID,
+                                 display.device_id,
+                                 annotated_user=display.annotated_user,
+                                 annotated_location=display.annotated_location,
+                                 notes=display.notes,
+                                 org_unit_path=display.org_unit_path)

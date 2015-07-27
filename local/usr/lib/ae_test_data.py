@@ -51,12 +51,15 @@ class ConfigDefaults(object):
         'StringProperty',
         'TextProperty',
         'TimeProperty',
-        'UserProperty',
-        # 'BlobKeyProperty',
-        # 'GenericProperty',
-        # 'KeyProperty',
-        # 'LocalStructuredProperty',
-        # 'StructuredProperty'
+        'UserProperty'
+    ]
+
+    UNSUPPORTED_PROPERTIES = [
+        'BlobKeyProperty',
+        'GenericProperty',
+        'KeyProperty',
+        'LocalStructuredProperty',
+        'StructuredProperty'
     ]
 
     @classmethod
@@ -176,18 +179,14 @@ def _populate_instance_params(cls, kwargs, cls_properties, required_only):
                         params[_property._name] = property_config_function(_property)
                 except AttributeError as e:
                     logging.info('Skipped %s, Property not supported ' % e)
-                    # return
 
     params.update(kwargs)
     return params
 
 
-def _call_constructor(cls, constructor, params, _put=True):
+def _call_constructor(cls, constructor, params, put=True):
     if constructor is None and config.DEFAULT_CONSTRUCTOR is None:
         instance = cls(**params)
-        if _put:
-            instance.put()
-        return instance
     else:
         if constructor is not None:
             _constructor = getattr(cls, constructor)
@@ -195,9 +194,10 @@ def _call_constructor(cls, constructor, params, _put=True):
             _constructor = getattr(cls, config.DEFAULT_CONSTRUCTOR)
 
         instance = _constructor(**params)
-        if _put and instance.key is None:
-            instance.put()
-        return instance
+
+    if put:
+        instance.put()
+    return instance
 
 
 def build(cls, *args, **kwargs):
@@ -213,7 +213,7 @@ def build(cls, *args, **kwargs):
     Builder kwargs:
         constructor (str): Name of the classmethod to call to instantiate.
         required_only (bool): Default True.  False populate all model properties, regardless of required=True model property attribute
-        _put (bool): Default True.  False returns the model instance without first calling instance.put()
+        put (bool): Default True.  False returns the model instance without first calling instance.put()
 
     Returns:
        The populated instance of a Model.
@@ -222,7 +222,7 @@ def build(cls, *args, **kwargs):
     cls_properties = cls._properties.copy()
     constructor = kwargs.pop('constructor', None)
     required_only_kwarg = kwargs.get('required_only')
-    _put_kwarg = kwargs.get('_put')
+    put_kwarg = kwargs.get('put')
 
     if required_only_kwarg is not None:
         required_only = bool(required_only_kwarg)
@@ -230,11 +230,11 @@ def build(cls, *args, **kwargs):
     else:
         required_only = config.REQUIRED_ONLY
 
-    if _put_kwarg is None:
-        _put = True
+    if put_kwarg is None:
+        put = True
     else:
-        _put = bool(_put_kwarg)
-        del kwargs['_put']
+        put = bool(put_kwarg)
+        del kwargs['put']
 
     if 'namespace' in kwargs:
         namespace = kwargs.get('namespace')
@@ -246,4 +246,4 @@ def build(cls, *args, **kwargs):
     _remove_kwarg_params(kwargs, cls_properties)
     _remove_unsupported_properties(cls_properties)
     params = _populate_instance_params(cls, kwargs, cls_properties, required_only)
-    return _call_constructor(cls, constructor, params, _put=_put)
+    return _call_constructor(cls, constructor, params, put=put)

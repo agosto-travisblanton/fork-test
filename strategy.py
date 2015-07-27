@@ -56,6 +56,8 @@ DISPLAY_FIELDS = [
     'ethernet_mac_address',
     'org_unit_path',
     'annotated_user',
+    'annotated_location',
+    'notes',
     'boot_mode',
     'last_enrollment_time',
     'platform_version',
