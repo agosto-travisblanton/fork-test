@@ -32,6 +32,10 @@ handlers:
   upload: static/(.*)
   login: required
 
+- url: /_ereporter.*
+  script: google.appengine.ext.ereporter.report_generator.application
+  login: admin
+
 - url: /favicon.ico
   static_files: static/favicon.ico
   upload: static/favicon.ico
