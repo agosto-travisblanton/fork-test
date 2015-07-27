@@ -1,0 +1,5 @@
+cron:
+- description: Daily exception report
+  url: /_ereporter?sender=gcp.admin@agosto.com&to=gcp.exception.skykitprovisioning@agosto.com
+  schedule: every day 19:00
+  timezone: US/Central

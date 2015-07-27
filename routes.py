@@ -1,10 +1,12 @@
-from agar.env import on_development_server
 from env_setup import setup
 setup()
 
 import os
-
 from google.appengine.ext import ereporter
+# This 'CURRENT_VERSION_ID' variable is not available when running tests
+if os.environ.get('CURRENT_VERSION_ID'):
+    # this makes ereporter capture exceptions on all your handlers
+    ereporter.register_logger()
 
 # DO NOT REMOVE
 # Importing deferred is a work around to this bug.
@@ -130,25 +132,3 @@ application = WSGIApplication(
 )
 
 
-# if not on_production_server:
-#     dev_routes = [
-#
-#         Route(
-#             r'/dev/bootstrap',
-#             handler='handlers.bootstrap.BootstrapHandler',
-#             name='dev-bootstrap',
-#         ),
-#         Route(
-#             r'/dev/load_bootstrap',
-#             handler='handlers.dev.LoadBootstrap',
-#             name='load-bootstrap',
-#         ),
-#         Route(
-#             r'/dev',
-#             handler='handlers.dev.DevIndex',
-#             name='dev-index',
-#         ),
-#     ]
-#
-#     for route in dev_routes:
-#         application.router.add(route)
