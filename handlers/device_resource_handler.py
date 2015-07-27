@@ -5,6 +5,7 @@ from webapp2 import RequestHandler
 
 from google.appengine.ext import ndb
 from app_config import config
+from content_manager_api import ContentManagerApi
 
 from decorators import api_token_required
 from restler.serializers import json_response
@@ -159,6 +160,12 @@ class DeviceResourceHandler(RequestHandler):
                                                              gcm_registration_id=gcm_registration_id,
                                                              mac_address=device_mac_address)
                         device_key = local_device.put()
+
+                        content_manager_api = ContentManagerApi()
+                        notify_content_manager = content_manager_api.create_device(local_device)
+                        if not notify_content_manager:
+                            logging.info('Failed to notify content manager about new device')
+
                         device_uri = self.request.app.router.build(None,
                                                                    'manage-device',
                                                                    None,

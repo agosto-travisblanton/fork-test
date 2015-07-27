@@ -7,58 +7,47 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 class ContentManagerApi(object):
-    """ Facade around our Skykit Content Manager API. """
-
     HEADERS = {
         'Content-Type': 'application/json'
     }
 
     def __init__(self):
-        self.HEADERS['Authorization'] = 'key={0}'.format(config.CONTENT_MANAGER_API_SERVER_KEY)
+        self.HEADERS['Authorization'] = config.CONTENT_MANAGER_API_SERVER_KEY
 
     def create_tenant(self, tenant):
-        """
-        Create a new tenant in the Content Manager system.
-
-        :param tenant: A Tenant entity.
-        :return:
-        """
-
         payload = {
-            "name": tenant.tenant_code,
+            "tenant_code": tenant.tenant_code,
+            "tenant_name": tenant.name,
             "admin_email": tenant.admin_email
         }
-        http_client_response = HttpClient().post(HttpClientRequest(url=config.CONTENT_MANAGER_API_URL,
+        url = "{content_manager_base_url}/provisioning/v1/tenants".format(
+            content_manager_base_url=tenant.content_server_url)
+        http_client_response = HttpClient().post(HttpClientRequest(url=url,
                                                                    payload=(json.dumps(payload)),
                                                                    headers=self.HEADERS))
         if http_client_response.status_code == 201:
-            response_json = http_client_response.json_content()
-            return response_json.get(u'tenant_key')
-        elif http_client_response.status_code == 400:
-            return None
-        elif http_client_response.status_code == 422:
-            return None
+            return True
         else:
-            raise RuntimeError('Unable to create tenant in Content Manager. Unexpected http status code: {0}'.
-                               format(http_client_response.status_code))
-
+            error_message = 'Unable to create tenant {0} in Content Manager. Status code: {1}'.format(
+                tenant.name, http_client_response.status_code)
+            raise RuntimeError(error_message)
 
     def create_device(self, chrome_os_device):
-        """
-        Create a new device in Content Manager system.
-
-        :param chrome_os_device: A ChromeOsDevice object.
-        :return:
-        """
-
+        tenant = chrome_os_device.key.parent().get()
         payload = {
             "device_key": chrome_os_device.key.urlsafe(),
-            "api_key": chrome_os_device.api_key
+            "api_key": chrome_os_device.api_key,
+            "tenant_code": tenant.tenant_code
         }
-        tenant = chrome_os_device.key.parent().get()
-        url = "{content_manager_base_url}/api/v1/devices".format(content_manager_base_url=tenant.content_server_url)
-        http_client_request = HttpClientRequest(url=url, payload=json.dumps(payload), headers=self.HEADERS)
+        url = "{content_manager_base_url}/provisioning/v1/displays".format(
+            content_manager_base_url=tenant.content_server_url)
+        http_client_request = HttpClientRequest(url=url,
+                                                payload=json.dumps(payload),
+                                                headers=self.HEADERS)
         http_client_response = HttpClient().post(http_client_request)
-        if http_client_response.status_code != 201:
-            raise RuntimeError('Unable to create a device in Content Manager. Unexpected http status code: {0}'.
-                               format(http_client_response.status_code))
+        if http_client_response.status_code == 201:
+            return True
+        else:
+            error_message = 'Unable to create device in Content Manager with tenant code {0}. Status code: {1}'.format(
+                tenant.tenant_code, http_client_response.status_code)
+            raise RuntimeError(error_message)

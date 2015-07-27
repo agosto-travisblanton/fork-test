@@ -1,3 +1,4 @@
+from content_manager_api import ContentManagerApi
 from env_setup import setup_test_paths
 
 setup_test_paths()
@@ -6,7 +7,7 @@ import json
 from webtest import AppError
 from agar.test import BaseTest, WebTest
 from chrome_os_devices_api import ChromeOsDevicesApi
-from mockito import when, any as any_matcher
+from mockito import when, any as any_matcher, verify
 from routes import application
 from models import ChromeOsDevice, Tenant
 from app_config import config
@@ -113,12 +114,23 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             self.app.get('/api/v1/devices', params={}, headers=self.valid_authorization_header)
         self.assertTrue('404 Not Found' in context.exception.message)
 
+    def test_post_content_manager_api_collaboration(self):
+        when(ChromeOsDevicesApi).list(any_matcher()).thenReturn(self.chrome_os_device_list_json)
+        when(ContentManagerApi).create_device(any_matcher()).thenReturn(True)
+        request_body = {'macAddress': self.chrome_os_device_json.get('macAddress'),
+                        'gcmRegistrationId': '123',
+                        'tenantCode': self.TENANT_CODE
+                        }
+        self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.valid_authorization_header)
+        verify(ContentManagerApi, times=5).create_device(any_matcher(''))
+
     def test_device_resource_handler_post_returns_created_status(self):
         request_body = {'macAddress': self.chrome_os_device_json.get('macAddress'),
                         'gcmRegistrationId': '123',
                         'tenantCode': self.TENANT_CODE
                         }
         when(ChromeOsDevicesApi).list(any_matcher()).thenReturn(self.chrome_os_device_list_json)
+        when(ContentManagerApi).create_device(any_matcher()).thenReturn(True)
         response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.valid_authorization_header)
         self.assertEqual('201 Created', response.status)
 
@@ -136,6 +148,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'gcmRegistrationId': gcm_registration_id,
                         'tenantCode': self.TENANT_CODE}
         when(ChromeOsDevicesApi).list(any_matcher()).thenReturn(self.chrome_os_device_list_json)
+        when(ContentManagerApi).create_device(any_matcher()).thenReturn(True)
         response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.valid_authorization_header)
         location_uri = str(response.headers['Location'])
         location_uri_components = location_uri.split('/')
@@ -165,6 +178,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'gcmRegistrationId': gcm_registration_id,
                         'tenantCode': self.TENANT_CODE}
         when(ChromeOsDevicesApi).list(any_matcher()).thenReturn(self.chrome_os_device_list_json)
+        when(ContentManagerApi).create_device(any_matcher()).thenReturn(True)
         self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.valid_authorization_header)
         chrome_os_device_key = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id). \
             get(keys_only=True)
@@ -178,6 +192,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'gcmRegistrationId': gcm_registration_id,
                         'tenantCode': self.tenant.tenant_code}
         when(ChromeOsDevicesApi).list(any_matcher()).thenReturn(self.chrome_os_device_list_json)
+        when(ContentManagerApi).create_device(any_matcher()).thenReturn(True)
         self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.valid_authorization_header)
         chrome_os_device_key = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id). \
             get(keys_only=True)
