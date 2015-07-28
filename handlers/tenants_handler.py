@@ -44,10 +44,11 @@ class TenantsHandler(RequestHandler):
                                    chrome_device_domain=chrome_device_domain,
                                    active=active)
             tenant_key = tenant.put()
-            content_manager_api = ContentManagerApi()
-            notify_content_manager = content_manager_api.create_tenant(tenant)
-            if not notify_content_manager:
-                logging.info('Failed to notify content manager about new tenant {0}'.format(name))
+            # TODO uncomment when content mgr endpoint is ready
+            # content_manager_api = ContentManagerApi()
+            # notify_content_manager = content_manager_api.create_tenant(tenant)
+            # if not notify_content_manager:
+            #     logging.info('Failed to notify content manager about new tenant {0}'.format(name))
             tenant_uri = self.request.app.router.build(None,
                                                        'manage-tenant',
                                                        None,

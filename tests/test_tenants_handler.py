@@ -129,18 +129,19 @@ class TestTenantsHandler(BaseTest, WebTest):
         parent = actual.key.parent().get()
         self.assertEqual(parent.name, TENANT_ENTITY_GROUP_NAME)
 
-    def test_post_content_manager_api_collaboration(self):
-        when(ContentManagerApi).create_tenant(any_matcher()).thenReturn(True)
-        request_parameters = {'name': 'ABC',
-                              'tenant_code': 'acme',
-                              'admin_email': 'foo@bar.com',
-                              'content_server_url': 'https://www.foo.com',
-                              'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
-                              'chrome_device_domain': '',
-                              'active': True}
-        uri = application.router.build(None, 'tenants', None, {})
-        self.app.post(uri, json.dumps(request_parameters), headers=self.headers)
-        verify(ContentManagerApi, times=1).create_tenant(any_matcher(''))
+    # TODO put back into play after uncommenting the call to content mgr
+    # def test_post_content_manager_api_collaboration(self):
+    #     when(ContentManagerApi).create_tenant(any_matcher()).thenReturn(True)
+    #     request_parameters = {'name': 'ABC',
+    #                           'tenant_code': 'acme',
+    #                           'admin_email': 'foo@bar.com',
+    #                           'content_server_url': 'https://www.foo.com',
+    #                           'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
+    #                           'chrome_device_domain': '',
+    #                           'active': True}
+    #     uri = application.router.build(None, 'tenants', None, {})
+    #     self.app.post(uri, json.dumps(request_parameters), headers=self.headers)
+    #     verify(ContentManagerApi, times=1).create_tenant(any_matcher(''))
 
     def test_put_returns_no_content_status(self):
         tenant_keys = self.load_tenants()
