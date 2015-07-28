@@ -1,4 +1,5 @@
 import json
+import logging
 
 from app_config import config
 from http_client import HttpClient, HttpClientRequest
@@ -26,10 +27,16 @@ class ContentManagerApi(object):
                                                                    payload=(json.dumps(payload)),
                                                                    headers=self.HEADERS))
         if http_client_response.status_code == 201:
+            logging.info('create_tenant to Content Mgr: url={0}, name={1}, email={2}, tenant_code={3}'.format(
+                url,
+                tenant.name,
+                tenant.admin_email,
+                tenant.tenant_code))
             return True
         else:
             error_message = 'Unable to create tenant {0} in Content Manager. Status code: {1}'.format(
                 tenant.name, http_client_response.status_code)
+            logging.error(error_message)
             raise RuntimeError(error_message)
 
     def create_device(self, chrome_os_device):
@@ -46,8 +53,14 @@ class ContentManagerApi(object):
                                                 headers=self.HEADERS)
         http_client_response = HttpClient().post(http_client_request)
         if http_client_response.status_code == 201:
+            logging.info('create_device to Content Mgr: url={0}, device_key={1}, api_key={2}, tenant_code={3}'.format(
+                url,
+                chrome_os_device.key.urlsafe(),
+                chrome_os_device.api_key,
+                tenant.tenant_code))
             return True
         else:
             error_message = 'Unable to create device in Content Manager with tenant code {0}. Status code: {1}'.format(
                 tenant.tenant_code, http_client_response.status_code)
+            logging.error(error_message)
             raise RuntimeError(error_message)
