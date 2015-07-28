@@ -168,7 +168,6 @@ def refresh_display_by_mac_address(display_urlsafe_key=None, device_mac_address=
             display.device_id = chrome_os_device.get('deviceId')
             display.mac_address = chrome_os_device.get('macAddress')
             display.serial_number = chrome_os_device.get('serialNumber')
-            display.managed_display = chrome_os_device.get('managedDisplay')
             display.status = chrome_os_device.get('status')
             display.last_sync = chrome_os_device.get('lastSync')
             display.kind = chrome_os_device.get('kind')
@@ -185,6 +184,7 @@ def refresh_display_by_mac_address(display_urlsafe_key=None, device_mac_address=
             display.firmware_version = chrome_os_device.get('firmwareVersion')
             display.managed_display = True
             display.put()
+            return display
         else:
             if new_page_token is not None:
                 deferred.defer(refresh_display_by_mac_address,
@@ -208,7 +208,6 @@ def refresh_display(display_urlsafe_key=None):
         display.device_id = chrome_os_device.get('deviceId')
         display.mac_address = chrome_os_device.get('macAddress')
         display.serial_number = chrome_os_device.get('serialNumber')
-        display.managed_display = chrome_os_device.get('managedDisplay')
         display.status = chrome_os_device.get('status')
         display.last_sync = chrome_os_device.get('lastSync')
         display.kind = chrome_os_device.get('kind')
@@ -223,6 +222,7 @@ def refresh_display(display_urlsafe_key=None):
         display.model = chrome_os_device.get('model')
         display.os_version = chrome_os_device.get('osVersion')
         display.firmware_version = chrome_os_device.get('firmwareVersion')
+        display.managed_display = True
         display.put()
 
 
