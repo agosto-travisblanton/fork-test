@@ -183,6 +183,7 @@ def refresh_display_by_mac_address(display_urlsafe_key=None, device_mac_address=
             display.model = chrome_os_device.get('model')
             display.os_version = chrome_os_device.get('osVersion')
             display.firmware_version = chrome_os_device.get('firmwareVersion')
+            display.managed_display = True
             display.put()
         else:
             if new_page_token is not None:
