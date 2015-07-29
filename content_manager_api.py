@@ -60,7 +60,7 @@ class ContentManagerApi(object):
                 tenant.tenant_code))
             return True
         else:
-            error_message = 'Unable to create device in Content Manager with tenant code {0}. Status code: {1}, url(2)'.format(
+            error_message = 'Unable to create device in Content Manager with tenant code {0}. Status code: {1}, url{2}'.format(
                 tenant.tenant_code, http_client_response.status_code, url)
             logging.error(error_message)
             raise RuntimeError(error_message)
