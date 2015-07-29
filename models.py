@@ -118,7 +118,7 @@ class ChromeOsDevice(ndb.Model):
     def create(cls, tenant_key, device_id, gcm_registration_id, mac_address, serial_number=None):
         logging.info("ChromeOsDevice.create....")
         logging.info("  Tenant key: {0}".format(str(tenant_key)))
-        api_key = str(uuid.uuid4())
+        api_key = str(uuid.uuid4().hex)
         chrome_os_device = cls(parent=tenant_key,
                                device_id=device_id,
                                gcm_registration_id=gcm_registration_id,
