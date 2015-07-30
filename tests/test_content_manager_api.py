@@ -60,6 +60,7 @@ class TestContentManagerApi(BaseTest):
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=error_code))
         with self.assertRaises(RuntimeError) as context:
             self.content_manager_api.create_device(self.device)
-        error_message = 'Unable to create device in Content Manager with tenant code {0}. Status code: {1}'.format(
+        error_message = 'Unable to create device in Content Manager with tenant code {0}. Status code: {1}, ' \
+                        'url=https://www.content.com/provisioning/v1/displays'.format(
             self.TENANT_CODE, error_code)
         self.assertEqual(error_message, str(context.exception))
