@@ -155,12 +155,15 @@ class DeviceResourceHandler(RequestHandler):
                     chrome_os_device = next(loop_comprehension, None)
                     if chrome_os_device is not None:
                         device_id = chrome_os_device.get('deviceId')
+                        model = chrome_os_device.get('model')
+                        serial_number = chrome_os_device.get('serialNumber')
                         local_device = ChromeOsDevice.create(tenant_key=tenant_key,
                                                              device_id=device_id,
                                                              gcm_registration_id=gcm_registration_id,
-                                                             mac_address=device_mac_address)
+                                                             mac_address=device_mac_address,
+                                                             serial_number=serial_number,
+                                                             model=model)
                         device_key = local_device.put()
-
                         content_manager_api = ContentManagerApi()
                         notify_content_manager = content_manager_api.create_device(local_device)
                         if not notify_content_manager:

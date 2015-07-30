@@ -33,7 +33,9 @@ class TestContentManagerApi(BaseTest):
         self.device = ChromeOsDevice.create(tenant_key=self.tenant_key,
                                             device_id='f7ds8970dfasd8f70ad987',
                                             gcm_registration_id='fad7f890ad7f8ad0s7fa8s',
-                                            mac_address='54271e619346')
+                                            mac_address='54271e619346',
+                                            serial_number='E5MSCX022945',
+                                            model='ASUS Chromebox')
         self.device_key = self.device.put()
 
     def test_create_tenant_success(self):
@@ -60,6 +62,6 @@ class TestContentManagerApi(BaseTest):
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=error_code))
         with self.assertRaises(RuntimeError) as context:
             self.content_manager_api.create_device(self.device)
-        error_message = 'Unable to create device in Content Manager with tenant code {0}. Status code: {1}'.format(
-            self.TENANT_CODE, error_code)
+        error_message = 'Unable to create device in Content Manager with tenant code {0}. Status code: {1}, ' \
+                        'url={2}/provisioning/v1/displays'.format(self.TENANT_CODE, error_code, self.CONTENT_SERVER_URL)
         self.assertEqual(error_message, str(context.exception))
