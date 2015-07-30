@@ -89,7 +89,8 @@ class DisplaysHandler(RequestHandler, PagingListHandlerMixin, KeyValidatorMixin)
                 key = display.put()
                 deferred.defer(refresh_display_by_mac_address,
                                display_urlsafe_key=key.urlsafe(),
-                               device_mac_address=display_mac_address)
+                               device_mac_address=display_mac_address,
+                               _countdown=30)
                 display_uri = self.request.app.router.build(None,
                                                             'manage-display',
                                                             None,
