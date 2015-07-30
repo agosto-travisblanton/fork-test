@@ -22,6 +22,7 @@ class TestChromeOsDeviceModel(BaseTest):
     TENANT_CODE = 'foobar'
     MAC_ADDRESS='54271e619346'
     SERIAL_NUMBER='E3MSCX004781'
+    MODEL='ASUS Chromebox'
 
     def setUp(self):
         super(TestChromeOsDeviceModel, self).setUp()
@@ -74,12 +75,13 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertEqual(str(self.tenant.chrome_device_domain), json_representation['tenant']['chrome_device_domain'])
         self.assertEqual(self.tenant.active, json_representation['tenant']['active'])
 
-    def test_json_serialization_strategy_with_optional_serial_number(self):
+    def test_json_serialization_strategy_with_optional_serial_number_and_model(self):
         chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
                                                  device_id=self.TESTING_DEVICE_ID,
                                                  gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
                                                  mac_address=self.MAC_ADDRESS,
-                                                 serial_number=self.SERIAL_NUMBER)
+                                                 serial_number=self.SERIAL_NUMBER,
+                                                 model=self.MODEL)
         chrome_os_device.put()
         json_representation = json.loads(to_json(chrome_os_device, CHROME_OS_DEVICE_STRATEGY))
         self.assertEqual(self.TESTING_DEVICE_ID, json_representation['device_id'])
@@ -88,6 +90,7 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertIsNotNone(json_representation['created'])
         self.assertIsNotNone(json_representation['updated'])
         self.assertEqual(str(chrome_os_device.api_key), json_representation['api_key'])
+        self.assertEqual(str(chrome_os_device.name), '{0} {1}'.format(self.SERIAL_NUMBER, self.MODEL))
         self.assertEqual(str(self.tenant.name), json_representation['tenant']['name'])
         self.assertEqual(str(self.tenant.tenant_code), json_representation['tenant']['tenant_code'])
         self.assertEqual(str(self.tenant.admin_email), json_representation['tenant']['admin_email'])
