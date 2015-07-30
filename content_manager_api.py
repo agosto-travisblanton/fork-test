@@ -51,7 +51,7 @@ class ContentManagerApi(object):
         #     "device_key": chrome_os_device.key.urlsafe(),
         #     "api_key": chrome_os_device.api_key,
         #     "tenant_code": tenant.tenant_code,
-        #     "name" : "{0} {1}".format(chrome_os_device.serial_number, chrome_os_device.model)
+        #     "name" : chrome_os_device.name)
         # }
         url = "{content_manager_base_url}/provisioning/v1/displays".format(
             content_manager_base_url=tenant.content_server_url)

@@ -107,6 +107,7 @@ class ChromeOsDevice(ndb.Model):
     api_key = ndb.StringProperty(required=True, indexed=True)
     serial_number = ndb.StringProperty(required=False, indexed=True)
     model = ndb.StringProperty(required=False, indexed=True)
+    name = ndb.ComputedProperty(lambda self: '{0} {1}'.format(self.serial_number, self.model) )
 
     @classmethod
     def get_by_device_id(cls, device_id):
