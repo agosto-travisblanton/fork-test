@@ -106,6 +106,8 @@ class ChromeOsDevice(ndb.Model):
     mac_address = ndb.StringProperty(required=True, indexed=True)
     api_key = ndb.StringProperty(required=True, indexed=True)
     serial_number = ndb.StringProperty(required=False, indexed=True)
+    model = ndb.StringProperty(required=False, indexed=True)
+    name = ndb.ComputedProperty(lambda self: '{0} {1}'.format(self.serial_number, self.model) )
 
     @classmethod
     def get_by_device_id(cls, device_id):
@@ -115,16 +117,17 @@ class ChromeOsDevice(ndb.Model):
                 return chrome_os_device_key.get()
 
     @classmethod
-    def create(cls, tenant_key, device_id, gcm_registration_id, mac_address, serial_number=None):
+    def create(cls, tenant_key, device_id, gcm_registration_id, mac_address, serial_number=None, model=None):
         logging.info("ChromeOsDevice.create....")
         logging.info("  Tenant key: {0}".format(str(tenant_key)))
-        api_key = str(uuid.uuid4())
+        api_key = str(uuid.uuid4().hex)
         chrome_os_device = cls(parent=tenant_key,
                                device_id=device_id,
                                gcm_registration_id=gcm_registration_id,
                                mac_address=mac_address,
                                api_key=api_key,
-                               serial_number=serial_number)
+                               serial_number=serial_number,
+                               model=model)
         return chrome_os_device
 
 
