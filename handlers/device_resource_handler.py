@@ -2,11 +2,9 @@ import json
 import logging
 
 from webapp2 import RequestHandler
-
 from google.appengine.ext import ndb
-from app_config import config
-from content_manager_api import ContentManagerApi
 
+from content_manager_api import ContentManagerApi
 from app_config import config
 from decorators import api_token_required
 from restler.serializers import json_response
