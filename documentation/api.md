@@ -164,6 +164,56 @@ Retrieve a specific Skykit display by MAC address.
                 "error": "HTTP request API token is invalid."
             }
 
+### PUT /api/v1/displays/{urlsafe_key}
+
+Update Skykit display information.
+
+
++ Parameters
+
+    + urlsafe_key: `ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgID4woQKDA` (required, string) - The display's entity key.
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/json
+            Authorization: 6C346588BD4C6D722A1165B43C51C
+
+    + Body
+
+            {
+				"macAddress":"38b1db95806d",
+				"gcmRegistrationId":"blah blah 3",
+				"tenantKey": {The tenant's entity key}
+			}
+
++ Response 204 (application/json)
+
+    + Headers
+
+            Alternate-Protocol: 443:quic,p=1
+            Cache-Control: no-cache
+
++ Response 403 (application/json)
+
+    + Headers
+
+    + Body
+
+            {
+                "error": "HTTP request API token is invalid."
+            }
+			
++ Response 404 (text/html)
+
+    + Headers
+
+    + Body
+
+            Unrecognized display with key: {0}: {the display's entity key}
+
+
 
 ## Group Devices
 

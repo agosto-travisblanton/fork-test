@@ -121,6 +121,9 @@ class DisplaysHandler(RequestHandler, PagingListHandlerMixin, KeyValidatorMixin)
             gcm_registration_id = request_json.get('gcmRegistrationId')
             if gcm_registration_id:
                 display.gcm_registration_id = gcm_registration_id
+            tenant_key = (ndb.Key(urlsafe=request_json.get('tenantKey')).get()).key
+            if tenant_key != display.tenant_key:
+                display.tenant_key = tenant_key
             display.put()
             deferred.defer(update_chrome_os_device, display_urlsafe_key=display.key.urlsafe())
             self.response.headers.pop('Content-Type', None)
