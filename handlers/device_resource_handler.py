@@ -4,8 +4,8 @@ import logging
 from webapp2 import RequestHandler
 
 from google.appengine.ext import ndb
-from app_config import config
 
+from app_config import config
 from decorators import api_token_required
 from restler.serializers import json_response
 from chrome_os_devices_api import ChromeOsDevicesApi
@@ -167,10 +167,13 @@ class DeviceResourceHandler(RequestHandler):
                         self.response.headers.pop('Content-Type', None)
                         self.response.set_status(status)
                     else:
+                        logging.info('Chrome OS device not associated with this customer id ( {0}'.format(
+                            config.GOOGLE_CUSTOMER_ID))
                         self.response.set_status(422,
                                                  'Chrome OS device not associated with this customer id ( {0}'.format(
                                                      config.GOOGLE_CUSTOMER_ID))
             else:
+                logging.info('INVALID REQUEST: {0}'.format(error_message))
                 self.response.set_status(status, error_message)
         else:
             logging.info("Problem creating a ChromeOsDevice. No request body.")
