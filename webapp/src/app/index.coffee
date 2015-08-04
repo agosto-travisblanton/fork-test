@@ -131,7 +131,6 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
   RestangularProvider.addResponseInterceptor (data, operation, resourceType, url, response, deferred) ->
     result = data
     if resourceType == 'displays' and operation = 'getList' and url == '/api/v1/displays'
-      console.log "----> Pulling out objects from the wrapped JSON..."
       result = data.objects
     result
 

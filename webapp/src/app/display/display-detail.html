@@ -43,7 +43,7 @@
                   </div>
 
                   <div class="form-group"
-                       ng-class="{ 'has-error' : displayForm.serialNumber.$invalid && !displayForm.serialNumber.$pristine }">
+                       ng-class="{ 'has-error' : displayForm.serial_number.$invalid && !displayForm.serial_number.$pristine }">
                     <label for="serialNumber" class="col-sm-3 control-label">Serial number</label>
 
                     <div class="col-sm-4">
@@ -52,10 +52,10 @@
                              name="serialNumber"
                              id="serialNumber"
                              readonly
-                             ng-model="displayDetailsCtrl.currentDisplay.serialNumber">
+                             ng-model="displayDetailsCtrl.currentDisplay.serial_number">
                     </div>
                     <div class="col-sm-5">
-                      <p ng-show="displayForm.serialNumber.$invalid && !displayForm.serialNumber.$pristine"
+                      <p ng-show="displayForm.serial_number.$invalid && !displayForm.serial_number.$pristine"
                          class="help-block">
                         The display serial number is required.
                       </p>
@@ -63,7 +63,7 @@
                   </div>
 
                   <div class="form-group"
-                       ng-class="{ 'has-error' : displayForm.gcmRegistrationId.$invalid && !displayForm.gcmRegistrationId.$pristine }">
+                       ng-class="{ 'has-error' : displayForm.gcm_registration_id.$invalid && !displayForm.gcm_registration_id.$pristine }">
                     <label for="gcmRegistrationId" class="col-sm-3 control-label">GCM registration ID</label>
 
                     <div class="col-sm-4">
@@ -72,10 +72,10 @@
                              name="gcmRegistrationId"
                              id="gcmRegistrationId"
                              readonly
-                             ng-model="displayDetailsCtrl.currentDisplay.gcmRegistrationId">
+                             ng-model="displayDetailsCtrl.currentDisplay.gcm_registration_id">
                     </div>
                     <div class="col-sm-5">
-                      <p ng-show="displayForm.gcmRegistrationId.$invalid && !displayForm.gcmRegistrationId.$pristine"
+                      <p ng-show="displayForm.gcm_registration_id.$invalid && !displayForm.gcm_registration_id.$pristine"
                          class="help-block">
                         The display GCM registration ID is required.
                       </p>
@@ -83,7 +83,7 @@
                   </div>
 
                   <div class="form-group"
-                       ng-class="{ 'has-error' : displayForm.annotatedUser.$invalid && !displayForm.annotatedUser.$pristine }">
+                       ng-class="{ 'has-error' : displayForm.annotated_user.$invalid && !displayForm.annotated_user.$pristine }">
                     <label for="annotatedUser" class="col-sm-3 control-label">Annotated user</label>
 
                     <div class="col-sm-4">
@@ -92,10 +92,10 @@
                              name="annotatedUser"
                              id="annotatedUser"
                              readonly
-                             ng-model="displayDetailsCtrl.currentDisplay.annotatedUser">
+                             ng-model="displayDetailsCtrl.currentDisplay.annotated_user">
                     </div>
                     <div class="col-sm-5">
-                      <p ng-show="displayForm.annotatedUser.$invalid && !displayForm.annotatedUser.$pristine"
+                      <p ng-show="displayForm.annotated_user.$invalid && !displayForm.annotated_user.$pristine"
                          class="help-block">
                         The display annotated user is required.
                       </p>
@@ -103,7 +103,7 @@
                   </div>
 
                   <div class="form-group"
-                       ng-class="{ 'has-error' : displayForm.apiKey.$invalid && !displayForm.apiKey.$pristine }">
+                       ng-class="{ 'has-error' : displayForm.api_key.$invalid && !displayForm.api_key.$pristine }">
                     <label for="apiKey" class="col-sm-3 control-label">API key</label>
 
                     <div class="col-sm-4">
@@ -112,10 +112,10 @@
                              name="apiKey"
                              id="apiKey"
                              readonly
-                             ng-model="displayDetailsCtrl.currentDisplay.apiKey">
+                             ng-model="displayDetailsCtrl.currentDisplay.api_key">
                     </div>
                     <div class="col-sm-5">
-                      <p ng-show="displayForm.apiKey.$invalid && !displayForm.apiKey.$pristine"
+                      <p ng-show="displayForm.api_key.$invalid && !displayForm.api_key.$pristine"
                          class="help-block">
                         The display API key is required.
                       </p>
@@ -123,7 +123,7 @@
                   </div>
 
                   <div class="form-group"
-                       ng-class="{ 'has-error' : displayForm.displayId.$invalid && !displayForm.displayId.$pristine }">
+                       ng-class="{ 'has-error' : displayForm.display_id.$invalid && !displayForm.display_id.$pristine }">
                     <label for="displayId" class="col-sm-3 control-label">Display ID</label>
 
                     <div class="col-sm-4">
@@ -132,10 +132,10 @@
                              name="displayId"
                              id="displayId"
                              readonly
-                             ng-model="displayDetailsCtrl.currentDisplay.displayId">
+                             ng-model="displayDetailsCtrl.currentDisplay.display_id">
                     </div>
                     <div class="col-sm-5">
-                      <p ng-show="displayForm.displayId.$invalid && !displayForm.displayId.$pristine"
+                      <p ng-show="displayForm.display_id.$invalid && !displayForm.display_id.$pristine"
                          class="help-block">
                         The display ID is required.
                       </p>
@@ -143,7 +143,7 @@
                   </div>
 
                   <div class="form-group"
-                       ng-class="{ 'has-error' : displayForm.bootMode.$invalid && !displayForm.bootMode.$pristine }">
+                       ng-class="{ 'has-error' : displayForm.boot_mode.$invalid && !displayForm.boot_mode.$pristine }">
                     <label for="bootMode" class="col-sm-3 control-label">Boot mode</label>
 
                     <div class="col-sm-4">
@@ -152,10 +152,10 @@
                              name="bootMode"
                              id="bootMode"
                              readonly
-                             ng-model="displayDetailsCtrl.currentDisplay.bootMode">
+                             ng-model="displayDetailsCtrl.currentDisplay.boot_mode">
                     </div>
                     <div class="col-sm-5">
-                      <p ng-show="displayForm.bootMode.$invalid && !displayForm.bootMode.$pristine"
+                      <p ng-show="displayForm.boot_mode.$invalid && !displayForm.boot_mode.$pristine"
                          class="help-block">
                         The display boot mode is required.
                       </p>
@@ -163,7 +163,7 @@
                   </div>
 
                   <div class="form-group"
-                       ng-class="{ 'has-error' : displayForm.chromeDisplayDomain.$invalid && !displayForm.chromeDisplayDomain.$pristine }">
+                       ng-class="{ 'has-error' : displayForm.chrome_display_domain.$invalid && !displayForm.chrome_display_domain.$pristine }">
                     <label for="chromeDisplayDomain" class="col-sm-3 control-label">Chrome display domain</label>
 
                     <div class="col-sm-4">
@@ -172,10 +172,10 @@
                              name="chromeDisplayDomain"
                              id="chromeDisplayDomain"
                              readonly
-                             ng-model="displayDetailsCtrl.currentDisplay.chromeDisplayDomain">
+                             ng-model="displayDetailsCtrl.currentDisplay.chrome_display_domain">
                     </div>
                     <div class="col-sm-5">
-                      <p ng-show="displayForm.chromeDisplayDomain.$invalid && !displayForm.chromeDisplayDomain.$pristine"
+                      <p ng-show="displayForm.chrome_display_domain.$invalid && !displayForm.chrome_display_domain.$pristine"
                          class="help-block">
                         The Chrome display domain is required.
                       </p>
@@ -183,7 +183,7 @@
                   </div>
 
                   <div class="form-group"
-                       ng-class="{ 'has-error' : displayForm.contentServerUrl.$invalid && !displayForm.contentServerUrl.$pristine }">
+                       ng-class="{ 'has-error' : displayForm.content_server_url.$invalid && !displayForm.content_server_url.$pristine }">
                     <label for="contentServerUrl" class="col-sm-3 control-label">Content server URL</label>
 
                     <div class="col-sm-4">
@@ -192,10 +192,10 @@
                              name="contentServerUrl"
                              id="contentServerUrl"
                              readonly
-                             ng-model="displayDetailsCtrl.currentDisplay.contentServerUrl">
+                             ng-model="displayDetailsCtrl.currentDisplay.content_server_url">
                     </div>
                     <div class="col-sm-5">
-                      <p ng-show="displayForm.contentServerUrl.$invalid && !displayForm.contentServerUrl.$pristine"
+                      <p ng-show="displayForm.content_server_url.$invalid && !displayForm.content_server_url.$pristine"
                          class="help-block">
                         The display content server URL is required.
                       </p>
@@ -223,7 +223,7 @@
                   </div>
 
                   <div class="form-group"
-                       ng-class="{ 'has-error' : displayForm.ethernetMacAddress.$invalid && !displayForm.ethernetMacAddress.$pristine }">
+                       ng-class="{ 'has-error' : displayForm.ethernet_mac_address.$invalid && !displayForm.ethernet_mac_address.$pristine }">
                     <label for="ethernetMacAddress" class="col-sm-3 control-label">Ethernet MAC address</label>
 
                     <div class="col-sm-4">
@@ -232,10 +232,10 @@
                              name="ethernetMacAddress"
                              id="ethernetMacAddress"
                              readonly
-                             ng-model="displayDetailsCtrl.currentDisplay.ethernetMacAddress">
+                             ng-model="displayDetailsCtrl.currentDisplay.ethernet_mac_address">
                     </div>
                     <div class="col-sm-5">
-                      <p ng-show="displayForm.ethernetMacAddress.$invalid && !displayForm.ethernetMacAddress.$pristine"
+                      <p ng-show="displayForm.ethernet_mac_address.$invalid && !displayForm.ethernet_mac_address.$pristine"
                          class="help-block">
                         The display ethernet MAC address is required.
                       </p>
@@ -243,7 +243,7 @@
                   </div>
 
                   <div class="form-group"
-                       ng-class="{ 'has-error' : displayForm.macAddress.$invalid && !displayForm.macAddress.$pristine }">
+                       ng-class="{ 'has-error' : displayForm.mac_address.$invalid && !displayForm.mac_address.$pristine }">
                     <label for="macAddress" class="col-sm-3 control-label">MAC address</label>
 
                     <div class="col-sm-4">
@@ -252,10 +252,10 @@
                              name="macAddress"
                              id="macAddress"
                              readonly
-                             ng-model="displayDetailsCtrl.currentDisplay.macAddress">
+                             ng-model="displayDetailsCtrl.currentDisplay.mac_address">
                     </div>
                     <div class="col-sm-5">
-                      <p ng-show="displayForm.macAddress.$invalid && !displayForm.macAddress.$pristine"
+                      <p ng-show="displayForm.mac_address.$invalid && !displayForm.mac_address.$pristine"
                          class="help-block">
                         The display MAC address is required.
                       </p>
@@ -263,7 +263,7 @@
                   </div>
 
                   <div class="form-group"
-                       ng-class="{ 'has-error' : displayForm.firmwareVersion.$invalid && !displayForm.firmwareVersion.$pristine }">
+                       ng-class="{ 'has-error' : displayForm.firmware_version.$invalid && !displayForm.firmware_version.$pristine }">
                     <label for="firmwareVersion" class="col-sm-3 control-label">Firmware version</label>
 
                     <div class="col-sm-4">
@@ -272,10 +272,10 @@
                              name="firmwareVersion"
                              id="firmwareVersion"
                              readonly
-                             ng-model="displayDetailsCtrl.currentDisplay.firmwareVersion">
+                             ng-model="displayDetailsCtrl.currentDisplay.firmware_version">
                     </div>
                     <div class="col-sm-5">
-                      <p ng-show="displayForm.firmwareVersion.$invalid && !displayForm.firmwareVersion.$pristine"
+                      <p ng-show="displayForm.firmware_version.$invalid && !displayForm.firmware_version.$pristine"
                          class="help-block">
                         The display firmware version is required.
                       </p>
@@ -303,7 +303,7 @@
                   </div>
 
                   <div class="form-group"
-                       ng-class="{ 'has-error' : displayForm.lastEnrollmentTime.$invalid && !displayForm.lastEnrollmentTime.$pristine }">
+                       ng-class="{ 'has-error' : displayForm.last_enrollment_time.$invalid && !displayForm.last_enrollment_time.$pristine }">
                     <label for="lastEnrollmentTime" class="col-sm-3 control-label">Last enrollment timestamp</label>
 
                     <div class="col-sm-4">
@@ -312,10 +312,10 @@
                              name="lastEnrollmentTime"
                              id="lastEnrollmentTime"
                              readonly
-                             ng-model="displayDetailsCtrl.currentDisplay.lastEnrollmentTime">
+                             ng-model="displayDetailsCtrl.currentDisplay.last_enrollment_time">
                     </div>
                     <div class="col-sm-5">
-                      <p ng-show="displayForm.lastEnrollmentTime.$invalid && !displayForm.lastEnrollmentTime.$pristine"
+                      <p ng-show="displayForm.last_enrollment_time.$invalid && !displayForm.last_enrollment_time.$pristine"
                          class="help-block">
                         The display last enrollment timestamp is required.
                       </p>
@@ -323,7 +323,7 @@
                   </div>
 
                   <div class="form-group"
-                       ng-class="{ 'has-error' : displayForm.lastSync.$invalid && !displayForm.lastSync.$pristine }">
+                       ng-class="{ 'has-error' : displayForm.last_sync.$invalid && !displayForm.last_sync.$pristine }">
                     <label for="lastSync" class="col-sm-3 control-label">Last sync timestamp</label>
 
                     <div class="col-sm-4">
@@ -332,10 +332,10 @@
                              name="lastSync"
                              id="lastSync"
                              readonly
-                             ng-model="displayDetailsCtrl.currentDisplay.lastSync">
+                             ng-model="displayDetailsCtrl.currentDisplay.last_sync">
                     </div>
                     <div class="col-sm-5">
-                      <p ng-show="displayForm.lastSync.$invalid && !displayForm.lastSync.$pristine"
+                      <p ng-show="displayForm.last_sync.$invalid && !displayForm.last_sync.$pristine"
                          class="help-block">
                         The display last sync timestamp is required.
                       </p>
@@ -363,7 +363,7 @@
                   </div>
 
                   <div class="form-group"
-                       ng-class="{ 'has-error' : displayForm.orgUnitPath.$invalid && !displayForm.orgUnitPath.$pristine }">
+                       ng-class="{ 'has-error' : displayForm.org_unit_path.$invalid && !displayForm.org_unit_path.$pristine }">
                     <label for="orgUnitPath" class="col-sm-3 control-label">Organizational unit path</label>
 
                     <div class="col-sm-4">
@@ -372,10 +372,10 @@
                              name="orgUnitPath"
                              id="orgUnitPath"
                              readonly
-                             ng-model="displayDetailsCtrl.currentDisplay.orgUnitPath">
+                             ng-model="displayDetailsCtrl.currentDisplay.org_unit_path">
                     </div>
                     <div class="col-sm-5">
-                      <p ng-show="displayForm.orgUnitPath.$invalid && !displayForm.orgUnitPath.$pristine"
+                      <p ng-show="displayForm.org_unit_path.$invalid && !displayForm.org_unit_path.$pristine"
                          class="help-block">
                         The display organizational unit path is required.
                       </p>
@@ -383,7 +383,7 @@
                   </div>
 
                   <div class="form-group"
-                       ng-class="{ 'has-error' : displayForm.osVersion.$invalid && !displayForm.osVersion.$pristine }">
+                       ng-class="{ 'has-error' : displayForm.os_version.$invalid && !displayForm.os_version.$pristine }">
                     <label for="osVersion" class="col-sm-3 control-label">Operating system version</label>
 
                     <div class="col-sm-4">
@@ -392,10 +392,10 @@
                              name="osVersion"
                              id="osVersion"
                              readonly
-                             ng-model="displayDetailsCtrl.currentDisplay.osVersion">
+                             ng-model="displayDetailsCtrl.currentDisplay.os_version">
                     </div>
                     <div class="col-sm-5">
-                      <p ng-show="displayForm.osVersion.$invalid && !displayForm.osVersion.$pristine"
+                      <p ng-show="displayForm.os_version.$invalid && !displayForm.os_version.$pristine"
                          class="help-block">
                         The display OS version is required.
                       </p>
@@ -403,7 +403,7 @@
                   </div>
 
                   <div class="form-group"
-                       ng-class="{ 'has-error' : displayForm.platformVersion.$invalid && !displayForm.platformVersion.$pristine }">
+                       ng-class="{ 'has-error' : displayForm.platform_version.$invalid && !displayForm.platform_version.$pristine }">
                     <label for="platformVersion" class="col-sm-3 control-label">Platform version</label>
 
                     <div class="col-sm-4">
@@ -412,10 +412,10 @@
                              name="platformVersion"
                              id="platformVersion"
                              readonly
-                             ng-model="displayDetailsCtrl.currentDisplay.platformVersion">
+                             ng-model="displayDetailsCtrl.currentDisplay.platform_version">
                     </div>
                     <div class="col-sm-5">
-                      <p ng-show="displayForm.platformVersion.$invalid && !displayForm.platformVersion.$pristine"
+                      <p ng-show="displayForm.platform_version.$invalid && !displayForm.platform_version.$pristine"
                          class="help-block">
                         The display platform version is required.
                       </p>
@@ -443,8 +443,8 @@
                   </div>
 
                   <div class="form-group"
-                       ng-class="{ 'has-error' : displayForm.tenantCode.$invalid && !displayForm.tenantCode.$pristine }">
-                    <label for="tenantCode" class="col-sm-3 control-label">Tenant code</label>
+                       ng-class="{ 'has-error' : displayForm.tenant.$invalid && !displayForm.tenant.$pristine }">
+                    <label for="tenantCode" class="col-sm-3 control-label">Tenant</label>
 
                     <div class="col-sm-4">
                       <input type="text"
@@ -452,12 +452,12 @@
                              name="tenantCode"
                              id="tenantCode"
                              readonly
-                             ng-model="displayDetailsCtrl.currentDisplay.tenantCode">
+                             ng-model="displayDetailsCtrl.currentDisplay.tenant">
                     </div>
                     <div class="col-sm-5">
-                      <p ng-show="displayForm.tenantCode.$invalid && !displayForm.tenantCode.$pristine"
+                      <p ng-show="displayForm.tenant.$invalid && !displayForm.tenant.$pristine"
                          class="help-block">
-                        The display tenant code is required.
+                        The display tenant is required.
                       </p>
                     </div>
                   </div>

@@ -31,7 +31,13 @@
               <td class="no-displays" colspan="3">No displays</td>
             </tr>
             <tr ng-repeat="display in displaysListingCtrl.displays | orderBy:'-created' ">
-              <td class="display-key">{{ display.key }}</td>
+              <td class="display-key">
+                <a href="#/displays/{{ display.key }}">
+                  <span class="entity-key">
+                    {{ display.key | limitTo: 10 }}...{{ display.key | limitTo: 10 : display.key.length - 10}}
+                  </span>
+                </a>
+              </td>
               <td class="display-serial-number">{{ display.serial_number }}</td>
               <td class="display-mac-address">{{ display.mac_address }}</td>
             </tr>
