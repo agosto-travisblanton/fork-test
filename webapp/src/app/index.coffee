@@ -39,15 +39,6 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
       label: 'Domains'
     }
   })
-  $stateProvider.state("deviceEdit", {
-    url: "/deviceEdit",
-    templateUrl: "app/device/device.editor.html",
-    controller: "DeviceEditorCtrl",
-    controllerAs: 'deviceEdit',
-    ncyBreadcrumb: {
-      label: 'Edit device'
-    }
-  })
   $stateProvider.state("tenants", {
     url: "/tenants",
     templateUrl: "app/tenant/tenants.html",
@@ -86,6 +77,15 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
       label: 'Devices'
     }
   })
+  $stateProvider.state("displays", {
+    url: "/displays",
+    templateUrl: "app/display/displays-listing.html",
+    controller: "DisplaysListingCtrl",
+    controllerAs: 'displaysListingCtrl',
+    ncyBreadcrumb: {
+      label: 'Displays'
+    }
+  })
   $stateProvider.state("editDevice", {
     url: "/devices/:deviceKey",
     templateUrl: "app/device/device-detail.html",
@@ -93,6 +93,15 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     controllerAs: 'deviceDetailsCtrl',
     ncyBreadcrumb: {
       label: 'Device {{ deviceDetailsCtrl.currentDevice.key }}'
+    }
+  })
+  $stateProvider.state("editDisplay", {
+    url: "/displays/:displayKey",
+    templateUrl: "app/display/display-detail.html",
+    controller: "DisplayDetailsCtrl",
+    controllerAs: 'displayDetailsCtrl',
+    ncyBreadcrumb: {
+      label: 'Display {{ displayDetailsCtrl.currentDisplay.key }}'
     }
   })
   $stateProvider.state("remote_control", {
@@ -118,6 +127,13 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     if operation == 'remove'
       return undefined
     elem
+
+  RestangularProvider.addResponseInterceptor (data, operation, resourceType, url, response, deferred) ->
+    result = data
+    if resourceType == 'displays' and operation = 'getList' and url == '/api/v1/displays'
+      console.log "----> Pulling out objects from the wrapped JSON..."
+      result = data.objects
+    result
 
   RestangularProvider.setRestangularFields {
     id: 'key'

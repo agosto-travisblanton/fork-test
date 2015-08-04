@@ -1,0 +1,523 @@
+<div id="wrapper">
+
+  <div ng-include="'app/components/navbar/navbar.html'"></div>
+
+  <div id="page-wrapper">
+    <div class="container-fluid">
+
+      <div class="row">
+        <div class="col-lg-12">
+          <div ncy-breadcrumb></div>
+          <h1 class="page-header">
+            Display key: {{ displayDetailsCtrl.currentDisplay.key | limitTo: 10 }}...{{ displayDetailsCtrl.currentDisplay.key
+            | limitTo: 10 : displayDetailsCtrl.currentDisplay.key.length - 10}}
+          </h1>
+        </div>
+      </div>
+
+      <div>
+        <tabset>
+          <tab heading="General">
+            <div style="margin-top: 1px;">&nbsp;</div>
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Display properties</h3>
+              </div>
+              <div class="panel-body">
+                <form name="displayForm"
+                      class="form-horizontal"
+                      ng-submit="displayDetailsCtrl.onClickSaveButton()"
+                      novalidate>
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.key.$invalid && !displayForm.key.$pristine }">
+                    <label for="key" class="col-sm-3 control-label">Key</label>
+
+                    <div class="col-sm-9">
+                      <input type="text"
+                             class="form-control"
+                             name="key"
+                             id="key"
+                             readonly
+                             value="{{ displayDetailsCtrl.currentDisplay.key }}">
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.serialNumber.$invalid && !displayForm.serialNumber.$pristine }">
+                    <label for="serialNumber" class="col-sm-3 control-label">Serial number</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="serialNumber"
+                             id="serialNumber"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.serialNumber">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.serialNumber.$invalid && !displayForm.serialNumber.$pristine"
+                         class="help-block">
+                        The display serial number is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.gcmRegistrationId.$invalid && !displayForm.gcmRegistrationId.$pristine }">
+                    <label for="gcmRegistrationId" class="col-sm-3 control-label">GCM registration ID</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="gcmRegistrationId"
+                             id="gcmRegistrationId"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.gcmRegistrationId">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.gcmRegistrationId.$invalid && !displayForm.gcmRegistrationId.$pristine"
+                         class="help-block">
+                        The display GCM registration ID is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.annotatedUser.$invalid && !displayForm.annotatedUser.$pristine }">
+                    <label for="annotatedUser" class="col-sm-3 control-label">Annotated user</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="annotatedUser"
+                             id="annotatedUser"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.annotatedUser">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.annotatedUser.$invalid && !displayForm.annotatedUser.$pristine"
+                         class="help-block">
+                        The display annotated user is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.apiKey.$invalid && !displayForm.apiKey.$pristine }">
+                    <label for="apiKey" class="col-sm-3 control-label">API key</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="apiKey"
+                             id="apiKey"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.apiKey">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.apiKey.$invalid && !displayForm.apiKey.$pristine"
+                         class="help-block">
+                        The display API key is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.displayId.$invalid && !displayForm.displayId.$pristine }">
+                    <label for="displayId" class="col-sm-3 control-label">Display ID</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="displayId"
+                             id="displayId"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.displayId">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.displayId.$invalid && !displayForm.displayId.$pristine"
+                         class="help-block">
+                        The display ID is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.bootMode.$invalid && !displayForm.bootMode.$pristine }">
+                    <label for="bootMode" class="col-sm-3 control-label">Boot mode</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="bootMode"
+                             id="bootMode"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.bootMode">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.bootMode.$invalid && !displayForm.bootMode.$pristine"
+                         class="help-block">
+                        The display boot mode is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.chromeDisplayDomain.$invalid && !displayForm.chromeDisplayDomain.$pristine }">
+                    <label for="chromeDisplayDomain" class="col-sm-3 control-label">Chrome display domain</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="chromeDisplayDomain"
+                             id="chromeDisplayDomain"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.chromeDisplayDomain">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.chromeDisplayDomain.$invalid && !displayForm.chromeDisplayDomain.$pristine"
+                         class="help-block">
+                        The Chrome display domain is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.contentServerUrl.$invalid && !displayForm.contentServerUrl.$pristine }">
+                    <label for="contentServerUrl" class="col-sm-3 control-label">Content server URL</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="contentServerUrl"
+                             id="contentServerUrl"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.contentServerUrl">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.contentServerUrl.$invalid && !displayForm.contentServerUrl.$pristine"
+                         class="help-block">
+                        The display content server URL is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.etag.$invalid && !displayForm.etag.$pristine }">
+                    <label for="etag" class="col-sm-3 control-label">Etag</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="etag"
+                             id="etag"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.etag">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.etag.$invalid && !displayForm.etag.$pristine"
+                         class="help-block">
+                        The display Etag is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.ethernetMacAddress.$invalid && !displayForm.ethernetMacAddress.$pristine }">
+                    <label for="ethernetMacAddress" class="col-sm-3 control-label">Ethernet MAC address</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="ethernetMacAddress"
+                             id="ethernetMacAddress"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.ethernetMacAddress">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.ethernetMacAddress.$invalid && !displayForm.ethernetMacAddress.$pristine"
+                         class="help-block">
+                        The display ethernet MAC address is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.macAddress.$invalid && !displayForm.macAddress.$pristine }">
+                    <label for="macAddress" class="col-sm-3 control-label">MAC address</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="macAddress"
+                             id="macAddress"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.macAddress">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.macAddress.$invalid && !displayForm.macAddress.$pristine"
+                         class="help-block">
+                        The display MAC address is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.firmwareVersion.$invalid && !displayForm.firmwareVersion.$pristine }">
+                    <label for="firmwareVersion" class="col-sm-3 control-label">Firmware version</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="firmwareVersion"
+                             id="firmwareVersion"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.firmwareVersion">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.firmwareVersion.$invalid && !displayForm.firmwareVersion.$pristine"
+                         class="help-block">
+                        The display firmware version is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.kind.$invalid && !displayForm.kind.$pristine }">
+                    <label for="kind" class="col-sm-3 control-label">Kind</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="kind"
+                             id="kind"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.kind">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.kind.$invalid && !displayForm.kind.$pristine"
+                         class="help-block">
+                        The display kind is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.lastEnrollmentTime.$invalid && !displayForm.lastEnrollmentTime.$pristine }">
+                    <label for="lastEnrollmentTime" class="col-sm-3 control-label">Last enrollment timestamp</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="lastEnrollmentTime"
+                             id="lastEnrollmentTime"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.lastEnrollmentTime">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.lastEnrollmentTime.$invalid && !displayForm.lastEnrollmentTime.$pristine"
+                         class="help-block">
+                        The display last enrollment timestamp is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.lastSync.$invalid && !displayForm.lastSync.$pristine }">
+                    <label for="lastSync" class="col-sm-3 control-label">Last sync timestamp</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="lastSync"
+                             id="lastSync"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.lastSync">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.lastSync.$invalid && !displayForm.lastSync.$pristine"
+                         class="help-block">
+                        The display last sync timestamp is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.model.$invalid && !displayForm.model.$pristine }">
+                    <label for="model" class="col-sm-3 control-label">Model</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="model"
+                             id="model"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.model">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.model.$invalid && !displayForm.model.$pristine"
+                         class="help-block">
+                        The display model is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.orgUnitPath.$invalid && !displayForm.orgUnitPath.$pristine }">
+                    <label for="orgUnitPath" class="col-sm-3 control-label">Organizational unit path</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="orgUnitPath"
+                             id="orgUnitPath"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.orgUnitPath">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.orgUnitPath.$invalid && !displayForm.orgUnitPath.$pristine"
+                         class="help-block">
+                        The display organizational unit path is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.osVersion.$invalid && !displayForm.osVersion.$pristine }">
+                    <label for="osVersion" class="col-sm-3 control-label">Operating system version</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="osVersion"
+                             id="osVersion"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.osVersion">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.osVersion.$invalid && !displayForm.osVersion.$pristine"
+                         class="help-block">
+                        The display OS version is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.platformVersion.$invalid && !displayForm.platformVersion.$pristine }">
+                    <label for="platformVersion" class="col-sm-3 control-label">Platform version</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="platformVersion"
+                             id="platformVersion"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.platformVersion">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.platformVersion.$invalid && !displayForm.platformVersion.$pristine"
+                         class="help-block">
+                        The display platform version is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.status.$invalid && !displayForm.status.$pristine }">
+                    <label for="status" class="col-sm-3 control-label">Status</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="status"
+                             id="status"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.status">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.status.$invalid && !displayForm.status.$pristine"
+                         class="help-block">
+                        The display status is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.tenantCode.$invalid && !displayForm.tenantCode.$pristine }">
+                    <label for="tenantCode" class="col-sm-3 control-label">Tenant code</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="tenantCode"
+                             id="tenantCode"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.tenantCode">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.tenantCode.$invalid && !displayForm.tenantCode.$pristine"
+                         class="help-block">
+                        The display tenant code is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.created.$invalid && !displayForm.created.$pristine }">
+                    <label for="created" class="col-sm-3 control-label">Created timestamp</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="created"
+                             id="created"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.created">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.created.$invalid && !displayForm.created.$pristine"
+                         class="help-block">
+                        The display created timestamp is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="form-group"
+                       ng-class="{ 'has-error' : displayForm.updated.$invalid && !displayForm.updated.$pristine }">
+                    <label for="updated" class="col-sm-3 control-label">Updated timestamp</label>
+
+                    <div class="col-sm-4">
+                      <input type="text"
+                             class="form-control"
+                             name="updated"
+                             id="updated"
+                             readonly
+                             ng-model="displayDetailsCtrl.currentDisplay.updated">
+                    </div>
+                    <div class="col-sm-5">
+                      <p ng-show="displayForm.updated.$invalid && !displayForm.updated.$pristine"
+                         class="help-block">
+                        The display updated timestamp is required.
+                      </p>
+                    </div>
+                  </div>
+
+                  <!--<div class="form-group">-->
+                  <!--<div class="col-sm-offset-2 col-sm-10">-->
+                  <!--<button type="submit"-->
+                  <!--class="btn btn-primary btn-default"-->
+                  <!--ng-disabled="displayForm.$invalid">-->
+                  <!--<i class="fa fa-fw fa-save"></i> Save-->
+                  <!--</button>-->
+                  <!--</div>-->
+                  <!--</div>-->
+                </form>
+              </div>
+            </div>
+            <!-- END panel -->
+          </tab>
+        </tabset>
+      </div>
+    </div>
+  </div>
+</div>
