@@ -220,7 +220,7 @@
                   </tr>
                   <tr ng-repeat="display in tenantDetailsCtrl.currentTenantDisplays | orderBy:'-created' ">
                     <td class="tenant-display-key">
-                      <a href="#/display/{{ display.key }}">
+                      <a href="#/displays/{{ display.key }}">
                                           <span class="entity-key">
                                             {{ display.key | limitTo: 10 }}...{{ display.key | limitTo: 10 : display.key.length - 10}}
                                           </span>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Migrations</title>
+</head>
+<ul>
+<h1 style="text-align: center">Migrations</h2>
+<form action="{{run_uri}}" method="post">
+<table style="width:100%; text-align: center">
+    <tr style="font-weight: bold">
+        <td>Name</td>
+        <td>Start Date</td>
+        <td>Finish Date</td>
+        <td>Status</td>
+        <td>Run</td>
+    </tr>
+{% for migration in migrations %}
+    <tr style="background:{{migration.color}}">
+        <td><p>{{migration.name}}</p></td>
+        <td><p>{{migration.start_date}}</p></td>
+        <td><p>{{migration.finish_date}}</p></td>
+        <td><p>{{migration.state}}</p></td>
+        <td>{% if not migration.running %}<button type="submit" name="name" value="{{migration.name}}">Run</button>{% endif %}</td>
+    </tr>
+{% endfor %}
+</table>
+</form>
+</html>
+

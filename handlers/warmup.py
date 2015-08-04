@@ -7,6 +7,7 @@ from webapp2 import RequestHandler
 
 class WarmupHandler(RequestHandler):
     def get(self):
+        logging.info('Warmed up!')
         self.response.out.write("Warmed Up")
 
 
