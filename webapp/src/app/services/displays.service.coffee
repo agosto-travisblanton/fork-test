@@ -2,6 +2,7 @@
 
 angular.module('skykitDisplayDeviceManagement').factory 'DisplaysService', ($http, $log, Restangular) ->
 
+  # TODO: Handle pagination
   class DisplaysService
     @uriBase = 'v1/displays'
 

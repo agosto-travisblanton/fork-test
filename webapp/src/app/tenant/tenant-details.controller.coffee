@@ -2,7 +2,7 @@
 
 appModule = angular.module('skykitDisplayDeviceManagement')
 
-appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, DevicesService, $state) ->
+appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, DevicesService, DisplaysService, $state) ->
   @currentTenant = {
     key: undefined,
     name: undefined,
@@ -13,6 +13,7 @@ appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, Devices
     active: true
   }
   @currentTenantDevices = []
+  @currentTenantDisplays = []
   @editMode = !!$stateParams.tenantKey
 
   if @editMode
@@ -22,6 +23,9 @@ appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, Devices
     devicesPromise = DevicesService.getDevicesByTenant($stateParams.tenantKey)
     devicesPromise.then (data) =>
       @currentTenantDevices = data
+    displaysPromise = DisplaysService.getDisplaysByTenant($stateParams.tenantKey)
+    displaysPromise.then (data) =>
+      @currentTenantDisplays = data.objects
 
   @onClickSaveButton = () ->
     promise = TenantsService.save @currentTenant
