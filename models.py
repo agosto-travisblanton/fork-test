@@ -199,3 +199,22 @@ class Display(ndb.Model):
 
     def _pre_put_hook(self):
         self.class_version = 1
+
+
+@ae_ndb_serializer
+class MigrationOperation(ndb.Model):
+    tag_name = ndb.StringProperty(required=True, indexed=True)
+    timestamp = ndb.DateTimeProperty(auto_now_add=True)
+    class_version = ndb.IntegerProperty()
+
+    @classmethod
+    def has_been_run(cls, tag_name):
+        key = MigrationOperation.query(MigrationOperation.tag_name == tag_name).get(keys_only=True)
+        return key is not None
+
+    @classmethod
+    def create(cls, tag_name):
+        return cls(tag_name=tag_name)
+
+    def _pre_put_hook(self):
+        self.class_version = 1
