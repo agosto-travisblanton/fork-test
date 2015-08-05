@@ -202,14 +202,14 @@ class Display(ndb.Model):
 
 
 @ae_ndb_serializer
-class MigrationOperation(ndb.Model):
+class AppliedMigration(ndb.Model):
     tag_name = ndb.StringProperty(required=True, indexed=True)
     timestamp = ndb.DateTimeProperty(auto_now_add=True)
     class_version = ndb.IntegerProperty()
 
     @classmethod
     def has_been_run(cls, tag_name):
-        key = MigrationOperation.query(MigrationOperation.tag_name == tag_name).get(keys_only=True)
+        key = AppliedMigration.query(AppliedMigration.tag_name == tag_name).get(keys_only=True)
         return key is not None
 
     @classmethod
