@@ -208,9 +208,9 @@ class AppliedMigration(ndb.Model):
     class_version = ndb.IntegerProperty()
 
     @classmethod
-    def has_been_run(cls, tag_name):
+    def has_not_been_run(cls, tag_name):
         key = AppliedMigration.query(AppliedMigration.tag_name == tag_name).get(keys_only=True)
-        return key is not None
+        return key is None
 
     @classmethod
     def create(cls, tag_name):

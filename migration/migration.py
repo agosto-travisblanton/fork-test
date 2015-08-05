@@ -14,16 +14,10 @@ from utils.web_util import build_uri
 from webapp2 import RequestHandler
 import logging
 import traceback
-from migrations import SomethingMigration
+from device_to_display_conversion import DeviceToDisplayConversion
 
 MIGRATIONS = [
-    SomethingMigration(),
-    # MigrationExampleException(),
-    # DbEntityToucher(name='Touch all SensorReadings', kind_name='SensorReading'),
-    # DbEntityToucher(name='Touch all Customers', kind_name='Customer'),
-    # migration_elf_913.DbEntityToucher(name='ELF-913', kind_name='SensorReading'),
-    # migration_elf_1048.Migration1(name='ELF-1048-1 (touch all SensorReadings within past 30 days)'),
-    # migration_elf_1048.Migration2(name='ELF-1048-2 (touch all SensorReadings older than ~30 days)'),
+    DeviceToDisplayConversion()
 ]
 
 MIGRATIONS_MAP = {migration.name: migration for migration in MIGRATIONS}

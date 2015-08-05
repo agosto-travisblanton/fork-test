@@ -24,13 +24,13 @@ class TestAppliedMigrationModel(BaseTest):
     def test_migration_operation_has_auto_generated_timestamp(self):
         self.assertEqual(self.applied_migration.timestamp.date(), datetime.now().date())
 
-    def test_migration_operation_has_been_run_affirmative(self):
-        result = AppliedMigration.has_been_run(self.MIGRATION_TAG)
-        self.assertTrue(result)
-
-    def test_migration_operation_has_been_run_negative(self):
-        result = AppliedMigration.has_been_run('Migration that has not been run')
+    def test_migration_operation_has_not_been_run_affirmative(self):
+        result = AppliedMigration.has_not_been_run(self.MIGRATION_TAG)
         self.assertFalse(result)
+
+    def test_migration_operation_has_not_been_run_negative(self):
+        result = AppliedMigration.has_not_been_run('Migration that has been run')
+        self.assertTrue(result)
 
     def test_migration_operation_class_version_is_only_set_by_pre_put_hook_method(self):
         self.applied_migration.class_version = 47
