@@ -1,8 +1,8 @@
 import logging
 from datetime import time
-from migration.migration_base import MigrationBase
+from migration_base import MigrationBase
 
-__author__ = 'chris'
+__author__ = 'Someone'
 
 
 class SomethingMigration(MigrationBase):
