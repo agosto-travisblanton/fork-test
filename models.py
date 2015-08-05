@@ -13,20 +13,28 @@ DISTRIBUTOR_ENTITY_GROUP_NAME = 'distributorEntityGroup'
 
 class TenantEntityGroup(ndb.Model):
     name = ndb.StringProperty(required=True)
+    class_version = ndb.IntegerProperty()
 
     @classmethod
     def singleton(cls):
         return TenantEntityGroup.get_or_insert(TENANT_ENTITY_GROUP_NAME,
                                                name=TENANT_ENTITY_GROUP_NAME)
 
+    def _pre_put_hook(self):
+        self.class_version = 1
+
 
 class DistributorEntityGroup(ndb.Model):
     name = ndb.StringProperty(required=True)
+    class_version = ndb.IntegerProperty()
 
     @classmethod
     def singleton(cls):
         return DistributorEntityGroup.get_or_insert(DISTRIBUTOR_ENTITY_GROUP_NAME,
                                                     name=DISTRIBUTOR_ENTITY_GROUP_NAME)
+
+    def _pre_put_hook(self):
+        self.class_version = 1
 
 
 @ae_ndb_serializer
@@ -35,6 +43,7 @@ class Distributor(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
+    class_version = ndb.IntegerProperty()
 
     @classmethod
     def find_by_name(cls, name):
@@ -58,6 +67,9 @@ class Distributor(ndb.Model):
                    name=name,
                    active=active)
 
+    def _pre_put_hook(self):
+        self.class_version = 1
+
 
 @ae_ndb_serializer
 class Tenant(ndb.Model):
@@ -69,6 +81,7 @@ class Tenant(ndb.Model):
     content_server_url = ndb.StringProperty(required=True)
     chrome_device_domain = ndb.StringProperty()
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
+    class_version = ndb.IntegerProperty()
 
     @classmethod
     def find_by_name(cls, name):
@@ -96,6 +109,9 @@ class Tenant(ndb.Model):
                    chrome_device_domain=chrome_device_domain,
                    active=active)
 
+    def _pre_put_hook(self):
+        self.class_version = 1
+
 
 @ae_ndb_serializer
 class ChromeOsDevice(ndb.Model):
@@ -107,7 +123,8 @@ class ChromeOsDevice(ndb.Model):
     api_key = ndb.StringProperty(required=True, indexed=True)
     serial_number = ndb.StringProperty(required=False, indexed=True)
     model = ndb.StringProperty(required=False, indexed=True)
-    name = ndb.ComputedProperty(lambda self: '{0} {1}'.format(self.serial_number, self.model) )
+    name = ndb.ComputedProperty(lambda self: '{0} {1}'.format(self.serial_number, self.model))
+    class_version = ndb.IntegerProperty()
 
     @classmethod
     def get_by_device_id(cls, device_id):
@@ -129,6 +146,9 @@ class ChromeOsDevice(ndb.Model):
                                serial_number=serial_number,
                                model=model)
         return chrome_os_device
+
+    def _pre_put_hook(self):
+        self.class_version = 1
 
 
 @ae_ndb_serializer
@@ -156,6 +176,7 @@ class Display(ndb.Model):
     model = ndb.StringProperty(required=False, indexed=False)
     os_version = ndb.StringProperty(required=False, indexed=False)
     firmware_version = ndb.StringProperty(required=False, indexed=False)
+    class_version = ndb.IntegerProperty()
 
     @classmethod
     def get_by_device_id(cls, device_id):
@@ -175,3 +196,6 @@ class Display(ndb.Model):
                       serial_number=serial_number,
                       managed_display=managed_display)
         return display
+
+    def _pre_put_hook(self):
+        self.class_version = 1

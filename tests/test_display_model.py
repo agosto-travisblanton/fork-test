@@ -22,6 +22,7 @@ class TestDisplayModel(BaseTest):
     CONTENT_SERVER_API_KEY = 'API KEY'
     MAC_ADDRESS = '54271e619346'
     SERIAL_NUMBER = 'SN0MZCX005783'
+    CURRENT_CLASS_VERSION = 1
 
     def setUp(self):
         super(TestDisplayModel, self).setUp()
@@ -153,3 +154,12 @@ class TestDisplayModel(BaseTest):
         display.put()
         json_representation = json.loads(to_json(display, DISPLAY_STRATEGY))
         self.assertEqual(True, json_representation['managed_display'])
+
+    def test_class_version_is_only_set_by_pre_put_hook_method(self):
+        display = Display.create(tenant_key=self.tenant_key,
+                                 gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                 mac_address=self.MAC_ADDRESS
+                                 )
+        display.class_version = 47
+        display.put()
+        self.assertEqual(display.class_version, self.CURRENT_CLASS_VERSION)
