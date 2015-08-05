@@ -15,14 +15,14 @@ class TestAppliedMigrationModel(BaseTest):
 
     def setUp(self):
         super(TestAppliedMigrationModel, self).setUp()
-        self.migration_operation = AppliedMigration.create(tag_name=self.MIGRATION_TAG)
-        self.migration_operation_key = self.migration_operation.put()
+        self.applied_migration = AppliedMigration.create(tag_name=self.MIGRATION_TAG)
+        self.migration_operation_key = self.applied_migration.put()
 
     def test_migration_operation_create_returns_expected_migration_tag(self):
-        self.assertEqual(self.migration_operation.tag_name, self.MIGRATION_TAG)
+        self.assertEqual(self.applied_migration.tag_name, self.MIGRATION_TAG)
 
     def test_migration_operation_has_auto_generated_timestamp(self):
-        self.assertEqual(self.migration_operation.timestamp.date(), datetime.now().date())
+        self.assertEqual(self.applied_migration.timestamp.date(), datetime.now().date())
 
     def test_migration_operation_has_been_run_affirmative(self):
         result = AppliedMigration.has_been_run(self.MIGRATION_TAG)
@@ -33,6 +33,6 @@ class TestAppliedMigrationModel(BaseTest):
         self.assertFalse(result)
 
     def test_migration_operation_class_version_is_only_set_by_pre_put_hook_method(self):
-        self.migration_operation.class_version = 47
-        self.migration_operation.put()
-        self.assertEqual(self.migration_operation.class_version, self.CURRENT_CLASS_VERSION)
+        self.applied_migration.class_version = 47
+        self.applied_migration.put()
+        self.assertEqual(self.applied_migration.class_version, self.CURRENT_CLASS_VERSION)
