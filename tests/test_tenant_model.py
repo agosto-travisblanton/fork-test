@@ -16,6 +16,7 @@ class TestTenantModel(BaseTest):
     CHROME_DEVICE_DOMAIN = 'bar.com'
     TENANT_CODE = 'foobar'
     ENTITY_GROUP_NAME = 'tenantEntityGroup'
+    CURRENT_CLASS_VERSION = 1
 
     def setUp(self):
         super(TestTenantModel, self).setUp()
@@ -70,3 +71,8 @@ class TestTenantModel(BaseTest):
     def test_is_unique_returns_true_when_name_not_found(self):
         uniqueness_check = Tenant.is_unique('Foobar')
         self.assertTrue(uniqueness_check)
+
+    def test_class_version_is_only_set_by_pre_put_hook_method(self):
+        self.tenant.class_version = 47
+        self.tenant.put()
+        self.assertEqual(self.tenant.class_version, self.CURRENT_CLASS_VERSION)

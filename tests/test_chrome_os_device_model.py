@@ -20,9 +20,10 @@ class TestChromeOsDeviceModel(BaseTest):
     CHROME_DEVICE_DOMAIN = 'bar.com'
     CONTENT_SERVER_API_KEY = 'API KEY'
     TENANT_CODE = 'foobar'
-    MAC_ADDRESS='54271e619346'
-    SERIAL_NUMBER='E3MSCX004781'
-    MODEL='ASUS Chromebox'
+    MAC_ADDRESS = '54271e619346'
+    SERIAL_NUMBER = 'E3MSCX004781'
+    MODEL = 'ASUS Chromebox'
+    CURRENT_CLASS_VERSION = 1
 
     def setUp(self):
         super(TestChromeOsDeviceModel, self).setUp()
@@ -97,3 +98,14 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertEqual(str(self.tenant.content_server_url), json_representation['tenant']['content_server_url'])
         self.assertEqual(str(self.tenant.chrome_device_domain), json_representation['tenant']['chrome_device_domain'])
         self.assertEqual(self.tenant.active, json_representation['tenant']['active'])
+
+    def test_class_version_is_only_set_by_pre_put_hook_method(self):
+        chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
+                                                 device_id=self.TESTING_DEVICE_ID,
+                                                 gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                                 mac_address=self.MAC_ADDRESS,
+                                                 serial_number=self.SERIAL_NUMBER,
+                                                 model=self.MODEL)
+        chrome_os_device.class_version = 47
+        chrome_os_device.put()
+        self.assertEqual(chrome_os_device.class_version, self.CURRENT_CLASS_VERSION)

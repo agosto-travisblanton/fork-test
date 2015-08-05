@@ -10,6 +10,7 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 class TestDistributorModel(BaseTest):
     NAME = 'Agosto'
+    CURRENT_CLASS_VERSION = 1
 
     def setUp(self):
         super(TestDistributorModel, self).setUp()
@@ -59,3 +60,8 @@ class TestDistributorModel(BaseTest):
     def test_is_unique_returns_true_when_name_not_found(self):
         uniqueness_check = Distributor.is_unique('Foobar')
         self.assertTrue(uniqueness_check)
+
+    def test_class_version_is_only_set_by_pre_put_hook_method(self):
+        self.distributor.class_version = 47
+        self.distributor.put()
+        self.assertEqual(self.distributor.class_version, self.CURRENT_CLASS_VERSION)
