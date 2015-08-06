@@ -1,7 +1,5 @@
-from datetime import datetime
 from env_setup import setup_test_paths
 from migration.migration_models import MigrationOperation
-from models import AppliedMigration
 
 setup_test_paths()
 
@@ -43,7 +41,7 @@ class TestMigrationOperationModel(BaseTest):
         self.assertIsNotNone(migration.finish_time)
 
     def test_set_debug_info_populates_expected_property(self):
-        debug_info = 'Op is hosed'
+        debug_info = 'Your op is hosed'
         migration = self.migration_operation.set_debug_info(self.MIGRATION_TAG, debug_info)
         self.assertEqual(migration.debug_info, debug_info)
 
