@@ -2,7 +2,7 @@
 
 angular.module('skykitDisplayDeviceManagement').factory 'DisplaysService', ($http, $log, Restangular) ->
 
-  # TODO: Handle pagination
+# TODO: Handle pagination
   class DisplaysService
     @uriBase = 'v1/displays'
 
@@ -22,5 +22,13 @@ angular.module('skykitDisplayDeviceManagement').factory 'DisplaysService', ($htt
       params = {}
       promise = Restangular.all('displays').getList()
       promise
+
+    save: (display) ->
+      if display.key != undefined
+        promise = display.put()
+      else
+        promise = Restangular.service('displays').post(display)
+      promise
+
 
   new DisplaysService()
