@@ -9,11 +9,7 @@ describe 'DisplayDetailsCtrl', ->
   displaysServicePromise = undefined
   TenantsService = undefined
   tenantsServicePromise = undefined
-  displays = [
-    {key: 'dhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
-    {key: 'dhjad897d987fadafg708y67d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
-    {key: 'dhjad897d987fadafg708hb55', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
-  ]
+  display = {key: 'dhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
   tenants = [
     {key: 'dhjad897d987fadafg708fg7d', name: 'Foobar1', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
     {key: 'dhjad897d987fadafg708y67d', name: 'Foobar2', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
@@ -23,10 +19,10 @@ describe 'DisplayDetailsCtrl', ->
 
   beforeEach module('skykitDisplayDeviceManagement')
 
-  beforeEach inject (_$controller_, _DisplaysService_, _TenantsService_, _$stateParams_, _$state_) ->
+  beforeEach inject (_$controller_, _DisplaysService_, _TenantsService_) ->
     $controller = _$controller_
-    $stateParams = _$stateParams_
-    $state = _$state_
+    $stateParams = {}
+    $state = {}
     DisplaysService = _DisplaysService_
     TenantsService = _TenantsService_
 
@@ -36,20 +32,51 @@ describe 'DisplayDetailsCtrl', ->
       spyOn(TenantsService, 'fetchAllTenants').and.returnValue tenantsServicePromise
       displaysServicePromise = new skykitDisplayDeviceManagement.q.Mock
       spyOn(DisplaysService, 'getByKey').and.returnValue displaysServicePromise
-      controller = $controller 'DisplayDetailsCtrl', {
-        $stateParams: $stateParams
-        $state: $state
-        DisplaysService: DisplaysService
-        TenantsService: TenantsService
-      }
 
-    it 'currentDisplay property should be defined', ->
-      expect(controller.currentDisplay).toBeDefined()
+    describe 'new mode', ->
+      beforeEach ->
+        controller = $controller 'DisplayDetailsCtrl', {
+          $stateParams: $stateParams
+          $state: $state
+          DisplaysService: DisplaysService
+          TenantsService: TenantsService
+        }
 
-    it 'call TenantsService.fetchAllTenants to retrieve all tenants', ->
-      expect(TenantsService.fetchAllTenants).toHaveBeenCalled()
+      it 'currentDisplay property should be defined', ->
+        expect(controller.currentDisplay).toBeDefined()
 
-    it "the 'then' handler caches the retrieved tenants in the controller", ->
-      tenantsServicePromise.resolve tenants
-      expect(controller.tenants).toBe tenants
+      it 'call TenantsService.fetchAllTenants to retrieve all tenants', ->
+        expect(TenantsService.fetchAllTenants).toHaveBeenCalled()
+
+      it "the 'then' handler caches the retrieved tenants in the controller", ->
+        tenantsServicePromise.resolve tenants
+        expect(controller.tenants).toBe tenants
+
+
+    describe 'edit mode', ->
+      beforeEach ->
+        $stateParams.displayKey = 'fkasdhfjfa9s8udyva7dygoudyg'
+        controller = $controller 'DisplayDetailsCtrl', {
+          $stateParams: $stateParams
+          $state: $state
+          DisplaysService: DisplaysService
+          TenantsService: TenantsService
+        }
+
+      it 'currentDisplay property should be defined', ->
+        expect(controller.currentDisplay).toBeDefined()
+
+      it 'call TenantsService.fetchAllTenants to retrieve all tenants', ->
+        expect(TenantsService.fetchAllTenants).toHaveBeenCalled()
+
+      it "the 'then' handler caches the retrieved tenants in the controller", ->
+        tenantsServicePromise.resolve tenants
+        expect(controller.tenants).toBe tenants
+
+      it 'call DisplaysService.getByKey to retrieve the selected display', ->
+        expect(DisplaysService.getByKey).toHaveBeenCalledWith($stateParams.displayKey)
+
+      it "the 'then' handler caches the retrieved display in the controller", ->
+        displaysServicePromise.resolve display
+        expect(controller.currentDisplay).toBe display
 
