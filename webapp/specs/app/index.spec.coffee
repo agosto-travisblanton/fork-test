@@ -12,6 +12,7 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
       spyOn(RestangularProvider, 'setBaseUrl').and.callThrough()
       spyOn(RestangularProvider, 'setDefaultHeaders').and.callThrough()
       spyOn(RestangularProvider, 'addRequestInterceptor').and.callThrough()
+      spyOn(RestangularProvider, 'addResponseInterceptor').and.callThrough()
       spyOn(RestangularProvider, 'setRestangularFields').and.callThrough()
 
     module 'skykitDisplayDeviceManagement'
