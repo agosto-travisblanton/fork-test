@@ -113,6 +113,11 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
       args = RestangularProvider.addRequestInterceptor.calls.argsFor(0)
       expect(args[0] instanceof Function).toBeTruthy()
 
+    it 'adds a response interceptor', ->
+      expect(RestangularProvider.addResponseInterceptor).toHaveBeenCalled()
+      args = RestangularProvider.addResponseInterceptor.calls.argsFor(0)
+      expect(args[0] instanceof Function).toBeTruthy()
+
     it 'sets the Restangular fields mapping', ->
       restangularFieldsMapping = {id: 'key'}
       expect(RestangularProvider.setRestangularFields).toHaveBeenCalledWith restangularFieldsMapping
