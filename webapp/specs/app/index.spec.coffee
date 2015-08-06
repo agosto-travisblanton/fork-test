@@ -31,9 +31,6 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
     it 'should resolve \'domain\' state', ->
       expect($state.href('domain', {})).toEqual('#/domain')
 
-    it 'should resolve \'deviceEdit\' state', ->
-      expect($state.href('deviceEdit', {})).toEqual('#/deviceEdit')
-
     it 'should resolve \'devices\' state', ->
       expect($state.href('devices', {})).toEqual('#/devices')
 
@@ -65,9 +62,6 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
 
       it 'should resolve \'domain\' state', ->
         expect($state.get('domain').ncyBreadcrumb.label).toBe 'Domains'
-
-      it 'should resolve \'deviceEdit\' state', ->
-        expect($state.get('deviceEdit').ncyBreadcrumb.label).toBe 'Edit device'
 
       it 'should resolve \'tenants\' state', ->
         expect($state.get('tenants').ncyBreadcrumb.label).toBe 'Tenants'
