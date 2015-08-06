@@ -2,19 +2,20 @@
 from google.appengine.ext import ndb
 import logging
 
+MIGRATION_STATUS_QUEUED = 'Queued'
+MIGRATION_STATUS_RUNNING = 'Running'
+MIGRATION_STATUS_FAILED = 'Failed'
+MIGRATION_STATUS_COMPLETED = 'Completed'
+MIGRATION_STATUSES = [MIGRATION_STATUS_QUEUED, MIGRATION_STATUS_RUNNING, MIGRATION_STATUS_FAILED,
+                      MIGRATION_STATUS_COMPLETED]
 
-MIGRATION_STATE_NONE = 'None'
-MIGRATION_STATE_RUNNING = 'Running'
-MIGRATION_STATE_FAILED = 'Failed'
-MIGRATION_STATE_COMPLETE = 'Complete'
-MIGRATION_STATES = [MIGRATION_STATE_NONE, MIGRATION_STATE_RUNNING, MIGRATION_STATE_FAILED, MIGRATION_STATE_COMPLETE]
 
-
-class MigrationStatus(ndb.Model):
-    start_date = ndb.DateTimeProperty()
-    finish_date = ndb.DateTimeProperty()
-    state = ndb.StringProperty(required=True, choices=MIGRATION_STATES, default=MIGRATION_STATE_NONE)
+class MigrationOperation(ndb.Model):
+    start_time = ndb.DateTimeProperty()
+    finish_time = ndb.DateTimeProperty()
+    status = ndb.StringProperty(required=True, choices=MIGRATION_STATUSES, default=MIGRATION_STATUS_QUEUED)
     debug_info = ndb.StringProperty()
+    class_version = ndb.IntegerProperty()
 
     @property
     def name(self):
@@ -31,49 +32,52 @@ class MigrationStatus(ndb.Model):
     @classmethod
     @ndb.transactional
     def start(cls, name):
-        migration_status = cls.get_or_insert_by_name(name)
-        if migration_status.state == MIGRATION_STATE_RUNNING:
-            migration_status = None
+        migration = cls.get_or_insert_by_name(name)
+        if migration.status == MIGRATION_STATUS_RUNNING:
+            migration = None
         else:
-            migration_status.state = MIGRATION_STATE_RUNNING
-            migration_status.start_date = datetime.utcnow()
-            migration_status.finish_date = None
-            migration_status.put()
-        return migration_status
+            migration.status = MIGRATION_STATUS_RUNNING
+            migration.start_time = datetime.now()
+            migration.finish_time = None
+            migration.put()
+        return migration
 
     @classmethod
     @ndb.transactional
     def fail(cls, name):
-        status = cls.get_by_name(name)
-        if status is None:
-            logging.warning("Attempted to fail invalid migration '{}'".format(name))
+        migration = cls.get_by_name(name)
+        if migration is None:
+            logging.warning("Attempt to FAIL '{0}' which could not be retrieved from data store.".format(name))
         else:
-            if status.state != MIGRATION_STATE_RUNNING:
-                logging.warning("Failed migration '{}' while in state '{}'".format(status.name, status.state))
-
-            # 'Failed' state trumps all other states.
-            status.state = MIGRATION_STATE_FAILED
-            status.finish_date = datetime.utcnow()
-            status.put()
+            if migration.status != MIGRATION_STATUS_RUNNING:
+                logging.warning("FAIL '{0}' with status '{1}'".format(migration.name, migration.status))
+            migration.status = MIGRATION_STATUS_FAILED
+            migration.finish_time = datetime.now()
+            migration.put()
+        return migration
 
     @classmethod
     @ndb.transactional
     def complete(cls, name):
-        status = cls.get_by_name(name)
-        if status is None:
-            logging.warning("Attempted to complete invalid migration '{}'".format(name))
-        elif status.state != MIGRATION_STATE_RUNNING:
-            logging.warning("Completed migration '{}' while in state '{}'".format(status.name, status.state))
+        migration = cls.get_by_name(name)
+        if migration is None:
+            logging.warning("Attempt to COMPLETE '{0}' which counld not be retrieved from data store.".format(name))
+        elif migration.status != MIGRATION_STATUS_RUNNING:
+            logging.warning("COMPLETE '{0}' with status '{1}'".format(migration.name, migration.status))
         else:
-            status.state = MIGRATION_STATE_COMPLETE
-            status.finish_date = datetime.utcnow()
-            status.put()
+            migration.status = MIGRATION_STATUS_COMPLETED
+            migration.finish_time = datetime.now()
+            migration.put()
+        return migration
 
     @classmethod
     @ndb.transactional
     def set_debug_info(cls, name, debug_info):
-        status = cls.get_by_name(name)
-        if status is not None:
-            status.debug_info = debug_info
-            status.put()
+        migration = cls.get_by_name(name)
+        if migration is not None:
+            migration.debug_info = debug_info
+            migration.put()
+        return migration
 
+    def _pre_put_hook(self):
+        self.class_version = 1
