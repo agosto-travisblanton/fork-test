@@ -12,4 +12,3 @@ class DeviceToDisplayConversion(MigrationBase):
 
     def run(self):
         logging.info('Running {0}'.format(self.MIGRATION_NAME))
-        raise ValueError('A very specific bad thing happened')

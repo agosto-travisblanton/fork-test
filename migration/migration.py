@@ -16,11 +16,9 @@ from webapp2 import RequestHandler
 import logging
 import traceback
 from device_to_display_conversion import DeviceToDisplayConversion
-from migration_2 import Migration_2
 
 MIGRATIONS = [
-    DeviceToDisplayConversion(),
-    Migration_2(),
+    DeviceToDisplayConversion()
 ]
 
 MIGRATIONS_MAP = {migration.name: migration for migration in MIGRATIONS}
