@@ -2,7 +2,7 @@
 
 appModule = angular.module('skykitDisplayDeviceManagement')
 
-appModule.controller 'DisplayDetailsCtrl', ($stateParams, DisplaysService) ->
+appModule.controller 'DisplayDetailsCtrl', ($stateParams, $state, DisplaysService, TenantsService) ->
   @currentDisplay = {
     key: undefined
     gcm_registration_id: undefined
@@ -25,11 +25,15 @@ appModule.controller 'DisplayDetailsCtrl', ($stateParams, DisplaysService) ->
     platform_version: undefined #"6812.88.0 (Official Build) stable-channel zako"
     serial_number: undefined #"5CD45183T6"
     status: undefined #"ACTIVE"
-    tenant: undefined
+    tenant_key: undefined
     created: undefined #"2015-07-07 19:22:57"
     updated: undefined #"2015-07-07 19:22:57"
   }
   @editMode = !!$stateParams.displayKey
+
+  tenantsPromise = TenantsService.fetchAllTenants()
+  tenantsPromise.then (data) =>
+    @tenants = data
 
   if @editMode
     displayPromise = DisplaysService.getByKey($stateParams.displayKey)
@@ -37,9 +41,9 @@ appModule.controller 'DisplayDetailsCtrl', ($stateParams, DisplaysService) ->
       @currentDisplay = data
 
   @onClickSaveButton = () ->
-#    promise = DisplaysService.save @currentDisplay
-#    promise.then (data) ->
-#      $state.go 'displays'
+    promise = DisplaysService.save @currentDisplay
+    promise.then (data) ->
+      $state.go 'displays'
 
 
   @

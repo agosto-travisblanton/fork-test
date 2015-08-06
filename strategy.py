@@ -69,5 +69,5 @@ DISPLAY_FIELDS = [
 DISPLAY_STRATEGY = ModelStrategy(Display) + DISPLAY_FIELDS
 DISPLAY_STRATEGY += [
     {'key': lambda o, field_name, context: o.key.urlsafe()},
-    {'tenant': lambda o, field_name, context: o.tenant_key.get()}
+    {'tenant_key': lambda o, field_name, context: o.tenant_key.urlsafe()}
 ]

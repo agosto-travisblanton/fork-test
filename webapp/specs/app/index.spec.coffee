@@ -12,6 +12,7 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
       spyOn(RestangularProvider, 'setBaseUrl').and.callThrough()
       spyOn(RestangularProvider, 'setDefaultHeaders').and.callThrough()
       spyOn(RestangularProvider, 'addRequestInterceptor').and.callThrough()
+      spyOn(RestangularProvider, 'addResponseInterceptor').and.callThrough()
       spyOn(RestangularProvider, 'setRestangularFields').and.callThrough()
 
     module 'skykitDisplayDeviceManagement'
@@ -31,9 +32,6 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
     it 'should resolve \'domain\' state', ->
       expect($state.href('domain', {})).toEqual('#/domain')
 
-    it 'should resolve \'deviceEdit\' state', ->
-      expect($state.href('deviceEdit', {})).toEqual('#/deviceEdit')
-
     it 'should resolve \'devices\' state', ->
       expect($state.href('devices', {})).toEqual('#/devices')
 
@@ -51,6 +49,10 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
       deviceKey = '3741833e781236b4jwdfhhfds98fyasd6fa7d6'
       expect($state.href('editDevice', {deviceKey: deviceKey})).toEqual("#/devices/#{deviceKey}")
 
+    it 'should resolve \'editDisplay\' state', ->
+      displayKey = '3741833e781236b4jwdfhhfds98fyasd6fa7d6'
+      expect($state.href('editDisplay', {displayKey: displayKey})).toEqual("#/displays/#{displayKey}")
+
     it 'should resolve \'remote_control\' state', ->
       expect($state.href('remote_control', {})).toEqual('#/remote_control')
 
@@ -66,9 +68,6 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
       it 'should resolve \'domain\' state', ->
         expect($state.get('domain').ncyBreadcrumb.label).toBe 'Domains'
 
-      it 'should resolve \'deviceEdit\' state', ->
-        expect($state.get('deviceEdit').ncyBreadcrumb.label).toBe 'Edit device'
-
       it 'should resolve \'tenants\' state', ->
         expect($state.get('tenants').ncyBreadcrumb.label).toBe 'Tenants'
 
@@ -83,6 +82,9 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
 
       it 'should resolve \'editDevice\' state', ->
         expect($state.get('editDevice').ncyBreadcrumb.label).toBe 'Device {{ deviceDetailsCtrl.currentDevice.key }}'
+
+      it 'should resolve \'editDisplay\' state', ->
+        expect($state.get('editDisplay').ncyBreadcrumb.label).toBe 'Display {{ displayDetailsCtrl.currentDisplay.key }}'
 
       it 'should resolve \'remote_control\' state', ->
         expect($state.get('remote_control').ncyBreadcrumb.label).toBe 'Remote control'
@@ -110,6 +112,11 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
     it 'adds a request interceptor', ->
       expect(RestangularProvider.addRequestInterceptor).toHaveBeenCalled()
       args = RestangularProvider.addRequestInterceptor.calls.argsFor(0)
+      expect(args[0] instanceof Function).toBeTruthy()
+
+    it 'adds a response interceptor', ->
+      expect(RestangularProvider.addResponseInterceptor).toHaveBeenCalled()
+      args = RestangularProvider.addResponseInterceptor.calls.argsFor(0)
       expect(args[0] instanceof Function).toBeTruthy()
 
     it 'sets the Restangular fields mapping', ->
