@@ -117,12 +117,15 @@ class DisplaysHandler(RequestHandler, PagingListHandlerMixin, KeyValidatorMixin)
             status = 404
             message = 'Unrecognized display with key: {0}'.format(display_urlsafe_key)
         else:
+            logging.info('Updating display entity...')
             request_json = json.loads(self.request.body)
-            gcm_registration_id = request_json.get('gcmRegistrationId')
+            gcm_registration_id = request_json.get('gcm_registration_id')
             if gcm_registration_id:
+                logging.info('  Updating the gcm_registration_id...')
                 display.gcm_registration_id = gcm_registration_id
-            tenant_key = (ndb.Key(urlsafe=request_json.get('tenantKey')).get()).key
+            tenant_key = ndb.Key(urlsafe=request_json.get('tenant_key'))
             if tenant_key != display.tenant_key:
+                logging.info('  Updating the tenant...')
                 display.tenant_key = tenant_key
             display.put()
             deferred.defer(update_chrome_os_device, display_urlsafe_key=display.key.urlsafe())

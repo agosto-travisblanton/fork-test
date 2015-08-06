@@ -45,7 +45,6 @@ class TestDisplaysHandler(BaseTest, WebTest):
         }
         self.invalid_authorization_header = {}
 
-
     ##################################################################################################################
     ## get_list
     ##################################################################################################################
@@ -147,14 +146,7 @@ class TestDisplaysHandler(BaseTest, WebTest):
         self.assertEqual(response_json['serial_number'], display.serial_number)
         self.assertEqual(response_json['status'], display.status)
         self.assertEqual(response_json['updated'], display.updated.strftime('%Y-%m-%d %H:%M:%S'))
-        self.assertEqual(response_json['tenant']['active'], tenant.active)
-        self.assertEqual(response_json['tenant']['admin_email'], tenant.admin_email)
-        self.assertEqual(response_json['tenant']['chrome_device_domain'], tenant.chrome_device_domain)
-        self.assertEqual(response_json['tenant']['content_server_url'], tenant.content_server_url)
-        self.assertEqual(response_json['tenant']['created'], tenant.created.strftime('%Y-%m-%d %H:%M:%S'))
-        self.assertEqual(response_json['tenant']['name'], tenant.name)
-        self.assertEqual(response_json['tenant']['tenant_code'], tenant.tenant_code)
-        self.assertEqual(response_json['tenant']['updated'], tenant.updated.strftime('%Y-%m-%d %H:%M:%S'))
+        self.assertEqual(response_json['tenant_key'], tenant.key.urlsafe())
 
     ##################################################################################################################
     ## post
@@ -192,7 +184,7 @@ class TestDisplaysHandler(BaseTest, WebTest):
     ##################################################################################################################
     def test_put_http_status_no_content(self):
         gcm_registration_id = 'd23784972038845ab3963412'
-        request_body = {'gcmRegistrationId': gcm_registration_id, 'tenantKey': self.tenant_key.urlsafe()}
+        request_body = {'gcm_registration_id': gcm_registration_id, 'tenant_key': self.tenant_key.urlsafe()}
         when(deferred).defer(any_matcher(update_chrome_os_device),
                              any_matcher(self.managed_display_key.urlsafe())).thenReturn(None)
         response = self.app.put('/api/v1/displays/{0}'.format(self.managed_display_key.urlsafe()),
@@ -202,7 +194,7 @@ class TestDisplaysHandler(BaseTest, WebTest):
 
     def test_put_updates_display_entity_in_datastore(self):
         gcm_registration_id = 'd23784972038845ab3963412'
-        request_body = {'gcmRegistrationId': gcm_registration_id, 'tenantKey': self.tenant_key.urlsafe()}
+        request_body = {'gcm_registration_id': gcm_registration_id, 'tenant_key': self.tenant_key.urlsafe()}
         when(deferred).defer(any_matcher(update_chrome_os_device),
                              any_matcher(self.managed_display_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/displays/{0}'.format(self.managed_display_key.urlsafe()),
@@ -214,7 +206,10 @@ class TestDisplaysHandler(BaseTest, WebTest):
 
     def test_put_updates_display_entity_in_datastore_with_explicit_tenant_change(self):
         gcm_registration_id = 'd23784972038845ab3963412'
-        request_body = {'gcmRegistrationId': gcm_registration_id, 'tenantKey': self.another_tenant_key.urlsafe()}
+        request_body = {
+            'gcm_registration_id': gcm_registration_id,
+            'tenant_key': self.another_tenant_key.urlsafe()
+        }
         when(deferred).defer(any_matcher(update_chrome_os_device),
                              any_matcher(self.managed_display_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/displays/{0}'.format(self.managed_display_key.urlsafe()),

@@ -69,12 +69,7 @@ class TestDisplayModel(BaseTest):
         self.assertIsNotNone(json_representation['created'])
         self.assertIsNotNone(json_representation['updated'])
         self.assertEqual(str(display.api_key), json_representation['api_key'])
-        self.assertEqual(str(self.tenant.name), json_representation['tenant']['name'])
-        self.assertEqual(str(self.tenant.tenant_code), json_representation['tenant']['tenant_code'])
-        self.assertEqual(str(self.tenant.admin_email), json_representation['tenant']['admin_email'])
-        self.assertEqual(str(self.tenant.content_server_url), json_representation['tenant']['content_server_url'])
-        self.assertEqual(str(self.tenant.chrome_device_domain), json_representation['tenant']['chrome_device_domain'])
-        self.assertEqual(self.tenant.active, json_representation['tenant']['active'])
+        self.assertEqual(str(self.tenant.key.urlsafe()), json_representation['tenant_key'])
 
     def test_json_serialization_strategy_for_optional_chrome_os_device_properties(self):
         display = Display.create(tenant_key=self.tenant_key,

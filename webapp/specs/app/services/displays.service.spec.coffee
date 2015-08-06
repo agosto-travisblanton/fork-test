@@ -56,3 +56,24 @@ describe 'DisplaysService', ->
       expect(displayRestangularService.getList).toHaveBeenCalled()
       expect(actual).toBe promise
 
+  describe '.save', ->
+    it 'update an existing display, returning a promise', ->
+      display = {
+        key: 'kdfalkdsjfakjdf98ad87fa87df0'
+        put: ->
+      }
+      spyOn(display, 'put').and.returnValue promise
+      actual = DisplaysService.save display
+      expect(display.put).toHaveBeenCalled()
+      expect(actual).toBe promise
+
+    it 'insert a new tenant, returning a promise', ->
+      display = {name: 'Foobar'}
+      displayRestangularService = { post: (tenant) -> }
+      spyOn(Restangular, 'service').and.returnValue displayRestangularService
+      spyOn(displayRestangularService, 'post').and.returnValue promise
+      actual = DisplaysService.save display
+      expect(Restangular.service).toHaveBeenCalledWith 'displays'
+      expect(displayRestangularService.post).toHaveBeenCalledWith display
+      expect(actual).toBe promise
+
