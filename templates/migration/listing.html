@@ -25,8 +25,9 @@
                 <td style="padding: 2px 2px 2px 10px"><p>{{migration.status}}</p></td>
                 <td style="padding: 2px 2px 2px 10px"><p>{{migration.start_time}}</p></td>
                 <td style="padding: 2px 2px 2px 10px"><p>{{migration.finish_time}}</p></td>
-                <td style="padding: 2px 2px 2px 10px; width:100px">{% if migration.status == 'Queued'  %}
-                    <button type="submit" name="name" value="{{migration.name}}" style="width:60px">Run</button>
+                <td style="padding: 2px 2px 2px 10px; width:100px">
+                    {% if migration.status == 'Queued'  %}
+                        <button type="submit" name="name" value="{{migration.name}}" style="width:60px">Run</button>
                     {% endif %}
                 </td>
             </tr>
