@@ -1,4 +1,6 @@
-import env_setup; env_setup.setup()
+import env_setup;
+
+env_setup.setup()
 
 import logging
 from google.appengine.api import modules
@@ -14,5 +16,3 @@ class WarmupHandler(RequestHandler):
 class StartHandler(RequestHandler):
     def get(self):
         logging.info('{} started successfully.'.format(modules.get_current_module_name()))
-
-
