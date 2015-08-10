@@ -78,6 +78,19 @@ class DeviceResourceHandler(RequestHandler):
         chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
         chrome_os_devices = chrome_os_devices_api.list(config.GOOGLE_CUSTOMER_ID)
         if chrome_os_devices is not None:
+            for chrome_os_device in chrome_os_devices:
+                device_id = chrome_os_device.get('deviceId')
+                local_device = ChromeOsDevice.get_by_device_id(device_id)
+                if local_device is not None:
+                    tenant = local_device.key.parent().get()
+                    chrome_os_device['tenantCode'] = tenant.tenant_code
+                    chrome_os_device['contentServerUrl'] = tenant.content_server_url
+                    chrome_os_device['chromeDeviceDomain'] = tenant.chrome_device_domain
+                    chrome_os_device["gcmRegistrationId"] = local_device.gcm_registration_id
+                    chrome_os_device['created'] = local_device.created.strftime('%Y-%m-%d %H:%M:%S')
+                    chrome_os_device['updated'] = local_device.updated.strftime('%Y-%m-%d %H:%M:%S')
+                    chrome_os_device['apiKey'] = local_device.api_key
+                    chrome_os_device['key'] = local_device.key.urlsafe()
             json_response(self.response, chrome_os_devices)
             self.response.set_status(200)
         else:
