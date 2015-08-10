@@ -1,4 +1,5 @@
 from env_setup import setup
+
 setup()
 
 import os
@@ -97,6 +98,11 @@ application = WSGIApplication(
             handler_method='post',
             methods=['POST']
         ),
+        Route(
+            r'/api/v1/displays/<display_urlsafe_key>/commands',
+            handler='handlers.display_commands_handler.DisplayCommandsHandler',
+            name='display-commands',
+        ),
 
         ############################################################
         # Tenants
@@ -130,5 +136,3 @@ application = WSGIApplication(
         )
     ]
 )
-
-
