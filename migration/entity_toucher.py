@@ -1,7 +1,7 @@
 from migration_base import MapReduceMigration
 from google.appengine.ext import ndb
 from mapreduce import mapreduce_pipeline, base_handler
-from migration_models import MigrationStatus
+from migration_models import MigrationOperation
 import logging
 from mapreduce import operation as op
 import models  # DO NOT REMOVE; needed for mapper
@@ -17,7 +17,7 @@ class DbEntityToucher(MapReduceMigration):
         pipeline = DbEntityToucherPipeline(self.name, self.kind_name)
         pipeline.start(queue_name='migrations')
         logging.info('DbEntityToucher started for {}'.format(self.kind_name))
-        MigrationStatus.set_debug_info(self.name, 'pipeline_id={}'.format(pipeline.pipeline_id))
+        MigrationOperation.set_debug_info(self.name, 'pipeline_id={}'.format(pipeline.pipeline_id))
         self.poll_for_completion([pipeline.pipeline_id])
 
 
