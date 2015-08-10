@@ -63,19 +63,19 @@ class TestDisplayCommandsHandler(BaseTest, WebTest):
         request_body = {}
         with self.assertRaises(AppError) as context:
             self.app.post(self.post_uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        self.assertTrue('400 Invalid intent' in context.exception.message)
+        self.assertTrue('400 DisplayCommandsHandler: Invalid intent' in context.exception.message)
 
     def test_post_empty_string_intent_returns_bad_request(self):
         request_body = {'intent': ''}
         with self.assertRaises(AppError) as context:
             self.app.post(self.post_uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        self.assertTrue('400 Invalid intent' in context.exception.message)
+        self.assertTrue('400 DisplayCommandsHandler: Invalid intent' in context.exception.message)
 
     def test_post_wrong_payload_returns_bad_request(self):
         request_body = {'wrong_intent': self.some_intent}
         with self.assertRaises(AppError) as context:
             self.app.post(self.post_uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        self.assertTrue('400 Invalid intent' in context.exception.message)
+        self.assertTrue('400 DisplayCommandsHandler: Invalid intent' in context.exception.message)
 
     def test_post_bogus_key_returns_not_found(self):
         request_body = {'intent': self.some_intent}
@@ -86,4 +86,4 @@ class TestDisplayCommandsHandler(BaseTest, WebTest):
                                        {'display_urlsafe_key': bogus_key})
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        self.assertTrue("404 Display not found with key: {0}".format(bogus_key) in context.exception.message)
+        self.assertTrue("404 DisplayCommandsHandler: Display not found with key: {0}".format(bogus_key) in context.exception.message)

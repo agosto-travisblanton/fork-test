@@ -20,7 +20,7 @@ class DisplayCommandsHandler(RequestHandler):
         intent = request_json.get('intent')
         if intent is None or intent == '':
             status = 400
-            message = 'Invalid intent.'
+            message = 'DisplayCommandsHandler: Invalid intent.'
         else:
             display = None
             try:
@@ -32,6 +32,6 @@ class DisplayCommandsHandler(RequestHandler):
                 change_intent(display.gcm_registration_id, intent)
             else:
                 status = 404
-                message = 'Display not found with key: {0}'.format(display_urlsafe_key)
-                logging.info(message)
+                message = 'DisplayCommandsHandler: Display not found with key: {0}'.format(display_urlsafe_key)
+                logging.error(message)
         self.response.set_status(status, message)
