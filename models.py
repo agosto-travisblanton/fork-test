@@ -218,3 +218,61 @@ class AppliedMigration(ndb.Model):
 
     def _pre_put_hook(self):
         self.class_version = 1
+
+
+@ae_ndb_serializer
+class User(ndb.Model):
+    class_version = ndb.IntegerProperty()
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    updated = ndb.DateTimeProperty(auto_now=True)
+    email = ndb.StringProperty(required=True)
+    is_administrator = ndb.BooleanProperty(default=False)
+    stormpath_account_href = ndb.StringProperty()
+    last_login = ndb.DateTimeProperty()
+
+    def _pre_put_hook(self):
+        self.class_version = 1
+        if self.key is None or self.key.id() is None:
+            self.key = ndb.Key(User, self.email)
+
+    @classmethod
+    def get_by_email(cls, email):
+        return ndb.Key(User, email).get()
+
+    @classmethod
+    def update_or_create_with_api_account(cls, account):
+        user = None
+        if account.href:
+            user = cls.query(cls.stormpath_account_href == account.href).get()
+            if user is None:
+                user = User.get_or_insert(account.email, email=account.email, stormpath_account_href=account.href)
+        return user
+
+    @property
+    def distributor_keys(self):
+        dist_user_keys = DistributorUser.query(DistributorUser.user_key == self.key).fetch(keys_only=True)
+        dist_users = ndb.get_multi(dist_user_keys)
+        return [du.distributor_key for du in dist_users]
+
+    @property
+    def distributors(self):
+        return ndb.get_multi(self.distributor_keys)
+
+    def add_distributor(self, distributor_key):
+        if distributor_key not in self.distributor_keys:
+            dist_user = DistributorUser(user_key = self.key, distributor_key=distributor_key)
+            dist_user.put()
+
+@ae_ndb_serializer
+class DistributorUser(ndb.Model):
+    """
+    Many-to-many relationship between Distributor and User.  Similar to Tenant-User relationship ("Permit") in SKD
+    Is there a better name for this?
+    """
+    class_version = ndb.IntegerProperty()
+    distributor_key = ndb.KeyProperty(kind=Distributor, required=True)
+    user_key = ndb.KeyProperty(kind=User, required=True)
+
+    def _pre_put_hook(self):
+        self.class_version = 1
+

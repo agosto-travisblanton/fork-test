@@ -1,4 +1,5 @@
 from env_setup import setup
+
 setup()
 
 import os
@@ -11,14 +12,10 @@ if os.environ.get('CURRENT_VERSION_ID'):
 # DO NOT REMOVE
 # Importing deferred is a work around to this bug.
 # https://groups.google.com/forum/?fromgroups=#!topic/webapp2/sHb2RYxGDLc
-from google.appengine.ext import deferred
+# from google.appengine.ext import deferred
 
 from webapp2 import Route, WSGIApplication
-
-# This 'CURRENT_VERSION_ID' variable is not available when running tests
-if os.environ.get('CURRENT_VERSION_ID'):
-    # this makes ereporter capture exceptions on all your handlers
-    ereporter.register_logger()
+from agar.env import on_production_server
 
 application = WSGIApplication(
     [
@@ -29,6 +26,27 @@ application = WSGIApplication(
             r'/_ah/warmup',
             handler='handlers.warmup.WarmupHandler',
             name='warmup',
+        ),
+
+        ############################################################
+        # login
+        ############################################################
+        Route(
+            r'/api/v1/identity',
+            handler='handlers.login.IdentityHandler',
+            name='identity'
+        ),
+
+        Route(
+            r'/login',
+            handler='handlers.login.LoginHandler',
+            name='login',
+        ),
+
+        Route(
+            r'/logout',
+            handler='handlers.login.LogoutHandler',
+            name='logout',
         ),
 
         ############################################################
@@ -128,7 +146,6 @@ application = WSGIApplication(
             name='manage-distributor',
             methods=['GET', 'PUT', 'DELETE']
         )
-    ]
+    ],
+    debug=not on_production_server
 )
-
-

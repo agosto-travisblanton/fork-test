@@ -2,11 +2,10 @@
 The configuration file used by :py:mod:`agar.config` implementations and other libraries using the
 `google.appengine.api.lib_config`_ configuration library. Configuration overrides go in this file.
 """
-from env_setup import setup;
-
+from env_setup import setup
 setup()
 import os
-from agar.env import on_development_server, on_server, on_production_server, on_integration_server
+from agar.env import on_development_server, on_server, on_production_server, on_integration_server, appid
 
 
 ##############################################################################
@@ -154,3 +153,33 @@ def _GOOGLE_CUSTOMER_ID():
 
 
 app_GOOGLE_CUSTOMER_ID = _GOOGLE_CUSTOMER_ID()
+
+
+def _STORMPATH_CLIENT():
+    """
+    http://docs.stormpath.com/python/quickstart/#create-a-client
+    """
+    if on_production_server:
+        raise Exception('STORMPATH_CLIENT is not configured for production yet!!!')
+        # id = 'TBD'
+        # secret = 'TBD'
+    else:
+        id = '6VYRY6TL26YRBJOAOO533W6DO'
+        secret = 'oc4u1Nm0M5p3vJSOENhPZzAhNfzifAxMQS0v3J/kG/U'
+
+    api_key = {
+        'id': id,
+        'secret': secret
+    }
+
+    # NOTE: must use scheme='basic' - only one that works on GAE
+    from stormpath.client import Client
+    return Client(api_key=api_key, scheme='basic')
+app_STORMPATH_CLIENT = _STORMPATH_CLIENT()
+
+
+def _STORMPATH_AUTH_APP():
+    return appid
+app_STORMPATH_AUTH_APP = _STORMPATH_AUTH_APP()
+
+webapp2_extras_sessions_secret_key = '94eda847-0ea9-4f49-b96c-1434ec318563'
