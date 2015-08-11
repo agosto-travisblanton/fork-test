@@ -1,60 +1,62 @@
+"""Stormpath API client."""
+
+
 from .auth import Auth
-from .http import HttpExecutor
 from .data_store import DataStore
-from .resource.tenant import Tenant
-from .resource.account import AccountList
-from .resource.group import GroupList
-from .resource.group_membership import GroupMembershipList
-from .resource.account_store_mapping import AccountStoreMappingList
+from .http import HttpExecutor
+from .resources.account import AccountList
+from .resources.account_store_mapping import AccountStoreMappingList
+from .resources.group import GroupList
+from .resources.group_membership import GroupMembershipList
+from .resources.tenant import Tenant
 
 
 class Client(object):
-    """ The root entry point for SDK functionality.
+    """The root entry point for SDK functionality.
 
     Using the client instance, you can access all tenant data, such as
     applications, directories, groups, and accounts.
 
     More info in documentation:
-    https://www.stormpath.com/docs/python/product-guide#Client
+    http://docs.stormpath.com/python/product-guide/#sdk-concepts
 
     The client contains the following attributes that represent resource lists:
 
     :py:attr:`applications` -
-    :class:`stormpath.resource.application.ApplicationList`
+    :class:`stormpath.resources.application.ApplicationList`
 
     :py:attr:`directories` -
-    :class:`stormpath.resource.directory.DirectoryList`
+    :class:`stormpath.resources.directory.DirectoryList`
 
     :py:attr:`accounts` -
-    :class:`stormpath.resource.account.AccountList`
+    :class:`stormpath.resources.account.AccountList`
 
     :py:attr:`groups` -
-    :class:`stormpath.resource.group.GroupList`
+    :class:`stormpath.resources.group.GroupList`
 
     :py:attr:`group_memberships` -
-    :class:`stormpath.resource.group_membership.GroupMembershipList`
+    :class:`stormpath.resources.group_membership.GroupMembershipList`
 
     :py:attr:`account_store_mappings` -
-    :class:`stormpath.resource.account_store_mapping.AccountStoreMappingList`
-
+    :class:`stormpath.resources.account_store_mapping.AccountStoreMappingList`
     """
-
     BASE_URL = 'https://api.stormpath.com/v1'
 
-    def __init__(self, cache_options=None, expand=None, **kwargs):
-        executor = HttpExecutor(self.BASE_URL, Auth(**kwargs).basic)
-        self.data_store = DataStore(executor, cache_options)
-        self.tenant = Tenant(client=self, href='/tenants/current',
-            expand=expand)
-
+    def __init__(self, cache_options=None, expand=None, proxies=None, user_agent=None, **auth_kwargs):
         """
         Initialize the client by setting the
         :class:`stormpath.data_store.DataStore` and
-        :class:`stormpath.resource.tenant.Tenant`.
-        The parameters the Client accepts are those used by
-        :class:`stormpath.http.HttpExecutor`, :class:`stormpath.auth.Auth` and
+        :class:`stormpath.resources.tenant.Tenant`.
+
+        The parameters the Client accepts are those used by the
+        :class:`stormpath.http.HttpExecutor`, :class:`stormpath.auth.Auth`, and
         :class:`stormpath.data_store.DataStore` classes.
+
+        :param str user_agent: (optional) The custom user agent to set.
         """
+        executor = HttpExecutor(self.BASE_URL, Auth(**auth_kwargs).scheme, proxies, user_agent=user_agent)
+        self.data_store = DataStore(executor, cache_options)
+        self.tenant = Tenant(client=self, href='/tenants/current', expand=expand)
 
     @property
     def applications(self):

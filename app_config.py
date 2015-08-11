@@ -24,6 +24,8 @@ class AppConfig(Config):
     GCM_TEST_MODE = None
     IMPERSONATION_ADMIN_EMAIL_ADDRESS = None
     GOOGLE_CUSTOMER_ID = None
+    STORMPATH_AUTH_APP = None
+    STORMPATH_CLIENT = None
 
 
 config = AppConfig.get_config()
