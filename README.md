@@ -167,7 +167,7 @@ ________________________________________________________________________________
 
 From the project root directory: `appcfg.py --oauth2 -A skykit-display-device-int update .`
 
-snapdeploy: `python manage.py snapdeploy --ignore-branch -A skykit-display-device-int --oauth2
+snapdeploy: `python manage.py snapdeploy --ignore-branch -A skykit-display-device-int --oauth2`
 
 [SkyKit Provisioning INT](https://skykit-display-device-int.appspot.com/#)
 
