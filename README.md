@@ -175,6 +175,6 @@ snapdeploy: `python manage.py snapdeploy --ignore-branch -A skykit-display-devic
 
 From the project root directory: `appcfg.py --oauth2 -A skykit-provisioning update .`
 
-snapdeploy: `python manage.py snapdeploy --ignore-branch -A skykit-provisioning --oauth2
+snapdeploy: `python manage.py snapdeploy --ignore-branch -A skykit-provisioning --oauth2`
 
 [SkyKit Provisioning](https://skykit-provisioning.appspot.com/#)
