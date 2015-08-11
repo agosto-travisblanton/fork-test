@@ -1,5 +1,6 @@
 from ae_test_data import build
 import env_setup
+
 env_setup.setup_tests()
 env_setup.setup()
 
@@ -13,6 +14,7 @@ from models import (
     Distributor,
     User,
 )
+
 
 class MockStormpathResponse:
     def __init__(self, email):
@@ -58,4 +60,3 @@ class ProvisioningBaseTest(BaseTest, WebTest, KeyValidatorMixin):
         with patch.object(stormpath_api, 'google_login', return_value=user):
             resp = self.app.post_json(build_uri('login'), params)
         self.assertTrue("Successful Login" in resp)
-

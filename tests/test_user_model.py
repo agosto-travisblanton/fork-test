@@ -1,7 +1,7 @@
 from ae_test_data import build
 from agar.test import BaseTest
 from models import User, Distributor
-from tests.provisioning_base_test import MockStormpathResponse
+from provisioning_base_test import MockStormpathResponse
 
 
 class UserTest(BaseTest):

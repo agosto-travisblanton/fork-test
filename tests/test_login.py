@@ -5,10 +5,9 @@ from app_config import config
 from models import User, Distributor, DistributorEntityGroup
 import stormpath_api
 from datetime import datetime
-from tests.provisioning_base_test import ProvisioningBaseTest
+from provisioning_base_test import ProvisioningBaseTest
 from utils.web_util import build_uri
 from mock import patch
-
 
 
 class LoginHandlerTest(ProvisioningBaseTest):
@@ -18,7 +17,6 @@ class LoginHandlerTest(ProvisioningBaseTest):
         self.identity = self.get(build_uri('identity')).json
 
     def test_login_authed_user(self):
-
         params = {
             'email': self.user.email,
             'password': 'letmein',
@@ -225,7 +223,6 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         self.assertNotIn('email', data)
         self.assertEqual(config.CLIENT_ID, data.get('CLIENT_ID'))
         self.assertIsNotNone(data.get('STATE'))
-
 
     def test_logged_in_no_session_distributor(self):
         user = build(User)
