@@ -37,7 +37,7 @@ class MigrationOperation(ndb.Model):
             migration = None
         else:
             migration.status = MIGRATION_STATUS_RUNNING
-            migration.start_time = datetime.now()
+            migration.start_time = datetime.utcnow()
             migration.finish_time = None
             migration.put()
         return migration
@@ -52,7 +52,7 @@ class MigrationOperation(ndb.Model):
             if migration.status != MIGRATION_STATUS_RUNNING:
                 logging.warning("FAIL '{0}' with status '{1}'".format(migration.name, migration.status))
             migration.status = MIGRATION_STATUS_FAILED
-            migration.finish_time = datetime.now()
+            migration.finish_time = datetime.utcnow()
             migration.put()
         return migration
 
@@ -66,7 +66,7 @@ class MigrationOperation(ndb.Model):
             logging.warning("COMPLETE '{0}' with status '{1}'".format(migration.name, migration.status))
         else:
             migration.status = MIGRATION_STATUS_COMPLETED
-            migration.finish_time = datetime.now()
+            migration.finish_time = datetime.utcnow()
             migration.put()
         return migration
 
