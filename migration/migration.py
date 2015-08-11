@@ -79,14 +79,22 @@ class MigrationListingHandler(RequestHandler):
 
 class MigrationRunHandler(RequestHandler):
     def post(self):
-        name = self.request.get('name')
-        if name in MIGRATIONS_MAP:
-            migration_operation = MigrationOperation.start(name)
-            if migration_operation is not None:
-                _run_migration(migration_operation.key)
-                # deferred.defer(_run_migration, migration_status.key, _queue='migrations', _target='migration')
-            else:
-                logging.warning("Migration '{0}' is already running".format(name))
+        name = self.request.get('name').split("|", 2)
+        if name[0] == 'rerun':
+            migration_name = name[1]
+            migration = MigrationOperation.get_by_name(migration_name)
+            migration.status = 'Queued'
+            migration.put()
         else:
-            logging.error('Attempted to run invalid migration: {0}'.format(name))
+            migration_name = name[0]
+        if migration_name in MIGRATIONS_MAP:
+            migration_operation = MigrationOperation.start(migration_name)
+            if migration_operation is not None:
+                logging.warning("Migration '{0}' is set to run".format(migration_name))
+                _run_migration(migration_operation.key)
+                # deferred.defer(_run_migration, migration_operation.key, _queue='migrations', _target='migration')
+            else:
+                logging.warning("Migration '{0}' is already running".format(migration_name))
+        else:
+            logging.error('Attempted to run invalid migration: {0}'.format(migration_name))
         self.redirect(build_uri('migration-listing', module='migration'))
