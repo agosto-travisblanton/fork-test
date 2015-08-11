@@ -40,11 +40,14 @@ class DeviceResourceHandler(RequestHandler):
         if local_device is None:
             logging.info('Unrecognized device with device key: {0}'.format(device_urlsafe_key))
             return self.response.set_status(404)
-        chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
-        chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, local_device.device_id)
         result = {}
-        if chrome_os_device:
-            result = chrome_os_device
+        try:
+            chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
+            chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, local_device.device_id)
+            if chrome_os_device:
+                result = chrome_os_device
+        except Exception, e:
+            logging.exception(e)
         if local_device.key.parent():
             try:
                 tenant = local_device.key.parent().get()
