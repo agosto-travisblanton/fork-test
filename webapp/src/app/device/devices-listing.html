@@ -23,17 +23,25 @@
             <tr>
               <th>Key</th>
               <th>Serial Number</th>
+              <th>Tenant code</th>
               <th>MAC address</th>
+              <th>Ethernet MAC address</th>
             </tr>
             </thead>
             <tbody>
             <tr ng-hide="devicesListingCtrl.devices.length">
-              <td class="no-devices" colspan="3">No devices</td>
+              <td class="no-devices" colspan="5">No devices</td>
             </tr>
             <tr ng-repeat="device in devicesListingCtrl.devices | orderBy:'-created' ">
-              <td class="device-key">{{ device.key }}</td>
-              <td class="device-key">{{ device.serialNumber }}</td>
-              <td class="device-key">{{ device.macAddress }}</td>
+              <td class="device-key">
+                <span class="entity-key" ng-show="device.key">
+                    {{ device.key | limitTo: 10 }}...{{ device.key | limitTo: 10 : device.key.length - 10}}
+                </span>
+              </td>
+              <td class="device-serial-number">{{ device.serialNumber }}</td>
+              <td class="device-tenant-code">{{ device.tenantCode }}</td>
+              <td class="device-mac-address">{{ device.macAddress }}</td>
+              <td class="device-ethernet-mac-address">{{ device.ethernetMacAddress }}</td>
             </tr>
             </tbody>
           </table>
