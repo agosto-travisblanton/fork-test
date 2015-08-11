@@ -203,25 +203,6 @@ class Display(ndb.Model):
 
 
 @ae_ndb_serializer
-class AppliedMigration(ndb.Model):
-    tag_name = ndb.StringProperty(required=True, indexed=True)
-    timestamp = ndb.DateTimeProperty(auto_now_add=True)
-    class_version = ndb.IntegerProperty()
-
-    @classmethod
-    def has_been_run(cls, tag_name):
-        key = AppliedMigration.query(AppliedMigration.tag_name == tag_name).get(keys_only=True)
-        return key is not None
-
-    @classmethod
-    def create(cls, tag_name):
-        return cls(tag_name=tag_name)
-
-    def _pre_put_hook(self):
-        self.class_version = 1
-
-
-@ae_ndb_serializer
 class User(ndb.Model):
     class_version = ndb.IntegerProperty()
     created = ndb.DateTimeProperty(auto_now_add=True)
@@ -261,8 +242,9 @@ class User(ndb.Model):
 
     def add_distributor(self, distributor_key):
         if distributor_key not in self.distributor_keys:
-            dist_user = DistributorUser(user_key = self.key, distributor_key=distributor_key)
+            dist_user = DistributorUser(user_key=self.key, distributor_key=distributor_key)
             dist_user.put()
+
 
 @ae_ndb_serializer
 class DistributorUser(ndb.Model):
@@ -276,4 +258,3 @@ class DistributorUser(ndb.Model):
 
     def _pre_put_hook(self):
         self.class_version = 1
-
