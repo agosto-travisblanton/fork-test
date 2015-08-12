@@ -24,10 +24,10 @@ class AddTenantKeyToDevices(MigrationBase):
             number_of_devices = len(devices)
             number_of_tenant_keys_hydrated = 0
             for device in devices:
-                if len(device.tenant_key) < 1:
+                if device.tenant_key is None:
                     number_of_tenant_keys_hydrated += 1
                     device.tenant_key = tenant_key
                     device.put()
-            tally = '{0}: tenant.name={1}, number_of_devices={2}, number_of_tenant_keys_hydrated={3}'.format(
+            tally = '<<{0}>> tenant.name={1}, number_of_devices={2}, number_of_tenant_keys_hydrated={3}'.format(
                 self.MIGRATION_NAME, tenant.name, number_of_devices, number_of_tenant_keys_hydrated)
             logging.info(tally)

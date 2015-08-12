@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 
 from restler.decorators import ae_ndb_serializer
 
-__author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
+__author__ = 'Christopher Bartling <chris.bartling@agosto.com>. Bob MacNeal <bob.macneal@agosto.com>'
 
 TENANT_ENTITY_GROUP_NAME = 'tenantEntityGroup'
 DISTRIBUTOR_ENTITY_GROUP_NAME = 'distributorEntityGroup'
@@ -116,15 +116,27 @@ class Tenant(ndb.Model):
 @ae_ndb_serializer
 class ChromeOsDevice(ndb.Model):
     tenant_key = ndb.KeyProperty(required=False, indexed=True)
-
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
-    device_id = ndb.StringProperty(required=True, indexed=True)
+    device_id = ndb.StringProperty(required=False, indexed=True)
     gcm_registration_id = ndb.StringProperty(required=True)
     mac_address = ndb.StringProperty(required=True, indexed=True)
     api_key = ndb.StringProperty(required=True, indexed=True)
     serial_number = ndb.StringProperty(required=False, indexed=True)
-    model = ndb.StringProperty(required=False, indexed=True)
+    status = ndb.StringProperty(required=False, indexed=False)
+    last_sync = ndb.StringProperty(required=False, indexed=False)
+    kind = ndb.StringProperty(required=False, indexed=False)
+    ethernet_mac_address = ndb.StringProperty(required=False, indexed=True)
+    org_unit_path = ndb.StringProperty(required=False, indexed=False)
+    annotated_user = ndb.StringProperty(required=False, indexed=False)
+    annotated_location = ndb.StringProperty(required=False, indexed=False)
+    notes = ndb.StringProperty(required=False, indexed=False)
+    boot_mode = ndb.StringProperty(required=False, indexed=False)
+    last_enrollment_time = ndb.StringProperty(required=False, indexed=False)
+    platform_version = ndb.StringProperty(required=False, indexed=False)
+    model = ndb.StringProperty(required=False, indexed=False)
+    os_version = ndb.StringProperty(required=False, indexed=False)
+    firmware_version = ndb.StringProperty(required=False, indexed=False)
     name = ndb.ComputedProperty(lambda self: '{0} {1}'.format(self.serial_number, self.model))
     class_version = ndb.IntegerProperty()
 
@@ -136,21 +148,19 @@ class ChromeOsDevice(ndb.Model):
                 return chrome_os_device_key.get()
 
     @classmethod
-    def create(cls, tenant_key, device_id, gcm_registration_id, mac_address, serial_number=None, model=None):
-        logging.info("ChromeOsDevice.create....")
-        logging.info("  Tenant key: {0}".format(str(tenant_key)))
-        api_key = str(uuid.uuid4().hex)
-        chrome_os_device = cls(parent=tenant_key,
-                               device_id=device_id,
-                               gcm_registration_id=gcm_registration_id,
-                               mac_address=mac_address,
-                               api_key=api_key,
-                               serial_number=serial_number,
-                               model=model)
+    def create(cls, tenant_key, gcm_registration_id, mac_address, device_id=None, serial_number=None, model=None):
+        chrome_os_device = cls(
+            device_id=device_id,
+            tenant_key=tenant_key,
+            gcm_registration_id=gcm_registration_id,
+            mac_address=mac_address,
+            api_key=str(uuid.uuid4().hex),
+            serial_number=serial_number,
+            model=model)
         return chrome_os_device
 
     def _pre_put_hook(self):
-        self.class_version = 1
+        self.class_version = 2
 
 
 @ae_ndb_serializer

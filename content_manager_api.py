@@ -40,7 +40,7 @@ class ContentManagerApi(object):
             raise RuntimeError(error_message)
 
     def create_device(self, chrome_os_device):
-        tenant = chrome_os_device.key.parent().get()
+        tenant = chrome_os_device.tenant_key.get()
         payload = {
             "device_key": chrome_os_device.key.urlsafe(),
             "api_key": chrome_os_device.api_key,

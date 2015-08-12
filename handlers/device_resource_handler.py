@@ -45,9 +45,9 @@ class DeviceResourceHandler(RequestHandler):
         result = {}
         if chrome_os_device:
             result = chrome_os_device
-        if local_device.key.parent():
+        if local_device.tenant_key:
             try:
-                tenant = local_device.key.parent().get()
+                tenant = local_device.tenant_key.get()
             except Exception, e:
                 logging.exception(e)
                 logging.info('No parent tenant for device key: {0}'.format(device_urlsafe_key))
@@ -82,7 +82,7 @@ class DeviceResourceHandler(RequestHandler):
                 device_id = chrome_os_device.get('deviceId')
                 local_device = ChromeOsDevice.get_by_device_id(device_id)
                 if local_device is not None:
-                    tenant = local_device.key.parent().get()
+                    tenant = local_device.tenant_key.get()
                     chrome_os_device['tenantCode'] = tenant.tenant_code
                     chrome_os_device['contentServerUrl'] = tenant.content_server_url
                     chrome_os_device['chromeDeviceDomain'] = tenant.chrome_device_domain
@@ -109,7 +109,7 @@ class DeviceResourceHandler(RequestHandler):
                 device_id = chrome_os_device.get('deviceId')
                 local_device = ChromeOsDevice.get_by_device_id(device_id)
                 if local_device is not None:
-                    tenant = local_device.key.parent().get()
+                    tenant = local_device.tenant_key.get()
                     chrome_os_device['tenantCode'] = tenant.tenant_code
                     chrome_os_device['contentServerUrl'] = tenant.content_server_url
                     chrome_os_device['chromeDeviceDomain'] = tenant.chrome_device_domain
