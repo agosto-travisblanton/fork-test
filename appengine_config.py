@@ -160,9 +160,8 @@ def _STORMPATH_CLIENT():
     http://docs.stormpath.com/python/quickstart/#create-a-client
     """
     if on_production_server:
-        raise Exception('STORMPATH_CLIENT is not configured for production yet!!!')
-        # id = 'TBD'
-        # secret = 'TBD'
+        id = 'IY5YOGP105D4HGY07GK2IT62X'
+        secret = '8jPFs33PKDFuAz++gDeokLO7zAyfi1LSciL9xL0tEJk'
     else:
         id = '6VYRY6TL26YRBJOAOO533W6DO'
         secret = 'oc4u1Nm0M5p3vJSOENhPZzAhNfzifAxMQS0v3J/kG/U'
