@@ -3,6 +3,7 @@ The configuration file used by :py:mod:`agar.config` implementations and other l
 `google.appengine.api.lib_config`_ configuration library. Configuration overrides go in this file.
 """
 from env_setup import setup
+
 setup()
 import os
 from agar.env import on_development_server, on_server, on_production_server, on_integration_server, appid
@@ -131,9 +132,9 @@ app_CONTENT_MANAGER_API_SERVER_KEY = _CONTENT_MANAGER_API_SERVER_KEY()
 
 def _IMPERSONATION_ADMIN_EMAIL_ADDRESS():
     if on_development_server or not on_server:
-        return 'administrator@skykit.com'
+        return 'admin@dev.agosto.com'
     if on_integration_server:
-        return 'administrator@dev.agosto.com'
+        return 'admin@dev.agosto.com'
     if on_production_server:
         return 'skykit.api@skykit.agosto.com'
     return None
@@ -175,11 +176,15 @@ def _STORMPATH_CLIENT():
     # NOTE: must use scheme='basic' - only one that works on GAE
     from stormpath.client import Client
     return Client(api_key=api_key, scheme='basic')
+
+
 app_STORMPATH_CLIENT = _STORMPATH_CLIENT()
 
 
 def _STORMPATH_AUTH_APP():
     return appid
+
+
 app_STORMPATH_AUTH_APP = _STORMPATH_AUTH_APP()
 
 webapp2_extras_sessions_secret_key = '94eda847-0ea9-4f49-b96c-1434ec318563'
