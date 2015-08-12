@@ -115,6 +115,8 @@ class Tenant(ndb.Model):
 
 @ae_ndb_serializer
 class ChromeOsDevice(ndb.Model):
+    tenant_key = ndb.KeyProperty(required=False, indexed=True)
+
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     device_id = ndb.StringProperty(required=True, indexed=True)
