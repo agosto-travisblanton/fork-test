@@ -15,12 +15,6 @@ class AddTenantKeyToDevices(MigrationBase):
     def __init__(self):
         super(AddTenantKeyToDevices, self).__init__(self.MIGRATION_NAME)
 
-    @staticmethod
-    def get_displays_by_tenant(key):
-        tenant_key = ndb.Key(urlsafe=key)
-        displays = Display.query(Display.tenant_key == tenant_key)
-        return displays
-
     def run(self):
         tenants = Tenant.query(ancestor=TenantEntityGroup.singleton().key).fetch(100)
         active_tenants = filter(lambda x: x.active is True, tenants)
