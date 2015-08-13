@@ -128,6 +128,7 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         self.assertNotIn('distributor', data)
         self.assertNotIn('distributors', data)
         self.assertEqual(config.CLIENT_ID, data.get('CLIENT_ID'))
+        self.assertEqual(config.PUBLIC_API_SERVER_KEY, data.get('BROWSER_API_KEY'))
         self.assertIsNotNone(data.get('STATE'))
 
     def test_logged_out_identity(self):
@@ -145,6 +146,7 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         self.assertNotIn('distributors', data)
         self.assertNotIn('email', data)
         self.assertEqual(config.CLIENT_ID, data.get('CLIENT_ID'))
+        self.assertEqual(config.PUBLIC_API_SERVER_KEY, data.get('BROWSER_API_KEY'))
         self.assertIsNotNone(data.get('STATE'))
 
     def test_logged_in_administrator_identity(self):
@@ -164,6 +166,7 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         self.assertEqual(self.user.distributors[0].name, data.get('distributor'))
         self.assertEqual(self.user.email, data.get('email'))
         self.assertEqual(config.CLIENT_ID, data.get('CLIENT_ID'))
+        self.assertEqual(config.PUBLIC_API_SERVER_KEY, data.get('BROWSER_API_KEY'))
         self.assertIsNotNone(data.get('STATE'))
 
     def test_logged_in_non_administrator_identity(self):
@@ -182,6 +185,7 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         self.assertEqual(self.user.distributors[0].name, data.get('distributor'))
         self.assertEqual(self.user.email, data.get('email'))
         self.assertEqual(config.CLIENT_ID, data.get('CLIENT_ID'))
+        self.assertEqual(config.PUBLIC_API_SERVER_KEY, data.get('BROWSER_API_KEY'))
         self.assertIsNotNone(data.get('STATE'))
 
     def test_logged_in_non_administrator_identity_multiple_distributors(self):
@@ -203,6 +207,7 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         self.assertEqual(None, data.get('distributor'))
         self.assertEqual(self.user.email, data.get('email'))
         self.assertEqual(config.CLIENT_ID, data.get('CLIENT_ID'))
+        self.assertEqual(config.PUBLIC_API_SERVER_KEY, data.get('BROWSER_API_KEY'))
         self.assertIsNotNone(data.get('STATE'))
 
     def test_logged_out_administrator_identity(self):
@@ -239,6 +244,7 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         self.assertEqual([], data.get('distributors'))
         self.assertEqual(user.email, data.get('email'))
         self.assertEqual(config.CLIENT_ID, data.get('CLIENT_ID'))
+        self.assertEqual(config.PUBLIC_API_SERVER_KEY, data.get('BROWSER_API_KEY'))
         self.assertIsNotNone(data.get('STATE'))
 
         new_distributor = build(Distributor)
