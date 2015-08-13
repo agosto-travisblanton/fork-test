@@ -16,8 +16,8 @@ class AddGoogleApiChromeDeviceProperties(MigrationBase):
         super(AddGoogleApiChromeDeviceProperties, self).__init__(self.MIGRATION_NAME)
 
     def run(self):
-        logging.info('Migration {0}: Running'.format(self.MIGRATION_NAME))
-        tenants = Tenant.query(ancestor=TenantEntityGroup.singleton().key).fetch(100)
+        logging.debug('Migration {0}: Running'.format(self.MIGRATION_NAME))
+        tenants = Tenant.query(ancestor=TenantEntityGroup.singleton().key).fetch()
         active_tenants = filter(lambda x: x.active is True, tenants)
         for tenant in active_tenants:
             tenant_key = ndb.Key(urlsafe=tenant.key.urlsafe())
@@ -25,7 +25,7 @@ class AddGoogleApiChromeDeviceProperties(MigrationBase):
             number_of_devices = len(devices)
             number_of_refreshed_displays = 0
             for device in devices:
-                deferred.defer(refresh_chrome_os_display, device_urlsafe_key=device.key.urlsafe())
+                refresh_chrome_os_display(device_urlsafe_key=device.key.urlsafe())
                 number_of_refreshed_displays += 1
             tally = '<<{0}>> tenant.name={1}, number_of_devices={2}, number_of_refreshed_displays={3}'.format(
                 self.MIGRATION_NAME, tenant.name, number_of_devices, number_of_refreshed_displays)

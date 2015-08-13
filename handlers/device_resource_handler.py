@@ -21,11 +21,11 @@ class DeviceResourceHandler(RequestHandler):
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
         tenant = tenant_key.get()
         if tenant is not None:
-            chrome_os_devices = ChromeOsDevice.query(ancestor=tenant_key).fetch()
+            chrome_os_devices = ChromeOsDevice.query(ChromeOsDevice.tenant_key == tenant_key).fetch()
             json_response(self.response, chrome_os_devices, strategy=CHROME_OS_DEVICE_STRATEGY)
             self.response.set_status(200)
         else:
-            message = 'Unable to retrieve the parent tenant by key: {0}'.format(tenant_urlsafe_key)
+            message = 'Unable to retrieve the tenant by key: {0}'.format(tenant_urlsafe_key)
             json_response(self.response, {'error': message}, status_code=404)
 
     @api_token_required
@@ -189,7 +189,6 @@ class DeviceResourceHandler(RequestHandler):
                         notify_content_manager = content_manager_api.create_device(local_device)
                         if not notify_content_manager:
                             logging.info('Failed to notify content manager about new device')
-
                         device_uri = self.request.app.router.build(None,
                                                                    'manage-device',
                                                                    None,
