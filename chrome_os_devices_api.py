@@ -1,3 +1,5 @@
+import logging
+
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
@@ -256,6 +258,9 @@ def refresh_chrome_os_display(device_urlsafe_key=None):
         device.os_version = chrome_os_device.get('osVersion')
         device.firmware_version = chrome_os_device.get('firmwareVersion')
         device.put()
+    else:
+        logging.debug('Directory API lookup failure for device_id = {0}, impersonating {1}'.
+                      format(device.device_id, config.IMPERSONATION_ADMIN_EMAIL_ADDRESS))
 
 
 def update_chrome_os_device(display_urlsafe_key=None):
