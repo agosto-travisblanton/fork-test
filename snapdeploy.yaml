@@ -1,5 +1,5 @@
-hash: 2b0c05a941
+hash: d609accb3a
 module_yaml_files:
 - app.yaml
 - migration.yaml
-version: 6
+version: 7
