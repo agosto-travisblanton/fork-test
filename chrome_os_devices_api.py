@@ -237,8 +237,12 @@ def refresh_chrome_os_display(device_urlsafe_key=None):
         raise deferred.PermanentTaskFailure('The device url-safe key parameter is None. It is required.')
     device_key = ndb.Key(urlsafe=device_urlsafe_key)
     device = device_key.get()
+    chrome_os_device = None
     chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
-    chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, device.device_id)
+    try:
+        chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, device.device_id)
+    except Exception, e:
+        logging.exception(e)
     if chrome_os_device is not None:
         device.device_id = chrome_os_device.get('deviceId')
         device.mac_address = chrome_os_device.get('macAddress')
@@ -259,7 +263,7 @@ def refresh_chrome_os_display(device_urlsafe_key=None):
         device.firmware_version = chrome_os_device.get('firmwareVersion')
         device.put()
     else:
-        logging.debug('Directory API lookup failure for device_id = {0}, impersonating {1}'.
+        logging.info('Directory API lookup failure for device_id = {0}, impersonating {1}'.
                       format(device.device_id, config.IMPERSONATION_ADMIN_EMAIL_ADDRESS))
 
 
