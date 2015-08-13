@@ -189,7 +189,6 @@ class DeviceResourceHandler(RequestHandler):
                         notify_content_manager = content_manager_api.create_device(local_device)
                         if not notify_content_manager:
                             logging.info('Failed to notify content manager about new device')
-
                         device_uri = self.request.app.router.build(None,
                                                                    'manage-device',
                                                                    None,

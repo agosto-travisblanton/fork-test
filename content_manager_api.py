@@ -47,13 +47,6 @@ class ContentManagerApi(object):
                 "api_key": chrome_os_device.api_key,
                 "tenant_code": tenant.tenant_code
             }
-            # TODO - this is the future payload Content Manager will be expecting. But for now, use the payload above
-            # payload = {
-            #     "device_key": chrome_os_device.key.urlsafe(),
-            #     "api_key": chrome_os_device.api_key,
-            #     "tenant_code": tenant.tenant_code,
-            #     "name" : chrome_os_device.name)
-            # }
             url = "{content_manager_base_url}/provisioning/v1/displays".format(
                 content_manager_base_url=tenant.content_server_url)
             http_client_request = HttpClientRequest(url=url,
@@ -73,6 +66,7 @@ class ContentManagerApi(object):
                                 'url={2}'.format(tenant.tenant_code, http_client_response.status_code, url)
                 logging.error(error_message)
                 raise RuntimeError(error_message)
+                return False
         else:
             error_message = 'No tenant_key for device'
             logging.error(error_message)

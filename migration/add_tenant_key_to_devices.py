@@ -1,10 +1,7 @@
 import logging
 from google.appengine.ext import ndb
 from migration_base import MigrationBase
-from models import Tenant, TenantEntityGroup, ChromeOsDevice, Display
-from chrome_os_devices_api import (refresh_display)
-
-from google.appengine.ext.deferred import deferred
+from models import Tenant, TenantEntityGroup, ChromeOsDevice
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -30,4 +27,4 @@ class AddTenantKeyToDevices(MigrationBase):
                     device.put()
             tally = '<<{0}>> tenant.name={1}, number_of_devices={2}, number_of_tenant_keys_hydrated={3}'.format(
                 self.MIGRATION_NAME, tenant.name, number_of_devices, number_of_tenant_keys_hydrated)
-            logging.info(tally)
+            logging.debug(tally)
