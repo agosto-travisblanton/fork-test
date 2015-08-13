@@ -40,34 +40,40 @@ class ContentManagerApi(object):
             raise RuntimeError(error_message)
 
     def create_device(self, chrome_os_device):
-        tenant = chrome_os_device.key.parent().get()
-        payload = {
-            "device_key": chrome_os_device.key.urlsafe(),
-            "api_key": chrome_os_device.api_key,
-            "tenant_code": tenant.tenant_code
-        }
-        # TODO - this is the future payload Content Manager will be expecting. But for now, use the payload above
-        # payload = {
-        #     "device_key": chrome_os_device.key.urlsafe(),
-        #     "api_key": chrome_os_device.api_key,
-        #     "tenant_code": tenant.tenant_code,
-        #     "name" : chrome_os_device.name)
-        # }
-        url = "{content_manager_base_url}/provisioning/v1/displays".format(
-            content_manager_base_url=tenant.content_server_url)
-        http_client_request = HttpClientRequest(url=url,
-                                                payload=json.dumps(payload),
-                                                headers=self.HEADERS)
-        http_client_response = HttpClient().post(http_client_request)
-        if http_client_response.status_code == 201:
-            logging.info('create_device to Content Mgr: url={0}, device_key={1}, api_key={2}, tenant_code={3}'.format(
-                url,
-                chrome_os_device.key.urlsafe(),
-                chrome_os_device.api_key,
-                tenant.tenant_code))
-            return True
+        if chrome_os_device.tenant_key is not None:
+            tenant = chrome_os_device.tenant_key.get()
+            payload = {
+                "device_key": chrome_os_device.key.urlsafe(),
+                "api_key": chrome_os_device.api_key,
+                "tenant_code": tenant.tenant_code
+            }
+            # TODO - this is the future payload Content Manager will be expecting. But for now, use the payload above
+            # payload = {
+            #     "device_key": chrome_os_device.key.urlsafe(),
+            #     "api_key": chrome_os_device.api_key,
+            #     "tenant_code": tenant.tenant_code,
+            #     "name" : chrome_os_device.name)
+            # }
+            url = "{content_manager_base_url}/provisioning/v1/displays".format(
+                content_manager_base_url=tenant.content_server_url)
+            http_client_request = HttpClientRequest(url=url,
+                                                    payload=json.dumps(payload),
+                                                    headers=self.HEADERS)
+            http_client_response = HttpClient().post(http_client_request)
+            if http_client_response.status_code == 201:
+                logging.info(
+                    'create_device to Content Mgr: url={0}, device_key={1}, api_key={2}, tenant_code={3}'.format(
+                        url,
+                        chrome_os_device.key.urlsafe(),
+                        chrome_os_device.api_key,
+                        tenant.tenant_code))
+                return True
+            else:
+                error_message = 'Unable to create device in Content Manager with tenant code {0}. Status code: {1}, ' \
+                                'url={2}'.format(tenant.tenant_code, http_client_response.status_code, url)
+                logging.error(error_message)
+                raise RuntimeError(error_message)
         else:
-            error_message = 'Unable to create device in Content Manager with tenant code {0}. Status code: {1}, ' \
-                            'url={2}'.format(tenant.tenant_code, http_client_response.status_code, url)
+            error_message = 'No tenant_key for device'
             logging.error(error_message)
             raise RuntimeError(error_message)

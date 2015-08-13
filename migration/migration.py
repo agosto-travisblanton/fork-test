@@ -15,10 +15,12 @@ from utils.web_util import build_uri
 from webapp2 import RequestHandler
 import logging
 import traceback
-from device_to_display_conversion import DeviceToDisplayConversion
+from add_tenant_key_to_devices import AddTenantKeyToDevices
+from add_google_api_chrome_device_properties import AddGoogleApiChromeDeviceProperties
 
 MIGRATIONS = [
-    DeviceToDisplayConversion()
+    AddTenantKeyToDevices(),
+    AddGoogleApiChromeDeviceProperties()
 ]
 
 MIGRATIONS_MAP = {migration.name: migration for migration in MIGRATIONS}

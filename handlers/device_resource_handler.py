@@ -45,9 +45,9 @@ class DeviceResourceHandler(RequestHandler):
         result = {}
         if chrome_os_device:
             result = chrome_os_device
-        if local_device.key.parent():
+        if local_device.tenant_key:
             try:
-                tenant = local_device.key.parent().get()
+                tenant = local_device.tenant_key.get()
             except Exception, e:
                 logging.exception(e)
                 logging.info('No parent tenant for device key: {0}'.format(device_urlsafe_key))
@@ -82,15 +82,19 @@ class DeviceResourceHandler(RequestHandler):
                 device_id = chrome_os_device.get('deviceId')
                 local_device = ChromeOsDevice.get_by_device_id(device_id)
                 if local_device is not None:
-                    tenant = local_device.key.parent().get()
-                    chrome_os_device['tenantCode'] = tenant.tenant_code
-                    chrome_os_device['contentServerUrl'] = tenant.content_server_url
-                    chrome_os_device['chromeDeviceDomain'] = tenant.chrome_device_domain
-                    chrome_os_device["gcmRegistrationId"] = local_device.gcm_registration_id
-                    chrome_os_device['created'] = local_device.created.strftime('%Y-%m-%d %H:%M:%S')
-                    chrome_os_device['updated'] = local_device.updated.strftime('%Y-%m-%d %H:%M:%S')
-                    chrome_os_device['apiKey'] = local_device.api_key
-                    chrome_os_device['key'] = local_device.key.urlsafe()
+                    if local_device.tenant_key is not None:
+                        tenant = local_device.tenant_key.get()
+                        chrome_os_device['tenantCode'] = tenant.tenant_code
+                        chrome_os_device['contentServerUrl'] = tenant.content_server_url
+                        chrome_os_device['chromeDeviceDomain'] = tenant.chrome_device_domain
+                        chrome_os_device["gcmRegistrationId"] = local_device.gcm_registration_id
+                        chrome_os_device['created'] = local_device.created.strftime('%Y-%m-%d %H:%M:%S')
+                        chrome_os_device['updated'] = local_device.updated.strftime('%Y-%m-%d %H:%M:%S')
+                        chrome_os_device['apiKey'] = local_device.api_key
+                        chrome_os_device['key'] = local_device.key.urlsafe()
+                    else:
+                        message = 'No tenant_key for device'
+                        json_response(self.response, {'error': message}, status_code=422)
             json_response(self.response, chrome_os_devices)
             self.response.set_status(200)
         else:
@@ -109,16 +113,21 @@ class DeviceResourceHandler(RequestHandler):
                 device_id = chrome_os_device.get('deviceId')
                 local_device = ChromeOsDevice.get_by_device_id(device_id)
                 if local_device is not None:
-                    tenant = local_device.key.parent().get()
-                    chrome_os_device['tenantCode'] = tenant.tenant_code
-                    chrome_os_device['contentServerUrl'] = tenant.content_server_url
-                    chrome_os_device['chromeDeviceDomain'] = tenant.chrome_device_domain
-                    chrome_os_device["gcmRegistrationId"] = local_device.gcm_registration_id
-                    chrome_os_device['created'] = local_device.created.strftime('%Y-%m-%d %H:%M:%S')
-                    chrome_os_device['updated'] = local_device.updated.strftime('%Y-%m-%d %H:%M:%S')
-                    chrome_os_device['apiKey'] = local_device.api_key
-                    chrome_os_device['key'] = local_device.key.urlsafe()
-                    json_response(self.response, chrome_os_device)
+                    if local_device.tenant_key is not None:
+                        tenant = local_device.tenant_key.get()
+                        chrome_os_device['tenantCode'] = tenant.tenant_code
+                        chrome_os_device['contentServerUrl'] = tenant.content_server_url
+                        chrome_os_device['chromeDeviceDomain'] = tenant.chrome_device_domain
+                        chrome_os_device["gcmRegistrationId"] = local_device.gcm_registration_id
+                        chrome_os_device['created'] = local_device.created.strftime('%Y-%m-%d %H:%M:%S')
+                        chrome_os_device['updated'] = local_device.updated.strftime('%Y-%m-%d %H:%M:%S')
+                        chrome_os_device['apiKey'] = local_device.api_key
+                        chrome_os_device['key'] = local_device.key.urlsafe()
+                        json_response(self.response, chrome_os_device)
+                    else:
+                        message = 'No tenant key for deviceId {0} and MAC address {1}.'.format(
+                            device_id, device_mac_address)
+                        json_response(self.response, {'error': message}, status_code=422)
                 else:
                     message = 'Device not stored for deviceId {0} and MAC address {1}.'.format(
                         device_id, device_mac_address)

@@ -132,7 +132,7 @@ app_CONTENT_MANAGER_API_SERVER_KEY = _CONTENT_MANAGER_API_SERVER_KEY()
 
 def _IMPERSONATION_ADMIN_EMAIL_ADDRESS():
     if on_development_server or not on_server:
-        return 'admin@dev.agosto.com'
+        return 'administrator@skykit.com'
     if on_integration_server:
         return 'admin@dev.agosto.com'
     if on_production_server:

@@ -61,6 +61,15 @@ class TestContentManagerApi(BaseTest):
         with self.assertRaises(RuntimeError) as context:
             self.content_manager_api.create_device(self.device)
         error_message = 'Unable to create device in Content Manager with tenant code {0}. Status code: {1}, ' \
-                        'url=https://www.content.com/provisioning/v1/displays'.format(
-            self.TENANT_CODE, error_code)
+                        'url=https://www.content.com/provisioning/v1/displays'.format(self.TENANT_CODE, error_code)
+        self.assertEqual(error_message, str(context.exception))
+
+    def test_create_device_without_tenant_key_raises_error(self):
+        tenant_less_device = ChromeOsDevice.create(tenant_key=None,
+                                                   device_id='f7ds8970dfasd8f70ad987',
+                                                   gcm_registration_id='fad7f890ad7f8ad0s7fa8s',
+                                                   mac_address='54271e619346')
+        with self.assertRaises(RuntimeError) as context:
+            self.content_manager_api.create_device(tenant_less_device)
+        error_message = 'No tenant_key for device'
         self.assertEqual(error_message, str(context.exception))
