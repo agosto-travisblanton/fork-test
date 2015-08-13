@@ -35,6 +35,7 @@ handlers:
   login: admin
 
 skip_files:
+- ^webapp/.*
 - ^coverage/.*
 - ^coverage_html_report/.*
 - ^monitor/.*
