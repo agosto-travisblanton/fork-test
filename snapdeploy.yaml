@@ -1,5 +1,5 @@
-hash: TBD
+hash: ffd7d6ac51
 module_yaml_files:
 - app.yaml
 - migration.yaml
-version: 0
+version: 2
