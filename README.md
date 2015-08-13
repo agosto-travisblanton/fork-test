@@ -179,4 +179,8 @@ snapdeploy: `python manage.py snapdeploy --ignore-branch -A skykit-provisioning 
 
 [SkyKit Provisioning](https://skykit-provisioning.appspot.com/#)
 
+### GOTCHAS ###
+
+Snapdeploy tags with a hash. You have to explicitly choose that hash under migrations module, otherwise you're using old code.
+ 
 ![Screen Shot 2015-08-13 at 12.11.02 PM.png](https://bitbucket.org/repo/L8AoyM/images/288299165-Screen%20Shot%202015-08-13%20at%2012.11.02%20PM.png)
