@@ -181,6 +181,6 @@ snapdeploy: `python manage.py snapdeploy --ignore-branch -A skykit-provisioning 
 
 ### GOTCHAS ###
 
-Snapdeploy tags with a hash. You have to explicitly choose that hash under migrations module, otherwise you're using old code.
+Snapdeploy tags with a hash. You have to explicitly choose that hash under migrations module, otherwise you're using old code and any new migrations won't show up because you're probably still using the old tag.
  
 ![Screen Shot 2015-08-13 at 12.11.02 PM.png](https://bitbucket.org/repo/L8AoyM/images/288299165-Screen%20Shot%202015-08-13%20at%2012.11.02%20PM.png)
