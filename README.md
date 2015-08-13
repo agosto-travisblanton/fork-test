@@ -178,3 +178,5 @@ From the project root directory: `appcfg.py --oauth2 -A skykit-provisioning upda
 snapdeploy: `python manage.py snapdeploy --ignore-branch -A skykit-provisioning --oauth2`
 
 [SkyKit Provisioning](https://skykit-provisioning.appspot.com/#)
+
+![Screen Shot 2015-08-13 at 12.11.02 PM.png](https://bitbucket.org/repo/L8AoyM/images/288299165-Screen%20Shot%202015-08-13%20at%2012.11.02%20PM.png)
