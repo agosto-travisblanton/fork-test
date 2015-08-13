@@ -226,6 +226,38 @@ def refresh_display(display_urlsafe_key=None):
         display.put()
 
 
+def refresh_chrome_os_display(device_urlsafe_key=None):
+    """
+    A function that is meant to be run asynchronously to update the Display entity
+    with ChromeOsDevice information from Directory API using the device ID to match.
+    """
+    if device_urlsafe_key is None:
+        raise deferred.PermanentTaskFailure('The device url-safe key parameter is None. It is required.')
+    device_key = ndb.Key(urlsafe=device_urlsafe_key)
+    device = device_key.get()
+    chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
+    chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, device.device_id)
+    if chrome_os_device is not None:
+        device.device_id = chrome_os_device.get('deviceId')
+        device.mac_address = chrome_os_device.get('macAddress')
+        device.serial_number = chrome_os_device.get('serialNumber')
+        device.status = chrome_os_device.get('status')
+        device.last_sync = chrome_os_device.get('lastSync')
+        device.kind = chrome_os_device.get('kind')
+        device.ethernet_mac_address = chrome_os_device.get('ethernetMacAddress')
+        device.org_unit_path = chrome_os_device.get('orgUnitPath')
+        device.annotated_user = chrome_os_device.get('annotatedUser')
+        device.annotated_location = chrome_os_device.get('annotatedLocation')
+        device.notes = chrome_os_device.get('notes')
+        device.boot_mode = chrome_os_device.get('bootMode')
+        device.last_enrollment_time = chrome_os_device.get('lastEnrollmentTime')
+        device.platform_version = chrome_os_device.get('platformVersion')
+        device.model = chrome_os_device.get('model')
+        device.os_version = chrome_os_device.get('osVersion')
+        device.firmware_version = chrome_os_device.get('firmwareVersion')
+        device.put()
+
+
 def update_chrome_os_device(display_urlsafe_key=None):
     """
     A function that is meant to be run asynchronously to update the ChromeOsDevice
