@@ -169,13 +169,13 @@
                   <thead>
                   <tr>
                     <th>Key</th>
-                    <th>Device ID</th>
+                    <th>Status</th>
                     <th>MAC address</th>
                   </tr>
                   </thead>
                   <tbody>
                   <tr ng-hide="tenantDetailsCtrl.currentTenantDevices.length">
-                    <td name="no-tenants" colspan="3" class="text-center text-danger">No devices</td>
+                    <td name="no-devices" colspan="3" class="text-center text-danger">No devices</td>
                   </tr>
                   <tr ng-repeat="device in tenantDetailsCtrl.currentTenantDevices | orderBy:'-created' ">
                     <td class="tenant-device-key">
@@ -186,7 +186,7 @@
                       </a>
                     </td>
                     <td class="tenant-device-id">
-                      {{ device.device_id }}
+                      {{ device.status }}
                     </td>
                     <td class="tenant-device-mac-address">
                       {{ device.mac_address }}
@@ -216,21 +216,21 @@
                   </thead>
                   <tbody>
                   <tr ng-hide="tenantDetailsCtrl.currentTenantDisplays.length">
-                    <td name="no-tenants" colspan="3" class="text-center text-danger">No displays</td>
+                    <td name="no-displays" colspan="3" class="text-center text-danger">No displays</td>
                   </tr>
-                  <tr ng-repeat="display in tenantDetailsCtrl.currentTenantDisplays | orderBy:'-created' ">
+                  <tr ng-repeat="item in tenantDetailsCtrl.currentTenantDisplays | orderBy:'-created' ">
                     <td class="tenant-display-key">
-                      <a href="#/displays/{{ display.key }}">
+                      <a href="#/displays/{{ item.key }}">
                                           <span class="entity-key">
-                                            {{ display.key | limitTo: 10 }}...{{ display.key | limitTo: 10 : display.key.length - 10}}
+                                            {{ item.key | limitTo: 10 }}...{{ item.key | limitTo: 10 : item.key.length - 10}}
                                           </span>
                       </a>
                     </td>
                     <td class="tenant-display-status">
-                      {{ display.status }}
+                      {{ item.status }}
                     </td>
                     <td class="tenant-display-mac-address">
-                      {{ display.mac_address }}
+                      {{ item.mac_address }}
                     </td>
                   </tr>
                   </tbody>

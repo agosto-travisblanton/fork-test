@@ -50,14 +50,20 @@ CHROME_OS_DEVICE_FIELDS = [
     'os_version',
     'firmware_version'
 ]
+
 CHROME_OS_DEVICE_STRATEGY = ModelStrategy(ChromeOsDevice) + CHROME_OS_DEVICE_FIELDS
 CHROME_OS_DEVICE_STRATEGY += [
-    {'key': lambda chrome_os_device, field_name, context: chrome_os_device.key.urlsafe()},
+    {'key': lambda o, field_name, context: o.key.urlsafe()},
     {'tenant_key': lambda o, field_name, context: o.tenant_key.urlsafe()},
-    {'tenant_code': lambda o, field_name, context: o.tenant_key.get().tenant_code},
-    {'tenant_name': lambda o, field_name, context: o.tenant_key.get().name},
-    {'content_server_url': lambda o, field_name, context: o.tenant_key.get().content_server_url},
-    {'chrome_device_domain': lambda o, field_name, context: o.tenant_key.get().chrome_device_domain}
+    {'tenant_code': lambda o, field_name, context: o.tenant_key.get().tenant_code}
+    #
+    #
+    # {'key': lambda chrome_os_device, field_name, context: chrome_os_device.key.urlsafe()},
+    # {'tenant_key': lambda o, field_name, context: o.tenant_key.urlsafe()},
+    # {'tenant_code': lambda o, field_name, context: o.tenant_key.get().tenant_code},
+    # {'tenant_name': lambda o, field_name, context: o.tenant_key.get().name},
+    # {'content_server_url': lambda o, field_name, context: o.tenant_key.get().content_server_url},
+    # {'chrome_device_domain': lambda o, field_name, context: o.tenant_key.get().chrome_device_domain}
 ]
 
 DISPLAY_FIELDS = [

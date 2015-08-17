@@ -22,4 +22,12 @@ angular.module('skykitDisplayDeviceManagement').factory 'DevicesService', ($http
       promise = Restangular.all('devices').getList()
       promise
 
+    save: (device) ->
+      if device.key != undefined
+        promise = device.put()
+      else
+        promise = Restangular.service('devices').post(device)
+      promise
+
+
   new DevicesService()

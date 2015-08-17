@@ -33,10 +33,12 @@
               <td class="no-devices" colspan="5">No devices</td>
             </tr>
             <tr ng-repeat="device in devicesListingCtrl.devices | orderBy:'-created' ">
-              <td class="device-key">
-                <span class="entity-key" ng-show="device.key">
-                    {{ device.key | limitTo: 10 }}...{{ device.key | limitTo: 10 : device.key.length - 10}}
-                </span>
+              <td class="display-key">
+                <a href="#/devices/{{ device.key }}">
+                  <span class="entity-key" ng-show="device.key">
+                      {{ device.key | limitTo: 10 }}...{{ device.key | limitTo: 10 : device.key.length - 10}}
+                  </span>
+                </a>
               </td>
               <td class="device-serial-number">{{ device.serialNumber }}</td>
               <td class="device-tenant-code">{{ device.tenantCode }}</td>
