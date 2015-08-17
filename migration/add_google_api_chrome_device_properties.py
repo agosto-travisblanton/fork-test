@@ -2,7 +2,7 @@ import logging
 from google.appengine.ext import ndb
 from migration_base import MigrationBase
 from models import Tenant, TenantEntityGroup, ChromeOsDevice
-from chrome_os_devices_api import (refresh_chrome_os_display)
+from chrome_os_devices_api import (refresh_chrome_os_device)
 
 from google.appengine.ext.deferred import deferred
 
@@ -23,4 +23,4 @@ class AddGoogleApiChromeDeviceProperties(MigrationBase):
             tenant_key = ndb.Key(urlsafe=tenant.key.urlsafe())
             devices = ChromeOsDevice.query(ChromeOsDevice.tenant_key == tenant_key).fetch()
             for device in devices:
-                refresh_chrome_os_display(device_urlsafe_key=device.key.urlsafe())
+                refresh_chrome_os_device(device_urlsafe_key=device.key.urlsafe())

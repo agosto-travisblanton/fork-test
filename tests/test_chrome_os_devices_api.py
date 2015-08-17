@@ -6,7 +6,7 @@ setup_test_paths()
 from time import sleep, gmtime, strftime
 
 from agar.test import BaseTest
-from chrome_os_devices_api import ChromeOsDevicesApi, refresh_display_by_mac_address
+from chrome_os_devices_api import ChromeOsDevicesApi, refresh_device_by_mac_address
 
 
 class TestChromeOsDevicesApi(BaseTest):
@@ -93,6 +93,6 @@ class TestChromeOsDevicesApi(BaseTest):
                                  mac_address=mac_address,
                                  device_id=device_id)
         display_key = display.put()
-        result = refresh_display_by_mac_address(display_key.urlsafe(), mac_address)
+        result = refresh_device_by_mac_address(display_key.urlsafe(), mac_address)
         self.assertEqual(result.device_id, device_id)
         self.assertTrue(result.managed_display)

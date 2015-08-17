@@ -9,8 +9,8 @@ from google.appengine.ext import ndb
 from decorators import api_token_required
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
-from chrome_os_devices_api import (refresh_display,
-                                   refresh_display_by_mac_address,
+from chrome_os_devices_api import (refresh_device,
+                                   refresh_device_by_mac_address,
                                    update_chrome_os_device)
 from models import Display, Tenant
 from strategy import DISPLAY_STRATEGY
@@ -51,7 +51,7 @@ class DisplaysHandler(RequestHandler, PagingListHandlerMixin, KeyValidatorMixin)
         display = key.get()
         if display is None:
             return self.response.set_status(404)
-        deferred.defer(refresh_display, display_urlsafe_key=display_urlsafe_key)
+        deferred.defer(refresh_device, display_urlsafe_key=display_urlsafe_key)
         json_response(self.response, display, strategy=DISPLAY_STRATEGY)
 
     @api_token_required
@@ -87,7 +87,7 @@ class DisplaysHandler(RequestHandler, PagingListHandlerMixin, KeyValidatorMixin)
                                          mac_address=display_mac_address,
                                          managed_display=True)
                 key = display.put()
-                deferred.defer(refresh_display_by_mac_address,
+                deferred.defer(refresh_device_by_mac_address,
                                display_urlsafe_key=key.urlsafe(),
                                device_mac_address=display_mac_address,
                                _countdown=30)

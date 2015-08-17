@@ -4,8 +4,8 @@ from env_setup import setup_test_paths
 
 setup_test_paths()
 
-from chrome_os_devices_api import (refresh_display,
-                                   refresh_display_by_mac_address,
+from chrome_os_devices_api import (refresh_device,
+                                   refresh_device_by_mac_address,
                                    update_chrome_os_device)
 import json
 from google.appengine.ext.deferred import deferred
@@ -107,7 +107,7 @@ class TestDisplaysHandler(BaseTest, WebTest):
                                        'manage-display',
                                        None,
                                        {'display_urlsafe_key': self.managed_display_key.urlsafe()})
-        when(deferred).defer(any_matcher(refresh_display),
+        when(deferred).defer(any_matcher(refresh_device),
                              any_matcher(self.managed_display_key.urlsafe())).thenReturn(None)
         response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
         self.assertOK(response)
@@ -118,7 +118,7 @@ class TestDisplaysHandler(BaseTest, WebTest):
                                        'manage-display',
                                        None,
                                        {'display_urlsafe_key': self.managed_display_key.urlsafe()})
-        when(deferred).defer(any_matcher(refresh_display),
+        when(deferred).defer(any_matcher(refresh_device),
                              any_matcher(self.managed_display_key.urlsafe())).thenReturn(None)
         response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
         response_json = json.loads(response.body)
@@ -157,7 +157,7 @@ class TestDisplaysHandler(BaseTest, WebTest):
         request_body = {'macAddress': mac_address,
                         'gcmRegistrationId': '123',
                         'tenantCode': tenant.tenant_code}
-        when(deferred).defer(any_matcher(refresh_display_by_mac_address),
+        when(deferred).defer(any_matcher(refresh_device_by_mac_address),
                              any_matcher(str),
                              any_matcher(mac_address)).thenReturn(None)
         response = self.app.post('/api/v1/displays', json.dumps(request_body), headers=self.valid_authorization_header)
@@ -169,7 +169,7 @@ class TestDisplaysHandler(BaseTest, WebTest):
         request_body = {'macAddress': mac_address,
                         'gcmRegistrationId': '123',
                         'tenantCode': tenant.tenant_code}
-        when(deferred).defer(any_matcher(refresh_display_by_mac_address),
+        when(deferred).defer(any_matcher(refresh_device_by_mac_address),
                              any_matcher(str),
                              any_matcher(mac_address)).thenReturn(None)
         response = self.app.post('/api/v1/displays', json.dumps(request_body), headers=self.valid_authorization_header)
