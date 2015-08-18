@@ -82,8 +82,7 @@ DISPLAY_FIELDS = [
     'platform_version',
     'model',
     'os_version',
-    'firmware_version',
-    'name'
+    'firmware_version'
 ]
 
 DISPLAY_STRATEGY = ModelStrategy(Display) + DISPLAY_FIELDS

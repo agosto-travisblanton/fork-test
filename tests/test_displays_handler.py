@@ -138,7 +138,6 @@ class TestDisplaysHandler(BaseTest, WebTest):
         self.assertEqual(response_json['last_enrollment_time'], display.last_enrollment_time)
         self.assertEqual(response_json['last_sync'], display.last_sync)
         self.assertEqual(response_json['mac_address'], display.mac_address)
-        self.assertEqual(response_json['managed_display'], display.managed_display)
         self.assertEqual(response_json['model'], display.model)
         self.assertEqual(response_json['org_unit_path'], display.org_unit_path)
         self.assertEqual(response_json['os_version'], display.os_version)

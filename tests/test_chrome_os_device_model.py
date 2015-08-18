@@ -16,7 +16,7 @@ class TestChromeOsDeviceModel(BaseTest):
     TEST_GCM_REGISTRATION_ID = '8d70a8d78a6dfa6df76dfasd'
     NAME = 'foobar tenant'
     ADMIN_EMAIL = 'foo@bar.com'
-    CONTENT_SERVER_URL = 'https://www.content.com'
+    CONTENT_SERVER_URL = 'https://skykit-contentmanager-int.appspot.com/content'
     CHROME_DEVICE_DOMAIN = 'bar.com'
     CONTENT_SERVER_API_KEY = 'API KEY'
     TENANT_CODE = 'foobar'

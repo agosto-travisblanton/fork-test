@@ -6,6 +6,7 @@ appModule.controller 'DeviceDetailsCtrl', ($stateParams, $state, DevicesService,
   @currentDevice = {
     key: undefined
     gcm_registration_id: undefined
+    annotated_location: undefined
     annotated_user: undefined
     api_key: undefined
     device_id: undefined #"41b0f043-4296-4c56-b21a-c8bd660ea9ca"

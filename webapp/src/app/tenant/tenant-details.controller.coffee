@@ -2,7 +2,7 @@
 
 appModule = angular.module('skykitDisplayDeviceManagement')
 
-appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, DisplaysService, $state) ->
+appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, DevicesService, $state) ->
   @currentTenant = {
     key: undefined,
     name: undefined,
@@ -13,7 +13,6 @@ appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, Display
     active: true
   }
 
-#  @currentTenantDevices = []
   @currentTenantDisplays = []
   @editMode = !!$stateParams.tenantKey
 
@@ -22,11 +21,8 @@ appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, Display
     tenantPromise.then (data) =>
       @currentTenant = data
 
-#    devicesPromise = DevicesService.getDevicesByTenant($stateParams.tenantKey)
-#    devicesPromise.then (data) =>
-#      @currentTenantDevices = data
-
-    displaysPromise = DisplaysService.getDisplaysByTenant($stateParams.tenantKey)
+#    displaysPromise = DisplaysService.getDisplaysByTenant($stateParams.tenantKey)
+    displaysPromise = DevicesService.getDevicesByTenant($stateParams.tenantKey)
     displaysPromise.then (data) =>
       @currentTenantDisplays = data.objects
 
