@@ -26,7 +26,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         query_forward = query.order(ChromeOsDevice.key)
         query_reverse = query.order(-ChromeOsDevice.key)
         result_data = self.fetch_page(query_forward, query_reverse)
-        json_response(self.response, result_data, strategy=CHROME_OS_DEVICE_STRATEGY)
+        foo = json_response(self.response, result_data, strategy=CHROME_OS_DEVICE_STRATEGY)
+        foo
 
     @api_token_required
     def get_devices_by_tenant(self, tenant_urlsafe_key):
