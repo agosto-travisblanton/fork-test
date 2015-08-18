@@ -77,18 +77,18 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
       label: 'Devices'
     }
   })
-#  $stateProvider.state("displays", {
-#    url: "/displays",
-#    templateUrl: "app/display/displays-listing.html",
-#    controller: "DisplaysListingCtrl",
-#    controllerAs: 'displaysListingCtrl',
-#    ncyBreadcrumb: {
-#      label: 'Displays'
-#    }
-#  })
+  $stateProvider.state("displays", {
+    url: "/displays",
+    templateUrl: "app/display/displays-listing.html",
+    controller: "DisplaysListingCtrl",
+    controllerAs: 'displaysListingCtrl',
+    ncyBreadcrumb: {
+      label: 'Displays'
+    }
+  })
   $stateProvider.state("editDevice", {
     url: "/devices/:deviceKey",
-    templateUrl: "app/device/display-detail.html",
+    templateUrl: "app/device/device-detail.html",
     controller: "DeviceDetailsCtrl",
     controllerAs: 'deviceDetailsCtrl',
     ncyBreadcrumb: {

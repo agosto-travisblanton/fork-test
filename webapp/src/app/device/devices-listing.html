@@ -30,7 +30,7 @@
             </thead>
             <tbody>
             <tr ng-hide="devicesListingCtrl.devices.length">
-              <td class="no-devices" colspan="5">No devices</td>
+              <td class="no-devices text-center text-danger" colspan="5">No devices</td>
             </tr>
             <tr ng-repeat="device in devicesListingCtrl.devices | orderBy:'-created' ">
               <td class="display-key">

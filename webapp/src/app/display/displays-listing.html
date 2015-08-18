@@ -30,7 +30,7 @@
             </thead>
             <tbody>
             <tr ng-hide="displaysListingCtrl.displays.length">
-              <td class="no-displays" colspan="5">No displays</td>
+              <td class="no-displays text-center text-danger" colspan="5">No displays</td>
             </tr>
             <tr ng-repeat="display in displaysListingCtrl.displays | orderBy:'-created' ">
               <td class="display-key">

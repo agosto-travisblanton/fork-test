@@ -18,6 +18,7 @@ angular.module('skykitDisplayDeviceManagement').factory 'DevicesService', ($http
         promise
 
     getDevices: ->
+      params = {}
       promise = Restangular.all('devices').getList()
       promise
 
