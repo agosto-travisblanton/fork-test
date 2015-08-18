@@ -86,12 +86,12 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 deferred.defer(refresh_device_by_mac_address,
                                device_urlsafe_key=key.urlsafe(),
                                device_mac_address=device_mac_address,
-                               _countdown=30)
+                               _queue='directory-api')
                 content_manager_api = ContentManagerApi()
                 try:
                     deferred.defer(content_manager_api.create_device,
                                    chrome_os_device=device,
-                                   _countdown=30)
+                                   _queue='content-server')
                 except Exception, e:
                     logging.exception(e)
                 device_uri = self.request.app.router.build(None,
