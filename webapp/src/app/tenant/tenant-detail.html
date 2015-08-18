@@ -157,15 +157,14 @@
             </div>
             <!-- END panel -->
           </tab>
-          <tab heading="Linked displays">
+          <tab heading="Linked displays" active="true">
             <div style="margin-top: 1px;">&nbsp;</div>
             <div class="panel panel-default">
               <div class="panel-heading">
                 <h3 class="panel-title">Displays</h3>
               </div>
               <div class="panel-body">
-                <table name="tenant-displays-table"
-                       class="table table-bordered table-condensed table-responsive table-striped">
+                <table class="table table-bordered table-condensed table-responsive table-striped">
                   <thead>
                   <tr>
                     <th>Key</th>
@@ -177,7 +176,7 @@
                   </thead>
                   <tbody>
                   <tr ng-hide="tenantDetailsCtrl.currentTenantDisplays.length">
-                    <td name="no-displays" colspan="5" class="text-center text-danger">No displays</td>
+                    <td colspan="5" class="text-center text-danger">No displays</td>
                   </tr>
                   <tr ng-repeat="item in tenantDetailsCtrl.currentTenantDisplays | orderBy:'-created' ">
                     <td class="tenant-display-key">

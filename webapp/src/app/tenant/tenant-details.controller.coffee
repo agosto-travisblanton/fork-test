@@ -21,14 +21,13 @@ appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, Devices
     tenantPromise.then (data) =>
       @currentTenant = data
 
-#    displaysPromise = DisplaysService.getDisplaysByTenant($stateParams.tenantKey)
     displaysPromise = DevicesService.getDevicesByTenant($stateParams.tenantKey)
     displaysPromise.then (data) =>
       @currentTenantDisplays = data.objects
 
   @onClickSaveButton = () ->
     promise = TenantsService.save @currentTenant
-    promise.then (data) ->
+    promise.then () ->
       $state.go 'tenants'
 
   @autoGenerateTenantCode = ->
