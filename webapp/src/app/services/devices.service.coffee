@@ -17,10 +17,16 @@ angular.module('skykitDisplayDeviceManagement').factory 'DevicesService', ($http
         promise = Restangular.one('tenants', tenantKey).doGET('devices')
         promise
 
+#    getDevices: ->
+#      params = {}
+#      promise = Restangular.all('devices').getList()
+#      promise
+
     getDevices: ->
       params = {}
-      promise = Restangular.all('devices').getList()
+      promise = Restangular.all('displays').getList()
       promise
+
 
     save: (device) ->
       if device.key != undefined

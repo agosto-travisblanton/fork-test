@@ -9,7 +9,7 @@ from restler.serializers import json_response
 from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address, update_chrome_os_device)
 from models import ChromeOsDevice, Tenant
 from content_manager_api import ContentManagerApi
-from strategy import CHROME_OS_DEVICE_STRATEGY,DISPLAY_STRATEGY
+from strategy import CHROME_OS_DEVICE_STRATEGY
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -35,7 +35,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         query_forward = query.order(ChromeOsDevice.key)
         query_reverse = query.order(-ChromeOsDevice.key)
         result_data = self.fetch_page(query_forward, query_reverse)
-        json_response(self.response, result_data, strategy=DISPLAY_STRATEGY)
+        json_response(self.response, result_data, strategy=CHROME_OS_DEVICE_STRATEGY)
 
     @api_token_required
     def get(self, device_urlsafe_key):

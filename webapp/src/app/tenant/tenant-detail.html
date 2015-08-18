@@ -157,47 +157,47 @@
             </div>
             <!-- END panel -->
           </tab>
-          <tab heading="Linked devices">
-            <div style="margin-top: 1px;">&nbsp;</div>
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Devices</h3>
-              </div>
-              <div class="panel-body">
-                <table name="tenant-devices-table"
-                       class="table table-bordered table-condensed table-responsive table-striped">
-                  <thead>
-                  <tr>
-                    <th>Key</th>
-                    <th>Status</th>
-                    <th>MAC address</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr ng-hide="tenantDetailsCtrl.currentTenantDevices.length">
-                    <td name="no-devices" colspan="3" class="text-center text-danger">No devices</td>
-                  </tr>
-                  <tr ng-repeat="device in tenantDetailsCtrl.currentTenantDevices | orderBy:'-created' ">
-                    <td class="tenant-device-key">
-                      <a href="#/devices/{{ device.key }}">
-                                          <span class="entity-key">
-                                            {{ device.key | limitTo: 10 }}...{{ device.key | limitTo: 10 : device.key.length - 10}}
-                                          </span>
-                      </a>
-                    </td>
-                    <td class="tenant-device-id">
-                      {{ device.status }}
-                    </td>
-                    <td class="tenant-device-mac-address">
-                      {{ device.mac_address }}
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <!-- END panel -->
-          </tab>
+          <!--<tab heading="Linked devices">-->
+            <!--<div style="margin-top: 1px;">&nbsp;</div>-->
+            <!--<div class="panel panel-default">-->
+              <!--<div class="panel-heading">-->
+                <!--<h3 class="panel-title">Devices</h3>-->
+              <!--</div>-->
+              <!--<div class="panel-body">-->
+                <!--<table name="tenant-devices-table"-->
+                       <!--class="table table-bordered table-condensed table-responsive table-striped">-->
+                  <!--<thead>-->
+                  <!--<tr>-->
+                    <!--<th>Key</th>-->
+                    <!--<th>Status</th>-->
+                    <!--<th>MAC address</th>-->
+                  <!--</tr>-->
+                  <!--</thead>-->
+                  <!--<tbody>-->
+                  <!--<tr ng-hide="tenantDetailsCtrl.currentTenantDevices.length">-->
+                    <!--<td name="no-devices" colspan="3" class="text-center text-danger">No devices</td>-->
+                  <!--</tr>-->
+                  <!--<tr ng-repeat="device in tenantDetailsCtrl.currentTenantDevices | orderBy:'-created' ">-->
+                    <!--<td class="tenant-device-key">-->
+                      <!--<a href="#/devices/{{ device.key }}">-->
+                                          <!--<span class="entity-key">-->
+                                            <!--{{ device.key | limitTo: 10 }}...{{ device.key | limitTo: 10 : device.key.length - 10}}-->
+                                          <!--</span>-->
+                      <!--</a>-->
+                    <!--</td>-->
+                    <!--<td class="tenant-device-id">-->
+                      <!--{{ device.status }}-->
+                    <!--</td>-->
+                    <!--<td class="tenant-device-mac-address">-->
+                      <!--{{ device.mac_address }}-->
+                    <!--</td>-->
+                  <!--</tr>-->
+                  <!--</tbody>-->
+                <!--</table>-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--&lt;!&ndash; END panel &ndash;&gt;-->
+          <!--</tab>-->
           <tab heading="Linked displays">
             <div style="margin-top: 1px;">&nbsp;</div>
             <div class="panel panel-default">
@@ -210,27 +210,35 @@
                   <thead>
                   <tr>
                     <th>Key</th>
+                    <th>Location</th>
                     <th>Status</th>
                     <th>MAC address</th>
+                    <th>Device ID</th>
                   </tr>
                   </thead>
                   <tbody>
                   <tr ng-hide="tenantDetailsCtrl.currentTenantDisplays.length">
-                    <td name="no-displays" colspan="3" class="text-center text-danger">No displays</td>
+                    <td name="no-displays" colspan="5" class="text-center text-danger">No displays</td>
                   </tr>
                   <tr ng-repeat="item in tenantDetailsCtrl.currentTenantDisplays | orderBy:'-created' ">
                     <td class="tenant-display-key">
-                      <a href="#/displays/{{ item.key }}">
+                      <a href="#/devices/{{ item.key }}">
                                           <span class="entity-key">
                                             {{ item.key | limitTo: 10 }}...{{ item.key | limitTo: 10 : item.key.length - 10}}
                                           </span>
                       </a>
+                    </td>
+                    <td class="tenant-display-location">
+                      {{ item.annotated_location }}
                     </td>
                     <td class="tenant-display-status">
                       {{ item.status }}
                     </td>
                     <td class="tenant-display-mac-address">
                       {{ item.mac_address }}
+                    </td>
+                    <td class="tenant-display-id">
+                      {{ item.device_id }}
                     </td>
                   </tr>
                   </tbody>

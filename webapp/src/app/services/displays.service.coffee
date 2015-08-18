@@ -14,7 +14,7 @@ angular.module('skykitDisplayDeviceManagement').factory 'DisplaysService', ($htt
 
     getDisplaysByTenant: (tenantKey) ->
       unless tenantKey == undefined
-        promise = Restangular.one('tenants', tenantKey).doGET('displays')
+        promise = Restangular.one('tenants', tenantKey).doGET('devices')
         promise
 
     getDisplays: ->
