@@ -1,42 +1,39 @@
 'use strict'
 
 describe 'DevicesListingCtrl', ->
-  scope = undefined
   $controller = undefined
   controller = undefined
-  $state = undefined
   $stateParams = undefined
   DevicesService = undefined
-  devicesServicePromise = undefined
+  promise = undefined
+  devices = [
+    {key: 'dhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
+    {key: 'dhjad897d987fadafg708y67d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
+    {key: 'dhjad897d987fadafg708hb55', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
+  ]
+
 
   beforeEach module('skykitDisplayDeviceManagement')
 
-  beforeEach inject (_$controller_, _DevicesService_, _$state_) ->
+  beforeEach inject (_$controller_, _DevicesService_, _$stateParams_) ->
     $controller = _$controller_
-    $state = _$state_
-    $stateParams = {}
+    $stateParams = _$stateParams_
     DevicesService = _DevicesService_
-    scope = {}
-
 
   describe 'initialization', ->
-    data = {}
-
     beforeEach ->
-      devicesServicePromise = new skykitDisplayDeviceManagement.q.Mock
-      spyOn(DevicesService, 'getDevices').and.returnValue devicesServicePromise
-      controller = $controller 'DevicesListingCtrl', {
-        $scope: scope,
-        $stateParams: $stateParams,
-        DevicesService: DevicesService
-      }
+      promise = new skykitDisplayDeviceManagement.q.Mock
+      spyOn(DevicesService, 'getDevices').and.returnValue promise
+      controller = $controller 'DevicesListingCtrl', {$stateParams: $stateParams, DevicesService: DevicesService}
 
-    it 'devices list should be defined but empty', ->
-      expect(controller.devices).toBeDefined()
-      expect(controller.devices.length).toBe 0
+    it 'displays should be an empty array', ->
+      expect(angular.isArray(controller.devices)).toBeTruthy()
 
-    it 'will invoke getDevices on DeviceService', ->
-      devicesServicePromise.resolve(data)
-      expect(controller.devices).toBe data
+    it 'call DevicesService.getDisplays to retrieve all displays', ->
       expect(DevicesService.getDevices).toHaveBeenCalled()
+
+    it "the 'then' handler caches the retrieved displays in the controller", ->
+      promise.resolve devices
+      expect(controller.devices).toBe devices
+
 

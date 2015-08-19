@@ -1,80 +1,82 @@
 'use strict'
 
 describe 'DeviceDetailsCtrl', ->
-  scope = undefined
   $controller = undefined
   controller = undefined
-  $state = undefined
   $stateParams = undefined
+  $state = undefined
   DevicesService = undefined
   devicesServicePromise = undefined
+  TenantsService = undefined
+  tenantsServicePromise = undefined
+  device = {key: 'dhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
+  tenants = [
+    {key: 'dhjad897d987fadafg708fg7d', name: 'Foobar1', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
+    {key: 'dhjad897d987fadafg708y67d', name: 'Foobar2', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
+    {key: 'dhjad897d987fadafg708hb55', name: 'Foobar3', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
+  ]
+
 
   beforeEach module('skykitDisplayDeviceManagement')
 
-  beforeEach inject (_$controller_, _DevicesService_, _$state_) ->
+  beforeEach inject (_$controller_, _DevicesService_, _TenantsService_) ->
     $controller = _$controller_
-    $state = _$state_
     $stateParams = {}
+    $state = {}
     DevicesService = _DevicesService_
-    scope = {}
-
+    TenantsService = _TenantsService_
 
   describe 'initialization', ->
     beforeEach ->
+      tenantsServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      spyOn(TenantsService, 'fetchAllTenants').and.returnValue tenantsServicePromise
       devicesServicePromise = new skykitDisplayDeviceManagement.q.Mock
-      spyOn(DevicesService, 'getDeviceByKey').and.returnValue(devicesServicePromise)
+      spyOn(DevicesService, 'getDeviceByKey').and.returnValue devicesServicePromise
 
-    describe 'initialization', ->
+    describe 'new mode', ->
       beforeEach ->
-        controller = $controller('DeviceDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
+        controller = $controller 'DeviceDetailsCtrl', {
+          $stateParams: $stateParams
+          $state: $state
+          DevicesService: DevicesService
+          TenantsService: TenantsService
+        }
 
-      it 'currentDevice should be defined', ->
+      it 'currentDevice property should be defined', ->
         expect(controller.currentDevice).toBeDefined()
 
-      it 'currentDevice.key should be undefined', ->
-        expect(controller.currentDevice.key).toBeUndefined()
+      it 'call TenantsService.fetchAllTenants to retrieve all tenants', ->
+        expect(TenantsService.fetchAllTenants).toHaveBeenCalled()
 
-    describe 'editing an existing device', ->
-      device = {key: 'fahdsfyudsyfauisdyfoiusydfu'}
+      it "the 'then' handler caches the retrieved tenants in the controller", ->
+        tenantsServicePromise.resolve tenants
+        expect(controller.tenants).toBe tenants
 
+
+    describe 'edit mode', ->
       beforeEach ->
-        $stateParams = {deviceKey: 'fahdsfyudsyfauisdyfoiusydfu'}
-        controller = $controller('DeviceDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
+        $stateParams.deviceKey = 'fkasdhfjfa9s8udyva7dygoudyg'
+        controller = $controller 'DeviceDetailsCtrl', {
+          $stateParams: $stateParams
+          $state: $state
+          DevicesService: DevicesService
+          TenantsService: TenantsService
+        }
 
-      it 'editMode should be true', ->
-        expect(controller.editMode).toBeTruthy()
+      it 'currentDevice property should be defined', ->
+        expect(controller.currentDevice).toBeDefined()
 
-      it 'retrieve device by key from DevicesService', ->
-        devicesServicePromise.resolve(device)
+      it 'call TenantsService.fetchAllTenants to retrieve all tenants', ->
+        expect(TenantsService.fetchAllTenants).toHaveBeenCalled()
+
+      it "the 'then' handler caches the retrieved tenants in the controller", ->
+        tenantsServicePromise.resolve tenants
+        expect(controller.tenants).toBe tenants
+
+      it 'call DevicesService.getByKey to retrieve the selected device', ->
         expect(DevicesService.getDeviceByKey).toHaveBeenCalledWith($stateParams.deviceKey)
-        expect(controller.currentDevice).toBe(device)
 
-    describe 'creating a new device', ->
-      beforeEach ->
-        $stateParams = {}
-        controller = $controller('DeviceDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
+      it "the 'then' handler caches the retrieved device in the controller", ->
+        devicesServicePromise.resolve device
+        expect(controller.currentDevice).toBe device
 
-      it 'editMode should be false', ->
-        expect(controller.editMode).toBeFalsy()
-
-      it 'do not call DevicesService.getDeviceByKey', ->
-        expect(DevicesService.getDeviceByKey).not.toHaveBeenCalled()
-
-#  describe '.onClickSaveButton', ->
-#    beforeEach ->
-#      devicesServicePromise = new skykitDisplayDeviceManagement.q.Mock
-#      spyOn(DevicesService, 'save').and.returnValue(devicesServicePromise)
-#      spyOn($state, 'go')
-#      $stateParams = {}
-#      controller = $controller('DeviceDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
-#
-#    it 'call DevicesService.save, pass the current device', ->
-#      controller.onClickSaveButton()
-#      devicesServicePromise.resolve()
-#      expect(DevicesService.save).toHaveBeenCalledWith(controller.currentDevice)
-#
-#    it "the 'then' handler routes navigation back to 'devices'", ->
-#      controller.onClickSaveButton()
-#      devicesServicePromise.resolve()
-#      expect($state.go).toHaveBeenCalledWith('devices')
-#
