@@ -69,6 +69,7 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertIsNotNone(json_representation['created'])
         self.assertIsNotNone(json_representation['updated'])
         self.assertEqual(str(chrome_os_device.api_key), json_representation['api_key'])
+        self.assertEqual(str(self.tenant.tenant_code), json_representation['tenant_code'])
         self.assertEqual(str(self.tenant.name), json_representation['tenant_name'])
         self.assertEqual(str(self.tenant.content_server_url), json_representation['content_server_url'])
         self.assertEqual(str(self.tenant.chrome_device_domain), json_representation['chrome_device_domain'])
