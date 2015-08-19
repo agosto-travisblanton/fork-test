@@ -21,11 +21,12 @@
           <table name="tenant-table" class="table table-bordered table-responsive table-striped">
             <thead>
             <tr>
-              <th>Key</th>
-              <th>Serial Number</th>
+              <th>Device key</th>
+              <th>Serial number</th>
               <th>Tenant code</th>
-              <th>MAC address</th>
-              <th>Ethernet MAC address</th>
+              <th>Wifi mac address</th>
+              <th>Ether mac address</th>
+              <th>Provisioning date</th>
             </tr>
             </thead>
             <tbody>
@@ -44,9 +45,8 @@
               <td class="display-tenant-code">{{ display.tenant_code }}</td>
               <td class="display-mac-address">{{ display.mac_address }}</td>
               <td class="display-ethernet-mac-address">{{ display.ethernet_mac_address }}</td>
+              <td class="display-provisioning-date">{{ display.created }}</td>
             </tr>
-
-
             </tbody>
           </table>
         </div>

@@ -167,11 +167,12 @@
                 <table class="table table-bordered table-condensed table-responsive table-striped">
                   <thead>
                   <tr>
-                    <th>Key</th>
-                    <th>Location</th>
-                    <th>Status</th>
-                    <th>MAC address</th>
+                    <th>Device key</th>
+                    <th>Serial number</th>
                     <th>Device ID</th>
+                    <th>Wifi mac address</th>
+                    <th>Ether mac address</th>
+                    <th>Provisioning date</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -186,17 +187,20 @@
                                           </span>
                       </a>
                     </td>
-                    <td class="tenant-display-location">
-                      {{ item.annotated_location }}
+                    <td class="tenant-display-serial-number">
+                      {{ item.serial_number }}
                     </td>
-                    <td class="tenant-display-status">
-                      {{ item.status }}
+                    <td class="tenant-display-id">
+                      {{ item.device_id }}
                     </td>
                     <td class="tenant-display-mac-address">
                       {{ item.mac_address }}
                     </td>
-                    <td class="tenant-display-id">
-                      {{ item.device_id }}
+                    <td class="tenant-display-ethernet-mac-address">
+                      {{ item.ethernet_mac_address }}
+                    </td>
+                    <td class="tenant-display-provisioning-date">
+                      {{ item.created }}
                     </td>
                   </tr>
                   </tbody>

@@ -206,6 +206,8 @@ def refresh_device(device_urlsafe_key=None):
         raise deferred.PermanentTaskFailure('The device URL-safe key parameter is None. It is required.')
     device_key = ndb.Key(urlsafe=device_urlsafe_key)
     device = device_key.get()
+    if None == device.device_id:
+        return
     chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
     chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, device.device_id)
     if chrome_os_device is not None:
