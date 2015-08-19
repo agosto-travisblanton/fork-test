@@ -42,9 +42,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         }
         self.invalid_authorization_header = {}
 
-    ##################################################################################################################
-    ## get_list
-    ##################################################################################################################
+    #################################################################################################################
+    # get_list
+    #################################################################################################################
 
     def test_get_list_no_query_parameters_http_status_ok(self):
         self.__build_list_devices(tenant_key=self.tenant_key, number_to_build=1)
@@ -95,6 +95,33 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                              any_matcher(self.device_key.urlsafe())).thenReturn(None)
         response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
         self.assertOK(response)
+
+    def test_get_device_by_key_returns_not_found_status_with_a_valid_key_not_found(self):
+        request_parameters = {}
+        uri = application.router.build(None,
+                                       'manage-device',
+                                       None,
+                                       {'device_urlsafe_key': self.device_key.urlsafe()})
+        self.app.delete('/api/v1/devices/{0}'.format(self.device_key.urlsafe()),
+                        json.dumps({}),
+                        headers=self.valid_authorization_header)
+        when(deferred).defer(any_matcher(refresh_device),
+                             any_matcher(self.device_key.urlsafe())).thenReturn(None)
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
+        self.assertTrue('404 Not Found' in context.exception.message)
+
+    def test_get_device_by_key_returns_bad_request_status_with_invalid_key(self):
+        request_parameters = {}
+        uri = application.router.build(None,
+                                       'manage-device',
+                                       None,
+                                       {'device_urlsafe_key': '0000ZXN0YmVkLXRlc3RyFAsSDkNocm9tZU9zRGV2aWNl0000'})
+        when(deferred).defer(any_matcher(refresh_device),
+                             any_matcher(self.device_key.urlsafe())).thenReturn(None)
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
+        self.assertTrue('400 Bad Request' in context.exception.message)
 
     def test_get_device_by_key_entity_body_json(self):
         request_parameters = {}

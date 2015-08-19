@@ -39,14 +39,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @api_token_required
     def get(self, device_urlsafe_key):
-        try:
-            key = ndb.Key(urlsafe=device_urlsafe_key)
-        except Exception, e:
-            logging.exception(e)
-            return self.response.set_status(404)
-        device = key.get()
-        if device is None:
-            return self.response.set_status(404)
+        device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
         deferred.defer(refresh_device, device_urlsafe_key=device_urlsafe_key)
         json_response(self.response, device, strategy=CHROME_OS_DEVICE_STRATEGY)
 

@@ -20,7 +20,7 @@ class TenantsHandler(RequestHandler):
     @api_token_required
     def get(self, tenant_key=None):
         if None == tenant_key:
-            result = Tenant.query(ancestor=TenantEntityGroup.singleton().key).fetch(100)
+            result = Tenant.query(ancestor=TenantEntityGroup.singleton().key)
             result = filter(lambda x: x.active is True, result)
         else:
             tenant_key = ndb.Key(urlsafe=tenant_key)
