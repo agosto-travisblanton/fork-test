@@ -1,5 +1,6 @@
 from google.appengine.ext import ndb
 from env_setup import setup_test_paths
+from utils.web_util import build_uri
 
 setup_test_paths()
 
@@ -49,17 +50,17 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_get_list_no_query_parameters_http_status_ok(self):
         self.__build_list_devices(tenant_key=self.tenant_key, number_to_build=1)
         request_parameters = {}
-        uri = application.router.build(None, 'devices-retrieval', None, {})
+        uri = build_uri('devices-retrieval')
         response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
         self.assertOK(response)
 
     def test_get_list_no_query_parameters_entity_body_json(self):
         self.__build_list_devices(tenant_key=self.tenant_key, number_to_build=20)
         request_parameters = {}
-        uri = application.router.build(None, 'devices-retrieval', None, {})
+        uri = build_uri('devices-retrieval')
         response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(len(response_json['objects']), 10)
+        self.assertLength(10, response_json['objects'])
 
     ##################################################################################################################
     ## get_devices_by_tenant
@@ -80,11 +81,16 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(len(response_json['objects']), 10)
+        self.assertLength(10, response_json['objects'])
 
     ##################################################################################################################
     ## get
     ##################################################################################################################
+    def test_get_device_by_key_no_authorization_header_returns_forbidden(self):
+        uri = build_uri('manage-device', params_dict={'device_urlsafe_key': self.device_key.urlsafe()})
+        response = self.get(uri, headers=self.invalid_authorization_header)
+        self.assertForbidden(response)
+
     def test_get_device_by_key_http_status_ok(self):
         request_parameters = {}
         uri = application.router.build(None,
@@ -166,9 +172,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {'macAddress': self.MAC_ADDRESS,
                         'gcmRegistrationId': self.GCM_REGISTRATION_ID,
                         'tenantCode': self.TENANT_CODE}
-        with self.assertRaises(AppError) as context:
-            self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.invalid_authorization_header)
-        self.assertTrue('403 Forbidden' in context.exception.message)
+        uri = build_uri('device-creator')
+        response = self.post(uri, params=request_body, headers=self.invalid_authorization_header)
+        self.assertForbidden(response)
 
     def test_device_resource_handler_post_no_returns_bad_response_if_mac_address_already_assigned_to_device(self):
         request_body = {'macAddress': self.MAC_ADDRESS,
@@ -242,10 +248,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {'gcmRegistrationId': self.GCM_REGISTRATION_ID,
                         'tenantCode': self.TENANT_CODE}
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.device_key.get())
-        with self.assertRaises(Exception) as context:
-            self.app.put('/api/v1/devices/{0}'.format(self.device_key.urlsafe()),
-                         json.dumps(request_body), headers=self.invalid_authorization_header)
-        self.assertTrue('403 Forbidden' in str(context.exception))
+        uri = build_uri('manage-device', params_dict={'device_urlsafe_key': self.device_key.urlsafe()})
+        response = self.put(uri, params=request_body, headers=self.invalid_authorization_header)
+        self.assertForbidden(response)
 
     def test_put_http_status_no_content(self):
         request_body = {'gcm_registration_id': self.GCM_REGISTRATION_ID, 'tenant_key': self.tenant_key.urlsafe()}
@@ -285,11 +290,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     ## delete
     ##################################################################################################################
 
-    def test_device_resource_delete_no_authorization_header_returns_forbidden(self):
-        url = '/api/v1/devices/{0}'.format(self.device_key.urlsafe())
-        with self.assertRaises(Exception) as context:
-            self.app.delete(url, headers=self.invalid_authorization_header)
-        self.assertTrue('403 Forbidden' in str(context.exception))
+    def test_delete_no_authorization_header_returns_forbidden(self):
+        uri = build_uri('manage-device', params_dict={'device_urlsafe_key': self.device_key.urlsafe()})
+        response = self.delete(uri, headers=self.invalid_authorization_header)
+        self.assertForbidden(response)
 
     def test_delete_http_status_no_content(self):
         request_body = {}
