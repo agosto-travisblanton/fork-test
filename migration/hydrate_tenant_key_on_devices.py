@@ -6,16 +6,15 @@ from models import Tenant, TenantEntityGroup, ChromeOsDevice
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
-class AddTenantKeyToDevices(MigrationBase):
-    MIGRATION_NAME = 'add_tenant_key_to_devices'
+class HydrateTenantKeyOnDevices(MigrationBase):
+    MIGRATION_NAME = 'hydrate_tenant_key_on_devices'
 
     def __init__(self):
-        super(AddTenantKeyToDevices, self).__init__(self.MIGRATION_NAME)
+        super(HydrateTenantKeyOnDevices, self).__init__(self.MIGRATION_NAME)
 
     def run(self):
-        tenants = Tenant.query(ancestor=TenantEntityGroup.singleton().key).fetch(100)
-        active_tenants = filter(lambda x: x.active is True, tenants)
-        for tenant in active_tenants:
+        tenants = Tenant.query(ancestor=TenantEntityGroup.singleton().key)
+        for tenant in tenants:
             tenant_key = ndb.Key(urlsafe=tenant.key.urlsafe())
             devices = ChromeOsDevice.query(ancestor=tenant_key).fetch()
             number_of_devices = len(devices)
