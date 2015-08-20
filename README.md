@@ -62,8 +62,6 @@ The following is an example of a **request body** JSON that could be sent to the
 
 {
 
-  "macAddress": "54271e619346",
-
   "gcmRegistrationId": "8d70a8d78a6dfa6df76dfas7",
 
   "tenantKey": "ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyOwsSEVRlbmFudEVudGl0eUdyb3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgPDUnwoM"
