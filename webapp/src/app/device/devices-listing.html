@@ -31,13 +31,14 @@
             </thead>
             <tbody>
             <tr ng-hide="devicesListingCtrl.devices.length">
-              <td class="no-devices text-center text-danger" colspan="5">No displays</td>
+              <td class="no-devices text-center text-danger" colspan="6">No displays</td>
             </tr>
             <tr ng-repeat="display in devicesListingCtrl.devices | orderBy:'-created' ">
               <td class="display-key">
                 <a href="#/devices/{{ display.key }}">
                   <span class="entity-key">
-                    {{ display.key | limitTo: 10 }}...{{ display.key | limitTo: 10 : display.key.length - 10}}
+                    {{display.key}}
+                    <!--{{ display.key | limitTo: 10 }}...{{ display.key | limitTo: 10 : display.key.length - 10}}-->
                   </span>
                 </a>
               </td>

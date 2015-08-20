@@ -116,11 +116,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
         else:
             request_json = json.loads(self.request.body)
-            gcm_registration_id = request_json.get('gcm_registration_id')
+            gcm_registration_id = request_json.get('gcmRegistrationId')
             if gcm_registration_id:
-                logging.info('  PUT updating the gcm_registration_id.')
+                logging.info('  PUT updating the gcmRegistrationId.')
                 device.gcm_registration_id = gcm_registration_id
-            tenant_key = ndb.Key(urlsafe=request_json.get('tenant_key'))
+            tenant_key = ndb.Key(urlsafe=request_json.get('tenantKey'))
             if tenant_key != device.tenant_key:
                 logging.info('  PUT updating the tenant.')
                 device.tenant_key = tenant_key
