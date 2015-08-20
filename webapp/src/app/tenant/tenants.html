@@ -28,6 +28,7 @@
               <th>Name</th>
               <th>Email</th>
               <th>Content Server URL</th>
+              <th>Tenant key</th>
               <th></th>
             </tr>
             </thead>
@@ -39,6 +40,7 @@
               <td class="tenant-name">{{item.name}}</td>
               <td class="tenant-admin-email">{{item.admin_email}}</td>
               <td class="content-server-url">{{item.content_server_url}}</td>
+              <td class="content-server-url">{{item.key}}</td>
               <td class="text-center">
                 <a name="edit-tenant" class="btn"
                    ng-click="tenantsCtrl.editItem(item)"
