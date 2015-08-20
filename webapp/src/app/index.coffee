@@ -95,6 +95,13 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
       label: 'Remote control'
     }
   })
+  $stateProvider.state("version", {
+    url: "/version",
+    templateUrl: "app/components/version/version.html",
+    controller: "VersionCtrl",
+    controllerAs: 'versionCtrl'
+  })
+
   $urlRouterProvider.otherwise '/'
 
   RestangularProvider.setBaseUrl '/api/v1'

@@ -23,7 +23,7 @@ class TestVersionHandler(BaseTest, WebTest):
         uri = build_uri('version-retrieval')
         response = self.get(uri)
         response_json = json.loads(response.body)
-        self.assertIsInstance(int(response_json['version']), int)
+        self.assertIsInstance(int(response_json['number']), int)
 
     def test_get_returns_json_tag(self):
         uri = build_uri('version-retrieval')

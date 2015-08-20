@@ -9,8 +9,8 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 class VersionHandler(RequestHandler):
     def get(self):
-        data = {
-            'version': config.APP_VERSION_NUMBER,
+        version = {
+            'number': config.APP_VERSION_NUMBER,
             'tag': config.APP_VERSION_TAG
         }
-        json_response(self.response, data)
+        json_response(self.response, version)

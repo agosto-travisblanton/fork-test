@@ -1,3 +1,18 @@
 'use strict'
 
-angular.module("skykitDisplayDeviceManagement").controller "VersionCtrl", ($scope) ->
+appModule = angular.module('skykitDisplayDeviceManagement')
+
+appModule.controller 'VersionCtrl', ($scope, $stateParams, VersionService) ->
+  @version = {
+    number: undefined
+    tag: undefined
+  }
+
+  initialize: ->
+    versionPromise = VersionService.getVersion()
+    versionPromise.then (data) =>
+      debugger
+      @version = data
+
+
+  @

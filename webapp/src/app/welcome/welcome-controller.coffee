@@ -7,6 +7,7 @@ appModule.controller "WelcomeCtrl", ($state, DistributorsService) ->
   @currentDistributor = undefined
 
   @initialize = ->
+    alert 'foo'
     promise = DistributorsService.fetchAll()
     promise.then (data) =>
       @distributors = data
