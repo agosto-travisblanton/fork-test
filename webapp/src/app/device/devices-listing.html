@@ -37,8 +37,7 @@
               <td class="display-key">
                 <a href="#/devices/{{ display.key }}">
                   <span class="entity-key">
-                    {{display.key}}
-                    <!--{{ display.key | limitTo: 10 }}...{{ display.key | limitTo: 10 : display.key.length - 10}}-->
+                    {{ display.key | limitTo: 10 }}...{{ display.key | limitTo: 10 : display.key.length - 10}}
                   </span>
                 </a>
               </td>
