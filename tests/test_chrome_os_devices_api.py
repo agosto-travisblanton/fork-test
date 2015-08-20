@@ -1,12 +1,12 @@
 from env_setup import setup_test_paths
-from models import Tenant, Display
+from models import Tenant, ChromeOsDevice
 
 setup_test_paths()
 
 from time import sleep, gmtime, strftime
 
 from agar.test import BaseTest
-from chrome_os_devices_api import ChromeOsDevicesApi, refresh_display_by_mac_address
+from chrome_os_devices_api import ChromeOsDevicesApi, refresh_device_by_mac_address
 
 
 class TestChromeOsDevicesApi(BaseTest):
@@ -78,8 +78,7 @@ class TestChromeOsDevicesApi(BaseTest):
         else:
             return None
 
-    def test_refresh_display_by_mac_address(self):
-        device_id = '6daf712b-7a65-4450-abcd-45027a47a716'
+    def test_refresh_device_by_mac_address(self):
         tenant = Tenant.create(name='Foobar, Inc',
                                tenant_code='foobar_inc',
                                admin_email='admin@foobar.com',
@@ -88,11 +87,9 @@ class TestChromeOsDevicesApi(BaseTest):
                                active=True)
         tenant_key = tenant.put()
         mac_address = '54271e4af1e7'
-        display = Display.create(tenant_key=tenant_key,
-                                 gcm_registration_id='8d70a8d78a6dfa6df76dfasd',
-                                 mac_address=mac_address,
-                                 device_id=device_id)
-        display_key = display.put()
-        result = refresh_display_by_mac_address(display_key.urlsafe(), mac_address)
-        self.assertEqual(result.device_id, device_id)
-        self.assertTrue(result.managed_display)
+        device = ChromeOsDevice.create(tenant_key=tenant_key,
+                                       gcm_registration_id='8d70a8d78a6dfa6df76dfasd',
+                                       mac_address=mac_address)
+        device_key = device.put()
+        result = refresh_device_by_mac_address(device_key.urlsafe(), mac_address)
+        self.assertEqual(result.device_id, self.TESTING_DEVICE_ID)

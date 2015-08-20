@@ -157,47 +157,6 @@
             </div>
             <!-- END panel -->
           </tab>
-          <tab heading="Linked devices">
-            <div style="margin-top: 1px;">&nbsp;</div>
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Devices</h3>
-              </div>
-              <div class="panel-body">
-                <table name="tenant-devices-table"
-                       class="table table-bordered table-condensed table-responsive table-striped">
-                  <thead>
-                  <tr>
-                    <th>Key</th>
-                    <th>Device ID</th>
-                    <th>MAC address</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr ng-hide="tenantDetailsCtrl.currentTenantDevices.length">
-                    <td name="no-tenants" colspan="3" class="text-center text-danger">No devices</td>
-                  </tr>
-                  <tr ng-repeat="device in tenantDetailsCtrl.currentTenantDevices | orderBy:'-created' ">
-                    <td class="tenant-device-key">
-                      <a href="#/devices/{{ device.key }}">
-                                          <span class="entity-key">
-                                            {{ device.key | limitTo: 10 }}...{{ device.key | limitTo: 10 : device.key.length - 10}}
-                                          </span>
-                      </a>
-                    </td>
-                    <td class="tenant-device-id">
-                      {{ device.device_id }}
-                    </td>
-                    <td class="tenant-device-mac-address">
-                      {{ device.mac_address }}
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <!-- END panel -->
-          </tab>
           <tab heading="Linked displays">
             <div style="margin-top: 1px;">&nbsp;</div>
             <div class="panel panel-default">
@@ -205,32 +164,43 @@
                 <h3 class="panel-title">Displays</h3>
               </div>
               <div class="panel-body">
-                <table name="tenant-displays-table"
-                       class="table table-bordered table-condensed table-responsive table-striped">
+                <table class="table table-bordered table-condensed table-responsive table-striped">
                   <thead>
                   <tr>
-                    <th>Key</th>
-                    <th>Status</th>
-                    <th>MAC address</th>
+                    <th>Device key</th>
+                    <th>Serial number</th>
+                    <th>Device ID</th>
+                    <th>Wifi mac address</th>
+                    <th>Ether mac address</th>
+                    <th>Provisioning date</th>
                   </tr>
                   </thead>
                   <tbody>
                   <tr ng-hide="tenantDetailsCtrl.currentTenantDisplays.length">
-                    <td name="no-tenants" colspan="3" class="text-center text-danger">No displays</td>
+                    <td colspan="5" class="text-center text-danger">No displays</td>
                   </tr>
-                  <tr ng-repeat="display in tenantDetailsCtrl.currentTenantDisplays | orderBy:'-created' ">
+                  <tr ng-repeat="item in tenantDetailsCtrl.currentTenantDisplays | orderBy:'-created' ">
                     <td class="tenant-display-key">
-                      <a href="#/displays/{{ display.key }}">
+                      <a href="#/devices/{{ item.key }}">
                                           <span class="entity-key">
-                                            {{ display.key | limitTo: 10 }}...{{ display.key | limitTo: 10 : display.key.length - 10}}
+                                            {{ item.key | limitTo: 10 }}...{{ item.key | limitTo: 10 : item.key.length - 10}}
                                           </span>
                       </a>
                     </td>
-                    <td class="tenant-display-status">
-                      {{ display.status }}
+                    <td class="tenant-display-serial-number">
+                      {{ item.serial_number }}
+                    </td>
+                    <td class="tenant-display-id">
+                      {{ item.device_id }}
                     </td>
                     <td class="tenant-display-mac-address">
-                      {{ display.mac_address }}
+                      {{ item.mac_address }}
+                    </td>
+                    <td class="tenant-display-ethernet-mac-address">
+                      {{ item.ethernet_mac_address }}
+                    </td>
+                    <td class="tenant-display-provisioning-date">
+                      {{ item.created }}
                     </td>
                   </tr>
                   </tbody>

@@ -49,10 +49,6 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
       deviceKey = '3741833e781236b4jwdfhhfds98fyasd6fa7d6'
       expect($state.href('editDevice', {deviceKey: deviceKey})).toEqual("#/devices/#{deviceKey}")
 
-    it 'should resolve \'editDisplay\' state', ->
-      displayKey = '3741833e781236b4jwdfhhfds98fyasd6fa7d6'
-      expect($state.href('editDisplay', {displayKey: displayKey})).toEqual("#/displays/#{displayKey}")
-
     it 'should resolve \'remote_control\' state', ->
       expect($state.href('remote_control', {})).toEqual('#/remote_control')
 
@@ -78,13 +74,10 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
         expect($state.get('editTenant').ncyBreadcrumb.label).toBe '{{ tenantDetailsCtrl.currentTenant.name }}'
 
       it 'should resolve \'devices\' state', ->
-        expect($state.get('devices').ncyBreadcrumb.label).toBe 'Devices'
+        expect($state.get('devices').ncyBreadcrumb.label).toBe 'Displays'
 
       it 'should resolve \'editDevice\' state', ->
-        expect($state.get('editDevice').ncyBreadcrumb.label).toBe 'Device {{ deviceDetailsCtrl.currentDevice.key }}'
-
-      it 'should resolve \'editDisplay\' state', ->
-        expect($state.get('editDisplay').ncyBreadcrumb.label).toBe 'Display {{ displayDetailsCtrl.currentDisplay.key }}'
+        expect($state.get('editDevice').ncyBreadcrumb.label).toBe 'Display {{ deviceDetailsCtrl.currentDevice.key }}'
 
       it 'should resolve \'remote_control\' state', ->
         expect($state.get('remote_control').ncyBreadcrumb.label).toBe 'Remote control'

@@ -74,15 +74,6 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     controller: "DevicesListingCtrl",
     controllerAs: 'devicesListingCtrl',
     ncyBreadcrumb: {
-      label: 'Devices'
-    }
-  })
-  $stateProvider.state("displays", {
-    url: "/displays",
-    templateUrl: "app/display/displays-listing.html",
-    controller: "DisplaysListingCtrl",
-    controllerAs: 'displaysListingCtrl',
-    ncyBreadcrumb: {
       label: 'Displays'
     }
   })
@@ -92,16 +83,7 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     controller: "DeviceDetailsCtrl",
     controllerAs: 'deviceDetailsCtrl',
     ncyBreadcrumb: {
-      label: 'Device {{ deviceDetailsCtrl.currentDevice.key }}'
-    }
-  })
-  $stateProvider.state("editDisplay", {
-    url: "/displays/:displayKey",
-    templateUrl: "app/display/display-detail.html",
-    controller: "DisplayDetailsCtrl",
-    controllerAs: 'displayDetailsCtrl',
-    ncyBreadcrumb: {
-      label: 'Display {{ displayDetailsCtrl.currentDisplay.key }}'
+      label: 'Display {{ deviceDetailsCtrl.currentDevice.key }}'
     }
   })
   $stateProvider.state("remote_control", {
@@ -130,7 +112,7 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
 
   RestangularProvider.addResponseInterceptor (data, operation, resourceType, url, response, deferred) ->
     result = data
-    if resourceType == 'displays' and operation = 'getList' and url == '/api/v1/displays'
+    if resourceType == 'devices' and operation = 'getList' and url == '/api/v1/devices'
       result = data.objects
     result
 

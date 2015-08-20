@@ -35,7 +35,7 @@
             <tr ng-hide="tenantsCtrl.tenants.length">
               <td name="no-tenants" colspan="5">No tenants</td>
             </tr>
-            <tr ng-repeat="item in tenantsCtrl.tenants | orderBy:'-created' ">
+            <tr ng-repeat="item in tenantsCtrl.tenants | orderBy:'name' ">
               <td class="tenant-name">{{item.name}}</td>
               <td class="tenant-admin-email">{{item.admin_email}}</td>
               <td class="content-server-url">{{item.content_server_url}}</td>

@@ -2,7 +2,7 @@
 
 appModule = angular.module('skykitDisplayDeviceManagement')
 
-appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, DevicesService, DisplaysService, $state) ->
+appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, DevicesService, $state) ->
   @currentTenant = {
     key: undefined,
     name: undefined,
@@ -12,7 +12,7 @@ appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, Devices
     chrome_device_domain: undefined,
     active: true
   }
-  @currentTenantDevices = []
+
   @currentTenantDisplays = []
   @editMode = !!$stateParams.tenantKey
 
@@ -20,16 +20,14 @@ appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, Devices
     tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey)
     tenantPromise.then (data) =>
       @currentTenant = data
-    devicesPromise = DevicesService.getDevicesByTenant($stateParams.tenantKey)
-    devicesPromise.then (data) =>
-      @currentTenantDevices = data
-    displaysPromise = DisplaysService.getDisplaysByTenant($stateParams.tenantKey)
+
+    displaysPromise = DevicesService.getDevicesByTenant($stateParams.tenantKey)
     displaysPromise.then (data) =>
       @currentTenantDisplays = data.objects
 
   @onClickSaveButton = () ->
     promise = TenantsService.save @currentTenant
-    promise.then (data) ->
+    promise.then () ->
       $state.go 'tenants'
 
   @autoGenerateTenantCode = ->

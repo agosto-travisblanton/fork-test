@@ -55,7 +55,7 @@ application = WSGIApplication(
         Route(
             r'/api/v1/devices',
             handler='handlers.device_resource_handler.DeviceResourceHandler',
-            name='devices',
+            name='devices-retrieval',
             handler_method='get_list',
             methods=['GET']
         ),
@@ -83,42 +83,6 @@ application = WSGIApplication(
             name='devices-by-tenant',
             handler_method='get_devices_by_tenant',
             methods=['GET']
-        ),
-
-        ############################################################
-        # Displays
-        ############################################################
-        Route(
-            r'/api/v1/displays',
-            handler='handlers.displays_handler.DisplaysHandler',
-            name='displays-retrieval',
-            handler_method='get_list',
-            methods=['GET']
-        ),
-        Route(
-            r'/api/v1/tenants/<tenant_urlsafe_key>/displays',
-            handler='handlers.displays_handler.DisplaysHandler',
-            name='displays-by-tenant',
-            handler_method='get_displays_by_tenant',
-            methods=['GET']
-        ),
-        Route(
-            r'/api/v1/displays/<display_urlsafe_key>',
-            handler='handlers.displays_handler.DisplaysHandler',
-            name='manage-display',
-            methods=['GET', 'PUT', 'DELETE']
-        ),
-        Route(
-            r'/api/v1/displays',
-            handler='handlers.displays_handler.DisplaysHandler',
-            name='display-creator',
-            handler_method='post',
-            methods=['POST']
-        ),
-        Route(
-            r'/api/v1/displays/<display_urlsafe_key>/commands',
-            handler='handlers.display_commands_handler.DisplayCommandsHandler',
-            name='display-commands',
         ),
 
         ############################################################

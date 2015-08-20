@@ -3,7 +3,6 @@ from env_setup import setup
 setup()
 
 from agar.django.templates import render_template
-from google.appengine.ext import deferred
 from migration_models import (
     MigrationOperation,
     MIGRATION_STATUS_QUEUED,
@@ -15,12 +14,12 @@ from utils.web_util import build_uri
 from webapp2 import RequestHandler
 import logging
 import traceback
-from add_tenant_key_to_devices import AddTenantKeyToDevices
-from add_google_api_chrome_device_properties import AddGoogleApiChromeDeviceProperties
+from hydrate_tenant_key_on_devices import HydrateTenantKeyOnDevices
+from refresh_chrome_device_properties_from_directory_api import RefreshChromeDevicePropertiesFromDirectoryApi
 
 MIGRATIONS = [
-    AddTenantKeyToDevices(),
-    AddGoogleApiChromeDeviceProperties()
+    HydrateTenantKeyOnDevices(),
+    RefreshChromeDevicePropertiesFromDirectoryApi()
 ]
 
 MIGRATIONS_MAP = {migration.name: migration for migration in MIGRATIONS}
@@ -60,7 +59,7 @@ def _run_migration(migration_operation_key):
     migration_operation = migration_operation_key.get()
     name = migration_operation.name
     migration = MIGRATIONS_MAP[name]
-    logging.info("Running migration '{}'".format(name))
+    logging.info("'{}' is running.".format(name))
     try:
         migration.run()
         migration.complete()
@@ -92,11 +91,11 @@ class MigrationRunHandler(RequestHandler):
         if migration_name in MIGRATIONS_MAP:
             migration_operation = MigrationOperation.start(migration_name)
             if migration_operation is not None:
-                logging.warning("Migration '{0}' is set to run".format(migration_name))
+                logging.info("'{0}' is set to run".format(migration_name))
                 _run_migration(migration_operation.key)
                 # deferred.defer(_run_migration, migration_operation.key, _queue='migrations', _target='migration')
             else:
-                logging.warning("Migration '{0}' is already running".format(migration_name))
+                logging.info("'{0}' is already running".format(migration_name))
         else:
             logging.error('Attempted to run invalid migration: {0}'.format(migration_name))
         self.redirect(build_uri('migration-listing', module='migration'))
