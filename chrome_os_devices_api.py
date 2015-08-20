@@ -207,6 +207,7 @@ def refresh_device(device_urlsafe_key=None):
     device_key = ndb.Key(urlsafe=device_urlsafe_key)
     device = device_key.get()
     if None == device.device_id:
+        logging.info('Did not refresh in refresh_device because no device_id available.')
         return
     chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
     chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, device.device_id)
@@ -246,6 +247,9 @@ def refresh_chrome_os_device(device_urlsafe_key=None):
         raise deferred.PermanentTaskFailure('The device url-safe key parameter is None. It is required.')
     device_key = ndb.Key(urlsafe=device_urlsafe_key)
     device = device_key.get()
+    if None == device.device_id:
+        logging.info('Did not refresh in refresh_chrome_os_device because no device_id available.')
+        return
     chrome_os_device = None
     chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
     try:
