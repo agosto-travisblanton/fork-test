@@ -66,7 +66,7 @@ The following is an example of a **request body** JSON that could be sent to the
 
   "gcmRegistrationId": "8d70a8d78a6dfa6df76dfas7",
 
-  "tenantCode": "foobar"
+  "tenantKey": "ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyOwsSEVRlbmFudEVudGl0eUdyb3VwIhF0ZW5hbnRFbnRpdHlHcm91cAwLEgZUZW5hbnQYgICAgPDUnwoM"
 
 }
 
