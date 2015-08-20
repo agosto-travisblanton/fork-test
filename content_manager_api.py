@@ -18,7 +18,6 @@ class ContentManagerApi(object):
     def create_tenant(self, tenant):
         payload = {
             "tenant_code": tenant.tenant_code,
-            "tenant_name": tenant.name,
             "admin_email": tenant.admin_email
         }
         url = "{content_manager_base_url}/provisioning/v1/tenants".format(
@@ -27,9 +26,8 @@ class ContentManagerApi(object):
                                                                    payload=(json.dumps(payload)),
                                                                    headers=self.HEADERS))
         if http_client_response.status_code == 201:
-            logging.info('create_tenant to Content Mgr: url={0}, name={1}, email={2}, tenant_code={3}'.format(
+            logging.info('create_tenant to Content Mgr: url={0}, admin_email={1}, tenant_code={1}'.format(
                 url,
-                tenant.name,
                 tenant.admin_email,
                 tenant.tenant_code))
             return True
