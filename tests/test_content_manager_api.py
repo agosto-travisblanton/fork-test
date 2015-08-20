@@ -36,6 +36,10 @@ class TestContentManagerApi(BaseTest):
                                             mac_address='54271e619346')
         self.device_key = self.device.put()
 
+    ##################################################################################################################
+    ## create_tenant
+    ##################################################################################################################
+
     def test_create_tenant_success(self):
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=201))
         result = self.content_manager_api.create_tenant(self.tenant)
@@ -49,6 +53,10 @@ class TestContentManagerApi(BaseTest):
         error_message = 'Unable to create tenant {0} in Content Manager. Status code: {1}'.format(
             self.NAME, error_code)
         self.assertEqual(error_message, str(context.exception))
+
+    ##################################################################################################################
+    ## create_device
+    ##################################################################################################################
 
     def test_create_device_success(self):
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=201))
