@@ -83,7 +83,8 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     controller: "DeviceDetailsCtrl",
     controllerAs: 'deviceDetailsCtrl',
     ncyBreadcrumb: {
-      label: 'Display {{ deviceDetailsCtrl.currentDevice.key }}'
+      label: '{{ deviceDetailsCtrl.currentDevice.key }}'
+      parent: 'devices'
     }
   })
   $stateProvider.state("remote_control", {
