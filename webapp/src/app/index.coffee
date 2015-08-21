@@ -78,13 +78,17 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     }
   })
   $stateProvider.state("editDevice", {
-    url: "/devices/:deviceKey",
+    url: "/devices/:deviceKey?tenantKey",
     templateUrl: "app/device/device-detail.html",
-    controller: "DeviceDetailsCtrl",
-    controllerAs: 'deviceDetailsCtrl',
     ncyBreadcrumb: {
-      label: 'Display {{ deviceDetailsCtrl.currentDevice.key }}'
-    }
+      label: '{{ deviceDetailsCtrl.currentDevice.key }}'
+      parent: 'devices'
+    },
+    controller: 'DeviceDetailsCtrl'
+    function: ($scope, $stateParams) ->
+      $scope.tenantKey = $stateParams.tenantKey
+      return
+    controllerAs: 'deviceDetailsCtrl'
   })
   $stateProvider.state("remote_control", {
     url: "/remote_control",
