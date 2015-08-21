@@ -3,7 +3,6 @@
 appModule = angular.module('skykitDisplayDeviceManagement')
 
 appModule.controller 'DeviceDetailsCtrl', ($stateParams, $state, DevicesService, TenantsService) ->
-  debugger
   @currentDevice = {
     key: undefined
     gcm_registration_id: undefined
