@@ -3,7 +3,8 @@
 appModule = angular.module('skykitDisplayDeviceManagement')
 
 appModule.controller 'DeviceDetailsCtrl', ($stateParams, $state, DevicesService, TenantsService) ->
-  debugger
+  @tenantContext = $stateParams.tenantContext
+
   @currentDevice = {
     key: undefined
     gcm_registration_id: undefined
@@ -37,6 +38,7 @@ appModule.controller 'DeviceDetailsCtrl', ($stateParams, $state, DevicesService,
   tenantsPromise.then (data) =>
     @tenants = data
 
+
   if @editMode
     devicePromise = DevicesService.getDeviceByKey($stateParams.deviceKey)
     devicePromise.then (data) =>
@@ -46,6 +48,5 @@ appModule.controller 'DeviceDetailsCtrl', ($stateParams, $state, DevicesService,
     promise = DevicesService.save @currentDevice
     promise.then (data) ->
       $state.go 'devices'
-
 
   @

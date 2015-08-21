@@ -31,7 +31,7 @@ appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, Devices
       $state.go 'tenants'
 
   @editItem = (item) ->
-    $state.go 'editTenantDevice', {deviceKey: item.key}
+    $state.go 'editDevice', {deviceKey: item.key, tenantContext: $stateParams.tenantKey}
 
   @autoGenerateTenantCode = ->
     unless @currentTenant.key

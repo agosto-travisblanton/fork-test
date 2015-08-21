@@ -8,6 +8,9 @@
       <div class="row">
         <div class="col-lg-12">
           <div ncy-breadcrumb></div>
+          <div ng-show="deviceDetailsCtrl.tenantContext.length > 0">
+            <a href="/#/tenants/{{deviceDetailsCtrl.tenantContext}}">back to Tenants</a>
+          </div>
         </div>
       </div>
 
