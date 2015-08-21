@@ -77,7 +77,7 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
         expect($state.get('devices').ncyBreadcrumb.label).toBe 'Displays'
 
       it 'should resolve \'editDevice\' state', ->
-        expect($state.get('editDevice').ncyBreadcrumb.label).toBe 'Display {{ deviceDetailsCtrl.currentDevice.key }}'
+        expect($state.get('editDevice').ncyBreadcrumb.label).toBe '{{ deviceDetailsCtrl.currentDevice.key }}'
 
       it 'should resolve \'remote_control\' state', ->
         expect($state.get('remote_control').ncyBreadcrumb.label).toBe 'Remote control'

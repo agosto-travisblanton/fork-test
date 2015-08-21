@@ -3,7 +3,7 @@
 appModule = angular.module('skykitDisplayDeviceManagement')
 
 appModule.controller 'DeviceDetailsCtrl', ($stateParams, $state, DevicesService, TenantsService) ->
-  @tenantContext = $stateParams.tenantContext
+  @tenantKey = $stateParams.tenantKey
 
   @currentDevice = {
     key: undefined

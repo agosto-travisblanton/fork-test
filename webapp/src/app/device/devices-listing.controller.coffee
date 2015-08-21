@@ -12,7 +12,6 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, DevicesService, $state
   initialize: ->
 
   @editItem = (item) ->
-    $state.go 'editDevice', {deviceKey: item.key, tenantContext: ''}
-
+    $state.go 'editDevice', {deviceKey: item.key, tenantKey: ''}
 
   @

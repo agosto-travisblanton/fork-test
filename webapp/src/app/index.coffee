@@ -78,7 +78,7 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     }
   })
   $stateProvider.state("editDevice", {
-    url: "/devices/:deviceKey?tenantContext",
+    url: "/devices/:deviceKey?tenantKey",
     templateUrl: "app/device/device-detail.html",
     ncyBreadcrumb: {
       label: '{{ deviceDetailsCtrl.currentDevice.key }}'
@@ -86,7 +86,7 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     },
     controller: 'DeviceDetailsCtrl'
     function: ($scope, $stateParams) ->
-      $scope.tenantContext = $stateParams.tenantContext
+      $scope.tenantKey = $stateParams.tenantKey
       return
     controllerAs: 'deviceDetailsCtrl'
   })
