@@ -19,14 +19,8 @@ class TestVersionHandler(BaseTest, WebTest):
         response = self.get(uri)
         self.assertOK(response)
 
-    def test_get_returns_json_version(self):
+    def test_get_returns_json_version_name(self):
         uri = build_uri('version-retrieval')
         response = self.get(uri)
         response_json = json.loads(response.body)
-        self.assertIsInstance(int(response_json['number']), int)
-
-    def test_get_returns_json_tag(self):
-        uri = build_uri('version-retrieval')
-        response = self.get(uri)
-        response_json = json.loads(response.body)
-        self.assertEqual(10, len(response_json['tag']))
+        self.assertEqual(response_json['name'], 'testbed-version')
