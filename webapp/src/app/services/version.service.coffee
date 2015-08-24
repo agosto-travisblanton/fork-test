@@ -3,9 +3,8 @@
 angular.module('skykitDisplayDeviceManagement').factory 'VersionService', ($http, $log, Restangular) ->
 
   class VersionService
-    @uriBase = 'v1/version'
 
     getVersion: ->
-      Restangular.oneUrl('api/v1/version').get()
+      Restangular.oneUrl('version').get()
 
   new VersionService()
