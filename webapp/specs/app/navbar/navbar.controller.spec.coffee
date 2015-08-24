@@ -1,18 +1,25 @@
-#'use strict'
-#
-#describe 'MainCtrl', ->
-#  scope = undefined
-#  $rootScope = undefined
-#  controller = undefined
-#
-#  beforeEach module('skykitDisplayDeviceManagement')
-#
-#  beforeEach inject (_$controller_, _$rootScope_) ->
-#    $rootScope = _$rootScope_
-#    scope = $rootScope.$new()
-#    controller = _$controller_('MainCtrl', $scope: scope)
-#
-#  it 'should define more than 5 awesome things', ->
-#    expect(angular.isArray(scope.awesomeThings)).toBeTruthy()
-#    expect(scope.awesomeThings.length > 5).toBeTruthy()
-#
+'use strict'
+
+describe 'NavbarCtrl', ->
+  $controller = undefined
+  VersionService = undefined
+  versionPromise = undefined
+
+  beforeEach module('skykitDisplayDeviceManagement')
+
+  beforeEach inject (_$controller_, _VersionService_) ->
+    $controller = _$controller_
+    VersionService = _VersionService_
+    versionPromise = new skykitDisplayDeviceManagement.q.Mock
+
+  it 'should call getVersion', ->
+    version_service_spy = spyOn(VersionService, 'getVersion').and.returnValue(versionPromise)
+    controller = $controller('NavbarCtrl', {VersionService: VersionService})
+    expect(version_service_spy).toHaveBeenCalled()
+
+  it 'getVersion should define the version name property', ->
+    spyOn(VersionService, 'getVersion').and.returnValue(versionPromise)
+    controller = $controller('NavbarCtrl', {VersionService: VersionService})
+    version_name = 'Foobar'
+    versionPromise.resolve({name: version_name})
+    expect(controller.version.name).toBe(version_name)
