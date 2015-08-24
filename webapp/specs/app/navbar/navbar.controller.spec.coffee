@@ -17,7 +17,7 @@ describe 'NavbarCtrl', ->
     controller = $controller('NavbarCtrl', {VersionService: VersionService})
     expect(version_service_spy).toHaveBeenCalled()
 
-  it 'getVersion should define the version name property', ->
+  it 'should define the version name property', ->
     spyOn(VersionService, 'getVersion').and.returnValue(versionPromise)
     controller = $controller('NavbarCtrl', {VersionService: VersionService})
     version_name = 'Foobar'
