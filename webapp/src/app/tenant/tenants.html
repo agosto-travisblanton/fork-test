@@ -28,25 +28,17 @@
               <th>Name</th>
               <th>Email</th>
               <th>Content Server URL</th>
-              <th></th>
             </tr>
             </thead>
             <tbody>
             <tr ng-hide="tenantsCtrl.tenants.length">
-              <td name="no-tenants" colspan="5">No tenants</td>
+              <td name="no-tenants" colspan="3">No tenants</td>
             </tr>
-            <tr ng-repeat="item in tenantsCtrl.tenants | orderBy:'name' ">
+            <tr ng-repeat="item in tenantsCtrl.tenants | orderBy:'name' "
+                ng-click="tenantsCtrl.editItem(item)" >
               <td class="tenant-name">{{item.name}}</td>
               <td class="tenant-admin-email">{{item.admin_email}}</td>
               <td class="content-server-url">{{item.content_server_url}}</td>
-              <td class="text-center">
-                <a name="edit-tenant" class="btn"
-                   ng-click="tenantsCtrl.editItem(item)"
-                   title="Edit tenant"><i class="fa fa-fw fa-edit"></i></a>
-                <a name="delete-tenant" class="btn"
-                   ng-click="tenantsCtrl.deleteItem(item)"
-                   title="Delete tenant"><i class="fa fa-fw fa-trash"></i></a>
-              </td>
             </tr>
             </tbody>
           </table>

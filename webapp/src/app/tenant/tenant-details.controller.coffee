@@ -30,6 +30,9 @@ appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, Devices
     promise.then () ->
       $state.go 'tenants'
 
+  @editItem = (item) ->
+    $state.go 'editDevice', {deviceKey: item.key, tenantKey: $stateParams.tenantKey}
+
   @autoGenerateTenantCode = ->
     unless @currentTenant.key
       newTenantCode = ''
