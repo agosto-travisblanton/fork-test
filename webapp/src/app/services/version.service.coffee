@@ -1,10 +1,11 @@
 'use strict'
 
-angular.module('skykitDisplayDeviceManagement').factory 'VersionService', ($http, $log, Restangular) ->
+appModule = angular.module('skykitDisplayDeviceManagement')
 
+appModule.factory 'VersionService', (Restangular) ->
   class VersionService
 
-    getVersion: ->
+    getVersion: () ->
       Restangular.oneUrl('version').get()
 
   new VersionService()
