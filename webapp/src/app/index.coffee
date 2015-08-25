@@ -9,7 +9,8 @@ skykitDisplayDeviceManagement = angular.module('skykitDisplayDeviceManagement', 
   'ui.router',
   'hSweetAlert',
   'ui.bootstrap',
-  'ncy-angular-breadcrumb'
+  'ncy-angular-breadcrumb',
+  'directive.g+signin'
 ])
 
 skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
