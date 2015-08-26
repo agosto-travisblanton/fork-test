@@ -146,7 +146,7 @@ The request body includes the *intent* as follows:
 
 {
 
-  "intent": "http://skykit.com/skdchromeapp/reset"
+  "intent": "skykit.com/skdchromeapp/reset"
 
 }
 
