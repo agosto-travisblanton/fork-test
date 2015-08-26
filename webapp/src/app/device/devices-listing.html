@@ -34,10 +34,10 @@
             </tr>
             <tr ng-repeat="item in devicesListingCtrl.devices | orderBy:'-created' "
                 ng-click="devicesListingCtrl.editItem(item)">
-              <td class="display-serial-number">{{ item.serial_number }}</td>
-              <td class="display-tenant-code">{{ item.tenant_code }}</td>
-              <td class="display-mac-address">{{ item.mac_address }}</td>
-              <td class="display-ethernet-mac-address">{{ item.ethernet_mac_address }}</td>
+              <td class="display-serial-number">{{ item.serialNumber }}</td>
+              <td class="display-tenant-code">{{ item.tenantCode }}</td>
+              <td class="display-mac-address">{{ item.macAddress }}</td>
+              <td class="display-ethernet-mac-address">{{ item.ethernetMacAddress }}</td>
               <td class="display-provisioning-date">{{ item.created }}</td>
             </tr>
             </tbody>
