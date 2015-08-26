@@ -29,6 +29,17 @@ application = WSGIApplication(
         ),
 
         ############################################################
+        # version
+        ############################################################
+        Route(
+            r'/api/v1/version',
+            handler='handlers.version_handler.VersionHandler',
+            name='version-retrieval',
+            handler_method='get',
+            methods=['GET']
+        ),
+
+        ############################################################
         # login
         ############################################################
         Route(
