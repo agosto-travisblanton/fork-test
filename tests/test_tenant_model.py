@@ -1,9 +1,10 @@
+from google.appengine.ext import ndb
 from env_setup import setup_test_paths
 
 setup_test_paths()
 
 from agar.test import BaseTest
-from models import Tenant, TENANT_ENTITY_GROUP_NAME
+from models import Tenant, Distributor, TENANT_ENTITY_GROUP_NAME
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
@@ -17,14 +18,19 @@ class TestTenantModel(BaseTest):
     TENANT_CODE = 'foobar'
     ENTITY_GROUP_NAME = 'tenantEntityGroup'
     CURRENT_CLASS_VERSION = 1
+    DISTRIBUTOR_NAME = 'Agosto'
+
 
     def setUp(self):
         super(TestTenantModel, self).setUp()
+        self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME, active=True)
+        self.distributor_key = self.distributor.put()
         self.tenant = Tenant.create(tenant_code=self.TENANT_CODE,
                                     name=self.NAME,
                                     admin_email=self.ADMIN_EMAIL,
                                     content_server_url=self.CONTENT_SERVER_URL,
                                     chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
+                                    distributor_key=self.distributor_key,
                                     active=True)
         self.tenant_key = self.tenant.put()
 
@@ -49,6 +55,7 @@ class TestTenantModel(BaseTest):
                                         admin_email=self.ADMIN_EMAIL,
                                         content_server_url=self.CONTENT_SERVER_URL,
                                         chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
+                                        distributor_key=self.distributor_key,
                                         active=False)
         inactive_tenant.put()
         tenant_created = Tenant.find_by_name(name)
@@ -63,6 +70,7 @@ class TestTenantModel(BaseTest):
         self.assertEqual(self.CONTENT_SERVER_URL, tenant_created.content_server_url)
         self.assertEqual(self.CHROME_DEVICE_DOMAIN, tenant_created.chrome_device_domain)
         self.assertEqual(self.NAME, tenant_created.name)
+        self.assertEqual(self.distributor_key, tenant_created.distributor_key)
 
     def test_is_unique_returns_false_when_name_is_found(self):
         uniqueness_check = Tenant.is_unique(self.NAME)

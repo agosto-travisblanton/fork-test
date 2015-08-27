@@ -19,7 +19,8 @@ class AddDistributorKeyOnTenantsAndSeedAgostoDistributor(MigrationBase):
         agosto_distributor = Distributor.find_by_name(self.AGOSTO_DISTRIBUTOR_NAME)
         if agosto_distributor is None:
             agosto_distributor = Distributor.create(name=self.AGOSTO_DISTRIBUTOR_NAME, active=True)
-        distributor_key = ndb.Key(urlsafe=agosto_distributor.key.urlsafe())
+            agosto_distributor.put()
+        distributor_key = agosto_distributor.key.urlsafe()
         tenants = Tenant.query()
         for tenant in tenants:
             tenant.distributor_key = distributor_key

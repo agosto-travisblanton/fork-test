@@ -100,7 +100,7 @@ class Tenant(ndb.Model):
             return True
 
     @classmethod
-    def create(cls, tenant_code, name, admin_email, content_server_url, chrome_device_domain, active):
+    def create(cls, tenant_code, name, admin_email, content_server_url, chrome_device_domain, distributor_key, active):
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
                    tenant_code=tenant_code,
@@ -108,6 +108,7 @@ class Tenant(ndb.Model):
                    admin_email=admin_email,
                    content_server_url=content_server_url,
                    chrome_device_domain=chrome_device_domain,
+                   distributor_key = distributor_key,
                    active=active)
 
     def _pre_put_hook(self):
