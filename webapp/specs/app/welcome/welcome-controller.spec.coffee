@@ -7,15 +7,21 @@ describe 'WelcomeCtrl', ->
   DistributorsService = undefined
   promise = undefined
   identity = {CLIENT_ID: 'CLIENT-ID', STATE: 'STATE'}
+  $rootScope = undefined
+  $scope = undefined
 
   beforeEach module('skykitDisplayDeviceManagement')
 
-  beforeEach inject (_$controller_, _$state_, _DistributorsService_) ->
+  beforeEach inject (_$controller_, _$state_, _$rootScope_, _DistributorsService_) ->
     $controller = _$controller_
     $state = _$state_
+    $rootScope = _$rootScope_
+    $scope = _$rootScope_.$new()
     DistributorsService = _DistributorsService_
+    spyOn($scope, '$on')
     controller = $controller 'WelcomeCtrl', {
       $state: $state
+      $scope: $scope
       DistributorsService: DistributorsService
       identity: identity
     }
@@ -28,6 +34,11 @@ describe 'WelcomeCtrl', ->
     it 'distributors should be an empty array', ->
       expect(angular.isArray(controller.distributors)).toBeTruthy()
 
+    it "add listener for 'event:google-plus-signin-success' event", ->
+      expect($scope.$on).toHaveBeenCalledWith 'event:google-plus-signin-success', jasmine.any(Function)
+
+    it "add listener for 'event:google-plus-signin-failure' event", ->
+      expect($scope.$on).toHaveBeenCalledWith 'event:google-plus-signin-failure', jasmine.any(Function)
 
   describe '.initialize', ->
     distributors = [
