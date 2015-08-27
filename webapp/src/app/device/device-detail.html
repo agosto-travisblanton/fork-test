@@ -15,7 +15,7 @@
       <div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h3 class="panel-title">Display properties</h3>
+            <h3 class="panel-title">Device properties</h3>
           </div>
           <div class="panel-body">
             <form name="deviceForm"
@@ -38,7 +38,7 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.serialNumber.$invalid && !deviceForm.serialNumber.$pristine"
                      class="help-block">
-                    The display serial number is required.
+                    The Serial number is required.
                   </p>
                 </div>
               </div>
@@ -58,7 +58,7 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.gcmRegistrationId.$invalid && !deviceForm.gcmRegistrationId.$pristine"
                      class="help-block">
-                    The display GCM registration ID is required.
+                    The GCM registration ID is required.
                   </p>
                 </div>
               </div>
@@ -92,7 +92,7 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.annotatedUser.$invalid && !deviceForm.annotatedUser.$pristine"
                      class="help-block">
-                    The display annotated user is required.
+                    The Annotated user is required.
                   </p>
                 </div>
               </div>
@@ -112,20 +112,20 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.apiKey.$invalid && !deviceForm.apiKey.$pristine"
                      class="help-block">
-                    The display API key is required.
+                    The API key is required.
                   </p>
                 </div>
               </div>
 
               <div class="form-group"
                    ng-class="{ 'has-error' : deviceForm.deviceId.$invalid && !deviceForm.deviceId.$pristine }">
-                <label for="displayId" class="col-sm-3 control-label">Device ID</label>
+                <label for="deviceId" class="col-sm-3 control-label">Device ID</label>
 
                 <div class="col-sm-4">
                   <input type="text"
                          class="form-control"
-                         name="displayId"
-                         id="displayId"
+                         name="deviceId"
+                         id="deviceId"
                          readonly
                          ng-model="deviceDetailsCtrl.currentDevice.deviceId">
                 </div>
@@ -152,20 +152,20 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.bootMode.$invalid && !deviceForm.bootMode.$pristine"
                      class="help-block">
-                    The display boot mode is required.
+                    The boot mode is required.
                   </p>
                 </div>
               </div>
 
               <div class="form-group"
                    ng-class="{ 'has-error' : deviceForm.chromeDeviceDomain.$invalid && !deviceForm.chromeDeviceDomain.$pristine }">
-                <label for="chromeDisplayDomain" class="col-sm-3 control-label">Chrome display domain</label>
+                <label for="chromeDeviceDomain" class="col-sm-3 control-label">Chrome device domain</label>
 
                 <div class="col-sm-4">
                   <input type="text"
                          class="form-control"
-                         name="chromeDisplayDomain"
-                         id="chromeDisplayDomain"
+                         name="chromeDeviceDomain"
+                         id="chromeDeviceDomain"
                          readonly
                          ng-model="deviceDetailsCtrl.currentDevice.chromeDeviceDomain">
                 </div>
@@ -173,7 +173,7 @@
                   <p
                     ng-show="deviceForm.chromeDeviceDomain.$invalid && !deviceForm.chromeDeviceDomain.$pristine"
                     class="help-block">
-                    The Chrome display domain is required.
+                    The Chrome device domain is required.
                   </p>
                 </div>
               </div>
@@ -193,7 +193,7 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.contentServerUrl.$invalid && !deviceForm.contentServerUrl.$pristine"
                      class="help-block">
-                    The display content server URL is required.
+                    The Content server URL is required.
                   </p>
                 </div>
               </div>
@@ -213,7 +213,7 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.etag.$invalid && !deviceForm.etag.$pristine"
                      class="help-block">
-                    The display Etag is required.
+                    The Etag is required.
                   </p>
                 </div>
               </div>
@@ -233,7 +233,7 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.ethernetMacAddress.$invalid && !deviceForm.ethernetMacAddress.$pristine"
                      class="help-block">
-                    The display ethernet MAC address is required.
+                    The Ethernet MAC address is required.
                   </p>
                 </div>
               </div>
@@ -253,7 +253,7 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.macAddress.$invalid && !deviceForm.macAddress.$pristine"
                      class="help-block">
-                    The display MAC address is required.
+                    The MAC address is required.
                   </p>
                 </div>
               </div>
@@ -273,7 +273,7 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.firmwareVersion.$invalid && !deviceForm.firmwareVersion.$pristine"
                      class="help-block">
-                    The display firmware version is required.
+                    The Firmware version is required.
                   </p>
                 </div>
               </div>
@@ -293,7 +293,7 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.kind.$invalid && !deviceForm.kind.$pristine"
                      class="help-block">
-                    The display kind is required.
+                    The kind is required.
                   </p>
                 </div>
               </div>
@@ -313,7 +313,7 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.lastEnrollmentTime.$invalid && !deviceForm.lastEnrollmentTime.$pristine"
                      class="help-block">
-                    The display last enrollment timestamp is required.
+                    The Last enrollment timestamp is required.
                   </p>
                 </div>
               </div>
@@ -333,7 +333,7 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.lastSync.$invalid && !deviceForm.lastSync.$pristine"
                      class="help-block">
-                    The display last sync timestamp is required.
+                    The Last sync timestamp is required.
                   </p>
                 </div>
               </div>
@@ -353,7 +353,7 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.model.$invalid && !deviceForm.model.$pristine"
                      class="help-block">
-                    The display model is required.
+                    The model is required.
                   </p>
                 </div>
               </div>
@@ -373,7 +373,7 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.orgUnitPath.$invalid && !deviceForm.orgUnitPath.$pristine"
                      class="help-block">
-                    The display organizational unit path is required.
+                    The Organizational unit path is required.
                   </p>
                 </div>
               </div>
@@ -393,7 +393,7 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.osVersion.$invalid && !deviceForm.os_version.$pristine"
                      class="help-block">
-                    The display OS version is required.
+                    The Operating system version is required.
                   </p>
                 </div>
               </div>
@@ -413,7 +413,7 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.platformVersion.$invalid && !deviceForm.platformVersion.$pristine"
                      class="help-block">
-                    The display platform version is required.
+                    The Platform version is required.
                   </p>
                 </div>
               </div>
@@ -433,7 +433,7 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.status.$invalid && !deviceForm.status.$pristine"
                      class="help-block">
-                    The display status is required.
+                    The status is required.
                   </p>
                 </div>
               </div>
@@ -453,7 +453,7 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.tenant.$invalid && !deviceForm.tenant.$pristine"
                      class="help-block">
-                    The display tenant is required.
+                    The tenant code is required.
                   </p>
                 </div>
               </div>
@@ -487,7 +487,7 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.created.$invalid && !deviceForm.created.$pristine"
                      class="help-block">
-                    The display created timestamp is required.
+                    The created timestamp is required.
                   </p>
                 </div>
               </div>
@@ -507,7 +507,7 @@
                 <div class="col-sm-5">
                   <p ng-show="deviceForm.updated.$invalid && !deviceForm.updated.$pristine"
                      class="help-block">
-                    The display updated timestamp is required.
+                    The updated timestamp is required.
                   </p>
                 </div>
               </div>
