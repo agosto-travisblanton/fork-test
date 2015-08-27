@@ -184,6 +184,7 @@ def refresh_device_by_mac_address(device_urlsafe_key=None, device_mac_address=No
             device.model = chrome_os_device.get('model')
             device.os_version = chrome_os_device.get('osVersion')
             device.firmware_version = chrome_os_device.get('firmwareVersion')
+            device.etag = chrome_os_device.get('etag')
             device.put()
             logging.info('Refreshed device_id = {0} by MAC address = {1}'.
                          format(device.device_id, lowercase_device_mac_address))
@@ -229,6 +230,7 @@ def refresh_device(device_urlsafe_key=None):
         device.model = chrome_os_device.get('model')
         device.os_version = chrome_os_device.get('osVersion')
         device.firmware_version = chrome_os_device.get('firmwareVersion')
+        device.etag = chrome_os_device.get('etag')
         device.put()
         logging.info('Refreshed device_id = {0}, impersonating {1}'.
                      format(device.device_id, config.IMPERSONATION_ADMIN_EMAIL_ADDRESS))
@@ -274,6 +276,7 @@ def refresh_chrome_os_device(device_urlsafe_key=None):
         device.model = chrome_os_device.get('model')
         device.os_version = chrome_os_device.get('osVersion')
         device.firmware_version = chrome_os_device.get('firmwareVersion')
+        device.etag = chrome_os_device.get('etag')
         device.put()
         logging.info('Refreshed device_id = {0}, impersonating {1}'.
                      format(device.device_id, config.IMPERSONATION_ADMIN_EMAIL_ADDRESS))

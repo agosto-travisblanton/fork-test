@@ -137,6 +137,7 @@ class ChromeOsDevice(ndb.Model):
     model = ndb.StringProperty(required=False, indexed=False)
     os_version = ndb.StringProperty(required=False, indexed=False)
     firmware_version = ndb.StringProperty(required=False, indexed=False)
+    etag = ndb.StringProperty(required=False, indexed=False)
     name = ndb.ComputedProperty(lambda self: '{0} {1}'.format(self.serial_number, self.model))
     class_version = ndb.IntegerProperty()
 

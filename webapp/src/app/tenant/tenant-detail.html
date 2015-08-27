@@ -37,16 +37,16 @@
                   <tr ng-repeat="item in tenantDetailsCtrl.currentTenantDisplays | orderBy:'-created' "
                       ng-click="tenantDetailsCtrl.editItem(item)">
                     <td class="tenant-display-serial-number">
-                      {{ item.serial_number }}
+                      {{ item.serialNumber }}
                     </td>
                     <td class="tenant-display-id">
-                      {{ item.device_id }}
+                      {{ item.deviceId }}
                     </td>
                     <td class="tenant-display-mac-address">
-                      {{ item.mac_address }}
+                      {{ item.macAddress }}
                     </td>
                     <td class="tenant-display-ethernet-mac-address">
-                      {{ item.ethernet_mac_address }}
+                      {{ item.ethernetMacAddress }}
                     </td>
                     <td class="tenant-display-provisioning-date">
                       {{ item.created }}
@@ -58,7 +58,7 @@
             </div>
             <!-- END panel -->
           </tab>
-          <tab heading="General">
+          <tab heading="General" active="tenantDetailsCtrl.generalTabActive">
             <div style="margin-top: 1px;">&nbsp;</div>
             <div class="panel panel-default">
               <div class="panel-heading">
