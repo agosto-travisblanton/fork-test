@@ -40,6 +40,7 @@ describe 'WelcomeCtrl', ->
     it "add listener for 'event:google-plus-signin-failure' event", ->
       expect($scope.$on).toHaveBeenCalledWith 'event:google-plus-signin-failure', jasmine.any(Function)
 
+
   describe '.initialize', ->
     distributors = [
       {key: 'dhjad897d987fadafg708fg7d', name: 'Agosto, Inc.', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
