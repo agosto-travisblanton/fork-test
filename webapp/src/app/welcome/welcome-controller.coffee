@@ -5,12 +5,12 @@ appModule = angular.module 'skykitDisplayDeviceManagement'
 appModule.controller "WelcomeCtrl", ($scope, $log, DistributorsService, identity) ->
   @distributors = []
   @currentDistributor = undefined
-  @clientId = identity.CLIENT_ID
+  @clientId = identity.WEB_APP_CLIENT_ID
   @state = identity.STATE
 
   $scope.$on 'event:google-plus-signin-success', (event, authResult) ->
     # Send login to server or save into cookie
-    $log.info "SUCCESS: Google+ sign in: #{JSON.stringify authResult}"
+    $log.info "SUCCESS: Google+ sign in."
 
   $scope.$on 'event:google-plus-signin-failure', (event, authResult) ->
     # Auth failure or signout detected

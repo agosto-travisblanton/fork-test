@@ -26,6 +26,7 @@ class AppConfig(Config):
     GOOGLE_CUSTOMER_ID = None
     STORMPATH_AUTH_APP = None
     STORMPATH_CLIENT = None
+    WEB_APP_CLIENT_ID = None
 
 
 config = AppConfig.get_config()
