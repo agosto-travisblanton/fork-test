@@ -17,6 +17,7 @@ appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, Devices
   @editMode = !!$stateParams.tenantKey
 
   if @editMode
+    @generalTabActive = false
     tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey)
     tenantPromise.then (data) =>
       @currentTenant = data
@@ -24,6 +25,8 @@ appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, Devices
     displaysPromise = DevicesService.getDevicesByTenant($stateParams.tenantKey)
     displaysPromise.then (data) =>
       @currentTenantDisplays = data.objects
+  else
+    @generalTabActive = true
 
   @onClickSaveButton = () ->
     promise = TenantsService.save @currentTenant
