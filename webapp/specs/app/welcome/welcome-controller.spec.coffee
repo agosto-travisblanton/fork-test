@@ -6,6 +6,7 @@ describe 'WelcomeCtrl', ->
   $state = undefined
   DistributorsService = undefined
   promise = undefined
+  identity = {CLIENT_ID: 'CLIENT-ID', STATE: 'STATE'}
 
   beforeEach module('skykitDisplayDeviceManagement')
 
@@ -13,7 +14,12 @@ describe 'WelcomeCtrl', ->
     $controller = _$controller_
     $state = _$state_
     DistributorsService = _DistributorsService_
-    controller = $controller 'WelcomeCtrl', {$state: $state, DistributorsService: DistributorsService}
+    controller = $controller 'WelcomeCtrl', {
+      $state: $state
+      DistributorsService: DistributorsService
+      identity: identity
+    }
+
 
   describe 'initialization', ->
     it 'currentDistributor is undefined', ->
@@ -21,6 +27,7 @@ describe 'WelcomeCtrl', ->
 
     it 'distributors should be an empty array', ->
       expect(angular.isArray(controller.distributors)).toBeTruthy()
+
 
   describe '.initialize', ->
     distributors = [
@@ -39,6 +46,13 @@ describe 'WelcomeCtrl', ->
 
     it "the 'then' handler caches the retrieved distributors in the controller", ->
       expect(controller.distributors).toBe distributors
+
+    it 'sets the clientId property on the controller', ->
+      expect(controller.clientId).toBe identity.CLIENT_ID
+
+    it 'sets the state property on the controller', ->
+      expect(controller.state).toBe identity.STATE
+
 
   describe '.selectDistributor', ->
     distributor = {
