@@ -6,7 +6,7 @@ describe 'WelcomeCtrl', ->
   $state = undefined
   DistributorsService = undefined
   promise = undefined
-  identity = {CLIENT_ID: 'CLIENT-ID', STATE: 'STATE'}
+  identity = {WEB_APP_CLIENT_ID: 'CLIENT-ID', STATE: 'STATE'}
   $rootScope = undefined
   $scope = undefined
 
@@ -60,7 +60,7 @@ describe 'WelcomeCtrl', ->
       expect(controller.distributors).toBe distributors
 
     it 'sets the clientId property on the controller', ->
-      expect(controller.clientId).toBe identity.CLIENT_ID
+      expect(controller.clientId).toBe identity.WEB_APP_CLIENT_ID
 
     it 'sets the state property on the controller', ->
       expect(controller.state).toBe identity.STATE
