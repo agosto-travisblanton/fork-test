@@ -25,6 +25,7 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
             'logout_url': self.uri_for('logout'),
             'version': app_version,
             'CLIENT_ID': config.CLIENT_ID,
+            'WEB_APP_CLIENT_ID': config.WEB_APP_CLIENT_ID,
             'BROWSER_API_KEY': config.PUBLIC_API_SERVER_KEY,
             'STATE': state,
         }
