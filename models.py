@@ -72,6 +72,8 @@ class Distributor(ndb.Model):
 
 @ae_ndb_serializer
 class Tenant(ndb.Model):
+    # TODO Make distributor_key required=True after migration run in prod !!
+    distributor_key = ndb.KeyProperty(required=False, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     tenant_code = ndb.StringProperty(required=True, indexed=True)
@@ -114,8 +116,8 @@ class Tenant(ndb.Model):
 
 @ae_ndb_serializer
 class ChromeOsDevice(ndb.Model):
-    tenant_key = ndb.KeyProperty(required=False, indexed=True)
     # TODO Make tenant_key required=True after migration run in prod !!
+    tenant_key = ndb.KeyProperty(required=False, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     device_id = ndb.StringProperty(required=False, indexed=True)
