@@ -158,7 +158,7 @@
               </div>
 
               <div class="form-group"
-                   ng-class="{ 'has-error' : deviceForm.chromeDisplayDomain.$invalid && !deviceForm.chromeDisplayDomain.$pristine }">
+                   ng-class="{ 'has-error' : deviceForm.chromeDeviceDomain.$invalid && !deviceForm.chromeDeviceDomain.$pristine }">
                 <label for="chromeDisplayDomain" class="col-sm-3 control-label">Chrome display domain</label>
 
                 <div class="col-sm-4">
@@ -167,11 +167,11 @@
                          name="chromeDisplayDomain"
                          id="chromeDisplayDomain"
                          readonly
-                         ng-model="deviceDetailsCtrl.currentDevice.chromeDisplayDomain">
+                         ng-model="deviceDetailsCtrl.currentDevice.chromeDeviceDomain">
                 </div>
                 <div class="col-sm-5">
                   <p
-                    ng-show="deviceForm.chromeDisplayDomain.$invalid && !deviceForm.chromeDisplayDomain.$pristine"
+                    ng-show="deviceForm.chromeDeviceDomain.$invalid && !deviceForm.chromeDeviceDomain.$pristine"
                     class="help-block">
                     The Chrome display domain is required.
                   </p>
