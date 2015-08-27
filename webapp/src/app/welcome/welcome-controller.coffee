@@ -2,13 +2,15 @@
 
 appModule = angular.module 'skykitDisplayDeviceManagement'
 
-appModule.controller "WelcomeCtrl", ($state, DistributorsService) ->
+appModule.controller "WelcomeCtrl", ($log, DistributorsService, identity) ->
   @distributors = []
   @currentDistributor = undefined
+  @clientId = identity.CLIENT_ID
+  @state = identity.STATE
 
   @initialize = ->
-    promise = DistributorsService.fetchAll()
-    promise.then (data) =>
+    distributorsPromise = DistributorsService.fetchAll()
+    distributorsPromise.then (data) =>
       @distributors = data
 
   @selectDistributor = ->

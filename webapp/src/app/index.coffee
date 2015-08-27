@@ -17,7 +17,11 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
   $stateProvider.state("home", {
     url: "/",
     templateUrl: "app/welcome/welcome.html",
-    controller: "WelcomeCtrl"
+    resolve: {
+      identity: (IdentityService) ->
+        IdentityService.getIdentity()
+    },
+    controller: "WelcomeCtrl",
     controllerAs: 'welcomeCtrl',
     ncyBreadcrumb: {
       label: 'Home page'
@@ -26,6 +30,10 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
   $stateProvider.state("welcome", {
     url: "/welcome",
     templateUrl: "app/welcome/welcome.html",
+    resolve: {
+      identity: (IdentityService) ->
+        IdentityService.getIdentity()
+    },
     controller: "WelcomeCtrl"
     controllerAs: 'welcomeCtrl',
     ncyBreadcrumb: {
@@ -124,3 +132,6 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
   RestangularProvider.setRestangularFields {
     id: 'key'
   }
+
+#skykitDisplayDeviceManagement.run (IdentityService) ->
+#  IdentityService.getIdentity()
