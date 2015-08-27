@@ -7,5 +7,3 @@ angular.module('skykitDisplayDeviceManagement').factory 'IdentityService', ($log
     getIdentity: ->
       Restangular.oneUrl('identity').get()
 
-
-
