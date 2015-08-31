@@ -2,7 +2,7 @@
 
 appModule = angular.module 'skykitDisplayDeviceManagement'
 
-appModule.controller "TenantsCtrl", ($state, TenantsService, sweet) ->
+appModule.controller "TenantsCtrl", ($state, $log, TenantsService, sweet) ->
   @tenants = []
 
   @initialize = ->

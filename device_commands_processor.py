@@ -2,6 +2,7 @@ import logging
 from google_cloud_messaging import GoogleCloudMessaging
 from app_config import config
 
+
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
 

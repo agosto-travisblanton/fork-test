@@ -21,12 +21,20 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         if device_mac_address:
             query = ChromeOsDevice.query(ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
                                                 ChromeOsDevice.ethernet_mac_address == device_mac_address))
+            query_results = query.fetch()
+            if len(query_results) > 0:
+                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+            else:
+                error_message = "Unable to find Chrome OS device by MAC address: {0}".format(device_mac_address)
+                self.response.set_status(404, error_message)
         else:
-            query = ChromeOsDevice.query()
-        query_forward = query.order(ChromeOsDevice.key)
-        query_reverse = query.order(-ChromeOsDevice.key)
-        result_data = self.fetch_page(query_forward, query_reverse)
-        json_response(self.response, result_data, strategy=CHROME_OS_DEVICE_STRATEGY)
+            query = ChromeOsDevice.query().order(ChromeOsDevice.created)
+            # query_forward = query.order(ChromeOsDevice.key)
+            # query_reverse = query.order(-ChromeOsDevice.key)
+            # query_results = self.fetch_page(query_forward, query_reverse)
+            # json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
+            query_results = query.fetch(1000)
+            json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
 
     @api_token_required
     def get_devices_by_tenant(self, tenant_urlsafe_key):

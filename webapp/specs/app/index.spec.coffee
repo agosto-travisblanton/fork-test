@@ -74,7 +74,7 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
         expect($state.get('editTenant').ncyBreadcrumb.label).toBe '{{ tenantDetailsCtrl.currentTenant.name }}'
 
       it 'should resolve \'devices\' state', ->
-        expect($state.get('devices').ncyBreadcrumb.label).toBe 'Displays'
+        expect($state.get('devices').ncyBreadcrumb.label).toBe 'Devices'
 
       it 'should resolve \'editDevice\' state', ->
         expect($state.get('editDevice').ncyBreadcrumb.label).toBe '{{ deviceDetailsCtrl.currentDevice.key }}'

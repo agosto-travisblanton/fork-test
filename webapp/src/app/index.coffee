@@ -83,7 +83,7 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     controller: "DevicesListingCtrl",
     controllerAs: 'devicesListingCtrl',
     ncyBreadcrumb: {
-      label: 'Displays'
+      label: 'Devices'
     }
   })
   $stateProvider.state("editDevice", {
@@ -126,8 +126,9 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
 
   RestangularProvider.addResponseInterceptor (data, operation, resourceType, url, response, deferred) ->
     result = data
-    if resourceType == 'devices' and operation = 'getList' and url == '/api/v1/devices'
-      result = data.objects
+    # Uncomment this for pagination support when using PagingListHandlerMixin on the Python side.
+#    if resourceType == 'devices' and operation = 'getList' and url == '/api/v1/devices'
+#      result = data.objects
     result
 
   RestangularProvider.setRestangularFields {
