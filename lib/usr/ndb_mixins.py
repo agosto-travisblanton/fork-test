@@ -47,7 +47,7 @@ class KeyValidatorMixin(object):
         :param urlsafe_key: an urlsafe key string
         :param kind_cls: a class object
         :param abort_on_not_found: if the key is valid but the object is not found, True will cause this method to
-        abort with a 400; False will cause None to be returned.
+        abort with a 404; False will cause None to be returned.
         :return: If the key is valid and the object exists, the object is returned.  If the key is invalid, the method
         will abort with a 400.
         '''
@@ -56,7 +56,7 @@ class KeyValidatorMixin(object):
         if valid:
             obj = key.get()
             if obj is None and abort_on_not_found:
-                self.abort(400, "%s not found" % kind_cls.__name__)
+                self.abort(404, "%s not found" % kind_cls.__name__)
 
         return obj
 

@@ -7,17 +7,62 @@
 
       <div class="row">
         <div class="col-lg-12">
-          <h1 class="page-header">{{ tenantDetailsCtrl.currentTenant.name }}</h1>
+          <div ncy-breadcrumb></div>
         </div>
       </div>
 
       <div>
         <tabset>
-          <tab heading="General">
+          <tab heading="Linked displays">
             <div style="margin-top: 1px;">&nbsp;</div>
             <div class="panel panel-default">
               <div class="panel-heading">
-                <h3 class="panel-title">Tenant properties</h3>
+                <h3 class="panel-title">{{tenantDetailsCtrl.currentTenant.name}}</h3>
+              </div>
+              <div class="panel-body">
+                <table class="table table-bordered table-condensed table-responsive table-striped">
+                  <thead>
+                  <tr>
+                    <th>Serial number</th>
+                    <th>Device ID</th>
+                    <th>Wifi mac address</th>
+                    <th>Ether mac address</th>
+                    <th>Provisioning date</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr ng-hide="tenantDetailsCtrl.currentTenantDisplays.length">
+                    <td colspan="5" class="text-center text-danger">No displays</td>
+                  </tr>
+                  <tr ng-repeat="item in tenantDetailsCtrl.currentTenantDisplays | orderBy:'-created' "
+                      ng-click="tenantDetailsCtrl.editItem(item)">
+                    <td class="tenant-display-serial-number">
+                      {{ item.serialNumber }}
+                    </td>
+                    <td class="tenant-display-id">
+                      {{ item.deviceId }}
+                    </td>
+                    <td class="tenant-display-mac-address">
+                      {{ item.macAddress }}
+                    </td>
+                    <td class="tenant-display-ethernet-mac-address">
+                      {{ item.ethernetMacAddress }}
+                    </td>
+                    <td class="tenant-display-provisioning-date">
+                      {{ item.created }}
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <!-- END panel -->
+          </tab>
+          <tab heading="General" active="tenantDetailsCtrl.generalTabActive">
+            <div style="margin-top: 1px;">&nbsp;</div>
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title"> {{ tenantDetailsCtrl.currentTenant.name }}</h4>
               </div>
               <div class="panel-body">
                 <form name="tenantForm"
@@ -139,7 +184,7 @@
                       for="active">Active</label>
                     </div>
                   </div>
-                  <hr>
+                  <hr/>
                   <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
                       <button type="submit"
@@ -150,47 +195,12 @@
                     </div>
                   </div>
                 </form>
-              </div>
-            </div>
-            <!-- END panel -->
-          </tab>
-          <tab heading="Linked devices">
-            <div style="margin-top: 1px;">&nbsp;</div>
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Devices</h3>
-              </div>
-              <div class="panel-body">
-                <table name="tenant-devices-table"
-                       class="table table-bordered table-condensed table-responsive table-striped">
-                  <thead>
-                  <tr>
-                    <th>Key</th>
-                    <th>Device ID</th>
-                    <th>MAC address</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr ng-hide="tenantDetailsCtrl.currentTenantDevices.length">
-                    <td name="no-tenants" colspan="3" class="text-center text-danger">No devices</td>
-                  </tr>
-                  <tr ng-repeat="device in tenantDetailsCtrl.currentTenantDevices | orderBy:'-created' ">
-                    <td class="tenant-device-key">
-                      <a href="#/devices/{{ device.key }}">
-                                          <span class="entity-key">
-                                            {{ device.key | limitTo: 10 }}...{{ device.key | limitTo: 10 : device.key.length - 10}}
-                                          </span>
-                      </a>
-                    </td>
-                    <td class="tenant-device-id">
-                      {{ device.device_id }}
-                    </td>
-                    <td class="tenant-device-mac-address">
-                      {{ device.macAddress }}
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>
+                <hr/>
+                <div class="col-sm-12">
+                  <label class="control-label">key:</label><br>
+                  <small>
+                    {{tenantDetailsCtrl.currentTenant.key}}</small>
+                </div>
               </div>
             </div>
             <!-- END panel -->

@@ -32,6 +32,10 @@ handlers:
   upload: static/(.*)
   login: required
 
+- url: /_ereporter.*
+  script: google.appengine.ext.ereporter.report_generator.application
+  login: admin
+
 - url: /favicon.ico
   static_files: static/favicon.ico
   upload: static/favicon.ico
@@ -80,15 +84,11 @@ skip_files:
 - ^coverage/.*
 - ^coverage_html_report/.*
 - ^migration/.*
-- ^monitor/.*
-- ^export/.*
-- ^pa/.*
 - ^scripts/.*
 - ^snapdeploy.yaml
 - ^images/readme.md
 - ^local/.*
 - ^tests/.*
-- ^simtests/.*
 - ^webapp/.*
 - ^.git/.*
 - ^.idea/.*

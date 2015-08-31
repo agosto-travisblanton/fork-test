@@ -5,9 +5,9 @@ setup_test_paths()
 import json
 from content_manager_api import ContentManagerApi
 from agar.test import BaseTest, WebTest
-from models import Tenant
+from models import Tenant, TENANT_ENTITY_GROUP_NAME
 from routes import application
-from mockito import when
+from mockito import when, any as any_matcher, verify
 from app_config import config
 
 
@@ -61,6 +61,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         name = u'ABC'
         admin_email = u'foo@bar.com'
         when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(str('some key'))
+        when(ContentManagerApi).create_tenant(any_matcher()).thenReturn(True)
         request_parameters = {'name': name,
                               'tenant_code': 'acme',
                               'admin_email': admin_email,
@@ -76,6 +77,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         name = u'ABC'
         admin_email = u'foo@bar.com'
         when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(str('some key'))
+        when(ContentManagerApi).create_tenant(any_matcher()).thenReturn(True)
         request_parameters = {'name': name,
                               'tenant_code': 'acme',
                               'admin_email': admin_email,
@@ -92,6 +94,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         name = u'ABC'
         admin_email = u'foo@bar.com'
         when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(str('some key'))
+        when(ContentManagerApi).create_tenant(any_matcher()).thenReturn(True)
         request_parameters = {'name': name,
                               'tenant_code': 'acme',
                               'admin_email': admin_email,
@@ -108,38 +111,37 @@ class TestTenantsHandler(BaseTest, WebTest):
                                               {'tenant_key': actual.key.urlsafe()})
         self.assertTrue(tenant_uri in response.headers.get('Location'))
 
-    # TODO Put this back in after call to content mgr is completed
-    # def test_post_create_when_content_manager_fails_to_return_key(self):
-    #     name = u'ABC'
-    #     admin_email = u'foo@bar.com'
-    #     when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(None)
-    #     request_parameters = {'name': name,
-    #                           'tenant_code': 'acme',
-    #                           'admin_email': admin_email,
-    #                           'content_server_url': 'https://www.foo.com',
-    #                           'chrome_device_domain': '',
-    #                           'active': True}
-    #     uri = application.router.build(None, 'tenants', None, {})
-    #     with self.assertRaises(Exception) as context:
-    #         self.app.post_json(uri, params=request_parameters)
-    #     self.assertTrue('422 Unable to obtain content server key' in str(context.exception))
+    def test_post_create_object_has_expected_parent(self):
+        name = u'ABC'
+        admin_email = u'foo@bar.com'
+        when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(str('some key'))
+        when(ContentManagerApi).create_tenant(any_matcher()).thenReturn(True)
+        request_parameters = {'name': name,
+                              'tenant_code': 'acme',
+                              'admin_email': admin_email,
+                              'content_server_url': 'https://www.foo.com',
+                              'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
+                              'chrome_device_domain': '',
+                              'active': True}
+        uri = application.router.build(None, 'tenants', None, {})
+        self.app.post_json(uri, params=request_parameters, headers=self.headers)
+        actual = Tenant.find_by_name(request_parameters['name'])
+        parent = actual.key.parent().get()
+        self.assertEqual(parent.name, TENANT_ENTITY_GROUP_NAME)
 
-    # TODO Put this back in after call to content mgr is completed
+    # TODO put back into play after uncommenting the call to content mgr
     # def test_post_content_manager_api_collaboration(self):
-    #     name = u'ABC'
-    #     admin_email = u'foo@bar.com'
-    #     when(ContentManagerApi).create_tenant(name, admin_email).thenReturn('some key')
-    #     request_parameters = {'name': name,
+    #     when(ContentManagerApi).create_tenant(any_matcher()).thenReturn(True)
+    #     request_parameters = {'name': 'ABC',
     #                           'tenant_code': 'acme',
-    #                           'admin_email': admin_email,
+    #                           'admin_email': 'foo@bar.com',
     #                           'content_server_url': 'https://www.foo.com',
     #                           'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
     #                           'chrome_device_domain': '',
     #                           'active': True}
     #     uri = application.router.build(None, 'tenants', None, {})
     #     self.app.post(uri, json.dumps(request_parameters), headers=self.headers)
-    #     verify(ContentManagerApi, times=1).create_tenant(any_matcher(''), any_matcher(''))
-
+    #     verify(ContentManagerApi, times=1).create_tenant(any_matcher(''))
 
     def test_put_returns_no_content_status(self):
         tenant_keys = self.load_tenants()

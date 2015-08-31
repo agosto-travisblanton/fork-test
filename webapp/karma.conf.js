@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function(config) {
+module.exports = function (config) {
 
   var configuration = {
     // base path, that will be used to resolve files and exclude
@@ -23,6 +23,7 @@ module.exports = function(config) {
       'bower_components/restangular/dist/restangular.js',
       'bower_components/angular-bootstrap/ui-bootstrap.js',
       'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+      'bower_components/angular-breadcrumb/dist/angular-breadcrumb.js',
       'src/app/index.coffee',
       'src/app/**/*.coffee',
       'specs/**/*.coffee'
@@ -39,6 +40,8 @@ module.exports = function(config) {
       stripPrefix: 'src/',
       moduleName: 'gulpAngular'
     },
+
+    reporters: ['progress', 'coverage'],
 
     browsers: ['PhantomJS'],
 
@@ -63,11 +66,19 @@ module.exports = function(config) {
     colors: true,
 
     preprocessors: {
-      '**/*.coffee': ['coffee'],
+      'src/**/*.coffee': ['coffee', 'coverage'],
+      'specs/**/*.coffee': ['coffee'],
       'src/**/*.html': ['ng-html2js']
+    },
+
+    coverageReporter: {
+      instrumenterOptions: {
+        istanbul: {noCompact: true}
+      },
+      type: 'html',
+      dir: 'coverage/'
     }
   };
-
 
   // This block is needed to execute Chrome on Travis
   // If you ever plan to use Chrome and Travis, you can keep it

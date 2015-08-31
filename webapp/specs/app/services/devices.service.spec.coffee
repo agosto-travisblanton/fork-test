@@ -34,3 +34,14 @@ describe 'DevicesService', ->
       expect(deviceRestangularService.get).toHaveBeenCalled()
       expect(actual).toBe promise
 
+  describe '.getDevices', ->
+    it 'retrieve all devices, returning a promise', ->
+      deviceRestangularService = { getList: -> }
+      spyOn(Restangular, 'all').and.returnValue deviceRestangularService
+      spyOn(deviceRestangularService, 'getList').and.returnValue promise
+      actual = DevicesService.getDevices()
+      expect(Restangular.all).toHaveBeenCalledWith 'devices'
+      parameters = {}
+      expect(deviceRestangularService.getList).toHaveBeenCalled()
+      expect(actual).toBe promise
+

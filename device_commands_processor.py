@@ -1,6 +1,7 @@
+import logging
 from google_cloud_messaging import GoogleCloudMessaging
 from app_config import config
-import logging
+
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -18,4 +19,3 @@ def change_intent(gcm_registration_id, payload):
             test_mode))
     except Exception, e:
         logging.exception(e)
-

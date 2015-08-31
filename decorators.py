@@ -84,7 +84,6 @@ def log_memory(function):
     return log
 
 
-
 def api_token_required(handler_method):
 
     def authorize(self, *args, **kwargs):

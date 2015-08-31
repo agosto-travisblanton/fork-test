@@ -1,0 +1,19 @@
+queue:
+- name: directory-api
+  rate: 30/s
+  bucket_size: 30
+  retry_parameters:
+    task_retry_limit: 3
+
+- name: content-server
+  rate: 30/s
+  bucket_size: 30
+  retry_parameters:
+    task_retry_limit: 3
+
+- name: migrations
+  rate: 30/s
+  bucket_size: 30
+  retry_parameters:
+    task_retry_limit: 3
+    task_age_limit: 1h

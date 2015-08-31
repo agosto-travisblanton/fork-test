@@ -1,6 +1,6 @@
 from google.appengine.ext import deferred
 from mapreduce import mapreduce_pipeline
-from migration_models import MigrationStatus
+from migration_models import MigrationOperation
 import logging
 
 
@@ -12,8 +12,8 @@ class MigrationBase(object):
         raise NotImplementedError()
 
     def complete(self):
-        MigrationStatus.complete(self.name)
-        logging.info("Completed migration '{}'".format(self.name))
+        MigrationOperation.complete(self.name)
+        logging.info("'{}' has completed.".format(self.name))
 
 
 def _poll_for_mapreduce_pipeline_completion(migration_name, remaining_pipeline_ids, aborted_pipeline_ids=[]):
@@ -32,13 +32,13 @@ def _poll_for_mapreduce_pipeline_completion(migration_name, remaining_pipeline_i
 
     if len(remaining_pipeline_ids) != 0:
         deferred.defer(_poll_for_mapreduce_pipeline_completion, migration_name, remaining_pipeline_ids,
-            aborted_pipeline_ids, _queue='migrations', _countdown=5)
+                       aborted_pipeline_ids, _queue='migrations', _countdown=5)
     elif len(aborted_pipeline_ids) != 0:
         logging.error("MapReduce migration '{}' failed because the following pipelines were aborted: {}".
-            format(migration_name, ' '.join(aborted_pipeline_ids)))
-        MigrationStatus.fail(migration_name)
+                      format(migration_name, ' '.join(aborted_pipeline_ids)))
+        MigrationOperation.fail(migration_name)
     else:
-        MigrationStatus.complete(migration_name)
+        MigrationOperation.complete(migration_name)
         logging.info("Completed migration '{}'".format(migration_name))
 
 
@@ -49,4 +49,4 @@ class MapReduceMigration(MigrationBase):
 
     def poll_for_completion(self, pipeline_ids):
         deferred.defer(_poll_for_mapreduce_pipeline_completion, self.name, pipeline_ids, _queue='migrations',
-            _countdown=5)
+                       _countdown=5)

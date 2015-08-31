@@ -12,18 +12,20 @@ class AppConfig(Config):
 
     APP_ROOT = None
     APP_NAME = ''
+    DEFAULT_PAGE_SIZE = 10
+    MAX_PAGE_SIZE = 100
     SECRET_KEY_FILE = None
     PRIVATE_KEY = None
     SERVICE_ACCOUNT_EMAIL = None
     CLIENT_ID = None
-    # CLIENT_SECRET = None
     PUBLIC_API_SERVER_KEY = None
     API_TOKEN = None
     CONTENT_MANAGER_API_SERVER_KEY = None
-    CONTENT_MANAGER_API_URL = None
     GCM_TEST_MODE = None
     IMPERSONATION_ADMIN_EMAIL_ADDRESS = None
     GOOGLE_CUSTOMER_ID = None
+    STORMPATH_AUTH_APP = None
+    STORMPATH_CLIENT = None
 
 
 config = AppConfig.get_config()

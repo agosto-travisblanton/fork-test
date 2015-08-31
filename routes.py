@@ -1,22 +1,21 @@
-from agar.env import on_development_server
 from env_setup import setup
+
 setup()
 
 import os
-
 from google.appengine.ext import ereporter
-
-# DO NOT REMOVE
-# Importing deferred is a work around to this bug.
-# https://groups.google.com/forum/?fromgroups=#!topic/webapp2/sHb2RYxGDLc
-from google.appengine.ext import deferred
-
-from webapp2 import Route, WSGIApplication
-
 # This 'CURRENT_VERSION_ID' variable is not available when running tests
 if os.environ.get('CURRENT_VERSION_ID'):
     # this makes ereporter capture exceptions on all your handlers
     ereporter.register_logger()
+
+# DO NOT REMOVE
+# Importing deferred is a work around to this bug.
+# https://groups.google.com/forum/?fromgroups=#!topic/webapp2/sHb2RYxGDLc
+# from google.appengine.ext import deferred
+
+from webapp2 import Route, WSGIApplication
+from agar.env import on_production_server
 
 application = WSGIApplication(
     [
@@ -30,12 +29,44 @@ application = WSGIApplication(
         ),
 
         ############################################################
+        # version
+        ############################################################
+        Route(
+            r'/api/v1/version',
+            handler='handlers.version_handler.VersionHandler',
+            name='version-retrieval',
+            handler_method='get',
+            methods=['GET']
+        ),
+
+        ############################################################
+        # login
+        ############################################################
+        Route(
+            r'/api/v1/identity',
+            handler='handlers.login.IdentityHandler',
+            name='identity'
+        ),
+
+        Route(
+            r'/login',
+            handler='handlers.login.LoginHandler',
+            name='login',
+        ),
+
+        Route(
+            r'/logout',
+            handler='handlers.login.LogoutHandler',
+            name='logout',
+        ),
+
+        ############################################################
         # device registration
         ############################################################
         Route(
             r'/api/v1/devices',
             handler='handlers.device_resource_handler.DeviceResourceHandler',
-            name='devices',
+            name='devices-retrieval',
             handler_method='get_list',
             methods=['GET']
         ),
@@ -79,30 +110,22 @@ application = WSGIApplication(
             handler='handlers.tenants_handler.TenantsHandler',
             name='manage-tenant',
             methods=['GET', 'PUT', 'DELETE']
+        ),
+        ############################################################
+        # Distributors
+        ############################################################
+        Route(
+            r'/api/v1/distributors',
+            handler='handlers.distributors_handler.DistributorsHandler',
+            name='distributors',
+            methods=['GET', 'POST']
+        ),
+        Route(
+            r'/api/v1/distributors/<distributor_key>',
+            handler='handlers.distributors_handler.DistributorsHandler',
+            name='manage-distributor',
+            methods=['GET', 'PUT', 'DELETE']
         )
-    ]
+    ],
+    debug=not on_production_server
 )
-
-
-# if not on_production_server:
-#     dev_routes = [
-#
-#         Route(
-#             r'/dev/bootstrap',
-#             handler='handlers.bootstrap.BootstrapHandler',
-#             name='dev-bootstrap',
-#         ),
-#         Route(
-#             r'/dev/load_bootstrap',
-#             handler='handlers.dev.LoadBootstrap',
-#             name='load-bootstrap',
-#         ),
-#         Route(
-#             r'/dev',
-#             handler='handlers.dev.DevIndex',
-#             name='dev-index',
-#         ),
-#     ]
-#
-#     for route in dev_routes:
-#         application.router.add(route)

@@ -12,21 +12,29 @@ appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, Devices
     chrome_device_domain: undefined,
     active: true
   }
-  @currentTenantDevices = []
+
+  @currentTenantDisplays = []
   @editMode = !!$stateParams.tenantKey
 
   if @editMode
+    @generalTabActive = false
     tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey)
     tenantPromise.then (data) =>
       @currentTenant = data
-    devicesPromise = DevicesService.getDevicesByTenant($stateParams.tenantKey)
-    devicesPromise.then (data) =>
-      @currentTenantDevices = data
+
+    displaysPromise = DevicesService.getDevicesByTenant($stateParams.tenantKey)
+    displaysPromise.then (data) =>
+      @currentTenantDisplays = data.objects
+  else
+    @generalTabActive = true
 
   @onClickSaveButton = () ->
     promise = TenantsService.save @currentTenant
-    promise.then (data) ->
+    promise.then () ->
       $state.go 'tenants'
+
+  @editItem = (item) ->
+    $state.go 'editDevice', {deviceKey: item.key, tenantKey: $stateParams.tenantKey}
 
   @autoGenerateTenantCode = ->
     unless @currentTenant.key

@@ -2,10 +2,13 @@
 
 appModule = angular.module('skykitDisplayDeviceManagement')
 
-appModule.controller 'DeviceDetailsCtrl', ($stateParams, DevicesService) ->
+appModule.controller 'DeviceDetailsCtrl', ($stateParams, $state, DevicesService, TenantsService) ->
+  @tenantKey = $stateParams.tenantKey
+
   @currentDevice = {
     key: undefined
     gcmRegistrationId: undefined
+    annotatedLocation: undefined
     annotatedUser: undefined
     apiKey: undefined
     deviceId: undefined #"41b0f043-4296-4c56-b21a-c8bd660ea9ca"
@@ -25,11 +28,16 @@ appModule.controller 'DeviceDetailsCtrl', ($stateParams, DevicesService) ->
     platformVersion: undefined #"6812.88.0 (Official Build) stable-channel zako"
     serialNumber: undefined #"5CD45183T6"
     status: undefined #"ACTIVE"
-    tenantCode: undefined #"foobar_inc"
+    tenantKey: undefined
     created: undefined #"2015-07-07 19:22:57"
     updated: undefined #"2015-07-07 19:22:57"
   }
   @editMode = !!$stateParams.deviceKey
+
+  tenantsPromise = TenantsService.fetchAllTenants()
+  tenantsPromise.then (data) =>
+    @tenants = data
+
 
   if @editMode
     devicePromise = DevicesService.getDeviceByKey($stateParams.deviceKey)
@@ -37,9 +45,8 @@ appModule.controller 'DeviceDetailsCtrl', ($stateParams, DevicesService) ->
       @currentDevice = data
 
   @onClickSaveButton = () ->
-#    promise = DevicesService.save @currentDevice
-#    promise.then (data) ->
-#      $state.go 'devices'
-
+    promise = DevicesService.save @currentDevice
+    promise.then (data) ->
+      $state.go 'devices'
 
   @
