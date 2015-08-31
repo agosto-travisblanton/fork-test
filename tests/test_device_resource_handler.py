@@ -1,4 +1,5 @@
 from google.appengine.ext import ndb
+
 from env_setup import setup_test_paths
 from utils.web_util import build_uri
 
@@ -37,7 +38,11 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.tenant_key = self.__create_tenant(self.TENANT_CODE, self.TENANT_NAME, self.ADMIN_EMAIL)
         self.another_tenant_key = self.__create_tenant(self.ANOTHER_TENANT_CODE, self.ANOTHER_TENANT_NAME,
                                                        self.ANOTHER_ADMIN_EMAIL)
-        self.device_key = self.__create_device(self.tenant_key)
+        self.device_key = build(ChromeOsDevice,
+                                tenant_key=self.tenant_key,
+                                gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                device_id=self.DEVICE_ID,
+                                mac_address=self.MAC_ADDRESS).key
         self.valid_authorization_header = {
             'Authorization': config.API_TOKEN
         }
@@ -48,7 +53,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     #################################################################################################################
 
     def test_get_list_no_query_parameters_http_status_ok(self):
-        self.__build_list_devices(tenant_key=self.tenant_key, number_to_build=1)
         request_parameters = {}
         uri = build_uri('devices-retrieval')
         response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
@@ -61,6 +65,22 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
         response_json = json.loads(response.body)
         self.assertLength(10, response_json['objects'])
+
+    def test_get_list_mac_address_query_parameters_http_status_ok(self):
+        request_parameters = {'macAddress': self.MAC_ADDRESS}
+        uri = build_uri('devices-retrieval')
+        response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
+        self.assertOK(response)
+
+    def test_get_list_mac_address_query_parameters_payload_single_resource(self):
+        request_parameters = {'macAddress': self.MAC_ADDRESS}
+        uri = build_uri('devices-retrieval')
+        response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['macAddress'], self.MAC_ADDRESS)
+        device = self.device_key.get()
+        self.assertEqual(response_json['gcmRegistrationId'], device.gcm_registration_id)
+        self.assertEqual(response_json['deviceId'], device.device_id)
 
     ##################################################################################################################
     ## get_devices_by_tenant
@@ -318,17 +338,13 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                active=True)
         return tenant.put()
 
-    def __create_device(self, tenant_key):
-        device = ChromeOsDevice.create(tenant_key=tenant_key,
-                                       device_id=self.DEVICE_ID,
-                                       gcm_registration_id=self.GCM_REGISTRATION_ID,
-                                       mac_address=self.MAC_ADDRESS)
-        return device.put()
-
     def __build_list_devices(self, tenant_key=None, number_to_build=10):
         results = []
         if tenant_key is None:
             tenant_key = self.__create_tenant()
         for i in range(number_to_build):
-            results.append(build(ChromeOsDevice, tenant_key=tenant_key))
+            results.append(build(ChromeOsDevice,
+                                 tenant_key=tenant_key,
+                                 gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                 device_id=self.DEVICE_ID))
         return results
