@@ -64,7 +64,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         uri = build_uri('devices-retrieval')
         response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
         response_json = json.loads(response.body)
-        self.assertLength(10, response_json['objects'])
+        # When pagination comes back from the dead...
+        # self.assertLength(10, response_json['objects'])
+        self.assertLength(21, response_json)
 
     def test_get_list_mac_address_query_parameters_http_status_ok(self):
         request_parameters = {'macAddress': self.MAC_ADDRESS}

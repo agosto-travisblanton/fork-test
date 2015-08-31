@@ -28,10 +28,12 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 error_message = "Unable to find Chrome OS device by MAC address: {0}".format(device_mac_address)
                 self.response.set_status(404, error_message)
         else:
-            query = ChromeOsDevice.query()
-            query_forward = query.order(ChromeOsDevice.key)
-            query_reverse = query.order(-ChromeOsDevice.key)
-            query_results = self.fetch_page(query_forward, query_reverse)
+            query = ChromeOsDevice.query().order(ChromeOsDevice.created)
+            # query_forward = query.order(ChromeOsDevice.key)
+            # query_reverse = query.order(-ChromeOsDevice.key)
+            # query_results = self.fetch_page(query_forward, query_reverse)
+            # json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
+            query_results = query.fetch(1000)
             json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
 
     @api_token_required
