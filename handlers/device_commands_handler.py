@@ -20,7 +20,7 @@ class DeviceCommandsHandler(RequestHandler):
         intent = request_json.get('intent')
         if intent is None or intent == '':
             status = 400
-            message = 'Invalid intent.'
+            message = 'DeviceCommandsHandler: Invalid intent.'
         else:
             chrome_os_device = None
             try:
@@ -32,6 +32,6 @@ class DeviceCommandsHandler(RequestHandler):
                 change_intent(chrome_os_device.gcm_registration_id, intent)
             else:
                 status = 404
-                message = 'Device not found with key: {0}'.format(device_urlsafe_key)
+                message = 'DeviceCommandsHandler: Device not found with key: {0}'.format(device_urlsafe_key)
                 logging.info(message)
         self.response.set_status(status, message)

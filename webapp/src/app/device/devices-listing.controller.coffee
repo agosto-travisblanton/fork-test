@@ -2,14 +2,13 @@
 
 appModule = angular.module('skykitDisplayDeviceManagement')
 
-appModule.controller 'DevicesListingCtrl', ($stateParams, DevicesService, $state) ->
+appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, $state) ->
   @devices = []
 
-  devicesPromise = DevicesService.getDevices()
-  devicesPromise.then (data) =>
-    @devices = data
-
-  initialize: ->
+  @initialize = ->
+    devicesPromise = DevicesService.getDevices()
+    devicesPromise.then (data) =>
+      @devices = data
 
   @editItem = (item) ->
     $state.go 'editDevice', {deviceKey: item.key, tenantKey: ''}

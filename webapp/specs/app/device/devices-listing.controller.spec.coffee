@@ -30,9 +30,11 @@ describe 'DevicesListingCtrl', ->
       expect(angular.isArray(controller.devices)).toBeTruthy()
 
     it 'call DevicesService.getDisplays to retrieve all displays', ->
+      controller.initialize()
       expect(DevicesService.getDevices).toHaveBeenCalled()
 
     it "the 'then' handler caches the retrieved displays in the controller", ->
+      controller.initialize()
       promise.resolve devices
       expect(controller.devices).toBe devices
 

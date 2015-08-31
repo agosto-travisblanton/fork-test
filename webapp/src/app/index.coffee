@@ -9,14 +9,19 @@ skykitDisplayDeviceManagement = angular.module('skykitDisplayDeviceManagement', 
   'ui.router',
   'hSweetAlert',
   'ui.bootstrap',
-  'ncy-angular-breadcrumb'
+  'ncy-angular-breadcrumb',
+  'directive.g+signin'
 ])
 
 skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   $stateProvider.state("home", {
     url: "/",
     templateUrl: "app/welcome/welcome.html",
-    controller: "WelcomeCtrl"
+    resolve: {
+      identity: (IdentityService) ->
+        IdentityService.getIdentity()
+    },
+    controller: "WelcomeCtrl",
     controllerAs: 'welcomeCtrl',
     ncyBreadcrumb: {
       label: 'Home page'
@@ -25,6 +30,10 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
   $stateProvider.state("welcome", {
     url: "/welcome",
     templateUrl: "app/welcome/welcome.html",
+    resolve: {
+      identity: (IdentityService) ->
+        IdentityService.getIdentity()
+    },
     controller: "WelcomeCtrl"
     controllerAs: 'welcomeCtrl',
     ncyBreadcrumb: {
@@ -74,7 +83,7 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     controller: "DevicesListingCtrl",
     controllerAs: 'devicesListingCtrl',
     ncyBreadcrumb: {
-      label: 'Displays'
+      label: 'Devices'
     }
   })
   $stateProvider.state("editDevice", {
@@ -117,10 +126,14 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
 
   RestangularProvider.addResponseInterceptor (data, operation, resourceType, url, response, deferred) ->
     result = data
-    if resourceType == 'devices' and operation = 'getList' and url == '/api/v1/devices'
-      result = data.objects
+    # Uncomment this for pagination support when using PagingListHandlerMixin on the Python side.
+#    if resourceType == 'devices' and operation = 'getList' and url == '/api/v1/devices'
+#      result = data.objects
     result
 
   RestangularProvider.setRestangularFields {
     id: 'key'
   }
+
+#skykitDisplayDeviceManagement.run (IdentityService) ->
+#  IdentityService.getIdentity()

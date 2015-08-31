@@ -54,7 +54,6 @@ def _SERVICE_ACCOUNT_EMAIL():
         return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0@developer.gserviceaccount.com'
     return None
 
-
 app_SERVICE_ACCOUNT_EMAIL = _SERVICE_ACCOUNT_EMAIL()
 
 
@@ -68,6 +67,7 @@ def _GCM_TEST_MODE():
 app_GCM_TEST_MODE = _GCM_TEST_MODE()
 
 
+
 def _CLIENT_ID():
     if on_development_server or not on_server:
         return '390010375778-87capuus77kispm64q27iah4kl0rorv4.apps.googleusercontent.com'
@@ -79,6 +79,18 @@ def _CLIENT_ID():
 
 
 app_CLIENT_ID = _CLIENT_ID()
+
+
+def _WEB_APP_CLIENT_ID():
+    if on_development_server or not on_server:
+        return '390010375778-gidaqujfhgkqrc5lat9t890mhc0nhutt.apps.googleusercontent.com'
+    if on_integration_server:
+        return '390010375778-gidaqujfhgkqrc5lat9t890mhc0nhutt.apps.googleusercontent.com'
+    if on_production_server:
+        return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0.apps.googleusercontent.com'
+    return None
+
+app_WEB_APP_CLIENT_ID = _WEB_APP_CLIENT_ID()
 
 
 # def _CLIENT_SECRET():
