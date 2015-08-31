@@ -6,14 +6,26 @@ describe 'WelcomeCtrl', ->
   $state = undefined
   DistributorsService = undefined
   promise = undefined
+  identity = {WEB_APP_CLIENT_ID: 'CLIENT-ID', STATE: 'STATE'}
+  $rootScope = undefined
+  $scope = undefined
 
   beforeEach module('skykitDisplayDeviceManagement')
 
-  beforeEach inject (_$controller_, _$state_, _DistributorsService_) ->
+  beforeEach inject (_$controller_, _$state_, _$rootScope_, _DistributorsService_) ->
     $controller = _$controller_
     $state = _$state_
+    $rootScope = _$rootScope_
+    $scope = _$rootScope_.$new()
     DistributorsService = _DistributorsService_
-    controller = $controller 'WelcomeCtrl', {$state: $state, DistributorsService: DistributorsService}
+    spyOn($scope, '$on')
+    controller = $controller 'WelcomeCtrl', {
+      $state: $state
+      $scope: $scope
+      DistributorsService: DistributorsService
+      identity: identity
+    }
+
 
   describe 'initialization', ->
     it 'currentDistributor is undefined', ->
@@ -21,6 +33,13 @@ describe 'WelcomeCtrl', ->
 
     it 'distributors should be an empty array', ->
       expect(angular.isArray(controller.distributors)).toBeTruthy()
+
+    it "add listener for 'event:google-plus-signin-success' event", ->
+      expect($scope.$on).toHaveBeenCalledWith 'event:google-plus-signin-success', jasmine.any(Function)
+
+    it "add listener for 'event:google-plus-signin-failure' event", ->
+      expect($scope.$on).toHaveBeenCalledWith 'event:google-plus-signin-failure', jasmine.any(Function)
+
 
   describe '.initialize', ->
     distributors = [
@@ -39,6 +58,13 @@ describe 'WelcomeCtrl', ->
 
     it "the 'then' handler caches the retrieved distributors in the controller", ->
       expect(controller.distributors).toBe distributors
+
+    it 'sets the clientId property on the controller', ->
+      expect(controller.clientId).toBe identity.WEB_APP_CLIENT_ID
+
+    it 'sets the state property on the controller', ->
+      expect(controller.state).toBe identity.STATE
+
 
   describe '.selectDistributor', ->
     distributor = {

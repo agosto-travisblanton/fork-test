@@ -9,9 +9,7 @@
       <div class="row">
         <div class="col-lg-12">
           <div ncy-breadcrumb></div>
-          <h1 class="page-header">
-            Displays
-          </h1>
+          <h1 class="page-header">Devices</h1>
         </div>
       </div>
       <!-- /.row -->
@@ -23,16 +21,16 @@
             <tr>
               <th>Serial number</th>
               <th>Tenant code</th>
-              <th>Wifi mac address</th>
+              <th>WiFi mac address</th>
               <th>Ether mac address</th>
               <th>Provisioning date</th>
             </tr>
             </thead>
             <tbody>
             <tr ng-hide="devicesListingCtrl.devices.length">
-              <td class="no-devices text-center text-danger" colspan="5">No displays</td>
+              <td class="no-devices text-center text-danger" colspan="5">No devices</td>
             </tr>
-            <tr ng-repeat="item in devicesListingCtrl.devices | orderBy:'-created' "
+            <tr ng-repeat="item in devicesListingCtrl.devices | orderBy:'-created'"
                 ng-click="devicesListingCtrl.editItem(item)">
               <td class="display-serial-number">{{ item.serialNumber }}</td>
               <td class="display-tenant-code">{{ item.tenantCode }}</td>
