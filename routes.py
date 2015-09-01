@@ -101,6 +101,7 @@ application = WSGIApplication(
             name='manage-tenant',
             methods=['GET', 'PUT', 'DELETE']
         ),
+
         ############################################################
         # Distributors
         ############################################################
@@ -114,6 +115,20 @@ application = WSGIApplication(
               name='manage-distributor',
               methods=['GET', 'PUT', 'DELETE']
               ),
+
+        ############################################################
+        # Domains
+        ############################################################
+        Route(r'/api/v1/domains',
+              handler='handlers.domains_handler.DomainsHandler',
+              name='domains',
+              methods=['GET', 'POST']
+              ),
+        Route(r'/api/v1/domains/<domain_key>',
+              handler='handlers.domains_handler.DomainsHandler',
+              name='manage-domain',
+              methods=['GET', 'PUT', 'DELETE']
+              )
     ],
     debug=not on_production_server
 )

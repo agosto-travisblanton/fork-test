@@ -1,4 +1,4 @@
-from models import (Tenant, ChromeOsDevice, Distributor)
+from models import (Tenant, ChromeOsDevice, Distributor, Domain)
 from restler.serializers import ModelStrategy
 
 TENANT_FIELDS = [
@@ -57,4 +57,18 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'gcmRegistrationId': lambda o, field_name, context: o.key.get().gcm_registration_id},
     {'contentServerUrl': lambda o, field_name, context: o.tenant_key.get().content_server_url},
     {'model': lambda o, field_name, context: o.key.get().model}
+]
+
+DOMAIN_FIELDS = [
+    'name',
+    'distributor_key'
+    'active',
+    'created',
+    'updated'
+]
+DOMAIN_STRATEGY = ModelStrategy(Domain) + DOMAIN_FIELDS
+DOMAIN_STRATEGY += [
+    {'key': lambda o, field_name, context: o.key.urlsafe()},
+    {'distributorKey': lambda o, field_name, context: o.distributor_key.urlsafe()},
+
 ]
