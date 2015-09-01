@@ -8,7 +8,8 @@ appModule.controller 'TenantDetailsCtrl', ($log,
                                            DevicesService,
                                            $state,
                                            sweet,
-                                           ProgressBarService) ->
+                                           ProgressBarService
+                                           ) ->
   @currentTenant = {
     key: undefined,
     name: undefined,
@@ -34,17 +35,17 @@ appModule.controller 'TenantDetailsCtrl', ($log,
   else
     @generalTabActive = true
 
-  @onClickSaveButton = () ->
-    ProgressBarService.start()
+  @onClickSaveButton = ->
+#    ProgressBarService.start()
     promise = TenantsService.save @currentTenant
     promise.then @onSuccessTenantSave, @onFailureTenantSave
 
-  @onSuccessTenantSave = () ->
-    ProgressBarService.complete()
+  @onSuccessTenantSave = ->
+#    ProgressBarService.complete()
     $state.go 'tenants'
 
   @onFailureTenantSave = (errorObject) ->
-    ProgressBarService.complete()
+#    ProgressBarService.complete()
     $log.error errorObject
     sweet.show('Oops...', 'Unable to save the tenant.', 'error')
 
