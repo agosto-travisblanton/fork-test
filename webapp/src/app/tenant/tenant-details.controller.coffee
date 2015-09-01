@@ -39,13 +39,13 @@ appModule.controller 'TenantDetailsCtrl', ($log,
     promise = TenantsService.save @currentTenant
     promise.then @onSuccessTenantSave, @onFailureTenantSave
 
-  @onSuccessTenantSave = () =>
+  @onSuccessTenantSave = () ->
     ProgressBarService.complete()
     $state.go 'tenants'
 
-  @onFailureTenantSave = (reason) =>
+  @onFailureTenantSave = (errorObject) ->
     ProgressBarService.complete()
-    $log.error reason
+    $log.error errorObject
     sweet.show('Oops...', 'Unable to save the tenant.', 'error')
 
   @editItem = (item) ->
