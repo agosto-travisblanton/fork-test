@@ -128,13 +128,16 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             if gcm_registration_id:
                 logging.info('  PUT updating the gcmRegistrationId.')
                 device.gcm_registration_id = gcm_registration_id
-            tenant_key = ndb.Key(urlsafe=request_json.get('tenantKey'))
-            if tenant_key != device.tenant_key:
-                logging.info('  PUT updating the tenant.')
-                device.tenant_key = tenant_key
-            device.put()
-            deferred.defer(update_chrome_os_device, device_urlsafe_key=device.key.urlsafe(), _queue='directory-api')
-            self.response.headers.pop('Content-Type', None)
+            # tenant_key = ndb.Key(urlsafe=request_json.get('tenantKey'))
+            tenants = Tenant.query(Tenant.tenant_code == request_json.get('tenantCode')).fetch(1)
+            if len(tenants) > 0:
+                tenant = tenants[0]
+                if tenant.key != device.tenant_key:
+                    logging.info('  PUT updating the tenant.')
+                    device.tenant_key = tenant.key
+                device.put()
+                deferred.defer(update_chrome_os_device, device_urlsafe_key=device.key.urlsafe(), _queue='directory-api')
+                self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
 
     @api_token_required
