@@ -36,13 +36,14 @@ class TenantsHandler(RequestHandler):
             content_server_url = request_json.get('content_server_url')
             chrome_device_domain = request_json.get('chrome_device_domain')
             active = request_json.get('active')
-
+            domain_urlsafe_key = request_json.get('domain_key')
+            domain_key = ndb.Key(urlsafe=domain_urlsafe_key)
             tenant = Tenant.create(name=name,
                                    tenant_code=tenant_code,
                                    admin_email=admin_email,
                                    content_server_url=content_server_url,
                                    chrome_device_domain=chrome_device_domain,
-                                   domain_key=self.get_agosto_domain_key(),
+                                   domain_key=domain_key,
                                    active=active)
             tenant_key = tenant.put()
             # TODO uncomment when content mgr endpoint is ready
@@ -83,20 +84,20 @@ class TenantsHandler(RequestHandler):
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
 
-    def get_agosto_domain_key(self):
-        agosto_distributor = Distributor.find_by_name(self.AGOSTO_DISTRIBUTOR.lower())
-        distributor_key = None
-        if agosto_distributor is None:
-            distributor = Distributor.create(name=self.AGOSTO_DISTRIBUTOR,
-                                             active=True)
-            distributor_key = distributor.put()
-
-        domain_key = Domain.query(ndb.AND(Domain.distributor_key == distributor_key,
-                                          Domain.name == self.CHROME_DEVICE_DOMAIN)).get(keys_only=True)
-        if domain_key:
-            return domain_key
-        else:
-            domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
-                                   distributor_key=distributor_key,
-                                   active=True)
-            return domain.put()
+    # def get_agosto_domain_key(self):
+    #     agosto_distributor = Distributor.find_by_name(self.AGOSTO_DISTRIBUTOR.lower())
+    #     distributor_key = None
+    #     if agosto_distributor is None:
+    #         distributor = Distributor.create(name=self.AGOSTO_DISTRIBUTOR,
+    #                                          active=True)
+    #         distributor_key = distributor.put()
+    #
+    #     domain_key = Domain.query(ndb.AND(Domain.distributor_key == distributor_key,
+    #                                       Domain.name == self.CHROME_DEVICE_DOMAIN)).get(keys_only=True)
+    #     if domain_key:
+    #         return domain_key
+    #     else:
+    #         domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
+    #                                distributor_key=distributor_key,
+    #                                active=True)
+    #         return domain.put()
