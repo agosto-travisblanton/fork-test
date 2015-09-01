@@ -120,6 +120,13 @@ class Tenant(ndb.Model):
                 return key.get()
 
     @classmethod
+    def find_by_tenant_code(cls, tenant_code):
+        if tenant_code:
+            key = Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
+            if None is not key:
+                return key.get()
+
+    @classmethod
     def is_unique(cls, name):
         tenant = cls.find_by_name(name)
         if tenant is not None and name == name:
