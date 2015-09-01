@@ -18,6 +18,7 @@ class TestTenantModel(BaseTest):
     ENTITY_GROUP_NAME = 'tenantEntityGroup'
     CURRENT_CLASS_VERSION = 1
     DISTRIBUTOR_NAME = 'Agosto'
+    IMPERSONATION_EMAIL = 'test@test.com'
 
     def setUp(self):
         super(TestTenantModel, self).setUp()
@@ -25,6 +26,7 @@ class TestTenantModel(BaseTest):
         self.distributor_key = self.distributor.put()
         self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
                                     distributor_key=self.distributor_key,
+                                    impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                     active=True)
         self.domain_key = self.domain.put()
 

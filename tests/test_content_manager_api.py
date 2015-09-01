@@ -21,6 +21,7 @@ class TestContentManagerApi(BaseTest):
     TENANT_CODE = 'foobar'
     DISTRIBUTOR_NAME = 'agosto'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
+    IMPERSONATION_EMAIL = 'test@test.com'
 
     def setUp(self):
         super(TestContentManagerApi, self).setUp()
@@ -30,6 +31,7 @@ class TestContentManagerApi(BaseTest):
         self.distributor_key = self.distributor.put()
         self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
                                     distributor_key=self.distributor_key,
+                                    impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                     active=True)
         self.domain_key = self.domain.put()
 

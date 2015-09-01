@@ -12,6 +12,7 @@ class TestDomainModel(BaseTest):
     DISTRIBUTOR_NAME = 'agosto'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     CURRENT_CLASS_VERSION = 1
+    IMPERSONATION_EMAIL = 'test@test.com'
 
     def setUp(self):
         super(TestDomainModel, self).setUp()
@@ -20,6 +21,7 @@ class TestDomainModel(BaseTest):
         self.distributor_key = self.distributor.put()
         self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
                                     distributor_key=self.distributor_key,
+                                    impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                     active=True)
         self.domain_key = self.domain.put()
 
@@ -31,6 +33,7 @@ class TestDomainModel(BaseTest):
         domain = Domain.find_by_name(self.CHROME_DEVICE_DOMAIN)
         self.assertEqual(domain.distributor_key, self.distributor_key)
         self.assertEqual(domain.name, self.CHROME_DEVICE_DOMAIN)
+        self.assertEqual(domain.impersonation_admin_email_address, self.IMPERSONATION_EMAIL)
         self.assertTrue(domain.active)
         self.assertIsNotNone(domain.created)
 
@@ -38,6 +41,7 @@ class TestDomainModel(BaseTest):
         name = 'some domain'
         domain = Domain.create(name=name,
                                distributor_key=self.distributor_key,
+                               impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                active=False)
         domain.put()
         domain_created = Domain.find_by_name(name)

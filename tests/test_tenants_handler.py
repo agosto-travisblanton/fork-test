@@ -17,12 +17,22 @@ class TestTenantsHandler(BaseTest, WebTest):
     API_KEY = "SOME_KEY_{0}"
     CONTENT_SERVER_URL = 'https://www.content.com'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
+    DISTRIBUTOR_NAME = 'agosto'
+    IMPERSONATION_EMAIL = 'test@test.com'
 
     def setUp(self):
         super(TestTenantsHandler, self).setUp()
         self.headers = {
             'Authorization': config.API_TOKEN
         }
+        self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
+                                              active=True)
+        self.distributor_key = self.distributor.put()
+        self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
+                                    distributor_key=self.distributor_key,
+                                    impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
+                                    active=True)
+        self.domain_key = self.domain.put()
 
     def test_get_by_id_returns_ok_status(self):
         tenant_keys = self.load_tenants()
@@ -69,6 +79,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_server_url': 'https://www.foo.com',
                               'chrome_device_domain': '',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
+                              'domain_key': self.domain_key.urlsafe(),
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
@@ -85,6 +96,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_server_url': 'https://www.foo.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'chrome_device_domain': '',
+                              'domain_key': self.domain_key.urlsafe(),
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
@@ -102,6 +114,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_server_url': 'https://www.foo.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'chrome_device_domain': '',
+                              'domain_key': self.domain_key.urlsafe(),
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
@@ -123,6 +136,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_server_url': 'https://www.foo.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'chrome_device_domain': '',
+                              'domain_key': self.domain_key.urlsafe(),
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
@@ -208,6 +222,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         distributor_key = distributor.put()
         domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
                                distributor_key=distributor_key,
+                               impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                active=True)
         domain_key = domain.put()
         for x in range(5):

@@ -33,6 +33,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     TENANT_CODE = 'foobar_inc'
     TENANT_NAME = 'Foobar, Inc,'
     DISTRIBUTOR_NAME = 'agosto'
+    IMPERSONATION_EMAIL = 'test@test.com'
 
     def setUp(self):
         super(TestDeviceResourceHandler, self).setUp()
@@ -41,6 +42,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.distributor_key = self.distributor.put()
         self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
                                     distributor_key=self.distributor_key,
+                                    impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                     active=True)
         self.domain_key = self.domain.put()
         self.tenant_key = self.__create_tenant(self.TENANT_CODE, self.TENANT_NAME, self.ADMIN_EMAIL)
@@ -273,8 +275,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     ##################################################################################################################
     ## put
     ##################################################################################################################
+
     def test_device_resource_put_no_authorization_header_returns_forbidden(self):
-        request_body = {'gcmRegistrationId': self.GCM_REGISTRATION_ID, 'tenantCode': self.TENANT_CODE}
+        request_body = {'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'tenantCode': self.TENANT_CODE}
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.device_key.get())
         uri = build_uri('manage-device', params_dict={'device_urlsafe_key': self.device_key.urlsafe()})
         response = self.put(uri, params=request_body, headers=self.invalid_authorization_header)

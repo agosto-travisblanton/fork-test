@@ -25,6 +25,7 @@ class TestChromeOsDeviceModel(BaseTest):
     MODEL = 'ASUS Chromebox'
     DISTRIBUTOR_NAME = 'agosto'
     CURRENT_CLASS_VERSION = 2
+    IMPERSONATION_EMAIL = 'test@test.com'
 
     def setUp(self):
         super(TestChromeOsDeviceModel, self).setUp()
@@ -33,6 +34,7 @@ class TestChromeOsDeviceModel(BaseTest):
         self.distributor_key = self.distributor.put()
         self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
                                     distributor_key=self.distributor_key,
+                                    impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                     active=True)
         self.domain_key = self.domain.put()
         self.tenant = Tenant.create(name=self.NAME,

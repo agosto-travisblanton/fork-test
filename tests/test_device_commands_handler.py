@@ -23,6 +23,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
     GCM_REGISTRATION_ID = '8d70a8d78a6dfa6df76dfasd'
     MAC_ADDRESS = '54271e619346'
     DISTRIBUTOR_NAME = 'agosto'
+    IMPERSONATION_EMAIL = 'test@test.com'
 
     def setUp(self):
         super(TestDeviceCommandsHandler, self).setUp()
@@ -31,6 +32,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.distributor_key = self.distributor.put()
         self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
                                     distributor_key=self.distributor_key,
+                                    impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                     active=True)
         self.domain_key = self.domain.put()
         self.tenant = Tenant.create(tenant_code=self.TENANT_CODE,
