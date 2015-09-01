@@ -13,7 +13,7 @@ from agar.test import BaseTest, WebTest
 from chrome_os_devices_api import ChromeOsDevicesApi
 from mockito import when, any as any_matcher
 from routes import application
-from models import ChromeOsDevice, Tenant
+from models import ChromeOsDevice, Tenant, Distributor, Domain
 from app_config import config
 from ae_test_data import build
 
@@ -32,9 +32,18 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     MAC_ADDRESS = '54271e619346'
     TENANT_CODE = 'foobar_inc'
     TENANT_NAME = 'Foobar, Inc,'
+    DISTRIBUTOR_NAME = 'agosto'
+
 
     def setUp(self):
         super(TestDeviceResourceHandler, self).setUp()
+        self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
+                                              active=True)
+        self.distributor_key = self.distributor.put()
+        self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
+                                    distributor_key=self.distributor_key,
+                                    active=True)
+        self.domain_key = self.domain.put()
         self.tenant_key = self.__create_tenant(self.TENANT_CODE, self.TENANT_NAME, self.ADMIN_EMAIL)
         self.another_tenant_key = self.__create_tenant(self.ANOTHER_TENANT_CODE, self.ANOTHER_TENANT_NAME,
                                                        self.ANOTHER_ADMIN_EMAIL)
@@ -337,6 +346,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                admin_email=email,
                                content_server_url=self.CONTENT_SERVER_URL,
                                chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
+                               domain_key=self.domain_key,
                                active=True)
         return tenant.put()
 
