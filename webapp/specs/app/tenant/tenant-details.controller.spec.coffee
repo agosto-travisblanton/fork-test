@@ -8,18 +8,31 @@ describe 'TenantDetailsCtrl', ->
   $stateParams = undefined
   TenantsService = undefined
   DevicesService = undefined
+  progressBarService = undefined
   tenantsServicePromise = undefined
   devicesServicePromise = undefined
+  sweet = undefined
+  serviceInjection = undefined
 
   beforeEach module('skykitDisplayDeviceManagement')
 
-  beforeEach inject (_$controller_, _TenantsService_, _DevicesService_, _$state_) ->
+  beforeEach inject (_$controller_, _TenantsService_, _DevicesService_, _$state_, _sweet_) ->
     $controller = _$controller_
     $state = _$state_
     $stateParams = {}
     TenantsService = _TenantsService_
     DevicesService = _DevicesService_
+    progressBarService = {
+      start: ->
+      complete: ->
+    }
+    sweet = _sweet_
     scope = {}
+    serviceInjection = {
+      $scope: scope
+      $stateParams: $stateParams
+      ProgressBarService: progressBarService
+    }
 
 
   describe 'initialization', ->
@@ -29,54 +42,60 @@ describe 'TenantDetailsCtrl', ->
       spyOn(TenantsService, 'getTenantByKey').and.returnValue(tenantsServicePromise)
       spyOn(DevicesService, 'getDevicesByTenant').and.returnValue(devicesServicePromise)
 
-      it 'currentTenant should be set', ->
-        controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
-        expect(controller.currentTenant).toBeDefined()
-        expect(controller.currentTenant.key).toBeUndefined()
-        expect(controller.currentTenant.name).toBeUndefined()
-        expect(controller.currentTenant.tenant_code).toBeUndefined()
-        expect(controller.currentTenant.admin_email).toBeUndefined()
-        expect(controller.currentTenant.content_server_url).toBeUndefined()
-        expect(controller.currentTenant.chrome_device_domain).toBeUndefined()
-        expect(controller.currentTenant.active).toBeTruthy()
+    it 'currentTenant should be set', ->
+      controller = $controller 'TenantDetailsCtrl', serviceInjection
+      expect(controller.currentTenant).toBeDefined()
+      expect(controller.currentTenant.key).toBeUndefined()
+      expect(controller.currentTenant.name).toBeUndefined()
+      expect(controller.currentTenant.tenant_code).toBeUndefined()
+      expect(controller.currentTenant.admin_email).toBeUndefined()
+      expect(controller.currentTenant.content_server_url).toBeUndefined()
+      expect(controller.currentTenant.chrome_device_domain).toBeUndefined()
+      expect(controller.currentTenant.active).toBeTruthy()
 
-      describe 'editing an existing tenant', ->
-        it 'editMode should be set to true', ->
-          $stateParams = {tenantKey: 'fahdsfyudsyfauisdyfoiusydfu'}
-          controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
-          expect(controller.editMode).toBeTruthy()
+    describe 'editing an existing tenant', ->
+      beforeEach ->
+        $stateParams = {tenantKey: 'fahdsfyudsyfauisdyfoiusydfu'}
+        serviceInjection = {
+          $scope: scope
+          $stateParams: $stateParams
+          ProgressBarService: progressBarService
+        }
 
-        it 'retrieve tenant by key from TenantsService', ->
-          $stateParams = {tenantKey: 'fahdsfyudsyfauisdyfoiusydfu'}
-          controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
-          tenant = {key: 'fahdsfyudsyfauisdyfoiusydfu', name: 'Foobar'}
-          tenantsServicePromise.resolve(tenant)
-          expect(TenantsService.getTenantByKey).toHaveBeenCalledWith($stateParams.tenantKey)
-          expect(controller.currentTenant).toBe(tenant)
+      it 'editMode should be set to true', ->
+        controller = $controller 'TenantDetailsCtrl', serviceInjection
+        expect(controller.editMode).toBeTruthy()
 
-        it 'retrieve tenant\'s devices by tenant key from DevicesService', ->
-          $stateParams = {tenantKey: 'fahdsfyudsyfauisdyfoiusydfu'}
-          controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
-          devices = [{key: 'f8sa76d78fa978d6fa7dg7ds55'}, {key: 'f8sa76d78fa978d6fa7dg7ds56'}]
-          devicesServicePromise.resolve(devices)
-          expect(DevicesService.getDevicesByTenant).toHaveBeenCalledWith($stateParams.tenantKey)
-          expect(controller.currentTenantDisplays).toBe(devices)
+      it 'retrieve tenant by key from TenantsService', ->
+        controller = $controller 'TenantDetailsCtrl', serviceInjection
+        tenant = {key: 'fahdsfyudsyfauisdyfoiusydfu', name: 'Foobar'}
+        tenantsServicePromise.resolve(tenant)
+        expect(TenantsService.getTenantByKey).toHaveBeenCalledWith($stateParams.tenantKey)
+        expect(controller.currentTenant).toBe(tenant)
 
-      describe 'creating a new tenant', ->
-        it 'editMode should be set to false', ->
-          $stateParams = {}
-          controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
-          expect(controller.editMode).toBeFalsy()
+      it 'retrieve tenant\'s devices by tenant key from DevicesService', ->
+        controller = $controller 'TenantDetailsCtrl', serviceInjection
+        devices = [{key: 'f8sa76d78fa978d6fa7dg7ds55'}, {key: 'f8sa76d78fa978d6fa7dg7ds56'}]
+        data = {objects: devices}
+        devicesServicePromise.resolve(data)
+        expect(DevicesService.getDevicesByTenant).toHaveBeenCalledWith($stateParams.tenantKey)
+        expect(controller.currentTenantDisplays).toBe(devices)
 
-        it 'do not call TenantsService.getTenantByKey', ->
-          $stateParams = {}
-          controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
-          expect(TenantsService.getTenantByKey).not.toHaveBeenCalled()
+    describe 'creating a new tenant', ->
+      it 'editMode should be set to false', ->
+        $stateParams = {}
+        controller = $controller 'TenantDetailsCtrl', serviceInjection
+        expect(controller.editMode).toBeFalsy()
 
-        it 'do not call Devices.getDevicesByTenant', ->
-          $stateParams = {}
-          controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
-          expect(DevicesService.getDevicesByTenant).not.toHaveBeenCalled()
+      it 'do not call TenantsService.getTenantByKey', ->
+        $stateParams = {}
+        controller = $controller 'TenantDetailsCtrl', serviceInjection
+        expect(TenantsService.getTenantByKey).not.toHaveBeenCalled()
+
+      it 'do not call Devices.getDevicesByTenant', ->
+        $stateParams = {}
+        controller = $controller 'TenantDetailsCtrl', serviceInjection
+        expect(DevicesService.getDevicesByTenant).not.toHaveBeenCalled()
 
   describe '.onClickSaveButton', ->
     beforeEach ->
@@ -84,7 +103,14 @@ describe 'TenantDetailsCtrl', ->
       spyOn(TenantsService, 'save').and.returnValue(tenantsServicePromise)
       spyOn($state, 'go')
       $stateParams = {}
-      controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
+      spyOn(progressBarService, 'start')
+      spyOn(progressBarService, 'complete')
+      controller = $controller 'TenantDetailsCtrl', serviceInjection
+
+    it 'start the progress bar animation', ->
+      controller.onClickSaveButton()
+      tenantsServicePromise.resolve()
+      expect(progressBarService.start).toHaveBeenCalled()
 
     it 'call TenantsService.save, pass the current tenant', ->
       controller.onClickSaveButton()
@@ -99,7 +125,7 @@ describe 'TenantDetailsCtrl', ->
   describe '.autoGenerateTenantCode', ->
     beforeEach ->
       $stateParams = {}
-      controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams})
+      controller = $controller 'TenantDetailsCtrl', serviceInjection
 
     it 'generates a new tenant code when key is undefined', ->
       controller.currentTenant.key = undefined
