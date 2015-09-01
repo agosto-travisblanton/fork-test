@@ -84,21 +84,3 @@ class TenantsHandler(RequestHandler):
             tenant.put()
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
-
-    # def get_agosto_domain_key(self):
-    #     agosto_distributor = Distributor.find_by_name(self.AGOSTO_DISTRIBUTOR.lower())
-    #     distributor_key = None
-    #     if agosto_distributor is None:
-    #         distributor = Distributor.create(name=self.AGOSTO_DISTRIBUTOR,
-    #                                          active=True)
-    #         distributor_key = distributor.put()
-    #
-    #     domain_key = Domain.query(ndb.AND(Domain.distributor_key == distributor_key,
-    #                                       Domain.name == self.CHROME_DEVICE_DOMAIN)).get(keys_only=True)
-    #     if domain_key:
-    #         return domain_key
-    #     else:
-    #         domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
-    #                                distributor_key=distributor_key,
-    #                                active=True)
-    #         return domain.put()
