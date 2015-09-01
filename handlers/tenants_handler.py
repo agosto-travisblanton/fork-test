@@ -1,13 +1,10 @@
 import json
-import logging
 
 from google.appengine.ext import ndb
-
 from webapp2 import RequestHandler
 
-from content_manager_api import ContentManagerApi
 from decorators import api_token_required
-from models import Tenant, TenantEntityGroup
+from models import Tenant, TenantEntityGroup, Distributor, Domain
 from restler.serializers import json_response
 from strategy import TENANT_STRATEGY
 
@@ -16,6 +13,8 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 class TenantsHandler(RequestHandler):
     ADMIN_ACCOUNT_TO_IMPERSONATE = 'administrator@skykit.com'
+    AGOSTO_DISTRIBUTOR = 'Agosto'
+    CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
 
     @api_token_required
     def get(self, tenant_key=None):
@@ -37,11 +36,13 @@ class TenantsHandler(RequestHandler):
             content_server_url = request_json.get('content_server_url')
             chrome_device_domain = request_json.get('chrome_device_domain')
             active = request_json.get('active')
+
             tenant = Tenant.create(name=name,
                                    tenant_code=tenant_code,
                                    admin_email=admin_email,
                                    content_server_url=content_server_url,
                                    chrome_device_domain=chrome_device_domain,
+                                   domain_key=self.get_agosto_domain_key(),
                                    active=active)
             tenant_key = tenant.put()
             # TODO uncomment when content mgr endpoint is ready
@@ -81,3 +82,21 @@ class TenantsHandler(RequestHandler):
             tenant.put()
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
+
+    def get_agosto_domain_key(self):
+        agosto_distributor = Distributor.find_by_name(self.AGOSTO_DISTRIBUTOR.lower())
+        distributor_key = None
+        if agosto_distributor is None:
+            distributor = Distributor.create(name=self.AGOSTO_DISTRIBUTOR,
+                                             active=True)
+            distributor_key = distributor.put()
+
+        domain_key = Domain.query(ndb.AND(Domain.distributor_key == distributor_key,
+                                          Domain.name == self.CHROME_DEVICE_DOMAIN)).get(keys_only=True)
+        if domain_key:
+            return domain_key
+        else:
+            domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
+                                   distributor_key=distributor_key,
+                                   active=True)
+            return domain.put()

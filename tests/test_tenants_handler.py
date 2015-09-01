@@ -5,9 +5,9 @@ setup_test_paths()
 import json
 from content_manager_api import ContentManagerApi
 from agar.test import BaseTest, WebTest
-from models import Tenant, TENANT_ENTITY_GROUP_NAME
+from models import Tenant, TENANT_ENTITY_GROUP_NAME, Distributor, Domain
 from routes import application
-from mockito import when, any as any_matcher, verify
+from mockito import when, any as any_matcher
 from app_config import config
 
 
@@ -16,6 +16,7 @@ class TestTenantsHandler(BaseTest, WebTest):
     ADMIN_EMAIL = "foo{0}@bar.com"
     API_KEY = "SOME_KEY_{0}"
     CONTENT_SERVER_URL = 'https://www.content.com'
+    CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
 
     def setUp(self):
         super(TestTenantsHandler, self).setUp()
@@ -202,12 +203,20 @@ class TestTenantsHandler(BaseTest, WebTest):
 
     def load_tenants(self):
         tenant_keys = []
+        distributor = Distributor.create(name='agosto',
+                                         active=True)
+        distributor_key = distributor.put()
+        domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
+                               distributor_key=distributor_key,
+                               active=True)
+        domain_key = domain.put()
         for x in range(5):
             tenant = Tenant.create(tenant_code='acme',
                                    name="Testing tenant {0}".format(x),
                                    admin_email=self.ADMIN_EMAIL.format(x),
                                    content_server_url=self.CONTENT_SERVER_URL,
                                    chrome_device_domain='testing.skykit.com',
+                                   domain_key=domain_key,
                                    active=True)
             tenant_key = tenant.put()
             tenant_keys.append(tenant_key)

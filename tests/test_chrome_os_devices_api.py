@@ -1,5 +1,5 @@
 from env_setup import setup_test_paths
-from models import Tenant, ChromeOsDevice
+from models import Tenant, ChromeOsDevice, Distributor, Domain
 
 setup_test_paths()
 
@@ -15,6 +15,9 @@ class TestChromeOsDevicesApi(BaseTest):
     TESTING_DEVICE_ID = '6daf712b-7a65-4450-abcd-45027a47a716'
     ORG_UNIT_DEPLOYED = '/SKD Automated Test/SKD Automated Deployed'
     ORG_UNIT_DISTRIBUTOR = '/SKD Automated Test/SKD Automated Distributor'
+    CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
+    DISTRIBUTOR_NAME = 'agosto'
+
 
     def setUp(self):
         super(TestChromeOsDevicesApi, self).setUp()
@@ -79,11 +82,19 @@ class TestChromeOsDevicesApi(BaseTest):
             return None
 
     def test_refresh_device_by_mac_address(self):
+        distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
+                                         active=True)
+        distributor_key = distributor.put()
+        domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
+                               distributor_key=distributor_key,
+                               active=True)
+        domain_key = domain.put()
         tenant = Tenant.create(name='Foobar, Inc',
                                tenant_code='foobar_inc',
                                admin_email='admin@foobar.com',
                                content_server_url='https://www.content.com',
                                chrome_device_domain='foobar.com',
+                               domain_key=domain_key,
                                active=True)
         tenant_key = tenant.put()
         mac_address = '54271e4af1e7'
