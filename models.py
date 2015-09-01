@@ -126,8 +126,7 @@ class Tenant(ndb.Model):
             return True
 
     @classmethod
-    def create(cls, tenant_code, name, admin_email, content_server_url, chrome_device_domain, domain_key,
-               active):
+    def create(cls, tenant_code, name, admin_email, content_server_url, chrome_device_domain, domain_key, active):
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
                    tenant_code=tenant_code,
