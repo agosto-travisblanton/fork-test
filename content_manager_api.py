@@ -22,14 +22,14 @@ class ContentManagerApi(object):
         }
         url = "{content_manager_base_url}/provisioning/v1/tenants".format(
             content_manager_base_url=tenant.content_server_url)
-        http_client_response = HttpClient().post(HttpClientRequest(url=url,
-                                                                   payload=(json.dumps(payload)),
-                                                                   headers=self.HEADERS))
+        http_client = HttpClient()
+        http_client.set_default_fetch_deadline(limit_in_seconds=30)
+        http_client_response = http_client.post(HttpClientRequest(url=url,
+                                                                  payload=(json.dumps(payload)),
+                                                                  headers=self.HEADERS))
         if http_client_response.status_code == 201:
-            logging.info('create_tenant to Content Mgr: url={0}, admin_email={1}, tenant_code={1}'.format(
-                url,
-                tenant.admin_email,
-                tenant.tenant_code))
+            logging.info('create_tenant to Content Mgr: url={0}, admin_email={1}, tenant_code={2}'.format(
+                url, tenant.admin_email, tenant.tenant_code))
             return True
         else:
             error_message = 'Unable to create tenant {0} in Content Manager. Status code: {1}'.format(

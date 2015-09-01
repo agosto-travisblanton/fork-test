@@ -7,6 +7,9 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 class HttpClient(object):
 
+    def set_default_fetch_deadline(self, limit_in_seconds):
+        urlfetch.set_default_fetch_deadline(limit_in_seconds)
+
     def get(self, http_client_request):
         pass
 

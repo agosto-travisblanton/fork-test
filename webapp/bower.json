@@ -18,6 +18,7 @@
     "components-font-awesome": "~4.3.0",
     "jquery": "~2.1.1",
     "lodash": "~3.10.0",
+    "ngprogress": "~1.1.2",
     "restangular": "~1.5.1",
     "sweetalert": "~1.0.1"
   },

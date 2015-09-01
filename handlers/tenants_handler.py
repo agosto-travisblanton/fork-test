@@ -1,7 +1,9 @@
 import json
+import logging
 
 from google.appengine.ext import ndb
 from webapp2 import RequestHandler
+from content_manager_api import ContentManagerApi
 
 from decorators import api_token_required
 from models import Tenant, TenantEntityGroup, Distributor, Domain
@@ -45,11 +47,10 @@ class TenantsHandler(RequestHandler):
                                    domain_key=self.get_agosto_domain_key(),
                                    active=active)
             tenant_key = tenant.put()
-            # TODO uncomment when content mgr endpoint is ready
-            # content_manager_api = ContentManagerApi()
-            # notify_content_manager = content_manager_api.create_tenant(tenant)
-            # if not notify_content_manager:
-            #     logging.info('Failed to notify content manager about new tenant {0}'.format(name))
+            content_manager_api = ContentManagerApi()
+            notify_content_manager = content_manager_api.create_tenant(tenant)
+            if not notify_content_manager:
+                logging.info('Failed to notify content manager about new tenant {0}'.format(name))
             tenant_uri = self.request.app.router.build(None,
                                                        'manage-tenant',
                                                        None,
