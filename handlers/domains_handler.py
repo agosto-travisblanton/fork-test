@@ -41,24 +41,3 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
             self.response.headers['Location'] = domain_uri
             self.response.headers.pop('Content-Type', None)
             self.response.set_status(201)
-
-    # @api_token_required
-    # def put(self, domain_key):
-    #     key = ndb.Key(urlsafe=domain_key)
-    #     domain = key.get()
-    #     request_json = json.loads(self.request.body)
-    #     domain.name = request_json.get('name')
-    #     domain.active = request_json.get('active')
-    #     domain.put()
-    #     self.response.headers.pop('Content-Type', None)
-    #     self.response.set_status(204)
-    #
-    # @api_token_required
-    # def delete(self, domain_key):
-    #     key = ndb.Key(urlsafe=domain_key)
-    #     domain = key.get()
-    #     if domain:
-    #         domain.active = False
-    #         domain.put()
-    #     self.response.headers.pop('Content-Type', None)
-    #     self.response.set_status(204)
