@@ -131,7 +131,8 @@ app_API_TOKEN = _API_TOKEN()
 
 def _CONTENT_MANAGER_API_SERVER_KEY():
     if on_development_server or not on_server:
-        return 'nDsguD7jXCuoCVFhCTKXvAkhmAdzjG9Q'
+        # return 'nDsguD7jXCuoCVFhCTKXvAkhmAdzjG9Q'
+        return 'EqwbumxWrJzybkDerDbm9yLBteJqZi7X'
     if on_integration_server:
         return 'EqwbumxWrJzybkDerDbm9yLBteJqZi7X'
     if on_production_server:

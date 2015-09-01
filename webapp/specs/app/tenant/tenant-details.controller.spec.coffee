@@ -11,16 +11,21 @@ describe 'TenantDetailsCtrl', ->
   ProgressBarService = undefined
   tenantsServicePromise = undefined
   devicesServicePromise = undefined
+  sweet = undefined
 
   beforeEach module('skykitDisplayDeviceManagement')
 
-  beforeEach inject (_$controller_, _TenantsService_, _DevicesService_, _ProgressBarService_, _$state_) ->
+  beforeEach inject (_$controller_, _TenantsService_, _DevicesService_,  _$state_, _sweet_) ->
     $controller = _$controller_
     $state = _$state_
     $stateParams = {}
     TenantsService = _TenantsService_
     DevicesService = _DevicesService_
-    ProgressBarService = _ProgressBarService_
+    ProgressBarService = {
+      start: ->
+      complete: ->
+    }
+    sweet = _sweet_
     scope = {}
 
 
@@ -92,8 +97,9 @@ describe 'TenantDetailsCtrl', ->
       tenantsServicePromise = new skykitDisplayDeviceManagement.q.Mock
       spyOn(TenantsService, 'save').and.returnValue(tenantsServicePromise)
       spyOn($state, 'go')
-      spyOn(ProgressBarService, 'start')
       $stateParams = {}
+#      spyOn(ProgressBarService, 'start')
+#      spyOn(ProgressBarService, 'complete')
       controller = $controller('TenantDetailsCtrl', {$scope: scope, $stateParams: $stateParams,
         ProgressBarService: ProgressBarService})
 
