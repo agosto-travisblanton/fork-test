@@ -1,6 +1,7 @@
 import json
 
 from google.appengine.ext import ndb
+import logging
 from webapp2 import RequestHandler
 from decorators import api_token_required
 from models import Domain
@@ -23,20 +24,37 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
 
     @api_token_required
     def post(self):
-        if self.request.body is not None:
+        if self.request.body is not str('') and self.request.body is not None:
+            status = 201
+            error_message = None
             request_json = json.loads(self.request.body)
             name = request_json.get('name')
+            if name is None or name == '':
+                status = 400
+                error_message = 'The name parameter is invalid.'
             active = request_json.get('active')
+            if active is None or active == '':
+                status = 400
+                error_message = 'The active parameter is invalid.'
             distributor_urlsafe_key = request_json.get('distributor_key')
-            distribution_key = ndb.Key(urlsafe=distributor_urlsafe_key)
-            domain = Domain.create(distributor_key=distribution_key,
-                                   name=name,
-                                   active=active)
-            domain_key = domain.put()
-            domain_uri = self.request.app.router.build(None,
-                                                       'manage-domain',
-                                                       None,
-                                                       {'domain_key': domain_key.urlsafe()})
-            self.response.headers['Location'] = domain_uri
-            self.response.headers.pop('Content-Type', None)
-            self.response.set_status(201)
+            if distributor_urlsafe_key is None or distributor_urlsafe_key == '':
+                status = 400
+                error_message = 'The distributor_key parameter is invalid.'
+            if status == 201:
+                distribution_key = ndb.Key(urlsafe=distributor_urlsafe_key)
+                domain = Domain.create(distributor_key=distribution_key,
+                                       name=name,
+                                       active=active)
+                domain_key = domain.put()
+                domain_uri = self.request.app.router.build(None,
+                                                           'manage-domain',
+                                                           None,
+                                                           {'domain_key': domain_key.urlsafe()})
+                self.response.headers['Location'] = domain_uri
+                self.response.headers.pop('Content-Type', None)
+                self.response.set_status(201)
+            else:
+                self.response.set_status(status, error_message)
+        else:
+            logging.info("Problem creating Domain. No request body.")
+            self.response.set_status(400, 'Did not receive request body.')

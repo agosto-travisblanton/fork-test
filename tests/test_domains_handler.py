@@ -38,6 +38,9 @@ class TestDomainsHandler(BaseTest, WebTest):
                                              active=False)
         self.inactive_domain_key = self.inactive_domain.put()
 
+    ##################################################################################################################
+    ## post
+    ##################################################################################################################
     def test_post_returns_created_status(self):
         request_parameters = {'name': self.CHROME_DEVICE_DOMAIN,
                               'active': True,
@@ -74,6 +77,42 @@ class TestDomainsHandler(BaseTest, WebTest):
             self.app.post_json(uri, params=request_parameters, headers=self.bad_authorization_header)
         self.assertTrue(self.FORBIDDEN in context.exception.message)
 
+    def test_post_fails_without_distributor_key(self):
+        request_body = {'name': self.CHROME_DEVICE_DOMAIN,
+                        'active': True,
+                        'distributor_key': None}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/domains', json.dumps(request_body), headers=self.headers)
+        self.assertTrue('Bad response: 400 The distributor_key parameter is invalid.'
+                        in context.exception.message)
+
+    def test_post_fails_without_name_parameter(self):
+        request_body = {'name': None,
+                        'active': True,
+                        'distributor_key': self.distributor_key.urlsafe()}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/domains', json.dumps(request_body), headers=self.headers)
+        self.assertTrue('Bad response: 400 The name parameter is invalid.'
+                        in context.exception.message)
+
+    def test_post_fails_without_active_parameter(self):
+        request_body = {'name': self.CHROME_DEVICE_DOMAIN,
+                        'active': None,
+                        'distributor_key': self.distributor_key.urlsafe()}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/domains', json.dumps(request_body), headers=self.headers)
+        self.assertTrue('Bad response: 400 The active parameter is invalid.'
+                        in context.exception.message)
+
+    def test_post_fails_without_request_body(self):
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/domains', {}, headers=self.headers)
+        self.assertTrue('Bad response: 400 Did not receive request body.'
+                        in context.exception.message)
+
+    ##################################################################################################################
+    ## get
+    ##################################################################################################################
     def test_get_by_key_returns_ok_status(self):
         request_parameters = {}
         uri = application.router.build(None, 'manage-domain', None, {'domain_key': self.domain_key.urlsafe()})
