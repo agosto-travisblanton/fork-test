@@ -34,7 +34,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     TENANT_NAME = 'Foobar, Inc,'
     DISTRIBUTOR_NAME = 'agosto'
 
-
     def setUp(self):
         super(TestDeviceResourceHandler, self).setUp()
         self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
@@ -274,17 +273,15 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     ##################################################################################################################
     ## put
     ##################################################################################################################
-
     def test_device_resource_put_no_authorization_header_returns_forbidden(self):
-        request_body = {'gcmRegistrationId': self.GCM_REGISTRATION_ID,
-                        'tenantCode': self.TENANT_CODE}
+        request_body = {'gcmRegistrationId': self.GCM_REGISTRATION_ID, 'tenantCode': self.TENANT_CODE}
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.device_key.get())
         uri = build_uri('manage-device', params_dict={'device_urlsafe_key': self.device_key.urlsafe()})
         response = self.put(uri, params=request_body, headers=self.invalid_authorization_header)
         self.assertForbidden(response)
 
     def test_put_http_status_no_content(self):
-        request_body = {'gcmRegistrationId': self.GCM_REGISTRATION_ID, 'tenantKey': self.tenant_key.urlsafe()}
+        request_body = {'gcmRegistrationId': self.GCM_REGISTRATION_ID, 'tenantCode': self.tenant_key.get().tenant_code}
         when(deferred).defer(any_matcher(update_chrome_os_device),
                              any_matcher(self.device_key.urlsafe())).thenReturn(None)
         response = self.app.put('/api/v1/devices/{0}'.format(self.device_key.urlsafe()),
@@ -294,7 +291,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_put_updates_device_entity(self):
         gcm_registration_id = 'd23784972038845ab3963412'
-        request_body = {'gcmRegistrationId': gcm_registration_id, 'tenantKey': self.tenant_key.urlsafe()}
+        request_body = {
+            'gcmRegistrationId': gcm_registration_id,
+            'tenantCode': self.tenant_key.get().tenant_code
+        }
         when(deferred).defer(any_matcher(update_chrome_os_device),
                              any_matcher(self.device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.device_key.urlsafe()),
@@ -305,9 +305,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(self.tenant_key, updated_display.tenant_key)
 
     def test_put_updates_device_entity_with_explicit_tenant_change(self):
+        new_tenant = self.another_tenant_key.get()
         request_body = {
             'gcmRegistrationId': self.GCM_REGISTRATION_ID,
-            'tenantKey': self.another_tenant_key.urlsafe()
+            'tenantCode': new_tenant.tenant_code
         }
         when(deferred).defer(any_matcher(update_chrome_os_device),
                              any_matcher(self.device_key.urlsafe())).thenReturn(None)
