@@ -61,6 +61,7 @@ CHROME_OS_DEVICE_STRATEGY += [
 
 DOMAIN_FIELDS = [
     'name',
+    'impersonation_admin_email_address',
     'active',
     'created',
     'updated'

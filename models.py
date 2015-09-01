@@ -74,6 +74,7 @@ class Distributor(ndb.Model):
 class Domain(ndb.Model):
     name = ndb.StringProperty(required=True, indexed=True)
     distributor_key = ndb.KeyProperty(kind=Distributor, required=True, indexed=True)
+    impersonation_admin_email_address = ndb.StringProperty(required=True, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
@@ -87,9 +88,10 @@ class Domain(ndb.Model):
                 return key.get()
 
     @classmethod
-    def create(cls, name, distributor_key, active):
+    def create(cls, name, distributor_key, impersonation_admin_email_address, active):
         return cls(distributor_key=distributor_key,
                    name=name,
+                   impersonation_admin_email_address=impersonation_admin_email_address,
                    active=active)
 
     def _pre_put_hook(self):

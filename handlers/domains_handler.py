@@ -36,6 +36,10 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
             if active is None or active == '':
                 status = 400
                 error_message = 'The active parameter is invalid.'
+            impersonation_admin_email_address = request_json.get('impersonation_admin_email_address')
+            if impersonation_admin_email_address is None or impersonation_admin_email_address == '':
+                status = 400
+                error_message = 'The impersonation_admin_email_address parameter is invalid.'
             distributor_urlsafe_key = request_json.get('distributor_key')
             if distributor_urlsafe_key is None or distributor_urlsafe_key == '':
                 status = 400
@@ -44,6 +48,7 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
                 distribution_key = ndb.Key(urlsafe=distributor_urlsafe_key)
                 domain = Domain.create(distributor_key=distribution_key,
                                        name=name,
+                                       impersonation_admin_email_address=impersonation_admin_email_address,
                                        active=active)
                 domain_key = domain.put()
                 domain_uri = self.request.app.router.build(None,

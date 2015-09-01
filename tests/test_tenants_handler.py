@@ -18,6 +18,7 @@ class TestTenantsHandler(BaseTest, WebTest):
     CONTENT_SERVER_URL = 'https://www.content.com'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     DISTRIBUTOR_NAME = 'agosto'
+    IMPERSONATION_EMAIL = 'test@test.com'
 
     def setUp(self):
         super(TestTenantsHandler, self).setUp()
@@ -29,6 +30,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         self.distributor_key = self.distributor.put()
         self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
                                     distributor_key=self.distributor_key,
+                                    impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                     active=True)
         self.domain_key = self.domain.put()
 
@@ -220,6 +222,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         distributor_key = distributor.put()
         domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
                                distributor_key=distributor_key,
+                               impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                active=True)
         domain_key = domain.put()
         for x in range(5):

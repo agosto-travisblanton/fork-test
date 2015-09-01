@@ -17,7 +17,7 @@ class TestChromeOsDevicesApi(BaseTest):
     ORG_UNIT_DISTRIBUTOR = '/SKD Automated Test/SKD Automated Distributor'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     DISTRIBUTOR_NAME = 'agosto'
-
+    IMPERSONATION_EMAIL = 'test@test.com'
 
     def setUp(self):
         super(TestChromeOsDevicesApi, self).setUp()
@@ -87,6 +87,7 @@ class TestChromeOsDevicesApi(BaseTest):
         distributor_key = distributor.put()
         domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
                                distributor_key=distributor_key,
+                               impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                active=True)
         domain_key = domain.put()
         tenant = Tenant.create(name='Foobar, Inc',

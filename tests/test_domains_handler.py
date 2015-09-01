@@ -17,6 +17,7 @@ class TestDomainsHandler(BaseTest, WebTest):
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     CHROME_DEVICE_DOMAIN_INACTIVE = 'inactive.agosto.com'
     FORBIDDEN = '403 Forbidden'
+    IMPERSONATION_EMAIL = 'test@test.com'
 
     def setUp(self):
         super(TestDomainsHandler, self).setUp()
@@ -31,10 +32,12 @@ class TestDomainsHandler(BaseTest, WebTest):
         self.distributor_key = self.distributor.put()
         self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
                                     distributor_key=self.distributor_key,
+                                    impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                     active=True)
         self.domain_key = self.domain.put()
         self.inactive_domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN_INACTIVE,
                                              distributor_key=self.distributor_key,
+                                             impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                              active=False)
         self.inactive_domain_key = self.inactive_domain.put()
 
@@ -44,6 +47,7 @@ class TestDomainsHandler(BaseTest, WebTest):
     def test_post_returns_created_status(self):
         request_parameters = {'name': self.CHROME_DEVICE_DOMAIN,
                               'active': True,
+                              'impersonation_admin_email_address': self.IMPERSONATION_EMAIL,
                               'distributor_key': self.distributor_key.urlsafe()}
         uri = application.router.build(None, 'domains', None, {})
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
@@ -52,6 +56,7 @@ class TestDomainsHandler(BaseTest, WebTest):
     def test_post_create_new_domain_persists_object(self):
         request_parameters = {'name': self.CHROME_DEVICE_DOMAIN,
                               'active': True,
+                              'impersonation_admin_email_address': self.IMPERSONATION_EMAIL,
                               'distributor_key': self.distributor_key.urlsafe()}
         uri = application.router.build(None, 'domains', None, {})
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
@@ -63,6 +68,7 @@ class TestDomainsHandler(BaseTest, WebTest):
         name = 'something.agosto.com'
         request_parameters = {'name': name,
                               'active': True,
+                              'impersonation_admin_email_address': self.IMPERSONATION_EMAIL,
                               'distributor_key': self.distributor_key.urlsafe()}
         uri = application.router.build(None, 'domains', None, {})
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
@@ -80,6 +86,7 @@ class TestDomainsHandler(BaseTest, WebTest):
     def test_post_fails_without_distributor_key(self):
         request_body = {'name': self.CHROME_DEVICE_DOMAIN,
                         'active': True,
+                        'impersonation_admin_email_address': self.IMPERSONATION_EMAIL,
                         'distributor_key': None}
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/domains', json.dumps(request_body), headers=self.headers)
@@ -89,6 +96,7 @@ class TestDomainsHandler(BaseTest, WebTest):
     def test_post_fails_without_name_parameter(self):
         request_body = {'name': None,
                         'active': True,
+                        'impersonation_admin_email_address': self.IMPERSONATION_EMAIL,
                         'distributor_key': self.distributor_key.urlsafe()}
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/domains', json.dumps(request_body), headers=self.headers)
@@ -98,10 +106,21 @@ class TestDomainsHandler(BaseTest, WebTest):
     def test_post_fails_without_active_parameter(self):
         request_body = {'name': self.CHROME_DEVICE_DOMAIN,
                         'active': None,
+                        'impersonation_admin_email_address': self.IMPERSONATION_EMAIL,
                         'distributor_key': self.distributor_key.urlsafe()}
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/domains', json.dumps(request_body), headers=self.headers)
         self.assertTrue('Bad response: 400 The active parameter is invalid.'
+                        in context.exception.message)
+
+    def test_post_fails_without_impersonation_admin_email_address_parameter(self):
+        request_body = {'name': self.CHROME_DEVICE_DOMAIN,
+                        'active': True,
+                        'impersonation_admin_email_address': None,
+                        'distributor_key': self.distributor_key.urlsafe()}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/domains', json.dumps(request_body), headers=self.headers)
+        self.assertTrue('Bad response: 400 The impersonation_admin_email_address parameter is invalid.'
                         in context.exception.message)
 
     def test_post_fails_without_request_body(self):
