@@ -61,7 +61,6 @@ CHROME_OS_DEVICE_STRATEGY += [
 
 DOMAIN_FIELDS = [
     'name',
-    'distributor_key',
     'active',
     'created',
     'updated'
