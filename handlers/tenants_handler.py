@@ -13,7 +13,7 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 class TenantsHandler(RequestHandler):
     ADMIN_ACCOUNT_TO_IMPERSONATE = 'administrator@skykit.com'
-    AGOSTO_DISTRIBUTOR = 'agosto'
+    AGOSTO_DISTRIBUTOR = 'Agosto'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
 
     @api_token_required
@@ -84,7 +84,7 @@ class TenantsHandler(RequestHandler):
         self.response.set_status(204)
 
     def get_agosto_domain_key(self):
-        agosto_distributor = Distributor.find_by_name(self.AGOSTO_DISTRIBUTOR)
+        agosto_distributor = Distributor.find_by_name(self.AGOSTO_DISTRIBUTOR.lower())
         distributor_key = None
         if agosto_distributor is None:
             distributor = Distributor.create(name=self.AGOSTO_DISTRIBUTOR,
