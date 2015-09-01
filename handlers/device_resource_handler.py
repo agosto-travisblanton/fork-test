@@ -128,10 +128,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             if gcm_registration_id:
                 logging.info('  PUT updating the gcmRegistrationId.')
                 device.gcm_registration_id = gcm_registration_id
-            # tenant_key = ndb.Key(urlsafe=request_json.get('tenantKey'))
-            tenants = Tenant.query(Tenant.tenant_code == request_json.get('tenantCode')).fetch(1)
-            if len(tenants) > 0:
-                tenant = tenants[0]
+            tenant = Tenant.find_by_tenant_code(request_json.get('tenantCode'))
+            if tenant:
                 if tenant.key != device.tenant_key:
                     logging.info('  PUT updating the tenant.')
                     device.tenant_key = tenant.key

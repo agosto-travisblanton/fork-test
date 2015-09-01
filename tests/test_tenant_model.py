@@ -89,3 +89,7 @@ class TestTenantModel(BaseTest):
         self.tenant.class_version = 47
         self.tenant.put()
         self.assertEqual(self.tenant.class_version, self.CURRENT_CLASS_VERSION)
+
+    def test_find_by_tenant_code(self):
+        actual = Tenant.find_by_tenant_code(self.tenant.tenant_code)
+        self.assertEqual(actual.key, self.tenant.key)
