@@ -2,7 +2,13 @@
 
 appModule = angular.module('skykitDisplayDeviceManagement')
 
-appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, DevicesService, $state) ->
+appModule.controller 'TenantDetailsCtrl', ($log,
+                                           $stateParams,
+                                           TenantsService,
+                                           DevicesService,
+                                           $state,
+                                           sweet,
+                                           ProgressBarService) ->
   @currentTenant = {
     key: undefined,
     name: undefined,
@@ -29,9 +35,18 @@ appModule.controller 'TenantDetailsCtrl', ($stateParams, TenantsService, Devices
     @generalTabActive = true
 
   @onClickSaveButton = () ->
+    ProgressBarService.start()
     promise = TenantsService.save @currentTenant
-    promise.then () ->
-      $state.go 'tenants'
+    promise.then @onSuccessTenantSave, @onFailureTenantSave
+
+  @onSuccessTenantSave = () =>
+    ProgressBarService.complete()
+    $state.go 'tenants'
+
+  @onFailureTenantSave = (reason) =>
+    ProgressBarService.complete()
+    $log.error reason
+    sweet.show('Oops...', 'Unable to save the tenant.', 'error')
 
   @editItem = (item) ->
     $state.go 'editDevice', {deviceKey: item.key, tenantKey: $stateParams.tenantKey}
