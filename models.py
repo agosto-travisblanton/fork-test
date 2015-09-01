@@ -71,9 +71,33 @@ class Distributor(ndb.Model):
 
 
 @ae_ndb_serializer
+class Domain(ndb.Model):
+    name = ndb.StringProperty(required=True, indexed=True)
+    distributor_key = ndb.KeyProperty(kind=Distributor, required=True, indexed=True)
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    updated = ndb.DateTimeProperty(auto_now=True)
+    active = ndb.BooleanProperty(default=True, required=True, indexed=True)
+    class_version = ndb.IntegerProperty()
+
+    @classmethod
+    def find_by_name(cls, name):
+        if name:
+            key = Domain.query(Domain.name == name).get(keys_only=True)
+            if None is not key:
+                return key.get()
+
+    @classmethod
+    def create(cls, name, distributor_key, active):
+        return cls(distributor_key=distributor_key,
+                   name=name,
+                   active=active)
+
+    def _pre_put_hook(self):
+        self.class_version = 1
+
+
+@ae_ndb_serializer
 class Tenant(ndb.Model):
-    # TODO Make distributor_key required=True after migration run in prod !!
-    distributor_key = ndb.KeyProperty(kind=Distributor, required=False, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     tenant_code = ndb.StringProperty(required=True, indexed=True)
@@ -82,6 +106,8 @@ class Tenant(ndb.Model):
     content_server_url = ndb.StringProperty(required=True)
     chrome_device_domain = ndb.StringProperty()
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
+    # TODO Make tenant_key required=True after migration run in prod !!
+    domain_key = ndb.KeyProperty(kind=Domain, required=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
     @classmethod
@@ -100,7 +126,8 @@ class Tenant(ndb.Model):
             return True
 
     @classmethod
-    def create(cls, tenant_code, name, admin_email, content_server_url, chrome_device_domain, distributor_key, active):
+    def create(cls, tenant_code, name, admin_email, content_server_url, chrome_device_domain, domain_key,
+               active):
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
                    tenant_code=tenant_code,
@@ -108,7 +135,7 @@ class Tenant(ndb.Model):
                    admin_email=admin_email,
                    content_server_url=content_server_url,
                    chrome_device_domain=chrome_device_domain,
-                   distributor_key = distributor_key,
+                   domain_key=domain_key,
                    active=active)
 
     def _pre_put_hook(self):

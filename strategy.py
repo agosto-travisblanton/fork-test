@@ -7,7 +7,7 @@ TENANT_FIELDS = [
     'admin_email',
     'content_server_url',
     'chrome_device_domain',
-    'distributor_key',
+    'domain_key',
     'active',
     'created',
     'updated'

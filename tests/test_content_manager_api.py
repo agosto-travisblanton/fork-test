@@ -3,7 +3,7 @@ from env_setup import setup_test_paths
 setup_test_paths()
 
 from http_client import HttpClient, HttpClientRequest, HttpClientResponse
-from models import Tenant, ChromeOsDevice
+from models import Tenant, ChromeOsDevice, Distributor, Domain
 from agar.test import BaseTest
 from content_manager_api import ContentManagerApi
 
@@ -19,15 +19,26 @@ class TestContentManagerApi(BaseTest):
     CONTENT_SERVER_API_KEY = 'API KEY'
     CHROME_DEVICE_DOMAIN = 'bar.com'
     TENANT_CODE = 'foobar'
+    DISTRIBUTOR_NAME = 'agosto'
+    CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
 
     def setUp(self):
         super(TestContentManagerApi, self).setUp()
         self.content_manager_api = ContentManagerApi()
+        self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
+                                              active=True)
+        self.distributor_key = self.distributor.put()
+        self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
+                                    distributor_key=self.distributor_key,
+                                    active=True)
+        self.domain_key = self.domain.put()
+
         self.tenant = Tenant.create(tenant_code=self.TENANT_CODE,
                                     name=self.NAME,
                                     admin_email=self.ADMIN_EMAIL,
                                     content_server_url=self.CONTENT_SERVER_URL,
                                     chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
+                                    domain_key=self.domain_key,
                                     active=True)
         self.tenant_key = self.tenant.put()
         self.device = ChromeOsDevice.create(tenant_key=self.tenant_key,
