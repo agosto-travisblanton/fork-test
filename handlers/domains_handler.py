@@ -16,8 +16,7 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
     @api_token_required
     def get(self, domain_key=None):
         if None == domain_key:
-            result = Domain.query()
-            result = filter(lambda x: x.active is True, result)
+            result = Domain.query(Domain.active == True)
         else:
             result = self.validate_and_get(domain_key, Domain, abort_on_not_found=True)
         json_response(self.response, result, strategy=DOMAIN_STRATEGY)
