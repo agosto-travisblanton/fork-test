@@ -41,10 +41,11 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
       label: 'Home page'
     }
   })
-  $stateProvider.state("domain", {
-    url: "/domain",
+  $stateProvider.state("domains", {
+    url: "/domains",
     templateUrl: "app/domain/domain.html",
     controller: "DomainCtrl",
+    controllerAs: 'domainCtrl',
     ncyBreadcrumb: {
       label: 'Domains'
     }
