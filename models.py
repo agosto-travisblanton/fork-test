@@ -106,6 +106,7 @@ class Tenant(ndb.Model):
     name = ndb.StringProperty(required=True, indexed=True)
     admin_email = ndb.StringProperty(required=True)
     content_server_url = ndb.StringProperty(required=True)
+    content_manager_base_url = ndb.StringProperty(required=False)
     chrome_device_domain = ndb.StringProperty()
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
     # TODO Make tenant_key required=True after migration run in prod !!
@@ -135,7 +136,8 @@ class Tenant(ndb.Model):
             return True
 
     @classmethod
-    def create(cls, tenant_code, name, admin_email, content_server_url, chrome_device_domain, domain_key, active):
+    def create(cls, tenant_code, name, admin_email, content_server_url, chrome_device_domain, domain_key, active,
+               content_manager_base_url):
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
                    tenant_code=tenant_code,
@@ -144,7 +146,8 @@ class Tenant(ndb.Model):
                    content_server_url=content_server_url,
                    chrome_device_domain=chrome_device_domain,
                    domain_key=domain_key,
-                   active=active)
+                   active=active,
+                   content_manager_base_url=content_manager_base_url)
 
     def _pre_put_hook(self):
         self.class_version = 1

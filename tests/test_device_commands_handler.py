@@ -16,7 +16,8 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
     APPLICATION = application
     NAME = 'foobar tenant'
     ADMIN_EMAIL = 'foo@bar.com'
-    CONTENT_SERVER_URL = 'https://www.content.com'
+    CONTENT_SERVER_URL = 'https://skykit-contentmanager-int.appspot.com/content'
+    CONTENT_MANAGER_BASE_URL = 'https://skykit-contentmanager-int.appspot.com'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     TENANT_CODE = 'foobar'
     DEVICE_ID = '4f099e50-6028-422b-85d2-3a629a45bf38'
@@ -39,6 +40,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
                                     name=self.NAME,
                                     admin_email=self.ADMIN_EMAIL,
                                     content_server_url=self.CONTENT_SERVER_URL,
+                                    content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
                                     chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
                                     domain_key=self.domain_key,
                                     active=True)

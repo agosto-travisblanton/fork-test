@@ -12,6 +12,7 @@ class TestTenantModel(BaseTest):
     NAME = 'foobar tenant'
     ADMIN_EMAIL = 'foo@bar.com'
     CONTENT_SERVER_URL = 'https://www.content.com'
+    CONTENT_MANAGER_BASE_URL = 'https://skykit-contentmanager-int.appspot.com'
     CONTENT_SERVER_API_KEY = 'API KEY'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     TENANT_CODE = 'foobar'
@@ -34,6 +35,7 @@ class TestTenantModel(BaseTest):
                                     name=self.NAME,
                                     admin_email=self.ADMIN_EMAIL,
                                     content_server_url=self.CONTENT_SERVER_URL,
+                                    content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
                                     chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
                                     domain_key=self.domain_key,
                                     active=True)
@@ -59,6 +61,7 @@ class TestTenantModel(BaseTest):
                                         name=name,
                                         admin_email=self.ADMIN_EMAIL,
                                         content_server_url=self.CONTENT_SERVER_URL,
+                                        content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
                                         chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
                                         domain_key=self.domain_key,
                                         active=False)
@@ -73,6 +76,7 @@ class TestTenantModel(BaseTest):
         self.assertEqual(self.TENANT_CODE, tenant_created.tenant_code)
         self.assertEqual(self.ADMIN_EMAIL, tenant_created.admin_email)
         self.assertEqual(self.CONTENT_SERVER_URL, tenant_created.content_server_url)
+        self.assertEqual(self.CONTENT_MANAGER_BASE_URL, tenant_created.content_manager_base_url)
         self.assertEqual(self.CHROME_DEVICE_DOMAIN, tenant_created.chrome_device_domain)
         self.assertEqual(self.NAME, tenant_created.name)
         self.assertEqual(self.domain_key, tenant_created.domain_key)

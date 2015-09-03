@@ -36,6 +36,7 @@ class TenantsHandler(RequestHandler):
             admin_email = request_json.get('admin_email')
             tenant_code = request_json.get('tenant_code')
             content_server_url = request_json.get('content_server_url')
+            content_manager_base_url = request_json.get('content_manager_base_url')
             chrome_device_domain = request_json.get('chrome_device_domain')
             active = request_json.get('active')
             domain_urlsafe_key = request_json.get('domain_key')
@@ -44,6 +45,7 @@ class TenantsHandler(RequestHandler):
                                    tenant_code=tenant_code,
                                    admin_email=admin_email,
                                    content_server_url=content_server_url,
+                                   content_manager_base_url=content_manager_base_url,
                                    chrome_device_domain=chrome_device_domain,
                                    domain_key=domain_key,
                                    active=active)
@@ -69,6 +71,7 @@ class TenantsHandler(RequestHandler):
         tenant.name = request_json.get('name')
         tenant.admin_email = request_json.get('admin_email')
         tenant.content_server_url = request_json.get('content_server_url')
+        tenant.content_manager_base_url = request_json.get('content_manager_base_url')
         tenant.chrome_device_domain = request_json.get('chrome_device_domain')
         tenant.active = request_json.get('active')
         tenant.put()

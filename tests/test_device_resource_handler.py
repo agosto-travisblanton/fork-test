@@ -27,6 +27,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     CONTENT_SERVER_API_KEY = 'API KEY'
     CONTENT_SERVER_URL = 'https://skykit-contentmanager-int.appspot.com/content'
+    CONTENT_MANAGER_BASE_URL = 'https://skykit-contentmanager-int.appspot.com'
     DEVICE_ID = '132e235a-b346-4a37-a100-de49fa753a2a'
     GCM_REGISTRATION_ID = '8d70a8d78a6dfa6df76dfasd'
     MAC_ADDRESS = '54271e619346'
@@ -350,6 +351,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                name=name,
                                admin_email=email,
                                content_server_url=self.CONTENT_SERVER_URL,
+                               content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
                                chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
                                domain_key=self.domain_key,
                                active=True)

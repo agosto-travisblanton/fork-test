@@ -15,7 +15,8 @@ class TestTenantsHandler(BaseTest, WebTest):
     APPLICATION = application
     ADMIN_EMAIL = "foo{0}@bar.com"
     API_KEY = "SOME_KEY_{0}"
-    CONTENT_SERVER_URL = 'https://www.content.com'
+    CONTENT_SERVER_URL = 'https://skykit-contentmanager-int.appspot.com/content'
+    CONTENT_MANAGER_BASE_URL = 'https://skykit-contentmanager-int.appspot.com'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     DISTRIBUTOR_NAME = 'agosto'
     IMPERSONATION_EMAIL = 'test@test.com'
@@ -230,6 +231,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                                    name="Testing tenant {0}".format(x),
                                    admin_email=self.ADMIN_EMAIL.format(x),
                                    content_server_url=self.CONTENT_SERVER_URL,
+                                   content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
                                    chrome_device_domain='testing.skykit.com',
                                    domain_key=domain_key,
                                    active=True)

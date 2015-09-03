@@ -21,7 +21,7 @@ class ContentManagerApi(object):
             "admin_email": tenant.admin_email
         }
         url = "{content_manager_base_url}/provisioning/v1/tenants".format(
-            content_manager_base_url=tenant.content_server_url)
+            content_manager_base_url=tenant.content_manager_base_url)
         http_client = HttpClient()
         http_client.set_default_fetch_deadline(limit_in_seconds=30)
         http_client_response = http_client.post(HttpClientRequest(url=url,
@@ -46,7 +46,7 @@ class ContentManagerApi(object):
                 "tenant_code": tenant.tenant_code
             }
             url = "{content_manager_base_url}/provisioning/v1/displays".format(
-                content_manager_base_url=tenant.content_server_url)
+                content_manager_base_url=tenant.content_manager_base_url)
             http_client_request = HttpClientRequest(url=url,
                                                     payload=json.dumps(payload),
                                                     headers=self.HEADERS)
