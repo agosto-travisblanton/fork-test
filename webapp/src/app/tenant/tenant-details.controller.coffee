@@ -8,14 +8,14 @@ appModule.controller 'TenantDetailsCtrl', ($log,
                                            DevicesService,
                                            $state,
                                            sweet,
-                                           ProgressBarService
-                                           ) ->
+                                           ProgressBarService) ->
   @currentTenant = {
     key: undefined,
     name: undefined,
     tenant_code: undefined,
     admin_email: undefined,
     content_server_url: undefined,
+    content_manager_base_url: undefined,
     chrome_device_domain: undefined,
     active: true
   }

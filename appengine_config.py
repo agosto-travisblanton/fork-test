@@ -156,6 +156,18 @@ def _IMPERSONATION_ADMIN_EMAIL_ADDRESS():
 app_IMPERSONATION_ADMIN_EMAIL_ADDRESS = _IMPERSONATION_ADMIN_EMAIL_ADDRESS()
 
 
+def _DEFAULT_AGOSTO_DEVICE_DOMAIN():
+    if on_development_server or not on_server:
+        return 'local.agosto.com'
+    if on_integration_server:
+        return 'dev.agosto.com'
+    if on_production_server:
+        return 'skykit.agosto.com'
+    return None
+
+
+app_DEFAULT_AGOSTO_DEVICE_DOMAIN = _DEFAULT_AGOSTO_DEVICE_DOMAIN()
+
 def _GOOGLE_CUSTOMER_ID():
     if on_development_server or not on_server:
         return 'my_customer'
