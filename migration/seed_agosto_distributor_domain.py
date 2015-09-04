@@ -17,7 +17,7 @@ class SeedAgostoDistributorDomain(MigrationBase):
         if agosto_distributor is None:
             agosto_distributor = Distributor.create(name=self.AGOSTO_DISTRIBUTOR_NAME, active=True)
             agosto_distributor.put()
-        default_domain = config.DEFAULT_AGOSTO_DOMAIN.lower()
+        default_domain = config.DEFAULT_AGOSTO_DEVICE_DOMAIN.lower()
         agosto_default_domain = Domain.find_by_name(default_domain)
         if agosto_default_domain is None:
             agosto_default_domain = \

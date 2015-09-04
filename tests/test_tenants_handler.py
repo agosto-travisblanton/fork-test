@@ -83,6 +83,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'domain_key': self.domain_key.urlsafe(),
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
+        when(Domain).find_by_name(any_matcher()).thenReturn(self.domain)
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
         self.assertEqual(201, response.status_code)
 
@@ -100,6 +101,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'domain_key': self.domain_key.urlsafe(),
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
+        when(Domain).find_by_name(any_matcher()).thenReturn(self.domain)
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
         actual = Tenant.find_by_name(request_parameters['name'])
         self.assertIsNotNone(actual)
@@ -118,6 +120,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'domain_key': self.domain_key.urlsafe(),
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
+        when(Domain).find_by_name(any_matcher()).thenReturn(self.domain)
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
         actual = Tenant.find_by_name(request_parameters['name'])
         tenant_uri = application.router.build(None,
@@ -140,6 +143,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'domain_key': self.domain_key.urlsafe(),
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
+        when(Domain).find_by_name(any_matcher()).thenReturn(self.domain)
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
         actual = Tenant.find_by_name(request_parameters['name'])
         parent = actual.key.parent().get()
