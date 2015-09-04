@@ -16,6 +16,7 @@ class TestContentManagerApi(BaseTest):
     NAME = 'foobar tenant'
     ADMIN_EMAIL = 'foo@bar.com'
     CONTENT_SERVER_URL = 'https://skykit-contentmanager-int.appspot.com/content'
+    CONTENT_MANAGER_BASE_URL = 'https://skykit-contentmanager-int.appspot.com'
     CONTENT_SERVER_API_KEY = 'API KEY'
     CHROME_DEVICE_DOMAIN = 'bar.com'
     TENANT_CODE = 'foobar'
@@ -39,6 +40,7 @@ class TestContentManagerApi(BaseTest):
                                     name=self.NAME,
                                     admin_email=self.ADMIN_EMAIL,
                                     content_server_url=self.CONTENT_SERVER_URL,
+                                    content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
                                     chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
                                     domain_key=self.domain_key,
                                     active=True)
@@ -82,7 +84,7 @@ class TestContentManagerApi(BaseTest):
         with self.assertRaises(RuntimeError) as context:
             self.content_manager_api.create_device(self.device)
         error_message = 'Unable to create device in Content Manager with tenant code {0}. Status code: {1}, ' \
-                        'url={2}/provisioning/v1/displays'.format(self.TENANT_CODE, error_code, self.CONTENT_SERVER_URL)
+                        'url={2}/provisioning/v1/displays'.format(self.TENANT_CODE, error_code, self.CONTENT_MANAGER_BASE_URL)
         self.assertEqual(error_message, str(context.exception))
 
     def test_create_device_without_tenant_key_raises_error(self):

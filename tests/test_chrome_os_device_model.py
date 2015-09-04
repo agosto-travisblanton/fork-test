@@ -17,6 +17,7 @@ class TestChromeOsDeviceModel(BaseTest):
     NAME = 'foobar tenant'
     ADMIN_EMAIL = 'foo@bar.com'
     CONTENT_SERVER_URL = 'https://skykit-contentmanager-int.appspot.com/content'
+    CONTENT_MANAGER_BASE_URL = 'https://skykit-contentmanager-int.appspot.com'
     CHROME_DEVICE_DOMAIN = 'bar.com'
     CONTENT_SERVER_API_KEY = 'API KEY'
     TENANT_CODE = 'foobar'
@@ -41,6 +42,7 @@ class TestChromeOsDeviceModel(BaseTest):
                                     tenant_code=self.TENANT_CODE,
                                     admin_email=self.ADMIN_EMAIL,
                                     content_server_url=self.CONTENT_SERVER_URL,
+                                    content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
                                     chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
                                     domain_key=self.domain_key,
                                     active=True)

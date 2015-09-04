@@ -15,7 +15,8 @@ class TestTenantsHandler(BaseTest, WebTest):
     APPLICATION = application
     ADMIN_EMAIL = "foo{0}@bar.com"
     API_KEY = "SOME_KEY_{0}"
-    CONTENT_SERVER_URL = 'https://www.content.com'
+    CONTENT_SERVER_URL = 'https://skykit-contentmanager-int.appspot.com/content'
+    CONTENT_MANAGER_BASE_URL = 'https://skykit-contentmanager-int.appspot.com'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     DISTRIBUTOR_NAME = 'agosto'
     IMPERSONATION_EMAIL = 'test@test.com'
@@ -82,6 +83,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'domain_key': self.domain_key.urlsafe(),
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
+        when(Domain).find_by_name(any_matcher()).thenReturn(self.domain)
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
         self.assertEqual(201, response.status_code)
 
@@ -99,6 +101,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'domain_key': self.domain_key.urlsafe(),
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
+        when(Domain).find_by_name(any_matcher()).thenReturn(self.domain)
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
         actual = Tenant.find_by_name(request_parameters['name'])
         self.assertIsNotNone(actual)
@@ -117,6 +120,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'domain_key': self.domain_key.urlsafe(),
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
+        when(Domain).find_by_name(any_matcher()).thenReturn(self.domain)
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
         actual = Tenant.find_by_name(request_parameters['name'])
         tenant_uri = application.router.build(None,
@@ -139,6 +143,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'domain_key': self.domain_key.urlsafe(),
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
+        when(Domain).find_by_name(any_matcher()).thenReturn(self.domain)
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
         actual = Tenant.find_by_name(request_parameters['name'])
         parent = actual.key.parent().get()
@@ -230,6 +235,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                                    name="Testing tenant {0}".format(x),
                                    admin_email=self.ADMIN_EMAIL.format(x),
                                    content_server_url=self.CONTENT_SERVER_URL,
+                                   content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
                                    chrome_device_domain='testing.skykit.com',
                                    domain_key=domain_key,
                                    active=True)

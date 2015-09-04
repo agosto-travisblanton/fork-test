@@ -93,7 +93,8 @@ class TestChromeOsDevicesApi(BaseTest):
         tenant = Tenant.create(name='Foobar, Inc',
                                tenant_code='foobar_inc',
                                admin_email='admin@foobar.com',
-                               content_server_url='https://www.content.com',
+                               content_server_url='https://www.content.com/content',
+                               content_manager_base_url='https://www.content.com',
                                chrome_device_domain='foobar.com',
                                domain_key=domain_key,
                                active=True)
