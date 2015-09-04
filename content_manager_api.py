@@ -23,7 +23,7 @@ class ContentManagerApi(object):
         url = "{content_manager_base_url}/provisioning/v1/tenants".format(
             content_manager_base_url=tenant.content_manager_base_url)
         http_client = HttpClient()
-        http_client.set_default_fetch_deadline(limit_in_seconds=30)
+        http_client.set_default_fetch_deadline(limit_in_seconds=60)
         http_client_response = http_client.post(HttpClientRequest(url=url,
                                                                   payload=(json.dumps(payload)),
                                                                   headers=self.HEADERS))
