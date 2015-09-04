@@ -3,6 +3,7 @@ import logging
 
 from google.appengine.ext import ndb
 from webapp2 import RequestHandler
+from app_config import config
 from content_manager_api import ContentManagerApi
 
 from decorators import api_token_required
@@ -39,15 +40,18 @@ class TenantsHandler(RequestHandler):
             content_manager_base_url = request_json.get('content_manager_base_url')
             chrome_device_domain = request_json.get('chrome_device_domain')
             active = request_json.get('active')
-            domain_urlsafe_key = request_json.get('domain_key')
-            domain_key = ndb.Key(urlsafe=domain_urlsafe_key)
+            # TODO Uncomment these after UI is passing in the domain key
+            # domain_urlsafe_key = request_json.get('domain_key')
+            # domain_key = ndb.Key(urlsafe=domain_urlsafe_key)
+            agosto_default_domain = Domain.find_by_name(config.DEFAULT_AGOSTO_DEVICE_DOMAIN)
+
             tenant = Tenant.create(name=name,
                                    tenant_code=tenant_code,
                                    admin_email=admin_email,
                                    content_server_url=content_server_url,
                                    content_manager_base_url=content_manager_base_url,
                                    chrome_device_domain=chrome_device_domain,
-                                   domain_key=domain_key,
+                                   domain_key=agosto_default_domain.key,
                                    active=active)
             tenant_key = tenant.put()
             content_manager_api = ContentManagerApi()
