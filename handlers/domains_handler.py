@@ -65,3 +65,25 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
         else:
             logging.info("Problem creating Domain. No request body.")
             self.response.set_status(400, 'Did not receive request body.')
+
+    @api_token_required
+    def put(self, domain_key):
+        key = ndb.Key(urlsafe=domain_key)
+        domain = key.get()
+        request_json = json.loads(self.request.body)
+        domain.name = request_json.get('name')
+        domain.impersonation_admin_email_address = request_json.get('impersonation_admin_email_address')
+        domain.active = request_json.get('active')
+        domain.put()
+        self.response.headers.pop('Content-Type', None)
+        self.response.set_status(204)
+
+    @api_token_required
+    def delete(self, domain_key):
+        key = ndb.Key(urlsafe=domain_key)
+        device = key.get()
+        if device:
+            device.active = False
+            device.put()
+        self.response.headers.pop('Content-Type', None)
+        self.response.set_status(204)
