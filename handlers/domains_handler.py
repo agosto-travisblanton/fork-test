@@ -17,7 +17,7 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
     @api_token_required
     def get(self, domain_key=None):
         if None == domain_key:
-            result = Domain.query(Domain.active == True)
+            result = Domain.query(Domain.active == True).fetch(100)
         else:
             result = self.validate_and_get(domain_key, Domain, abort_on_not_found=True)
         json_response(self.response, result, strategy=DOMAIN_STRATEGY)
@@ -33,9 +33,11 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
                 status = 400
                 error_message = 'The name parameter is invalid.'
             active = request_json.get('active')
-            if active is None or active == '':
+            if active is None or active == '' or (str(active).lower() != 'true' and str(active).lower() != 'false'):
                 status = 400
                 error_message = 'The active parameter is invalid.'
+            else:
+                active = bool(active)
             impersonation_admin_email_address = request_json.get('impersonation_admin_email_address')
             if impersonation_admin_email_address is None or impersonation_admin_email_address == '':
                 status = 400
