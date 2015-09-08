@@ -60,7 +60,6 @@ class LoginHandler(SessionRequestHandler):
     def post(self):
         user = None
         body = json.loads(self.request.body)
-
         email = body.get('email', '').strip()
         password = body.get('password', '').strip()
         if email and password:

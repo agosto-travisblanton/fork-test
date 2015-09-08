@@ -35,6 +35,9 @@ function proxyMiddleware(req, res, next) {
   if (/\/api\//.test(req.url)) {
     console.log(chalk.green('[Proxy] ' + req.url));
     proxy.web(req, res);
+  } else if (/\/login/.test(req.url)) {
+    console.log(chalk.green('[Proxy] ' + req.url));
+    proxy.web(req, res);
   } else {
     next();
   }
