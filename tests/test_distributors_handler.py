@@ -104,6 +104,31 @@ class TestDistributorsHandler(BaseTest, WebTest):
         actual = Distributor.find_by_name(request_parameters['name'])
         self.assertIsNotNone(actual)
 
+    def test_post_create_new_distributor_persists_object_with_string_boolean(self):
+        name = u'Acme'
+        request_parameters = {'name': name,
+                              'active': "true"}
+        uri = application.router.build(None, 'distributors', None, {})
+        self.app.post_json(uri, params=request_parameters, headers=self.headers)
+        actual = Distributor.find_by_name(request_parameters['name'])
+        self.assertIsNotNone(actual)
+
+    def test_post_fails_without_bogus_active_parameter(self):
+        request_body = {'name': 'Acme',
+                        'active': 'bogus'}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/distributors', json.dumps(request_body), headers=self.headers)
+        self.assertTrue('Bad response: 400 The active parameter is invalid'
+                        in context.exception.message)
+
+    def test_post_fails_without_name_parameter(self):
+        request_body = {'name': '',
+                        'active': True}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/distributors', json.dumps(request_body), headers=self.headers)
+        self.assertTrue('Bad response: 400 The name parameter is invalid'
+                        in context.exception.message)
+
     def test_post_create_new_distributor_sets_location_header(self):
         name = u'Acme'
         request_parameters = {'name': name,
