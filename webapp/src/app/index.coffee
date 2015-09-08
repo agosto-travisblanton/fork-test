@@ -62,7 +62,7 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
   })
   $stateProvider.state("editDomain", {
     url: "/domains/:domainKey",
-    templateUrl: "app/domain/domain-details.html",
+    templateUrl: "app/domain/domain-detail.html",
     controller: "DomainDetailsCtrl",
     controllerAs: 'domainDetailsCtrl',
     ncyBreadcrumb: {

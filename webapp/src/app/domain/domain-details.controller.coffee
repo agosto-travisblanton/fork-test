@@ -20,12 +20,9 @@ appModule.controller 'DomainDetailsCtrl', ($log,
   @editMode = !!$stateParams.domainKey
 
   if @editMode
-    @generalTabActive = false
     domainPromise = DomainsService.getDomainByKey($stateParams.domainKey)
     domainPromise.then (data) =>
       @currentDomain = data
-  else
-    @generalTabActive = true
 
   @onClickSaveButton = ->
     ProgressBarService.start()

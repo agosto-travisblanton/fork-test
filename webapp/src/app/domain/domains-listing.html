@@ -34,9 +34,10 @@
             <tr ng-hide="domainsCtrl.domains.length">
               <td name="no-domains" colspan="3">No domains</td>
             </tr>
-            <tr ng-repeat="item in domainsCtrl.domains | orderBy:'name' "
-                ng-click="domainsCtrl.editItem(item)" >
-              <td class="domain-name">{{item.name}}</td>
+            <tr ng-repeat="item in domainsCtrl.domains | orderBy:'name' ">
+              <td class="domain-name"><a name="edit-domain" class="btn"
+                                         ng-click="domainsCtrl.editItem(item)"
+                                         title="Edit domain">{{item.name}}</a></td>
               <td class="domain-impersonation-admin-email-address">{{item.impersonation_admin_email_address}}</td>
               <td class="domain-active">{{item.active}}</td>
             </tr>
