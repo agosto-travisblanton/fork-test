@@ -6,13 +6,10 @@ appModule.controller "WelcomeCtrl", ($scope, $log, DistributorsService, identity
   @distributors = []
   @currentDistributor = undefined
   # Following variables used in the template
-  @clientId = identity.WEB_APP_CLIENT_ID
+  @clientId = identity.OAUTH_CLIENT_ID
   @state = identity.STATE
 
-  $log.info "WEB APP CLIENT ID: #{@clientId}"
-  $log.info "STATE: #{@state}"
-
-  $scope.$on 'event:google-plus-signin-success', (event, authResult) ->
+  $scope.$on 'event:google-plus-signin-success', (event, authResult) =>
     $log.info "SUCCESS: Google+ sign in. #{JSON.stringify authResult}"
     promise = SessionsService.login(authResult)
     promise.then @loginSuccess, @loginFailure
@@ -31,9 +28,9 @@ appModule.controller "WelcomeCtrl", ($scope, $log, DistributorsService, identity
       DistributorsService.currentDistributor = @currentDistributor
 
   @loginSuccess = (response) ->
-    $log.info "SUCCESS: Stormpath login: #{response}"
+    $log.info "SUCCESS: Stormpath login: #{JSON.stringify response}"
 
   @loginFailure = (response) ->
-    $log.error "FAILURE: Stormpath login: #{response}"
+    $log.error "FAILURE: Stormpath login: #{JSON.stringify response}"
 
   @
