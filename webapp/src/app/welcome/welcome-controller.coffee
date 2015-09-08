@@ -32,5 +32,6 @@ appModule.controller "WelcomeCtrl", ($scope, $log, DistributorsService, identity
 
   @loginFailure = (response) ->
     $log.error "FAILURE: Stormpath login: #{JSON.stringify response}"
+    sweet.show('Oops...', 'Unable to authenticate to Stormpath.', 'error')
 
   @
