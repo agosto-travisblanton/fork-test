@@ -8,14 +8,17 @@ appModule.controller "WelcomeCtrl", ($scope, $log, DistributorsService, identity
   # Following variables used in the template
   @clientId = identity.OAUTH_CLIENT_ID
   @state = identity.STATE
+  @showGooglePlusButton = true
 
   $scope.$on 'event:google-plus-signin-success', (event, authResult) =>
     $log.info "SUCCESS: Google+ sign in. #{JSON.stringify authResult}"
+    @showGooglePlusButton = false
     promise = SessionsService.login(authResult)
     promise.then @loginSuccess, @loginFailure
 
-  $scope.$on 'event:google-plus-signin-failure', (event, authResult) ->
+  $scope.$on 'event:google-plus-signin-failure', (event, authResult) =>
     $log.error "FAILURE: Google+ sign in: #{JSON.stringify authResult}"
+    @showGooglePlusButton = true
     sweet.show('Oops...', 'Unable to authenticate to Google+.', 'error')
 
   @initialize = ->

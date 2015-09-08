@@ -16,7 +16,7 @@
       </div>
 
       <div class="row">
-        <div class="col-lg-12">
+        <div class="col-lg-12" ng-show="welcomeCtrl.showGooglePlusButton">
           <google-plus-signin clientid="{{ welcomeCtrl.clientId }}"
                               state="{{ welcomeCtrl.state }}"
                               language="en"></google-plus-signin>
