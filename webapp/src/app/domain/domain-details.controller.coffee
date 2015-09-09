@@ -9,10 +9,6 @@ appModule.controller 'DomainDetailsCtrl', ($log,
                                            $state,
                                            sweet,
                                            ProgressBarService) ->
-  @default_distributor = 'Agosto'
-
-  @distributors = []
-
   @currentDomain = {
     key: undefined,
     name: undefined,
@@ -20,7 +16,7 @@ appModule.controller 'DomainDetailsCtrl', ($log,
     distributor_key: undefined,
     active: true
   }
-
+  @defaultDistributor = 'Agosto'
   @currentDomains = []
   @editMode = !!$stateParams.domainKey
 
@@ -30,7 +26,7 @@ appModule.controller 'DomainDetailsCtrl', ($log,
       @currentDomain = data
 
   @initialize = ->
-    distributorPromise = DistributorsService.getByName(@default_distributor)
+    distributorPromise = DistributorsService.getByName(@defaultDistributor)
     distributorPromise.then (data) =>
       if typeof data[0] != 'undefined'
         @currentDomain.distributor_key = data[0].key

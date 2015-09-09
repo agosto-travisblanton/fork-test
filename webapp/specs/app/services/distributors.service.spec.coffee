@@ -116,3 +116,22 @@ describe 'DistributorsService', ->
 
     it 'returns a promise', ->
       expect(result).toBe promise
+
+  describe '.getByName', ->
+    distributorRestangularService = undefined
+    result = undefined
+
+    beforeEach ->
+      distributorRestangularService = { getList: -> }
+      spyOn(Restangular, 'all').and.returnValue distributorRestangularService
+      spyOn(distributorRestangularService, 'getList').and.returnValue promise
+      result = DistributorsService.getByName('Tierney Brothers')
+
+    it 'obtains Restangular service for distributors', ->
+      expect(Restangular.all).toHaveBeenCalledWith 'distributors'
+
+    it 'calls getList with name as query parameter', ->
+      expect(distributorRestangularService.getList).toHaveBeenCalledWith(distributorName: 'Tierney Brothers')
+
+    it 'returns a promise', ->
+      expect(result).toBe promise
