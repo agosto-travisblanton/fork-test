@@ -15,8 +15,12 @@ class DistributorsHandler(RequestHandler):
     @api_token_required
     def get(self, distributor_key=None):
         if None == distributor_key:
+            distributor_name = self.request.get('distributorName')
             result = Distributor.query(ancestor=DistributorEntityGroup.singleton().key).fetch(100)
-            result = filter(lambda x: x.active is True, result)
+            if distributor_name:
+                result = filter(lambda x: x.name == distributor_name, result)
+            else:
+                result = filter(lambda x: x.active is True, result)
         else:
             distributor_key = ndb.Key(urlsafe=distributor_key)
             result = distributor_key.get()

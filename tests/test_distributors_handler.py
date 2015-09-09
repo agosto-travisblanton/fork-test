@@ -87,6 +87,30 @@ class TestDistributorsHandler(BaseTest, WebTest):
             self.app.get(uri, params=request_parameters, headers=self.bad_authorization_header)
         self.assertTrue(self.FORBIDDEN in context.exception.message)
 
+    def test_get_distributors_by_name_returns_agosto(self):
+        request_parameters = {'distributorName': self.AGOSTO}
+        uri = application.router.build(None, 'distributors', None, {})
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response_json = json.loads(response.body)
+        self.assertEqual(len(response_json), 1)
+        self.assertEqual(response_json[0].get('name'), self.AGOSTO)
+
+    def test_get_distributors_by_name_returns_tierney(self):
+        request_parameters = {'distributorName': self.TIERNEY_BROS}
+        uri = application.router.build(None, 'distributors', None, {})
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response_json = json.loads(response.body)
+        self.assertEqual(len(response_json), 1)
+        self.assertEqual(response_json[0].get('name'), self.TIERNEY_BROS)
+
+    def test_get_distributors_by_name_returns_inactive(self):
+        request_parameters = {'distributorName': self.INACTIVE_DISTRIBUTOR}
+        uri = application.router.build(None, 'distributors', None, {})
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response_json = json.loads(response.body)
+        self.assertEqual(len(response_json), 1)
+        self.assertEqual(response_json[0].get('name'), self.INACTIVE_DISTRIBUTOR)
+
     def test_post_returns_created_status(self):
         name = u'Acme'
         request_parameters = {'name': name,

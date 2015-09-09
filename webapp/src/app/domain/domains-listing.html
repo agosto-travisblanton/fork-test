@@ -25,21 +25,23 @@
           <table name="domain-table" class="table table-bordered table-responsive table-striped">
             <thead>
             <tr>
+              <th>Key</th>
               <th>Name</th>
               <th>Impersonation Admin Email</th>
-              <th>Active</th>
+              <th>Created</th>
             </tr>
             </thead>
             <tbody>
             <tr ng-hide="domainsCtrl.domains.length">
               <td name="no-domains" colspan="3">No domains</td>
             </tr>
-            <tr ng-repeat="item in domainsCtrl.domains | orderBy:'name' ">
-              <td class="domain-name"><a name="edit-domain" class="btn"
+            <tr ng-repeat="item in domainsCtrl.domains | orderBy:'-created'">
+              <td class="domain-key"><a name="edit-domain" class="btn"
                                          ng-click="domainsCtrl.editItem(item)"
-                                         title="Edit domain">{{item.name}}</a></td>
+                                         title="Edit domain">{{item.key}}</a></td>
+              <td class="domain-name">{{item.name}}</td>
               <td class="domain-impersonation-admin-email-address">{{item.impersonation_admin_email_address}}</td>
-              <td class="domain-active">{{item.active}}</td>
+              <td class="domain-created">{{item.created}}</td>
             </tr>
             </tbody>
           </table>

@@ -4,10 +4,15 @@ appModule = angular.module('skykitDisplayDeviceManagement')
 
 appModule.controller 'DomainDetailsCtrl', ($log,
                                            $stateParams,
+                                           DistributorsService,
                                            DomainsService,
                                            $state,
                                            sweet,
                                            ProgressBarService) ->
+  @default_distributor = 'Agosto'
+
+  @distributors = []
+
   @currentDomain = {
     key: undefined,
     name: undefined,
@@ -23,6 +28,12 @@ appModule.controller 'DomainDetailsCtrl', ($log,
     domainPromise = DomainsService.getDomainByKey($stateParams.domainKey)
     domainPromise.then (data) =>
       @currentDomain = data
+
+  @initialize = ->
+    distributorPromise = DistributorsService.getByName(@default_distributor)
+    distributorPromise.then (data) =>
+      if typeof data[0] != 'undefined'
+        @currentDomain.distributor_key = data[0].key
 
   @onClickSaveButton = ->
     ProgressBarService.start()

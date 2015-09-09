@@ -28,4 +28,8 @@ appModule.factory 'DistributorsService', (Restangular) ->
         promise = Restangular.one(SERVICE_NAME, entity.key).remove()
         promise
 
+    getByName: (name) ->
+      promise = Restangular.all(SERVICE_NAME).getList distributorName: name
+      promise
+
   new DistributorsService()

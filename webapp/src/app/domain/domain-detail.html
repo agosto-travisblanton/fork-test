@@ -1,7 +1,5 @@
-<div id="wrapper">
-
+<div id="wrapper" ng-init="domainDetailsCtrl.initialize()">
   <div ng-include="'app/components/navbar/navbar.html'"></div>
-
   <div id="page-wrapper">
     <div class="container-fluid">
       <div class="row">
@@ -21,14 +19,14 @@
                   novalidate>
               <div class="form-group"
                    ng-class="{ 'has-error' : domainForm.name.$invalid && !domainForm.name.$pristine }">
-                <label for="domainName" class="col-sm-3 control-label">Name</label>
+                <label for="domainName" class="col-sm-2 control-label">Name</label>
 
                 <div class="col-sm-4">
                   <input type="text"
                          class="form-control"
                          name="domainName"
                          id="domainName"
-                         ng-model="domainDetailsCtrl.currentDomain.name">
+                         ng-model="domainDetailsCtrl.currentDomain.name" required>
                 </div>
                 <div class="col-sm-5">
                   <p ng-show="domainForm.name.$invalid && !domainForm.name.$pristine"
@@ -39,26 +37,45 @@
               </div>
               <div class="form-group"
                    ng-class="{ 'has-error' : domainForm.impersonation_admin_email_address.$invalid && !domainForm.impersonation_admin_email_address.$pristine }">
-                <label for="impersonationAdminEmailAddress" class="col-sm-3 control-label">Impersonation admin
-                  email</label>
+                <label for="impersonationAdminEmailAddress" class="col-sm-2 control-label">Impersonation email</label>
 
                 <div class="col-sm-4">
                   <input type="text"
                          class="form-control"
                          name="impersonationAdminEmailAddress"
                          id="impersonationAdminEmailAddress"
-                         ng-model="domainDetailsCtrl.currentDomain.impersonation_admin_email_address">
+                         ng-model="domainDetailsCtrl.currentDomain.impersonation_admin_email_address" required>
                 </div>
                 <div class="col-sm-5">
                   <p
                     ng-show="domainForm.impersonationAdminEmailAddress.$invalid && !domainForm.impersonationAdminEmailAddress.$pristine"
                     class="help-block">
-                    The impersonation admin email is required.
+                    The impersonation email is required.
                   </p>
                 </div>
               </div>
               <div class="form-group">
-                <div class="col-sm-offset-3 col-sm-9">
+                <label for="distributorKey" class="col-sm-2 control-label">Distributor key</label>
+
+                <div class="col-sm-10">
+                  <input type="text"
+                         class="form-control"
+                         name="distributorKey"
+                         id="distributorKey"
+                         readonly
+                         ng-model="domainDetailsCtrl.currentDomain.distributor_key" required>
+                </div>
+                <div class="col-sm-5">
+                  <p
+                    ng-show="domainForm.distributorKey.$invalid && !domainForm.distributorKey.$pristine"
+                    class="help-block">
+                    A distributor key is required.
+                  </p>
+                </div>
+
+              </div>
+              <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-9">
                   <input type="checkbox"
                          id="active"
                          ng-model="domainDetailsCtrl.currentDomain.active"> <label
@@ -67,7 +84,7 @@
               </div>
               <hr>
               <div class="form-group">
-                <div class="col-sm-offset-3 col-sm-4">
+                <div class="col-sm-offset-2 col-sm-4">
                   <button type="submit"
                           class="btn btn-primary btn-default"
                           ng-disabled="!domainForm.$dirty || domainForm.$invalid"><i class="fa fa-fw fa-save"></i>
