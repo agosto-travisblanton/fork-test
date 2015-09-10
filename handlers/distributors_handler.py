@@ -52,7 +52,7 @@ class DistributorsHandler(RequestHandler):
                                                                 {'distributor_key': distributor_key.urlsafe()})
                 self.response.headers['Location'] = distributor_uri
                 self.response.headers.pop('Content-Type', None)
-                self.response.set_status(201)
+                self.response.set_status(status)
             else:
                 self.response.set_status(status, error_message)
         else:
