@@ -34,6 +34,9 @@ class TestDistributorsHandler(BaseTest, WebTest):
                                                        active=False)
         self.inactive_distributor_key = self.inactive_distributor.put()
 
+    ##################################################################################################################
+    ## get
+    ##################################################################################################################
     def test_get_by_key_returns_ok_status(self):
         request_parameters = {}
         uri = application.router.build(None, 'manage-distributor', None, {'distributor_key': self.agosto_key.urlsafe()})
@@ -63,6 +66,9 @@ class TestDistributorsHandler(BaseTest, WebTest):
         self.assertEqual(response_json.get('name'), self.INACTIVE_DISTRIBUTOR)
         self.assertFalse(response_json.get('active'))
 
+    ##################################################################################################################
+    ## get_list
+    ##################################################################################################################
     def test_get_list_returns_ok_status(self):
         request_parameters = {}
         uri = application.router.build(None, 'distributors', None, {})
@@ -80,14 +86,14 @@ class TestDistributorsHandler(BaseTest, WebTest):
         self.assertEqual(response_json[1].get('name'), self.TIERNEY_BROS)
         self.assertTrue(response_json[1].get('active'))
 
-    def test_get_fails_with_bad_authorization_token(self):
+    def test_get_list_fails_with_bad_authorization_token(self):
         request_parameters = {}
         uri = application.router.build(None, 'distributors', None, {})
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.bad_authorization_header)
         self.assertTrue(self.FORBIDDEN in context.exception.message)
 
-    def test_get_distributors_by_name_returns_agosto(self):
+    def test_get_list_by_name_returns_agosto(self):
         request_parameters = {'distributorName': self.AGOSTO}
         uri = application.router.build(None, 'distributors', None, {})
         response = self.app.get(uri, params=request_parameters, headers=self.headers)
@@ -95,7 +101,7 @@ class TestDistributorsHandler(BaseTest, WebTest):
         self.assertEqual(len(response_json), 1)
         self.assertEqual(response_json[0].get('name'), self.AGOSTO)
 
-    def test_get_distributors_by_name_returns_tierney(self):
+    def test_get_list_by_name_returns_tierney(self):
         request_parameters = {'distributorName': self.TIERNEY_BROS}
         uri = application.router.build(None, 'distributors', None, {})
         response = self.app.get(uri, params=request_parameters, headers=self.headers)
@@ -103,7 +109,7 @@ class TestDistributorsHandler(BaseTest, WebTest):
         self.assertEqual(len(response_json), 1)
         self.assertEqual(response_json[0].get('name'), self.TIERNEY_BROS)
 
-    def test_get_distributors_by_name_returns_inactive(self):
+    def test_get_list_by_name_returns_inactive(self):
         request_parameters = {'distributorName': self.INACTIVE_DISTRIBUTOR}
         uri = application.router.build(None, 'distributors', None, {})
         response = self.app.get(uri, params=request_parameters, headers=self.headers)
@@ -111,11 +117,14 @@ class TestDistributorsHandler(BaseTest, WebTest):
         self.assertEqual(len(response_json), 1)
         self.assertEqual(response_json[0].get('name'), self.INACTIVE_DISTRIBUTOR)
 
+    ##################################################################################################################
+    ## post
+    ##################################################################################################################
     def test_post_returns_created_status(self):
         name = u'Acme'
         request_parameters = {'name': name,
                               'active': True}
-        uri = application.router.build(None, 'distributors', None, {})
+        uri = application.router.build(None, 'distributor-creator', None, {})
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
         self.assertEqual(201, response.status_code)
 
@@ -123,7 +132,7 @@ class TestDistributorsHandler(BaseTest, WebTest):
         name = u'Acme'
         request_parameters = {'name': name,
                               'active': True}
-        uri = application.router.build(None, 'distributors', None, {})
+        uri = application.router.build(None, 'distributor-creator', None, {})
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
         actual = Distributor.find_by_name(request_parameters['name'])
         self.assertIsNotNone(actual)
@@ -132,7 +141,7 @@ class TestDistributorsHandler(BaseTest, WebTest):
         name = u'Acme'
         request_parameters = {'name': name,
                               'active': "true"}
-        uri = application.router.build(None, 'distributors', None, {})
+        uri = application.router.build(None, 'distributor-creator', None, {})
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
         actual = Distributor.find_by_name(request_parameters['name'])
         self.assertIsNotNone(actual)
@@ -157,7 +166,7 @@ class TestDistributorsHandler(BaseTest, WebTest):
         name = u'Acme'
         request_parameters = {'name': name,
                               'active': True}
-        uri = application.router.build(None, 'distributors', None, {})
+        uri = application.router.build(None, 'distributor-creator', None, {})
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
         actual = Distributor.find_by_name(request_parameters['name'])
         distributor_uri = application.router.build(None,
@@ -170,7 +179,7 @@ class TestDistributorsHandler(BaseTest, WebTest):
         name = u'Acme'
         request_parameters = {'name': name,
                               'active': True}
-        uri = application.router.build(None, 'distributors', None, {})
+        uri = application.router.build(None, 'distributor-creator', None, {})
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
         actual = Distributor.find_by_name(request_parameters['name'])
         parent = actual.key.parent().get()
@@ -178,11 +187,14 @@ class TestDistributorsHandler(BaseTest, WebTest):
 
     def test_post_fails_with_bad_authorization_token(self):
         request_parameters = {}
-        uri = application.router.build(None, 'distributors', None, {})
+        uri = application.router.build(None, 'distributor-creator', None, {})
         with self.assertRaises(AppError) as context:
             self.app.post_json(uri, params=request_parameters, headers=self.bad_authorization_header)
         self.assertTrue(self.FORBIDDEN in context.exception.message)
 
+    ##################################################################################################################
+    ## put
+    ##################################################################################################################
     def test_put_returns_no_content_status(self):
         uri = application.router.build(None, 'manage-distributor', None, {'distributor_key': self.agosto_key.urlsafe()})
         entity_body = {
@@ -228,6 +240,9 @@ class TestDistributorsHandler(BaseTest, WebTest):
             self.app.put_json(uri, entity_body, headers=self.bad_authorization_header)
         self.assertTrue(self.FORBIDDEN in context.exception.message)
 
+    ##################################################################################################################
+    ## delete
+    ##################################################################################################################
     def test_delete_returns_no_content_status(self):
         url_safe_distributor_key = self.tierney_bros_key.urlsafe()
         uri = application.router.build(None, 'manage-distributor', None,

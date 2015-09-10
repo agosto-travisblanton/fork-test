@@ -4,7 +4,7 @@ appModule = angular.module('skykitDisplayDeviceManagement')
 
 appModule.factory 'DomainsService', (Restangular) ->
 
-  class DomainsService
+  new class DomainsService
 
     save: (domain) ->
       if domain.key != undefined
@@ -25,5 +25,3 @@ appModule.factory 'DomainsService', (Restangular) ->
       if domain.key != undefined
         promise = Restangular.one("domains", domain.key).remove()
         promise
-
-  new DomainsService()
