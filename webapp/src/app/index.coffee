@@ -41,12 +41,33 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
       label: 'Home page'
     }
   })
-  $stateProvider.state("domain", {
-    url: "/domain",
-    templateUrl: "app/domain/domain.html",
-    controller: "DomainCtrl",
+  $stateProvider.state("domains", {
+    url: "/domains",
+    templateUrl: "app/domain/domains-listing.html",
+    controller: "DomainsCtrl",
+    controllerAs: 'domainsCtrl',
     ncyBreadcrumb: {
       label: 'Domains'
+    }
+  })
+  $stateProvider.state("newDomain", {
+    url: "/domains/new",
+    templateUrl: "app/domain/domain-detail.html",
+    controller: "DomainDetailsCtrl",
+    controllerAs: 'domainDetailsCtrl',
+    ncyBreadcrumb: {
+      label: 'New domain',
+      parent: 'domains'
+    }
+  })
+  $stateProvider.state("editDomain", {
+    url: "/domains/:domainKey",
+    templateUrl: "app/domain/domain-detail.html",
+    controller: "DomainDetailsCtrl",
+    controllerAs: 'domainDetailsCtrl',
+    ncyBreadcrumb: {
+      label: '{{ domainDetailsCtrl.currentDomain.name }}',
+      parent: 'domains'
     }
   })
   $stateProvider.state("tenants", {
