@@ -15,19 +15,45 @@ skykitDisplayDeviceManagement = angular.module('skykitDisplayDeviceManagement', 
 ])
 
 skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
-  $stateProvider.state("home", {
-    url: "/",
-    templateUrl: "app/welcome/welcome.html",
+  $stateProvider.state("sign_in", {
     resolve: {
       identity: (IdentityService) ->
         IdentityService.getIdentity()
     },
-    controller: "WelcomeCtrl",
-    controllerAs: 'welcomeCtrl',
-    ncyBreadcrumb: {
-      label: 'Home page'
-    }
+    url: "/sign_in",
+    templateUrl: "app/authentication/sign_in.html",
+    controller: "AuthenticationCtrl",
+    controllerAs: 'authenticationCtrl',
   })
+  $stateProvider.state("sign_out", {
+    resolve: {
+      identity: (IdentityService) ->
+        IdentityService.getIdentity()
+    },
+    url: "/sign_out",
+    templateUrl: "app/authentication/sign_out.html",
+    controller: "AuthenticationCtrl",
+    controllerAs: 'authenticationCtrl',
+  })
+  $stateProvider.state("distributor_selection", {
+    url: "/distributor_selection",
+    templateUrl: "app/distributor/distributor_selector.html",
+    controller: "DistributorSelectorCtrl",
+    controllerAs: 'distributorSelectorCtrl',
+  })
+#  $stateProvider.state("home", {
+#    url: "/",
+#    templateUrl: "app/welcome/welcome.html",
+#    resolve: {
+#      identity: (IdentityService) ->
+#        IdentityService.getIdentity()
+#    },
+#    controller: "WelcomeCtrl",
+#    controllerAs: 'welcomeCtrl',
+#    ncyBreadcrumb: {
+#      label: 'Home page'
+#    }
+#  })
   $stateProvider.state("welcome", {
     url: "/welcome",
     templateUrl: "app/welcome/welcome.html",
@@ -110,7 +136,7 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     }
   })
 
-  $urlRouterProvider.otherwise '/'
+  $urlRouterProvider.otherwise '/sign_in'
 
   RestangularProvider.setBaseUrl '/api/v1'
 
