@@ -6,6 +6,7 @@ appModule.controller 'TenantDetailsCtrl', ($log,
                                            $stateParams,
                                            TenantsService,
                                            DevicesService,
+                                           DistributorsService,
                                            $state,
                                            sweet,
                                            ProgressBarService) ->
@@ -19,8 +20,10 @@ appModule.controller 'TenantDetailsCtrl', ($log,
     chrome_device_domain: undefined,
     active: true
   }
-
+  @defaultDistributorName = 'Agosto'
+  @defaultDistributor = undefined
   @currentTenantDisplays = []
+  @distributorDomains = []
   @editMode = !!$stateParams.tenantKey
 
   if @editMode
@@ -34,6 +37,14 @@ appModule.controller 'TenantDetailsCtrl', ($log,
       @currentTenantDisplays = data.objects
   else
     @generalTabActive = true
+
+  @initialize = ->
+    distributorPromise = DistributorsService.getByName(@defaultDistributorName)
+    distributorPromise.then (data) =>
+      @defaultDistributor = data
+      distributorDomainPromise = DistributorsService.getDomainsByKey(data[0].key)
+      distributorDomainPromise.then (data) =>
+        @distributorDomains = data
 
   @onClickSaveButton = ->
     ProgressBarService.start()

@@ -8,20 +8,24 @@ describe 'TenantDetailsCtrl', ->
   $stateParams = undefined
   TenantsService = undefined
   DevicesService = undefined
+  DistributorsService = undefined
   progressBarService = undefined
   tenantsServicePromise = undefined
   devicesServicePromise = undefined
+  distributorsServicePromise = undefined
+  distributorsDomainsServicePromise = undefined
   sweet = undefined
   serviceInjection = undefined
 
   beforeEach module('skykitDisplayDeviceManagement')
 
-  beforeEach inject (_$controller_, _TenantsService_, _DevicesService_, _$state_, _sweet_) ->
+  beforeEach inject (_$controller_, _TenantsService_, _DevicesService_, _DistributorsService_, _$state_, _sweet_) ->
     $controller = _$controller_
     $state = _$state_
     $stateParams = {}
     TenantsService = _TenantsService_
     DevicesService = _DevicesService_
+    DistributorsService = _DistributorsService_
     progressBarService = {
       start: ->
       complete: ->
@@ -39,8 +43,12 @@ describe 'TenantDetailsCtrl', ->
     beforeEach ->
       tenantsServicePromise = new skykitDisplayDeviceManagement.q.Mock
       devicesServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      distributorsServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      distributorsDomainsServicePromise = new skykitDisplayDeviceManagement.q.Mock
       spyOn(TenantsService, 'getTenantByKey').and.returnValue(tenantsServicePromise)
       spyOn(DevicesService, 'getDevicesByTenant').and.returnValue(devicesServicePromise)
+      spyOn(DistributorsService, 'getByName').and.returnValue(distributorsServicePromise)
+      spyOn(DistributorsService, 'getDomainsByKey').and.returnValue(distributorsDomainsServicePromise)
 
     it 'currentTenant should be set', ->
       controller = $controller 'TenantDetailsCtrl', serviceInjection
@@ -52,6 +60,22 @@ describe 'TenantDetailsCtrl', ->
       expect(controller.currentTenant.content_server_url).toBeUndefined()
       expect(controller.currentTenant.chrome_device_domain).toBeUndefined()
       expect(controller.currentTenant.active).toBeTruthy()
+
+    it 'defaultDistributor property should be Agosto', ->
+      controller = $controller 'TenantDetailsCtrl', serviceInjection
+      expect(controller.defaultDistributorName).toEqual 'Agosto'
+
+    it 'defaultDistributor property should be undefined', ->
+      controller = $controller 'TenantDetailsCtrl', serviceInjection
+      expect(controller.defaultDistributor).toBeUndefined()
+
+    it 'currentTenantDisplays property should be defined', ->
+      controller = $controller 'TenantDetailsCtrl', serviceInjection
+      expect(controller.currentTenantDisplays).toBeDefined()
+
+    it 'distributorDomains property should be defined', ->
+      controller = $controller 'TenantDetailsCtrl', serviceInjection
+      expect(controller.distributorDomains).toBeDefined()
 
     describe 'editing an existing tenant', ->
       beforeEach ->
@@ -96,6 +120,14 @@ describe 'TenantDetailsCtrl', ->
         $stateParams = {}
         controller = $controller 'TenantDetailsCtrl', serviceInjection
         expect(DevicesService.getDevicesByTenant).not.toHaveBeenCalled()
+
+    describe '.initialize', ->
+      beforeEach ->
+        controller = $controller 'TenantDetailsCtrl', serviceInjection
+
+      it 'calls DistributorsService.getByName to retrieve default distributor', ->
+        controller.initialize()
+        expect(DistributorsService.getByName).toHaveBeenCalledWith(controller.defaultDistributorName)
 
   describe '.onClickSaveButton', ->
     beforeEach ->
