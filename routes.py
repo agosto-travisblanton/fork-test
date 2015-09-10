@@ -121,6 +121,12 @@ application = WSGIApplication(
               name='manage-distributor',
               methods=['GET', 'PUT', 'DELETE']
               ),
+        Route(r'/api/v1/distributors/<distributor_key>/domains',
+              handler='handlers.distributors_handler.DistributorsHandler',
+              name='distributor-domains',
+              handler_method='get_domains',
+              methods=['GET']
+        ),
 
         ############################################################
         # Domains
