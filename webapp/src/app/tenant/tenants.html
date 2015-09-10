@@ -32,7 +32,7 @@
             </thead>
             <tbody>
             <tr ng-hide="tenantsCtrl.tenants.length">
-              <td name="no-tenants" colspan="3">No tenants</td>
+              <td class="no-devices text-center text-danger" colspan="3">No tenants</td>
             </tr>
             <tr ng-repeat="item in tenantsCtrl.tenants | orderBy:'name' "
                 ng-click="tenantsCtrl.editItem(item)" >

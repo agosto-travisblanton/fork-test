@@ -31,8 +31,8 @@ application = WSGIApplication(
         # version
         ############################################################
         Route(
-            r'/api/v1/version',
-            handler='handlers.version_handler.VersionHandler',
+            r'/api/v1/versions',
+            handler='handlers.versions_handler.VersionsHandler',
             name='version-retrieval',
             handler_method='get',
             methods=['GET']

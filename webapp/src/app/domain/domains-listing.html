@@ -29,7 +29,7 @@
             </thead>
             <tbody>
             <tr ng-hide="domainsCtrl.domains.length">
-              <td name="no-domains" colspan="4">No domains</td>
+              <td class="no-devices text-center text-danger" colspan="4">No domains</td>
             </tr>
             <tr ng-repeat="item in domainsCtrl.domains | orderBy:'-created'">
               <td class="domain-key"><a name="edit-domain" class="btn"
