@@ -135,3 +135,23 @@ describe 'DistributorsService', ->
 
     it 'returns a promise', ->
       expect(result).toBe promise
+
+  describe '.getDomainsByKey', ->
+    distributorRestangularService = undefined
+    result = undefined
+    distributorKey = 'dhYUYdfhdjfhlasddf7898a7sdfdas78d67'
+
+    beforeEach ->
+      distributorRestangularService = { get: -> }
+      spyOn(Restangular, 'oneUrl').and.returnValue distributorRestangularService
+      spyOn(distributorRestangularService, 'get').and.returnValue promise
+      result = DistributorsService.getDomainsByKey(distributorKey)
+
+    it 'obtains Restangular service for distributor domains', ->
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'distributors', "distributors/#{distributorKey}/domains"
+
+    it 'obtains the distributor domains from the Restangular service', ->
+      expect(distributorRestangularService.get).toHaveBeenCalled()
+
+    it 'returns a promise', ->
+      expect(result).toBe promise

@@ -3,10 +3,8 @@
 appModule = angular.module('skykitDisplayDeviceManagement')
 
 appModule.factory 'DistributorsService', (Restangular) ->
-
-  class DistributorsService
+  new class DistributorsService
     SERVICE_NAME = 'distributors'
-    @currentDistributor = undefined
 
     save: (tenant) ->
       if tenant.key != undefined
@@ -32,4 +30,6 @@ appModule.factory 'DistributorsService', (Restangular) ->
       promise = Restangular.all(SERVICE_NAME).getList distributorName: name
       promise
 
-  new DistributorsService()
+    getDomainsByKey: (key) ->
+      promise = Restangular.oneUrl(SERVICE_NAME, "distributors/#{key}/domains").get()
+      promise
