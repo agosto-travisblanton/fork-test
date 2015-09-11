@@ -1,4 +1,4 @@
-<div id="wrapper" ng-init="tenantDetailsCtrl.initialize()" >
+<div id="wrapper" ng-init="tenantDetailsCtrl.initialize()">
 
   <div ng-include="'app/components/navbar/navbar.html'"></div>
 
@@ -103,27 +103,20 @@
                   </div>
                   <div class="form-group"
                        ng-class="{ 'has-error' : tenantForm.chromeDeviceDomain.$invalid && !tenantForm.chromeDeviceDomain.$pristine }">
-                    <label for="chromeDeviceDomain" class="col-sm-3 control-label">Chrome
-                      device domain</label>
+                    <label for="chromeDeviceDomain" class="col-sm-3 control-label">Device domain</label>
 
                     <div class="col-sm-4">
-                      <input type="text"
-                             required
-                             class="form-control"
-                             name="chromeDeviceDomain"
-                             id="chromeDeviceDomain"
-                             placeholder="Enter Chrome device domain"
-                             ng-model="tenantDetailsCtrl.currentTenant.chrome_device_domain">
-
-                      <br>
-                      <select ng-model="selectedDomain" ng-options="item.Id as item.Name for item in testAccounts">
-                        <option value="">Select Chrome Device Domain</option>
+                      <select id="chromeDeviceDomain" class="form-control"
+                              data-ng-model="tenantDetailsCtrl.currentTenant.chrome_device_domain"
+                              data-ng-options="item.name for item in tenantDetailsCtrl.distributorDomains"
+                              ng-change="tenantDetailsCtrl.selectDomain()">
+                        <option value=''>Select domain</option>
                       </select>
                     </div>
                     <div class="col-sm-5">
                       <p ng-show="tenantForm.chromeDeviceDomain.$invalid && !tenantForm.chromeDeviceDomain.$pristine"
                          class="help-block">
-                        The Chrome device domain is required.
+                        The Device domain is required.
                       </p>
                     </div>
                   </div>

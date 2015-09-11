@@ -41,12 +41,18 @@ appModule.controller 'TenantDetailsCtrl', ($log,
     @linkedDisplaysTabActive = false
 
   @initialize = ->
-    distributorPromise = DistributorsService.getByName(@defaultDistributorName)
-    distributorPromise.then (data) =>
-      @defaultDistributor = data
-      distributorDomainPromise = DistributorsService.getDomainsByKey(data[0].key)
-      distributorDomainPromise.then (data) =>
-        @distributorDomains = data
+    @distributorDomains = [
+      name : 'dev.agosto.com'
+    ,
+      name : 'local.agosto.com'
+    ]
+
+#    distributorPromise = DistributorsService.getByName(@defaultDistributorName)
+#    distributorPromise.then (data) =>
+#      @defaultDistributor = data
+#      distributorDomainPromise = DistributorsService.getDomainsByKey(data[0].key)
+#      distributorDomainPromise.then (data) =>
+#        @distributorDomains = data
 
   @onClickSaveButton = ->
     ProgressBarService.start()
@@ -64,6 +70,9 @@ appModule.controller 'TenantDetailsCtrl', ($log,
 
   @editItem = (item) ->
     $state.go 'editDevice', {deviceKey: item.key, tenantKey: $stateParams.tenantKey}
+
+  @selectDomain = ->
+
 
   @autoGenerateTenantCode = ->
     unless @currentTenant.key
