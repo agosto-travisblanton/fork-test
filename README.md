@@ -175,7 +175,7 @@ snapdeploy: `python manage.py snapdeploy --ignore-branch -A skykit-display-devic
 
 ![Screen Shot 2015-09-11 at 10.15.06 AM.png](https://bitbucket.org/repo/L8AoyM/images/904603121-Screen%20Shot%202015-09-11%20at%2010.15.06%20AM.png)
 
-Resets develop branch to the sha1 git commit tag **9e0fffc** associated with the commit comment **Version 17**.
+This will reset the develop branch to the git commit tag **9e0fffc** associated with the commit comment **Version 17** (which will reset the branch to be multiple commits behind the latest commit to develop).
 
 ## Deployment to App Engine PROD Environment ##
 
