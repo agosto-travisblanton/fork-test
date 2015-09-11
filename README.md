@@ -169,7 +169,7 @@ snapdeploy: `python manage.py snapdeploy --ignore-branch -A skykit-display-devic
 
 [SkyKit Provisioning INT](https://skykit-display-device-int.appspot.com/#)
 
-## Cherry picking to a sha1 git commit ##
+## Cherry picking to a git commit ##
 
 `git reset --hard 9e0fffc`
 
