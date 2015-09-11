@@ -169,6 +169,10 @@ snapdeploy: `python manage.py snapdeploy --ignore-branch -A skykit-display-devic
 
 [SkyKit Provisioning INT](https://skykit-display-device-int.appspot.com/#)
 
+## Cherry Picking to a sha1 git commit ##
+
+'git reset --hard 9e0fffc'
+
 ## Deployment to App Engine PROD Environment ##
 
 From the project root directory: `appcfg.py --oauth2 -A skykit-provisioning update .`
@@ -179,6 +183,6 @@ snapdeploy: `python manage.py snapdeploy --ignore-branch -A skykit-provisioning 
 
 ### GOTCHAS ###
 
-Snapdeploy tags with a hash. You have to explicitly choose that hash under migrations module, otherwise you're using old code and any new migrations won't show up because you're probably still using the old tag.
+Snapdeploy tags with a sha1 hash of the git commit. You have to explicitly choose that hash under migrations module, otherwise you're using old code and any new migrations won't show up because you're probably still using the old tag.
  
 ![Screen Shot 2015-08-13 at 12.11.02 PM.png](https://bitbucket.org/repo/L8AoyM/images/288299165-Screen%20Shot%202015-08-13%20at%2012.11.02%20PM.png)
