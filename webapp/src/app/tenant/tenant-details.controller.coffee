@@ -42,20 +42,20 @@ appModule.controller 'TenantDetailsCtrl', ($log,
 
   @initialize = ->
     @distributorDomains = [
-      name : 'dev.agosto.com'
-    ,
-      name : 'local.agosto.com'
+      {name : 'looks.agosto.com', key: '1111111'}
+      {name : 'local.agosto.com', key: '2222221'}
     ]
 
-#    distributorPromise = DistributorsService.getByName(@defaultDistributorName)
-#    distributorPromise.then (data) =>
-#      @defaultDistributor = data
-#      distributorDomainPromise = DistributorsService.getDomainsByKey(data[0].key)
-#      distributorDomainPromise.then (data) =>
-#        @distributorDomains = data
+    distributorPromise = DistributorsService.getByName(@defaultDistributorName)
+    distributorPromise.then (data) =>
+      @defaultDistributor = data
+      distributorDomainPromise = DistributorsService.getDomainsByKey(data[0].key)
+      distributorDomainPromise.then (data) =>
+        @distributorDomains = data
 
   @onClickSaveButton = ->
     ProgressBarService.start()
+    @currentTenant.chrome_device_domain = @currentTenant.chrome_device_domain.key
     promise = TenantsService.save @currentTenant
     promise.then @onSuccessTenantSave, @onFailureTenantSave
 

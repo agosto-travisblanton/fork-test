@@ -108,10 +108,12 @@
                     <div class="col-sm-4">
                       <select id="chromeDeviceDomain" class="form-control"
                               data-ng-model="tenantDetailsCtrl.currentTenant.chrome_device_domain"
-                              data-ng-options="item.name for item in tenantDetailsCtrl.distributorDomains"
+                              data-ng-options="i as i.name for i in tenantDetailsCtrl.distributorDomains track by i.key"
                               ng-change="tenantDetailsCtrl.selectDomain()">
                         <option value=''>Select domain</option>
                       </select>
+
+
                     </div>
                     <div class="col-sm-5">
                       <p ng-show="tenantForm.chromeDeviceDomain.$invalid && !tenantForm.chromeDeviceDomain.$pristine"
