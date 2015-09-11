@@ -13,51 +13,6 @@
 
       <div>
         <tabset>
-          <tab heading="Linked displays">
-            <div style="margin-top: 1px;">&nbsp;</div>
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">{{tenantDetailsCtrl.currentTenant.name}}</h3>
-              </div>
-              <div class="panel-body">
-                <table class="table table-bordered table-condensed table-responsive table-striped">
-                  <thead>
-                  <tr>
-                    <th>Serial number</th>
-                    <th>Device ID</th>
-                    <th>Wifi mac address</th>
-                    <th>Ether mac address</th>
-                    <th>Provisioning date</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr ng-hide="tenantDetailsCtrl.currentTenantDisplays.length">
-                    <td colspan="5" class="text-center text-danger">No displays</td>
-                  </tr>
-                  <tr ng-repeat="item in tenantDetailsCtrl.currentTenantDisplays | orderBy:'-created' "
-                      ng-click="tenantDetailsCtrl.editItem(item)">
-                    <td class="tenant-display-serial-number">
-                      {{ item.serialNumber }}
-                    </td>
-                    <td class="tenant-display-id">
-                      {{ item.deviceId }}
-                    </td>
-                    <td class="tenant-display-mac-address">
-                      {{ item.macAddress }}
-                    </td>
-                    <td class="tenant-display-ethernet-mac-address">
-                      {{ item.ethernetMacAddress }}
-                    </td>
-                    <td class="tenant-display-provisioning-date">
-                      {{ item.created }}
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <!-- END panel -->
-          </tab>
           <tab heading="General" active="tenantDetailsCtrl.generalTabActive">
             <div style="margin-top: 1px;">&nbsp;</div>
             <div class="panel panel-default">
@@ -159,6 +114,11 @@
                              id="chromeDeviceDomain"
                              placeholder="Enter Chrome device domain"
                              ng-model="tenantDetailsCtrl.currentTenant.chrome_device_domain">
+
+                      <br>
+                      <select ng-model="selectedDomain" ng-options="item.Id as item.Name for item in testAccounts">
+                        <option value="">Select Chrome Device Domain</option>
+                      </select>
                     </div>
                     <div class="col-sm-5">
                       <p ng-show="tenantForm.chromeDeviceDomain.$invalid && !tenantForm.chromeDeviceDomain.$pristine"
@@ -232,6 +192,51 @@
                     </div>
                   </div>
                 </form>
+              </div>
+            </div>
+            <!-- END panel -->
+          </tab>
+          <tab heading="Linked displays" active="tenantDetailsCtrl.linkedDisplaysTabActive">
+            <div style="margin-top: 1px;">&nbsp;</div>
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">{{tenantDetailsCtrl.currentTenant.name}}</h3>
+              </div>
+              <div class="panel-body">
+                <table class="table table-bordered table-condensed table-responsive table-striped">
+                  <thead>
+                  <tr>
+                    <th>Serial number</th>
+                    <th>Device ID</th>
+                    <th>Wifi mac address</th>
+                    <th>Ether mac address</th>
+                    <th>Provisioning date</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr ng-hide="tenantDetailsCtrl.currentTenantDisplays.length">
+                    <td colspan="5" class="text-center text-danger">No displays</td>
+                  </tr>
+                  <tr ng-repeat="item in tenantDetailsCtrl.currentTenantDisplays | orderBy:'-created' "
+                      ng-click="tenantDetailsCtrl.editItem(item)">
+                    <td class="tenant-display-serial-number">
+                      {{ item.serialNumber }}
+                    </td>
+                    <td class="tenant-display-id">
+                      {{ item.deviceId }}
+                    </td>
+                    <td class="tenant-display-mac-address">
+                      {{ item.macAddress }}
+                    </td>
+                    <td class="tenant-display-ethernet-mac-address">
+                      {{ item.ethernetMacAddress }}
+                    </td>
+                    <td class="tenant-display-provisioning-date">
+                      {{ item.created }}
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
             <!-- END panel -->

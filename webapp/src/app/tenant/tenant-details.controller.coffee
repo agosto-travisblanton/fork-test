@@ -28,6 +28,7 @@ appModule.controller 'TenantDetailsCtrl', ($log,
 
   if @editMode
     @generalTabActive = false
+    @linkedDisplaysTabActive = true
     tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey)
     tenantPromise.then (data) =>
       @currentTenant = data
@@ -37,6 +38,7 @@ appModule.controller 'TenantDetailsCtrl', ($log,
       @currentTenantDisplays = data.objects
   else
     @generalTabActive = true
+    @linkedDisplaysTabActive = false
 
   @initialize = ->
     distributorPromise = DistributorsService.getByName(@defaultDistributorName)
