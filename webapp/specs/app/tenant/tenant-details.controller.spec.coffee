@@ -38,7 +38,6 @@ describe 'TenantDetailsCtrl', ->
       ProgressBarService: progressBarService
     }
 
-
   describe 'initialization', ->
     beforeEach ->
       tenantsServicePromise = new skykitDisplayDeviceManagement.q.Mock
@@ -59,15 +58,13 @@ describe 'TenantDetailsCtrl', ->
       expect(controller.currentTenant.admin_email).toBeUndefined()
       expect(controller.currentTenant.content_server_url).toBeUndefined()
       expect(controller.currentTenant.chrome_device_domain).toBeUndefined()
+      expect(controller.currentTenant.domain_key).toBeUndefined()
+      expect(controller.currentTenant.domain_name).toBeUndefined()
       expect(controller.currentTenant.active).toBeTruthy()
 
     it 'defaultDistributor property should be Agosto', ->
       controller = $controller 'TenantDetailsCtrl', serviceInjection
       expect(controller.defaultDistributorName).toEqual 'Agosto'
-
-    it 'defaultDistributor property should be undefined', ->
-      controller = $controller 'TenantDetailsCtrl', serviceInjection
-      expect(controller.defaultDistributor).toBeUndefined()
 
     it 'currentTenantDisplays property should be defined', ->
       controller = $controller 'TenantDetailsCtrl', serviceInjection
@@ -105,6 +102,16 @@ describe 'TenantDetailsCtrl', ->
         expect(DevicesService.getDevicesByTenant).toHaveBeenCalledWith($stateParams.tenantKey)
         expect(controller.currentTenantDisplays).toBe(devices)
 
+        beforeEach ->
+          $stateParams = {}
+          controller = $controller 'TenantDetailsCtrl', serviceInjection
+
+        it 'sets general tab active to false', ->
+          expect(controller.generalTabActive).toBeFalsy()
+
+        it 'sets linked displays tab active to true', ->
+          expect(controller.linkedDisplaysTabActive).toBeTruthy()
+
     describe 'creating a new tenant', ->
       it 'editMode should be set to false', ->
         $stateParams = {}
@@ -121,6 +128,16 @@ describe 'TenantDetailsCtrl', ->
         controller = $controller 'TenantDetailsCtrl', serviceInjection
         expect(DevicesService.getDevicesByTenant).not.toHaveBeenCalled()
 
+        beforeEach ->
+          $stateParams = {}
+          controller = $controller 'TenantDetailsCtrl', serviceInjection
+
+        it 'sets general tab active to true', ->
+          expect(controller.generalTabActive).toBeTruthy()
+
+        it 'sets linked displays tab active to false', ->
+          expect(controller.linkedDisplaysTabActive).toBeFalsy()
+
     describe '.initialize', ->
       beforeEach ->
         controller = $controller 'TenantDetailsCtrl', serviceInjection
@@ -130,6 +147,9 @@ describe 'TenantDetailsCtrl', ->
         expect(DistributorsService.getByName).toHaveBeenCalledWith(controller.defaultDistributorName)
 
   describe '.onClickSaveButton', ->
+    domain_name = undefined
+    domain_key = undefined
+
     beforeEach ->
       tenantsServicePromise = new skykitDisplayDeviceManagement.q.Mock
       spyOn(TenantsService, 'save').and.returnValue(tenantsServicePromise)
@@ -138,21 +158,26 @@ describe 'TenantDetailsCtrl', ->
       spyOn(progressBarService, 'start')
       spyOn(progressBarService, 'complete')
       controller = $controller 'TenantDetailsCtrl', serviceInjection
-
-    it 'start the progress bar animation', ->
+      domain_name = 'dev.agosto.com'
+      domain_key = '123456789'
+      controller.currentTenant.chrome_device_domain = {name: domain_name, key: domain_key}
       controller.onClickSaveButton()
       tenantsServicePromise.resolve()
+
+    it 'start the progress bar animation', ->
       expect(progressBarService.start).toHaveBeenCalled()
 
     it 'call TenantsService.save, pass the current tenant', ->
-      controller.onClickSaveButton()
-      tenantsServicePromise.resolve()
       expect(TenantsService.save).toHaveBeenCalledWith(controller.currentTenant)
 
     it "the 'then' handler routes navigation back to 'tenants'", ->
-      controller.onClickSaveButton()
-      tenantsServicePromise.resolve()
       expect($state.go).toHaveBeenCalledWith('tenants')
+
+    it 'the domain key gets set', ->
+      expect(controller.currentTenant.domain_key).toBe domain_key
+
+    it 'the domain name gets set', ->
+      expect(controller.currentTenant.domain_name).toBe domain_name
 
   describe '.autoGenerateTenantCode', ->
     beforeEach ->

@@ -18,10 +18,11 @@ appModule.controller 'TenantDetailsCtrl', ($log,
     content_server_url: undefined,
     content_manager_base_url: undefined,
     chrome_device_domain: undefined,
+    domain_key: undefined,
+    domain_name: undefined,
     active: true
   }
   @defaultDistributorName = 'Agosto'
-  @defaultDistributor = undefined
   @currentTenantDisplays = []
   @distributorDomains = []
   @editMode = !!$stateParams.tenantKey
@@ -32,7 +33,6 @@ appModule.controller 'TenantDetailsCtrl', ($log,
     tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey)
     tenantPromise.then (data) =>
       @currentTenant = data
-
     displaysPromise = DevicesService.getDevicesByTenant($stateParams.tenantKey)
     displaysPromise.then (data) =>
       @currentTenantDisplays = data.objects
@@ -41,21 +41,24 @@ appModule.controller 'TenantDetailsCtrl', ($log,
     @linkedDisplaysTabActive = false
 
   @initialize = ->
-    @distributorDomains = [
-      {name : 'looks.agosto.com', key: '1111111'}
-      {name : 'local.agosto.com', key: '2222221'}
-    ]
-
     distributorPromise = DistributorsService.getByName(@defaultDistributorName)
     distributorPromise.then (data) =>
-      @defaultDistributor = data
-      distributorDomainPromise = DistributorsService.getDomainsByKey(data[0].key)
-      distributorDomainPromise.then (data) =>
-        @distributorDomains = data
+      distributor_key = data[0].key
+      @onSuccessResolvingDistributor(distributor_key)
+
+  @onSuccessResolvingDistributor = (distributor_key) =>
+    distributorDomainPromise = DistributorsService.getDomainsByKey(distributor_key)
+    distributorDomainPromise.then (domains_array) =>
+      i = 0
+      while i < domains_array.length
+        domain = {name: domains_array[i].name, key: domains_array[i].key}
+        @distributorDomains.push domain
+        i++
 
   @onClickSaveButton = ->
     ProgressBarService.start()
-    @currentTenant.chrome_device_domain = @currentTenant.chrome_device_domain.key
+    @currentTenant.domain_key = @currentTenant.chrome_device_domain.key
+    @currentTenant.domain_name = @currentTenant.chrome_device_domain.name
     promise = TenantsService.save @currentTenant
     promise.then @onSuccessTenantSave, @onFailureTenantSave
 
@@ -72,7 +75,6 @@ appModule.controller 'TenantDetailsCtrl', ($log,
     $state.go 'editDevice', {deviceKey: item.key, tenantKey: $stateParams.tenantKey}
 
   @selectDomain = ->
-
 
   @autoGenerateTenantCode = ->
     unless @currentTenant.key

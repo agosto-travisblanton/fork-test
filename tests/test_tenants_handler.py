@@ -7,7 +7,7 @@ from content_manager_api import ContentManagerApi
 from agar.test import BaseTest, WebTest
 from models import Tenant, TENANT_ENTITY_GROUP_NAME, Distributor, Domain
 from routes import application
-from mockito import when, any as any_matcher
+from mockito import when, any as any_matcher, verify
 from app_config import config
 
 
@@ -34,6 +34,10 @@ class TestTenantsHandler(BaseTest, WebTest):
                                     impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                     active=True)
         self.domain_key = self.domain.put()
+
+    ##################################################################################################################
+    ## get
+    ##################################################################################################################
 
     def test_get_by_id_returns_ok_status(self):
         tenant_keys = self.load_tenants()
@@ -69,6 +73,10 @@ class TestTenantsHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 5)
 
+    ##################################################################################################################
+    ## post
+    ##################################################################################################################
+
     def test_post_returns_created_status(self):
         name = u'ABC'
         admin_email = u'foo@bar.com'
@@ -77,8 +85,9 @@ class TestTenantsHandler(BaseTest, WebTest):
         request_parameters = {'name': name,
                               'tenant_code': 'acme',
                               'admin_email': admin_email,
-                              'content_server_url': 'https://www.foo.com',
-                              'chrome_device_domain': '',
+                              'content_server_url': 'https://skykit-contentmanager-int.appspot.com/content',
+                              'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
+                              'chrome_device_domain': 'dev.agosto.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': self.domain_key.urlsafe(),
                               'active': True}
@@ -95,9 +104,10 @@ class TestTenantsHandler(BaseTest, WebTest):
         request_parameters = {'name': name,
                               'tenant_code': 'acme',
                               'admin_email': admin_email,
-                              'content_server_url': 'https://www.foo.com',
+                              'content_server_url': 'https://skykit-contentmanager-int.appspot.com/content',
+                              'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
+                              'chrome_device_domain': 'dev.agosto.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
-                              'chrome_device_domain': '',
                               'domain_key': self.domain_key.urlsafe(),
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
@@ -114,9 +124,10 @@ class TestTenantsHandler(BaseTest, WebTest):
         request_parameters = {'name': name,
                               'tenant_code': 'acme',
                               'admin_email': admin_email,
-                              'content_server_url': 'https://www.foo.com',
+                              'content_server_url': 'https://skykit-contentmanager-int.appspot.com/content',
+                              'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
+                              'chrome_device_domain': 'dev.agosto.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
-                              'chrome_device_domain': '',
                               'domain_key': self.domain_key.urlsafe(),
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
@@ -137,9 +148,10 @@ class TestTenantsHandler(BaseTest, WebTest):
         request_parameters = {'name': name,
                               'tenant_code': 'acme',
                               'admin_email': admin_email,
-                              'content_server_url': 'https://www.foo.com',
+                              'content_server_url': 'https://skykit-contentmanager-int.appspot.com/content',
+                              'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
+                              'chrome_device_domain': 'dev.agosto.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
-                              'chrome_device_domain': '',
                               'domain_key': self.domain_key.urlsafe(),
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
@@ -149,19 +161,28 @@ class TestTenantsHandler(BaseTest, WebTest):
         parent = actual.key.parent().get()
         self.assertEqual(parent.name, TENANT_ENTITY_GROUP_NAME)
 
-    # TODO put back into play after uncommenting the call to content mgr
-    # def test_post_content_manager_api_collaboration(self):
-    #     when(ContentManagerApi).create_tenant(any_matcher()).thenReturn(True)
-    #     request_parameters = {'name': 'ABC',
-    #                           'tenant_code': 'acme',
-    #                           'admin_email': 'foo@bar.com',
-    #                           'content_server_url': 'https://www.foo.com',
-    #                           'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
-    #                           'chrome_device_domain': '',
-    #                           'active': True}
-    #     uri = application.router.build(None, 'tenants', None, {})
-    #     self.app.post(uri, json.dumps(request_parameters), headers=self.headers)
-    #     verify(ContentManagerApi, times=1).create_tenant(any_matcher(''))
+    def test_post_content_manager_api_collaboration(self):
+        name = u'acme'
+        admin_email = u'foo@bar.com'
+        when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(str('some key'))
+        when(ContentManagerApi).create_tenant(any_matcher()).thenReturn(True)
+        request_parameters = {'name': name,
+                              'tenant_code': 'acme',
+                              'admin_email': admin_email,
+                              'content_server_url': 'https://skykit-contentmanager-int.appspot.com/content',
+                              'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
+                              'chrome_device_domain': 'dev.agosto.com',
+                              'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
+                              'domain_key': self.domain_key.urlsafe(),
+                              'active': True}
+        uri = application.router.build(None, 'tenants', None, {})
+        when(Domain).find_by_name(any_matcher()).thenReturn(self.domain)
+        self.app.post(uri, json.dumps(request_parameters), headers=self.headers)
+        verify(ContentManagerApi, times=1).create_tenant(any_matcher(''))
+
+    ##################################################################################################################
+    ## put
+    ##################################################################################################################
 
     def test_put_returns_no_content_status(self):
         tenant_keys = self.load_tenants()
@@ -196,6 +217,10 @@ class TestTenantsHandler(BaseTest, WebTest):
         self.app.put_json(uri, entity_body, headers=self.headers)
         self.assertEqual(expected.name, 'foobar')
         self.assertEqual(expected.active, False)
+
+    ##################################################################################################################
+    ## delete
+    ##################################################################################################################
 
     def test_delete_returns_no_content_status(self):
         tenant_keys = self.load_tenants()

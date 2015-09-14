@@ -3,10 +3,9 @@ import logging
 
 from google.appengine.ext import ndb
 from webapp2 import RequestHandler
-from app_config import config
 from content_manager_api import ContentManagerApi
 from decorators import api_token_required
-from models import Tenant, TenantEntityGroup, Domain
+from models import Tenant, TenantEntityGroup
 from restler.serializers import json_response
 from strategy import TENANT_STRATEGY
 
@@ -54,10 +53,21 @@ class TenantsHandler(RequestHandler):
             if content_manager_base_url is None or content_manager_base_url == '':
                 status = 400
                 error_message = 'The content manager base url parameter is invalid.'
-            chrome_device_domain = request_json.get('chrome_device_domain')
-            if chrome_device_domain is None or chrome_device_domain == '':
+            domain_key = request_json.get('domain_key')
+            if domain_key is None or domain_key == '':
                 status = 400
-                error_message = 'The chrome device domain parameter is invalid.'
+                error_message = 'The domain key parameter is invalid.'
+            else:
+                domain = None
+                try:
+                    domain = ndb.Key(urlsafe=domain_key).get()
+                except Exception, e:
+                    logging.exception(e)
+                if None is domain:
+                    status = 400
+                    error_message = 'The domain key parameter did not resolve to a domain'
+                else:
+                    domain_name = domain.name
             active = request_json.get('active')
             if active is None or active == '' or (str(active).lower() != 'true' and str(active).lower() != 'false'):
                 status = 400
@@ -65,17 +75,13 @@ class TenantsHandler(RequestHandler):
             else:
                 active = bool(active)
             if status == 201:
-                # TODO Uncomment these after UI is passing in the domain key
-                # domain_urlsafe_key = request_json.get('domain_key')
-                # domain_key = ndb.Key(urlsafe=domain_urlsafe_key)
-                agosto_default_domain = Domain.find_by_name(config.DEFAULT_AGOSTO_DEVICE_DOMAIN)
                 tenant = Tenant.create(name=name,
                                        tenant_code=tenant_code,
                                        admin_email=admin_email,
                                        content_server_url=content_server_url,
                                        content_manager_base_url=content_manager_base_url,
-                                       chrome_device_domain=chrome_device_domain,
-                                       domain_key=agosto_default_domain.key,
+                                       chrome_device_domain=domain_name,
+                                       domain_key=domain.key,
                                        active=active)
                 tenant_key = tenant.put()
                 content_manager_api = ContentManagerApi()

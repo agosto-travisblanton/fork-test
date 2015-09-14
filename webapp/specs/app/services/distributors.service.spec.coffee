@@ -89,7 +89,7 @@ describe 'DistributorsService', ->
       result = DistributorsService.getByKey(distributorKey)
 
     it 'obtains Restangular service for distributors', ->
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'distributors', "distributors/#{distributorKey}"
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'distributors', "api/v1/distributors/#{distributorKey}"
 
     it 'obtains the distributor from the Restangular service', ->
       expect(distributorRestangularService.get).toHaveBeenCalled()
@@ -148,7 +148,7 @@ describe 'DistributorsService', ->
       result = DistributorsService.getDomainsByKey(distributorKey)
 
     it 'obtains Restangular service for distributor domains', ->
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'distributors', "distributors/#{distributorKey}/domains"
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'distributors', "api/v1/distributors/#{distributorKey}/domains"
 
     it 'obtains the distributor domains from the Restangular service', ->
       expect(distributorRestangularService.get).toHaveBeenCalled()
