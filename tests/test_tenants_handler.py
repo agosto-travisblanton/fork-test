@@ -88,7 +88,6 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'admin_email': admin_email,
                               'content_server_url': 'https://skykit-contentmanager-int.appspot.com/content',
                               'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
-                              'chrome_device_domain': 'dev.agosto.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': self.domain_key.urlsafe(),
                               'active': True}
@@ -106,7 +105,6 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'admin_email': admin_email,
                               'content_server_url': 'https://skykit-contentmanager-int.appspot.com/content',
                               'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
-                              'chrome_device_domain': 'dev.agosto.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': self.domain_key.urlsafe(),
                               'active': True}
@@ -125,7 +123,6 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'admin_email': admin_email,
                               'content_server_url': 'https://skykit-contentmanager-int.appspot.com/content',
                               'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
-                              'chrome_device_domain': 'dev.agosto.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': self.domain_key.urlsafe(),
                               'active': True}
@@ -148,7 +145,6 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'admin_email': admin_email,
                               'content_server_url': 'https://skykit-contentmanager-int.appspot.com/content',
                               'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
-                              'chrome_device_domain': 'dev.agosto.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': self.domain_key.urlsafe(),
                               'active': True}
@@ -168,7 +164,6 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'admin_email': admin_email,
                               'content_server_url': 'https://skykit-contentmanager-int.appspot.com/content',
                               'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
-                              'chrome_device_domain': 'dev.agosto.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': self.domain_key.urlsafe(),
                               'active': True}
@@ -298,7 +293,6 @@ class TestTenantsHandler(BaseTest, WebTest):
                                    admin_email=self.ADMIN_EMAIL.format(x),
                                    content_server_url=self.CONTENT_SERVER_URL,
                                    content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
-                                   chrome_device_domain='testing.skykit.com',
                                    domain_key=domain_key,
                                    active=True)
             tenant_key = tenant.put()

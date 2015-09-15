@@ -53,9 +53,6 @@ class TenantsHandler(RequestHandler):
             if content_manager_base_url is None or content_manager_base_url == '':
                 status = 400
                 error_message = 'The content manager base url parameter is invalid.'
-            chrome_device_domain = request_json.get('chrome_device_domain')
-            if chrome_device_domain is None or chrome_device_domain == '':
-                chrome_device_domain = 'deprecated'
             domain_key_input = request_json.get('domain_key')
             domain_key = None
             if domain_key_input is None or domain_key_input == '':
@@ -81,7 +78,6 @@ class TenantsHandler(RequestHandler):
                                        admin_email=admin_email,
                                        content_server_url=content_server_url,
                                        content_manager_base_url=content_manager_base_url,
-                                       chrome_device_domain=chrome_device_domain,
                                        domain_key=domain_key,
                                        active=active)
                 tenant_key = tenant.put()

@@ -7,7 +7,6 @@ TENANT_FIELDS = [
     'admin_email',
     'content_server_url',
     'content_manager_base_url',
-    'chrome_device_domain',
     'active',
     'created',
     'updated'

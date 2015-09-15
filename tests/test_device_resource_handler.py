@@ -46,9 +46,22 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                     impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                     active=True)
         self.domain_key = self.domain.put()
-        self.tenant_key = self.__create_tenant(self.TENANT_CODE, self.TENANT_NAME, self.ADMIN_EMAIL)
-        self.another_tenant_key = self.__create_tenant(self.ANOTHER_TENANT_CODE, self.ANOTHER_TENANT_NAME,
-                                                       self.ANOTHER_ADMIN_EMAIL)
+        self.tenant = Tenant.create(tenant_code=self.TENANT_CODE,
+                                    name=self.TENANT_NAME,
+                                    admin_email=self.ADMIN_EMAIL,
+                                    content_server_url=self.CONTENT_SERVER_URL,
+                                    content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                                    domain_key=self.domain_key,
+                                    active=True)
+        self.tenant_key = self.tenant.put()
+        self.another_tenant = Tenant.create(tenant_code=self.ANOTHER_TENANT_CODE,
+                                            name=self.ANOTHER_TENANT_NAME,
+                                            admin_email=self.ANOTHER_ADMIN_EMAIL,
+                                            content_server_url=self.CONTENT_SERVER_URL,
+                                            content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                                            domain_key=self.domain_key,
+                                            active=True)
+        self.another_tenant_key = self.another_tenant.put()
         self.device_key = build(ChromeOsDevice,
                                 tenant_key=self.tenant_key,
                                 gcm_registration_id=self.GCM_REGISTRATION_ID,
