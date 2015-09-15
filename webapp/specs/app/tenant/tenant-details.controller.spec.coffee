@@ -147,8 +147,7 @@ describe 'TenantDetailsCtrl', ->
         expect(DistributorsService.getByName).toHaveBeenCalledWith(controller.defaultDistributorName)
 
   describe '.onClickSaveButton', ->
-    domain_name = undefined
-    domain_key = undefined
+    domain_name_value = undefined
 
     beforeEach ->
       tenantsServicePromise = new skykitDisplayDeviceManagement.q.Mock
@@ -158,26 +157,39 @@ describe 'TenantDetailsCtrl', ->
       spyOn(progressBarService, 'start')
       spyOn(progressBarService, 'complete')
       controller = $controller 'TenantDetailsCtrl', serviceInjection
-      domain_name = 'dev.agosto.com'
-      domain_key = '123456789'
-      controller.currentTenant.chrome_device_domain = {name: domain_name, key: domain_key}
+      domain_name_value = 'dev.agosto.com'
+      controller.currentTenant.chrome_device_domain = {value: domain_name_value}
       controller.onClickSaveButton()
       tenantsServicePromise.resolve()
 
-    it 'start the progress bar animation', ->
+    it 'starts the progress bar animation', ->
       expect(progressBarService.start).toHaveBeenCalled()
 
     it 'call TenantsService.save, pass the current tenant', ->
       expect(TenantsService.save).toHaveBeenCalledWith(controller.currentTenant)
 
-    it "the 'then' handler routes navigation back to 'tenants'", ->
-      expect($state.go).toHaveBeenCalledWith('tenants')
+    it 'set the chrome device domain', ->
+      expect(controller.currentTenant.chrome_device_domain).toBe domain_name_value
 
-    it 'the domain key gets set', ->
-      expect(controller.currentTenant.domain_key).toBe domain_key
+    describe '.onSuccessTenantSave', ->
+      beforeEach ->
+        controller.onSuccessTenantSave()
 
-    it 'the domain name gets set', ->
-      expect(controller.currentTenant.domain_name).toBe domain_name
+      it 'stops the progress bar animation', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it "the 'then' handler routes navigation back to 'tenants'", ->
+        expect($state.go).toHaveBeenCalledWith('tenants')
+
+    describe '.onFailureTenantSave', ->
+      beforeEach ->
+        controller.onFailureTenantSave()
+
+      it 'stops the progress bar animation', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it "the 'then' handler routes navigation back to 'tenants'", ->
+        expect($state.go).toHaveBeenCalledWith('tenants')
 
   describe '.autoGenerateTenantCode', ->
     beforeEach ->
