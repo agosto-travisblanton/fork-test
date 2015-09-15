@@ -108,7 +108,13 @@ application = WSGIApplication(
         Route(r'/api/v1/distributors',
               handler='handlers.distributors_handler.DistributorsHandler',
               name='distributors',
-              methods=['GET', 'POST']
+              handler_method='get_list',
+              methods=['GET']
+        ),
+        Route(r'/api/v1/distributors',
+              handler='handlers.distributors_handler.DistributorsHandler',
+              name='distributor-creator',
+              methods=['POST']
               ),
         Route(r'/api/v1/distributors/<distributor_key>',
               handler='handlers.distributors_handler.DistributorsHandler',

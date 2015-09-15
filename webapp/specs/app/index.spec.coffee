@@ -29,8 +29,15 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
     it 'should resolve \'home\' state', ->
       expect($state.href('home', {})).toEqual('#/')
 
-    it 'should resolve \'domain\' state', ->
-      expect($state.href('domain', {})).toEqual('#/domain')
+    it 'should resolve \'domains\' state', ->
+      expect($state.href('domains', {})).toEqual('#/domains')
+
+    it 'should resolve \'newDomain\' state', ->
+      expect($state.href('newDomain', {})).toEqual('#/domains/new')
+
+    it 'should resolve \'editDomain\' state', ->
+      domainKey = 'deree0re9reuewqerer'
+      expect($state.href('editDomain', {domainKey: domainKey})).toEqual("#/domains/#{domainKey}")
 
     it 'should resolve \'devices\' state', ->
       expect($state.href('devices', {})).toEqual('#/devices')
@@ -61,8 +68,8 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
       it 'should resolve \'welcome\' state', ->
         expect($state.get('welcome').ncyBreadcrumb.label).toBe 'Home page'
 
-      it 'should resolve \'domain\' state', ->
-        expect($state.get('domain').ncyBreadcrumb.label).toBe 'Domains'
+      it 'should resolve \'domains\' state', ->
+        expect($state.get('domains').ncyBreadcrumb.label).toBe 'Domains'
 
       it 'should resolve \'tenants\' state', ->
         expect($state.get('tenants').ncyBreadcrumb.label).toBe 'Tenants'
