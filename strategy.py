@@ -8,7 +8,6 @@ TENANT_FIELDS = [
     'content_server_url',
     'content_manager_base_url',
     'chrome_device_domain',
-    'domain_key',
     'active',
     'created',
     'updated'
@@ -16,6 +15,7 @@ TENANT_FIELDS = [
 TENANT_STRATEGY = ModelStrategy(Tenant) + TENANT_FIELDS
 TENANT_STRATEGY += [
     {'key': lambda o, field_name, context: o.key.urlsafe()},
+    {'domain_key': lambda o, field_name, context: o.domain_key.urlsafe()},
 ]
 
 DISTRIBUTOR_FIELDS = [

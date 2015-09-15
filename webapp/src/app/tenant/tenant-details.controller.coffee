@@ -5,6 +5,7 @@ appModule = angular.module('skykitDisplayDeviceManagement')
 appModule.controller 'TenantDetailsCtrl', ($log,
                                            $stateParams,
                                            TenantsService,
+                                           DomainsService,
                                            DevicesService,
                                            DistributorsService,
                                            $state,
@@ -17,45 +18,43 @@ appModule.controller 'TenantDetailsCtrl', ($log,
     admin_email: undefined,
     content_server_url: undefined,
     content_manager_base_url: undefined,
-    chrome_device_domain: undefined,
+    domain_key: undefined
     active: true
   }
+  @selectedDomain = undefined
   @defaultDistributorName = 'Agosto'
   @currentTenantDisplays = []
   @distributorDomains = []
   @editMode = !!$stateParams.tenantKey
 
   if @editMode
-    @generalTabActive = false
-    @linkedDisplaysTabActive = true
-    tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey)
-    tenantPromise.then (data) =>
-      @currentTenant = data
-    displaysPromise = DevicesService.getDevicesByTenant($stateParams.tenantKey)
+    tenantPromise = TenantsService.getTenantByKey $stateParams.tenantKey
+    tenantPromise.then (tenant) =>
+      @currentTenant = tenant
+      @onSuccessResolvingTenant tenant
+    displaysPromise = DevicesService.getDevicesByTenant $stateParams.tenantKey
     displaysPromise.then (data) =>
       @currentTenantDisplays = data.objects
-  else
-    @generalTabActive = true
-    @linkedDisplaysTabActive = false
 
   @initialize = ->
-    distributorPromise = DistributorsService.getByName(@defaultDistributorName)
+    distributorPromise = DistributorsService.getByName @defaultDistributorName
     distributorPromise.then (data) =>
       distributor_key = data[0].key
-      @onSuccessResolvingDistributor(distributor_key)
+      @onSuccessResolvingDistributor distributor_key
+
+  @onSuccessResolvingTenant = (tenant) =>
+    domainPromise = DomainsService.getDomainByKey tenant.domain_key
+    domainPromise.then (data) =>
+      @selectedDomain = data
 
   @onSuccessResolvingDistributor = (distributor_key) =>
-    distributorDomainPromise = DistributorsService.getDomainsByKey(distributor_key)
-    distributorDomainPromise.then (domains_array) =>
-      i = 0
-      while i < domains_array.length
-        domain = {name: domains_array[i].name, value: domains_array[i].name}
-        @distributorDomains.push domain
-        i++
+    distributorDomainPromise = DistributorsService.getDomainsByKey distributor_key
+    distributorDomainPromise.then (domains) =>
+      @distributorDomains = domains
 
   @onClickSaveButton = ->
     ProgressBarService.start()
-    @currentTenant.chrome_device_domain = @currentTenant.chrome_device_domain.value
+    @currentTenant.domain_key = @selectedDomain.key
     promise = TenantsService.save @currentTenant
     promise.then @onSuccessTenantSave, @onFailureTenantSave
 
@@ -70,8 +69,6 @@ appModule.controller 'TenantDetailsCtrl', ($log,
 
   @editItem = (item) ->
     $state.go 'editDevice', {deviceKey: item.key, tenantKey: $stateParams.tenantKey}
-
-  @selectDomain = ->
 
   @autoGenerateTenantCode = ->
     unless @currentTenant.key

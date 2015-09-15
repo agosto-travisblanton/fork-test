@@ -53,22 +53,22 @@ class TenantsHandler(RequestHandler):
             if content_manager_base_url is None or content_manager_base_url == '':
                 status = 400
                 error_message = 'The content manager base url parameter is invalid.'
-
             chrome_device_domain = request_json.get('chrome_device_domain')
             if chrome_device_domain is None or chrome_device_domain == '':
+                chrome_device_domain = 'deprecated'
+            domain_key_input = request_json.get('domain_key')
+            domain_key = None
+            if domain_key_input is None or domain_key_input == '':
                 status = 400
-                error_message = 'The device domain parameter is invalid.'
+                error_message = 'The domain key parameter is invalid.'
             else:
-                domain = None
                 try:
-                    domain = Domain.find_by_name(chrome_device_domain)
+                    domain_key = ndb.Key(urlsafe=domain_key_input)
                 except Exception, e:
                     logging.exception(e)
-                if None is domain:
+                if None is domain_key:
                     status = 400
                     error_message = 'The domain did not resolve.'
-                else:
-                    domain_name = domain.name
             active = request_json.get('active')
             if active is None or active == '' or (str(active).lower() != 'true' and str(active).lower() != 'false'):
                 status = 400
@@ -81,8 +81,8 @@ class TenantsHandler(RequestHandler):
                                        admin_email=admin_email,
                                        content_server_url=content_server_url,
                                        content_manager_base_url=content_manager_base_url,
-                                       chrome_device_domain=domain_name,
-                                       domain_key=domain.key,
+                                       chrome_device_domain=chrome_device_domain,
+                                       domain_key=domain_key,
                                        active=active)
                 tenant_key = tenant.put()
                 content_manager_api = ContentManagerApi()
@@ -102,7 +102,6 @@ class TenantsHandler(RequestHandler):
             logging.info("Problem creating Domain. No request body.")
             self.response.set_status(400, 'Did not receive request body.')
 
-
     @api_token_required
     def put(self, tenant_key):
         key = ndb.Key(urlsafe=tenant_key)
@@ -114,6 +113,13 @@ class TenantsHandler(RequestHandler):
         tenant.content_server_url = request_json.get('content_server_url')
         tenant.content_manager_base_url = request_json.get('content_manager_base_url')
         tenant.chrome_device_domain = request_json.get('chrome_device_domain')
+        domain_key_input = request_json.get('domain_key')
+        try:
+            domain_key = ndb.Key(urlsafe=domain_key_input)
+        except Exception, e:
+            logging.exception(e)
+        if domain_key:
+            tenant.domain_key = domain_key
         tenant.active = request_json.get('active')
         tenant.put()
         self.response.headers.pop('Content-Type', None)

@@ -13,7 +13,7 @@
 
       <div>
         <tabset>
-          <tab heading="General" active="tenantDetailsCtrl.generalTabActive">
+          <tab heading="General">
             <div style="margin-top: 1px;">&nbsp;</div>
             <div class="panel panel-default">
               <div class="panel-heading">
@@ -106,10 +106,10 @@
                     <label for="chromeDeviceDomain" class="col-sm-3 control-label">Device domain</label>
 
                     <div class="col-sm-4">
-                      <select id="chromeDeviceDomain" class="form-control"
-                              data-ng-model="tenantDetailsCtrl.currentTenant.chrome_device_domain"
-                              data-ng-options="i as i.name for i in tenantDetailsCtrl.distributorDomains track by i.value"
-                              ng-change="tenantDetailsCtrl.selectDomain()">
+                      <select id="chromeDeviceDomain"
+                              ng-model="tenantDetailsCtrl.selectedDomain"
+                              class="form-control"
+                              ng-options="i.name for i in tenantDetailsCtrl.distributorDomains track by i.key">
                         <option value=''>Select domain</option>
                       </select>
                     </div>
@@ -189,7 +189,7 @@
             </div>
             <!-- END panel -->
           </tab>
-          <tab heading="Linked displays" active="tenantDetailsCtrl.linkedDisplaysTabActive">
+          <tab heading="Linked displays">
             <div style="margin-top: 1px;">&nbsp;</div>
             <div class="panel panel-default">
               <div class="panel-heading">
