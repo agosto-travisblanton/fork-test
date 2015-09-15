@@ -7,17 +7,18 @@ appModule.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
                                             sweet,
                                             SessionsService,
                                             ProgressBarService) ->
-
   @initializeSignIn = ->
     @clientId = identity.OAUTH_CLIENT_ID
     @state = identity.STATE
     @googlePlusSignInButtonClicked = false
 
   @initializeSignOut = ->
-    $timeout @proceedToSignIn, 2500
+    $timeout @proceedToSignIn, 1500
 
   $scope.$on 'event:google-plus-signin-success', (event, authResult) =>
 #    $log.info "SUCCESS: Google+ sign in. #{JSON.stringify authResult}"
+    unless @googlePlusSignInButtonClicked
+      ProgressBarService.start()
     promise = SessionsService.login(authResult)
     promise.then @loginSuccess, @loginFailure
 
