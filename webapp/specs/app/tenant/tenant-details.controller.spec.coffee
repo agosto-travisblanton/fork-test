@@ -7,6 +7,7 @@ describe 'TenantDetailsCtrl', ->
   $state = undefined
   $stateParams = undefined
   TenantsService = undefined
+  DomainsService = undefined
   DevicesService = undefined
   DistributorsService = undefined
   progressBarService = undefined
@@ -14,16 +15,19 @@ describe 'TenantDetailsCtrl', ->
   devicesServicePromise = undefined
   distributorsServicePromise = undefined
   distributorsDomainsServicePromise = undefined
+  domainsServicePromise = undefined
   sweet = undefined
   serviceInjection = undefined
 
   beforeEach module('skykitDisplayDeviceManagement')
 
-  beforeEach inject (_$controller_, _TenantsService_, _DevicesService_, _DistributorsService_, _$state_, _sweet_) ->
+  beforeEach inject (_$controller_, _TenantsService_, _DomainsService_, _DevicesService_, _DistributorsService_,
+                     _$state_, _sweet_) ->
     $controller = _$controller_
     $state = _$state_
     $stateParams = {}
     TenantsService = _TenantsService_
+    DomainsService = _DomainsService_
     DevicesService = _DevicesService_
     DistributorsService = _DistributorsService_
     progressBarService = {
@@ -44,10 +48,12 @@ describe 'TenantDetailsCtrl', ->
       devicesServicePromise = new skykitDisplayDeviceManagement.q.Mock
       distributorsServicePromise = new skykitDisplayDeviceManagement.q.Mock
       distributorsDomainsServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      domainsServicePromise = new skykitDisplayDeviceManagement.q.Mock
       spyOn(TenantsService, 'getTenantByKey').and.returnValue(tenantsServicePromise)
       spyOn(DevicesService, 'getDevicesByTenant').and.returnValue(devicesServicePromise)
       spyOn(DistributorsService, 'getByName').and.returnValue(distributorsServicePromise)
       spyOn(DistributorsService, 'getDomainsByKey').and.returnValue(distributorsDomainsServicePromise)
+      spyOn(DomainsService, 'getDomainByKey').and.returnValue(domainsServicePromise)
 
     it 'currentTenant should be set', ->
       controller = $controller 'TenantDetailsCtrl', serviceInjection
@@ -59,8 +65,11 @@ describe 'TenantDetailsCtrl', ->
       expect(controller.currentTenant.content_server_url).toBeUndefined()
       expect(controller.currentTenant.chrome_device_domain).toBeUndefined()
       expect(controller.currentTenant.domain_key).toBeUndefined()
-      expect(controller.currentTenant.domain_name).toBeUndefined()
       expect(controller.currentTenant.active).toBeTruthy()
+
+    it 'selectedDomain should be defined', ->
+      controller = $controller 'TenantDetailsCtrl', serviceInjection
+      expect(controller.selectedDomain).toBeUndefined()
 
     it 'defaultDistributor property should be Agosto', ->
       controller = $controller 'TenantDetailsCtrl', serviceInjection
@@ -102,16 +111,6 @@ describe 'TenantDetailsCtrl', ->
         expect(DevicesService.getDevicesByTenant).toHaveBeenCalledWith($stateParams.tenantKey)
         expect(controller.currentTenantDisplays).toBe(devices)
 
-        beforeEach ->
-          $stateParams = {}
-          controller = $controller 'TenantDetailsCtrl', serviceInjection
-
-        it 'sets general tab active to false', ->
-          expect(controller.generalTabActive).toBeFalsy()
-
-        it 'sets linked displays tab active to true', ->
-          expect(controller.linkedDisplaysTabActive).toBeTruthy()
-
     describe 'creating a new tenant', ->
       it 'editMode should be set to false', ->
         $stateParams = {}
@@ -128,16 +127,6 @@ describe 'TenantDetailsCtrl', ->
         controller = $controller 'TenantDetailsCtrl', serviceInjection
         expect(DevicesService.getDevicesByTenant).not.toHaveBeenCalled()
 
-        beforeEach ->
-          $stateParams = {}
-          controller = $controller 'TenantDetailsCtrl', serviceInjection
-
-        it 'sets general tab active to true', ->
-          expect(controller.generalTabActive).toBeTruthy()
-
-        it 'sets linked displays tab active to false', ->
-          expect(controller.linkedDisplaysTabActive).toBeFalsy()
-
     describe '.initialize', ->
       beforeEach ->
         controller = $controller 'TenantDetailsCtrl', serviceInjection
@@ -147,7 +136,7 @@ describe 'TenantDetailsCtrl', ->
         expect(DistributorsService.getByName).toHaveBeenCalledWith(controller.defaultDistributorName)
 
   describe '.onClickSaveButton', ->
-    domain_name_value = undefined
+    domain_key = undefined
 
     beforeEach ->
       tenantsServicePromise = new skykitDisplayDeviceManagement.q.Mock
@@ -157,19 +146,19 @@ describe 'TenantDetailsCtrl', ->
       spyOn(progressBarService, 'start')
       spyOn(progressBarService, 'complete')
       controller = $controller 'TenantDetailsCtrl', serviceInjection
-      domain_name_value = 'dev.agosto.com'
-      controller.currentTenant.chrome_device_domain = {value: domain_name_value}
+      domain_key = '1231231231312'
+      controller.selectedDomain = {key: domain_key}
       controller.onClickSaveButton()
       tenantsServicePromise.resolve()
+
+    it 'sets the domain_key on the current tenant from the selected domain', ->
+      expect(controller.currentTenant.domain_key).toEqual domain_key
 
     it 'starts the progress bar animation', ->
       expect(progressBarService.start).toHaveBeenCalled()
 
     it 'call TenantsService.save, pass the current tenant', ->
       expect(TenantsService.save).toHaveBeenCalledWith(controller.currentTenant)
-
-    it 'set the chrome device domain', ->
-      expect(controller.currentTenant.chrome_device_domain).toBe domain_name_value
 
     describe '.onSuccessTenantSave', ->
       beforeEach ->
