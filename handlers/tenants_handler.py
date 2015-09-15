@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 from webapp2 import RequestHandler
 from content_manager_api import ContentManagerApi
 from decorators import api_token_required
-from models import Tenant, TenantEntityGroup
+from models import Tenant, TenantEntityGroup, Domain
 from restler.serializers import json_response
 from strategy import TENANT_STRATEGY
 
@@ -53,19 +53,20 @@ class TenantsHandler(RequestHandler):
             if content_manager_base_url is None or content_manager_base_url == '':
                 status = 400
                 error_message = 'The content manager base url parameter is invalid.'
-            domain_key = request_json.get('domain_key')
-            if domain_key is None or domain_key == '':
+
+            chrome_device_domain = request_json.get('chrome_device_domain')
+            if chrome_device_domain is None or chrome_device_domain == '':
                 status = 400
-                error_message = 'The domain key parameter is invalid.'
+                error_message = 'The device domain parameter is invalid.'
             else:
                 domain = None
                 try:
-                    domain = ndb.Key(urlsafe=domain_key).get()
+                    domain = Domain.find_by_name(chrome_device_domain)
                 except Exception, e:
                     logging.exception(e)
                 if None is domain:
                     status = 400
-                    error_message = 'The domain key parameter did not resolve to a domain'
+                    error_message = 'The domain did not resolve.'
                 else:
                     domain_name = domain.name
             active = request_json.get('active')

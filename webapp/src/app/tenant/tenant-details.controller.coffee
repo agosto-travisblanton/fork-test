@@ -18,8 +18,6 @@ appModule.controller 'TenantDetailsCtrl', ($log,
     content_server_url: undefined,
     content_manager_base_url: undefined,
     chrome_device_domain: undefined,
-    domain_key: undefined,
-    domain_name: undefined,
     active: true
   }
   @defaultDistributorName = 'Agosto'
@@ -51,14 +49,13 @@ appModule.controller 'TenantDetailsCtrl', ($log,
     distributorDomainPromise.then (domains_array) =>
       i = 0
       while i < domains_array.length
-        domain = {name: domains_array[i].name, key: domains_array[i].key}
+        domain = {name: domains_array[i].name, value: domains_array[i].name}
         @distributorDomains.push domain
         i++
 
   @onClickSaveButton = ->
     ProgressBarService.start()
-    @currentTenant.domain_key = @currentTenant.chrome_device_domain.key
-    @currentTenant.domain_name = @currentTenant.chrome_device_domain.name
+    @currentTenant.chrome_device_domain = @currentTenant.chrome_device_domain.value
     promise = TenantsService.save @currentTenant
     promise.then @onSuccessTenantSave, @onFailureTenantSave
 
