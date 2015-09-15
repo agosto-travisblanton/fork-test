@@ -1,9 +1,11 @@
 'use strict'
 
 angular.module('skykitDisplayDeviceManagement').factory 'SessionsService', ($http, $log, Restangular) ->
+
   new class SessionsService
     SERVICE_NAME = 'sessions'
     @uriBase = 'v1/sessions'
+    @currentUserKey = undefined
 
     getIdentity: ->
       Restangular.oneUrl('api/v1/devices').get()
@@ -22,8 +24,9 @@ angular.module('skykitDisplayDeviceManagement').factory 'SessionsService', ($htt
       }
       if credentials.email and credentials.password
         authenticationPayload = credentials
-      $log.info "Authentication payload: #{JSON.stringify authenticationPayload}"
       promise = $http.post '/login', authenticationPayload
+      promise.success (data) =>
+        @currentUserKey = data.user.key
       promise
 
 

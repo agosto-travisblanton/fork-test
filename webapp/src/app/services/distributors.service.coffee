@@ -4,7 +4,7 @@ appModule = angular.module('skykitDisplayDeviceManagement')
 
 appModule.factory 'DistributorsService', (Restangular) ->
 
-  class DistributorsService
+  new class DistributorsService
     SERVICE_NAME = 'distributors'
     @currentDistributor = undefined
 
@@ -19,6 +19,11 @@ appModule.factory 'DistributorsService', (Restangular) ->
       promise = Restangular.all(SERVICE_NAME).getList()
       promise
 
+    fetchAllByUser: (userKey) ->
+      if userKey
+        promise = Restangular.one('users', userKey).doGET(SERVICE_NAME)
+        promise
+
     getByKey: (key) ->
       promise = Restangular.oneUrl(SERVICE_NAME, "distributors/#{key}").get()
       promise
@@ -32,4 +37,3 @@ appModule.factory 'DistributorsService', (Restangular) ->
       promise = Restangular.all(SERVICE_NAME).getList distributorName: name
       promise
 
-  new DistributorsService()

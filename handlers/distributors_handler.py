@@ -3,15 +3,25 @@ import logging
 
 from google.appengine.ext import ndb
 from webapp2 import RequestHandler
+
 from decorators import api_token_required
-from models import Distributor, DistributorEntityGroup
+from models import Distributor, DistributorEntityGroup, DistributorUser
 from restler.serializers import json_response
 from strategy import DISTRIBUTOR_STRATEGY
 
-__author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
+__author__ = 'Bob MacNeal <bob.macneal@agosto.com>, Christopher Bartling <chris.bartling@agosto.com>'
 
 
 class DistributorsHandler(RequestHandler):
+    @api_token_required
+    def get_list_by_user(self, user_urlsafe_key):
+        key = ndb.Key(urlsafe=user_urlsafe_key)
+        distributor_user_associations = DistributorUser.query(DistributorUser.user_key == key).fetch(100)
+        distributors = []
+        for distributor_user_association in distributor_user_associations:
+            distributors.append(distributor_user_association.distributor_key.get())
+        json_response(self.response, distributors, strategy=DISTRIBUTOR_STRATEGY)
+
     @api_token_required
     def get_list(self):
         distributor_name = self.request.get('distributorName')

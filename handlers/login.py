@@ -85,7 +85,7 @@ class LoginHandler(SessionRequestHandler):
             self.session['user_key'] = user.key.urlsafe()
             if len(user.distributors) == 1:
                 self.session['distributor'] = user.distributors[0].name
-            result = {'message': 'Successful Login'}
+            result = {'message': 'Successful Login', 'user': {'key': user.key.urlsafe()}}
             status_code = 200
 
         json_response(self.response, result, status_code=status_code)
