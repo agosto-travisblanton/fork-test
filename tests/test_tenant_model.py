@@ -36,7 +36,6 @@ class TestTenantModel(BaseTest):
                                     admin_email=self.ADMIN_EMAIL,
                                     content_server_url=self.CONTENT_SERVER_URL,
                                     content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
-                                    chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
                                     domain_key=self.domain_key,
                                     active=True)
         self.tenant_key = self.tenant.put()
@@ -62,7 +61,6 @@ class TestTenantModel(BaseTest):
                                         admin_email=self.ADMIN_EMAIL,
                                         content_server_url=self.CONTENT_SERVER_URL,
                                         content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
-                                        chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
                                         domain_key=self.domain_key,
                                         active=False)
         inactive_tenant.put()
@@ -77,7 +75,6 @@ class TestTenantModel(BaseTest):
         self.assertEqual(self.ADMIN_EMAIL, tenant_created.admin_email)
         self.assertEqual(self.CONTENT_SERVER_URL, tenant_created.content_server_url)
         self.assertEqual(self.CONTENT_MANAGER_BASE_URL, tenant_created.content_manager_base_url)
-        self.assertEqual(self.CHROME_DEVICE_DOMAIN, tenant_created.chrome_device_domain)
         self.assertEqual(self.NAME, tenant_created.name)
         self.assertEqual(self.domain_key, tenant_created.domain_key)
 

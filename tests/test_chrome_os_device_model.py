@@ -43,7 +43,6 @@ class TestChromeOsDeviceModel(BaseTest):
                                     admin_email=self.ADMIN_EMAIL,
                                     content_server_url=self.CONTENT_SERVER_URL,
                                     content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
-                                    chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
                                     domain_key=self.domain_key,
                                     active=True)
         self.tenant_key = self.tenant.put()
@@ -84,7 +83,6 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertEqual(str(chrome_os_device.api_key), json_representation['apiKey'])
         self.assertEqual(str(self.tenant.name), json_representation['tenantName'])
         self.assertEqual(str(self.tenant.content_server_url), json_representation['contentServerUrl'])
-        self.assertEqual(str(self.tenant.chrome_device_domain), json_representation['chromeDeviceDomain'])
         self.assertEqual(str(chrome_os_device.mac_address), json_representation['macAddress'])
 
     def test_json_serialization_strategy_with_optional_serial_number(self):

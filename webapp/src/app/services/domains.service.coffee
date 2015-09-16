@@ -3,7 +3,6 @@
 appModule = angular.module('skykitDisplayDeviceManagement')
 
 appModule.factory 'DomainsService', (Restangular) ->
-
   new class DomainsService
 
     save: (domain) ->

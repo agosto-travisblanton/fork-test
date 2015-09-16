@@ -72,8 +72,21 @@
                     A distributor key is required.
                   </p>
                 </div>
+              </div>
+              <div class="form-group">
+                <label for="entityKey" class="col-sm-2 control-label">Entity key</label>
+
+                <div class="col-sm-10">
+                  <input type="text"
+                         class="form-control"
+                         name="entityKey"
+                         id="entityKey"
+                         readonly
+                         ng-model="domainDetailsCtrl.currentDomain.key">
+                </div>
 
               </div>
+
               <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-9">
                   <input type="checkbox"

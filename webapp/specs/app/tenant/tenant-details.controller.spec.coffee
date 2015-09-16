@@ -7,21 +7,29 @@ describe 'TenantDetailsCtrl', ->
   $state = undefined
   $stateParams = undefined
   TenantsService = undefined
+  DomainsService = undefined
   DevicesService = undefined
+  DistributorsService = undefined
   progressBarService = undefined
   tenantsServicePromise = undefined
   devicesServicePromise = undefined
+  distributorsServicePromise = undefined
+  distributorsDomainsServicePromise = undefined
+  domainsServicePromise = undefined
   sweet = undefined
   serviceInjection = undefined
 
   beforeEach module('skykitDisplayDeviceManagement')
 
-  beforeEach inject (_$controller_, _TenantsService_, _DevicesService_, _$state_, _sweet_) ->
+  beforeEach inject (_$controller_, _TenantsService_, _DomainsService_, _DevicesService_, _DistributorsService_,
+                     _$state_, _sweet_) ->
     $controller = _$controller_
     $state = _$state_
     $stateParams = {}
     TenantsService = _TenantsService_
+    DomainsService = _DomainsService_
     DevicesService = _DevicesService_
+    DistributorsService = _DistributorsService_
     progressBarService = {
       start: ->
       complete: ->
@@ -34,13 +42,18 @@ describe 'TenantDetailsCtrl', ->
       ProgressBarService: progressBarService
     }
 
-
   describe 'initialization', ->
     beforeEach ->
       tenantsServicePromise = new skykitDisplayDeviceManagement.q.Mock
       devicesServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      distributorsServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      distributorsDomainsServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      domainsServicePromise = new skykitDisplayDeviceManagement.q.Mock
       spyOn(TenantsService, 'getTenantByKey').and.returnValue(tenantsServicePromise)
       spyOn(DevicesService, 'getDevicesByTenant').and.returnValue(devicesServicePromise)
+      spyOn(DistributorsService, 'getByName').and.returnValue(distributorsServicePromise)
+      spyOn(DistributorsService, 'getDomainsByKey').and.returnValue(distributorsDomainsServicePromise)
+      spyOn(DomainsService, 'getDomainByKey').and.returnValue(domainsServicePromise)
 
     it 'currentTenant should be set', ->
       controller = $controller 'TenantDetailsCtrl', serviceInjection
@@ -51,7 +64,24 @@ describe 'TenantDetailsCtrl', ->
       expect(controller.currentTenant.admin_email).toBeUndefined()
       expect(controller.currentTenant.content_server_url).toBeUndefined()
       expect(controller.currentTenant.chrome_device_domain).toBeUndefined()
+      expect(controller.currentTenant.domain_key).toBeUndefined()
       expect(controller.currentTenant.active).toBeTruthy()
+
+    it 'selectedDomain should be defined', ->
+      controller = $controller 'TenantDetailsCtrl', serviceInjection
+      expect(controller.selectedDomain).toBeUndefined()
+
+    it 'defaultDistributor property should be Agosto', ->
+      controller = $controller 'TenantDetailsCtrl', serviceInjection
+      expect(controller.defaultDistributorName).toEqual 'Agosto'
+
+    it 'currentTenantDisplays property should be defined', ->
+      controller = $controller 'TenantDetailsCtrl', serviceInjection
+      expect(controller.currentTenantDisplays).toBeDefined()
+
+    it 'distributorDomains property should be defined', ->
+      controller = $controller 'TenantDetailsCtrl', serviceInjection
+      expect(controller.distributorDomains).toBeDefined()
 
     describe 'editing an existing tenant', ->
       beforeEach ->
@@ -97,7 +127,17 @@ describe 'TenantDetailsCtrl', ->
         controller = $controller 'TenantDetailsCtrl', serviceInjection
         expect(DevicesService.getDevicesByTenant).not.toHaveBeenCalled()
 
+    describe '.initialize', ->
+      beforeEach ->
+        controller = $controller 'TenantDetailsCtrl', serviceInjection
+
+      it 'calls DistributorsService.getByName to retrieve default distributor', ->
+        controller.initialize()
+        expect(DistributorsService.getByName).toHaveBeenCalledWith(controller.defaultDistributorName)
+
   describe '.onClickSaveButton', ->
+    domain_key = undefined
+
     beforeEach ->
       tenantsServicePromise = new skykitDisplayDeviceManagement.q.Mock
       spyOn(TenantsService, 'save').and.returnValue(tenantsServicePromise)
@@ -106,21 +146,39 @@ describe 'TenantDetailsCtrl', ->
       spyOn(progressBarService, 'start')
       spyOn(progressBarService, 'complete')
       controller = $controller 'TenantDetailsCtrl', serviceInjection
-
-    it 'start the progress bar animation', ->
+      domain_key = '1231231231312'
+      controller.selectedDomain = {key: domain_key}
       controller.onClickSaveButton()
       tenantsServicePromise.resolve()
+
+    it 'sets the domain_key on the current tenant from the selected domain', ->
+      expect(controller.currentTenant.domain_key).toEqual domain_key
+
+    it 'starts the progress bar animation', ->
       expect(progressBarService.start).toHaveBeenCalled()
 
     it 'call TenantsService.save, pass the current tenant', ->
-      controller.onClickSaveButton()
-      tenantsServicePromise.resolve()
       expect(TenantsService.save).toHaveBeenCalledWith(controller.currentTenant)
 
-    it "the 'then' handler routes navigation back to 'tenants'", ->
-      controller.onClickSaveButton()
-      tenantsServicePromise.resolve()
-      expect($state.go).toHaveBeenCalledWith('tenants')
+    describe '.onSuccessTenantSave', ->
+      beforeEach ->
+        controller.onSuccessTenantSave()
+
+      it 'stops the progress bar animation', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it "the 'then' handler routes navigation back to 'tenants'", ->
+        expect($state.go).toHaveBeenCalledWith('tenants')
+
+    describe '.onFailureTenantSave', ->
+      beforeEach ->
+        controller.onFailureTenantSave()
+
+      it 'stops the progress bar animation', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it "the 'then' handler routes navigation back to 'tenants'", ->
+        expect($state.go).toHaveBeenCalledWith('tenants')
 
   describe '.autoGenerateTenantCode', ->
     beforeEach ->

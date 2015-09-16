@@ -6,8 +6,9 @@ from webapp2 import RequestHandler
 
 from decorators import api_token_required
 from models import Distributor, DistributorEntityGroup, DistributorUser
+from models import Distributor, DistributorEntityGroup, Domain
 from restler.serializers import json_response
-from strategy import DISTRIBUTOR_STRATEGY
+from strategy import DISTRIBUTOR_STRATEGY, DOMAIN_STRATEGY
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>, Christopher Bartling <chris.bartling@agosto.com>'
 
@@ -37,6 +38,12 @@ class DistributorsHandler(RequestHandler):
         distributor_key = ndb.Key(urlsafe=distributor_key)
         result = distributor_key.get()
         json_response(self.response, result, strategy=DISTRIBUTOR_STRATEGY)
+
+    @api_token_required
+    def get_domains(self, distributor_key):
+        distributor_key = ndb.Key(urlsafe=distributor_key)
+        result = Domain.query(Domain.distributor_key == distributor_key, True == Domain.active).fetch(100)
+        json_response(self.response, result, strategy=DOMAIN_STRATEGY)
 
     @api_token_required
     def post(self):

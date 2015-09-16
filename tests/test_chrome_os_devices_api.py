@@ -95,7 +95,6 @@ class TestChromeOsDevicesApi(BaseTest):
                                admin_email='admin@foobar.com',
                                content_server_url='https://www.content.com/content',
                                content_manager_base_url='https://www.content.com',
-                               chrome_device_domain='foobar.com',
                                domain_key=domain_key,
                                active=True)
         tenant_key = tenant.put()

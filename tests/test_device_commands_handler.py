@@ -41,7 +41,6 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
                                     admin_email=self.ADMIN_EMAIL,
                                     content_server_url=self.CONTENT_SERVER_URL,
                                     content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
-                                    chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
                                     domain_key=self.domain_key,
                                     active=True)
         self.tenant_key = self.tenant.put()

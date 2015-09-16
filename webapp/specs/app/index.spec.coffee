@@ -29,6 +29,9 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
     it 'should resolve \'home\' state', ->
       expect($state.href('home', {})).toEqual('#/')
 
+    it 'should resolve \'version\' state', ->
+      expect($state.href('version', {})).toEqual('#/version')
+
     it 'should resolve \'domains\' state', ->
       expect($state.href('domains', {})).toEqual('#/domains')
 
