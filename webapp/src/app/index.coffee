@@ -41,19 +41,19 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     controller: "DistributorSelectorCtrl",
     controllerAs: 'distributorSelectorCtrl',
   })
-#  $stateProvider.state("home", {
-#    url: "/",
-#    templateUrl: "app/welcome/welcome.html",
-#    resolve: {
-#      identity: (IdentityService) ->
-#        IdentityService.getIdentity()
-#    },
-#    controller: "WelcomeCtrl",
-#    controllerAs: 'welcomeCtrl',
-#    ncyBreadcrumb: {
-#      label: 'Home page'
-#    }
-#  })
+  $stateProvider.state("home", {
+    url: "/",
+    templateUrl: "app/welcome/welcome.html",
+    resolve: {
+      identity: (IdentityService) ->
+        IdentityService.getIdentity()
+    },
+    controller: "WelcomeCtrl",
+    controllerAs: 'welcomeCtrl',
+    ncyBreadcrumb: {
+      label: 'Home page'
+    }
+  })
   $stateProvider.state("welcome", {
     url: "/welcome",
     templateUrl: "app/welcome/welcome.html",
