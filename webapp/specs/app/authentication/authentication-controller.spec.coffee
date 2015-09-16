@@ -67,8 +67,27 @@ describe 'AuthenticationCtrl', ->
       spyOn(controller, 'loginSuccess').and.callFake (response) ->
       spyOn(controller, 'loginFailure').and.callFake (response) ->
 
-#    describe "Google Plus sign in button clicked", ->
-#      it "", ->
+    describe "Google Plus sign in button clicked", ->
+      beforeEach ->
+        controller.googlePlusSignInButtonClicked = true
+        controller.onGooglePlusSignInSuccess event, authResult
+
+      it "do not start the progress bar", ->
+        promise.resolve loginResponse
+        expect(ProgressBarService.start).not.toHaveBeenCalled()
+
+      it "call SessionsService.login to sign into Stormpath", ->
+        promise.resolve loginResponse
+        expect(SessionsService.login).toHaveBeenCalledWith authResult
+
+      it "invoke loginSuccess when the login promise resolves successfully", ->
+        promise.resolve loginResponse
+        expect(controller.loginSuccess).toHaveBeenCalledWith loginResponse
+
+      it "invoke loginFailure when the login promise fails to resolve", ->
+        promise.reject loginResponse
+        expect(controller.loginFailure).toHaveBeenCalledWith loginResponse
+
 
     describe "Google Plus sign in button not clicked", ->
       beforeEach ->
