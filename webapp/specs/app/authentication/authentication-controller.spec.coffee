@@ -9,7 +9,10 @@ describe 'AuthenticationCtrl', ->
   $rootScope = undefined
   $scope = undefined
   $log = undefined
-  $timeout = undefined
+  $timeoutMock = {
+    timeout: (callback, lapse) ->
+      setTimeout(callback, lapse)
+  }
   identity = undefined
   sweet = undefined
   SessionsService = undefined
@@ -17,11 +20,18 @@ describe 'AuthenticationCtrl', ->
 
   beforeEach module('skykitDisplayDeviceManagement')
 
+  beforeEach module(($provide) ->
+    $provide.decorator '$timeout',
+      ($delegate) ->
+        (callback, lapse) ->
+          $timeoutMock.timeout callback, lapse
+          $delegate.apply(this, arguments)
+  )
+
   beforeEach inject (_$controller_,
                      _$state_,
                      _$rootScope_,
                      _$log_,
-                     _$timeout_,
                      _sweet_,
                      _SessionsService_,
                      _ProgressBarService_) ->
@@ -30,7 +40,6 @@ describe 'AuthenticationCtrl', ->
     $rootScope = _$rootScope_
     $scope = _$rootScope_.$new()
     $log = _$log_
-    $timeout = _$timeout_
     sweet = _sweet_
     SessionsService = _SessionsService_
     ProgressBarService = _ProgressBarService_
@@ -39,7 +48,6 @@ describe 'AuthenticationCtrl', ->
       $scope: $scope
       $log: $log
       $state: $state
-      $timeout: $timeout
       identity: identity
       sweet: sweet
       SessionsService: SessionsService
@@ -112,9 +120,46 @@ describe 'AuthenticationCtrl', ->
 
 
   describe '.onGooglePlusSignInFailure', ->
-    beforeEach ->
+    authResult = {}
+    event = {}
+    loginResponse = {}
+    promise = undefined
 
-    it "", ->
+    beforeEach ->
+      promise = new skykitDisplayDeviceManagement.q.Mock()
+      spyOn(ProgressBarService, 'complete')
+      spyOn(sweet, 'show')
+
+    describe "Google Plus sign in button clicked", ->
+      beforeEach ->
+        controller.googlePlusSignInButtonClicked = true
+        controller.onGooglePlusSignInFailure event, authResult
+
+      it "complete the progress bar", ->
+        expect(ProgressBarService.complete).toHaveBeenCalled()
+
+      it "show the error dialog", ->
+        expect(sweet.show).toHaveBeenCalledWith 'Oops...', 'Unable to authenticate to Google+.', 'error'
+
+    describe "Google Plus sign in button not clicked", ->
+      beforeEach ->
+        controller.googlePlusSignInButtonClicked = false
+        controller.onGooglePlusSignInFailure event, authResult
+
+      it "does not complete the progress bar", ->
+        expect(ProgressBarService.complete).not.toHaveBeenCalled()
+
+      it "does not show the error dialog", ->
+        expect(sweet.show).not.toHaveBeenCalled()
+
+  describe '.initializeSignOut', ->
+    beforeEach ->
+      spyOn($timeoutMock, 'timeout').and.callFake (callback) -> callback()
+      spyOn(controller, 'proceedToSignIn').and.callFake ->
+      controller.initializeSignOut()
+
+    it "calls $timeout with the proceed with sign in function and delay", ->
+      expect(controller.proceedToSignIn).toHaveBeenCalled()
 
 
 
