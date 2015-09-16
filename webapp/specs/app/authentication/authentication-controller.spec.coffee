@@ -159,6 +159,9 @@ describe 'AuthenticationCtrl', ->
       controller.initializeSignOut()
 
     it "calls $timeout with the proceed with sign in function and delay", ->
+      expect($timeoutMock.timeout).toHaveBeenCalledWith controller.proceedToSignIn, 1500
+
+    it "calls proceedToSignIn after timeout delay", ->
       expect(controller.proceedToSignIn).toHaveBeenCalled()
 
 
