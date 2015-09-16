@@ -64,7 +64,7 @@ describe 'DomainDetailsCtrl', ->
       beforeEach ->
         controller = $controller 'DomainDetailsCtrl', serviceInjection
 
-      it 'call DistributorsService.getByName to retrieve default distributor', ->
+      it 'calls DistributorsService.getByName to retrieve default distributor', ->
         controller.initialize()
         expect(DistributorsService.getByName).toHaveBeenCalledWith(controller.defaultDistributor)
 
