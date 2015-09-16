@@ -32,7 +32,6 @@ appModule.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
   @initializeSignOut = ->
     $timeout @proceedToSignIn, 1500
 
-
   @loginSuccess = (response) ->
     ProgressBarService.complete()
     $state.go 'distributor_selection'

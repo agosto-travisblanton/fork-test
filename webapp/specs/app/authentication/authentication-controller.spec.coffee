@@ -13,7 +13,6 @@ describe 'AuthenticationCtrl', ->
     timeout: (callback, lapse) ->
       setTimeout(callback, lapse)
   }
-  identity = undefined
   sweet = undefined
   SessionsService = undefined
   ProgressBarService = undefined
@@ -151,6 +150,21 @@ describe 'AuthenticationCtrl', ->
 
       it "does not show the error dialog", ->
         expect(sweet.show).not.toHaveBeenCalled()
+
+
+  describe '.initializeSignIn', ->
+    beforeEach ->
+      controller.initializeSignIn()
+
+    it "initializes the clientId variable with identity OAuth client ID", ->
+      expect(controller.clientId).toBe identity.OAUTH_CLIENT_ID
+
+    it "initializes the state variable with identity state", ->
+      expect(controller.state).toBe identity.STATE
+
+    it "initializes the googlePlusSignInButtonClicked variable to false", ->
+      expect(controller.googlePlusSignInButtonClicked).toBeFalsy()
+
 
   describe '.initializeSignOut', ->
     beforeEach ->
