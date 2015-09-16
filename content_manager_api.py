@@ -21,15 +21,15 @@ class ContentManagerApi(object):
             "admin_email": tenant.admin_email
         }
         url = "{content_manager_base_url}/provisioning/v1/tenants".format(
-            content_manager_base_url=tenant.content_server_url)
-        http_client_response = HttpClient().post(HttpClientRequest(url=url,
-                                                                   payload=(json.dumps(payload)),
-                                                                   headers=self.HEADERS))
+            content_manager_base_url=tenant.content_manager_base_url)
+        http_client = HttpClient()
+        http_client.set_default_fetch_deadline(limit_in_seconds=60)
+        http_client_response = http_client.post(HttpClientRequest(url=url,
+                                                                  payload=(json.dumps(payload)),
+                                                                  headers=self.HEADERS))
         if http_client_response.status_code == 201:
-            logging.info('create_tenant to Content Mgr: url={0}, admin_email={1}, tenant_code={1}'.format(
-                url,
-                tenant.admin_email,
-                tenant.tenant_code))
+            logging.info('create_tenant to Content Mgr: url={0}, admin_email={1}, tenant_code={2}'.format(
+                url, tenant.admin_email, tenant.tenant_code))
             return True
         else:
             error_message = 'Unable to create tenant {0} in Content Manager. Status code: {1}'.format(
@@ -46,7 +46,7 @@ class ContentManagerApi(object):
                 "tenant_code": tenant.tenant_code
             }
             url = "{content_manager_base_url}/provisioning/v1/displays".format(
-                content_manager_base_url=tenant.content_server_url)
+                content_manager_base_url=tenant.content_manager_base_url)
             http_client_request = HttpClientRequest(url=url,
                                                     payload=json.dumps(payload),
                                                     headers=self.HEADERS)

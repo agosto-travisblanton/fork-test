@@ -6,7 +6,7 @@ import json
 from webtest import AppError
 from agar.test import BaseTest, WebTest
 from app_config import config
-from models import ChromeOsDevice, Tenant
+from models import ChromeOsDevice, Tenant, Distributor, Domain
 from routes import application
 import device_commands_processor
 from mockito import when, any as any_matcher
@@ -16,20 +16,33 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
     APPLICATION = application
     NAME = 'foobar tenant'
     ADMIN_EMAIL = 'foo@bar.com'
-    CONTENT_SERVER_URL = 'https://www.content.com'
-    CHROME_DEVICE_DOMAIN = 'bar.com'
+    CONTENT_SERVER_URL = 'https://skykit-contentmanager-int.appspot.com/content'
+    CONTENT_MANAGER_BASE_URL = 'https://skykit-contentmanager-int.appspot.com'
+    CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     TENANT_CODE = 'foobar'
     DEVICE_ID = '4f099e50-6028-422b-85d2-3a629a45bf38'
     GCM_REGISTRATION_ID = '8d70a8d78a6dfa6df76dfasd'
     MAC_ADDRESS = '54271e619346'
+    DISTRIBUTOR_NAME = 'agosto'
+    IMPERSONATION_EMAIL = 'test@test.com'
 
     def setUp(self):
         super(TestDeviceCommandsHandler, self).setUp()
+        self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
+                                              active=True)
+        self.distributor_key = self.distributor.put()
+        self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
+                                    distributor_key=self.distributor_key,
+                                    impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
+                                    active=True)
+        self.domain_key = self.domain.put()
         self.tenant = Tenant.create(tenant_code=self.TENANT_CODE,
                                     name=self.NAME,
                                     admin_email=self.ADMIN_EMAIL,
                                     content_server_url=self.CONTENT_SERVER_URL,
+                                    content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
                                     chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
+                                    domain_key=self.domain_key,
                                     active=True)
         self.tenant_key = self.tenant.put()
         self.chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,

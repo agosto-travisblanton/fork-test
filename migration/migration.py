@@ -14,12 +14,17 @@ from utils.web_util import build_uri
 from webapp2 import RequestHandler
 import logging
 import traceback
+
 from hydrate_tenant_key_on_devices import HydrateTenantKeyOnDevices
 from refresh_chrome_device_properties_from_directory_api import RefreshChromeDevicePropertiesFromDirectoryApi
+from seed_agosto_distributor_domain import SeedAgostoDistributorDomain
+from set_content_manager_base_url_on_tenant import SetContentManagerBaseUrlOnTenant
 
 MIGRATIONS = [
     HydrateTenantKeyOnDevices(),
-    RefreshChromeDevicePropertiesFromDirectoryApi()
+    RefreshChromeDevicePropertiesFromDirectoryApi(),
+    SeedAgostoDistributorDomain(),
+    SetContentManagerBaseUrlOnTenant()
 ]
 
 MIGRATIONS_MAP = {migration.name: migration for migration in MIGRATIONS}

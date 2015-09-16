@@ -9,14 +9,20 @@ skykitDisplayDeviceManagement = angular.module('skykitDisplayDeviceManagement', 
   'ui.router',
   'hSweetAlert',
   'ui.bootstrap',
-  'ncy-angular-breadcrumb'
+  'ncy-angular-breadcrumb',
+  'directive.g+signin',
+  'ngProgress'
 ])
 
 skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   $stateProvider.state("home", {
     url: "/",
     templateUrl: "app/welcome/welcome.html",
-    controller: "WelcomeCtrl"
+    resolve: {
+      identity: (IdentityService) ->
+        IdentityService.getIdentity()
+    },
+    controller: "WelcomeCtrl",
     controllerAs: 'welcomeCtrl',
     ncyBreadcrumb: {
       label: 'Home page'
@@ -25,6 +31,10 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
   $stateProvider.state("welcome", {
     url: "/welcome",
     templateUrl: "app/welcome/welcome.html",
+    resolve: {
+      identity: (IdentityService) ->
+        IdentityService.getIdentity()
+    },
     controller: "WelcomeCtrl"
     controllerAs: 'welcomeCtrl',
     ncyBreadcrumb: {
@@ -125,3 +135,6 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
   RestangularProvider.setRestangularFields {
     id: 'key'
   }
+
+#skykitDisplayDeviceManagement.run (IdentityService) ->
+#  IdentityService.getIdentity()

@@ -22,11 +22,10 @@ application = WSGIApplication(
         ############################################################
         # warmup
         ############################################################
-        Route(
-            r'/_ah/warmup',
-            handler='handlers.warmup.WarmupHandler',
-            name='warmup',
-        ),
+        Route(r'/_ah/warmup',
+              handler='handlers.warmup.WarmupHandler',
+              name='warmup',
+              ),
 
         ############################################################
         # version
@@ -42,90 +41,94 @@ application = WSGIApplication(
         ############################################################
         # login
         ############################################################
-        Route(
-            r'/api/v1/identity',
-            handler='handlers.login.IdentityHandler',
-            name='identity'
-        ),
+        Route(r'/api/v1/identity',
+              handler='handlers.login.IdentityHandler',
+              name='identity'
+              ),
 
-        Route(
-            r'/login',
-            handler='handlers.login.LoginHandler',
-            name='login',
-        ),
+        Route(r'/login',
+              handler='handlers.login.LoginHandler',
+              name='login',
+              ),
 
-        Route(
-            r'/logout',
-            handler='handlers.login.LogoutHandler',
-            name='logout',
-        ),
+        Route(r'/logout',
+              handler='handlers.login.LogoutHandler',
+              name='logout',
+              ),
 
         ############################################################
         # device registration
         ############################################################
-        Route(
-            r'/api/v1/devices',
-            handler='handlers.device_resource_handler.DeviceResourceHandler',
-            name='devices-retrieval',
-            handler_method='get_list',
-            methods=['GET']
-        ),
-        Route(
-            r'/api/v1/devices',
-            handler='handlers.device_resource_handler.DeviceResourceHandler',
-            name='device-creator',
-            handler_method='post',
-            methods=['POST']
-        ),
-        Route(
-            r'/api/v1/devices/<device_urlsafe_key>',
-            handler='handlers.device_resource_handler.DeviceResourceHandler',
-            name='manage-device',
-            methods=['GET', 'PUT', 'DELETE']
-        ),
-        Route(
-            r'/api/v1/devices/<device_urlsafe_key>/commands',
-            handler='handlers.device_commands_handler.DeviceCommandsHandler',
-            name='device-commands',
-        ),
-        Route(
-            r'/api/v1/tenants/<tenant_urlsafe_key>/devices',
-            handler='handlers.device_resource_handler.DeviceResourceHandler',
-            name='devices-by-tenant',
-            handler_method='get_devices_by_tenant',
-            methods=['GET']
-        ),
+        Route(r'/api/v1/devices',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='devices-retrieval',
+              handler_method='get_list',
+              methods=['GET']
+              ),
+        Route(r'/api/v1/devices',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='device-creator',
+              handler_method='post',
+              methods=['POST']
+              ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='manage-device',
+              methods=['GET', 'PUT', 'DELETE']
+              ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/commands',
+              handler='handlers.device_commands_handler.DeviceCommandsHandler',
+              name='device-commands',
+              ),
+        Route(r'/api/v1/tenants/<tenant_urlsafe_key>/devices',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='devices-by-tenant',
+              handler_method='get_devices_by_tenant',
+              methods=['GET']
+              ),
 
         ############################################################
         # Tenants
         ############################################################
-        Route(
-            r'/api/v1/tenants',
-            handler='handlers.tenants_handler.TenantsHandler',
-            name='tenants',
-            methods=['GET', 'POST']
-        ),
+        Route(r'/api/v1/tenants',
+              handler='handlers.tenants_handler.TenantsHandler',
+              name='tenants',
+              methods=['GET', 'POST']
+              ),
         Route(
             r'/api/v1/tenants/<tenant_key>',
             handler='handlers.tenants_handler.TenantsHandler',
             name='manage-tenant',
             methods=['GET', 'PUT', 'DELETE']
         ),
+
         ############################################################
         # Distributors
         ############################################################
-        Route(
-            r'/api/v1/distributors',
-            handler='handlers.distributors_handler.DistributorsHandler',
-            name='distributors',
-            methods=['GET', 'POST']
-        ),
-        Route(
-            r'/api/v1/distributors/<distributor_key>',
-            handler='handlers.distributors_handler.DistributorsHandler',
-            name='manage-distributor',
-            methods=['GET', 'PUT', 'DELETE']
-        )
+        Route(r'/api/v1/distributors',
+              handler='handlers.distributors_handler.DistributorsHandler',
+              name='distributors',
+              methods=['GET', 'POST']
+              ),
+        Route(r'/api/v1/distributors/<distributor_key>',
+              handler='handlers.distributors_handler.DistributorsHandler',
+              name='manage-distributor',
+              methods=['GET', 'PUT', 'DELETE']
+              ),
+
+        ############################################################
+        # Domains
+        ############################################################
+        Route(r'/api/v1/domains',
+              handler='handlers.domains_handler.DomainsHandler',
+              name='domains',
+              methods=['GET', 'POST']
+              ),
+        Route(r'/api/v1/domains/<domain_key>',
+              handler='handlers.domains_handler.DomainsHandler',
+              name='manage-domain',
+              methods=['GET', 'PUT', 'DELETE']
+              )
     ],
     debug=not on_production_server
 )

@@ -69,9 +69,22 @@
                       class="form-horizontal"
                       ng-submit="tenantDetailsCtrl.onClickSaveButton()"
                       novalidate>
+                  <div class="form-group">
+                    <label for="key" class="col-sm-3 control-label">Entity key</label>
+
+                    <div class="col-sm-9">
+                      <input type="text"
+                             class="form-control"
+                             style="font-size: 0.8em;"
+                             name="key"
+                             id="key"
+                             readonly
+                             ng-model="tenantDetailsCtrl.currentTenant.key">
+                    </div>
+                  </div>
                   <div class="form-group"
                        ng-class="{ 'has-error' : tenantForm.name.$invalid && !tenantForm.name.$pristine }">
-                    <label for="name" class="col-sm-2 control-label">Name</label>
+                    <label for="name" class="col-sm-3 control-label">Name</label>
 
                     <div class="col-sm-4">
                       <input type="text"
@@ -84,7 +97,7 @@
                              ng-change="tenantDetailsCtrl.autoGenerateTenantCode()"
                              autofocus>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-5">
                       <p ng-show="tenantForm.name.$invalid && !tenantForm.name.$pristine"
                          class="help-block">
                         The tenant name is required.
@@ -93,7 +106,7 @@
                   </div>
                   <div class="form-group"
                        ng-class="{ 'has-error' : tenantForm.tenantCode.$invalid && !tenantForm.tenantCode.$pristine }">
-                    <label for="tenantCode" class="col-sm-2 control-label">Tenant
+                    <label for="tenantCode" class="col-sm-3 control-label">Tenant
                       code</label>
 
                     <div class="col-sm-4">
@@ -105,7 +118,7 @@
                              placeholder="Enter tenant code (must match tenant code in Google Device Management)"
                              ng-model="tenantDetailsCtrl.currentTenant.tenant_code">
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-5">
                       <p ng-show="tenantForm.tenantCode.$invalid && !tenantForm.tenantCode.$pristine"
                          class="help-block">
                         The tenant lookup code is required.
@@ -114,7 +127,7 @@
                   </div>
                   <div class="form-group"
                        ng-class="{ 'has-error' : tenantForm.adminEmail.$invalid && !tenantForm.adminEmail.$pristine }">
-                    <label for="adminEmail" class="col-sm-2 control-label">Admin email
+                    <label for="adminEmail" class="col-sm-3 control-label">Admin email
                       address</label>
 
                     <div class="col-sm-4">
@@ -126,7 +139,7 @@
                              placeholder="Enter admin email"
                              ng-model="tenantDetailsCtrl.currentTenant.admin_email">
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-5">
                       <p ng-show="tenantForm.adminEmail.$invalid && !tenantForm.adminEmail.$pristine"
                          class="help-block">
                         The tenant admin email address is required.
@@ -135,7 +148,7 @@
                   </div>
                   <div class="form-group"
                        ng-class="{ 'has-error' : tenantForm.chromeDeviceDomain.$invalid && !tenantForm.chromeDeviceDomain.$pristine }">
-                    <label for="chromeDeviceDomain" class="col-sm-2 control-label">Chrome
+                    <label for="chromeDeviceDomain" class="col-sm-3 control-label">Chrome
                       device domain</label>
 
                     <div class="col-sm-4">
@@ -147,7 +160,7 @@
                              placeholder="Enter Chrome device domain"
                              ng-model="tenantDetailsCtrl.currentTenant.chrome_device_domain">
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-5">
                       <p ng-show="tenantForm.chromeDeviceDomain.$invalid && !tenantForm.chromeDeviceDomain.$pristine"
                          class="help-block">
                         The Chrome device domain is required.
@@ -155,8 +168,32 @@
                     </div>
                   </div>
                   <div class="form-group"
+                       ng-class="{ 'has-error' : tenantForm.contentManagerBaseUrl.$invalid && !tenantForm.contentManagerBaseUrl.$pristine }">
+                    <label for="contentManagerBaseUrl" class="col-sm-3 control-label">
+                      Content manager base URL
+                    </label>
+
+                    <div class="col-sm-4">
+                      <input type="url"
+                             required
+                             class="form-control"
+                             name="contentManagerBaseUrl"
+                             id="contentManagerBaseUrl"
+                             placeholder="Enter content manager base URL"
+                             ng-model="tenantDetailsCtrl.currentTenant.content_manager_base_url"
+                             ng-pattern="/^https:\/\/\S+$/">
+                    </div>
+                    <div class="col-sm-5">
+                      <p
+                        ng-show="tenantForm.contentManagerBaseUrl.$invalid && !tenantForm.contentManagerBaseUrl.$pristine"
+                        class="help-block">
+                        The content manager base URL is required to be a secure URL.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="form-group"
                        ng-class="{ 'has-error' : tenantForm.contentServerUrl.$invalid && !tenantForm.contentServerUrl.$pristine }">
-                    <label for="contentServerUrl" class="col-sm-2 control-label">Content
+                    <label for="contentServerUrl" class="col-sm-3 control-label">Content
                       server URL</label>
 
                     <div class="col-sm-4">
@@ -169,7 +206,7 @@
                              ng-model="tenantDetailsCtrl.currentTenant.content_server_url"
                              ng-pattern="/^https:\/\/\S+$/">
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-5">
                       <p ng-show="tenantForm.contentServerUrl.$invalid && !tenantForm.contentServerUrl.$pristine"
                          class="help-block">
                         The content server URL is required to be a secure URL.
@@ -177,7 +214,7 @@
                     </div>
                   </div>
                   <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-6">
+                    <div class="col-sm-offset-3 col-sm-9">
                       <input type="checkbox"
                              id="active"
                              ng-model="tenantDetailsCtrl.currentTenant.active"> <label
@@ -186,7 +223,7 @@
                   </div>
                   <hr/>
                   <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-10">
+                    <div class="col-sm-offset-3 col-sm-9">
                       <button type="submit"
                               class="btn btn-primary btn-default"
                               ng-disabled="tenantForm.$invalid">
@@ -195,12 +232,6 @@
                     </div>
                   </div>
                 </form>
-                <hr/>
-                <div class="col-sm-12">
-                  <label class="control-label">key:</label><br>
-                  <small>
-                    {{tenantDetailsCtrl.currentTenant.key}}</small>
-                </div>
               </div>
             </div>
             <!-- END panel -->

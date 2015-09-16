@@ -3,7 +3,7 @@ from env_setup import setup_test_paths
 setup_test_paths()
 
 from http_client import HttpClient, HttpClientRequest, HttpClientResponse
-from models import Tenant, ChromeOsDevice
+from models import Tenant, ChromeOsDevice, Distributor, Domain
 from agar.test import BaseTest
 from content_manager_api import ContentManagerApi
 
@@ -16,18 +16,33 @@ class TestContentManagerApi(BaseTest):
     NAME = 'foobar tenant'
     ADMIN_EMAIL = 'foo@bar.com'
     CONTENT_SERVER_URL = 'https://skykit-contentmanager-int.appspot.com/content'
+    CONTENT_MANAGER_BASE_URL = 'https://skykit-contentmanager-int.appspot.com'
     CONTENT_SERVER_API_KEY = 'API KEY'
     CHROME_DEVICE_DOMAIN = 'bar.com'
     TENANT_CODE = 'foobar'
+    DISTRIBUTOR_NAME = 'agosto'
+    CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
+    IMPERSONATION_EMAIL = 'test@test.com'
 
     def setUp(self):
         super(TestContentManagerApi, self).setUp()
         self.content_manager_api = ContentManagerApi()
+        self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
+                                              active=True)
+        self.distributor_key = self.distributor.put()
+        self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
+                                    distributor_key=self.distributor_key,
+                                    impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
+                                    active=True)
+        self.domain_key = self.domain.put()
+
         self.tenant = Tenant.create(tenant_code=self.TENANT_CODE,
                                     name=self.NAME,
                                     admin_email=self.ADMIN_EMAIL,
                                     content_server_url=self.CONTENT_SERVER_URL,
+                                    content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
                                     chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
+                                    domain_key=self.domain_key,
                                     active=True)
         self.tenant_key = self.tenant.put()
         self.device = ChromeOsDevice.create(tenant_key=self.tenant_key,
@@ -69,7 +84,7 @@ class TestContentManagerApi(BaseTest):
         with self.assertRaises(RuntimeError) as context:
             self.content_manager_api.create_device(self.device)
         error_message = 'Unable to create device in Content Manager with tenant code {0}. Status code: {1}, ' \
-                        'url={2}/provisioning/v1/displays'.format(self.TENANT_CODE, error_code, self.CONTENT_SERVER_URL)
+                        'url={2}/provisioning/v1/displays'.format(self.TENANT_CODE, error_code, self.CONTENT_MANAGER_BASE_URL)
         self.assertEqual(error_message, str(context.exception))
 
     def test_create_device_without_tenant_key_raises_error(self):

@@ -5,9 +5,9 @@ setup_test_paths()
 import json
 from content_manager_api import ContentManagerApi
 from agar.test import BaseTest, WebTest
-from models import Tenant, TENANT_ENTITY_GROUP_NAME
+from models import Tenant, TENANT_ENTITY_GROUP_NAME, Distributor, Domain
 from routes import application
-from mockito import when, any as any_matcher, verify
+from mockito import when, any as any_matcher
 from app_config import config
 
 
@@ -15,13 +15,25 @@ class TestTenantsHandler(BaseTest, WebTest):
     APPLICATION = application
     ADMIN_EMAIL = "foo{0}@bar.com"
     API_KEY = "SOME_KEY_{0}"
-    CONTENT_SERVER_URL = 'https://www.content.com'
+    CONTENT_SERVER_URL = 'https://skykit-contentmanager-int.appspot.com/content'
+    CONTENT_MANAGER_BASE_URL = 'https://skykit-contentmanager-int.appspot.com'
+    CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
+    DISTRIBUTOR_NAME = 'agosto'
+    IMPERSONATION_EMAIL = 'test@test.com'
 
     def setUp(self):
         super(TestTenantsHandler, self).setUp()
         self.headers = {
             'Authorization': config.API_TOKEN
         }
+        self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
+                                              active=True)
+        self.distributor_key = self.distributor.put()
+        self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
+                                    distributor_key=self.distributor_key,
+                                    impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
+                                    active=True)
+        self.domain_key = self.domain.put()
 
     def test_get_by_id_returns_ok_status(self):
         tenant_keys = self.load_tenants()
@@ -68,8 +80,10 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_server_url': 'https://www.foo.com',
                               'chrome_device_domain': '',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
+                              'domain_key': self.domain_key.urlsafe(),
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
+        when(Domain).find_by_name(any_matcher()).thenReturn(self.domain)
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
         self.assertEqual(201, response.status_code)
 
@@ -84,8 +98,10 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_server_url': 'https://www.foo.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'chrome_device_domain': '',
+                              'domain_key': self.domain_key.urlsafe(),
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
+        when(Domain).find_by_name(any_matcher()).thenReturn(self.domain)
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
         actual = Tenant.find_by_name(request_parameters['name'])
         self.assertIsNotNone(actual)
@@ -101,8 +117,10 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_server_url': 'https://www.foo.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'chrome_device_domain': '',
+                              'domain_key': self.domain_key.urlsafe(),
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
+        when(Domain).find_by_name(any_matcher()).thenReturn(self.domain)
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
         actual = Tenant.find_by_name(request_parameters['name'])
         tenant_uri = application.router.build(None,
@@ -122,8 +140,10 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_server_url': 'https://www.foo.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'chrome_device_domain': '',
+                              'domain_key': self.domain_key.urlsafe(),
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
+        when(Domain).find_by_name(any_matcher()).thenReturn(self.domain)
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
         actual = Tenant.find_by_name(request_parameters['name'])
         parent = actual.key.parent().get()
@@ -202,12 +222,22 @@ class TestTenantsHandler(BaseTest, WebTest):
 
     def load_tenants(self):
         tenant_keys = []
+        distributor = Distributor.create(name='agosto',
+                                         active=True)
+        distributor_key = distributor.put()
+        domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
+                               distributor_key=distributor_key,
+                               impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
+                               active=True)
+        domain_key = domain.put()
         for x in range(5):
             tenant = Tenant.create(tenant_code='acme',
                                    name="Testing tenant {0}".format(x),
                                    admin_email=self.ADMIN_EMAIL.format(x),
                                    content_server_url=self.CONTENT_SERVER_URL,
+                                   content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
                                    chrome_device_domain='testing.skykit.com',
+                                   domain_key=domain_key,
                                    active=True)
             tenant_key = tenant.put()
             tenant_keys.append(tenant_key)

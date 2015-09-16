@@ -13,7 +13,7 @@ from agar.test import BaseTest, WebTest
 from chrome_os_devices_api import ChromeOsDevicesApi
 from mockito import when, any as any_matcher
 from routes import application
-from models import ChromeOsDevice, Tenant
+from models import ChromeOsDevice, Tenant, Distributor, Domain
 from app_config import config
 from ae_test_data import build
 
@@ -27,14 +27,25 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     CONTENT_SERVER_API_KEY = 'API KEY'
     CONTENT_SERVER_URL = 'https://skykit-contentmanager-int.appspot.com/content'
+    CONTENT_MANAGER_BASE_URL = 'https://skykit-contentmanager-int.appspot.com'
     DEVICE_ID = '132e235a-b346-4a37-a100-de49fa753a2a'
     GCM_REGISTRATION_ID = '8d70a8d78a6dfa6df76dfasd'
     MAC_ADDRESS = '54271e619346'
     TENANT_CODE = 'foobar_inc'
     TENANT_NAME = 'Foobar, Inc,'
+    DISTRIBUTOR_NAME = 'agosto'
+    IMPERSONATION_EMAIL = 'test@test.com'
 
     def setUp(self):
         super(TestDeviceResourceHandler, self).setUp()
+        self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
+                                              active=True)
+        self.distributor_key = self.distributor.put()
+        self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
+                                    distributor_key=self.distributor_key,
+                                    impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
+                                    active=True)
+        self.domain_key = self.domain.put()
         self.tenant_key = self.__create_tenant(self.TENANT_CODE, self.TENANT_NAME, self.ADMIN_EMAIL)
         self.another_tenant_key = self.__create_tenant(self.ANOTHER_TENANT_CODE, self.ANOTHER_TENANT_NAME,
                                                        self.ANOTHER_ADMIN_EMAIL)
@@ -275,7 +286,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertForbidden(response)
 
     def test_put_http_status_no_content(self):
-        request_body = {'gcmRegistrationId': self.GCM_REGISTRATION_ID, 'tenantKey': self.tenant_key.urlsafe()}
+        request_body = {'gcmRegistrationId': self.GCM_REGISTRATION_ID, 'tenantCode': self.tenant_key.get().tenant_code}
         when(deferred).defer(any_matcher(update_chrome_os_device),
                              any_matcher(self.device_key.urlsafe())).thenReturn(None)
         response = self.app.put('/api/v1/devices/{0}'.format(self.device_key.urlsafe()),
@@ -285,7 +296,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_put_updates_device_entity(self):
         gcm_registration_id = 'd23784972038845ab3963412'
-        request_body = {'gcmRegistrationId': gcm_registration_id, 'tenantKey': self.tenant_key.urlsafe()}
+        request_body = {
+            'gcmRegistrationId': gcm_registration_id,
+            'tenantCode': self.tenant_key.get().tenant_code
+        }
         when(deferred).defer(any_matcher(update_chrome_os_device),
                              any_matcher(self.device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.device_key.urlsafe()),
@@ -296,9 +310,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(self.tenant_key, updated_display.tenant_key)
 
     def test_put_updates_device_entity_with_explicit_tenant_change(self):
+        new_tenant = self.another_tenant_key.get()
         request_body = {
             'gcmRegistrationId': self.GCM_REGISTRATION_ID,
-            'tenantKey': self.another_tenant_key.urlsafe()
+            'tenantCode': new_tenant.tenant_code
         }
         when(deferred).defer(any_matcher(update_chrome_os_device),
                              any_matcher(self.device_key.urlsafe())).thenReturn(None)
@@ -336,7 +351,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                name=name,
                                admin_email=email,
                                content_server_url=self.CONTENT_SERVER_URL,
+                               content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
                                chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
+                               domain_key=self.domain_key,
                                active=True)
         return tenant.put()
 

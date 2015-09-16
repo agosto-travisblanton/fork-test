@@ -26,6 +26,8 @@ class AppConfig(Config):
     GOOGLE_CUSTOMER_ID = None
     STORMPATH_AUTH_APP = None
     STORMPATH_CLIENT = None
+    WEB_APP_CLIENT_ID = None
+    DEFAULT_AGOSTO_DEVICE_DOMAIN = None
 
 
 config = AppConfig.get_config()

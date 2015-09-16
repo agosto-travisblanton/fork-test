@@ -71,6 +71,34 @@ class Distributor(ndb.Model):
 
 
 @ae_ndb_serializer
+class Domain(ndb.Model):
+    name = ndb.StringProperty(required=True, indexed=True)
+    distributor_key = ndb.KeyProperty(kind=Distributor, required=True, indexed=True)
+    impersonation_admin_email_address = ndb.StringProperty(required=True, indexed=True)
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    updated = ndb.DateTimeProperty(auto_now=True)
+    active = ndb.BooleanProperty(default=True, required=True, indexed=True)
+    class_version = ndb.IntegerProperty()
+
+    @classmethod
+    def find_by_name(cls, name):
+        if name:
+            key = Domain.query(Domain.name == name).get(keys_only=True)
+            if None is not key:
+                return key.get()
+
+    @classmethod
+    def create(cls, name, distributor_key, impersonation_admin_email_address, active):
+        return cls(distributor_key=distributor_key,
+                   name=name,
+                   impersonation_admin_email_address=impersonation_admin_email_address,
+                   active=active)
+
+    def _pre_put_hook(self):
+        self.class_version = 1
+
+
+@ae_ndb_serializer
 class Tenant(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
@@ -78,14 +106,24 @@ class Tenant(ndb.Model):
     name = ndb.StringProperty(required=True, indexed=True)
     admin_email = ndb.StringProperty(required=True)
     content_server_url = ndb.StringProperty(required=True)
+    content_manager_base_url = ndb.StringProperty(required=False)
     chrome_device_domain = ndb.StringProperty()
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
+    # TODO Make tenant_key required=True after migration run in prod !!
+    domain_key = ndb.KeyProperty(kind=Domain, required=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
     @classmethod
     def find_by_name(cls, name):
         if name:
             key = Tenant.query(Tenant.name == name).get(keys_only=True)
+            if None is not key:
+                return key.get()
+
+    @classmethod
+    def find_by_tenant_code(cls, tenant_code):
+        if tenant_code:
+            key = Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
             if None is not key:
                 return key.get()
 
@@ -98,7 +136,8 @@ class Tenant(ndb.Model):
             return True
 
     @classmethod
-    def create(cls, tenant_code, name, admin_email, content_server_url, chrome_device_domain, active):
+    def create(cls, tenant_code, name, admin_email, content_server_url, chrome_device_domain, domain_key, active,
+               content_manager_base_url):
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
                    tenant_code=tenant_code,
@@ -106,7 +145,9 @@ class Tenant(ndb.Model):
                    admin_email=admin_email,
                    content_server_url=content_server_url,
                    chrome_device_domain=chrome_device_domain,
-                   active=active)
+                   domain_key=domain_key,
+                   active=active,
+                   content_manager_base_url=content_manager_base_url)
 
     def _pre_put_hook(self):
         self.class_version = 1
@@ -114,8 +155,8 @@ class Tenant(ndb.Model):
 
 @ae_ndb_serializer
 class ChromeOsDevice(ndb.Model):
-    tenant_key = ndb.KeyProperty(required=False, indexed=True)
     # TODO Make tenant_key required=True after migration run in prod !!
+    tenant_key = ndb.KeyProperty(required=False, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     device_id = ndb.StringProperty(required=False, indexed=True)

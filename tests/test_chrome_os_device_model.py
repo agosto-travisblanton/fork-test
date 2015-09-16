@@ -6,7 +6,7 @@ import json
 from restler.serializers import to_json
 from strategy import CHROME_OS_DEVICE_STRATEGY
 from agar.test import BaseTest
-from models import ChromeOsDevice, Tenant
+from models import ChromeOsDevice, Tenant, Domain, Distributor
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>. Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -17,21 +17,34 @@ class TestChromeOsDeviceModel(BaseTest):
     NAME = 'foobar tenant'
     ADMIN_EMAIL = 'foo@bar.com'
     CONTENT_SERVER_URL = 'https://skykit-contentmanager-int.appspot.com/content'
+    CONTENT_MANAGER_BASE_URL = 'https://skykit-contentmanager-int.appspot.com'
     CHROME_DEVICE_DOMAIN = 'bar.com'
     CONTENT_SERVER_API_KEY = 'API KEY'
     TENANT_CODE = 'foobar'
     MAC_ADDRESS = '54271e619346'
     SERIAL_NUMBER = 'E3MSCX004781'
     MODEL = 'ASUS Chromebox'
+    DISTRIBUTOR_NAME = 'agosto'
     CURRENT_CLASS_VERSION = 2
+    IMPERSONATION_EMAIL = 'test@test.com'
 
     def setUp(self):
         super(TestChromeOsDeviceModel, self).setUp()
+        self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
+                                              active=True)
+        self.distributor_key = self.distributor.put()
+        self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
+                                    distributor_key=self.distributor_key,
+                                    impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
+                                    active=True)
+        self.domain_key = self.domain.put()
         self.tenant = Tenant.create(name=self.NAME,
                                     tenant_code=self.TENANT_CODE,
                                     admin_email=self.ADMIN_EMAIL,
                                     content_server_url=self.CONTENT_SERVER_URL,
+                                    content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
                                     chrome_device_domain=self.CHROME_DEVICE_DOMAIN,
+                                    domain_key=self.domain_key,
                                     active=True)
         self.tenant_key = self.tenant.put()
 
