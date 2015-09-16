@@ -7,6 +7,23 @@ appModule.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
                                             sweet,
                                             SessionsService,
                                             ProgressBarService) ->
+
+
+  @onGooglePlusSignInSuccess = (event, authResult) =>
+    unless @googlePlusSignInButtonClicked
+      ProgressBarService.start()
+    promise = SessionsService.login(authResult)
+    promise.then @loginSuccess, @loginFailure
+
+
+  @onGooglePlusSignInFailure = (event, authResult) =>
+    if @googlePlusSignInButtonClicked
+      ProgressBarService.complete()
+      sweet.show('Oops...', 'Unable to authenticate to Google+.', 'error')
+
+  $scope.$on 'event:google-plus-signin-success', @onGooglePlusSignInSuccess
+  $scope.$on 'event:google-plus-signin-failure', @onGooglePlusSignInFailure
+
   @initializeSignIn = ->
     @clientId = identity.OAUTH_CLIENT_ID
     @state = identity.STATE
@@ -15,16 +32,6 @@ appModule.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
   @initializeSignOut = ->
     $timeout @proceedToSignIn, 1500
 
-  $scope.$on 'event:google-plus-signin-success', (event, authResult) =>
-    unless @googlePlusSignInButtonClicked
-      ProgressBarService.start()
-    promise = SessionsService.login(authResult)
-    promise.then @loginSuccess, @loginFailure
-
-  $scope.$on 'event:google-plus-signin-failure', (event, authResult) =>
-    if @googlePlusSignInButtonClicked
-      ProgressBarService.complete()
-      sweet.show('Oops...', 'Unable to authenticate to Google+.', 'error')
 
   @loginSuccess = (response) ->
     ProgressBarService.complete()
