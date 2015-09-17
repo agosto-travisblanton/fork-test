@@ -211,19 +211,21 @@ describe 'AuthenticationCtrl', ->
 
   describe '.proceedToSignIn', ->
     beforeEach ->
-      controller.initializeSignOut()
+      spyOn($state, 'go').and.callFake (name) ->
+      controller.proceedToSignIn()
 
-    it "", ->
+    it "specifies ui-router go to the sign in route", ->
+      expect($state.go).toHaveBeenCalledWith 'sign_in'
 
 
   describe '.onClickGooglePlusSignIn', ->
     beforeEach ->
-      controller.initializeSignOut()
+      controller.googlePlusSignInButtonClicked = false
+      spyOn(ProgressBarService, 'start')
+      controller.onClickGooglePlusSignIn()
 
-    it "", ->
+    it "sets the googlePlusSignInButtonClicked instance variable to true", ->
+      expect(controller.googlePlusSignInButtonClicked).toBeTruthy()
 
-
-
-
-
-
+    it "starts the progress bar animation", ->
+      expect(ProgressBarService.start).toHaveBeenCalled()
