@@ -5,6 +5,7 @@ appModule = angular.module('skykitDisplayDeviceManagement')
 appModule.factory 'DistributorsService', (Restangular) ->
   new class DistributorsService
     SERVICE_NAME = 'distributors'
+    @currentDistributor = undefined
 
     save: (tenant) ->
       if tenant.key != undefined
@@ -16,6 +17,11 @@ appModule.factory 'DistributorsService', (Restangular) ->
     fetchAll: () ->
       promise = Restangular.all(SERVICE_NAME).getList()
       promise
+
+    fetchAllByUser: (userKey) ->
+      if userKey
+        promise = Restangular.one('users', userKey).doGET(SERVICE_NAME)
+        promise
 
     getByKey: (key) ->
       promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/distributors/#{key}").get()

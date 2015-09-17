@@ -105,6 +105,13 @@ application = WSGIApplication(
         ############################################################
         # Distributors
         ############################################################
+        Route(
+            r'/api/v1/users/<user_urlsafe_key>/distributors',
+            handler='handlers.distributors_handler.DistributorsHandler',
+            handler_method='get_list_by_user',
+            name='get-distributors-by-user',
+            methods=['GET']
+        ),
         Route(r'/api/v1/distributors',
               handler='handlers.distributors_handler.DistributorsHandler',
               name='distributors',

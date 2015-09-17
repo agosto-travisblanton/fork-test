@@ -25,7 +25,7 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
             'logout_url': self.uri_for('logout'),
             'version': app_version,
             'CLIENT_ID': config.CLIENT_ID,
-            'WEB_APP_CLIENT_ID': config.WEB_APP_CLIENT_ID,
+            'OAUTH_CLIENT_ID': config.OAUTH_CLIENT_ID,
             'BROWSER_API_KEY': config.PUBLIC_API_SERVER_KEY,
             'STATE': state,
         }
@@ -60,7 +60,6 @@ class LoginHandler(SessionRequestHandler):
     def post(self):
         user = None
         body = json.loads(self.request.body)
-
         email = body.get('email', '').strip()
         password = body.get('password', '').strip()
         if email and password:
@@ -86,7 +85,7 @@ class LoginHandler(SessionRequestHandler):
             self.session['user_key'] = user.key.urlsafe()
             if len(user.distributors) == 1:
                 self.session['distributor'] = user.distributors[0].name
-            result = {'message': 'Successful Login'}
+            result = {'message': 'Successful Login', 'user': {'key': user.key.urlsafe()}}
             status_code = 200
 
         json_response(self.response, result, status_code=status_code)

@@ -9,6 +9,5 @@ appModule.controller "VersionsCtrl", ($state, $log, VersionsService) ->
     promise = VersionsService.getVersions()
     promise.then (data) =>
       @versions = data
-      debugger
 
   @

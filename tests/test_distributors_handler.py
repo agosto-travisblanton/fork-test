@@ -4,9 +4,11 @@ setup_test_paths()
 import json
 from agar.test import BaseTest, WebTest
 from webtest import AppError
-from models import Distributor, DISTRIBUTOR_ENTITY_GROUP_NAME, Domain
+from models import Distributor, DISTRIBUTOR_ENTITY_GROUP_NAME, Domain, User, DistributorUser
 from routes import application
 from app_config import config
+
+__author__ = 'Bob MacNeal <bob.macneal@agosto.com>, Christopher Bartling <chris.bartling@agosto.com>'
 
 
 class TestDistributorsHandler(BaseTest, WebTest):
@@ -27,6 +29,8 @@ class TestDistributorsHandler(BaseTest, WebTest):
         self.bad_authorization_header = {
             'Authorization': 'Forget about it!'
         }
+        self.user = User(email="chris@mycompany.com")
+        self.user_key = self.user.put()
         self.agosto = Distributor.create(name=self.AGOSTO,
                                          active=True)
         self.agosto_key = self.agosto.put()
@@ -135,6 +139,43 @@ class TestDistributorsHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 1)
         self.assertEqual(response_json[0].get('name'), self.INACTIVE_DISTRIBUTOR)
+
+    ##################################################################################################################
+    ## get_list_by_user
+    ##################################################################################################################
+    def test_get_list_by_user_returns_ok_status(self):
+        self._create_distributor_user_associations()
+        request_parameters = {}
+        uri = application.router.build(None, 'get-distributors-by-user', None, {
+            'user_urlsafe_key': self.user_key.urlsafe()
+        })
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        self.assertOK(response)
+
+    def test_get_list_returns_distributors_associated_to_user(self):
+        self._create_distributor_user_associations()
+        request_parameters = {}
+        uri = application.router.build(None, 'get-distributors-by-user', None, {
+            'user_urlsafe_key': self.user_key.urlsafe()
+        })
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response_json = json.loads(response.body)
+        self.assertEqual(len(response_json), 2)
+        self.assertEqual(response_json[0].get('name'), self.AGOSTO)
+        self.assertTrue(response_json[0].get('active'))
+        self.assertEqual(response_json[1].get('name'), self.TIERNEY_BROS)
+        self.assertTrue(response_json[1].get('active'))
+
+    def test_get_list_fails_with_bad_authorization_token(self):
+        self._create_distributor_user_associations()
+        request_parameters = {}
+        uri = application.router.build(None, 'get-distributors-by-user', None, {
+            'user_urlsafe_key': self.user_key.urlsafe()
+        })
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.bad_authorization_header)
+        self.assertTrue(self.FORBIDDEN in context.exception.message)
+
 
     ##################################################################################################################
     ## post
@@ -338,3 +379,10 @@ class TestDistributorsHandler(BaseTest, WebTest):
         response = self.app.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 0)
+
+
+    def _create_distributor_user_associations(self):
+        distributor_user1 = DistributorUser(user_key=self.user_key, distributor_key=self.agosto_key)
+        distributor_user1.put()
+        distributor_user2 = DistributorUser(user_key=self.user_key, distributor_key=self.tierney_bros_key)
+        distributor_user2.put()

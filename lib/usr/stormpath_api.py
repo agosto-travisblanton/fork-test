@@ -23,7 +23,7 @@ def google_login(id_token, access_token, code):
         # Check that the ID Token is valid.
         try:
             # Client library can verify the ID token.
-            client.verify_id_token(id_token, config.CLIENT_ID)  # returns jwt. jwt["sub"] = gplus id
+            client.verify_id_token(id_token, config.OAUTH_CLIENT_ID)  # returns jwt. jwt["sub"] = gplus id
         except AppIdentityError:
             logging.error('Invalid ID Token.')
 
@@ -35,7 +35,7 @@ def google_login(id_token, access_token, code):
         if result.get('error') is not None:
             # This is not a valid token.
             logging.error('Invalid Access Token.')
-        elif result['issued_to'] != config.CLIENT_ID:
+        elif result['issued_to'] != config.OAUTH_CLIENT_ID:
             # This is not meant for this app. It is VERY important to check
             # the client ID in order to prevent man-in-the-middle attacks.
             logging.error('Access Token not meant for this app.')

@@ -15,6 +15,32 @@ skykitDisplayDeviceManagement = angular.module('skykitDisplayDeviceManagement', 
 ])
 
 skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
+  $stateProvider.state("sign_in", {
+    resolve: {
+      identity: (IdentityService) ->
+        IdentityService.getIdentity()
+    },
+    url: "/sign_in",
+    templateUrl: "app/authentication/sign_in.html",
+    controller: "AuthenticationCtrl",
+    controllerAs: 'authenticationCtrl',
+  })
+  $stateProvider.state("sign_out", {
+    resolve: {
+      identity: (IdentityService) ->
+        IdentityService.getIdentity()
+    },
+    url: "/sign_out",
+    templateUrl: "app/authentication/sign_out.html",
+    controller: "AuthenticationCtrl",
+    controllerAs: 'authenticationCtrl',
+  })
+  $stateProvider.state("distributor_selection", {
+    url: "/distributor_selection",
+    templateUrl: "app/distributor/distributor_selector.html",
+    controller: "DistributorSelectorCtrl",
+    controllerAs: 'distributorSelectorCtrl',
+  })
   $stateProvider.state("home", {
     url: "/",
     templateUrl: "app/welcome/welcome.html",
@@ -140,7 +166,7 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     }
   })
 
-  $urlRouterProvider.otherwise '/'
+  $urlRouterProvider.otherwise '/sign_in'
 
   RestangularProvider.setBaseUrl '/api/v1'
 
