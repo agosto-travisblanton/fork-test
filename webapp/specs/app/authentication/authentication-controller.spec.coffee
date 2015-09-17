@@ -179,6 +179,51 @@ describe 'AuthenticationCtrl', ->
       expect(controller.proceedToSignIn).toHaveBeenCalled()
 
 
+  describe '.loginSuccess', ->
+    response = {}
+
+    beforeEach ->
+      spyOn(ProgressBarService, 'complete')
+      spyOn($state, 'go').and.callFake (name) ->
+      controller.loginSuccess(response)
+
+    it "completes the progress bar", ->
+      expect(ProgressBarService.complete).toHaveBeenCalled()
+
+    it "routes to the distributor selection route", ->
+      expect($state.go).toHaveBeenCalledWith 'distributor_selection'
+
+
+  describe '.loginFailure', ->
+    response = {}
+
+    beforeEach ->
+      spyOn(ProgressBarService, 'complete')
+      spyOn(sweet, 'show')
+      controller.loginFailure(response)
+
+    it "completes the progress bar", ->
+      expect(ProgressBarService.complete).toHaveBeenCalled()
+
+    it "show error dialog", ->
+      expect(sweet.show).toHaveBeenCalledWith 'Oops...', 'Unable to authenticate to Stormpath.', 'error'
+
+
+  describe '.proceedToSignIn', ->
+    beforeEach ->
+      controller.initializeSignOut()
+
+    it "", ->
+
+
+  describe '.onClickGooglePlusSignIn', ->
+    beforeEach ->
+      controller.initializeSignOut()
+
+    it "", ->
+
+
+
 
 
 
