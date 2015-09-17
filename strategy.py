@@ -14,7 +14,7 @@ TENANT_FIELDS = [
 TENANT_STRATEGY = ModelStrategy(Tenant) + TENANT_FIELDS
 TENANT_STRATEGY += [
     {'key': lambda o, field_name, context: o.key.urlsafe()},
-    {'domain_key': lambda o, field_name, context: o.domain_key.urlsafe()},
+    {'domain_key': lambda o, field_name, context: o.domain_key.urlsafe() if o.domain_key else None},
 ]
 
 DISTRIBUTOR_FIELDS = [
