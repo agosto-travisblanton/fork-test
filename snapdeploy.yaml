@@ -1,5 +1,5 @@
-hash: 9e0fffcff3
+hash: dd5cdfe2fa
 module_yaml_files:
 - app.yaml
 - migration.yaml
-version: 18
+version: 19

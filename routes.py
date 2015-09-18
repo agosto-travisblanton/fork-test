@@ -31,8 +31,8 @@ application = WSGIApplication(
         # version
         ############################################################
         Route(
-            r'/api/v1/version',
-            handler='handlers.version_handler.VersionHandler',
+            r'/api/v1/versions',
+            handler='handlers.versions_handler.VersionsHandler',
             name='version-retrieval',
             handler_method='get',
             methods=['GET']
@@ -108,13 +108,25 @@ application = WSGIApplication(
         Route(r'/api/v1/distributors',
               handler='handlers.distributors_handler.DistributorsHandler',
               name='distributors',
-              methods=['GET', 'POST']
+              handler_method='get_list',
+              methods=['GET']
+        ),
+        Route(r'/api/v1/distributors',
+              handler='handlers.distributors_handler.DistributorsHandler',
+              name='distributor-creator',
+              methods=['POST']
               ),
         Route(r'/api/v1/distributors/<distributor_key>',
               handler='handlers.distributors_handler.DistributorsHandler',
               name='manage-distributor',
               methods=['GET', 'PUT', 'DELETE']
               ),
+        Route(r'/api/v1/distributors/<distributor_key>/domains',
+              handler='handlers.distributors_handler.DistributorsHandler',
+              name='distributor-domains',
+              handler_method='get_domains',
+              methods=['GET']
+        ),
 
         ############################################################
         # Domains

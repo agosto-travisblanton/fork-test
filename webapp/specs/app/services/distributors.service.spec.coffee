@@ -89,7 +89,7 @@ describe 'DistributorsService', ->
       result = DistributorsService.getByKey(distributorKey)
 
     it 'obtains Restangular service for distributors', ->
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'distributors', "distributors/#{distributorKey}"
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'distributors', "api/v1/distributors/#{distributorKey}"
 
     it 'obtains the distributor from the Restangular service', ->
       expect(distributorRestangularService.get).toHaveBeenCalled()
@@ -113,6 +113,45 @@ describe 'DistributorsService', ->
 
     it 'removes the distributor via the Restangular service', ->
       expect(distributorRestangularService.remove).toHaveBeenCalled()
+
+    it 'returns a promise', ->
+      expect(result).toBe promise
+
+  describe '.getByName', ->
+    distributorRestangularService = undefined
+    result = undefined
+
+    beforeEach ->
+      distributorRestangularService = { getList: -> }
+      spyOn(Restangular, 'all').and.returnValue distributorRestangularService
+      spyOn(distributorRestangularService, 'getList').and.returnValue promise
+      result = DistributorsService.getByName('Tierney Brothers')
+
+    it 'obtains Restangular service for distributors', ->
+      expect(Restangular.all).toHaveBeenCalledWith 'distributors'
+
+    it 'calls getList with name as query parameter', ->
+      expect(distributorRestangularService.getList).toHaveBeenCalledWith(distributorName: 'Tierney Brothers')
+
+    it 'returns a promise', ->
+      expect(result).toBe promise
+
+  describe '.getDomainsByKey', ->
+    distributorRestangularService = undefined
+    result = undefined
+    distributorKey = 'dhYUYdfhdjfhlasddf7898a7sdfdas78d67'
+
+    beforeEach ->
+      distributorRestangularService = { get: -> }
+      spyOn(Restangular, 'oneUrl').and.returnValue distributorRestangularService
+      spyOn(distributorRestangularService, 'get').and.returnValue promise
+      result = DistributorsService.getDomainsByKey(distributorKey)
+
+    it 'obtains Restangular service for distributor domains', ->
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'distributors', "api/v1/distributors/#{distributorKey}/domains"
+
+    it 'obtains the distributor domains from the Restangular service', ->
+      expect(distributorRestangularService.get).toHaveBeenCalled()
 
     it 'returns a promise', ->
       expect(result).toBe promise

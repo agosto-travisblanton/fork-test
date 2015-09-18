@@ -1,6 +1,6 @@
 <!-- Navigation -->
 
-<nav class="navbar navbar-default navbar-fixed-top" role="navigation" ng-controller="NavbarCtrl as navbarCtrl">
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
   <!-- Brand and toggle get grouped for better mobile display -->
   <div class="navbar-header">
     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -28,7 +28,13 @@
         <a id="navbar-devices" href="#/devices"><i class="fa fa-fw fa-desktop"></i> Devices</a>
       </li>
       <li>
+        <a id="navbar-domains" href="#/domains"><i class="fa fa-fw fa-desktop"></i> Domains</a>
+      </li>
+      <li>
         <a id="navbar-remote_control" href="#/remote_control"><i class="fa fa-fw fa-building"></i> Remote control</a>
+      </li>
+      <li>
+        <a id="navbar-version" href="#/version"><i class="fa fa-fw fa-tag"></i> Version</a>
       </li>
       <!--<li>-->
         <!--<a href="javascript:;" data-toggle="collapse" data-target="#demo" id="navbar-domains">-->
@@ -46,6 +52,5 @@
       <!--</li>-->
     </ul>
   </div>
-  <div class="navbar-version">{{ navbarCtrl.version.name }}</div>
   <!-- /.navbar-collapse -->
 </nav>

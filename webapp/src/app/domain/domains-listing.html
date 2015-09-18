@@ -1,0 +1,46 @@
+<div id="wrapper" ng-init="domainsCtrl.initialize()">
+  <div ng-include="'app/components/navbar/navbar.html'"></div>
+  <div id="page-wrapper">
+    <div class="container-fluid">
+      <!-- Page Heading -->
+      <div class="row">
+        <div class="col-lg-12">
+          <div ncy-breadcrumb></div>
+          <h1 class="page-header">
+            Domains
+          </h1>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="col-md-12 toolbar">
+            <a id="button-add-tenant"
+               class="btn btn-success"
+               href="#/domains/new"><i class="fa fa-fw fa-plus"></i> Add domain</a>
+          </div>
+          <table name="domain-table" class="table table-bordered table-responsive table-striped">
+            <thead>
+            <tr>
+              <th>Name</th>
+              <th>Impersonation Admin Email</th>
+              <th>Created</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-hide="domainsCtrl.domains.length">
+              <td class="no-devices text-center text-danger" colspan="4">No domains</td>
+            </tr>
+            <tr ng-repeat="item in domainsCtrl.domains | orderBy:'-created'">
+              <td class="domain-key"><a name="edit-domain" class="btn"
+                                        ng-click="domainsCtrl.editItem(item)"
+                                        title="Edit domain">{{item.name}}</a></td>
+              <td class="domain-impersonation-admin-email-address">{{item.impersonation_admin_email_address}}</td>
+              <td class="domain-created">{{item.created}}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
