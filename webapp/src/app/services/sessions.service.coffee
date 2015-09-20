@@ -3,9 +3,10 @@
 angular.module('skykitDisplayDeviceManagement').factory 'SessionsService', ($http, $log, Restangular) ->
 
   new class SessionsService
-    SERVICE_NAME = 'sessions'
-    @uriBase = 'v1/sessions'
-    @currentUserKey = undefined
+
+    constructor: ->
+      @uriBase = 'v1/sessions'
+      @currentUserKey = undefined
 
     getIdentity: ->
       Restangular.oneUrl('api/v1/devices').get()
