@@ -25,7 +25,7 @@ angular.module('skykitDisplayDeviceManagement').factory 'SessionsService', ($htt
       }
       if credentials.email and credentials.password
         authenticationPayload = credentials
-      promise = $http.post '/login', authenticationPayload
+      promise = $http.post('/login', authenticationPayload)
       promise.success (data) =>
         @currentUserKey = data.user.key
       promise
