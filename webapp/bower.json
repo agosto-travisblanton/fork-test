@@ -20,7 +20,7 @@
     "lodash": "~3.10.0",
     "ngprogress": "~1.1.2",
     "restangular": "~1.5.1",
-    "sweetalert": "~1.0.3"
+    "sweetalert": "~1.1.0"
   },
   "overrides": {
     "bootstrap-sass-official": {
