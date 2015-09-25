@@ -95,3 +95,25 @@ class TestContentManagerApi(BaseTest):
             self.content_manager_api.create_device(tenant_less_device)
         error_message = 'No tenant_key for device'
         self.assertEqual(error_message, str(context.exception))
+
+    ##################################################################################################################
+    ## update_device
+    ##################################################################################################################
+    def test_delete_device_success(self):
+        when(HttpClient).delete(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=204))
+        result = self.content_manager_api.delete_device(self.device)
+        self.assertTrue(result)
+
+
+    ##################################################################################################################
+    ## delete_device
+    ##################################################################################################################
+    def test_delete_device_success(self):
+        when(HttpClient).delete(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=204))
+        result = self.content_manager_api.delete_device(self.device)
+        self.assertTrue(result)
+
+    def test_delete_device_failure(self):
+        when(HttpClient).delete(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=400))
+        result = self.content_manager_api.delete_device(self.device)
+        self.assertFalse(result)

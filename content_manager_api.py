@@ -80,7 +80,7 @@ class ContentManagerApi(object):
         http_client_response = HttpClient().delete(http_client_request)
         if http_client_response.status_code == 204:
             logging.info(
-                'update_device to Content Mgr delete successful: url={0}, device_key={1}, tenant_code={3}'.format(
+                'update_device to Content Mgr delete successful: url={0}, device_key={1}, tenant_code={2}'.format(
                     url,
                     chrome_os_device.key.urlsafe(),
                     tenant.tenant_code))
