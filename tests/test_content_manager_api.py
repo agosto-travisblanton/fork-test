@@ -58,14 +58,14 @@ class TestContentManagerApi(BaseTest):
 
     def test_create_tenant_success(self):
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=201))
-        result = self.content_manager_api.create_tenant(tenant=self.tenant)
+        result = self.content_manager_api.create_tenant(self.tenant)
         self.assertTrue(result)
 
     def test_unsuccessful_create_tenant_raises_error(self):
         error_code = 400
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=error_code))
         with self.assertRaises(RuntimeError) as context:
-            self.content_manager_api.create_tenant(tenant=self.tenant)
+            self.content_manager_api.create_tenant(self.tenant)
         error_message = 'Unable to create tenant {0} in Content Manager. Status code: {1}'.format(
             self.NAME, error_code)
         self.assertEqual(error_message, str(context.exception))
