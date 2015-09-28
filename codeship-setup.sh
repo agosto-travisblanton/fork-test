@@ -20,8 +20,8 @@ cd ~/src/bitbucket.org/agosto_administrator/skykit-display-device/webapp
 
 printf "\n${COLOR_LIGHT_GREEN}===> Installing node runtime via nvm...${COLOR_OFF}\n"
 
-nvm install
-nvm use
+nvm install 4.1.1
+nvm use 4.1.1
 
 printf "\n${COLOR_LIGHT_GREEN}===> Installing installing the latest version of npm...${COLOR_OFF}\n"
 
