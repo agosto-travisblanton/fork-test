@@ -1,6 +1,8 @@
 #!/bin/bash --login
 set -e
 
+. ~/.nvm/nvm.sh
+
 COLOR_LIGHT_GREEN='\033[1;32m'
 COLOR_OFF='\033[0m'
 
@@ -15,7 +17,7 @@ cd ~/src/bitbucket.org/agosto_administrator/skykit-display-device/webapp
 
 printf "\n${COLOR_LIGHT_GREEN}===> Installing node runtime via nvm...${COLOR_OFF}\n"
 
-. ~/.nvm/nvm.sh
+
 nvm install
 nvm use
 
