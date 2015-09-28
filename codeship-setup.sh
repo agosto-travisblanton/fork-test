@@ -24,9 +24,9 @@ printf "\n${COLOR_LIGHT_GREEN}===> Installing node runtime via nvm...${COLOR_OFF
 nvm install $NODEJS_RUNTIME_VERSION
 nvm use $NODEJS_RUNTIME_VERSION
 
-printf "\n${COLOR_LIGHT_GREEN}===> Installing installing the latest version of npm...${COLOR_OFF}\n"
-
-npm install -g npm@latest
+#printf "\n${COLOR_LIGHT_GREEN}===> Installing installing the latest version of npm...${COLOR_OFF}\n"
+#
+#npm install -g npm@latest
 
 printf "\n${COLOR_LIGHT_GREEN}===> Installing installing the latest version of bower...${COLOR_OFF}\n"
 
