@@ -108,7 +108,6 @@ class TenantsHandler(RequestHandler):
         tenant.admin_email = request_json.get('admin_email')
         tenant.content_server_url = request_json.get('content_server_url')
         tenant.content_manager_base_url = request_json.get('content_manager_base_url')
-        tenant.chrome_device_domain = request_json.get('chrome_device_domain')
         domain_key_input = request_json.get('domain_key')
         try:
             domain_key = ndb.Key(urlsafe=domain_key_input)
