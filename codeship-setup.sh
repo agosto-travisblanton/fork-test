@@ -1,13 +1,10 @@
-#!/bin/bash
+#!/bin/bash --login
 set -e
+
+export NODEJS_RUNTIME_VERSION=4.1.1
 
 COLOR_LIGHT_GREEN='\033[1;32m'
 COLOR_OFF='\033[0m'
-
-printf "\n${COLOR_LIGHT_GREEN}===> Sourcing nvm...${COLOR_OFF}\n"
-
-. ~/.nvm/nvm.sh
-
 
 cd ~/src/bitbucket.org/agosto_administrator/skykit-display-device
 
@@ -18,10 +15,14 @@ pip install py
 
 cd ~/src/bitbucket.org/agosto_administrator/skykit-display-device/webapp
 
+printf "\n${COLOR_LIGHT_GREEN}===> Sourcing nvm...${COLOR_OFF}\n"
+
+. ~/.nvm/nvm.sh
+
 printf "\n${COLOR_LIGHT_GREEN}===> Installing node runtime via nvm...${COLOR_OFF}\n"
 
-nvm install 4.1.1
-nvm use 4.1.1
+nvm install $NODEJS_RUNTIME_VERSION
+nvm use $NODEJS_RUNTIME_VERSION
 
 printf "\n${COLOR_LIGHT_GREEN}===> Installing installing the latest version of npm...${COLOR_OFF}\n"
 
