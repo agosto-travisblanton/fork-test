@@ -15,6 +15,7 @@ cd ~/src/bitbucket.org/agosto_administrator/skykit-display-device/webapp
 
 printf "\n${COLOR_LIGHT_GREEN}===> Installing node runtime via nvm...${COLOR_OFF}\n"
 
+. ~/.nvm/nvm.sh
 nvm install
 nvm use
 
