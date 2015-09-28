@@ -127,7 +127,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 device.gcm_registration_id = gcm_registration_id
             tenant_code = request_json.get('tenantCode')
             if tenant_code:
-                tenant = Tenant.find_by_tenant_code(request_json.get('tenantCode'))
+                tenant = Tenant.find_by_tenant_code(tenant_code)
                 if tenant and tenant.key != device.tenant_key:
                     logging.info('  PUT updating the tenant.')
                     device.tenant_key = tenant.key
