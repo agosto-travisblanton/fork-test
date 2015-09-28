@@ -4,10 +4,31 @@ set -e
 COLOR_LIGHT_GREEN='\033[1;32m'
 COLOR_OFF='\033[0m'
 
-cd webapp
+cd ~/src/bitbucket.org/agosto_administrator/skykit-display-device
 
+printf "\n${COLOR_LIGHT_GREEN}===> Installing Python packages via pip...${COLOR_OFF}\n"
+
+pip install PyOpenSSL
+pip install py
+
+printf "\n${COLOR_LIGHT_GREEN}===> Installing Node Version Manager (nvm)...${COLOR_OFF}\n"
+
+nvm install 4.1.0
+nvm use 4.1.0
+
+printf "\n${COLOR_LIGHT_GREEN}===> Installing installing the latest version of npm...${COLOR_OFF}\n"
+
+npm install -g npm@latest
+
+printf "\n${COLOR_LIGHT_GREEN}===> Installing installing the latest version of bower...${COLOR_OFF}\n"
+
+npm install -g bower@latest
 
 printf "\n${COLOR_LIGHT_GREEN}===> Installing node packages via npm...${COLOR_OFF}\n"
 
+cd ~/src/bitbucket.org/agosto_administrator/skykit-display-device/webapp
 npm install
 
+printf "\n${COLOR_LIGHT_GREEN}===> Installing web packages via bower...${COLOR_OFF}\n"
+
+bower install
