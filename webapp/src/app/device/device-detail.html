@@ -471,6 +471,19 @@
                          ng-model="deviceDetailsCtrl.currentDevice.notes">
                 </div>
               </div>
+              <div class="form-group"
+                   ng-class="{ 'has-error' : deviceForm.loggly_link.$invalid && !deviceForm.loggly_link.$pristine }">
+                <label for="notes" class="col-sm-3 control-label">Loggly link</label>
+
+                <div class="col-sm-4">
+                  <input type="text"
+                         class="form-control"
+                         name="loggly_link"
+                         id="loggly_link"
+                         readonly
+                         ng-model="deviceDetailsCtrl.currentDevice.loggly_link">
+                </div>
+              </div>
 
               <div class="form-group"
                    ng-class="{ 'has-error' : deviceForm.created.$invalid && !deviceForm.created.$pristine }">

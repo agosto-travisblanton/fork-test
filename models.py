@@ -179,6 +179,8 @@ class ChromeOsDevice(ndb.Model):
     firmware_version = ndb.StringProperty(required=False, indexed=False)
     etag = ndb.StringProperty(required=False, indexed=False)
     name = ndb.ComputedProperty(lambda self: '{0} {1}'.format(self.serial_number, self.model))
+    loggly_link = ndb.ComputedProperty(lambda self: 'https://skykit.loggly.com/search?&terms=tag%3A"{0}"'.format(
+        self.serial_number))
     class_version = ndb.IntegerProperty()
 
     @classmethod

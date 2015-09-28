@@ -1,5 +1,6 @@
 from models import (Tenant, ChromeOsDevice, Distributor, Domain)
 from restler.serializers import ModelStrategy
+from google.appengine.ext import ndb
 
 TENANT_FIELDS = [
     'name',
@@ -38,7 +39,8 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'annotatedUser': lambda o, field_name, context: o.key.get().annotated_user},
     {'firmwareVersion': lambda o, field_name, context: o.key.get().firmware_version},
     {'bootMode': lambda o, field_name, context: o.key.get().boot_mode},
-    {'chromeDeviceDomain': lambda o, field_name, context: o.tenant_key.get().chrome_device_domain},
+    {'chromeDeviceDomain': lambda o, field_name, context: ndb.Key(
+        urlsafe=o.tenant_key.get().domain_key.urlsafe()).get().name},
     {'orgUnitPath': lambda o, field_name, context: o.key.get().org_unit_path},
     {'status': lambda o, field_name, context: o.key.get().status},
     {'updated': lambda o, field_name, context: o.key.get().updated},
@@ -56,7 +58,10 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'serialNumber': lambda o, field_name, context: o.key.get().serial_number},
     {'gcmRegistrationId': lambda o, field_name, context: o.key.get().gcm_registration_id},
     {'contentServerUrl': lambda o, field_name, context: o.tenant_key.get().content_server_url},
-    {'model': lambda o, field_name, context: o.key.get().model}
+    {'model': lambda o, field_name, context: o.key.get().model},
+    {'name': lambda o, field_name, context: o.key.get().name},
+    {'loggly_link': lambda o, field_name, context: o.key.get().loggly_link},
+    {'etag': lambda o, field_name, context: o.key.get().etag}
 ]
 
 DOMAIN_FIELDS = [

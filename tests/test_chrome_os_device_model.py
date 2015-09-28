@@ -96,6 +96,8 @@ class TestChromeOsDeviceModel(BaseTest):
         json_representation = json.loads(to_json(chrome_os_device, CHROME_OS_DEVICE_STRATEGY))
         self.assertEqual(self.SERIAL_NUMBER, json_representation['serialNumber'])
         self.assertEqual(str(chrome_os_device.name), '{0} {1}'.format(self.SERIAL_NUMBER, self.MODEL))
+        self.assertEqual(str(chrome_os_device.loggly_link),
+                         'https://skykit.loggly.com/search?&terms=tag%3A"{0}"'.format(self.SERIAL_NUMBER))
 
     def test_class_version_is_only_set_by_pre_put_hook_method(self):
         chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,

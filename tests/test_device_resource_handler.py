@@ -209,6 +209,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json['status'], device.status)
         self.assertEqual(response_json['updated'], device.updated.strftime('%Y-%m-%d %H:%M:%S'))
         self.assertEqual(response_json['tenantKey'], tenant.key.urlsafe())
+        self.assertEqual(response_json['chromeDeviceDomain'], self.CHROME_DEVICE_DOMAIN)
+        self.assertEqual(response_json['loggly_link'], 'https://skykit.loggly.com/search?&terms=tag%3A"{0}"'.format(
+        device.serial_number))
 
     ##################################################################################################################
     ## post
