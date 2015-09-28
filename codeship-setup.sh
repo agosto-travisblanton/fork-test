@@ -1,10 +1,13 @@
-#!/bin/bash --login
+#!/bin/bash
 set -e
-
-. ~/.nvm/nvm.sh
 
 COLOR_LIGHT_GREEN='\033[1;32m'
 COLOR_OFF='\033[0m'
+
+printf "\n${COLOR_LIGHT_GREEN}===> Sourcing nvm...${COLOR_OFF}\n"
+
+. ~/.nvm/nvm.sh
+
 
 cd ~/src/bitbucket.org/agosto_administrator/skykit-display-device
 
@@ -16,7 +19,6 @@ pip install py
 cd ~/src/bitbucket.org/agosto_administrator/skykit-display-device/webapp
 
 printf "\n${COLOR_LIGHT_GREEN}===> Installing node runtime via nvm...${COLOR_OFF}\n"
-
 
 nvm install
 nvm use
