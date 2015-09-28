@@ -76,11 +76,10 @@ class ContentManagerApi(object):
         key = ndb.Key(urlsafe=device_urlsafe_key)
         device = key.get()
         tenant = device.tenant_key.get()
-        content_manager_base_url = tenant.content_manager_base_url
         url = "{content_manager_base_url}/provisioning/v1/displays/{device_key}".format(
-            content_manager_base_url=content_manager_base_url, device_key=device_urlsafe_key)
-        http_client_request = HttpClientRequest(url=url,
-                                                headers=self.HEADERS)
+            content_manager_base_url=tenant.content_manager_base_url,
+            device_key=device_urlsafe_key)
+        http_client_request = HttpClientRequest(url=url, headers=self.HEADERS)
         http_client_response = HttpClient().delete(http_client_request)
         if http_client_response.status_code == 204:
             logging.info(
