@@ -13,7 +13,7 @@ class SeedAgostoDistributorDomain(MigrationBase):
         super(SeedAgostoDistributorDomain, self).__init__(self.MIGRATION_NAME)
 
     def run(self):
-        agosto_distributor = Distributor.find_by_name(self.AGOSTO_DISTRIBUTOR_NAME.lower())
+        agosto_distributor = Distributor.find_by_name(self.AGOSTO_DISTRIBUTOR_NAME)
         if agosto_distributor is None:
             agosto_distributor = Distributor.create(name=self.AGOSTO_DISTRIBUTOR_NAME, active=True)
             agosto_distributor.put()
