@@ -3,6 +3,7 @@ import logging
 
 from app_config import config
 from http_client import HttpClient, HttpClientRequest
+from google.appengine.ext import ndb
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -37,11 +38,13 @@ class ContentManagerApi(object):
             logging.error(error_message)
             raise RuntimeError(error_message)
 
-    def create_device(self, chrome_os_device):
+    def create_device(self, device_urlsafe_key):
+        key = ndb.Key(urlsafe=device_urlsafe_key)
+        chrome_os_device = key.get()
         if chrome_os_device.tenant_key is not None:
             tenant = chrome_os_device.tenant_key.get()
             payload = {
-                "device_key": chrome_os_device.key.urlsafe(),
+                "device_key": device_urlsafe_key,
                 "api_key": chrome_os_device.api_key,
                 "tenant_code": tenant.tenant_code
             }
@@ -55,7 +58,7 @@ class ContentManagerApi(object):
                 logging.info(
                     'create_device to Content Mgr: url={0}, device_key={1}, api_key={2}, tenant_code={3}'.format(
                         url,
-                        chrome_os_device.key.urlsafe(),
+                        device_urlsafe_key,
                         chrome_os_device.api_key,
                         tenant.tenant_code))
                 return True
@@ -64,29 +67,39 @@ class ContentManagerApi(object):
                                 'url={2}'.format(tenant.tenant_code, http_client_response.status_code, url)
                 logging.error(error_message)
                 raise RuntimeError(error_message)
-                return False
         else:
             error_message = 'No tenant_key for device'
             logging.error(error_message)
             raise RuntimeError(error_message)
 
-    def delete_device(self, chrome_os_device):
-        tenant = chrome_os_device.tenant_key.get()
+    def delete_device(self, device_urlsafe_key):
+        key = ndb.Key(urlsafe=device_urlsafe_key)
+        device = key.get()
+        tenant = device.tenant_key.get()
         content_manager_base_url = tenant.content_manager_base_url
         url = "{content_manager_base_url}/provisioning/v1/displays/{device_key}".format(
-            content_manager_base_url=content_manager_base_url, device_key=chrome_os_device.key.urlsafe())
+            content_manager_base_url=content_manager_base_url, device_key=device_urlsafe_key)
         http_client_request = HttpClientRequest(url=url,
                                                 headers=self.HEADERS)
         http_client_response = HttpClient().delete(http_client_request)
         if http_client_response.status_code == 204:
             logging.info(
-                'update_device to Content Mgr delete successful: url={0}, device_key={1}, tenant_code={2}'.format(
+                'delete_device to Content Mgr successful: url={0}, device_key={1}, tenant_code={2}'.format(
                     url,
-                    chrome_os_device.key.urlsafe(),
+                    device_urlsafe_key,
                     tenant.tenant_code))
             return True
         else:
-            error_message = 'Failed deleting device in Content Manager. Device_key: {0}. Status code: {1}. ' \
-                            'url: {2}'.format(chrome_os_device.key.urlsafe(), http_client_response.status_code, url)
+            error_message = 'Failed deleting device in Content Manager. device_key: {0}. Status code: {1}. ' \
+                            'url: {2}'.format(device_urlsafe_key, http_client_response.status_code, url)
             logging.error(error_message)
             return False
+
+    def update_device(self, device_urlsafe_key):
+        if self.delete_device(device_urlsafe_key):
+            return self.create_device(device_urlsafe_key)
+        else:
+            error_message = 'update_device failed deleting device in Content Manager. device_key={0}'.format(
+                device_urlsafe_key)
+            logging.error(error_message)
+            raise RuntimeError(error_message)

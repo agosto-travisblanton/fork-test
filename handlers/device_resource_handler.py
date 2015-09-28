@@ -1,5 +1,6 @@
 import json
 import logging
+
 from google.appengine.ext.deferred import deferred
 from webapp2 import RequestHandler
 from google.appengine.ext import ndb
@@ -89,14 +90,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                device_mac_address=device_mac_address,
                                _queue='directory-api',
                                _countdown=30)
-                content_manager_api = ContentManagerApi()
-                try:
-                    deferred.defer(content_manager_api.create_device,
-                                   chrome_os_device=device,
-                                   _queue='content-server',
-                                   _countdown=5)
-                except Exception, e:
-                    logging.exception(e)
+                deferred.defer(ContentManagerApi().create_device,
+                               device_urlsafe_key=key.urlsafe(),
+                               _queue='content-server',
+                               _countdown=5)
                 device_uri = self.request.app.router.build(None,
                                                            'manage-device',
                                                            None,
@@ -128,14 +125,22 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             if gcm_registration_id:
                 logging.info('  PUT updating the gcmRegistrationId.')
                 device.gcm_registration_id = gcm_registration_id
-            tenant = Tenant.find_by_tenant_code(request_json.get('tenantCode'))
-            if tenant:
-                if tenant.key != device.tenant_key:
+            tenant_code = request_json.get('tenantCode')
+            if tenant_code:
+                tenant = Tenant.find_by_tenant_code(request_json.get('tenantCode'))
+                if tenant and tenant.key != device.tenant_key:
                     logging.info('  PUT updating the tenant.')
                     device.tenant_key = tenant.key
-                device.put()
-                deferred.defer(update_chrome_os_device, device_urlsafe_key=device.key.urlsafe(), _queue='directory-api')
-                self.response.headers.pop('Content-Type', None)
+                    device.put()
+                    deferred.defer(ContentManagerApi().update_device,
+                                   device_urlsafe_key=device.key.urlsafe(),
+                                   _queue='content-server',
+                                   _countdown=5)
+            device.put()
+            deferred.defer(update_chrome_os_device,
+                           device_urlsafe_key=device.key.urlsafe(),
+                           _queue='directory-api')
+            self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
 
     @api_token_required
