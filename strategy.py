@@ -56,7 +56,9 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'serialNumber': lambda o, field_name, context: o.key.get().serial_number},
     {'gcmRegistrationId': lambda o, field_name, context: o.key.get().gcm_registration_id},
     {'contentServerUrl': lambda o, field_name, context: o.tenant_key.get().content_server_url},
-    {'model': lambda o, field_name, context: o.key.get().model}
+    {'model': lambda o, field_name, context: o.key.get().model},
+    {'name': lambda o, field_name, context: o.key.get().name},
+    {'loggly_link': lambda o, field_name, context: o.key.get().loggly_link},
 ]
 
 DOMAIN_FIELDS = [
