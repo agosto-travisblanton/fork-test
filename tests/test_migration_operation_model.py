@@ -1,5 +1,7 @@
+import logging
 from env_setup import setup_test_paths
 from migration.migration_models import MigrationOperation
+from mockito import when, any as any_matcher
 
 setup_test_paths()
 
@@ -28,6 +30,7 @@ class TestMigrationOperationModel(BaseTest):
         self.assertIsNone(migration.debug_info)
 
     def test_fail_updates_status_and_finish_time(self):
+        when(logging).warning(any_matcher()).thenReturn('')
         migration = self.migration_operation.fail(self.MIGRATION_TAG)
         self.assertEqual(migration.status, 'Failed')
         self.assertIsNotNone(migration.finish_time)
