@@ -132,7 +132,6 @@ class ChromeOsDevicesApi(object):
         """
         resource_json = self.get(customer_id, device_id)
         if resource_json is not None:
-            chrome_os_devices_api = self.discovery_service.chromeosdevices()
             if org_unit_path is not None:
                 resource_json['orgUnitPath'] = org_unit_path
             if notes is not None:
@@ -141,6 +140,8 @@ class ChromeOsDevicesApi(object):
                 resource_json['annotatedLocation'] = annotated_location
             if annotated_user is not None:
                 resource_json['annotatedUser'] = annotated_user
+
+            chrome_os_devices_api = self.discovery_service.chromeosdevices()
             request = chrome_os_devices_api.update(customerId=customer_id,
                                                    deviceId=device_id,
                                                    body=resource_json)
