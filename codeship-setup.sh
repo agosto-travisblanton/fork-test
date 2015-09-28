@@ -11,11 +11,6 @@ printf "\n${COLOR_LIGHT_GREEN}===> Installing Python packages via pip...${COLOR_
 pip install PyOpenSSL
 pip install py
 
-printf "\n${COLOR_LIGHT_GREEN}===> Installing Node Version Manager (nvm)...${COLOR_OFF}\n"
-
-nvm install 4.1.0
-nvm use 4.1.0
-
 printf "\n${COLOR_LIGHT_GREEN}===> Installing installing the latest version of npm...${COLOR_OFF}\n"
 
 npm install -g npm@latest
