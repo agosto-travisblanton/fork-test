@@ -11,6 +11,13 @@ printf "\n${COLOR_LIGHT_GREEN}===> Installing Python packages via pip...${COLOR_
 pip install PyOpenSSL
 pip install py
 
+cd ~/src/bitbucket.org/agosto_administrator/skykit-display-device/webapp
+
+printf "\n${COLOR_LIGHT_GREEN}===> Installing node runtime via nvm...${COLOR_OFF}\n"
+
+nvm install
+nvm use
+
 printf "\n${COLOR_LIGHT_GREEN}===> Installing installing the latest version of npm...${COLOR_OFF}\n"
 
 npm install -g npm@latest
@@ -21,7 +28,6 @@ npm install -g bower@latest
 
 printf "\n${COLOR_LIGHT_GREEN}===> Installing node packages via npm...${COLOR_OFF}\n"
 
-cd ~/src/bitbucket.org/agosto_administrator/skykit-display-device/webapp
 npm install
 
 printf "\n${COLOR_LIGHT_GREEN}===> Installing web packages via bower...${COLOR_OFF}\n"
