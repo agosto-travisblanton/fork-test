@@ -2,7 +2,8 @@
 
 appModule = angular.module('skykitDisplayDeviceManagement')
 
-appModule.controller 'DeviceDetailsCtrl', ($stateParams,
+appModule.controller 'DeviceDetailsCtrl', ($log,
+                                           $stateParams,
                                            $state,
                                            DevicesService,
                                            TenantsService,
