@@ -11,6 +11,8 @@ appModule.controller "DistributorSelectorCtrl", ($scope, $log, $state, Distribut
     if distributorsPromise
       distributorsPromise.then (data) =>
         @distributors = data
+        if @distributors.length == 1
+          @selectDistributor(@distributors[0])
 
   @selectDistributor = (distributor) =>
     @currentDistributor = distributor
