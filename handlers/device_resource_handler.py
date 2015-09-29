@@ -121,6 +121,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
         else:
             request_json = json.loads(self.request.body)
+            notes = request_json.get('notes')
+            if notes:
+                device.notes = notes
             gcm_registration_id = request_json.get('gcmRegistrationId')
             if gcm_registration_id:
                 logging.info('  PUT updating the gcmRegistrationId.')
