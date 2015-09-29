@@ -210,10 +210,10 @@
                   <tr ng-hide="tenantDetailsCtrl.currentTenantDisplays.length">
                     <td colspan="5" class="text-center text-danger">No displays</td>
                   </tr>
-                  <tr ng-repeat="item in tenantDetailsCtrl.currentTenantDisplays | orderBy:'-created' "
-                      ng-click="tenantDetailsCtrl.editItem(item)">
+                  <tr ng-repeat="item in tenantDetailsCtrl.currentTenantDisplays | orderBy:'-created' ">
                     <td class="tenant-display-serial-number">
-                      {{ item.serialNumber }}
+                      <a name="edit-device" class="btn" ng-click="tenantDetailsCtrl.editItem(item)"
+                         title="Device detail">{{item.serialNumber}}</a>
                     </td>
                     <td class="tenant-display-id">
                       {{ item.deviceId }}
