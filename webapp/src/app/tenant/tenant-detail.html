@@ -203,12 +203,13 @@
                     <th>Device ID</th>
                     <th>Wifi mac address</th>
                     <th>Ether mac address</th>
+                    <th>Notes</th>
                     <th>Provisioning date</th>
                   </tr>
                   </thead>
                   <tbody>
                   <tr ng-hide="tenantDetailsCtrl.currentTenantDisplays.length">
-                    <td colspan="5" class="text-center text-danger">No displays</td>
+                    <td colspan="6" class="text-center text-danger">No displays</td>
                   </tr>
                   <tr ng-repeat="item in tenantDetailsCtrl.currentTenantDisplays | orderBy:'-created' ">
                     <td class="tenant-display-serial-number">
@@ -223,6 +224,9 @@
                     </td>
                     <td class="tenant-display-ethernet-mac-address">
                       {{ item.ethernetMacAddress }}
+                    </td>
+                    <td class="tenant-display-notes">
+                      {{ item.notes }}
                     </td>
                     <td class="tenant-display-provisioning-date">
                       {{ item.created }}
