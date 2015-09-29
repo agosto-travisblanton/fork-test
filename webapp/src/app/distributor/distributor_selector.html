@@ -14,6 +14,14 @@
 
       <div class="row">
         <div class="col-lg-12">
+          <div ng-hide="distributorSelectorCtrl.distributors.length">
+            <div class="alert alert-warning" role="alert">
+              <strong>Warning!</strong>
+              &nbsp;&nbsp;
+              Your account is not associated with any distributors.
+              Please contact support (XXX) to rectify this situation.
+            </div>
+          </div>
           <div class="distributor-selection"
                ng-repeat="distributor in distributorSelectorCtrl.distributors"
                ng-click="distributorSelectorCtrl.selectDistributor(distributor);">
