@@ -147,7 +147,18 @@ application = WSGIApplication(
               handler='handlers.domains_handler.DomainsHandler',
               name='manage-domain',
               methods=['GET', 'PUT', 'DELETE']
-              )
+              ),
+
+        ############################################################
+        # /dev/ routes secured by admin:required
+        ############################################################
+        Route(
+            r'/dev/versions',
+            handler='handlers.versions.VersionHandler',
+            name='versions',
+            methods=['GET'],
+        ),
+
     ],
     debug=not on_production_server
 )
