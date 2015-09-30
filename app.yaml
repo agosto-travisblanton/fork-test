@@ -76,6 +76,11 @@ handlers:
   secure: always
   auth_fail_action: redirect
 
+- url: /dev/.*
+  login: admin
+  script: routes.application
+  secure: always
+
 - url: /.*
   script: routes.application
   secure: always
