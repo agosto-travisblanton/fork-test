@@ -85,6 +85,10 @@ handlers:
   script: routes.application
   secure: always
 
+- url: /admin/.*
+  script: google.appengine.ext.admin.application
+  login: admin
+
 skip_files:
 - ^coverage/.*
 - ^coverage_html_report/.*
