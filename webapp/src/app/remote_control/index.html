@@ -11,20 +11,84 @@
           </h1>
         </div>
       </div>
-      <div class="row" data-ng-controller="RemoteControlCtrl">
-        <div class="col-lg-4">
-          <label for="device">Choose a device:</label>
-          <select id="device" data-ng-model="remoteControlCtrl.currentDevice"
-                  data-ng-options="c.name for c in remoteControlCtrl.devices">
-            <option value=''>Select device</option>
-          </select>
-        </div>
-        <div class="col-lg-8">
-          <div ng-show="remoteControlCtrl.currentDevice.name != undefined">
-            selected device: {{ remoteControlCtrl.currentDevice}}
+
+      <form name="resetForm"
+            class="form-horizontal"
+            ng-submit="remoteControlCtrl.onClickResetSendButton()"
+            novalidate>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-xs-offset-1 col-xs-1">
+              <label>Reset:</label>
+            </div>
+            <div class="col-xs-2">
+              <button type="submit"
+                      class="btn btn-primary btn-default"><i class="fa fa-fw fa-building"></i>
+                Send
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </form>
+      <hr>
+      <form name="volumeForm"
+            class="form-horizontal"
+            ng-submit="remoteControlCtrl.onClickVolumeSendButton()"
+            novalidate>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-xs-offset-1 col-xs-2">
+              <label for="volume">Volume (1-100):</label>
+            </div>
+            <div class="col-xs-2">
+              <input type="number"
+                     class="form-control"
+                     name="volume"
+                     id="volume"
+                     ng-model="RemoteControlCtrl.currentDevice.volume"
+                     min="1"
+                     max="100"
+                     ngMinlength="1"
+                     ngMaxlength="3"
+                     maxlength="3"
+                     ng-pattern="/^[1-100]{1,3}$/">
+            </div>
+            <div class="col-xs-2">
+              <button type="submit"
+                      class="btn btn-primary btn-default"
+                      ng-disabled="!volumeForm.$dirty || volumeForm.$invalid"><i class="fa fa-fw fa-building"></i>
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+      <form name="customForm"
+            class="form-horizontal"
+            ng-submit="remoteControlCtrl.onClickCustomSendButton()"
+            novalidate>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-xs-offset-1 col-xs-2">
+              <label for="volume">Custom command:</label>
+            </div>
+            <div class="col-xs-2">
+              <input type="text"
+                     class="form-control"
+                     name="custom"
+                     id="custom"
+                     ng-model="RemoteControlCtrl.currentDevice.custom">
+            </div>
+            <div class="col-xs-2">
+              <button type="submit"
+                      class="btn btn-primary btn-default"
+                      ng-disabled="!customForm.$dirty || customForm.$invalid"><i class="fa fa-fw fa-building"></i>
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
     </div>
   </div>
 </div>
