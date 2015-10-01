@@ -13,72 +13,37 @@
         </div>
       </div>
       <!-- /.row -->
-
-      <div>
-        <tabset>
-          <tab heading="Devices">
-            <div style="margin-top: 1px;">&nbsp;</div>
-            <div class="row">
-              <div class="col-lg-12">
-                <table name="devices-table" class="table table-bordered table-responsive table-striped">
-                  <thead>
-                  <tr>
-                    <th>Serial number</th>
-                    <th>Tenant code</th>
-                    <th>WiFi mac address</th>
-                    <th>Ether mac address</th>
-                    <th>Notes</th>
-                    <th>Provisioning date</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr ng-hide="devicesListingCtrl.devices.length">
-                    <td class="no-devices text-center text-danger" colspan="6">No devices</td>
-                  </tr>
-                  <tr ng-repeat="item in devicesListingCtrl.devices | orderBy:'-created'">
-                    <td class="display-serial-number">
-                      <a name="edit-device" class="btn" ng-click="devicesListingCtrl.editItem(item)"
-                         title="Device detail">{{item.serialNumber}}</a></td>
-                    <td class="display-tenant-code">{{ item.tenantCode }}</td>
-                    <td class="display-mac-address">{{ item.macAddress }}</td>
-                    <td class="display-ethernet-mac-address">{{ item.ethernetMacAddress }}</td>
-                    <td class="display-notes">{{ item.notes }}</td>
-                    <td class="display-provisioning-date">{{ item.created }}</td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </tab>
-          <tab heading="Commands">
-            <div style="margin-top: 1px;">&nbsp;</div>
-            <div class="row">
-              <div class="col-lg-12">
-                <table name="devices-commands-table" class="table table-bordered table-responsive table-striped">
-                  <thead>
-                  <tr>
-                    <th>Serial number</th>
-                    <th>Commands</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr ng-hide="devicesListingCtrl.devices.length">
-                    <td class="no-devices text-center text-danger" colspan="3">No devices</td>
-                  </tr>
-                  <tr ng-repeat="item in devicesListingCtrl.devices | orderBy:'-created'">
-                    <td class="display-serial-number">
-                      <a name="edit-device" class="btn" ng-click="devicesListingCtrl.editItem(item)"
-                         title="Device detail">{{item.serialNumber}}</a></td>
-                    <td class="display-commands"></td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </tab>
-        </tabset>
+      <div class="row">
+        <div class="col-lg-12">
+          <table name="devices-table" class="table table-bordered table-responsive table-striped">
+            <thead>
+            <tr>
+              <th>Serial number</th>
+              <th>Tenant code</th>
+              <th>WiFi mac address</th>
+              <th>Ether mac address</th>
+              <th>Notes</th>
+              <th>Provisioning date</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-hide="devicesListingCtrl.devices.length">
+              <td class="no-devices text-center text-danger" colspan="6">No devices</td>
+            </tr>
+            <tr ng-repeat="item in devicesListingCtrl.devices | orderBy:'-created'">
+              <td class="display-serial-number">
+                <a name="edit-device" class="btn" ng-click="devicesListingCtrl.editItem(item)"
+                   title="Device detail">{{item.serialNumber}}</a></td>
+              <td class="display-tenant-code">{{ item.tenantCode }}</td>
+              <td class="display-mac-address">{{ item.macAddress }}</td>
+              <td class="display-ethernet-mac-address">{{ item.ethernetMacAddress }}</td>
+              <td class="display-notes">{{ item.notes }}</td>
+              <td class="display-provisioning-date">{{ item.created }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
   </div>
 </div>
 </div>
