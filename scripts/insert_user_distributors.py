@@ -11,5 +11,4 @@ for name in names:
 
     users = User.query().fetch(10)
     for user in users:
-        distributor_user = DistributorUser(user_key=user.key, distributor_key=distributor_key)
-        distributor_user.put()
+        User.add_distributor(user, distributor_key)
