@@ -59,6 +59,11 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
                                                  None,
                                                  {'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
 
+
+    ##################################################################################################################
+    ## post
+    ##################################################################################################################
+
     def test_post_intent_returns_ok_status(self):
         request_body = {'intent': self.some_intent}
         when(device_commands_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
@@ -100,3 +105,19 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
         self.assertTrue("404 DeviceCommandsHandler: Device not found with key: {0}".format(bogus_key)
                         in context.exception.message)
+
+    ##################################################################################################################
+    ## post reset
+    ##################################################################################################################
+    # def test_post_reset_returns_ok_status(self):
+    #     request_body = {'intent': self.some_intent}
+    #     when(device_commands_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
+    #     response = self.app.post(self.post_uri, json.dumps(request_body), headers=self.valid_authorization_header)
+    #     self.assertOK(response)
+
+    def test_valid(self):
+        request_body = {'intent': self.some_intent}
+
+
+        response = self.app.post(self.post_uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        self.assertOK(response)
