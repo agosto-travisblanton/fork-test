@@ -9,6 +9,8 @@ describe 'DeviceDetailsCtrl', ->
   devicesServicePromise = undefined
   TenantsService = undefined
   tenantsServicePromise = undefined
+  CommandsService = undefined
+  commandsServicePromise = undefined
   sweet = undefined
   progressBarService = undefined
   serviceInjection = undefined
@@ -21,13 +23,14 @@ describe 'DeviceDetailsCtrl', ->
 
   beforeEach module('skykitDisplayDeviceManagement')
 
-  beforeEach inject (_$controller_, _DevicesService_, _TenantsService_, _sweet_, _$state_) ->
+  beforeEach inject (_$controller_, _DevicesService_, _TenantsService_, _CommandsService_, _sweet_, _$state_) ->
     $controller = _$controller_
     $stateParams = {}
     $state = {}
     $state = _$state_
     DevicesService = _DevicesService_
     TenantsService = _TenantsService_
+    CommandsService = _CommandsService_
     progressBarService = {
       start: ->
       complete: ->
@@ -132,3 +135,121 @@ describe 'DeviceDetailsCtrl', ->
       it "the 'then' handler routes navigation back to 'devices'", ->
         expect($state.go).toHaveBeenCalledWith('devices')
 
+  describe '.onClickResetSendButton', ->
+    beforeEach ->
+      commandsServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      spyOn(CommandsService, 'reset').and.returnValue(commandsServicePromise)
+      spyOn(progressBarService, 'start')
+      spyOn(progressBarService, 'complete')
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+      controller.editMode = true
+      controller.onClickResetSendButton()
+      commandsServicePromise.resolve()
+
+    it 'starts the progress bar', ->
+      expect(progressBarService.start).toHaveBeenCalled()
+
+    it 'call CommandsService.reset with the current device', ->
+      expect(CommandsService.reset).toHaveBeenCalledWith(controller.currentDevice.key)
+
+    describe '.onResetSuccess', ->
+      beforeEach ->
+        spyOn(sweet, 'show')
+        controller.onResetSuccess()
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a sweet alert', ->
+        expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent reset command to the device.', 'success')
+
+    describe '.onResetFailure', ->
+      beforeEach ->
+        spyOn(sweet, 'show')
+        controller.onResetFailure()
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a sweet alert', ->
+        expect(sweet.show).toHaveBeenCalledWith('Oops...', 'Unable to send reset command to the device.', 'error')
+
+  describe '.onClickVolumeSendButton', ->
+    beforeEach ->
+      commandsServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      spyOn(CommandsService, 'volume').and.returnValue(commandsServicePromise)
+      spyOn(progressBarService, 'start')
+      spyOn(progressBarService, 'complete')
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+      controller.editMode = true
+      controller.currentDevice.volume = 5
+      controller.onClickVolumeSendButton()
+      commandsServicePromise.resolve()
+
+    it 'starts the progress bar', ->
+      expect(progressBarService.start).toHaveBeenCalled()
+
+    it 'call CommandsService.volume with the current device', ->
+      expect(CommandsService.volume).toHaveBeenCalledWith(controller.currentDevice.key, controller.currentDevice.volume)
+
+    describe '.onVolumeSuccess', ->
+      beforeEach ->
+        spyOn(sweet, 'show')
+        controller.onVolumeSuccess()
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a sweet alert', ->
+        expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent volume command to the device.', 'success')
+
+    describe '.onVolumeFailure', ->
+      beforeEach ->
+        spyOn(sweet, 'show')
+        controller.onVolumeFailure()
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a sweet alert', ->
+        expect(sweet.show).toHaveBeenCalledWith('Oops...', 'Unable to send volume command to the device.', 'error')
+
+  describe '.onClickCommandSendButton', ->
+    beforeEach ->
+      commandsServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      spyOn(CommandsService, 'custom').and.returnValue(commandsServicePromise)
+      spyOn(progressBarService, 'start')
+      spyOn(progressBarService, 'complete')
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+      controller.editMode = true
+      controller.currentDevice.custom = 'skykit.com/skdchromeapp/channel/2'
+      controller.onClickCommandSendButton()
+      commandsServicePromise.resolve()
+
+    it 'starts the progress bar', ->
+      expect(progressBarService.start).toHaveBeenCalled()
+
+    it 'call CommandsService.custom with the current device', ->
+      expect(CommandsService.custom).toHaveBeenCalledWith(controller.currentDevice.key, controller.currentDevice.custom)
+
+    describe '.onCommandSuccess', ->
+      beforeEach ->
+        spyOn(sweet, 'show')
+        controller.onCommandSuccess()
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a sweet alert', ->
+        expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent custom command to the device.', 'success')
+
+    describe '.onCommandFailure', ->
+      beforeEach ->
+        spyOn(sweet, 'show')
+        controller.onCommandFailure()
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a sweet alert', ->
+        expect(sweet.show).toHaveBeenCalledWith('Oops...', 'Unable to send custom command to the device.', 'error')

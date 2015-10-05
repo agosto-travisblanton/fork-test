@@ -156,14 +156,35 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
       return
     controllerAs: 'deviceDetailsCtrl'
   })
-  $stateProvider.state("remote_control", {
-    url: "/remote_control",
-    templateUrl: "app/remote_control/index.html",
-    controller: "RemoteControlCtrl",
-    controllerAs: 'remoteControlCtrl',
+  $stateProvider.state("deviceReset", {
+    url: "/devices/:deviceKey/commands/reset",
+    templateUrl: "app/device/device-detail.html",
     ncyBreadcrumb: {
-      label: 'Remote control'
-    }
+      label: '{{ deviceDetailsCtrl.currentDevice.key }}'
+      parent: 'devices'
+    },
+    controller: 'DeviceDetailsCtrl'
+    controllerAs: 'deviceDetailsCtrl'
+  })
+  $stateProvider.state("deviceVolume", {
+    url: "/devices/:deviceKey/commands/volume",
+    templateUrl: "app/device/device-detail.html",
+    ncyBreadcrumb: {
+      label: '{{ deviceDetailsCtrl.currentDevice.key }}'
+      parent: 'devices'
+    },
+    controller: 'DeviceDetailsCtrl'
+    controllerAs: 'deviceDetailsCtrl'
+  })
+  $stateProvider.state("deviceCustom", {
+    url: "/devices/:deviceKey/commands/custom",
+    templateUrl: "app/device/device-detail.html",
+    ncyBreadcrumb: {
+      label: '{{ deviceDetailsCtrl.currentDevice.key }}'
+      parent: 'devices'
+    },
+    controller: 'DeviceDetailsCtrl'
+    controllerAs: 'deviceDetailsCtrl'
   })
 
   $urlRouterProvider.otherwise '/sign_in'
@@ -184,8 +205,8 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
   RestangularProvider.addResponseInterceptor (data, operation, resourceType, url, response, deferred) ->
     result = data
     # Uncomment this for pagination support when using PagingListHandlerMixin on the Python side.
-#    if resourceType == 'devices' and operation = 'getList' and url == '/api/v1/devices'
-#      result = data.objects
+    #    if resourceType == 'devices' and operation = 'getList' and url == '/api/v1/devices'
+    #      result = data.objects
     result
 
   RestangularProvider.setRestangularFields {

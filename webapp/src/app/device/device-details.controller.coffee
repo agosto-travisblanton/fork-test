@@ -7,6 +7,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
                                            $state,
                                            DevicesService,
                                            TenantsService,
+                                           CommandsService,
                                            sweet,
                                            ProgressBarService) ->
   @tenantKey = $stateParams.tenantKey
@@ -37,6 +38,8 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     tenantKey: undefined
     created: undefined #"2015-07-07 19:22:57"
     updated: undefined #"2015-07-07 19:22:57"
+    volume: undefined
+    custom: undefined
   }
   @editMode = !!$stateParams.deviceKey
 
@@ -63,5 +66,48 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     ProgressBarService.complete()
     $log.error errorObject
     sweet.show('Oops...', 'Unable to save the device.', 'error')
+
+  @onClickResetSendButton = () ->
+    if @editMode
+      ProgressBarService.start()
+      promise = CommandsService.reset $stateParams.deviceKey
+      promise.then @onResetSuccess, @onResetFailure
+
+  @onResetSuccess = () ->
+    ProgressBarService.complete()
+    sweet.show('Success!', 'Sent reset command to the device.', 'success')
+
+  @onResetFailure = () ->
+    ProgressBarService.complete()
+    sweet.show('Oops...', 'Unable to send reset command to the device.', 'error')
+
+  @onClickVolumeSendButton = () ->
+    if @editMode
+      ProgressBarService.start()
+      promise = CommandsService.volume $stateParams.deviceKey, @currentDevice.volume
+      promise.then @onVolumeSuccess, @onVolumeFailure
+
+  @onVolumeSuccess = () ->
+    ProgressBarService.complete()
+    sweet.show('Success!', 'Sent volume command to the device.', 'success')
+
+  @onVolumeFailure = () ->
+    ProgressBarService.complete()
+    sweet.show('Oops...', 'Unable to send volume command to the device.', 'error')
+
+  @onClickCommandSendButton = () ->
+    if @editMode
+      ProgressBarService.start()
+      promise = CommandsService.custom $stateParams.deviceKey, @currentDevice.custom
+      promise.then @onCommandSuccess, @onCommandFailure
+
+  @onCommandSuccess = () ->
+    ProgressBarService.complete()
+    sweet.show('Success!', 'Sent custom command to the device.', 'success')
+
+  @onCommandFailure = () ->
+    ProgressBarService.complete()
+    message = ""
+    sweet.show('Oops...', 'Unable to send custom command to the device.', 'error')
 
   @
