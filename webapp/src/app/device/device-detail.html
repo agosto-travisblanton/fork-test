@@ -442,19 +442,19 @@
                                  class="form-control"
                                  name="volume"
                                  id="volume"
-                                 ng-model="RemoteControlCtrl.currentDevice.volume"
+                                 ng-model="deviceDetailsCtrl.currentDevice.volume"
                                  min="1"
                                  max="100"
                                  ngMinlength="1"
                                  ngMaxlength="3"
-                                 maxlength="3"
-                                 ng-pattern="/^[1-100]{1,3}$/">
+                                 ng-pattern="/^^([1-9]|[0-9][0])$">
+                          <span ng-show="volumeForm.$invalid" class="alert-danger">only 1-100 is allowed</span>
                         </div>
                         <div class="col-sm-2">
                           <button type="submit"
                                   class="btn btn-primary btn-default"
-                                  ng-disabled="!volumeForm.$dirty || volumeForm.$invalid"><i
-                            class="fa fa-fw fa-building"></i>
+                                  ng-disabled="volumeForm.$invalid">
+                            <i class="fa fa-fw fa-building"></i>
                             Send
                           </button>
                         </div>
@@ -509,7 +509,7 @@
                                  class="form-control"
                                  name="custom"
                                  id="custom"
-                                 ng-model="RemoteControlCtrl.currentDevice.custom">
+                                 ng-model="deviceDetailsCtrl.currentDevice.custom">
                         </div>
                         <div class="col-sm-2">
                           <button type="submit"
