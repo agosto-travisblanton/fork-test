@@ -11,4 +11,8 @@ for name in names:
 
     users = User.query().fetch(10)
     for user in users:
+<<<<<<< HEAD
         User.add_distributor(user, distributor_key)
+=======
+        User.add_distributor(user, distributor_key)
+>>>>>>> 1616e192daa925065daff5fe350fb591053bbb50
