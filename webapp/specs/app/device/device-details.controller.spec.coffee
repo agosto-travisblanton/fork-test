@@ -41,7 +41,6 @@ describe 'DeviceDetailsCtrl', ->
       $scope: scope
       $stateParams: $stateParams
       ProgressBarService: progressBarService
-
     }
 
   describe 'initialization', ->
@@ -140,8 +139,6 @@ describe 'DeviceDetailsCtrl', ->
     beforeEach ->
       commandsServicePromise = new skykitDisplayDeviceManagement.q.Mock
       spyOn(CommandsService, 'reset').and.returnValue(commandsServicePromise)
-      spyOn($state, 'go')
-      $stateParams = {}
       spyOn(progressBarService, 'start')
       spyOn(progressBarService, 'complete')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
@@ -181,8 +178,6 @@ describe 'DeviceDetailsCtrl', ->
     beforeEach ->
       commandsServicePromise = new skykitDisplayDeviceManagement.q.Mock
       spyOn(CommandsService, 'volume').and.returnValue(commandsServicePromise)
-      spyOn($state, 'go')
-      $stateParams = {}
       spyOn(progressBarService, 'start')
       spyOn(progressBarService, 'complete')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
@@ -223,8 +218,6 @@ describe 'DeviceDetailsCtrl', ->
     beforeEach ->
       commandsServicePromise = new skykitDisplayDeviceManagement.q.Mock
       spyOn(CommandsService, 'custom').and.returnValue(commandsServicePromise)
-      spyOn($state, 'go')
-      $stateParams = {}
       spyOn(progressBarService, 'start')
       spyOn(progressBarService, 'complete')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
