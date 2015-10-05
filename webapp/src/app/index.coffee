@@ -186,15 +186,6 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     controller: 'DeviceDetailsCtrl'
     controllerAs: 'deviceDetailsCtrl'
   })
-  $stateProvider.state("remote_control", {
-    url: "/remote_control",
-    templateUrl: "app/remote_control/index.html",
-    controller: "RemoteControlCtrl",
-    controllerAs: 'remoteControlCtrl',
-    ncyBreadcrumb: {
-      label: 'Remote control'
-    }
-  })
 
   $urlRouterProvider.otherwise '/sign_in'
 
