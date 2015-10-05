@@ -83,10 +83,8 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onClickVolumeSendButton = () ->
     if @editMode
-      volume = @currentDevice.volume
-      debugger
       ProgressBarService.start()
-      promise = CommandsService.volume $stateParams.deviceKey, volume
+      promise = CommandsService.volume $stateParams.deviceKey, @currentDevice.volume
       promise.then @onVolumeSuccess, @onVolumeFailure
 
   @onVolumeSuccess = () ->
@@ -99,10 +97,8 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onClickCommandSendButton = () ->
     if @editMode
-      custom_command = @currentDevice.custom
-      debugger
       ProgressBarService.start()
-      promise = CommandsService.custom $stateParams.deviceKey, custom_command
+      promise = CommandsService.custom $stateParams.deviceKey, @currentDevice.custom
       promise.then @onCommandSuccess, @onCommandFailure
 
   @onCommandSuccess = () ->
