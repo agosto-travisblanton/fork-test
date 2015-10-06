@@ -43,6 +43,7 @@ class DeviceCommandsHandler(RequestHandler):
     def reset(self, device_urlsafe_key):
         status = 200
         message = None
+        chrome_os_device = None
         try:
             device_key = ndb.Key(urlsafe=device_urlsafe_key)
             chrome_os_device = device_key.get()
@@ -74,7 +75,7 @@ class DeviceCommandsHandler(RequestHandler):
                 logging.exception(e)
             if None is chrome_os_device:
                 status = 404
-                message = 'DeviceCommandsHandler: Device not found with key: {0}'.format(device_urlsafe_key)
+                message = 'DeviceCommandsHandler volume: Device not found with key: {0}'.format(device_urlsafe_key)
                 logging.info(message)
             else:
                 intent = "skykit.com/skdchromeapp/volume/{0}".format(int(volume))
@@ -83,11 +84,31 @@ class DeviceCommandsHandler(RequestHandler):
 
     @api_token_required
     def custom(self, device_urlsafe_key):
-        pass
+        status = 200
+        message = None
+        request_json = json.loads(self.request.body)
+        intent = request_json.get('command')
+        if intent is None or intent == '':
+            status = 400
+            message = 'DeviceCommandsHandler: Invalid command.'
+        else:
+            chrome_os_device = None
+            try:
+                device_key = ndb.Key(urlsafe=device_urlsafe_key)
+                chrome_os_device = device_key.get()
+            except Exception, e:
+                logging.exception(e)
+            if None is chrome_os_device:
+                status = 404
+                message = 'DeviceCommandsHandler command: Device not found with key: {0}'.format(device_urlsafe_key)
+                logging.info(message)
+            else:
+                change_intent(chrome_os_device.gcm_registration_id, intent)
+        self.response.set_status(status, message)
 
     @staticmethod
     def is_valid_volume(volume):
-        if volume.isdigit():
+        if str(volume).isdigit():
             int_volume = int(volume)
             if 0 < int_volume < 101:
                 return True
