@@ -28,6 +28,8 @@ class AppConfig(Config):
     STORMPATH_CLIENT = None
     OAUTH_CLIENT_ID = None
     DEFAULT_AGOSTO_DEVICE_DOMAIN = None
+    PLAYER_RESET_COMMAND = None
+    PLAYER_VOLUME_COMMAND = None
 
 
 config = AppConfig.get_config()

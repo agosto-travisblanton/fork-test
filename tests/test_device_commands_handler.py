@@ -25,7 +25,6 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
     MAC_ADDRESS = '54271e619346'
     DISTRIBUTOR_NAME = 'agosto'
     IMPERSONATION_EMAIL = 'test@test.com'
-    DEVICE_RESET = 'skykit.com/skdchromeapp/reset'
 
     def setUp(self):
         super(TestDeviceCommandsHandler, self).setUp()
@@ -112,7 +111,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
 
     def test_post_device_reset_returns_ok_status(self):
         when(device_commands_processor).change_intent(self.chrome_os_device.gcm_registration_id,
-                                                      self.DEVICE_RESET).thenReturn(None)
+                                                      config.PLAYER_RESET_COMMAND).thenReturn(None)
         uri = application.router.build(None,
                                        'device-reset-command',
                                        None,
@@ -123,7 +122,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
 
     def test_post_device_reset_with_bogus_device_key_returns_not_found_status(self):
         when(device_commands_processor).change_intent(self.chrome_os_device.gcm_registration_id,
-                                                      self.DEVICE_RESET).thenReturn(None)
+                                                      config.PLAYER_RESET_COMMAND).thenReturn(None)
         bogus_key = '0AXC19Z0DE'
         uri = application.router.build(None,
                                        'device-reset-command',

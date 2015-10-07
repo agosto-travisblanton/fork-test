@@ -3,6 +3,7 @@ import logging
 
 from google.appengine.ext import ndb
 from webapp2 import RequestHandler
+from app_config import config
 
 from decorators import api_token_required
 from device_commands_processor import (change_intent)
@@ -11,7 +12,6 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>. Bob MacNeal <bob
 
 
 class DeviceCommandsHandler(RequestHandler):
-    DEVICE_RESET = 'skykit.com/skdchromeapp/reset'
 
     @api_token_required
     def post(self, device_urlsafe_key):
@@ -52,7 +52,7 @@ class DeviceCommandsHandler(RequestHandler):
             message = 'DeviceCommandsHandler reset: Device not found with key: {0}'.format(device_urlsafe_key)
             logging.info(message)
         else:
-            change_intent(chrome_os_device.gcm_registration_id, self.DEVICE_RESET)
+            change_intent(chrome_os_device.gcm_registration_id, config.PLAYER_RESET_COMMAND)
         self.response.set_status(status, message)
 
     @api_token_required
@@ -76,7 +76,7 @@ class DeviceCommandsHandler(RequestHandler):
                 message = 'DeviceCommandsHandler volume: Device not found with key: {0}'.format(device_urlsafe_key)
                 logging.info(message)
             else:
-                intent = "skykit.com/skdchromeapp/volume/{0}".format(int(volume))
+                intent = "{0}{1}".format(config.PLAYER_VOLUME_COMMAND, int(volume))
                 change_intent(chrome_os_device.gcm_registration_id, intent)
         self.response.set_status(status, message)
 

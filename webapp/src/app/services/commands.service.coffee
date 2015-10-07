@@ -14,7 +14,7 @@ appModule.factory 'CommandsService', (Restangular) ->
       volumeCommand = {
         volume: volume
       }
-      promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}/commands/volume").customPOST(volumeCommand)
+      promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}/commands/volume").post(volumeCommand)
       promise
 
     custom: (key, command) ->
