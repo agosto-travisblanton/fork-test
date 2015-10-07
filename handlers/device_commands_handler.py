@@ -1,9 +1,7 @@
 import json
 import logging
-import re
 
 from google.appengine.ext import ndb
-
 from webapp2 import RequestHandler
 
 from decorators import api_token_required
