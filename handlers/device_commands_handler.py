@@ -7,6 +7,7 @@ from app_config import config
 
 from decorators import api_token_required
 from device_commands_processor import (change_intent)
+from models import ChromeOsDevice
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>. Bob MacNeal <bob.macneal@agosto.com>'
 
