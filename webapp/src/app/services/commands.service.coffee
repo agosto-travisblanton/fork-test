@@ -14,14 +14,14 @@ appModule.factory 'CommandsService', (Restangular) ->
       volumeCommand = {
         volume: volume
       }
-      promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}/commands/volume").post(volumeCommand)
+      promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}").customPOST(volumeCommand, '/commands/volume')
       promise
 
     custom: (key, command) ->
       customCommand = {
         command: command
       }
-      promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}/commands/custom").customPOST(customCommand)
+      promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}").customPOST(customCommand, '/commands/custom')
       promise
 
 

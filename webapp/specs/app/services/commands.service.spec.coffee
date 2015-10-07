@@ -29,12 +29,13 @@ describe 'CommandsService', ->
       commandsRestangularService = {customPOST: ->}
       spyOn(Restangular, 'oneUrl').and.returnValue commandsRestangularService
       spyOn(commandsRestangularService, 'customPOST').and.returnValue promise
+      volume = 6
       volumeCommand = {
-        volume: 5
+        volume: volume
       }
-      actual = CommandsService.volume key, {volume: 5}
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}/commands/volume"
-      expect(commandsRestangularService.customPOST).toHaveBeenCalled()
+      actual = CommandsService.volume key, volume
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}"
+      expect(commandsRestangularService.customPOST).toHaveBeenCalledWith(volumeCommand, '/commands/volume')
       expect(actual).toBe promise
 
   describe '.custom', ->
@@ -43,7 +44,11 @@ describe 'CommandsService', ->
       commandsRestangularService = { customPOST: -> }
       spyOn(Restangular, 'oneUrl').and.returnValue commandsRestangularService
       spyOn(commandsRestangularService, 'customPOST').and.returnValue promise
-      actual = CommandsService.custom key, {'command': 'skykit.com/skdchromeapp/channel/2'}
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}/commands/custom"
-      expect(commandsRestangularService.customPOST).toHaveBeenCalled()
+      channel_change = 'skykit.com/skdchromeapp/channel/2'
+      customCommand = {
+        command: channel_change
+      }
+      actual = CommandsService.custom key, channel_change
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}"
+      expect(commandsRestangularService.customPOST).toHaveBeenCalledWith(customCommand, '/commands/custom')
       expect(actual).toBe promise
