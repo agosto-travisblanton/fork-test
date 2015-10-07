@@ -35,7 +35,7 @@ describe 'CommandsService', ->
       }
       actual = CommandsService.volume key, volume
       expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}"
-      expect(commandsRestangularService.customPOST).toHaveBeenCalledWith(volumeCommand, '/commands/volume')
+      expect(commandsRestangularService.customPOST).toHaveBeenCalledWith(volumeCommand, 'commands/volume')
       expect(actual).toBe promise
 
   describe '.custom', ->
@@ -50,5 +50,5 @@ describe 'CommandsService', ->
       }
       actual = CommandsService.custom key, channel_change
       expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}"
-      expect(commandsRestangularService.customPOST).toHaveBeenCalledWith(customCommand, '/commands/custom')
+      expect(commandsRestangularService.customPOST).toHaveBeenCalledWith(customCommand, 'commands/custom')
       expect(actual).toBe promise
