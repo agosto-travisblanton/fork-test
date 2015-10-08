@@ -42,17 +42,17 @@ application = WSGIApplication(
         # login
         ############################################################
         Route(r'/api/v1/identity',
-              handler='handlers.login.IdentityHandler',
+              handler='handlers.identity_handler.IdentityHandler',
               name='identity'
               ),
 
         Route(r'/login',
-              handler='handlers.login.LoginHandler',
+              handler='handlers.login_handler.LoginHandler',
               name='login',
               ),
 
         Route(r'/logout',
-              handler='handlers.login.LogoutHandler',
+              handler='handlers.logout_handler.LogoutHandler',
               name='logout',
               ),
 
