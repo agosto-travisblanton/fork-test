@@ -2,21 +2,16 @@
 
 appModule = angular.module('skykitDisplayDeviceManagement')
 
-appModule.controller 'NavbarCtrl', ($log,
-                                    $stateParams,
-                                    $state,
-                                    SessionsService, IdentityService) ->
+appModule.controller 'NavbarCtrl', ($stateParams, $log, $cookies, IdentityService) ->
+  @identity = {}
 
-  @identity = {
-    distributor: undefined
-    email: undefined
-  }
+  @initialize = ->
+    debugger
+    @identity.key = $cookies.get('user_key')
+    identityPromise = IdentityService.getIdentity()
+    identityPromise.then (data) =>
+      if data['is_logged_in']
+        @identity.email = data['email']
+        @identity.distributor = data['distributor']
 
-  identityPromise = IdentityService.getIdentity()
-  identityPromise.then (data) =>
-    if data['is_logged_in']
-      @identity = data
-      @identity.key = 'foo'
-  debugger
-
-@
+  @
