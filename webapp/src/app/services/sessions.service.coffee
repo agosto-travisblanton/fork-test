@@ -8,9 +8,6 @@ angular.module('skykitDisplayDeviceManagement').factory 'SessionsService', ($htt
       @uriBase = 'v1/sessions'
       @currentUserKey = undefined
 
-    getIdentity: ->
-      Restangular.oneUrl('api/v1/devices').get()
-
     login: (credentials) ->
       authenticationPayload = {
         access_token: _.clone(credentials.access_token)
