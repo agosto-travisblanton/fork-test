@@ -75,39 +75,38 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onResetSuccess = () ->
     ProgressBarService.complete()
-    sweet.show('Success!', 'Sent reset command to the device.', 'success')
+    sweet.show('Success!', 'Sent a reset command to the device.', 'success')
 
-  @onResetFailure = () ->
+  @onResetFailure = (error) ->
     ProgressBarService.complete()
-    sweet.show('Oops...', 'Unable to send reset command to the device.', 'error')
+    sweet.show('Oops...', "Reset error: #{error.data}", 'error')
 
   @onClickVolumeSendButton = () ->
     if @editMode
       ProgressBarService.start()
       promise = CommandsService.volume $stateParams.deviceKey, @currentDevice.volume
-      promise.then @onVolumeSuccess, @onVolumeFailure
+      promise.then @onVolumeSuccess(@currentDevice.volume), @onVolumeFailure
 
-  @onVolumeSuccess = () ->
+  @onVolumeSuccess = (level) ->
     ProgressBarService.complete()
-    sweet.show('Success!', 'Sent volume command to the device.', 'success')
+    sweet.show('Success!', "Sent a volume level of #{level} to the device.", 'success')
 
-  @onVolumeFailure = () ->
+  @onVolumeFailure = (error) ->
     ProgressBarService.complete()
-    sweet.show('Oops...', 'Unable to send volume command to the device.', 'error')
+    sweet.show('Oops...', "Volume error: #{error.data}", 'error')
 
   @onClickCommandSendButton = () ->
     if @editMode
       ProgressBarService.start()
       promise = CommandsService.custom $stateParams.deviceKey, @currentDevice.custom
-      promise.then @onCommandSuccess, @onCommandFailure
+      promise.then @onCommandSuccess(@currentDevice.custom), @onCommandFailure
 
-  @onCommandSuccess = () ->
+  @onCommandSuccess = (command) ->
     ProgressBarService.complete()
-    sweet.show('Success!', 'Sent custom command to the device.', 'success')
+    sweet.show('Success!', "Sent '#{command}' to the device.", 'success')
 
-  @onCommandFailure = () ->
+  @onCommandFailure = (error) ->
     ProgressBarService.complete()
-    message = ""
-    sweet.show('Oops...', 'Unable to send custom command to the device.', 'error')
+    sweet.show('Oops...', "Command error: #{error.data}", 'error')
 
   @

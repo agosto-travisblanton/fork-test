@@ -180,6 +180,20 @@ def _GOOGLE_CUSTOMER_ID():
 app_GOOGLE_CUSTOMER_ID = _GOOGLE_CUSTOMER_ID()
 
 
+def _PLAYER_RESET_COMMAND():
+    return 'skykit.com/skdchromeapp/reset'
+
+
+app_PLAYER_RESET_COMMAND = _PLAYER_RESET_COMMAND()
+
+
+def _PLAYER_VOLUME_COMMAND():
+    return 'skykit.com/skdchromeapp/volume/'
+
+
+app_PLAYER_VOLUME_COMMAND = _PLAYER_VOLUME_COMMAND()
+
+
 def _STORMPATH_CLIENT():
     """
     http://docs.stormpath.com/python/quickstart/#create-a-client
