@@ -30,11 +30,11 @@ appModule.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
     @googlePlusSignInButtonClicked = false
 
   @initializeSignOut = ->
-    SessionsService.removeUserKey()
+    SessionsService.removeUserInfo()
     $timeout @proceedToSignIn, 1500
 
   @loginSuccess = (response) ->
-    SessionsService.setUserKey(response)
+    SessionsService.setIdentity(response)
     ProgressBarService.complete()
     $state.go 'distributor_selection'
 

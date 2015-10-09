@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module('skykitDisplayDeviceManagement').factory 'SessionsService', ($http, $log, $cookies, Restangular) ->
+angular.module('skykitDisplayDeviceManagement').factory 'SessionsService', ($http, $log, $cookies, IdentityService, Restangular) ->
   new class SessionsService
 
     constructor: ->
@@ -26,9 +26,15 @@ angular.module('skykitDisplayDeviceManagement').factory 'SessionsService', ($htt
         @currentUserKey = data.user.key
       promise
 
-    setUserKey: (loginResponse)->
-      $cookies.put('user_key', loginResponse.data.user.key)
+    setIdentity: (loginResponse)->
+      $cookies.put('userKey', loginResponse.data.user.key)
+      identityPromise = IdentityService.getIdentity()
+      identityPromise.then (data) =>
+        $cookies.put('userEmail', data['email'])
 
-    removeUserKey: ()->
-      $cookies.remove('user_key')
+    removeUserInfo: ()->
+      $cookies.remove('userKey')
+      $cookies.remove('userEmail')
+      $cookies.remove('currentDistributorKey')
+      $cookies.remove('currentDistributorName')
 
