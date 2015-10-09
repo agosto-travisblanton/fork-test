@@ -9,8 +9,11 @@ from restler.serializers import json_response
 def identity_required(handler_method):
     def identify(self, *args, **kwargs):
         self.user_key = self.request.headers.get('X-Provisioning-User')
-        self.user = ndb.Key(urlsafe=self.user_key).get()
-        if self.user is None:
+        self.user = None
+        try:
+            self.user = ndb.Key(urlsafe=self.user_key).get()
+        except Exception, e:
+            logging.exception(e)
             logging.error('API call is missing a user key in header.')
             json_response(self.response, {'error': 'No user logged in'}, status_code=403)
             return
@@ -23,8 +26,11 @@ def identity_required(handler_method):
 def distributor_required(handler_method):
     def distributor(self, *args, **kwargs):
         self.distributor_key = self.request.headers.get('X-Provisioning-Distributor')
-        self.distributor = ndb.Key(urlsafe=self.user_key).get()
-        if self.distributor is None:
+        self.distributor = None
+        try:
+            self.distributor = ndb.Key(urlsafe=self.distributor_key).get()
+        except Exception, e:
+            logging.exception(e)
             logging.error('API call is missing a distributor key in header.')
             json_response(self.response, {'error': 'No distributor'}, status_code=403)
             return
