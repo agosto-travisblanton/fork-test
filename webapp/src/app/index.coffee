@@ -195,7 +195,8 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     'Content-Type': 'application/json'
     'Accept': 'application/json'
     'Authorization': '6C346588BD4C6D722A1165B43C51C'
-    'X-Provisioning-User': ''
+    'X-Provisioning-User': 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHIgCxIEVXNlciIWYm9iLm1hY25lYWxAYWdvc3RvLmNvbQw' #loginResponse.data.user.key
+    'X-Provisioning-Distributor': 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHJKCxIWRGlzdHJpYnV0b3JFbnRpdHlHcm91cCIWZGlzdHJpYnV0b3JFbnRpdHlHcm91cAwLEgtEaXN0cmlidXRvchiAgICAgICACgw'
   }
 
   RestangularProvider.addRequestInterceptor (elem, operation) ->

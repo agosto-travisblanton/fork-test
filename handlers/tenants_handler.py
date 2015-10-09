@@ -4,7 +4,7 @@ import logging
 from google.appengine.ext import ndb
 from webapp2 import RequestHandler
 from content_manager_api import ContentManagerApi
-from decorators import api_token_required
+from decorators import api_token_required, identity_required, distributor_required
 from models import Tenant, TenantEntityGroup, Domain
 from restler.serializers import json_response
 from strategy import TENANT_STRATEGY
@@ -18,6 +18,8 @@ class TenantsHandler(RequestHandler):
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
 
     @api_token_required
+    # @identity_required
+    # @distributor_required
     def get(self, tenant_key=None):
         if None == tenant_key:
             result = Tenant.query(ancestor=TenantEntityGroup.singleton().key)
