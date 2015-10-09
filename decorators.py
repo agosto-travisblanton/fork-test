@@ -114,26 +114,3 @@ def api_token_required(handler_method):
         handler_method(self, *args, **kwargs)
 
     return authorize
-
-
-def login_required(handler_method):
-    from models import User
-
-    def identify(self, *args, **kwargs):
-        user_key = None
-        user = None
-        is_administrator = False
-        if hasattr(self, 'session'):
-            user_key = self.session.get('user_key')
-            is_administrator = self.session.get('is_administrator')
-        if user_key is not None:
-            user = self.validate_and_get(user_key, User, abort_on_not_found=True)
-
-        if user is None or not user.enabled:
-            json_response(self.response, {'error': 'No user logged in'}, status_code=403)
-        else:
-            self.user = user
-            self.is_administrator = is_administrator
-            handler_method(self, *args, **kwargs)
-
-    return identify
