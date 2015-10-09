@@ -6,8 +6,11 @@ appModule.controller 'NavbarCtrl', ($cookies) ->
   @identity = {}
 
   @initialize = ->
-    @identity.key = $cookies.get('userKey')
-    @identity.email = $cookies.get('userEmail')
-    @identity.distributor = $cookies.get('currentDistributorName')
+    @identity = {
+      key:  $cookies.get('userKey')
+      email:  $cookies.get('userEmail')
+      distributorKey: $cookies.get('currentDistributorKey')
+      distributorName: $cookies.get('currentDistributorName')
+    }
 
   @

@@ -168,9 +168,13 @@ describe 'AuthenticationCtrl', ->
 
   describe '.initializeSignOut', ->
     beforeEach ->
+      spyOn(SessionsService, 'removeUserInfo')
       spyOn($timeoutMock, 'timeout').and.callFake (callback) -> callback()
       spyOn(controller, 'proceedToSignIn').and.callFake ->
       controller.initializeSignOut()
+
+    it "calls SessionsService.removeUserInfo ", ->
+      expect(SessionsService.removeUserInfo).toHaveBeenCalled()
 
     it "calls $timeout with the proceed with sign in function and delay", ->
       expect($timeoutMock.timeout).toHaveBeenCalledWith controller.proceedToSignIn, 1500
@@ -184,8 +188,16 @@ describe 'AuthenticationCtrl', ->
 
     beforeEach ->
       spyOn(ProgressBarService, 'complete')
+      spyOn(SessionsService, 'setIdentity')
+      spyOn(SessionsService, 'setDefaultHeaders')
       spyOn($state, 'go').and.callFake (name) ->
       controller.loginSuccess(response)
+
+    it "calls SessionsService.setDefaultHeaders ", ->
+      expect(SessionsService.setDefaultHeaders).toHaveBeenCalledWith(response)
+
+    it "calls SessionsService.setIdentity ", ->
+      expect(SessionsService.setIdentity).toHaveBeenCalledWith(response)
 
     it "completes the progress bar", ->
       expect(ProgressBarService.complete).toHaveBeenCalled()

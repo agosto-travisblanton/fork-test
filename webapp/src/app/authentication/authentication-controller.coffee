@@ -35,10 +35,11 @@ appModule.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
 
   @loginSuccess = (response) ->
     SessionsService.setIdentity(response)
+    SessionsService.setDefaultHeaders(response)
     ProgressBarService.complete()
     $state.go 'distributor_selection'
 
-  @loginFailure = (response) ->
+  @loginFailure = () ->
     ProgressBarService.complete()
     sweet.show('Oops...', 'Unable to authenticate to Stormpath.', 'error')
 
