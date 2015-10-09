@@ -9,7 +9,7 @@ from app_config import config
 from agar.test import BaseTest, WebTest
 
 
-class TestApiTokenRequiredDecorator(BaseTest, WebTest):
+class TestDecorators(BaseTest, WebTest):
     APPLICATION = WSGIApplication(
         [Route(r'/api/v1/bogus1', handler='handlers.bogus_handler.BogusHandler1', name='bogus1'),
          Route(r'/api/v1/bogus2', handler='handlers.bogus_handler.BogusHandler2', name='bogus2'),
@@ -17,7 +17,7 @@ class TestApiTokenRequiredDecorator(BaseTest, WebTest):
     )
 
     def setUp(self):
-        super(TestApiTokenRequiredDecorator, self).setUp()
+        super(TestDecorators, self).setUp()
         self.user = build(User)
         self.distributor = Distributor.create(name='Agosto', active=True)
         self.distributor.put()
