@@ -15,6 +15,10 @@ skykitDisplayDeviceManagement = angular.module('skykitDisplayDeviceManagement', 
 ])
 
 skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
+  $cookies = undefined
+  angular.injector([ 'ngCookies' ]).invoke (_$cookies_) ->
+    $cookies = _$cookies_
+
   $stateProvider.state("sign_in", {
     resolve: {
       identity: (IdentityService) ->
@@ -191,15 +195,14 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
 
   RestangularProvider.setBaseUrl '/api/v1'
 
-  RestangularProvider.setDefaultHeaders {
-    'Content-Type': 'application/json'
-    'Accept': 'application/json'
-    'Authorization': '6C346588BD4C6D722A1165B43C51C'
-    'X-Provisioning-User': 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHIgCxIEVXNlciIWYm9iLm1hY25lYWxAYWdvc3RvLmNvbQw' #loginResponse.data.user.key
-    'X-Provisioning-Distributor': 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHJKCxIWRGlzdHJpYnV0b3JFbnRpdHlHcm91cCIWZGlzdHJpYnV0b3JFbnRpdHlHcm91cAwLEgtEaXN0cmlidXRvchiAgICAgICACgw'
-  }
-
   RestangularProvider.addRequestInterceptor (elem, operation) ->
+    RestangularProvider.setDefaultHeaders {
+      'Content-Type': 'application/json'
+      'Accept': 'application/json'
+      'Authorization': '6C346588BD4C6D722A1165B43C51C'
+      'X-Provisioning-User': $cookies.get('userKey')
+      'X-Provisioning-Distributor': $cookies.get('currentDistributorKey')
+    }
     if operation == 'remove'
       return undefined
     elem

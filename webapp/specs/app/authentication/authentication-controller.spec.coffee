@@ -189,12 +189,8 @@ describe 'AuthenticationCtrl', ->
     beforeEach ->
       spyOn(ProgressBarService, 'complete')
       spyOn(SessionsService, 'setIdentity')
-      spyOn(SessionsService, 'setDefaultHeaders')
       spyOn($state, 'go').and.callFake (name) ->
       controller.loginSuccess(response)
-
-    it "calls SessionsService.setDefaultHeaders ", ->
-      expect(SessionsService.setDefaultHeaders).toHaveBeenCalledWith(response)
 
     it "calls SessionsService.setIdentity ", ->
       expect(SessionsService.setIdentity).toHaveBeenCalledWith(response)

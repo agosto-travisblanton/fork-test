@@ -36,14 +36,6 @@ angular.module('skykitDisplayDeviceManagement').factory 'SessionsService', ($htt
       identityPromise.then (data) =>
         $cookies.put('userEmail', data['email'])
 
-    setDefaultHeaders: (loginResponse)->
-      Restangular.setDefaultHeaders {
-        'Content-Type': 'application/json'
-        'Accept': 'application/json'
-        'Authorization': '6C346588BD4C6D722A1165B43C51C'
-        'X-Provisioning-User': loginResponse.data.user.key
-      }
-
     removeUserInfo: ()->
       $cookies.remove('userKey')
       $cookies.remove('userEmail')

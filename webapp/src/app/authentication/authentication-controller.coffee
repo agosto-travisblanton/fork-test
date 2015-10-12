@@ -35,7 +35,6 @@ appModule.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
 
   @loginSuccess = (response) ->
     SessionsService.setIdentity(response)
-    SessionsService.setDefaultHeaders(response)
     ProgressBarService.complete()
     $state.go 'distributor_selection'
 
