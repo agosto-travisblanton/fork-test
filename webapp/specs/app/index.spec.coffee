@@ -10,8 +10,7 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
     module "restangular", (_RestangularProvider_) ->
       RestangularProvider = _RestangularProvider_
       spyOn(RestangularProvider, 'setBaseUrl').and.callThrough()
-      spyOn(RestangularProvider, 'setDefaultHeaders').and.callThrough()
-#      spyOn(RestangularProvider, 'addRequestInterceptor').and.callThrough()
+      spyOn(RestangularProvider, 'addRequestInterceptor').and.callThrough()
       spyOn(RestangularProvider, 'addResponseInterceptor').and.callThrough()
       spyOn(RestangularProvider, 'setRestangularFields').and.callThrough()
 
@@ -109,17 +108,7 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
     it 'sets the base URL', ->
       expect(RestangularProvider.setBaseUrl).toHaveBeenCalledWith '/api/v1'
 
-#    it 'sets the default headers', ->
-#      headers = {
-#        'Content-Type': 'application/json'
-#        'Accept': 'application/json'
-#        'Authorization': '6C346588BD4C6D722A1165B43C51C'
-#        'X-Provisioning-User': ''
-#      }
-#      expect(RestangularProvider.setDefaultHeaders).toHaveBeenCalled()
-
     it 'adds a request interceptor', ->
-      spyOn(RestangularProvider, 'addRequestInterceptor').and.callThrough()
       expect(RestangularProvider.addRequestInterceptor).toHaveBeenCalled()
       args = RestangularProvider.addRequestInterceptor.calls.argsFor(0)
       expect(args[0] instanceof Function).toBeTruthy()
