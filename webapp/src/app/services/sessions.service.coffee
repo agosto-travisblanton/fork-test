@@ -33,7 +33,7 @@ angular.module('skykitDisplayDeviceManagement').factory 'SessionsService', ($htt
     setIdentity: (loginResponse)->
       $cookies.put('userKey', loginResponse.data.user.key)
       identityPromise = IdentityService.getIdentity()
-      identityPromise.then (data) =>
+      identityPromise.then (data) ->
         $cookies.put('userEmail', data['email'])
 
     removeUserInfo: ()->

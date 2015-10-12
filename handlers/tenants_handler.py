@@ -18,12 +18,14 @@ class TenantsHandler(RequestHandler):
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
 
     @api_token_required
-    # @identity_required
-    # @distributor_required
     def get(self, tenant_key=None):
         if None == tenant_key:
-            result = Tenant.query(ancestor=TenantEntityGroup.singleton().key)
-            result = filter(lambda x: x.active is True, result)
+            distributor_key = self.request.headers.get('X-Provisioning-Distributor')
+            distributor = ndb.Key(urlsafe=distributor_key)
+            domain_keys = Domain.query(Domain.distributor_key == distributor).fetch(100, keys_only=True)
+            tenant_list = Tenant.query(ancestor=TenantEntityGroup.singleton().key)
+            tenant_list = filter(lambda x: x.active is True, tenant_list)
+            result = filter(lambda x: x.domain_key in domain_keys, tenant_list)
         else:
             tenant_key = ndb.Key(urlsafe=tenant_key)
             result = tenant_key.get()
