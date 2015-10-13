@@ -3,8 +3,9 @@ import logging
 
 from google.appengine.ext import ndb
 from webapp2 import RequestHandler
+
 from content_manager_api import ContentManagerApi
-from decorators import api_token_required, identity_required, distributor_required
+from decorators import api_token_required
 from models import Tenant, TenantEntityGroup, Domain
 from restler.serializers import json_response
 from strategy import TENANT_STRATEGY
