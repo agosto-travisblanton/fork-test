@@ -3,12 +3,14 @@ import logging
 
 from google.appengine.ext.deferred import deferred
 from webapp2 import RequestHandler
+
 from google.appengine.ext import ndb
+
 from decorators import api_token_required
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
 from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address, update_chrome_os_device)
-from models import ChromeOsDevice, Tenant
+from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup
 from content_manager_api import ContentManagerApi
 from strategy import CHROME_OS_DEVICE_STRATEGY
 
@@ -45,6 +47,20 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         query_reverse = query.order(-ChromeOsDevice.key)
         result_data = self.fetch_page(query_forward, query_reverse)
         json_response(self.response, result_data, strategy=CHROME_OS_DEVICE_STRATEGY)
+
+    @api_token_required
+    def get_devices_by_distributor(self, distributor_urlsafe_key):
+        device_list = []
+        distributor = ndb.Key(urlsafe=distributor_urlsafe_key)
+        domain_keys = Domain.query(Domain.distributor_key == distributor).fetch(100, keys_only=True)
+        tenant_list = Tenant.query(ancestor=TenantEntityGroup.singleton().key)
+        tenant_list = filter(lambda x: x.active is True, tenant_list)
+        domain_tenant_list = filter(lambda x: x.domain_key in domain_keys, tenant_list)
+        for tenant in domain_tenant_list:
+            tenant_devices = ChromeOsDevice.query(ChromeOsDevice.tenant_key == tenant.key).fetch(1000)
+            for tenant_device in tenant_devices:
+                device_list.append(tenant_device)
+        json_response(self.response, device_list, strategy=CHROME_OS_DEVICE_STRATEGY)
 
     @api_token_required
     def get(self, device_urlsafe_key):
