@@ -13,6 +13,6 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
       @devices = data
 
   @editItem = (item) ->
-Imp    $state.go 'editDevice', {deviceKey: item.key, tenantKey: ''}
+    $state.go 'editDevice', {deviceKey: item.key, tenantKey: ''}
 
   @
