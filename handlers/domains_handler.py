@@ -17,7 +17,10 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
     @api_token_required
     def get(self, domain_key=None):
         if None == domain_key:
-            result = Domain.query(Domain.active == True).fetch(100)
+            distributor_key = self.request.headers.get('X-Provisioning-Distributor')
+            distributor = ndb.Key(urlsafe=distributor_key)
+            domain_list = Domain.query(Domain.distributor_key == distributor).fetch(100)
+            result = filter(lambda x: x.active is True, domain_list)
         else:
             result = self.validate_and_get(domain_key, Domain, abort_on_not_found=True)
         json_response(self.response, result, strategy=DOMAIN_STRATEGY)
@@ -42,13 +45,12 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
             if impersonation_admin_email_address is None or impersonation_admin_email_address == '':
                 status = 400
                 error_message = 'The impersonation_admin_email_address parameter is invalid.'
-            distributor_urlsafe_key = request_json.get('distributor_key')
+            distributor_urlsafe_key = self.request.headers.get('X-Provisioning-Distributor')
             if distributor_urlsafe_key is None or distributor_urlsafe_key == '':
                 status = 400
                 error_message = 'The distributor_key parameter is invalid.'
             if status == 201:
-                distribution_key = ndb.Key(urlsafe=distributor_urlsafe_key)
-                domain = Domain.create(distributor_key=distribution_key,
+                domain = Domain.create(distributor_key=ndb.Key(urlsafe=distributor_urlsafe_key),
                                        name=name,
                                        impersonation_admin_email_address=impersonation_admin_email_address,
                                        active=active)
@@ -85,5 +87,5 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
         if device:
             device.active = False
             device.put()
-        self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
+        self.response.headers.pop('Content-Type', None)

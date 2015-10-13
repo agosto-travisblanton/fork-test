@@ -20,12 +20,6 @@ class TestDomainsHandler(BaseTest, WebTest):
 
     def setUp(self):
         super(TestDomainsHandler, self).setUp()
-        self.headers = {
-            'Authorization': config.API_TOKEN
-        }
-        self.bad_authorization_header = {
-            'Authorization': 'Forget about it!'
-        }
         self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
                                               active=True)
         self.distributor_key = self.distributor.put()
@@ -39,6 +33,14 @@ class TestDomainsHandler(BaseTest, WebTest):
                                              impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                              active=False)
         self.inactive_domain_key = self.inactive_domain.put()
+        self.headers = {
+            'Authorization': config.API_TOKEN,
+            'X-Provisioning-Distributor': self.distributor_key.urlsafe()
+        }
+        self.bad_authorization_header = {
+            'Authorization': 'Forget about it!',
+            'X-Provisioning-Distributor': self.distributor_key.urlsafe()
+        }
 
     ##################################################################################################################
     ## post
@@ -50,7 +52,7 @@ class TestDomainsHandler(BaseTest, WebTest):
                               'distributor_key': self.distributor_key.urlsafe()}
         uri = application.router.build(None, 'domains', None, {})
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
-        self.assertEqual(201, response.status_code)
+        self.assertEqual(201, response.status_int)
 
     def test_post_create_new_domain_persists_object(self):
         request_parameters = {'name': self.CHROME_DEVICE_DOMAIN,
@@ -83,12 +85,16 @@ class TestDomainsHandler(BaseTest, WebTest):
         self.assertTrue(self.FORBIDDEN in context.exception.message)
 
     def test_post_fails_without_distributor_key(self):
+        headers = {
+            'Authorization': config.API_TOKEN,
+            'X-Provisioning-Distributor': ''
+        }
+
         request_body = {'name': self.CHROME_DEVICE_DOMAIN,
                         'active': True,
-                        'impersonation_admin_email_address': self.IMPERSONATION_EMAIL,
-                        'distributor_key': None}
+                        'impersonation_admin_email_address': self.IMPERSONATION_EMAIL}
         with self.assertRaises(AppError) as context:
-            self.app.post('/api/v1/domains', json.dumps(request_body), headers=self.headers)
+            self.app.post('/api/v1/domains', json.dumps(request_body), headers=headers)
         self.assertTrue('Bad response: 400 The distributor_key parameter is invalid.'
                         in context.exception.message)
 
@@ -233,7 +239,7 @@ class TestDomainsHandler(BaseTest, WebTest):
     def test_delete_returns_no_content_status(self):
         uri = build_uri('manage-domain', params_dict={'domain_key': self.domain_key.urlsafe()})
         response = self.delete(uri, headers=self.headers)
-        self.assertEqual(204, response.status_code)
+        self.assertEqual(204, response.status_int)
 
     def test_delete_soft_deletes_domain(self):
         request_parameters = {}
