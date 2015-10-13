@@ -39,6 +39,8 @@ class DistributorEntityGroup(ndb.Model):
 @ae_ndb_serializer
 class Distributor(ndb.Model):
     name = ndb.StringProperty(required=True, indexed=True)
+    # TODO Make admin_email required=True after migration run in prod
+    admin_email = ndb.StringProperty(required=False, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
@@ -134,6 +136,11 @@ class Tenant(ndb.Model):
             return False
         else:
             return True
+
+    @classmethod
+    def find_devices(cls, tenant_key):
+        if tenant_key:
+            return ChromeOsDevice.query(ChromeOsDevice.tenant_key == tenant_key).fetch(1000)
 
     @classmethod
     def create(cls, tenant_code, name, admin_email, content_server_url, domain_key, active,

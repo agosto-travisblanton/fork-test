@@ -3,7 +3,7 @@ from env_setup import setup_test_paths
 setup_test_paths()
 
 from agar.test import BaseTest
-from models import Tenant, Distributor, TENANT_ENTITY_GROUP_NAME, Domain
+from models import Tenant, Distributor, TENANT_ENTITY_GROUP_NAME, Domain, ChromeOsDevice
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
@@ -39,6 +39,15 @@ class TestTenantModel(BaseTest):
                                     domain_key=self.domain_key,
                                     active=True)
         self.tenant_key = self.tenant.put()
+
+        self.device_1 = ChromeOsDevice.create(tenant_key=self.tenant_key,
+                                              gcm_registration_id='APA91bHyMJRcN7mj7b0aXGWE7Ae',
+                                              mac_address='54271ee81302')
+        self.device_1_key = self.device_1.put()
+        self.device_2 = ChromeOsDevice.create(tenant_key=self.tenant_key,
+                                              gcm_registration_id='c098d70a8d78a6dfa6df76dfas7',
+                                              mac_address='48d2247f2132')
+        self.device_2_key = self.device_2.put()
 
     def test_create_sets_tenant_entity_group_as_parent(self):
         actual = Tenant.find_by_name(self.NAME)
@@ -98,3 +107,7 @@ class TestTenantModel(BaseTest):
     def test_find_by_tenant_code_returns_none(self):
         actual = Tenant.find_by_tenant_code('kdjfashdfjkah')
         self.assertIsNone(actual)
+
+    def test_find_devices_returns_expected_device_count_for_tenant_key(self):
+        devices = Tenant.find_devices(self.tenant_key)
+        self.assertLength(2, devices)

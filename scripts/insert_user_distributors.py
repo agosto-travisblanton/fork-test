@@ -1,6 +1,6 @@
-from models import Distributor, User, DistributorUser
+from models import Distributor, User
 
-names = ['Agosto, Inc.', 'Tierney Bros., Inc.', 'Samsung Company']
+names = ['Agosto', 'Tierney Bros., Inc.']
 for name in names:
     matching = Distributor.query(Distributor.name == name).fetch(1)
     if len(matching) == 0:
