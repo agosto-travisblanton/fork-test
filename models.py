@@ -39,6 +39,8 @@ class DistributorEntityGroup(ndb.Model):
 @ae_ndb_serializer
 class Distributor(ndb.Model):
     name = ndb.StringProperty(required=True, indexed=True)
+    # TODO Make admin_email required=True after migration run in prod
+    admin_email = ndb.StringProperty(required=False, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
