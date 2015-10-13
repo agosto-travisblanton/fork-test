@@ -24,27 +24,6 @@ describe 'SessionsService', ->
     it 'sets @currentUserKey variable to undefined', ->
       expect(SessionsService.currentUserKey).toBeUndefined()
 
-  describe '.getIdentity', ->
-    identityRestangularService = undefined
-    result = undefined
-    promise = undefined
-
-    beforeEach ->
-      promise = new skykitDisplayDeviceManagement.q.Mock
-      identityRestangularService = {get: ->}
-      spyOn(Restangular, 'oneUrl').and.returnValue identityRestangularService
-      spyOn(identityRestangularService, 'get').and.returnValue promise
-      result = SessionsService.getIdentity()
-
-    it 'obtains Restangular service for devices', ->
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'api/v1/devices'
-
-    it 'obtains the identity from the Restangular service', ->
-      expect(identityRestangularService.get).toHaveBeenCalled()
-
-    it 'returns a promise', ->
-      expect(result).toBe promise
-
   describe '.login', ->
     expectedCredentials = {
       access_token: 'foobar_access_token'

@@ -10,7 +10,8 @@ appModule.controller 'TenantDetailsCtrl', ($log,
                                            DistributorsService,
                                            $state,
                                            sweet,
-                                           ProgressBarService) ->
+                                           ProgressBarService,
+                                           $cookies) ->
   @currentTenant = {
     key: undefined,
     name: undefined,
@@ -22,7 +23,6 @@ appModule.controller 'TenantDetailsCtrl', ($log,
     active: true
   }
   @selectedDomain = undefined
-  @defaultDistributorName = 'Agosto'
   @currentTenantDisplays = []
   @distributorDomains = []
   @editMode = !!$stateParams.tenantKey
@@ -37,20 +37,15 @@ appModule.controller 'TenantDetailsCtrl', ($log,
       @currentTenantDisplays = data.objects
 
   @initialize = ->
-    distributorPromise = DistributorsService.getByName @defaultDistributorName
-    distributorPromise.then (data) =>
-      distributor_key = data[0].key
-      @onSuccessResolvingDistributor distributor_key
+    @currentDistributorKey = $cookies.get('currentDistributorKey')
+    distributorDomainPromise = DistributorsService.getDomainsByKey @currentDistributorKey
+    distributorDomainPromise.then (domains) =>
+      @distributorDomains = domains
 
   @onSuccessResolvingTenant = (tenant) =>
     domainPromise = DomainsService.getDomainByKey tenant.domain_key
     domainPromise.then (data) =>
       @selectedDomain = data
-
-  @onSuccessResolvingDistributor = (distributor_key) =>
-    distributorDomainPromise = DistributorsService.getDomainsByKey distributor_key
-    distributorDomainPromise.then (domains) =>
-      @distributorDomains = domains
 
   @onClickSaveButton = ->
     ProgressBarService.start()

@@ -51,7 +51,6 @@ describe 'TenantDetailsCtrl', ->
       domainsServicePromise = new skykitDisplayDeviceManagement.q.Mock
       spyOn(TenantsService, 'getTenantByKey').and.returnValue(tenantsServicePromise)
       spyOn(DevicesService, 'getDevicesByTenant').and.returnValue(devicesServicePromise)
-      spyOn(DistributorsService, 'getByName').and.returnValue(distributorsServicePromise)
       spyOn(DistributorsService, 'getDomainsByKey').and.returnValue(distributorsDomainsServicePromise)
       spyOn(DomainsService, 'getDomainByKey').and.returnValue(domainsServicePromise)
 
@@ -70,10 +69,6 @@ describe 'TenantDetailsCtrl', ->
     it 'selectedDomain should be defined', ->
       controller = $controller 'TenantDetailsCtrl', serviceInjection
       expect(controller.selectedDomain).toBeUndefined()
-
-    it 'defaultDistributor property should be Agosto', ->
-      controller = $controller 'TenantDetailsCtrl', serviceInjection
-      expect(controller.defaultDistributorName).toEqual 'Agosto'
 
     it 'currentTenantDisplays property should be defined', ->
       controller = $controller 'TenantDetailsCtrl', serviceInjection
@@ -130,10 +125,11 @@ describe 'TenantDetailsCtrl', ->
     describe '.initialize', ->
       beforeEach ->
         controller = $controller 'TenantDetailsCtrl', serviceInjection
+        controller.currentDistributorKey = 'some-key'
 
-      it 'calls DistributorsService.getByName to retrieve default distributor', ->
+      it 'calls DistributorsService.getDomainsByKey to retrieve distributor domains', ->
         controller.initialize()
-        expect(DistributorsService.getByName).toHaveBeenCalledWith(controller.defaultDistributorName)
+        expect(DistributorsService.getDomainsByKey).toHaveBeenCalledWith controller.currentDistributorKey
 
   describe '.onClickSaveButton', ->
     domain_key = undefined

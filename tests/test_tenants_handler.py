@@ -24,9 +24,6 @@ class TestTenantsHandler(BaseTest, WebTest):
 
     def setUp(self):
         super(TestTenantsHandler, self).setUp()
-        self.headers = {
-            'Authorization': config.API_TOKEN
-        }
         self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
                                               active=True)
         self.distributor_key = self.distributor.put()
@@ -35,6 +32,10 @@ class TestTenantsHandler(BaseTest, WebTest):
                                     impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                     active=True)
         self.domain_key = self.domain.put()
+        self.headers = {
+            'Authorization': config.API_TOKEN,
+            'X-Provisioning-Distributor': self.distributor_key.urlsafe()
+        }
 
     ##################################################################################################################
     ## get
@@ -93,7 +94,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
-        self.assertEqual(201, response.status_code)
+        self.assertEqual(201, response.status_int)
 
     def test_post_create_new_tenant_persists_object(self):
         name = u'ABC'
@@ -207,7 +208,7 @@ class TestTenantsHandler(BaseTest, WebTest):
             'active': True
         }
         response = self.app.put_json(uri, entity_body, headers=self.headers)
-        self.assertEqual(204, response.status_code)
+        self.assertEqual(204, response.status_int)
 
     def test_put_updates_selected_properties(self):
         tenant_keys = self.load_tenants()
@@ -258,7 +259,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         tenant_keys = self.load_tenants()
         uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': tenant_keys[0].urlsafe()})
         response = self.app.delete(uri, headers=self.headers)
-        self.assertEqual(204, response.status_code)
+        self.assertEqual(204, response.status_int)
 
     def test_delete_soft_deletes_tenant(self):
         tenant_keys = self.load_tenants()
@@ -279,11 +280,8 @@ class TestTenantsHandler(BaseTest, WebTest):
 
     def load_tenants(self):
         tenant_keys = []
-        distributor = Distributor.create(name='agosto',
-                                         active=True)
-        distributor_key = distributor.put()
         domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
-                               distributor_key=distributor_key,
+                               distributor_key=self.distributor_key,
                                impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                active=True)
         domain_key = domain.put()

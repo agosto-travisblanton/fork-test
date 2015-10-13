@@ -8,7 +8,8 @@ appModule.controller 'DomainDetailsCtrl', ($log,
                                            DomainsService,
                                            $state,
                                            sweet,
-                                           ProgressBarService) ->
+                                           ProgressBarService,
+                                           $cookies) ->
   @currentDomain = {
     key: undefined,
     name: undefined,
@@ -16,7 +17,6 @@ appModule.controller 'DomainDetailsCtrl', ($log,
     distributor_key: undefined,
     active: true
   }
-  @defaultDistributor = 'Agosto'
   @currentDomains = []
   @editMode = !!$stateParams.domainKey
 
@@ -24,12 +24,8 @@ appModule.controller 'DomainDetailsCtrl', ($log,
     domainPromise = DomainsService.getDomainByKey($stateParams.domainKey)
     domainPromise.then (data) =>
       @currentDomain = data
-
-  @initialize = ->
-    distributorPromise = DistributorsService.getByName(@defaultDistributor)
-    distributorPromise.then (data) =>
-      if typeof data[0] != 'undefined'
-        @currentDomain.distributor_key = data[0].key
+  else
+    @currentDomain.distributor_key = $cookies.get('currentDistributorKey')
 
   @onClickSaveButton = ->
     ProgressBarService.start()

@@ -14,7 +14,7 @@ describe 'DevicesService', ->
 
   describe '.getDevicesByTenant', ->
     it 'retrieve all devices associated to a tenant, returning a promise', ->
-      restangularServiceStub = { doGET: -> }
+      restangularServiceStub = {doGET: ->}
       spyOn(Restangular, 'one').and.returnValue restangularServiceStub
       spyOn(restangularServiceStub, 'doGET').and.returnValue promise
       tenantKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFudEVudGl0eUdyb3VwDAsSBlRlbmFudBiAgICAgMCvCgw'
@@ -23,10 +23,21 @@ describe 'DevicesService', ->
       expect(restangularServiceStub.doGET).toHaveBeenCalledWith 'devices'
       expect(actual).toBe promise
 
+  describe '.getDevicesByDistributor', ->
+    it 'retrieve all devices associated with a distributor, returning a promise', ->
+      restangularServiceStub = {doGET: ->}
+      spyOn(Restangular, 'one').and.returnValue restangularServiceStub
+      spyOn(restangularServiceStub, 'doGET').and.returnValue promise
+      distributorKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFudEVudGl0eUdyb3VwDAsSBlRlbmFudBiAgICAgMCvCgw'
+      actual = DevicesService.getDevicesByDistributor(distributorKey)
+      expect(Restangular.one).toHaveBeenCalledWith 'distributors', distributorKey
+      expect(restangularServiceStub.doGET).toHaveBeenCalledWith 'devices'
+      expect(actual).toBe promise
+
   describe '.getDeviceByKey', ->
     it 'retrieve device associated with supplied key, returning a promise', ->
       deviceKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFudEVudGl0eUdyb3VwDAsSBlRlbmFudBiAgICAgMCvCgw'
-      deviceRestangularService = { get: -> }
+      deviceRestangularService = {get: ->}
       spyOn(Restangular, 'oneUrl').and.returnValue deviceRestangularService
       spyOn(deviceRestangularService, 'get').and.returnValue promise
       actual = DevicesService.getDeviceByKey deviceKey
@@ -36,7 +47,7 @@ describe 'DevicesService', ->
 
   describe '.getDevices', ->
     it 'retrieve all devices, returning a promise', ->
-      deviceRestangularService = { getList: -> }
+      deviceRestangularService = {getList: ->}
       spyOn(Restangular, 'all').and.returnValue deviceRestangularService
       spyOn(deviceRestangularService, 'getList').and.returnValue promise
       actual = DevicesService.getDevices()

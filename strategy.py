@@ -74,6 +74,6 @@ DOMAIN_FIELDS = [
 DOMAIN_STRATEGY = ModelStrategy(Domain) + DOMAIN_FIELDS
 DOMAIN_STRATEGY += [
     {'key': lambda o, field_name, context: o.key.urlsafe()},
-    {'distributorKey': lambda o, field_name, context: o.distributor_key.urlsafe()},
+    {'distributor_key': lambda o, field_name, context: o.distributor_key.urlsafe()},
 
 ]

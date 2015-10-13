@@ -57,17 +57,6 @@ describe 'DomainDetailsCtrl', ->
       it 'currentDomain property should be defined', ->
         expect(controller.currentDomain).toBeDefined()
 
-      it 'defaultDistributor property should be Agosto', ->
-        expect(controller.defaultDistributor).toEqual 'Agosto'
-
-    describe '.initialize', ->
-      beforeEach ->
-        controller = $controller 'DomainDetailsCtrl', serviceInjection
-
-      it 'calls DistributorsService.getByName to retrieve default distributor', ->
-        controller.initialize()
-        expect(DistributorsService.getByName).toHaveBeenCalledWith(controller.defaultDistributor)
-
     describe 'edit mode', ->
       beforeEach ->
         $stateParams.domainKey = 'fkasdhfjfa9s8udyva7dygoudyg'

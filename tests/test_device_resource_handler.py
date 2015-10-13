@@ -130,6 +130,37 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertLength(10, response_json['objects'])
 
+    #################################################################################################################
+    # get_devices_by_distributor
+    #################################################################################################################
+
+    def test_get_devices_by_distributor_http_status_ok(self):
+        distributor = Distributor.create(name='Acme Brothers',
+                                         active=True)
+        distributor_key = distributor.put()
+        self.__setup_distributor_with_two_tenants_with_n_devices(distributor_key,
+                                                                 tenant_1_device_count=1,
+                                                                 tenant_2_device_count=1)
+        request_parameters = {}
+        uri = application.router.build(None, 'devices-by-distributor', None,
+                                       {'distributor_urlsafe_key': distributor_key.urlsafe()})
+        response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
+        self.assertOK(response)
+
+    def test_get_devices_by_distributor_returns_expected_device_count(self):
+        distributor = Distributor.create(name='Acme Brothers',
+                                         active=True)
+        distributor_key = distributor.put()
+        self.__setup_distributor_with_two_tenants_with_n_devices(distributor_key,
+                                                                 tenant_1_device_count=13,
+                                                                 tenant_2_device_count=6)
+        request_parameters = {}
+        uri = application.router.build(None, 'devices-by-distributor', None,
+                                       {'distributor_urlsafe_key': distributor_key.urlsafe()})
+        response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertLength(19, response_json)
+
     ##################################################################################################################
     ## get
     ##################################################################################################################
@@ -390,3 +421,34 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                  gcm_registration_id=self.GCM_REGISTRATION_ID,
                                  device_id=self.DEVICE_ID))
         return results
+
+    def __setup_distributor_with_two_tenants_with_n_devices(self, distributor_key, tenant_1_device_count,
+                                                            tenant_2_device_count):
+        domain_1 = Domain.create(name='dev.acme.com',
+                                 distributor_key=distributor_key,
+                                 impersonation_admin_email_address='fred@acme.com',
+                                 active=True)
+        domain_key_1 = domain_1.put()
+        domain_2 = Domain.create(name='test.acme.com',
+                                 distributor_key=distributor_key,
+                                 impersonation_admin_email_address='fred@acme.com',
+                                 active=True)
+        domain_key_2 = domain_2.put()
+        tenant_1 = Tenant.create(tenant_code='foobar_inc',
+                                 name='Foobar, Inc',
+                                 admin_email='bill@foobar.com',
+                                 content_server_url=self.CONTENT_SERVER_URL,
+                                 content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                                 domain_key=domain_key_1,
+                                 active=True)
+        tenant_key_1 = tenant_1.put()
+        self.__build_list_devices(tenant_key=tenant_key_1, number_to_build=tenant_1_device_count)
+        tenant_2 = Tenant.create(tenant_code='goober_inc',
+                                 name='Goober, Inc',
+                                 admin_email='bill@goober.com',
+                                 content_server_url=self.CONTENT_SERVER_URL,
+                                 content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                                 domain_key=domain_key_2,
+                                 active=True)
+        tenant_key_2 = tenant_2.put()
+        self.__build_list_devices(tenant_key=tenant_key_2, number_to_build=tenant_2_device_count)

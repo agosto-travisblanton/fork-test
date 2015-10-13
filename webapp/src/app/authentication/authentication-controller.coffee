@@ -30,13 +30,15 @@ appModule.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
     @googlePlusSignInButtonClicked = false
 
   @initializeSignOut = ->
+    SessionsService.removeUserInfo()
     $timeout @proceedToSignIn, 1500
 
   @loginSuccess = (response) ->
+    SessionsService.setIdentity(response)
     ProgressBarService.complete()
     $state.go 'distributor_selection'
 
-  @loginFailure = (response) ->
+  @loginFailure = () ->
     ProgressBarService.complete()
     sweet.show('Oops...', 'Unable to authenticate to Stormpath.', 'error')
 

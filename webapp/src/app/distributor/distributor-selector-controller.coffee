@@ -2,7 +2,7 @@
 
 appModule = angular.module 'skykitDisplayDeviceManagement'
 
-appModule.controller "DistributorSelectorCtrl", ($scope, $log, $state, DistributorsService, SessionsService) ->
+appModule.controller "DistributorSelectorCtrl", ($scope, $log, $state, $cookies, DistributorsService, SessionsService) ->
   @distributors = []
   @currentDistributor = undefined
 
@@ -17,6 +17,8 @@ appModule.controller "DistributorSelectorCtrl", ($scope, $log, $state, Distribut
   @selectDistributor = (distributor) =>
     @currentDistributor = distributor
     DistributorsService.currentDistributor = @currentDistributor
+    $cookies.put('currentDistributorName', @currentDistributor.name)
+    $cookies.put('currentDistributorKey', @currentDistributor.key)
     $state.go 'welcome'
 
 

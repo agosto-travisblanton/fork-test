@@ -1,4 +1,5 @@
-<div id="wrapper" ng-init="welcomeCtrl.initialize()">
+<div id="wrapper" ng-controller="WelcomeCtrl as welcomeCtrl"
+     ng-init="welcomeCtrl.initialize()">
 
   <div ng-include="'app/components/navbar/navbar.html'"></div>
 
@@ -11,6 +12,9 @@
           <h1 class="page-header">
             Welcome to Skykit Provisioning
           </h1>
+          {{ welcomeCtrl.identity.email }}
+          <br>
+          {{ welcomeCtrl.identity.distributorName }}
         </div>
       </div>
     </div>

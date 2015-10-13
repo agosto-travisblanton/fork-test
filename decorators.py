@@ -1,31 +1,45 @@
 import logging
+
+from google.appengine.ext import ndb
+
 from app_config import config
 from restler.serializers import json_response
 
 
-# def identity_required(handler_method):
-#     from models import User, Tenant
-#
-#     def identify(self, *args, **kwargs):
-#         user_key = None
-#
-#         if hasattr(self, 'session'):
-#             user_key = self.session.get('user_key')
-#
-#         if not user_key:
-#             user_key = self.request.params.get('user_key')
-#
-#         self.user = self.validate_and_get(user_key, User, abort_on_not_found=True)
-#         if self.user is None:
-#             logging.error('Missing user')
-#             json_response(self.response, {'error': 'No user logged in'}, status_code=403)
-#             return
-#
-#         self.tenant = self.user.tenant
-#         handler_method(self, *args, **kwargs)
-#
-#     return identify
-#
+def identity_required(handler_method):
+    def identify(self, *args, **kwargs):
+        self.user_key = self.request.headers.get('X-Provisioning-User')
+        self.user = None
+        try:
+            self.user = ndb.Key(urlsafe=self.user_key).get()
+        except Exception, e:
+            logging.exception(e)
+            logging.error('API call is missing a user key in header.')
+            json_response(self.response, {'error': 'No user logged in'}, status_code=403)
+            return
+
+        handler_method(self, *args, **kwargs)
+
+    return identify
+
+
+def distributor_required(handler_method):
+    def distributor(self, *args, **kwargs):
+        self.distributor_key = self.request.headers.get('X-Provisioning-Distributor')
+        self.distributor = None
+        try:
+            self.distributor = ndb.Key(urlsafe=self.distributor_key).get()
+        except Exception, e:
+            logging.exception(e)
+            logging.error('API call is missing a distributor key in header.')
+            json_response(self.response, {'error': 'No distributor'}, status_code=403)
+            return
+
+        handler_method(self, *args, **kwargs)
+
+    return distributor
+
+
 #
 # def gae_supported_numpy(test_method):
 #     import numpy
