@@ -1,6 +1,6 @@
 from app_config import config
 from migration_base import MigrationBase
-from models import Distributor, Domain, Tenant
+from models import Domain, Tenant
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
