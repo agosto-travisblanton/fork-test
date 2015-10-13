@@ -57,7 +57,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         tenant_list = filter(lambda x: x.active is True, tenant_list)
         domain_tenant_list = filter(lambda x: x.domain_key in domain_keys, tenant_list)
         for tenant in domain_tenant_list:
-            tenant_devices = ChromeOsDevice.query(ChromeOsDevice.tenant_key == tenant.key).fetch(1000)
+            tenant_devices = Tenant.find_devices(tenant.key)
             for tenant_device in tenant_devices:
                 device_list.append(tenant_device)
         json_response(self.response, device_list, strategy=CHROME_OS_DEVICE_STRATEGY)

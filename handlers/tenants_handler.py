@@ -14,9 +14,6 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 
 class TenantsHandler(RequestHandler):
-    ADMIN_ACCOUNT_TO_IMPERSONATE = 'administrator@skykit.com'
-    AGOSTO_DISTRIBUTOR = 'Agosto'
-    CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
 
     @api_token_required
     def get(self, tenant_key=None):

@@ -136,6 +136,11 @@ class Tenant(ndb.Model):
             return True
 
     @classmethod
+    def find_devices(cls, tenant_key):
+        if tenant_key:
+            return ChromeOsDevice.query(ChromeOsDevice.tenant_key == tenant_key).fetch(1000)
+
+    @classmethod
     def create(cls, tenant_code, name, admin_email, content_server_url, domain_key, active,
                content_manager_base_url):
         tenant_entity_group = TenantEntityGroup.singleton()
