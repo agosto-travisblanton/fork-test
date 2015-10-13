@@ -1,7 +1,6 @@
 'use strict'
 
 angular.module('skykitDisplayDeviceManagement').factory 'DevicesService', ($http, $log, Restangular) ->
-
   class DevicesService
     SERVICE_NAME = 'devices'
     @uriBase = 'v1/devices'
@@ -16,6 +15,11 @@ angular.module('skykitDisplayDeviceManagement').factory 'DevicesService', ($http
     getDevicesByTenant: (tenantKey) ->
       unless tenantKey == undefined
         promise = Restangular.one('tenants', tenantKey).doGET(SERVICE_NAME)
+        promise
+
+    getDevicesByDistributor: (distributorKey) ->
+      unless distributorKey == undefined
+        promise = Restangular.one('distributors', distributorKey).doGET(SERVICE_NAME)
         promise
 
     getDevices: ->
