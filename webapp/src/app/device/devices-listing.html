@@ -24,11 +24,12 @@
               <th>Ether mac address</th>
               <th>Notes</th>
               <th>Provisioning date</th>
+              <th>&nbsp;</th>
             </tr>
             </thead>
             <tbody>
             <tr ng-hide="devicesListingCtrl.devices.length">
-              <td class="no-devices text-center text-danger" colspan="6">No devices</td>
+              <td class="no-devices text-center text-danger" colspan="7">No devices</td>
             </tr>
             <tr ng-repeat="item in devicesListingCtrl.devices | orderBy:'-created'">
               <td class="display-serial-number">
@@ -39,11 +40,14 @@
               <td class="display-ethernet-mac-address">{{ item.ethernetMacAddress }}</td>
               <td class="display-notes">{{ item.notes }}</td>
               <td class="display-provisioning-date">{{ item.created }}</td>
+              <td class="text-center">
+                <a name="edit-device" class="btn" ng-click="devicesListingCtrl.editItem(item)"
+                   title="Device detail"><i class="fa fa-fw fa-edit"></i></a></td>
             </tr>
             </tbody>
           </table>
         </div>
       </div>
+    </div>
   </div>
-</div>
 </div>
