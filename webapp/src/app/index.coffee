@@ -15,9 +15,6 @@ skykitDisplayDeviceManagement = angular.module('skykitDisplayDeviceManagement', 
 ])
 
 skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
-  $cookies = undefined
-  angular.injector([ 'ngCookies' ]).invoke (_$cookies_) ->
-    $cookies = _$cookies_
 
   $stateProvider.state("sign_in", {
     resolve: {
@@ -195,18 +192,6 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
 
   RestangularProvider.setBaseUrl '/api/v1'
 
-  RestangularProvider.addRequestInterceptor (elem, operation) ->
-    RestangularProvider.setDefaultHeaders {
-      'Content-Type': 'application/json'
-      'Accept': 'application/json'
-      'Authorization': '6C346588BD4C6D722A1165B43C51C'
-      'X-Provisioning-User': $cookies.get('userKey')
-      'X-Provisioning-Distributor': $cookies.get('currentDistributorKey')
-    }
-    if operation == 'remove'
-      return undefined
-    elem
-
   RestangularProvider.addResponseInterceptor (data, operation, resourceType, url, response, deferred) ->
     result = data
     # Uncomment this for pagination support when using PagingListHandlerMixin on the Python side.
@@ -218,5 +203,16 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     id: 'key'
   }
 
-#skykitDisplayDeviceManagement.run (IdentityService) ->
-#  IdentityService.getIdentity()
+skykitDisplayDeviceManagement.run ($cookies, Restangular) ->
+
+  Restangular.addRequestInterceptor (elem, operation) ->
+    Restangular.setDefaultHeaders {
+      'Content-Type': 'application/json'
+      'Accept': 'application/json'
+      'Authorization': '6C346588BD4C6D722A1165B43C51C'
+      'X-Provisioning-User': $cookies.get('userKey')
+      'X-Provisioning-Distributor': $cookies.get('currentDistributorKey')
+    }
+    if operation == 'remove'
+      return undefined
+    elem
