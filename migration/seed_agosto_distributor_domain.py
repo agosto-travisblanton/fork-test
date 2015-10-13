@@ -1,6 +1,6 @@
 from app_config import config
 from migration_base import MigrationBase
-from models import Distributor, Domain
+from models import Distributor, Domain, DistributorUser, User
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -28,6 +28,12 @@ class SeedAgostoDistributorDomain(MigrationBase):
                               impersonation_admin_email_address=config.IMPERSONATION_ADMIN_EMAIL_ADDRESS,
                               active=True)
             agosto_default_domain.put()
+        default_distributor_user = DistributorUser.query(DistributorUser.distributor_key == agosto_distributor.key)
+        if None is default_distributor_user:
+            user = User.get_by_email('bob.macneal@agosto.com')
+            distributor_user = DistributorUser.create(user_key=user.key,
+                                                      distributor_key = agosto_distributor.key)
+            distributor_user.put()
 
         tierney_distributor = Distributor.find_by_name(self.TIERNEY_DISTRIBUTOR_NAME)
         if tierney_distributor is None:

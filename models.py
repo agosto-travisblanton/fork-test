@@ -267,5 +267,12 @@ class DistributorUser(ndb.Model):
     distributor_key = ndb.KeyProperty(kind=Distributor, required=True)
     user_key = ndb.KeyProperty(kind=User, required=True)
 
+    @classmethod
+    def create(cls, distributor_key, user_key):
+        distributor_user = cls(
+            user_key=user_key,
+            distributor_key=distributor_key)
+        return distributor_user
+
     def _pre_put_hook(self):
         self.class_version = 1
