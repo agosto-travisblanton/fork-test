@@ -19,6 +19,6 @@ class RefreshChromeDevicePropertiesFromDirectoryApi(MigrationBase):
         active_tenants = filter(lambda x: x.active is True, tenants)
         for tenant in active_tenants:
             tenant_key = ndb.Key(urlsafe=tenant.key.urlsafe())
-            devices = ChromeOsDevice.query(ChromeOsDevice.tenant_key == tenant_key).fetch()
+            devices = Tenant.find_devices(tenant_key)
             for device in devices:
                 refresh_chrome_os_device(device_urlsafe_key=device.key.urlsafe())
