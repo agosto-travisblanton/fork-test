@@ -3,6 +3,8 @@ import logging
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
+from models import Tenant
+
 from oauth2client.client import SignedJwtAssertionCredentials
 from googleapiclient import discovery
 from httplib2 import Http
@@ -157,7 +159,12 @@ def refresh_device_by_mac_address(device_urlsafe_key=None, device_mac_address=No
         raise deferred.PermanentTaskFailure('The device URL-safe key parameter is None. It is required.')
     if device_mac_address is None:
         raise deferred.PermanentTaskFailure('The device MAC address parameter is None. It is required.')
-    chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
+    impersonation_admin_email_address = get_impersonation_email(device_urlsafe_key)
+    if None == impersonation_admin_email_address:
+        logging.info('Impersonation email not found for device with device key {0}.'.format(device_urlsafe_key))
+        return
+    chrome_os_devices_api = ChromeOsDevicesApi(impersonation_admin_email_address)
+    # chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
     chrome_os_devices, new_page_token = chrome_os_devices_api.cursor_list(customer_id=config.GOOGLE_CUSTOMER_ID,
                                                                           next_page_token=page_token)
     if chrome_os_devices is not None and len(chrome_os_devices) > 0:
@@ -211,7 +218,12 @@ def refresh_device(device_urlsafe_key=None):
     if None == device.device_id:
         logging.info('Did not refresh in refresh_device because no device_id available.')
         return
-    chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
+    impersonation_admin_email_address = get_impersonation_email(device_urlsafe_key)
+    if None == impersonation_admin_email_address:
+        logging.info('Impersonation email not found for device with device key {0}.'.format(device_urlsafe_key))
+        return
+    chrome_os_devices_api = ChromeOsDevicesApi(impersonation_admin_email_address)
+    # chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
     chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, device.device_id)
     if chrome_os_device is not None:
         device.device_id = chrome_os_device.get('deviceId')
@@ -234,11 +246,11 @@ def refresh_device(device_urlsafe_key=None):
         device.etag = chrome_os_device.get('etag')
         device.put()
         logging.info('Refreshed device_id = {0}, impersonating {1}'.
-                     format(device.device_id, config.IMPERSONATION_ADMIN_EMAIL_ADDRESS))
+                     format(device.device_id, impersonation_admin_email_address))
 
     else:
         logging.info('Directory API lookup failure for device_id = {0}, impersonating {1}'.
-                     format(device.device_id, config.IMPERSONATION_ADMIN_EMAIL_ADDRESS))
+                     format(device.device_id, impersonation_admin_email_address))
 
 
 def refresh_chrome_os_device(device_urlsafe_key=None):
@@ -253,8 +265,13 @@ def refresh_chrome_os_device(device_urlsafe_key=None):
     if None == device.device_id:
         logging.info('Did not refresh in refresh_chrome_os_device because no device_id available.')
         return
+    impersonation_admin_email_address = get_impersonation_email(device_urlsafe_key)
+    if None == impersonation_admin_email_address:
+        logging.info('Impersonation email not found for device with device key {0}.'.format(device_urlsafe_key))
+        return
     chrome_os_device = None
-    chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
+    chrome_os_devices_api = ChromeOsDevicesApi(impersonation_admin_email_address)
+    # chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
     try:
         chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, device.device_id)
     except Exception, e:
@@ -280,10 +297,10 @@ def refresh_chrome_os_device(device_urlsafe_key=None):
         device.etag = chrome_os_device.get('etag')
         device.put()
         logging.info('Refreshed device_id = {0}, impersonating {1}'.
-                     format(device.device_id, config.IMPERSONATION_ADMIN_EMAIL_ADDRESS))
+                     format(device.device_id, impersonation_admin_email_address))
     else:
         logging.info('Directory API lookup failure for device_id = {0}, impersonating {1}'.
-                     format(device.device_id, config.IMPERSONATION_ADMIN_EMAIL_ADDRESS))
+                     format(device.device_id, impersonation_admin_email_address))
 
 
 def update_chrome_os_device(device_urlsafe_key=None):
@@ -294,10 +311,23 @@ def update_chrome_os_device(device_urlsafe_key=None):
     if device_urlsafe_key is None:
         raise deferred.PermanentTaskFailure('The device URL-safe key parameter is None.  It is required.')
     device = ndb.Key(urlsafe=device_urlsafe_key).get()
-    chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
+    impersonation_admin_email_address = get_impersonation_email(device_urlsafe_key)
+    if None == impersonation_admin_email_address:
+        logging.info('Impersonation email not found for device with device key {0}.'.format(device_urlsafe_key))
+        return
+    chrome_os_devices_api = ChromeOsDevicesApi(impersonation_admin_email_address)
+    # chrome_os_devices_api = ChromeOsDevicesApi(config.IMPERSONATION_ADMIN_EMAIL_ADDRESS)
     chrome_os_devices_api.update(config.GOOGLE_CUSTOMER_ID,
                                  device.device_id,
                                  annotated_user=device.annotated_user,
                                  annotated_location=device.annotated_location,
                                  notes=device.notes,
                                  org_unit_path=device.org_unit_path)
+
+
+def get_impersonation_email(device_urlsafe_key):
+    # TODO Refactor how we get impersonation email
+    device = ndb.Key(urlsafe=device_urlsafe_key).get()
+    urlsafe_tenant_key = device.tenant_key.urlsafe()
+    impersonation_email = Tenant.get_impersonation_email(urlsafe_tenant_key=urlsafe_tenant_key)
+    return impersonation_email

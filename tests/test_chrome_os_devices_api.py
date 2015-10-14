@@ -1,12 +1,11 @@
 from env_setup import setup_test_paths
-from models import Tenant, ChromeOsDevice, Distributor, Domain
 
 setup_test_paths()
 
-from time import sleep, gmtime, strftime
-
+from models import Tenant, ChromeOsDevice, Distributor, Domain
 from agar.test import BaseTest
-from chrome_os_devices_api import ChromeOsDevicesApi, refresh_device_by_mac_address
+from chrome_os_devices_api import ChromeOsDevicesApi, refresh_device_by_mac_address, get_impersonation_email
+from app_config import config
 
 
 class TestChromeOsDevicesApi(BaseTest):
@@ -17,11 +16,32 @@ class TestChromeOsDevicesApi(BaseTest):
     ORG_UNIT_DISTRIBUTOR = '/SKD Automated Test/SKD Automated Distributor'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     DISTRIBUTOR_NAME = 'agosto'
-    IMPERSONATION_EMAIL = 'test@test.com'
+    IMPERSONATION_EMAIL = 'administrator@skykit.com'
 
     def setUp(self):
         super(TestChromeOsDevicesApi, self).setUp()
         self.chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
+        self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
+                                         active=True)
+        self.distributor_key = self.distributor.put()
+        self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
+                               distributor_key=self.distributor_key,
+                               impersonation_admin_email_address=config.IMPERSONATION_ADMIN_EMAIL_ADDRESS,
+                               active=True)
+        self.domain_key = self.domain.put()
+        self.tenant = Tenant.create(name='Foobar, Inc',
+                               tenant_code='foobar_inc',
+                               admin_email='admin@foobar.com',
+                               content_server_url='https://skykit-contentmanager-int.appspot.com/content',
+                               content_manager_base_url='https://skykit-contentmanager-int.appspot.com',
+                               domain_key=self.domain_key,
+                               active=True)
+        self.tenant_key = self.tenant.put()
+        self.mac_address = '54271e4af1e7'
+        self.device = ChromeOsDevice.create(tenant_key=self.tenant_key,
+                                       gcm_registration_id='8d70a8d78a6dfa6df76dfasd',
+                                       mac_address=self.mac_address)
+        self.device_key = self.device.put()
 
     def test_list(self):
         devices = self.chrome_os_devices_api.list(self.SKYKIT_COM_CUSTOMER_ID)
@@ -80,27 +100,12 @@ class TestChromeOsDevicesApi(BaseTest):
         else:
             return None
 
+
     def test_refresh_device_by_mac_address(self):
-        distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
-                                         active=True)
-        distributor_key = distributor.put()
-        domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
-                               distributor_key=distributor_key,
-                               impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
-                               active=True)
-        domain_key = domain.put()
-        tenant = Tenant.create(name='Foobar, Inc',
-                               tenant_code='foobar_inc',
-                               admin_email='admin@foobar.com',
-                               content_server_url='https://www.content.com/content',
-                               content_manager_base_url='https://www.content.com',
-                               domain_key=domain_key,
-                               active=True)
-        tenant_key = tenant.put()
-        mac_address = '54271e4af1e7'
-        device = ChromeOsDevice.create(tenant_key=tenant_key,
-                                       gcm_registration_id='8d70a8d78a6dfa6df76dfasd',
-                                       mac_address=mac_address)
-        device_key = device.put()
-        result = refresh_device_by_mac_address(device_key.urlsafe(), mac_address)
+        """ Tests the live connection to Admin SDK Directory API. """
+        result = refresh_device_by_mac_address(self.device_key.urlsafe(), self.mac_address)
         self.assertEqual(result.device_id, self.TESTING_DEVICE_ID)
+
+    def test_get_impersonation_email(self):
+        result = get_impersonation_email(self.device_key.urlsafe())
+        self.assertEqual(result, self.IMPERSONATION_EMAIL)
