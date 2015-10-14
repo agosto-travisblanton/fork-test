@@ -111,3 +111,8 @@ class TestTenantModel(BaseTest):
     def test_find_devices_returns_expected_device_count_for_tenant_key(self):
         devices = Tenant.find_devices(self.tenant_key)
         self.assertLength(2, devices)
+
+    def test_get_impersonation_email_for_tenant_key(self):
+        urlsafe_tenant_key = self.tenant_key.urlsafe()
+        impersonation_email = Tenant.get_impersonation_email(urlsafe_tenant_key=urlsafe_tenant_key)
+        self.assertEqual(impersonation_email, self.IMPERSONATION_EMAIL)

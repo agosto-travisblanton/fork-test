@@ -143,6 +143,14 @@ class Tenant(ndb.Model):
             return ChromeOsDevice.query(ChromeOsDevice.tenant_key == tenant_key).fetch(1000)
 
     @classmethod
+    def get_impersonation_email(cls, urlsafe_tenant_key):
+        if urlsafe_tenant_key:
+            tenant = ndb.Key(urlsafe=urlsafe_tenant_key).get()
+            urlsafe_domain_key = tenant.domain_key.urlsafe()
+            domain = ndb.Key(urlsafe=urlsafe_domain_key).get()
+            return domain.impersonation_admin_email_address
+
+    @classmethod
     def create(cls, tenant_code, name, admin_email, content_server_url, domain_key, active,
                content_manager_base_url):
         tenant_entity_group = TenantEntityGroup.singleton()

@@ -28,11 +28,6 @@ class SeedAgostoDistributorDomain(MigrationBase):
                               impersonation_admin_email_address=config.IMPERSONATION_ADMIN_EMAIL_ADDRESS,
                               active=True)
             agosto_default_domain.put()
-
-        user = User.query(User.email == 'bob.macneal@agosto.com').fetch(1)
-        distributor_user = DistributorUser.create(user_key=user.key, distributor_key=agosto_distributor.key)
-        distributor_user.put()
-
         tierney_distributor = Distributor.find_by_name(self.TIERNEY_DISTRIBUTOR_NAME)
         if tierney_distributor is None:
             tierney_distributor = Distributor.create(name=self.TIERNEY_DISTRIBUTOR_NAME, active=True)
