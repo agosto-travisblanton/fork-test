@@ -132,22 +132,23 @@ class ChromeOsDevicesApi(object):
         :param org_unit_path:
         :return:
         """
-        resource_json = self.get(customer_id, device_id)
-        if resource_json is not None:
-            if org_unit_path is not None:
-                resource_json['orgUnitPath'] = org_unit_path
-            if notes is not None:
-                resource_json['notes'] = notes
-            if annotated_location is not None:
-                resource_json['annotatedLocation'] = annotated_location
-            if annotated_user is not None:
-                resource_json['annotatedUser'] = annotated_user
+        if device_id:
+            resource_json = self.get(customer_id, device_id)
+            if resource_json is not None:
+                if org_unit_path is not None:
+                    resource_json['orgUnitPath'] = org_unit_path
+                if notes is not None:
+                    resource_json['notes'] = notes
+                if annotated_location is not None:
+                    resource_json['annotatedLocation'] = annotated_location
+                if annotated_user is not None:
+                    resource_json['annotatedUser'] = annotated_user
 
-            chrome_os_devices_api = self.discovery_service.chromeosdevices()
-            request = chrome_os_devices_api.update(customerId=customer_id,
-                                                   deviceId=device_id,
-                                                   body=resource_json)
-            request.execute()
+                chrome_os_devices_api = self.discovery_service.chromeosdevices()
+                request = chrome_os_devices_api.update(customerId=customer_id,
+                                                       deviceId=device_id,
+                                                       body=resource_json)
+                request.execute()
 
 
 def refresh_device_by_mac_address(device_urlsafe_key=None, device_mac_address=None, page_token=None):

@@ -1,3 +1,5 @@
+from time import sleep
+
 from env_setup import setup_test_paths
 
 setup_test_paths()
@@ -22,25 +24,25 @@ class TestChromeOsDevicesApi(BaseTest):
         super(TestChromeOsDevicesApi, self).setUp()
         self.chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
         self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
-                                         active=True)
+                                              active=True)
         self.distributor_key = self.distributor.put()
         self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
-                               distributor_key=self.distributor_key,
-                               impersonation_admin_email_address=config.IMPERSONATION_ADMIN_EMAIL_ADDRESS,
-                               active=True)
+                                    distributor_key=self.distributor_key,
+                                    impersonation_admin_email_address=config.IMPERSONATION_ADMIN_EMAIL_ADDRESS,
+                                    active=True)
         self.domain_key = self.domain.put()
         self.tenant = Tenant.create(name='Foobar, Inc',
-                               tenant_code='foobar_inc',
-                               admin_email='admin@foobar.com',
-                               content_server_url='https://skykit-contentmanager-int.appspot.com/content',
-                               content_manager_base_url='https://skykit-contentmanager-int.appspot.com',
-                               domain_key=self.domain_key,
-                               active=True)
+                                    tenant_code='foobar_inc',
+                                    admin_email='admin@foobar.com',
+                                    content_server_url='https://skykit-contentmanager-int.appspot.com/content',
+                                    content_manager_base_url='https://skykit-contentmanager-int.appspot.com',
+                                    domain_key=self.domain_key,
+                                    active=True)
         self.tenant_key = self.tenant.put()
         self.mac_address = '54271e4af1e7'
         self.device = ChromeOsDevice.create(tenant_key=self.tenant_key,
-                                       gcm_registration_id='8d70a8d78a6dfa6df76dfasd',
-                                       mac_address=self.mac_address)
+                                            gcm_registration_id='8d70a8d78a6dfa6df76dfasd',
+                                            mac_address=self.mac_address)
         self.device_key = self.device.put()
 
     def test_list(self):
@@ -54,16 +56,21 @@ class TestChromeOsDevicesApi(BaseTest):
         self.assertIsNotNone(device)
         # pprint(device)
 
-    # def test_update_org_unit_path(self):
-    #     org_unit_path_changing_to = self.ORG_UNIT_DEPLOYED
-    #     if self.find_by_device_id_and_org_unit(self.TESTING_DEVICE_ID, self.ORG_UNIT_DEPLOYED):
-    #         org_unit_path_changing_to = self.ORG_UNIT_DISTRIBUTOR
-    #     self.chrome_os_devices_api.update(self.SKYKIT_COM_CUSTOMER_ID,
-    #                                       self.TESTING_DEVICE_ID,
-    #                                       org_unit_path=org_unit_path_changing_to)
-    #     sleep(1)
-    #     device = self.chrome_os_devices_api.get(self.SKYKIT_COM_CUSTOMER_ID, self.TESTING_DEVICE_ID)
-    #     self.assertEqual(org_unit_path_changing_to, device.get('orgUnitPath'))
+    def test_update_org_unit_path_no_device_id(self):
+        self.chrome_os_devices_api.update(self.SKYKIT_COM_CUSTOMER_ID,
+                                          None,
+                                          org_unit_path='/Not/used')
+
+    def test_update_org_unit_path(self):
+        org_unit_path_changing_to = self.ORG_UNIT_DEPLOYED
+        if self._find_by_device_id_and_org_unit(self.TESTING_DEVICE_ID, self.ORG_UNIT_DEPLOYED):
+            org_unit_path_changing_to = self.ORG_UNIT_DISTRIBUTOR
+        self.chrome_os_devices_api.update(self.SKYKIT_COM_CUSTOMER_ID,
+                                          self.TESTING_DEVICE_ID,
+                                          org_unit_path=org_unit_path_changing_to)
+        sleep(1)
+        device = self.chrome_os_devices_api.get(self.SKYKIT_COM_CUSTOMER_ID, self.TESTING_DEVICE_ID)
+        self.assertEqual(org_unit_path_changing_to, device.get('orgUnitPath'))
 
     # def test_update_notes(self):
     #     new_notes = 'Notes updated at {0} from unit test.'.format(strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime()))
@@ -93,13 +100,19 @@ class TestChromeOsDevicesApi(BaseTest):
     #     device = self.chrome_os_devices_api.get(self.SKYKIT_COM_CUSTOMER_ID, self.TESTING_DEVICE_ID)
     #     self.assertEqual(new_user, device.get('annotatedUser'))
 
-    def find_by_device_id_and_org_unit(self, device_id, org_unit):
+    def _find_by_device_id_and_org_unit(self, device_id, org_unit):
         device = self.chrome_os_devices_api.get(self.SKYKIT_COM_CUSTOMER_ID, device_id)
         if device.get('orgUnitPath') == org_unit:
             return device
         else:
             return None
 
+    def _find_by_device_id(self, device_id, org_unit):
+        device = self.chrome_os_devices_api.get(self.SKYKIT_COM_CUSTOMER_ID, device_id)
+        if device.get('orgUnitPath') == org_unit:
+            return device
+        else:
+            return None
 
     def test_refresh_device_by_mac_address(self):
         """ Tests the live connection to Admin SDK Directory API. """
