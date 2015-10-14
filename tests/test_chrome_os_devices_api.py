@@ -16,7 +16,7 @@ class TestChromeOsDevicesApi(BaseTest):
     ORG_UNIT_DISTRIBUTOR = '/SKD Automated Test/SKD Automated Distributor'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     DISTRIBUTOR_NAME = 'agosto'
-    IMPERSONATION_EMAIL = 'test@test.com'
+    IMPERSONATION_EMAIL = 'administrator@skykit.com'
 
     def setUp(self):
         super(TestChromeOsDevicesApi, self).setUp()
