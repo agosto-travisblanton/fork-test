@@ -108,3 +108,12 @@ class TestChromeOsDeviceModel(BaseTest):
         chrome_os_device.class_version = 47
         chrome_os_device.put()
         self.assertEqual(chrome_os_device.class_version, self.CURRENT_CLASS_VERSION)
+
+    def test_get_tenant_returns_tenant_representation(self):
+        chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
+                                                 device_id=self.TESTING_DEVICE_ID,
+                                                 gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                                 mac_address=self.MAC_ADDRESS)
+        chrome_os_device.put()
+        tenant = chrome_os_device.get_tenant()
+        self.assertEqual(tenant, self.tenant)

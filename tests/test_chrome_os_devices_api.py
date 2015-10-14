@@ -1,12 +1,11 @@
-from time import sleep
-
 from env_setup import setup_test_paths
 
 setup_test_paths()
 
 from models import Tenant, ChromeOsDevice, Distributor, Domain
 from agar.test import BaseTest
-from chrome_os_devices_api import ChromeOsDevicesApi, refresh_device_by_mac_address, get_impersonation_email
+from chrome_os_devices_api import ChromeOsDevicesApi, refresh_device_by_mac_address, \
+    get_impersonation_email_from_device_key, get_impersonation_email_from_device
 from app_config import config
 
 
@@ -121,6 +120,10 @@ class TestChromeOsDevicesApi(BaseTest):
         result = refresh_device_by_mac_address(self.device_key.urlsafe(), self.mac_address)
         self.assertEqual(result.device_id, self.TESTING_DEVICE_ID)
 
-    def test_get_impersonation_email(self):
-        result = get_impersonation_email(self.device_key.urlsafe())
+    def test_get_impersonation_email_from_device_key(self):
+        result = get_impersonation_email_from_device_key(self.device_key.urlsafe())
+        self.assertEqual(result, self.IMPERSONATION_EMAIL)
+
+    def test_get_impersonation_email_from_device(self):
+        result = get_impersonation_email_from_device(self.device)
         self.assertEqual(result, self.IMPERSONATION_EMAIL)
