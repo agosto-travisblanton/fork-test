@@ -111,9 +111,11 @@ class Tenant(ndb.Model):
     content_manager_base_url = ndb.StringProperty(required=False)
     chrome_device_domain = ndb.StringProperty()
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
-    # TODO Make tenant_key required=True after migration run in prod !!
-    domain_key = ndb.KeyProperty(kind=Domain, required=False, indexed=True)
+    domain_key = ndb.KeyProperty(kind=Domain, required=True, indexed=True)
     class_version = ndb.IntegerProperty()
+
+    def get_domain(self):
+        return self.domain_key.get()
 
     @classmethod
     def find_by_name(cls, name):
@@ -169,8 +171,7 @@ class Tenant(ndb.Model):
 
 @ae_ndb_serializer
 class ChromeOsDevice(ndb.Model):
-    # TODO Make tenant_key required=True after migration run in prod !!
-    tenant_key = ndb.KeyProperty(required=False, indexed=True)
+    tenant_key = ndb.KeyProperty(required=True, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     device_id = ndb.StringProperty(required=False, indexed=True)
@@ -197,6 +198,9 @@ class ChromeOsDevice(ndb.Model):
     loggly_link = ndb.ComputedProperty(lambda self: 'https://skykit.loggly.com/search?&terms=tag%3A"{0}"'.format(
         self.serial_number))
     class_version = ndb.IntegerProperty()
+
+    def get_tenant(self):
+        return self.tenant_key.get()
 
     @classmethod
     def get_by_device_id(cls, device_id):

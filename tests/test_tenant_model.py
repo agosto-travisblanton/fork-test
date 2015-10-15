@@ -116,3 +116,7 @@ class TestTenantModel(BaseTest):
         urlsafe_tenant_key = self.tenant_key.urlsafe()
         impersonation_email = Tenant.get_impersonation_email(urlsafe_tenant_key=urlsafe_tenant_key)
         self.assertEqual(impersonation_email, self.IMPERSONATION_EMAIL)
+
+    def test_get_domain_returns_domain_representation(self):
+        domain = self.tenant.get_domain()
+        self.assertEqual(domain, self.domain)
