@@ -22,7 +22,6 @@ class AppConfig(Config):
     API_TOKEN = None
     CONTENT_MANAGER_API_SERVER_KEY = None
     GCM_TEST_MODE = None
-    IMPERSONATION_ADMIN_EMAIL_ADDRESS = None
     GOOGLE_CUSTOMER_ID = None
     STORMPATH_AUTH_APP = None
     STORMPATH_CLIENT = None
@@ -30,6 +29,7 @@ class AppConfig(Config):
     DEFAULT_AGOSTO_DEVICE_DOMAIN = None
     PLAYER_RESET_COMMAND = None
     PLAYER_VOLUME_COMMAND = None
+    LIMITED_UNMANAGED_DEVICE_REGISTRATION_API_TOKEN = None
 
 
 config = AppConfig.get_config()

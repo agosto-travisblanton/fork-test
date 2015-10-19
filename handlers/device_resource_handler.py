@@ -3,9 +3,7 @@ import logging
 
 from google.appengine.ext.deferred import deferred
 from webapp2 import RequestHandler
-
 from google.appengine.ext import ndb
-
 from decorators import api_token_required
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
@@ -75,50 +73,57 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             error_message = None
             request_json = json.loads(self.request.body)
             device_mac_address = request_json.get('macAddress')
-            device_exists = ChromeOsDevice.query(
-                ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
-                       ChromeOsDevice.ethernet_mac_address == device_mac_address)).count() > 0
-            if device_exists:
-                status = 400
-                error_message = 'Cannot create because macAddress has already been assigned to this device.'
-            tenant_code = request_json.get('tenantCode')
-            gcm_registration_id = request_json.get('gcmRegistrationId')
             if device_mac_address is None or device_mac_address == '':
                 status = 400
                 error_message = 'The macAddress parameter is invalid.'
-            if tenant_code is None or tenant_code == '':
-                status = 400
-                error_message = 'The tenantCode parameter is invalid.'
+                self.response.set_status(status, error_message)
+                return
+            gcm_registration_id = request_json.get('gcmRegistrationId')
             if gcm_registration_id is None or gcm_registration_id == '':
                 status = 400
                 error_message = 'The gcmRegistrationId parameter is invalid.'
-            tenant_key = Tenant.query(Tenant.tenant_code == tenant_code, Tenant.active == True).get(keys_only=True)
-            if tenant_key is None:
-                status = 400
-                error_message = 'Invalid or inactive tenant for device.'
-            if status == 201:
-                device = ChromeOsDevice.create(tenant_key=tenant_key,
-                                               gcm_registration_id=gcm_registration_id,
-                                               mac_address=device_mac_address)
-                key = device.put()
-                deferred.defer(refresh_device_by_mac_address,
-                               device_urlsafe_key=key.urlsafe(),
-                               device_mac_address=device_mac_address,
-                               _queue='directory-api',
-                               _countdown=30)
-                deferred.defer(ContentManagerApi().create_device,
-                               device_urlsafe_key=key.urlsafe(),
-                               _queue='content-server',
-                               _countdown=5)
-                device_uri = self.request.app.router.build(None,
-                                                           'manage-device',
-                                                           None,
-                                                           {'device_urlsafe_key': key.urlsafe()})
-                self.response.headers['Location'] = device_uri
-                self.response.headers.pop('Content-Type', None)
-                self.response.set_status(status)
-            else:
                 self.response.set_status(status, error_message)
+                return
+            if self.unmanaged_device_registration_token is True:
+                pass
+            else:
+                chrome_os_device_exists = ChromeOsDevice.query(
+                    ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
+                           ChromeOsDevice.ethernet_mac_address == device_mac_address)).count() > 0
+                if chrome_os_device_exists:
+                    status = 400
+                    error_message = 'Cannot create because macAddress has already been assigned to this device.'
+                tenant_code = request_json.get('tenantCode')
+                if tenant_code is None or tenant_code == '':
+                    status = 400
+                    error_message = 'The tenantCode parameter is invalid.'
+                tenant_key = Tenant.query(Tenant.tenant_code == tenant_code, Tenant.active == True).get(keys_only=True)
+                if tenant_key is None:
+                    status = 400
+                    error_message = 'Invalid or inactive tenant for device.'
+                if status == 201:
+                    device = ChromeOsDevice.create(tenant_key=tenant_key,
+                                                   gcm_registration_id=gcm_registration_id,
+                                                   mac_address=device_mac_address)
+                    key = device.put()
+                    deferred.defer(refresh_device_by_mac_address,
+                                   device_urlsafe_key=key.urlsafe(),
+                                   device_mac_address=device_mac_address,
+                                   _queue='directory-api',
+                                   _countdown=30)
+                    deferred.defer(ContentManagerApi().create_device,
+                                   device_urlsafe_key=key.urlsafe(),
+                                   _queue='content-server',
+                                   _countdown=5)
+                    device_uri = self.request.app.router.build(None,
+                                                               'manage-device',
+                                                               None,
+                                                               {'device_urlsafe_key': key.urlsafe()})
+                    self.response.headers['Location'] = device_uri
+                    self.response.headers.pop('Content-Type', None)
+                    self.response.set_status(status)
+                else:
+                    self.response.set_status(status, error_message)
         else:
             logging.info("Problem creating Device. No request body.")
             self.response.set_status(400, 'Did not receive request body.')
