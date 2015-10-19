@@ -131,11 +131,11 @@ app_API_TOKEN = _API_TOKEN()
 
 def _LIMITED_UNMANAGED_DEVICE_REGISTRATION_API_TOKEN():
     if on_development_server or not on_server:
-        return '6C346588BD4C6D722A1165B43C51C'
+        return '43C51C8BD4C6D723A1365B6C34658'
     if on_integration_server:
-        return '6C346588BD4C6D722A1165B43C51C'
+        return '43C51C8BD4C6D723A1365B6C34658'
     if on_production_server:
-        return '6C346588BD4C6D722A1165B43C51C'
+        return '43C51C8BD4C6D723A1365B6C34658'
     return None
 
 
