@@ -31,6 +31,9 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
             status = 201
             error_message = None
             request_json = json.loads(self.request.body)
+
+
+
             name = request_json.get('name')
             if name is None or name == '':
                 status = 400

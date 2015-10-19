@@ -100,15 +100,17 @@ def log_memory(function):
 def api_token_required(handler_method):
 
     def authorize(self, *args, **kwargs):
+        self.unmanaged_device_registration_token = False
         api_token = self.request.headers.get('Authorization')
         if api_token is None:
             logging.error('No API token supplied in the HTTP request.')
             json_response(self.response, {'error': 'No API token supplied in the HTTP request.'}, status_code=403)
             return
         else:
-            valid_api_token = api_token is config.API_TOKEN
-            valid_limited_token = api_token is config.LIMITED_UNMANAGED_DEVICE_REGISTRATION_API_TOKEN
-            if not valid_api_token and not valid_limited_token:
+            valid_api_token = api_token == config.API_TOKEN
+            self.unmanaged_device_registration_token = \
+                api_token == config.LIMITED_UNMANAGED_DEVICE_REGISTRATION_API_TOKEN
+            if not valid_api_token and not self.unmanaged_device_registration_token:
                 logging.error('HTTP request API token is invalid.')
                 json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=403)
                 return
