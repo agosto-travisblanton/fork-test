@@ -1,7 +1,6 @@
 import logging
 
 from google.appengine.ext import ndb
-
 from app_config import config
 from restler.serializers import json_response
 
@@ -106,10 +105,13 @@ def api_token_required(handler_method):
             logging.error('No API token supplied in the HTTP request.')
             json_response(self.response, {'error': 'No API token supplied in the HTTP request.'}, status_code=403)
             return
-        elif not api_token == config.API_TOKEN:
-            logging.error('HTTP request API token is invalid.')
-            json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=403)
-            return
+        else:
+            valid_api_token = api_token is config.API_TOKEN
+            valid_limited_token = api_token is config.LIMITED_UNMANAGED_DEVICE_REGISTRATION_API_TOKEN
+            if not valid_api_token and not valid_limited_token:
+                logging.error('HTTP request API token is invalid.')
+                json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=403)
+                return
 
         handler_method(self, *args, **kwargs)
 

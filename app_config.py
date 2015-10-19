@@ -29,6 +29,7 @@ class AppConfig(Config):
     DEFAULT_AGOSTO_DEVICE_DOMAIN = None
     PLAYER_RESET_COMMAND = None
     PLAYER_VOLUME_COMMAND = None
+    LIMITED_UNMANAGED_DEVICE_REGISTRATION_API_TOKEN = None
 
 
 config = AppConfig.get_config()
