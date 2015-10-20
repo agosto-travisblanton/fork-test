@@ -73,7 +73,7 @@ application = WSGIApplication(
               ),
         Route(r'/api/v1/devices/<device_urlsafe_key>',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='manage-device',
+              name='device',
               methods=['GET', 'PUT', 'DELETE']
               ),
         Route(r'/api/v1/devices/<device_urlsafe_key>/commands',

@@ -13,7 +13,7 @@ from agar.test import BaseTest, WebTest
 from chrome_os_devices_api import ChromeOsDevicesApi
 from mockito import when, any as any_matcher
 from routes import application
-from models import ChromeOsDevice, Tenant, Distributor, Domain
+from models import ChromeOsDevice, Tenant, Distributor, Domain, UnmanagedDevice
 from app_config import config
 from ae_test_data import build
 
@@ -63,6 +63,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                             domain_key=self.domain_key,
                                             active=True)
         self.another_tenant_key = self.another_tenant.put()
+        self.unmanaged_device = UnmanagedDevice.create(self.GCM_REGISTRATION_ID, self.MAC_ADDRESS)
+        self.unmanaged_device_key = self.unmanaged_device.put()
         self.device_key = build(ChromeOsDevice,
                                 tenant_key=self.tenant_key,
                                 gcm_registration_id=self.GCM_REGISTRATION_ID,
@@ -71,6 +73,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.valid_authorization_header = {
             'Authorization': config.API_TOKEN
         }
+        self.valid_unmanaged_device_authorization_header = {
+            'Authorization': config.LIMITED_UNMANAGED_DEVICE_REGISTRATION_API_TOKEN
+        }
+
         self.invalid_authorization_header = {}
 
     #################################################################################################################
@@ -162,17 +168,17 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertLength(19, response_json)
 
     ##################################################################################################################
-    ## get
+    ## get ChromeOsDevice
     ##################################################################################################################
     def test_get_device_by_key_no_authorization_header_returns_forbidden(self):
-        uri = build_uri('manage-device', params_dict={'device_urlsafe_key': self.device_key.urlsafe()})
+        uri = build_uri('device', params_dict={'device_urlsafe_key': self.device_key.urlsafe()})
         response = self.get(uri, headers=self.invalid_authorization_header)
         self.assertForbidden(response)
 
     def test_get_device_by_key_http_status_ok(self):
         request_parameters = {}
         uri = application.router.build(None,
-                                       'manage-device',
+                                       'device',
                                        None,
                                        {'device_urlsafe_key': self.device_key.urlsafe()})
         when(deferred).defer(any_matcher(refresh_device),
@@ -183,7 +189,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_get_device_by_key_returns_not_found_status_with_a_valid_key_not_found(self):
         request_parameters = {}
         uri = application.router.build(None,
-                                       'manage-device',
+                                       'device',
                                        None,
                                        {'device_urlsafe_key': self.device_key.urlsafe()})
         self.app.delete('/api/v1/devices/{0}'.format(self.device_key.urlsafe()),
@@ -198,7 +204,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_get_device_by_key_returns_bad_request_status_with_invalid_key(self):
         request_parameters = {}
         uri = application.router.build(None,
-                                       'manage-device',
+                                       'device',
                                        None,
                                        {'device_urlsafe_key': '0000ZXN0YmVkLXRlc3RyFAsSDkNocm9tZU9zRGV2aWNl0000'})
         when(deferred).defer(any_matcher(refresh_device),
@@ -210,7 +216,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_get_device_by_key_entity_body_json(self):
         request_parameters = {}
         uri = application.router.build(None,
-                                       'manage-device',
+                                       'device',
                                        None,
                                        {'device_urlsafe_key': self.device_key.urlsafe()})
         when(deferred).defer(any_matcher(refresh_device),
@@ -246,7 +252,35 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         device.serial_number))
 
     ##################################################################################################################
-    ## post
+    ## get UnmanagedDevice
+    ##################################################################################################################
+
+    def test_get_unmanaged_device_by_key_http_status_ok(self):
+        request_parameters = {}
+        uri = application.router.build(None,
+                                       'device',
+                                       None,
+                                       {'device_urlsafe_key': self.unmanaged_device_key.urlsafe()})
+        response = self.app.get(uri, params=request_parameters, headers=self.valid_unmanaged_device_authorization_header)
+        self.assertOK(response)
+
+    def test_get_unmanaged_device_by_key_returns_not_found_status_with_a_key_for_a_deleted_device(self):
+        request_parameters = {}
+        uri = application.router.build(None,
+                                       'device',
+                                       None,
+                                       {'device_urlsafe_key': self.unmanaged_device_key.urlsafe()})
+        self.app.delete('/api/v1/devices/{0}'.format(self.unmanaged_device_key.urlsafe()),
+                        json.dumps({}),
+                        headers=self.valid_unmanaged_device_authorization_header)
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.valid_unmanaged_device_authorization_header)
+        self.assertTrue('404 Not Found' in context.exception.message)
+
+
+
+    ##################################################################################################################
+    # post ChromeOsDevice
     ##################################################################################################################
 
     def test_device_resource_handler_post_no_authorization_header_returns_forbidden(self):
@@ -317,9 +351,48 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response = self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.valid_authorization_header)
         location_uri_components = str(response.headers['Location']).split('/')
         self.assertEqual(location_uri_components[5], "devices")
-        self.assertEqual(48, len(location_uri_components[6]))
         device = ndb.Key(urlsafe=location_uri_components[6]).get()
         self.assertIsNotNone(device)
+
+    ##################################################################################################################
+    # post UnmanagedDevice
+    ##################################################################################################################
+
+    def test_device_resource_handler_unmanaged_post_returns_bad_response_for_empty_gcm(self):
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': None}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body),
+                          headers=self.valid_unmanaged_device_authorization_header)
+        self.assertTrue('Bad response: 400 The gcmRegistrationId parameter is invalid.'
+                        in context.exception.message)
+
+    def test_device_resource_handler_unmanaged_post_returns_bad_response_for_mac_address(self):
+        request_body = {'macAddress': None,
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body),
+                          headers=self.valid_unmanaged_device_authorization_header)
+        self.assertTrue('Bad response: 400 The macAddress parameter is invalid.'
+                        in context.exception.message)
+
+    def test_device_resource_handler_unmanaged_post_returns_created_status_code(self):
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID}
+        response = self.app.post('/api/v1/devices', json.dumps(request_body),
+                                 headers=self.valid_unmanaged_device_authorization_header)
+        self.assertEqual(201, response.status_code)
+
+    def test_device_resource_handler_unmanaged_post_device_key_location_header(self):
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID}
+        response = self.app.post('/api/v1/devices', json.dumps(request_body),
+                                 headers=self.valid_unmanaged_device_authorization_header)
+        location_uri_components = str(response.headers['Location']).split('/')
+        self.assertEqual(location_uri_components[5], "devices")
+        device = ndb.Key(urlsafe=location_uri_components[6]).get()
+        self.assertIsNotNone(device)
+
 
     ##################################################################################################################
     ## put
@@ -330,7 +403,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'tenantCode': self.TENANT_CODE,
                         'notes': self.DEVICE_NOTES}
         when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.device_key.get())
-        uri = build_uri('manage-device', params_dict={'device_urlsafe_key': self.device_key.urlsafe()})
+        uri = build_uri('device', params_dict={'device_urlsafe_key': self.device_key.urlsafe()})
         response = self.put(uri, params=request_body, headers=self.invalid_authorization_header)
         self.assertForbidden(response)
 
@@ -382,7 +455,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     ##################################################################################################################
 
     def test_delete_no_authorization_header_returns_forbidden(self):
-        uri = build_uri('manage-device', params_dict={'device_urlsafe_key': self.device_key.urlsafe()})
+        uri = build_uri('device', params_dict={'device_urlsafe_key': self.device_key.urlsafe()})
         response = self.delete(uri, headers=self.invalid_authorization_header)
         self.assertForbidden(response)
 

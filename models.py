@@ -1,7 +1,6 @@
 import uuid
 
 from google.appengine.ext import ndb
-
 from restler.decorators import ae_ndb_serializer
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>. Bob MacNeal <bob.macneal@agosto.com>'
@@ -164,6 +163,48 @@ class Tenant(ndb.Model):
                    domain_key=domain_key,
                    active=active,
                    content_manager_base_url=content_manager_base_url)
+
+    def _pre_put_hook(self):
+        self.class_version = 1
+
+
+@ae_ndb_serializer
+class UnmanagedDevice(ndb.Model):
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    updated = ndb.DateTimeProperty(auto_now=True)
+    device_id = ndb.StringProperty(required=False, indexed=True)
+    gcm_registration_id = ndb.StringProperty(required=True, indexed=True)
+    mac_address = ndb.StringProperty(required=True, indexed=True)
+    api_key = ndb.StringProperty(required=True, indexed=True)
+    serial_number = ndb.StringProperty(required=False, indexed=True)
+    pairing_code = ndb.StringProperty(required=True, indexed=True)
+    tenant_key = ndb.KeyProperty(required=False, indexed=True)
+    class_version = ndb.IntegerProperty()
+
+    @classmethod
+    def create(cls, gcm_registration_id, mac_address):
+        unmanaged_device = cls(
+            gcm_registration_id=gcm_registration_id,
+            mac_address=mac_address,
+            api_key=str(uuid.uuid4().hex),
+            pairing_code=str(uuid.uuid4().hex))
+        return unmanaged_device
+
+    @classmethod
+    def get_by_gcm_registration_id(cls, gcm_registration_id):
+        if gcm_registration_id:
+            device_key = UnmanagedDevice.query(UnmanagedDevice.gcm_registration_id == gcm_registration_id).get(
+                keys_only=True)
+            if None is not device_key:
+                return device_key.get()
+
+    @classmethod
+    def get_by_mac_address(cls, mac_address):
+        if mac_address:
+            device_key = UnmanagedDevice.query(UnmanagedDevice.mac_address == mac_address).get(
+                keys_only=True)
+            if None is not device_key:
+                return device_key.get()
 
     def _pre_put_hook(self):
         self.class_version = 1
