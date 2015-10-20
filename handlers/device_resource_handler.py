@@ -8,7 +8,7 @@ from decorators import api_token_required
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
 from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address, update_chrome_os_device)
-from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup
+from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup, UnmanagedDevice
 from content_manager_api import ContentManagerApi
 from strategy import CHROME_OS_DEVICE_STRATEGY
 
@@ -85,7 +85,15 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 self.response.set_status(status, error_message)
                 return
             if self.unmanaged_device_registration_token is True:
-                pass
+                unmanaged_device = UnmanagedDevice.create(gcm_registration_id, device_mac_address)
+                unmanaged_device_key = unmanaged_device.put()
+                device_uri = self.request.app.router.build(None,
+                                                           'device',
+                                                           None,
+                                                           {'device_urlsafe_key': unmanaged_device_key.urlsafe()})
+                self.response.headers['Location'] = device_uri
+                self.response.headers.pop('Content-Type', None)
+                self.response.set_status(status)
             else:
                 chrome_os_device_exists = ChromeOsDevice.query(
                     ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
@@ -116,7 +124,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                    _queue='content-server',
                                    _countdown=5)
                     device_uri = self.request.app.router.build(None,
-                                                               'manage-device',
+                                                               'device',
                                                                None,
                                                                {'device_urlsafe_key': key.urlsafe()})
                     self.response.headers['Location'] = device_uri
