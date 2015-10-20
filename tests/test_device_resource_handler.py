@@ -13,7 +13,7 @@ from agar.test import BaseTest, WebTest
 from chrome_os_devices_api import ChromeOsDevicesApi
 from mockito import when, any as any_matcher
 from routes import application
-from models import ChromeOsDevice, Tenant, Distributor, Domain
+from models import ChromeOsDevice, Tenant, Distributor, Domain, UnmanagedDevice
 from app_config import config
 from ae_test_data import build
 
@@ -63,6 +63,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                             domain_key=self.domain_key,
                                             active=True)
         self.another_tenant_key = self.another_tenant.put()
+        self.unmanaged_device = UnmanagedDevice.create(self.GCM_REGISTRATION_ID, self.MAC_ADDRESS)
+        self.unmanaged_device_key = self.unmanaged_device.put()
         self.device_key = build(ChromeOsDevice,
                                 tenant_key=self.tenant_key,
                                 gcm_registration_id=self.GCM_REGISTRATION_ID,
@@ -166,7 +168,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertLength(19, response_json)
 
     ##################################################################################################################
-    ## get
+    ## get ChromeOsDevice
     ##################################################################################################################
     def test_get_device_by_key_no_authorization_header_returns_forbidden(self):
         uri = build_uri('device', params_dict={'device_urlsafe_key': self.device_key.urlsafe()})
@@ -248,6 +250,34 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json['chromeDeviceDomain'], self.CHROME_DEVICE_DOMAIN)
         self.assertEqual(response_json['loggly_link'], 'https://skykit.loggly.com/search?&terms=tag%3A"{0}"'.format(
         device.serial_number))
+
+    ##################################################################################################################
+    ## get UnmanagedDevice
+    ##################################################################################################################
+
+    def test_get_unmanaged_device_by_key_http_status_ok(self):
+        request_parameters = {}
+        uri = application.router.build(None,
+                                       'device',
+                                       None,
+                                       {'device_urlsafe_key': self.unmanaged_device_key.urlsafe()})
+        response = self.app.get(uri, params=request_parameters, headers=self.valid_unmanaged_device_authorization_header)
+        self.assertOK(response)
+
+    def test_get_unmanaged_device_by_key_returns_not_found_status_with_a_key_for_a_deleted_device(self):
+        request_parameters = {}
+        uri = application.router.build(None,
+                                       'device',
+                                       None,
+                                       {'device_urlsafe_key': self.unmanaged_device_key.urlsafe()})
+        self.app.delete('/api/v1/devices/{0}'.format(self.unmanaged_device_key.urlsafe()),
+                        json.dumps({}),
+                        headers=self.valid_unmanaged_device_authorization_header)
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.valid_unmanaged_device_authorization_header)
+        self.assertTrue('404 Not Found' in context.exception.message)
+
+
 
     ##################################################################################################################
     # post ChromeOsDevice
