@@ -48,3 +48,15 @@ class TestUnmanagedDeviceModel(BaseTest):
         unmanaged_device.put()
         actual = UnmanagedDevice.get_by_mac_address(self.MAC_ADDRESS)
         self.assertEqual(actual.gcm_registration_id, self.TEST_GCM_REGISTRATION_ID)
+
+    def test_create_generates_pairing_code(self):
+        unmanaged_device = UnmanagedDevice.create(
+            gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+            mac_address=self.MAC_ADDRESS)
+        self.assertIsNotNone(unmanaged_device.pairing_code)
+
+    def test_create_generates_api_key(self):
+        unmanaged_device = UnmanagedDevice.create(
+            gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+            mac_address=self.MAC_ADDRESS)
+        self.assertIsNotNone(unmanaged_device.api_key)
