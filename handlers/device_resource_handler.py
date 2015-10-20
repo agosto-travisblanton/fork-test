@@ -62,7 +62,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @api_token_required
     def get(self, device_urlsafe_key):
-        if self.unmanaged_device_token is True:
+        if self.is_unmanaged_device is True:
             device = self.validate_and_get(device_urlsafe_key, UnmanagedDevice, abort_on_not_found=True)
         else:
             device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
@@ -87,7 +87,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 error_message = 'The gcmRegistrationId parameter is invalid.'
                 self.response.set_status(status, error_message)
                 return
-            if self.unmanaged_device_token is True:
+            if self.is_unmanaged_device is True:
                 unmanaged_device = UnmanagedDevice.create(gcm_registration_id, device_mac_address)
                 unmanaged_device_key = unmanaged_device.put()
                 device_uri = self.request.app.router.build(None,
