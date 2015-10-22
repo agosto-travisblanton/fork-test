@@ -238,6 +238,8 @@ class ChromeOsDevice(ndb.Model):
     name = ndb.ComputedProperty(lambda self: '{0} {1}'.format(self.serial_number, self.model))
     loggly_link = ndb.ComputedProperty(lambda self: 'https://skykit.loggly.com/search?&terms=tag%3A"{0}"'.format(
         self.serial_number))
+    panel_model = ndb.StringProperty(required=False, indexed=True)
+    panel_input = ndb.StringProperty(required=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):

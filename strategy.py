@@ -61,7 +61,9 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'model': lambda o, field_name, context: o.key.get().model},
     {'name': lambda o, field_name, context: o.key.get().name},
     {'loggly_link': lambda o, field_name, context: o.key.get().loggly_link},
-    {'etag': lambda o, field_name, context: o.key.get().etag}
+    {'etag': lambda o, field_name, context: o.key.get().etag},
+    {'panelModel': lambda o, field_name, context: o.key.get().panel_model},
+    {'panelInput': lambda o, field_name, context: o.key.get().panel_input}
 ]
 
 DOMAIN_FIELDS = [
