@@ -329,7 +329,7 @@
                         id="panelModel"
                         class="form-control"
                         ng-model="deviceDetailsCtrl.currentDevice.panelModel"
-                        ng-options="p.displayName for p in deviceDetailsCtrl.panelModels">
+                        ng-options="p.displayName for p in deviceDetailsCtrl.panelModels track by p.id">
                       </select>
                     </div>
                     <div class="col-sm-3">
