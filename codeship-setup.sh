@@ -6,14 +6,14 @@ export NODEJS_RUNTIME_VERSION=4.1.1
 COLOR_LIGHT_GREEN='\033[1;32m'
 COLOR_OFF='\033[0m'
 
-cd ~/src/bitbucket.org/agosto_administrator/skykit-display-device
+cd ~/src/bitbucket.org/agosto/skykit-display-device
 
 
 printf "\n${COLOR_LIGHT_GREEN}===> Installing Python packages via pip...${COLOR_OFF}\n"
 pip install PyOpenSSL
 pip install py
 
-cd ~/src/bitbucket.org/agosto_administrator/skykit-display-device/webapp
+cd ~/src/bitbucket.org/agosto/skykit-display-device/webapp
 
 printf "\n${COLOR_LIGHT_GREEN}===> Sourcing nvm...${COLOR_OFF}\n"
 . ~/.nvm/nvm.sh
