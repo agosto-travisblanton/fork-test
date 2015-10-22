@@ -154,14 +154,20 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         else:
             request_json = json.loads(self.request.body)
             notes = request_json.get('notes')
-            panelModel = request_json.get('panelModel')['id']
-            panelInput = request_json.get('panelInput')['id']
             if notes:
                 device.notes = notes
             gcm_registration_id = request_json.get('gcmRegistrationId')
             if gcm_registration_id:
                 logging.info('  PUT updating the gcmRegistrationId.')
                 device.gcm_registration_id = gcm_registration_id
+            panel_model = request_json.get('panelModel')
+            if panel_model:
+                logging.info('  PUT updating the panel model.')
+                device.panel_model = panel_model
+            panel_input = request_json.get('panelInput')
+            if panel_input:
+                logging.info('  PUT updating the panel input.')
+                device.panel_input = panel_input
             tenant_code = request_json.get('tenantCode')
             if tenant_code:
                 tenant = Tenant.find_by_tenant_code(tenant_code)
