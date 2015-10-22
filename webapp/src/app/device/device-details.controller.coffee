@@ -50,9 +50,9 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     @tenants = data
 
   @panelModels = DevicesService.getPanelModels()
-  @currentDevice.panelModel = @panelModels[0];
+  @currentDevice.panelModel = @panelModels[0]
   @panelInputs = DevicesService.getPanelInputs()
-  @currentDevice.panelInput = @panelInputs[0];
+  @currentDevice.panelInput = @panelInputs[0]
 
   if @editMode
     devicePromise = DevicesService.getDeviceByKey($stateParams.deviceKey)
