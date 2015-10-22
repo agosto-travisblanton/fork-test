@@ -322,6 +322,27 @@
                     </div>
                   </div>
                   <div class="form-group">
+                    <label for="notes" class="col-sm-3 control-label">Serial Control</label>
+                    <div class="col-sm-3">
+                      <label>Panel model</label>
+                      <select
+                        id="panelModel"
+                        class="form-control"
+                        ng-model="deviceDetailsCtrl.currentDevice.panelModel"
+                        ng-options="p.displayName for p in deviceDetailsCtrl.panelModels">
+                      </select>
+                    </div>
+                    <div class="col-sm-3">
+                      <label>Panel input</label>
+                      <select
+                        id="panelInput"
+                        class="form-control"
+                        ng-model="deviceDetailsCtrl.currentDevice.panelInput"
+                        ng-options="c.displayName for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
                     <label for="notes" class="col-sm-3 control-label">Notes</label>
 
                     <div class="col-sm-6">
