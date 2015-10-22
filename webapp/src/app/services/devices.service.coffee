@@ -64,224 +64,208 @@ angular.module('skykitDisplayDeviceManagement').factory 'DevicesService', ($http
           'displayName': '0x08 INPUT1 RGB (Analog)'
           'parentId': 'Sony–FXD40LX2F'
         }
-
         {
           'id': 'son002'
           'displayName': '0x09 INPUT1 YUV (Analog)'
           'parentId': 'Sony–FXD40LX2F'
         }
-
         {
           'id': 'son003'
           'displayName': '0x0C OPTION1 VIDEO'
           'parentId': 'Sony–FXD40LX2F'
         }
-
         {
           'id': 'son004'
           'displayName': '0x0D OPTION1 S-VIDEO'
           'parentId': 'Sony–FXD40LX2F'
         }
-
         {
           'id': 'son005'
           'displayName': '0x0E OPTION1 RGB'
           'parentId': 'Sony–FXD40LX2F'
         }
-
         {
-          'id': 6
+          'id': 'son006'
           'displayName': '0x0F OPTION1 COMPONENT 0x10 OPTION2 VIDEO*2'
           'parentId': 'Sony–FXD40LX2F'
         }
-
         {
-          'id': 7
+          'id': 'son007'
           'displayName': '0x11 OPTION2 S-VIDEO*2'
           'parentId': 'Sony–FXD40LX2F'
         }
-
         {
-          'id': 8
+          'id': 'son008'
           'displayName': '0x12 OPTION2 RGB*2'
           'parentId': 'Sony–FXD40LX2F'
         }
-
         {
-          'id': 9
+          'id': 'son009'
           'displayName': '0x13 OPTION2 COMPONENT*2'
           'parentId': 'Sony–FXD40LX2F'
         }
-
         {
-          'id': 10
+          'id': 'son0010'
           'displayName': '0x44 INPUT2 RGB (Digital)'
           'parentId': 'Sony–FXD40LX2F'
         }
-
         {
-          'id': 11
+          'id': 'son0011'
           'displayName': '0x45 INPUT2 DTV (Digital)'
           'parentId': 'Sony–FXD40LX2F'
         }
-
         {
-          'id': 12
+          'id': 'son0012'
           'displayName': '0x54 INPUT3 RGB (Digital)'
           'parentId': 'Sony–FXD40LX2F'
         }
-
         {
-          'id': 13
+          'id': 'son0013'
           'displayName': '0x55 INPUT3 DTV (Digital)'
           'parentId': 'Sony–FXD40LX2F'
         }
-
         {
-          'id': 14
+          'id': 'phi001'
           'displayName': '0x01 = VIDEO'
           'parentId': 'Phillips–BDL5560EL'
         }
         {
-          'id': 15
+          'id': 'phi002'
           'displayName': '0x01 = S-VIDEO'
           'parentId': 'Phillips–BDL5560EL'
         }
         {
-          'id': 16
+          'id': 'phi003'
           'displayName': '0x03 = COMPONENT'
           'parentId': 'Phillips–BDL5560EL'
         }
         {
-          'id': 17
+          'id': 'phi004'
           'displayName': '0x05 = VGA'
           'parentId': 'Phillips–BDL5560EL'
         }
         {
-          'id': 18
+          'id': 'phi005'
           'displayName': '0x05 = HDMI 2'
           'parentId': 'Phillips–BDL5560EL'
         }
         {
-          'id': 19
+          'id': 'phi006'
           'displayName': '0x06 = Display Port 2'
           'parentId': 'Phillips–BDL5560EL'
         }
         {
-          'id': 20
+          'id': 'phi007'
           'displayName': '0x06 = USB 2'
           'parentId': 'Phillips–BDL5560EL'
         }
         {
-          'id': 21
+          'id': 'phi008'
           'displayName': '0x07 = Card DVI-D'
           'parentId': 'Phillips–BDL5560EL'
         }
         {
-          'id': 22
+          'id': 'phi009'
           'displayName': '0x07 = Display Port or Display Port 1 0x08 = Card OPS'
           'parentId': 'Phillips–BDL5560EL'
         }
         {
-          'id': 23
+          'id': 'phi0010'
           'displayName': '0x08 = USB or USB 1'
           'parentId': 'Phillips–BDL5560EL'
         }
         {
-          'id': 24
+          'id': 'phi0011'
           'displayName': '0x09 = HDMI or HDMI 1'
           'parentId': 'Phillips–BDL5560EL'
         }
         {
-          'id': 25
+          'id': 'phi0012'
           'displayName': '0x09 = DVI-D'
           'parentId': 'Phillips–BDL5560EL'
         }
-
         {
-          'id': 26
+          'id': 'pan001'
           'displayName': 'AV1 (VIDEO)'
           'parentId': 'Panasonic–TH55LF6U'
         }
         {
-          'id': 27
+          'id': 'pan002'
           'displayName': 'AV2 COMPONENT/RGB IN'
           'parentId': 'Panasonic–TH55LF6U'
         }
         {
-          'id': 28
+          'id': 'pan003'
           'displayName': 'HM1 HDMI 1'
           'parentId': 'Panasonic–TH55LF6U'
         }
         {
-          'id': 29
+          'id': 'pan004'
           'displayName': 'HM2 HDMI 2'
           'parentId': 'Panasonic–TH55LF6U'
         }
         {
-          'id': 30
+          'id': 'pan005'
           'displayName': 'DV1 DVI-D IN'
           'parentId': 'Panasonic–TH55LF6U'
         }
         {
-          'id': 31
+          'id': 'pan006'
           'displayName': 'PC1 PC IN'
           'parentId': 'Panasonic–TH55LF6U'
         }
         {
-          'id': 32
+          'id': 'pan007'
           'displayName': 'DL1 DIGITAL LINK'
           'parentId': 'Panasonic–TH55LF6U'
         }
-
         {
-          'id': 33
+          'id': 'sha001'
           'displayName': 'PC-DVI-D'
           'parentId': 'Sharp-PNE521'
         }
         {
-          'id': 34
+          'id': 'sha002'
           'displayName': 'PC D-SUB'
           'parentId': 'Sharp-PNE521'
         }
         {
-          'id': 35
+          'id': 'sha003'
           'displayName': 'AV COMPONENT'
           'parentId': 'Sharp-PNE521'
         }
         {
-          'id': 36
+          'id': 'sha004'
           'displayName': 'AV VIDEO'
           'parentId': 'Sharp-PNE521'
         }
         {
-          'id': 37
+          'id': 'sha005'
           'displayName': 'PC RGB'
           'parentId': 'Sharp-PNE521'
         }
         {
-          'id': 38
+          'id': 'sha006'
           'displayName': 'AV DVI-D'
           'parentId': 'Sharp-PNE521'
         }
         {
-          'id': 39
+          'id': 'sha007'
           'displayName': 'AV S-VIDEO'
           'parentId': 'Sharp-PNE521'
         }
         {
-          'id': 40
+          'id': 'sha008'
           'displayName': 'AV HDMI'
           'parentId': 'Sharp-PNE521'
         }
         {
-          'id': 41
+          'id': 'sha009'
           'displayName': 'PC HDMI'
           'parentId': 'Sharp-PNE521'
         }
-
         {
-          'id': 42
+          'id': 'nec001'
           'displayName': 'TBD'
           'parentId': 'NEC–LCD4215'
         }
