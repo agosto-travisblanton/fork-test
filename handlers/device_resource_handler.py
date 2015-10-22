@@ -154,6 +154,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         else:
             request_json = json.loads(self.request.body)
             notes = request_json.get('notes')
+            panelModel = request_json.get('panelModel')
+            panelInput = request_json.get('panelInput')
             if notes:
                 device.notes = notes
             gcm_registration_id = request_json.get('gcmRegistrationId')
