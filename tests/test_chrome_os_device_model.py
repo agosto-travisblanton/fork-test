@@ -27,6 +27,8 @@ class TestChromeOsDeviceModel(BaseTest):
     DISTRIBUTOR_NAME = 'agosto'
     CURRENT_CLASS_VERSION = 2
     IMPERSONATION_EMAIL = 'test@test.com'
+    DISPLAY_PANEL_MODEL = 'Sharp-PNE521'
+    DISPLAY_PANEL_INPUT = 'sha6'
 
     def setUp(self):
         super(TestChromeOsDeviceModel, self).setUp()
@@ -73,6 +75,8 @@ class TestChromeOsDeviceModel(BaseTest):
                                                  device_id=self.TESTING_DEVICE_ID,
                                                  gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
                                                  mac_address=self.MAC_ADDRESS)
+        chrome_os_device.panel_model = self.DISPLAY_PANEL_MODEL
+        chrome_os_device.panel_input = self.DISPLAY_PANEL_INPUT
         chrome_os_device.put()
         json_representation = json.loads(to_json(chrome_os_device, CHROME_OS_DEVICE_STRATEGY))
         self.assertEqual(str(chrome_os_device.device_id), json_representation['deviceId'])
@@ -84,6 +88,8 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertEqual(str(self.tenant.name), json_representation['tenantName'])
         self.assertEqual(str(self.tenant.content_server_url), json_representation['contentServerUrl'])
         self.assertEqual(str(chrome_os_device.mac_address), json_representation['macAddress'])
+        self.assertEqual(str(chrome_os_device.panel_input), json_representation['panelInput'])
+        self.assertEqual(str(chrome_os_device.panel_model), json_representation['panelModel'])
 
     def test_json_serialization_strategy_with_optional_serial_number(self):
         chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,

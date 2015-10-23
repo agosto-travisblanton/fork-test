@@ -11,7 +11,6 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
                                            sweet,
                                            ProgressBarService) ->
   @tenantKey = $stateParams.tenantKey
-
   @currentDevice = {
     key: undefined
     gcmRegistrationId: undefined
@@ -34,6 +33,8 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     osVersion: undefined #"42.0.2311.153"
     platformVersion: undefined #"6812.88.0 (Official Build) stable-channel zako"
     serialNumber: undefined #"5CD45183T6"
+    panelModel: undefined
+    panelInput: undefined
     status: undefined #"ACTIVE"
     tenantKey: undefined
     created: undefined #"2015-07-07 19:22:57"
@@ -43,18 +44,29 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   }
   @editMode = !!$stateParams.deviceKey
 
-  tenantsPromise = TenantsService.fetchAllTenants()
-  tenantsPromise.then (data) =>
-    @tenants = data
+  @initialize = () ->
+    @panelModels = DevicesService.getPanelModels()
+    @panelInputs = DevicesService.getPanelInputs()
 
+    tenantsPromise = TenantsService.fetchAllTenants()
+    tenantsPromise.then (data) =>
+      @tenants = data
 
-  if @editMode
-    devicePromise = DevicesService.getDeviceByKey($stateParams.deviceKey)
-    devicePromise.then (data) =>
-      @currentDevice = data
+    if @editMode
+      devicePromise = DevicesService.getDeviceByKey($stateParams.deviceKey)
+      devicePromise.then (data) =>
+        @currentDevice = data
+        for panelModel in @panelModels
+          if panelModel.id is data.panelModel
+            @currentDevice.panelModel = panelModel
+        for panelInput in @panelInputs
+          if panelInput.id is data.panelInput
+            @currentDevice.panelInput = panelInput
 
   @onClickSaveButton = () ->
     ProgressBarService.start()
+    @currentDevice.panelModel = @currentDevice.panelModel.id if @currentDevice.panelModel != null
+    @currentDevice.panelInput = @currentDevice.panelInput.id if @currentDevice.panelInput != null
     promise = DevicesService.save @currentDevice
     promise.then @onSuccessDeviceSave, @onFailureDeviceSave
 

@@ -60,8 +60,10 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'contentServerUrl': lambda o, field_name, context: o.tenant_key.get().content_server_url},
     {'model': lambda o, field_name, context: o.key.get().model},
     {'name': lambda o, field_name, context: o.key.get().name},
-    {'loggly_link': lambda o, field_name, context: o.key.get().loggly_link},
-    {'etag': lambda o, field_name, context: o.key.get().etag}
+    {'logglyLink': lambda o, field_name, context: o.key.get().loggly_link},
+    {'etag': lambda o, field_name, context: o.key.get().etag},
+    {'panelModel': lambda o, field_name, context: o.key.get().panel_model},
+    {'panelInput': lambda o, field_name, context: o.key.get().panel_input}
 ]
 
 DOMAIN_FIELDS = [

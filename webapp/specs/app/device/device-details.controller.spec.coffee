@@ -43,12 +43,30 @@ describe 'DeviceDetailsCtrl', ->
       ProgressBarService: progressBarService
     }
 
-  describe 'initialization', ->
+  describe 'initialize', ->
     beforeEach ->
       tenantsServicePromise = new skykitDisplayDeviceManagement.q.Mock
       spyOn(TenantsService, 'fetchAllTenants').and.returnValue tenantsServicePromise
       devicesServicePromise = new skykitDisplayDeviceManagement.q.Mock
       spyOn(DevicesService, 'getDeviceByKey').and.returnValue devicesServicePromise
+      spyOn(DevicesService, 'getPanelModels').and.returnValue [{'id': 'Sony–FXD40LX2F'}, {'id': 'NEC–LCD4215'}]
+      inputs = [
+        {
+          'id': 'son1'
+          'parentId': 'Sony–FXD40LX2F'
+        }
+        {
+          'id': 'son2'
+          'displayName': '0x09 INPUT1 YUV (Analog)'
+          'parentId': 'Sony–FXD40LX2F'
+        }
+        {
+          'id': 'nec1'
+          'displayName': 'HDMI-1'
+          'parentId': 'NEC–LCD4215'
+        }
+      ]
+      spyOn(DevicesService, 'getPanelInputs').and.returnValue inputs
 
     describe 'new mode', ->
       beforeEach ->
@@ -58,6 +76,7 @@ describe 'DeviceDetailsCtrl', ->
           DevicesService: DevicesService
           TenantsService: TenantsService
         }
+        controller.initialize()
 
       it 'currentDevice property should be defined', ->
         expect(controller.currentDevice).toBeDefined()
@@ -68,7 +87,6 @@ describe 'DeviceDetailsCtrl', ->
       it "the 'then' handler caches the retrieved tenants in the controller", ->
         tenantsServicePromise.resolve tenants
         expect(controller.tenants).toBe tenants
-
 
     describe 'edit mode', ->
       beforeEach ->
@@ -79,18 +97,25 @@ describe 'DeviceDetailsCtrl', ->
           DevicesService: DevicesService
           TenantsService: TenantsService
         }
+        controller.initialize()
 
-      it 'currentDevice property should be defined', ->
+      it 'defines currentDevice property', ->
         expect(controller.currentDevice).toBeDefined()
 
-      it 'call TenantsService.fetchAllTenants to retrieve all tenants', ->
+      it 'calls DevicesService.getPanelModels to retrieve all panel models', ->
+        expect(DevicesService.getPanelModels).toHaveBeenCalled()
+
+      it 'calls DevicesService.getPanelInputs to retrieve all panel inputs', ->
+        expect(DevicesService.getPanelInputs).toHaveBeenCalled()
+
+      it 'calls TenantsService.fetchAllTenants to retrieve all tenants', ->
         expect(TenantsService.fetchAllTenants).toHaveBeenCalled()
 
       it "the 'then' handler caches the retrieved tenants in the controller", ->
         tenantsServicePromise.resolve tenants
         expect(controller.tenants).toBe tenants
 
-      it 'call DevicesService.getByKey to retrieve the selected device', ->
+      it 'calls DevicesService.getByKey to retrieve the selected device', ->
         expect(DevicesService.getDeviceByKey).toHaveBeenCalledWith $stateParams.deviceKey
 
       it "the 'then' handler caches the retrieved device in the controller", ->
@@ -106,6 +131,8 @@ describe 'DeviceDetailsCtrl', ->
       spyOn(progressBarService, 'start')
       spyOn(progressBarService, 'complete')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
+      controller.currentDevice.panelModel = {id: 'Sony-112'}
+      controller.currentDevice.panelInput = {id: 'son01'}
       controller.onClickSaveButton()
       devicesServicePromise.resolve()
 
@@ -214,7 +241,6 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'displays a sweet alert', ->
         expect(sweet.show).toHaveBeenCalledWith('Oops...', "Volume error: #{@error.data}", 'error')
-
 
   describe '.onClickCommandSendButton', ->
     beforeEach ->
