@@ -27,9 +27,6 @@ angular.module('skykitDisplayDeviceManagement').factory 'DevicesService', ($http
       promise
 
     save: (device) ->
-      panelModel = device.panelModel.id
-      device.panelModel = device.panelModel.id
-      device.panelInput = device.panelINpu.id
       if device.key != undefined
         promise = device.put()
       else
