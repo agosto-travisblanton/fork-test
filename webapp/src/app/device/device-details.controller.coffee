@@ -11,9 +11,6 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
                                            sweet,
                                            ProgressBarService) ->
   @tenantKey = $stateParams.tenantKey
-
-  @panelModels = DevicesService.getPanelModels()
-  @panelInputs = DevicesService.getPanelInputs()
   @currentDevice = {
     key: undefined
     gcmRegistrationId: undefined
@@ -48,6 +45,9 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @editMode = !!$stateParams.deviceKey
 
   @initialize = () ->
+    @panelModels = DevicesService.getPanelModels()
+    @panelInputs = DevicesService.getPanelInputs()
+
     tenantsPromise = TenantsService.fetchAllTenants()
     tenantsPromise.then (data) =>
       @tenants = data

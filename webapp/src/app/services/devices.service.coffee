@@ -271,5 +271,4 @@ angular.module('skykitDisplayDeviceManagement').factory 'DevicesService', ($http
         }
       ]
 
-
   new DevicesService()
