@@ -27,6 +27,8 @@ class TestChromeOsDeviceModel(BaseTest):
     DISTRIBUTOR_NAME = 'agosto'
     CURRENT_CLASS_VERSION = 2
     IMPERSONATION_EMAIL = 'test@test.com'
+    DISPLAY_PANEL_MODEL = 'Sharp-PNE521'
+    DISPLAY_PANEL_INPUT = 'sha6'
 
     def setUp(self):
         super(TestChromeOsDeviceModel, self).setUp()
@@ -73,10 +75,8 @@ class TestChromeOsDeviceModel(BaseTest):
                                                  device_id=self.TESTING_DEVICE_ID,
                                                  gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
                                                  mac_address=self.MAC_ADDRESS)
-        panel_model = 'Sony-Foo'
-        panel_input = 'HDMI-1'
-        chrome_os_device.panel_model = panel_model
-        chrome_os_device.panel_input = panel_input
+        chrome_os_device.panel_model = self.DISPLAY_PANEL_MODEL
+        chrome_os_device.panel_input = self.DISPLAY_PANEL_INPUT
         chrome_os_device.put()
         json_representation = json.loads(to_json(chrome_os_device, CHROME_OS_DEVICE_STRATEGY))
         self.assertEqual(str(chrome_os_device.device_id), json_representation['deviceId'])
