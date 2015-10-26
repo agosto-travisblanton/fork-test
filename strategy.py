@@ -1,4 +1,4 @@
-from models import (Tenant, ChromeOsDevice, Distributor, Domain)
+from models import (Tenant, ChromeOsDevice, Distributor, Domain, Device)
 from restler.serializers import ModelStrategy
 from google.appengine.ext import ndb
 
@@ -65,6 +65,46 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'panelModel': lambda o, field_name, context: o.key.get().panel_model},
     {'panelInput': lambda o, field_name, context: o.key.get().panel_input}
 ]
+
+DEVICE_STRATEGY = ModelStrategy(Device)
+DEVICE_STRATEGY += [
+    {'tenantKey': lambda o, field_name, context: o.tenant_key.urlsafe()},
+    {'tenantName': lambda o, field_name, context: o.tenant_key.get().name},
+    {'lastSync': lambda o, field_name, context: o.key.get().last_sync},
+    {'apiKey': lambda o, field_name, context: o.key.get().api_key},
+    {'macAddress': lambda o, field_name, context: o.key.get().mac_address},
+    {'annotatedUser': lambda o, field_name, context: o.key.get().annotated_user},
+    {'firmwareVersion': lambda o, field_name, context: o.key.get().firmware_version},
+    {'bootMode': lambda o, field_name, context: o.key.get().boot_mode},
+    {'chromeDeviceDomain': lambda o, field_name, context: ndb.Key(
+        urlsafe=o.tenant_key.get().domain_key.urlsafe()).get().name},
+    {'orgUnitPath': lambda o, field_name, context: o.key.get().org_unit_path},
+    {'status': lambda o, field_name, context: o.key.get().status},
+    {'updated': lambda o, field_name, context: o.key.get().updated},
+    {'tenantCode': lambda o, field_name, context: o.tenant_key.get().tenant_code},
+    {'lastEnrollmentTime': lambda o, field_name, context: o.key.get().last_enrollment_time},
+    {'ethernetMacAddress': lambda o, field_name, context: o.key.get().ethernet_mac_address},
+    {'deviceId': lambda o, field_name, context: o.key.get().device_id},
+    {'key': lambda o, field_name, context: o.key.urlsafe()},
+    {'platformVersion': lambda o, field_name, context: o.key.get().platform_version},
+    {'osVersion': lambda o, field_name, context: o.key.get().os_version},
+    {'annotatedLocation': lambda o, field_name, context: o.key.get().annotated_location},
+    {'kind': lambda o, field_name, context: o.key.get().kind},
+    {'created': lambda o, field_name, context: o.key.get().created},
+    {'notes': lambda o, field_name, context: o.key.get().notes},
+    {'serialNumber': lambda o, field_name, context: o.key.get().serial_number},
+    {'gcmRegistrationId': lambda o, field_name, context: o.key.get().gcm_registration_id},
+    {'contentServerUrl': lambda o, field_name, context: o.tenant_key.get().content_server_url},
+    {'model': lambda o, field_name, context: o.key.get().model},
+    {'name': lambda o, field_name, context: o.key.get().name},
+    {'logglyLink': lambda o, field_name, context: o.key.get().loggly_link},
+    {'etag': lambda o, field_name, context: o.key.get().etag},
+    {'isManagedDevice': lambda o, field_name, context: o.key.get().is_managed_device},
+    {'pairingCode': lambda o, field_name, context: o.key.get().pairing_code},
+    {'panelModel': lambda o, field_name, context: o.key.get().panel_model},
+    {'panelInput': lambda o, field_name, context: o.key.get().panel_input}
+]
+
 
 DOMAIN_FIELDS = [
     'name',

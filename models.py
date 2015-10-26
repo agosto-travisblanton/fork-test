@@ -169,6 +169,77 @@ class Tenant(ndb.Model):
 
 
 @ae_ndb_serializer
+class Device(ndb.Model):
+    tenant_key = ndb.KeyProperty(kind=Tenant, required=True, indexed=True)
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    updated = ndb.DateTimeProperty(auto_now=True)
+    gcm_registration_id = ndb.StringProperty(required=True, indexed=True)
+    mac_address = ndb.StringProperty(required=True, indexed=True)
+    api_key = ndb.StringProperty(required=True, indexed=True)
+    device_id = ndb.StringProperty(required=False, indexed=True)
+    serial_number = ndb.StringProperty(required=False, indexed=True)
+    status = ndb.StringProperty(required=False, indexed=False)
+    last_sync = ndb.StringProperty(required=False, indexed=False)
+    kind = ndb.StringProperty(required=False, indexed=False)
+    ethernet_mac_address = ndb.StringProperty(required=False, indexed=True)
+    org_unit_path = ndb.StringProperty(required=False, indexed=False)
+    annotated_user = ndb.StringProperty(required=False, indexed=False)
+    annotated_location = ndb.StringProperty(required=False, indexed=False)
+    notes = ndb.StringProperty(required=False, indexed=False)
+    boot_mode = ndb.StringProperty(required=False, indexed=False)
+    last_enrollment_time = ndb.StringProperty(required=False, indexed=False)
+    platform_version = ndb.StringProperty(required=False, indexed=False)
+    model = ndb.StringProperty(required=False, indexed=False)
+    os_version = ndb.StringProperty(required=False, indexed=False)
+    firmware_version = ndb.StringProperty(required=False, indexed=False)
+    etag = ndb.StringProperty(required=False, indexed=False)
+    name = ndb.ComputedProperty(lambda self: '{0} {1}'.format(self.serial_number, self.model))
+    loggly_link = ndb.ComputedProperty(lambda self: 'https://skykit.loggly.com/search?&terms=tag%3A"{0}"'.format(
+        self.serial_number))
+    is_managed_device = ndb.BooleanProperty(default=True, required=True, indexed=True)
+    pairing_code = ndb.StringProperty(required=False, indexed=True)
+    panel_model = ndb.StringProperty(required=False, indexed=True)
+    panel_input = ndb.StringProperty(required=False, indexed=True)
+    class_version = ndb.IntegerProperty()
+
+    @classmethod
+    def create_unmanaged(cls, gcm_registration_id, mac_address):
+        device = cls(
+            gcm_registration_id=gcm_registration_id,
+            mac_address=mac_address,
+            api_key=str(uuid.uuid4().hex),
+            pairing_code=str(uuid.uuid4().hex),
+            is_managed_device=False
+        )
+        return device
+
+    @classmethod
+    def create_managed(cls, tenant_key, gcm_registration_id, mac_address,
+                       device_id=None, serial_number=None, model=None):
+        device = cls(
+            device_id=device_id,
+            tenant_key=tenant_key,
+            gcm_registration_id=gcm_registration_id,
+            mac_address=mac_address,
+            api_key=str(uuid.uuid4().hex),
+            serial_number=serial_number,
+            model=model,
+            is_managed_device=True
+        )
+        return device
+
+    @classmethod
+    def get_by_device_id(cls, device_id):
+        if device_id:
+            device_key = Device.query(Device.device_id == device_id).get(keys_only=True)
+            if None is not device_key:
+                return device_key.get()
+
+    def _pre_put_hook(self):
+        self.class_version = 1
+
+
+@ae_ndb_serializer
 class UnmanagedDevice(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
