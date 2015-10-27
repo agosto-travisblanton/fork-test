@@ -56,12 +56,19 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       devicePromise = DevicesService.getDeviceByKey($stateParams.deviceKey)
       devicePromise.then (data) =>
         @currentDevice = data
-        for panelModel in @panelModels
-          if panelModel.id is data.panelModel
-            @currentDevice.panelModel = panelModel
-        for panelInput in @panelInputs
-          if panelInput.id is data.panelInput
-            @currentDevice.panelInput = panelInput
+        @setSelectedOptions()
+
+  @setSelectedOptions = () ->
+    if @currentDevice.panelModel == null
+      @currentDevice.panelModel = @panelModels[0]
+      @currentDevice.panelInput = @panelInputs[0]
+    else
+      for panelModel in @panelModels
+        if panelModel.id is @currentDevice.panelModel
+          @currentDevice.panelModel = panelModel
+      for panelInput in @panelInputs
+        if panelInput.id is @currentDevice.panelInput
+          @currentDevice.panelInput = panelInput
 
   @onClickSaveButton = () ->
     ProgressBarService.start()
