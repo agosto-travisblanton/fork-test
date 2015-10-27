@@ -36,7 +36,7 @@ angular.module('skykitDisplayDeviceManagement').factory 'DevicesService', ($http
     getPanelModels: () ->
       [
         {
-          'id': 'None'
+          'id': '0'
           'displayName': 'None'
         }
         {
@@ -64,9 +64,9 @@ angular.module('skykitDisplayDeviceManagement').factory 'DevicesService', ($http
     getPanelInputs: () ->
       [
         {
-          'id': 'None'
+          'id': '0'
           'displayName': 'None'
-          'parentId': 'None'
+          'parentId': '0'
         }
         {
           'id': 'son1'
