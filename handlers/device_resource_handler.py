@@ -1,8 +1,9 @@
 import json
 import logging
 
-from google.appengine.ext.deferred import deferred
 from webapp2 import RequestHandler
+
+from google.appengine.ext.deferred import deferred
 from google.appengine.ext import ndb
 from decorators import api_token_required
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
@@ -162,12 +163,14 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 device.gcm_registration_id = gcm_registration_id
             panel_model = request_json.get('panelModel')
             if panel_model:
-                logging.info('  PUT updating the panel model.')
                 device.panel_model = panel_model
+            else:
+                device.panel_model = None
             panel_input = request_json.get('panelInput')
             if panel_input:
-                logging.info('  PUT updating the panel input.')
                 device.panel_input = panel_input
+            else:
+                device.panel_input = None
             tenant_code = request_json.get('tenantCode')
             if tenant_code:
                 tenant = Tenant.find_by_tenant_code(tenant_code)

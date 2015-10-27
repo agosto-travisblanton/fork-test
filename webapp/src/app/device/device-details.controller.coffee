@@ -56,17 +56,26 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       devicePromise = DevicesService.getDeviceByKey($stateParams.deviceKey)
       devicePromise.then (data) =>
         @currentDevice = data
-        for panelModel in @panelModels
-          if panelModel.id is data.panelModel
-            @currentDevice.panelModel = panelModel
-        for panelInput in @panelInputs
-          if panelInput.id is data.panelInput
-            @currentDevice.panelInput = panelInput
+        @setSelectedOptions()
+
+  @setSelectedOptions = () ->
+    if @currentDevice.panelModel == null
+      @currentDevice.panelModel = @panelModels[0]
+      @currentDevice.panelInput = @panelInputs[0]
+    else
+      for panelModel in @panelModels
+        if panelModel.id is @currentDevice.panelModel
+          @currentDevice.panelModel = panelModel
+      for panelInput in @panelInputs
+        if panelInput.id is @currentDevice.panelInput
+          @currentDevice.panelInput = panelInput
 
   @onClickSaveButton = () ->
     ProgressBarService.start()
-    @currentDevice.panelModel = @currentDevice.panelModel.id if @currentDevice.panelModel != null
-    @currentDevice.panelInput = @currentDevice.panelInput.id if @currentDevice.panelInput != null
+    if @currentDevice.panelModel != null
+      @currentDevice.panelModel = if @currentDevice.panelModel.id == '0' then null else @currentDevice.panelModel.id
+    if @currentDevice.panelInput != null
+      @currentDevice.panelInput = if @currentDevice.panelInput.id == '0' then null else @currentDevice.panelInput.id
     promise = DevicesService.save @currentDevice
     promise.then @onSuccessDeviceSave, @onFailureDeviceSave
 
