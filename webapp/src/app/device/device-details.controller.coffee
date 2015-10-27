@@ -73,7 +73,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @onClickSaveButton = () ->
     ProgressBarService.start()
     if @currentDevice.panelModel != null
-      @currentDevice.panelModel = if @currentDevice.panelModel.id == '0' then null else @currentDevice.panelModel.id
+      @currentDevice.panelModel = if @currentDevice.panelModel.id == 'None' then null else @currentDevice.panelModel.id
     if @currentDevice.panelInput != null
       @currentDevice.panelInput = if @currentDevice.panelInput.id == '0' then null else @currentDevice.panelInput.id
     promise = DevicesService.save @currentDevice
