@@ -75,9 +75,49 @@ class DeviceModel(BaseTest):
             gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
             mac_address=self.MAC_ADDRESS)
         self.assertIsNotNone(device)
+
+    def test_create_unmanaged_device_generates_api_key(self):
+        device = Device.create_unmanaged(
+            gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+            mac_address=self.MAC_ADDRESS)
         self.assertIsNotNone(device.api_key)
+
+    def test_create_unmanaged_device_generates_pairing_code(self):
+        device = Device.create_unmanaged(
+            gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+            mac_address=self.MAC_ADDRESS)
         self.assertIsNotNone(device.pairing_code)
-        self.assertFalse(device.is_managed_device)
+        self.assertTrue(device.is_unmanaged_device)
+
+    def test_create_unmanaged_device_sets_is_unmanaged_device_bit_to_true(self):
+        device = Device.create_unmanaged(
+            gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+            mac_address=self.MAC_ADDRESS)
+        self.assertTrue(device.is_unmanaged_device)
+
+    def test_unmanaged_json_serialization_strategy(self):
+        device = Device.create_unmanaged(
+            gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+            mac_address=self.MAC_ADDRESS)
+        device.panel_model = self.DISPLAY_PANEL_MODEL
+        device.panel_input = self.DISPLAY_PANEL_INPUT
+        device.put()
+        json_representation = json.loads(to_json(device, DEVICE_STRATEGY))
+        self.assertEqual(None, json_representation['deviceId'])
+        self.assertEqual(str(device.gcm_registration_id), json_representation['gcmRegistrationId'])
+        self.assertEqual(None, json_representation['serialNumber'])
+        self.assertIsNotNone(json_representation['created'])
+        self.assertIsNotNone(json_representation['updated'])
+        self.assertEqual(str(device.api_key), json_representation['apiKey'])
+        self.assertEqual(str(device.pairing_code), json_representation['pairingCode'])
+        self.assertEqual(None, json_representation['tenantName'])
+        self.assertEqual(None, json_representation['contentServerUrl'])
+        self.assertEqual(str(device.mac_address), json_representation['macAddress'])
+        self.assertEqual(str(device.panel_input), json_representation['panelInput'])
+        self.assertEqual(str(device.panel_model), json_representation['panelModel'])
+        self.assertEqual(device.is_unmanaged_device, json_representation['isUnmanagedDevice'])
+        self.assertEqual(str(device.loggly_link),
+                         'https://skykit.loggly.com/search?&terms=tag%3A"{0}"'.format(None))
 
     ##################################################################################################################
     ## create_managed
@@ -88,11 +128,29 @@ class DeviceModel(BaseTest):
                                        gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
                                        mac_address=self.MAC_ADDRESS)
         self.assertIsNotNone(device)
-        self.assertIsNotNone(device.api_key)
-        self.assertIsNone(device.pairing_code)
-        self.assertTrue(device.is_managed_device)
 
-    def test_json_serialization_strategy(self):
+    def test_create_managed_device_generates_api_key(self):
+        device = Device.create_managed(tenant_key=self.tenant_key,
+                                       device_id=self.TESTING_DEVICE_ID,
+                                       gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                       mac_address=self.MAC_ADDRESS)
+        self.assertIsNotNone(device.api_key)
+
+    def test_create_managed_device_does_not_generate_pairing_code(self):
+        device = Device.create_managed(tenant_key=self.tenant_key,
+                                       device_id=self.TESTING_DEVICE_ID,
+                                       gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                       mac_address=self.MAC_ADDRESS)
+        self.assertIsNone(device.pairing_code)
+
+    def test_create_managed_device_sets_is_unmanaged_device_bit_to_false(self):
+        device = Device.create_managed(tenant_key=self.tenant_key,
+                                       device_id=self.TESTING_DEVICE_ID,
+                                       gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                       mac_address=self.MAC_ADDRESS)
+        self.assertFalse(device.is_unmanaged_device)
+
+    def test_managed_json_serialization_strategy(self):
         device = Device.create_managed(tenant_key=self.tenant_key,
                                        device_id=self.TESTING_DEVICE_ID,
                                        gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
@@ -112,9 +170,9 @@ class DeviceModel(BaseTest):
         self.assertEqual(str(device.mac_address), json_representation['macAddress'])
         self.assertEqual(str(device.panel_input), json_representation['panelInput'])
         self.assertEqual(str(device.panel_model), json_representation['panelModel'])
-        self.assertEqual(device.is_managed_device, json_representation['isManagedDevice'])
-        self.assertEqual(str(device.loggly_link),
-                         'https://skykit.loggly.com/search?&terms=tag%3A"{0}"'.format(None))
+        self.assertEqual(None, json_representation['pairingCode'])
+        self.assertEqual(device.is_unmanaged_device, json_representation['isUnmanagedDevice'])
+        self.assertEqual(None, json_representation['logglyLink'])
 
     def test_json_serialization_strategy_with_optional_serial_number(self):
         device = Device.create_managed(tenant_key=self.tenant_key,
@@ -126,9 +184,9 @@ class DeviceModel(BaseTest):
         device.put()
         json_representation = json.loads(to_json(device, DEVICE_STRATEGY))
         self.assertEqual(self.SERIAL_NUMBER, json_representation['serialNumber'])
-        self.assertEqual(str(device.name), '{0} {1}'.format(self.SERIAL_NUMBER, self.MODEL))
-        self.assertEqual(str(device.loggly_link),
-                         'https://skykit.loggly.com/search?&terms=tag%3A"{0}"'.format(self.SERIAL_NUMBER))
+        self.assertEqual('{0} {1}'.format(self.SERIAL_NUMBER, self.MODEL), json_representation['name'])
+        self.assertEqual('https://skykit.loggly.com/search?&terms=tag%3A"{0}"'.format(self.SERIAL_NUMBER),
+                         json_representation['logglyLink'])
 
     def test_class_version_is_only_set_by_pre_put_hook_method(self):
         device = Device.create_managed(tenant_key=self.tenant_key,
@@ -140,11 +198,72 @@ class DeviceModel(BaseTest):
         device.put()
         self.assertEqual(device.class_version, self.CURRENT_CLASS_VERSION)
 
-        # def test_get_tenant_returns_tenant_representation(self):
-        #     managed_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
-        #                                              device_id=self.TESTING_DEVICE_ID,
-        #                                              gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
-        #                                              mac_address=self.MAC_ADDRESS)
-        #     managed_device.put()
-        #     tenant = managed_device.get_tenant()
-        #     self.assertEqual(tenant, self.tenant)
+    ##################################################################################################################
+    ## get_by_gcm_registration_id
+    ##################################################################################################################
+
+    def test_get_by_gcm_registration_id_returns_matching_unmanaged_device(self):
+        device = Device.create_unmanaged(
+            gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+            mac_address=self.MAC_ADDRESS)
+        device.put()
+        actual = device.get_by_gcm_registration_id(self.TEST_GCM_REGISTRATION_ID)
+        self.assertEqual(actual.mac_address, self.MAC_ADDRESS)
+
+    def test_get_by_gcm_registration_id_returns_matching_managed_device(self):
+        device = Device.create_managed(tenant_key=self.tenant_key,
+                                       device_id=self.TESTING_DEVICE_ID,
+                                       gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                       mac_address=self.MAC_ADDRESS)
+        device.put()
+        actual = device.get_by_gcm_registration_id(self.TEST_GCM_REGISTRATION_ID)
+        self.assertEqual(actual.mac_address, self.MAC_ADDRESS)
+
+    ##################################################################################################################
+    ## get_by_mac_address
+    ##################################################################################################################
+
+    def test_get_by_mac_address_returns_matching_unmanaged_device(self):
+        device = Device.create_unmanaged(
+            gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+            mac_address=self.MAC_ADDRESS)
+        device.put()
+        actual = device.get_by_mac_address(self.MAC_ADDRESS)
+        self.assertEqual(actual.gcm_registration_id, self.TEST_GCM_REGISTRATION_ID)
+
+    def test_get_by_mac_address_returns_matching_managed_device(self):
+        device = Device.create_managed(tenant_key=self.tenant_key,
+                                       device_id=self.TESTING_DEVICE_ID,
+                                       gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                       mac_address=self.MAC_ADDRESS)
+        device.put()
+        actual = device.get_by_mac_address(self.MAC_ADDRESS)
+        self.assertEqual(actual.gcm_registration_id, self.TEST_GCM_REGISTRATION_ID)
+
+    ##################################################################################################################
+    ## get_tenant
+    ##################################################################################################################
+
+    def test_get_tenant_returns_tenant_representation(self):
+        device = Device.create_managed(tenant_key=self.tenant_key,
+                                       device_id=self.TESTING_DEVICE_ID,
+                                       gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                       mac_address=self.MAC_ADDRESS)
+        device.put()
+        tenant = device.get_tenant()
+        self.assertEqual(tenant, self.tenant)
+
+    def test_get_tenant_on_unmanaged_device_returns_tenant_representation(self):
+        device = Device.create_unmanaged(tenant_key=self.tenant_key,
+                                         gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                         mac_address=self.MAC_ADDRESS)
+        device.put()
+        tenant = device.get_tenant()
+        self.assertEqual(tenant, self.tenant)
+
+    def test_get_tenant_on_unmanaged_device_with_undetermined_tenant_returns_none(self):
+        device = Device.create_unmanaged(gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                         mac_address=self.MAC_ADDRESS)
+        device.put()
+        tenant = device.get_tenant()
+        self.assertIsNone(tenant)

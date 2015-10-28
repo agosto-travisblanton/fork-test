@@ -29,9 +29,9 @@ class TestDecorators(BaseTest, WebTest):
         response = self.app.get('/api/v1/bogus', params={}, headers=headers)
         self.assertOK(response)
 
-    def testLimitedTokenRequired_AuthorizationSuccessful(self):
+    def testUnmanagedDeviceCreateTokenRequired_AuthorizationSuccessful(self):
         headers = {
-            'Authorization': config.LIMITED_UNMANAGED_DEVICE_REGISTRATION_API_TOKEN
+            'Authorization': config.UNMANAGED_DEVICE_CREATE_TOKEN
         }
         response = self.app.get('/api/v1/bogus', params={}, headers=headers)
         self.assertOK(response)

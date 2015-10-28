@@ -170,7 +170,7 @@ class Tenant(ndb.Model):
 
 @ae_ndb_serializer
 class Device(ndb.Model):
-    tenant_key = ndb.KeyProperty(kind=Tenant, required=True, indexed=True)
+    tenant_key = ndb.KeyProperty(kind=Tenant, required=False, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     gcm_registration_id = ndb.StringProperty(required=True, indexed=True)
@@ -196,20 +196,27 @@ class Device(ndb.Model):
     name = ndb.ComputedProperty(lambda self: '{0} {1}'.format(self.serial_number, self.model))
     loggly_link = ndb.ComputedProperty(lambda self: 'https://skykit.loggly.com/search?&terms=tag%3A"{0}"'.format(
         self.serial_number))
-    is_managed_device = ndb.BooleanProperty(default=True, required=True, indexed=True)
+    is_unmanaged_device = ndb.BooleanProperty(default=False, required=True, indexed=True)
     pairing_code = ndb.StringProperty(required=False, indexed=True)
     panel_model = ndb.StringProperty(required=False, indexed=True)
     panel_input = ndb.StringProperty(required=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
+    def get_tenant(self):
+        if None is self.tenant_key:
+            return None
+        else:
+            return self.tenant_key.get()
+
     @classmethod
-    def create_unmanaged(cls, gcm_registration_id, mac_address):
+    def create_unmanaged(cls, gcm_registration_id, mac_address, tenant_key=None):
         device = cls(
+            tenant_key=tenant_key,
             gcm_registration_id=gcm_registration_id,
             mac_address=mac_address,
             api_key=str(uuid.uuid4().hex),
             pairing_code=str(uuid.uuid4().hex),
-            is_managed_device=False
+            is_unmanaged_device=True
         )
         return device
 
@@ -224,7 +231,7 @@ class Device(ndb.Model):
             api_key=str(uuid.uuid4().hex),
             serial_number=serial_number,
             model=model,
-            is_managed_device=True
+            is_unmanaged_device=False
         )
         return device
 
@@ -232,6 +239,20 @@ class Device(ndb.Model):
     def get_by_device_id(cls, device_id):
         if device_id:
             device_key = Device.query(Device.device_id == device_id).get(keys_only=True)
+            if None is not device_key:
+                return device_key.get()
+
+    @classmethod
+    def get_by_gcm_registration_id(cls, gcm_registration_id):
+        if gcm_registration_id:
+            device_key = Device.query(Device.gcm_registration_id == gcm_registration_id).get(keys_only=True)
+            if None is not device_key:
+                return device_key.get()
+
+    @classmethod
+    def get_by_mac_address(cls, mac_address):
+        if mac_address:
+            device_key = Device.query(Device.mac_address == mac_address).get(keys_only=True)
             if None is not device_key:
                 return device_key.get()
 

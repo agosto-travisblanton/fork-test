@@ -20,6 +20,8 @@ class AppConfig(Config):
     CLIENT_ID = None
     PUBLIC_API_SERVER_KEY = None
     API_TOKEN = None
+    UNMANAGED_DEVICE_API_TOKEN = None
+    UNMANAGED_DEVICE_CREATE_TOKEN = None
     CONTENT_MANAGER_API_SERVER_KEY = None
     GCM_TEST_MODE = None
     GOOGLE_CUSTOMER_ID = None
@@ -29,7 +31,6 @@ class AppConfig(Config):
     DEFAULT_AGOSTO_DEVICE_DOMAIN = None
     PLAYER_RESET_COMMAND = None
     PLAYER_VOLUME_COMMAND = None
-    LIMITED_UNMANAGED_DEVICE_REGISTRATION_API_TOKEN = None
 
 
 config = AppConfig.get_config()

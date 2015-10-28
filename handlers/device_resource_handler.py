@@ -5,13 +5,13 @@ from webapp2 import RequestHandler
 
 from google.appengine.ext.deferred import deferred
 from google.appengine.ext import ndb
-from decorators import api_token_required
+from decorators import api_token_required, create_api_token_required
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
 from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address, update_chrome_os_device)
-from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup, UnmanagedDevice
+from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup, UnmanagedDevice, Device
 from content_manager_api import ContentManagerApi
-from strategy import CHROME_OS_DEVICE_STRATEGY
+from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -64,13 +64,19 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     @api_token_required
     def get(self, device_urlsafe_key):
         if self.is_unmanaged_device is True:
-            device = self.validate_and_get(device_urlsafe_key, UnmanagedDevice, abort_on_not_found=True)
+            device = self.validate_and_get(device_urlsafe_key, Device, abort_on_not_found=True)
+            return json_response(self.response, device, strategy=DEVICE_STRATEGY)
         else:
             device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
             deferred.defer(refresh_device, device_urlsafe_key=device_urlsafe_key, _queue='directory-api')
-        json_response(self.response, device, strategy=CHROME_OS_DEVICE_STRATEGY)
+            return json_response(self.response, device, strategy=CHROME_OS_DEVICE_STRATEGY)
 
-    @api_token_required
+    @create_api_token_required
+    def get_pairing_code(self, device_urlsafe_key):
+        device = self.validate_and_get(device_urlsafe_key, Device, abort_on_not_found=True)
+        return json_response(self.response, device, strategy=DEVICE_PAIRING_CODE_STRATEGY)
+
+    @create_api_token_required
     def post(self):
         if self.request.body is not str('') and self.request.body is not None:
             status = 201
@@ -89,12 +95,12 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 self.response.set_status(status, error_message)
                 return
             if self.is_unmanaged_device is True:
-                unmanaged_device = UnmanagedDevice.create(gcm_registration_id, device_mac_address)
-                unmanaged_device_key = unmanaged_device.put()
+                device = Device.create_unmanaged(gcm_registration_id, device_mac_address)
+                device_key = device.put()
                 device_uri = self.request.app.router.build(None,
-                                                           'device',
+                                                           'device-pairing-code',
                                                            None,
-                                                           {'device_urlsafe_key': unmanaged_device_key.urlsafe()})
+                                                           {'device_urlsafe_key': device_key.urlsafe()})
                 self.response.headers['Location'] = device_uri
                 self.response.headers.pop('Content-Type', None)
                 self.response.set_status(status)

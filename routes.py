@@ -76,6 +76,12 @@ application = WSGIApplication(
               name='device',
               methods=['GET', 'PUT', 'DELETE']
               ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/pairing',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='device-pairing-code',
+              handler_method='get_pairing_code',
+              methods=['GET']
+              ),
         Route(r'/api/v1/devices/<device_urlsafe_key>/commands',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
               name='device-commands',

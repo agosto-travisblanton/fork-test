@@ -29,6 +29,13 @@ DISTRIBUTOR_STRATEGY += [
     {'key': lambda o, field_name, context: o.key.urlsafe()},
 ]
 
+DEVICE_PAIRING_CODE_STRATEGY = ModelStrategy(Device)
+DEVICE_PAIRING_CODE_STRATEGY += [
+    {'pairingCode': lambda o, field_name, context: o.key.get().pairing_code},
+    {'gcmRegistrationId': lambda o, field_name, context: o.key.get().gcm_registration_id},
+    {'macAddress': lambda o, field_name, context: o.key.get().mac_address}
+]
+
 CHROME_OS_DEVICE_STRATEGY = ModelStrategy(ChromeOsDevice)
 CHROME_OS_DEVICE_STRATEGY += [
     {'tenantKey': lambda o, field_name, context: o.tenant_key.urlsafe()},
@@ -68,8 +75,8 @@ CHROME_OS_DEVICE_STRATEGY += [
 
 DEVICE_STRATEGY = ModelStrategy(Device)
 DEVICE_STRATEGY += [
-    {'tenantKey': lambda o, field_name, context: o.tenant_key.urlsafe()},
-    {'tenantName': lambda o, field_name, context: o.tenant_key.get().name},
+    {'tenantKey': lambda o, field_name, context: o.tenant_key.urlsafe() if o.tenant_key is not None else None},
+    {'tenantName': lambda o, field_name, context: o.tenant_key.get().name if o.tenant_key is not None else None},
     {'lastSync': lambda o, field_name, context: o.key.get().last_sync},
     {'apiKey': lambda o, field_name, context: o.key.get().api_key},
     {'macAddress': lambda o, field_name, context: o.key.get().mac_address},
@@ -77,11 +84,11 @@ DEVICE_STRATEGY += [
     {'firmwareVersion': lambda o, field_name, context: o.key.get().firmware_version},
     {'bootMode': lambda o, field_name, context: o.key.get().boot_mode},
     {'chromeDeviceDomain': lambda o, field_name, context: ndb.Key(
-        urlsafe=o.tenant_key.get().domain_key.urlsafe()).get().name},
+        urlsafe=o.tenant_key.get().domain_key.urlsafe()).get().name if o.tenant_key is not None else None},
     {'orgUnitPath': lambda o, field_name, context: o.key.get().org_unit_path},
     {'status': lambda o, field_name, context: o.key.get().status},
     {'updated': lambda o, field_name, context: o.key.get().updated},
-    {'tenantCode': lambda o, field_name, context: o.tenant_key.get().tenant_code},
+    {'tenantCode': lambda o, field_name, context: o.tenant_key.get().tenant_code if o.tenant_key is not None else None},
     {'lastEnrollmentTime': lambda o, field_name, context: o.key.get().last_enrollment_time},
     {'ethernetMacAddress': lambda o, field_name, context: o.key.get().ethernet_mac_address},
     {'deviceId': lambda o, field_name, context: o.key.get().device_id},
@@ -94,17 +101,18 @@ DEVICE_STRATEGY += [
     {'notes': lambda o, field_name, context: o.key.get().notes},
     {'serialNumber': lambda o, field_name, context: o.key.get().serial_number},
     {'gcmRegistrationId': lambda o, field_name, context: o.key.get().gcm_registration_id},
-    {'contentServerUrl': lambda o, field_name, context: o.tenant_key.get().content_server_url},
+    {'contentServerUrl': lambda o, field_name,
+                                context: o.tenant_key.get().content_server_url if o.tenant_key is not None else None},
     {'model': lambda o, field_name, context: o.key.get().model},
     {'name': lambda o, field_name, context: o.key.get().name},
-    {'logglyLink': lambda o, field_name, context: o.key.get().loggly_link},
+    {'logglyLink': lambda o, field_name,
+                          context: o.key.get().loggly_link if o.key.get().serial_number is not None else None},
     {'etag': lambda o, field_name, context: o.key.get().etag},
-    {'isManagedDevice': lambda o, field_name, context: o.key.get().is_managed_device},
+    {'isUnmanagedDevice': lambda o, field_name, context: o.key.get().is_unmanaged_device},
     {'pairingCode': lambda o, field_name, context: o.key.get().pairing_code},
     {'panelModel': lambda o, field_name, context: o.key.get().panel_model},
     {'panelInput': lambda o, field_name, context: o.key.get().panel_input}
 ]
-
 
 DOMAIN_FIELDS = [
     'name',
