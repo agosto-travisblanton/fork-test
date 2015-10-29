@@ -11,7 +11,7 @@ from restler.serializers import json_response
 from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address, update_chrome_os_device)
 from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup
 from content_manager_api import ContentManagerApi
-from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY
+from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -24,8 +24,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             query = ChromeOsDevice.query(ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
                                                 ChromeOsDevice.ethernet_mac_address == device_mac_address))
             query_results = query.fetch()
-            if len(query_results) > 0:
+            if len(query_results) is 1:
                 json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+            elif len(query_results) > 1:
+                error_message = "Multiple devices have MAC address {0}".format(device_mac_address)
+                logging.error(error_message)
             else:
                 error_message = "Unable to find Chrome OS device by MAC address: {0}".format(device_mac_address)
                 self.response.set_status(404, error_message)
@@ -63,13 +66,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @requires_api_token
     def get(self, device_urlsafe_key):
-        if self.is_unmanaged_device is True:
-            device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
-            return json_response(self.response, device, strategy=DEVICE_STRATEGY)
-        else:
-            device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
+        device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
+        if self.is_unmanaged_device is False:
             deferred.defer(refresh_device, device_urlsafe_key=device_urlsafe_key, _queue='directory-api')
-            return json_response(self.response, device, strategy=CHROME_OS_DEVICE_STRATEGY)
+        return json_response(self.response, device, strategy=CHROME_OS_DEVICE_STRATEGY)
 
     @requires_unmanaged_registration_token
     def get_pairing_code(self, device_urlsafe_key):
@@ -105,12 +105,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 self.response.headers.pop('Content-Type', None)
                 self.response.set_status(status)
             else:
-                chrome_os_device_exists = ChromeOsDevice.query(
-                    ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
-                           ChromeOsDevice.ethernet_mac_address == device_mac_address)).count() > 0
-                if chrome_os_device_exists:
+                if ChromeOsDevice.mac_address_already_assigned(device_mac_address):
                     status = 400
-                    error_message = 'Cannot create because macAddress has already been assigned to this device.'
+                    error_message = 'Cannot register because macAddress already assigned to managed device.'
                 tenant_code = request_json.get('tenantCode')
                 if tenant_code is None or tenant_code == '':
                     status = 400
@@ -118,7 +115,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 tenant_key = Tenant.query(Tenant.tenant_code == tenant_code, Tenant.active == True).get(keys_only=True)
                 if tenant_key is None:
                     status = 400
-                    error_message = 'Invalid or inactive tenant for device.'
+                    error_message = 'Invalid or inactive tenant for managed device.'
                 if status == 201:
                     device = ChromeOsDevice.create_managed(tenant_key=tenant_key,
                                                    gcm_registration_id=gcm_registration_id,
