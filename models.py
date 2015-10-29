@@ -215,7 +215,8 @@ class Device(ndb.Model):
             gcm_registration_id=gcm_registration_id,
             mac_address=mac_address,
             api_key=str(uuid.uuid4().hex),
-            pairing_code=str(uuid.uuid4().hex),
+            pairing_code='{0}-{1}-{2}-{3}'.format(str(uuid.uuid4().hex)[:4], str(uuid.uuid4().hex)[:4],
+                                   str(uuid.uuid4().hex)[:4], str(uuid.uuid4().hex)[:4]),
             is_unmanaged_device=True
         )
         return device

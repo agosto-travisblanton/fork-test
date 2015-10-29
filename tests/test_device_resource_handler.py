@@ -75,7 +75,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             'Authorization': config.API_TOKEN
         }
         self.unmanaged_device_create_token_authorization_header = {
-            'Authorization': config.UNMANAGED_DEVICE_CREATE_TOKEN
+            'Authorization': config.UNMANAGED_REGISTRATION_TOKEN
+        }
+        self.unmanaged_api_token_authorization_header = {
+            'Authorization': config.UNMANAGED_API_TOKEN
         }
 
         self.empty_header = {}
@@ -263,7 +266,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        None,
                                        {'device_urlsafe_key': self.unmanaged_device_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters,
-                                headers=self.unmanaged_device_create_token_authorization_header)
+                                headers=self.unmanaged_api_token_authorization_header)
         self.assertOK(response)
 
     def test_get_unmanaged_device_by_key_returns_not_found_status_with_a_key_for_a_deleted_device(self):
@@ -274,10 +277,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        {'device_urlsafe_key': self.unmanaged_device_key.urlsafe()})
         self.app.delete('/api/v1/devices/{0}'.format(self.unmanaged_device_key.urlsafe()),
                         json.dumps({}),
-                        headers=self.unmanaged_device_create_token_authorization_header)
+                        headers=self.unmanaged_api_token_authorization_header)
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters,
-                         headers=self.unmanaged_device_create_token_authorization_header)
+                         headers=self.unmanaged_api_token_authorization_header)
         self.assertTrue('404 Not Found' in context.exception.message)
 
     ##################################################################################################################

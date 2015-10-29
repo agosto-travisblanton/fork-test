@@ -5,7 +5,7 @@ from webapp2 import RequestHandler
 
 from google.appengine.ext.deferred import deferred
 from google.appengine.ext import ndb
-from decorators import api_token_required, create_api_token_required
+from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
 from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address, update_chrome_os_device)
@@ -17,7 +17,7 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob
 
 
 class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidatorMixin):
-    @api_token_required
+    @requires_api_token
     def get_list(self):
         device_mac_address = self.request.get('macAddress')
         if device_mac_address:
@@ -38,7 +38,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             query_results = query.fetch(1000)
             json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
 
-    @api_token_required
+    @requires_api_token
     def get_devices_by_tenant(self, tenant_urlsafe_key):
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
         query = ChromeOsDevice.query(ChromeOsDevice.tenant_key == tenant_key)
@@ -47,7 +47,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         result_data = self.fetch_page(query_forward, query_reverse)
         json_response(self.response, result_data, strategy=CHROME_OS_DEVICE_STRATEGY)
 
-    @api_token_required
+    @requires_api_token
     def get_devices_by_distributor(self, distributor_urlsafe_key):
         device_list = []
         distributor = ndb.Key(urlsafe=distributor_urlsafe_key)
@@ -61,7 +61,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 device_list.append(tenant_device)
         json_response(self.response, device_list, strategy=CHROME_OS_DEVICE_STRATEGY)
 
-    @api_token_required
+    @requires_api_token
     def get(self, device_urlsafe_key):
         if self.is_unmanaged_device is True:
             device = self.validate_and_get(device_urlsafe_key, Device, abort_on_not_found=True)
@@ -71,12 +71,12 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             deferred.defer(refresh_device, device_urlsafe_key=device_urlsafe_key, _queue='directory-api')
             return json_response(self.response, device, strategy=CHROME_OS_DEVICE_STRATEGY)
 
-    @create_api_token_required
+    @requires_unmanaged_registration_token
     def get_pairing_code(self, device_urlsafe_key):
         device = self.validate_and_get(device_urlsafe_key, Device, abort_on_not_found=True)
         return json_response(self.response, device, strategy=DEVICE_PAIRING_CODE_STRATEGY)
 
-    @create_api_token_required
+    @requires_registration_token
     def post(self):
         if self.request.body is not str('') and self.request.body is not None:
             status = 201
@@ -146,7 +146,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             logging.info("Problem creating Device. No request body.")
             self.response.set_status(400, 'Did not receive request body.')
 
-    @api_token_required
+    @requires_api_token
     def put(self, device_urlsafe_key):
         status = 204
         message = None
@@ -195,7 +195,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
 
-    @api_token_required
+    @requires_api_token
     def delete(self, device_urlsafe_key):
         status = 204
         message = None

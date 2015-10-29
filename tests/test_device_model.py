@@ -89,6 +89,13 @@ class DeviceModel(BaseTest):
         self.assertIsNotNone(device.pairing_code)
         self.assertTrue(device.is_unmanaged_device)
 
+    def test_create_unmanaged_device_generates_four_part_pairing_code(self):
+        device = Device.create_unmanaged(
+            gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+            mac_address=self.MAC_ADDRESS)
+        code_parts = device.pairing_code.split('-')
+        self.assertLength(4, code_parts)
+
     def test_create_unmanaged_device_sets_is_unmanaged_device_bit_to_true(self):
         device = Device.create_unmanaged(
             gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,

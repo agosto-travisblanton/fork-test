@@ -129,7 +129,7 @@ def _API_TOKEN():
 app_API_TOKEN = _API_TOKEN()
 
 
-def _UNMANAGED_DEVICE_API_TOKEN():
+def _UNMANAGED_API_TOKEN():
     if on_development_server or not on_server:
         return 'A1365B43C51C46588BD4C6D5016C0'
     if on_integration_server:
@@ -139,10 +139,10 @@ def _UNMANAGED_DEVICE_API_TOKEN():
     return None
 
 
-app_UNMANAGED_DEVICE_API_TOKEN = _UNMANAGED_DEVICE_API_TOKEN()
+app_UNMANAGED_API_TOKEN = _UNMANAGED_API_TOKEN()
 
 
-def _UNMANAGED_DEVICE_CREATE_TOKEN():
+def _UNMANAGED_REGISTRATION_TOKEN():
     if on_development_server or not on_server:
         return '43C51C8BD4C6D723A1365B6C34658'
     if on_integration_server:
@@ -152,7 +152,7 @@ def _UNMANAGED_DEVICE_CREATE_TOKEN():
     return None
 
 
-app_UNMANAGED_DEVICE_CREATE_TOKEN = _UNMANAGED_DEVICE_CREATE_TOKEN()
+app_UNMANAGED_REGISTRATION_TOKEN = _UNMANAGED_REGISTRATION_TOKEN()
 
 
 def _CONTENT_MANAGER_API_SERVER_KEY():

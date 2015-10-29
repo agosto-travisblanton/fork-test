@@ -19,7 +19,7 @@ class TestDecorators(BaseTest, WebTest):
         pass
 
     ##################################################################################################################
-    ## ApiTokenRequired
+    ## @requires_api_token on GET
     ##################################################################################################################
 
     def testApiTokenRequired_AuthorizationSuccessful(self):
@@ -31,7 +31,7 @@ class TestDecorators(BaseTest, WebTest):
 
     def testUnmanagedDeviceCreateTokenRequired_AuthorizationSuccessful(self):
         headers = {
-            'Authorization': config.UNMANAGED_DEVICE_CREATE_TOKEN
+            'Authorization': config.UNMANAGED_API_TOKEN
         }
         response = self.app.get('/api/v1/bogus', params={}, headers=headers)
         self.assertOK(response)
@@ -48,4 +48,41 @@ class TestDecorators(BaseTest, WebTest):
         headers = {}
         with self.assertRaises(AppError) as cm:
             self.app.get('/api/v1/bogus', params={}, headers=headers)
+        self.assertTrue('403 Forbidden' in cm.exception.message)
+
+    ##################################################################################################################
+    ## @requires_registration_token on POST
+    ##################################################################################################################
+
+    def testRequiresRegistrationToken_Unmanaged_AuthorizationSuccessful(self):
+        headers = {
+            'Authorization': config.UNMANAGED_REGISTRATION_TOKEN
+        }
+        response = self.app.post('/api/v1/bogus', params={}, headers=headers)
+        self.assertOK(response)
+
+    def testRequiresRegistrationToken_Managed_AuthorizationSuccessful(self):
+        headers = {
+            'Authorization': config.API_TOKEN
+        }
+        response = self.app.post('/api/v1/bogus', params={}, headers=headers)
+        self.assertOK(response)
+
+    ##################################################################################################################
+    ## @requires_unmanaged_registration_token on PUT
+    ##################################################################################################################
+
+    def testRequiresUnmanagedRegistrationTokenOnly_AuthorizationSuccessful(self):
+        headers = {
+            'Authorization': config.UNMANAGED_REGISTRATION_TOKEN
+        }
+        response = self.app.put('/api/v1/bogus', params={}, headers=headers)
+        self.assertOK(response)
+
+    def testRequiresUnmanagedRegistrationTokenOnly_AuthorizationUnsuccessful(self):
+        headers = {
+            'Authorization': 'sdfjahsdkjhfalskjdhfaiusyduifyasdyfaosdyfaiusydfiuasyoduifyas'
+        }
+        with self.assertRaises(AppError) as cm:
+            self.app.put('/api/v1/bogus', params={}, headers=headers)
         self.assertTrue('403 Forbidden' in cm.exception.message)

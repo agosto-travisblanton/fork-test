@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 from webapp2 import RequestHandler
 
 from content_manager_api import ContentManagerApi
-from decorators import api_token_required
+from decorators import requires_api_token
 from models import Tenant, TenantEntityGroup, Domain
 from restler.serializers import json_response
 from strategy import TENANT_STRATEGY
@@ -15,7 +15,7 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 class TenantsHandler(RequestHandler):
 
-    @api_token_required
+    @requires_api_token
     def get(self, tenant_key=None):
         if None == tenant_key:
             distributor_key = self.request.headers.get('X-Provisioning-Distributor')
@@ -29,7 +29,7 @@ class TenantsHandler(RequestHandler):
             result = tenant_key.get()
         json_response(self.response, result, strategy=TENANT_STRATEGY)
 
-    @api_token_required
+    @requires_api_token
     def post(self):
         if self.request.body is not str('') and self.request.body is not None:
             status = 201
@@ -100,7 +100,7 @@ class TenantsHandler(RequestHandler):
             logging.info("Problem creating Domain. No request body.")
             self.response.set_status(400, 'Did not receive request body.')
 
-    @api_token_required
+    @requires_api_token
     def put(self, tenant_key):
         key = ndb.Key(urlsafe=tenant_key)
         tenant = key.get()
@@ -122,7 +122,7 @@ class TenantsHandler(RequestHandler):
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
 
-    @api_token_required
+    @requires_api_token
     def delete(self, tenant_key):
         key = ndb.Key(urlsafe=tenant_key)
         tenant = key.get()
