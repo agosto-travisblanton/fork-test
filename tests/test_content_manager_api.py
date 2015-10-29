@@ -46,7 +46,7 @@ class TestContentManagerApi(BaseTest):
                                     domain_key=self.domain_key,
                                     active=True)
         self.tenant_key = self.tenant.put()
-        self.device = ChromeOsDevice.create(tenant_key=self.tenant_key,
+        self.device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
                                             device_id='f7ds8970dfasd8f70ad987',
                                             gcm_registration_id='fad7f890ad7f8ad0s7fa8s',
                                             mac_address='54271e619346')

@@ -13,7 +13,7 @@ from agar.test import BaseTest, WebTest
 from chrome_os_devices_api import ChromeOsDevicesApi
 from mockito import when, any as any_matcher
 from routes import application
-from models import ChromeOsDevice, Tenant, Distributor, Domain, Device
+from models import ChromeOsDevice, Tenant, Distributor, Domain
 from app_config import config
 from ae_test_data import build
 
@@ -63,14 +63,14 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                             domain_key=self.domain_key,
                                             active=True)
         self.another_tenant_key = self.another_tenant.put()
-        self.unmanaged_device = Device.create_unmanaged(self.GCM_REGISTRATION_ID, self.MAC_ADDRESS,
-                                                        tenant_key=self.tenant_key)
+        self.unmanaged_device = ChromeOsDevice.create_unmanaged(self.GCM_REGISTRATION_ID, self.MAC_ADDRESS)
         self.unmanaged_device_key = self.unmanaged_device.put()
-        self.device_key = build(ChromeOsDevice,
+        self.managed_device = ChromeOsDevice.create_managed(
                                 tenant_key=self.tenant_key,
                                 gcm_registration_id=self.GCM_REGISTRATION_ID,
                                 device_id=self.DEVICE_ID,
-                                mac_address=self.MAC_ADDRESS).key
+                                mac_address=self.MAC_ADDRESS)
+        self.managed_device_key = self.managed_device.put()
         self.valid_authorization_header = {
             'Authorization': config.API_TOKEN
         }
@@ -115,7 +115,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
         response_json = json.loads(response.body)
         self.assertEqual(response_json['macAddress'], self.MAC_ADDRESS)
-        device = self.device_key.get()
+        device = self.managed_device_key.get()
         self.assertEqual(response_json['gcmRegistrationId'], device.gcm_registration_id)
         self.assertEqual(response_json['deviceId'], device.device_id)
 
@@ -175,7 +175,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     ## get ChromeOsDevice
     ##################################################################################################################
     def test_get_device_by_key_no_authorization_header_returns_forbidden(self):
-        uri = build_uri('device', params_dict={'device_urlsafe_key': self.device_key.urlsafe()})
+        uri = build_uri('device', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
         response = self.get(uri, headers=self.empty_header)
         self.assertForbidden(response)
 
@@ -184,9 +184,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         uri = application.router.build(None,
                                        'device',
                                        None,
-                                       {'device_urlsafe_key': self.device_key.urlsafe()})
+                                       {'device_urlsafe_key': self.managed_device_key.urlsafe()})
         when(deferred).defer(any_matcher(refresh_device),
-                             any_matcher(self.device_key.urlsafe())).thenReturn(None)
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
         self.assertOK(response)
 
@@ -195,12 +195,12 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         uri = application.router.build(None,
                                        'device',
                                        None,
-                                       {'device_urlsafe_key': self.device_key.urlsafe()})
-        self.app.delete('/api/v1/devices/{0}'.format(self.device_key.urlsafe()),
+                                       {'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.app.delete('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                         json.dumps({}),
                         headers=self.valid_authorization_header)
         when(deferred).defer(any_matcher(refresh_device),
-                             any_matcher(self.device_key.urlsafe())).thenReturn(None)
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
         self.assertTrue('404 Not Found' in context.exception.message)
@@ -212,7 +212,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        None,
                                        {'device_urlsafe_key': '0000ZXN0YmVkLXRlc3RyFAsSDkNocm9tZU9zRGV2aWNl0000'})
         when(deferred).defer(any_matcher(refresh_device),
-                             any_matcher(self.device_key.urlsafe())).thenReturn(None)
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
         self.assertTrue('400 Bad Request' in context.exception.message)
@@ -222,12 +222,12 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         uri = application.router.build(None,
                                        'device',
                                        None,
-                                       {'device_urlsafe_key': self.device_key.urlsafe()})
+                                       {'device_urlsafe_key': self.managed_device_key.urlsafe()})
         when(deferred).defer(any_matcher(refresh_device),
-                             any_matcher(self.device_key.urlsafe())).thenReturn(None)
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         response = self.app.get(uri, params=request_parameters, headers=self.valid_authorization_header)
         response_json = json.loads(response.body)
-        device = self.device_key.get()
+        device = self.managed_device_key.get()
         tenant = device.tenant_key.get()
         self.assertEqual(response_json['annotatedUser'], device.annotated_user)
         self.assertEqual(response_json['annotatedLocation'], device.annotated_location)
@@ -483,8 +483,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {'gcmRegistrationId': self.GCM_REGISTRATION_ID,
                         'tenantCode': self.TENANT_CODE,
                         'notes': self.DEVICE_NOTES}
-        when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.device_key.get())
-        uri = build_uri('device', params_dict={'device_urlsafe_key': self.device_key.urlsafe()})
+        when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.managed_device_key.get())
+        uri = build_uri('device', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
         response = self.put(uri, params=request_body, headers=self.empty_header)
         self.assertForbidden(response)
 
@@ -494,8 +494,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'notes': self.DEVICE_NOTES
                         }
         when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.device_key.urlsafe())).thenReturn(None)
-        response = self.app.put('/api/v1/devices/{0}'.format(self.device_key.urlsafe()),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        response = self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                                 json.dumps(request_body),
                                 headers=self.valid_authorization_header)
         self.assertEqual('204 No Content', response.status)
@@ -508,11 +508,11 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             'notes': self.DEVICE_NOTES
         }
         when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.device_key.urlsafe())).thenReturn(None)
-        self.app.put('/api/v1/devices/{0}'.format(self.device_key.urlsafe()),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.valid_authorization_header)
-        updated_display = self.device_key.get()
+        updated_display = self.managed_device_key.get()
         self.assertEqual(gcm_registration_id, updated_display.gcm_registration_id)
         self.assertEqual(self.tenant_key, updated_display.tenant_key)
         self.assertEqual(self.DEVICE_NOTES, updated_display.notes)
@@ -524,11 +524,11 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             'tenantCode': new_tenant.tenant_code
         }
         when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.device_key.urlsafe())).thenReturn(None)
-        self.app.put('/api/v1/devices/{0}'.format(self.device_key.urlsafe()),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.valid_authorization_header)
-        updated_display = self.device_key.get()
+        updated_display = self.managed_device_key.get()
         self.assertEqual(self.another_tenant_key, updated_display.tenant_key)
 
     ##################################################################################################################
@@ -536,23 +536,23 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     ##################################################################################################################
 
     def test_delete_no_authorization_header_returns_forbidden(self):
-        uri = build_uri('device', params_dict={'device_urlsafe_key': self.device_key.urlsafe()})
+        uri = build_uri('device', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
         response = self.delete(uri, headers=self.empty_header)
         self.assertForbidden(response)
 
     def test_delete_http_status_no_content(self):
         request_body = {}
-        response = self.app.delete('/api/v1/devices/{0}'.format(self.device_key.urlsafe()),
+        response = self.app.delete('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                                    json.dumps(request_body),
                                    headers=self.valid_authorization_header)
         self.assertEqual('204 No Content', response.status)
 
     def test_delete_removes_device_entity(self):
         request_body = {}
-        self.app.delete('/api/v1/devices/{0}'.format(self.device_key.urlsafe()),
+        self.app.delete('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                         json.dumps(request_body),
                         headers=self.valid_authorization_header)
-        self.assertIsNone(self.device_key.get())
+        self.assertIsNone(self.managed_device_key.get())
 
     def __create_tenant(self, code, name, email):
         tenant = Tenant.create(tenant_code=code,

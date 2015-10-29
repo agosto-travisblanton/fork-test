@@ -50,7 +50,7 @@ class TestChromeOsDeviceModel(BaseTest):
         self.tenant_key = self.tenant.put()
 
     def test_get_by_device_id(self):
-        chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
+        chrome_os_device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
                                                  device_id=self.TESTING_DEVICE_ID,
                                                  gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
                                                  mac_address=self.MAC_ADDRESS)
@@ -63,7 +63,7 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertIsNone(actual)
 
     def test_create(self):
-        chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
+        chrome_os_device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
                                                  device_id=self.TESTING_DEVICE_ID,
                                                  gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
                                                  mac_address=self.MAC_ADDRESS)
@@ -71,7 +71,7 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertIsNotNone(chrome_os_device.api_key)
 
     def test_json_serialization_strategy(self):
-        chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
+        chrome_os_device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
                                                  device_id=self.TESTING_DEVICE_ID,
                                                  gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
                                                  mac_address=self.MAC_ADDRESS)
@@ -92,7 +92,7 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertEqual(str(chrome_os_device.panel_model), json_representation['panelModel'])
 
     def test_json_serialization_strategy_with_optional_serial_number(self):
-        chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
+        chrome_os_device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
                                                  device_id=self.TESTING_DEVICE_ID,
                                                  gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
                                                  mac_address=self.MAC_ADDRESS,
@@ -106,7 +106,7 @@ class TestChromeOsDeviceModel(BaseTest):
                          'https://skykit.loggly.com/search?&terms=tag%3A"{0}"'.format(self.SERIAL_NUMBER))
 
     def test_class_version_is_only_set_by_pre_put_hook_method(self):
-        chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
+        chrome_os_device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
                                                  device_id=self.TESTING_DEVICE_ID,
                                                  gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
                                                  mac_address=self.MAC_ADDRESS,
@@ -116,7 +116,7 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertEqual(chrome_os_device.class_version, self.CURRENT_CLASS_VERSION)
 
     def test_get_tenant_returns_tenant_representation(self):
-        chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
+        chrome_os_device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
                                                  device_id=self.TESTING_DEVICE_ID,
                                                  gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
                                                  mac_address=self.MAC_ADDRESS)

@@ -9,7 +9,7 @@ from decorators import requires_api_token, requires_registration_token, requires
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
 from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address, update_chrome_os_device)
-from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup, UnmanagedDevice, Device
+from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup
 from content_manager_api import ContentManagerApi
 from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY
 
@@ -64,7 +64,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     @requires_api_token
     def get(self, device_urlsafe_key):
         if self.is_unmanaged_device is True:
-            device = self.validate_and_get(device_urlsafe_key, Device, abort_on_not_found=True)
+            device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
             return json_response(self.response, device, strategy=DEVICE_STRATEGY)
         else:
             device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
@@ -73,7 +73,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @requires_unmanaged_registration_token
     def get_pairing_code(self, device_urlsafe_key):
-        device = self.validate_and_get(device_urlsafe_key, Device, abort_on_not_found=True)
+        device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
         return json_response(self.response, device, strategy=DEVICE_PAIRING_CODE_STRATEGY)
 
     @requires_registration_token
@@ -95,7 +95,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 self.response.set_status(status, error_message)
                 return
             if self.is_unmanaged_device is True:
-                device = Device.create_unmanaged(gcm_registration_id, device_mac_address)
+                device = ChromeOsDevice.create_unmanaged(gcm_registration_id, device_mac_address)
                 device_key = device.put()
                 device_uri = self.request.app.router.build(None,
                                                            'device-pairing-code',
@@ -120,7 +120,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     status = 400
                     error_message = 'Invalid or inactive tenant for device.'
                 if status == 201:
-                    device = ChromeOsDevice.create(tenant_key=tenant_key,
+                    device = ChromeOsDevice.create_managed(tenant_key=tenant_key,
                                                    gcm_registration_id=gcm_registration_id,
                                                    mac_address=device_mac_address)
                     key = device.put()
