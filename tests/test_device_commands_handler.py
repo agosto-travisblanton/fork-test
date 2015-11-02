@@ -7,7 +7,7 @@ from agar.test import BaseTest, WebTest
 from app_config import config
 from models import ChromeOsDevice, Tenant, Distributor, Domain
 from routes import application
-import device_commands_processor
+import device_message_processor
 from mockito import when, any as any_matcher
 from webtest import AppError
 
@@ -65,7 +65,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
 
     def test_post_intent_returns_ok_status(self):
         request_body = {'intent': self.some_intent}
-        when(device_commands_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
+        when(device_message_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
         response = self.app.post(self.post_uri, json.dumps(request_body), headers=self.valid_authorization_header)
         self.assertOK(response)
 
@@ -110,8 +110,8 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
     ##################################################################################################################
 
     def test_post_device_reset_returns_ok_status(self):
-        when(device_commands_processor).change_intent(self.chrome_os_device.gcm_registration_id,
-                                                      config.PLAYER_RESET_COMMAND).thenReturn(None)
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_RESET_COMMAND).thenReturn(None)
         uri = application.router.build(None,
                                        'device-reset-command',
                                        None,
@@ -121,8 +121,8 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertOK(response)
 
     def test_post_device_reset_with_bogus_device_key_returns_not_found_status(self):
-        when(device_commands_processor).change_intent(self.chrome_os_device.gcm_registration_id,
-                                                      config.PLAYER_RESET_COMMAND).thenReturn(None)
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_RESET_COMMAND).thenReturn(None)
         bogus_key = '0AXC19Z0DE'
         uri = application.router.build(None,
                                        'device-reset-command',
@@ -139,7 +139,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
     ##################################################################################################################
 
     def test_post_device_volume_returns_ok_status(self):
-        when(device_commands_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
+        when(device_message_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
         uri = application.router.build(None,
                                        'device-volume-command',
                                        None,
@@ -152,7 +152,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertOK(response)
 
     def test_post_device_volume_returns_bad_request_status_with_below_range_volume(self):
-        when(device_commands_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
+        when(device_message_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
         uri = application.router.build(None,
                                        'device-volume-command',
                                        None,
@@ -163,7 +163,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertTrue('400 DeviceCommandsHandler: Invalid volume.' in context.exception.message)
 
     def test_post_device_volume_returns_bad_request_status_with_above_range_volume(self):
-        when(device_commands_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
+        when(device_message_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
         uri = application.router.build(None,
                                        'device-volume-command',
                                        None,
@@ -174,7 +174,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertTrue('400 DeviceCommandsHandler: Invalid volume.' in context.exception.message)
 
     def test_post_device_volume_returns_bad_request_status_with_volume_none(self):
-        when(device_commands_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
+        when(device_message_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
         uri = application.router.build(None,
                                        'device-volume-command',
                                        None,
@@ -185,7 +185,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertTrue('400 DeviceCommandsHandler: Invalid volume.' in context.exception.message)
 
     def test_post_device_volume_with_bogus_device_key_returns_not_found_status(self):
-        when(device_commands_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
+        when(device_message_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
         bogus_key = '0AXC19Z0DE'
         uri = application.router.build(None,
                                        'device-volume-command',
@@ -202,7 +202,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
     ##################################################################################################################
 
     def test_post_device_custom_command_returns_ok_status(self):
-        when(device_commands_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
+        when(device_message_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
         uri = application.router.build(None,
                                        'device-custom-command',
                                        None,
@@ -212,7 +212,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertOK(response)
 
     def test_post_device_volume_returns_bad_request_status_with_command_none(self):
-        when(device_commands_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
+        when(device_message_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
         uri = application.router.build(None,
                                        'device-custom-command',
                                        None,
@@ -223,7 +223,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertTrue('400 DeviceCommandsHandler: Invalid command.' in context.exception.message)
 
     def test_post_device_custom_command_with_bogus_device_key_returns_not_found_status(self):
-        when(device_commands_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
+        when(device_message_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
         bogus_key = '0AXC19Z0DE'
         uri = application.router.build(None,
                                        'device-custom-command',
