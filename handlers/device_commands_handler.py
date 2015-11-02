@@ -6,8 +6,7 @@ from webapp2 import RequestHandler
 from app_config import config
 
 from decorators import requires_api_token
-from device_commands_processor import (change_intent)
-from models import ChromeOsDevice
+from device_message_processor import (change_intent)
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>. Bob MacNeal <bob.macneal@agosto.com>'
 
