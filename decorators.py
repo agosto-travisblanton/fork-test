@@ -1,6 +1,7 @@
 import logging
 
 from google.appengine.ext import ndb
+
 from app_config import config
 from restler.serializers import json_response
 
@@ -98,24 +99,17 @@ def log_memory(function):
 
 
 def requires_api_token(handler_method):
-
     def authorize(self, *args, **kwargs):
         self.is_unmanaged_device = False
         api_token = self.request.headers.get('Authorization')
-        if api_token is None:
-            logging.error('No API token supplied in the HTTP request.')
+        self.is_unmanaged_device = api_token == config.UNMANAGED_API_TOKEN
+        if _token_missing(api_token):
             json_response(self.response, {'error': 'No API token supplied in the HTTP request.'}, status_code=403)
             return
-        else:
-            valid_api_token = api_token == config.API_TOKEN
-            self.is_unmanaged_device = api_token == config.UNMANAGED_API_TOKEN
-            if not valid_api_token and not self.is_unmanaged_device:
-                logging.error('HTTP request API token is invalid.')
-                json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=403)
-                return
-
+        if _token_invalid(api_token=api_token, for_unmanaged_registration_token=False, for_registration_token=False):
+            json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=403)
+            return
         handler_method(self, *args, **kwargs)
-
     return authorize
 
 
@@ -123,20 +117,14 @@ def requires_registration_token(handler_method):
     def authorize(self, *args, **kwargs):
         self.is_unmanaged_device = False
         api_token = self.request.headers.get('Authorization')
-        if api_token is None:
-            logging.error('No API token supplied in the HTTP request.')
+        self.is_unmanaged_device = api_token == config.UNMANAGED_REGISTRATION_TOKEN
+        if _token_missing(api_token):
             json_response(self.response, {'error': 'No API token supplied in the HTTP request.'}, status_code=403)
             return
-        else:
-            valid_api_token = api_token == config.API_TOKEN
-            self.is_unmanaged_device = api_token == config.UNMANAGED_REGISTRATION_TOKEN
-            if not valid_api_token and not self.is_unmanaged_device:
-                logging.error('HTTP request API token is invalid.')
-                json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=403)
-                return
-
+        if _token_invalid(api_token=api_token, for_unmanaged_registration_token=False, for_registration_token=True):
+            json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=403)
+            return
         handler_method(self, *args, **kwargs)
-
     return authorize
 
 
@@ -144,17 +132,39 @@ def requires_unmanaged_registration_token(handler_method):
     def authorize(self, *args, **kwargs):
         self.is_unmanaged_device = True
         api_token = self.request.headers.get('Authorization')
-        if api_token is None:
-            logging.error('No API token supplied in the HTTP request for unmanaged registration.')
+        if _token_missing(api_token):
             json_response(self.response, {'error': 'No API token supplied in the HTTP request.'}, status_code=403)
             return
-        else:
-            valid_api_token = api_token == config.UNMANAGED_REGISTRATION_TOKEN
-            if not valid_api_token:
-                logging.error('HTTP request API token is invalid for unmanaged registration.')
-                json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=403)
-                return
-
+        if _token_invalid(api_token=api_token, for_unmanaged_registration_token=True, for_registration_token=False):
+            json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=403)
+            return
         handler_method(self, *args, **kwargs)
-
     return authorize
+
+
+def _token_missing(api_token):
+    if api_token is None:
+        logging.error('No API token supplied in the HTTP request.')
+        return True
+    return False
+
+
+def _token_invalid(api_token, for_unmanaged_registration_token=False, for_registration_token=False):
+    if for_unmanaged_registration_token is True:
+        valid_api_token = api_token == config.UNMANAGED_REGISTRATION_TOKEN
+        if not valid_api_token:
+            logging.error('HTTP request API token is invalid for unmanaged registration.')
+            return True
+    elif for_registration_token is True:
+        valid_api_token = api_token == config.API_TOKEN
+        unmanaged_registration_token = api_token == config.UNMANAGED_REGISTRATION_TOKEN
+        if not valid_api_token and not unmanaged_registration_token:
+            logging.error('HTTP request API token is invalid for registration.')
+            return True
+    else:
+        valid_api_token = api_token == config.API_TOKEN
+        unmanaged_api_token = api_token == config.UNMANAGED_API_TOKEN
+        if not valid_api_token and not unmanaged_api_token:
+            logging.error('HTTP request API token is invalid.')
+            return True
+    return False
