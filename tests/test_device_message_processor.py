@@ -11,11 +11,13 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 class TestDeviceMessageProcessor(BaseTest):
+    TEST_GCM_REGISTRATION_ID = '8d70a8d78a6dfa6df76dfasd'
+
     def setUp(self):
         super(TestDeviceMessageProcessor, self).setUp()
 
     def test_change_intent_invokes_google_cloud_messaging_notify_method(self):
-        gcm_registration_id = 'd23784972038845ab3963412'
+        gcm_registration_id = self.TEST_GCM_REGISTRATION_ID
         registration_ids = [gcm_registration_id]
         payload = {'https://www.content-manager/something'}
         data_dictionary = {'intent': payload}
@@ -23,7 +25,7 @@ class TestDeviceMessageProcessor(BaseTest):
         change_intent(gcm_registration_id, payload)
 
     def test_send_unmanaged_device_info_invokes_google_cloud_messaging_notify_method(self):
-        gcm_registration_id = 'd23784972038845ab3963412'
+        gcm_registration_id = self.TEST_GCM_REGISTRATION_ID
         registration_ids = [gcm_registration_id]
         device_urlsafe_key = 'ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgIDrop4KDA'
         data_dictionary = dict(deviceKey=device_urlsafe_key, apiToken=config.UNMANAGED_API_TOKEN)
