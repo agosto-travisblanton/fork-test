@@ -40,11 +40,11 @@ class TestTenantModel(BaseTest):
                                     active=True)
         self.tenant_key = self.tenant.put()
 
-        self.device_1 = ChromeOsDevice.create(tenant_key=self.tenant_key,
+        self.device_1 = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
                                               gcm_registration_id='APA91bHyMJRcN7mj7b0aXGWE7Ae',
                                               mac_address='54271ee81302')
         self.device_1_key = self.device_1.put()
-        self.device_2 = ChromeOsDevice.create(tenant_key=self.tenant_key,
+        self.device_2 = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
                                               gcm_registration_id='c098d70a8d78a6dfa6df76dfas7',
                                               mac_address='48d2247f2132')
         self.device_2_key = self.device_2.put()

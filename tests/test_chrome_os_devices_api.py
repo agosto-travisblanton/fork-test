@@ -39,7 +39,7 @@ class TestChromeOsDevicesApi(BaseTest):
                                     active=True)
         self.tenant_key = self.tenant.put()
         self.mac_address = '54271e4af1e7'
-        self.device = ChromeOsDevice.create(tenant_key=self.tenant_key,
+        self.device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
                                             gcm_registration_id='8d70a8d78a6dfa6df76dfasd',
                                             mac_address=self.mac_address)
         self.device_key = self.device.put()

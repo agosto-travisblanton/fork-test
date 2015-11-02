@@ -44,7 +44,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
                                     domain_key=self.domain_key,
                                     active=True)
         self.tenant_key = self.tenant.put()
-        self.chrome_os_device = ChromeOsDevice.create(tenant_key=self.tenant_key,
+        self.chrome_os_device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
                                                       device_id=self.DEVICE_ID,
                                                       gcm_registration_id=self.GCM_REGISTRATION_ID,
                                                       mac_address=self.MAC_ADDRESS)

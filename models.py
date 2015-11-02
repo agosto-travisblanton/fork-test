@@ -169,50 +169,8 @@ class Tenant(ndb.Model):
 
 
 @ae_ndb_serializer
-class UnmanagedDevice(ndb.Model):
-    created = ndb.DateTimeProperty(auto_now_add=True)
-    updated = ndb.DateTimeProperty(auto_now=True)
-    device_id = ndb.StringProperty(required=False, indexed=True)
-    gcm_registration_id = ndb.StringProperty(required=True, indexed=True)
-    mac_address = ndb.StringProperty(required=True, indexed=True)
-    api_key = ndb.StringProperty(required=True, indexed=True)
-    serial_number = ndb.StringProperty(required=False, indexed=True)
-    pairing_code = ndb.StringProperty(required=True, indexed=True)
-    tenant_key = ndb.KeyProperty(required=False, indexed=True)
-    class_version = ndb.IntegerProperty()
-
-    @classmethod
-    def create(cls, gcm_registration_id, mac_address):
-        unmanaged_device = cls(
-            gcm_registration_id=gcm_registration_id,
-            mac_address=mac_address,
-            api_key=str(uuid.uuid4().hex),
-            pairing_code=str(uuid.uuid4().hex))
-        return unmanaged_device
-
-    @classmethod
-    def get_by_gcm_registration_id(cls, gcm_registration_id):
-        if gcm_registration_id:
-            device_key = UnmanagedDevice.query(UnmanagedDevice.gcm_registration_id == gcm_registration_id).get(
-                keys_only=True)
-            if None is not device_key:
-                return device_key.get()
-
-    @classmethod
-    def get_by_mac_address(cls, mac_address):
-        if mac_address:
-            device_key = UnmanagedDevice.query(UnmanagedDevice.mac_address == mac_address).get(
-                keys_only=True)
-            if None is not device_key:
-                return device_key.get()
-
-    def _pre_put_hook(self):
-        self.class_version = 1
-
-
-@ae_ndb_serializer
 class ChromeOsDevice(ndb.Model):
-    tenant_key = ndb.KeyProperty(required=True, indexed=True)
+    tenant_key = ndb.KeyProperty(required=False, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     device_id = ndb.StringProperty(required=False, indexed=True)
@@ -238,6 +196,8 @@ class ChromeOsDevice(ndb.Model):
     name = ndb.ComputedProperty(lambda self: '{0} {1}'.format(self.serial_number, self.model))
     loggly_link = ndb.ComputedProperty(lambda self: 'https://skykit.loggly.com/search?&terms=tag%3A"{0}"'.format(
         self.serial_number))
+    is_unmanaged_device = ndb.BooleanProperty(default=False, required=True, indexed=True)
+    pairing_code = ndb.StringProperty(required=False, indexed=True)
     panel_model = ndb.StringProperty(required=False, indexed=True)
     panel_input = ndb.StringProperty(required=False, indexed=True)
     class_version = ndb.IntegerProperty()
@@ -253,19 +213,40 @@ class ChromeOsDevice(ndb.Model):
                 return chrome_os_device_key.get()
 
     @classmethod
-    def create(cls, tenant_key, gcm_registration_id, mac_address, device_id=None, serial_number=None, model=None):
-        chrome_os_device = cls(
+    def create_managed(cls, tenant_key, gcm_registration_id, mac_address, device_id=None, serial_number=None,
+                       model=None):
+        device = cls(
             device_id=device_id,
             tenant_key=tenant_key,
             gcm_registration_id=gcm_registration_id,
             mac_address=mac_address,
             api_key=str(uuid.uuid4().hex),
             serial_number=serial_number,
-            model=model)
-        return chrome_os_device
+            model=model,
+            is_unmanaged_device=False)
+        return device
+
+    @classmethod
+    def create_unmanaged(cls, gcm_registration_id, mac_address):
+        device = cls(
+            gcm_registration_id=gcm_registration_id,
+            mac_address=mac_address,
+            api_key=str(uuid.uuid4().hex),
+            pairing_code='{0}-{1}-{2}-{3}'.format(str(uuid.uuid4().hex)[:4], str(uuid.uuid4().hex)[:4],
+                                                  str(uuid.uuid4().hex)[:4], str(uuid.uuid4().hex)[:4]),
+            is_unmanaged_device=True
+        )
+        return device
+
+    @classmethod
+    def mac_address_already_assigned(cls, device_mac_address):
+        mac_address_assigned_to_device = ChromeOsDevice.query(
+            ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
+                   ChromeOsDevice.ethernet_mac_address == device_mac_address)).count() > 0
+        return mac_address_assigned_to_device
 
     def _pre_put_hook(self):
-        self.class_version = 2
+        self.class_version = 3
 
 
 @ae_ndb_serializer
