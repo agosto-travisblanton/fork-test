@@ -19,6 +19,7 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob
 class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidatorMixin):
     @requires_api_token
     def get_list(self):
+        pairing_code = self.request.get('pairingCode')
         device_mac_address = self.request.get('macAddress')
         if device_mac_address:
             query = ChromeOsDevice.query(ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
@@ -27,10 +28,23 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             if len(query_results) is 1:
                 json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
             elif len(query_results) > 1:
+                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
                 error_message = "Multiple devices have MAC address {0}".format(device_mac_address)
                 logging.error(error_message)
             else:
                 error_message = "Unable to find Chrome OS device by MAC address: {0}".format(device_mac_address)
+                self.response.set_status(404, error_message)
+        elif pairing_code:
+            query = ChromeOsDevice.query(ChromeOsDevice.pairing_code == pairing_code)
+            query_results = query.fetch()
+            if len(query_results) is 1:
+                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+            elif len(query_results) > 1:
+                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+                error_message = "Multiple devices have pairing code {0}".format(pairing_code)
+                logging.error(error_message)
+            else:
+                error_message = "Unable to find device by pairing code: {0}".format(pairing_code)
                 self.response.set_status(404, error_message)
         else:
             query = ChromeOsDevice.query().order(ChromeOsDevice.created)
