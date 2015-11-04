@@ -6,9 +6,9 @@ HOST: https://skykit-display-device-int.appspot.com
 ## Group Devices
 
 ### GET /api/v1/devices
-Retrieve all *managed* devices from Skykit Provisioning
+Retrieve all *managed* and *unmanaged* devices from Skykit Provisioning
 
-+ Request (application/json)
++ Request
 
     + Headers
 
@@ -17,38 +17,84 @@ Retrieve all *managed* devices from Skykit Provisioning
 
 
 
-+ Response 200 (application/json)
-
-    + Headers
-
++ Response
 
     + Body
 
             [
-				{
-					"status": "ACTIVE", 
-					"lastSync": "2015-06-22T18:31:42.678Z", 
-					"kind": "admin#directory#chromeosdevice", 
-					"ethernetMacAddress": "3863bb98f675", 
-					"macAddress": "38b1db95806d", 
-					"orgUnitPath": "/Agosto/Beta/Fairchild Semi", 
-					"serialNumber": "5CD45183S6", 
-					"annotatedUser": "fairchild@skykit.com", 
-					"bootMode": "Verified", 
-					"etag": "\"MO4FtId2-yiZq_-3TpU3AZTf2Ak/q2J1QVycAwick78q5218-w2DMgw\"", 
-					"deviceId": "e80a9161-4367-4189-be90-450e5e29501b", 
-					"lastEnrollmentTime": "2015-05-07T21:15:17.285Z", 
-					"platformVersion": "6812.88.0 (Official Build) stable-channel zako", 
-					"model": "HP Chromebox CB1-(000-099) / HP Chromebox G1", 
-					"osVersion": "42.0.2311.153", 
-					"firmwareVersion": ""
-				},
+				{"kind": null, 
+				"model": null, 
+				"lastSync": null, 
+				"tenantName": null, 
+				"notes": null, 
+				"tenantCode": null, 
+				"name": "None None", 
+				"lastEnrollmentTime": null, 
+				"firmwareVersion": null, 
+				"created": "2015-11-03 18:19:20", 
+				"chromeDeviceDomain": null, 
+				"isUnmanagedDevice": true, 
+				"annotatedUser": null, 
+				"deviceId": null, 
+				"etag": null, 
+				"key": "ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHIbCxIOQ2hyb21lT3NEZXZpY2UYgICAgICAwAoM", 
+				"orgUnitPath": null, 
+				"contentServerUrl": null, 
+				"gcmRegistrationId": "cf70a8d78a6dfa6df76df049", 
+				"serialNumber": null, 
+				"bootMode": null, 
+				"panelInput": null, 
+				"logglyLink": null, 
+				"tenantKey": null, 
+				"pairingCode": "7eb8-50d2-1c04-dc36", 
+				"status": null, 
+				"macAddress": "38cf5e8f8bdd", 
+				"platformVersion": null, 
+				"updated": "2015-11-03 18:19:20", 
+				"annotatedLocation": null, 
+				"osVersion": null, 
+				"panelModel": null, 
+				"ethernetMacAddress": null, 
+				"apiKey": "a0f518aebfd04a7196df7a6c8b2aa29c"},
+				 
+				{"kind": null, 
+				"model": null, 
+				"lastSync": null, 
+				"tenantName": "Acme, Inc.", 
+				"notes": null, 
+				"tenantCode": "acme_inc", 
+				"name": "None None", 
+				"lastEnrollmentTime": null, 
+				"firmwareVersion": null, 
+				"created": "2015-11-03 18:19:31", 
+				"chromeDeviceDomain": "local.agosto.com", 
+				"isUnmanagedDevice": false, 
+				"annotatedUser": null, 
+				"deviceId": null, 
+				"etag": null, 
+				"key": "ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHIbCxIOQ2hyb21lT3NEZXZpY2UYgICAgICAwAkM", 
+				"orgUnitPath": null, 
+				"contentServerUrl": "https://skykit-contentmanager-int.appspot.com/content", 
+				"gcmRegistrationId": "cf70a8d78a6dfa6df76df049", 
+				"serialNumber": null, 
+				"bootMode": null, 
+				"panelInput": null, 
+				"logglyLink": null, 
+				"tenantKey": "ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFudEVudGl0eUdyb3VwDAsSBlRlbmFudBiAgICAgIDACAw", 
+				"pairingCode": null, 
+				"status": null, 
+				"macAddress": "18cf5e8f8bca", 
+				"platformVersion": null, 
+				"updated": "2015-11-03 18:19:31", 
+				"annotatedLocation": null, 
+				"osVersion": null, 
+				"panelModel": null, 
+				"ethernetMacAddress": null, 
+				"apiKey": "8fdcb1bf2bd548018ce0f598663149bc"},
 				... 
 			]
 
-+ Response 403 (application/json)
-
-    + Headers
++ Response 403
 
     + Body
 
@@ -61,11 +107,10 @@ Retrieve a specific *unmanaged* Skykit device/display by pairing code.
 
 + Parameters
 
-    + pairing_code: `7eb8-50d2-1c04-dc36` (required, string) - The code displayed by player following unmanaged device registration.
+    + pairing_code: `7eb8-50d2-1c04-dc36` (required, string) - Code displayed by the player following an unmanaged device registration.
 
 
-
-+ Request
++ Request (application/json)
 
     + Headers
 
@@ -75,11 +120,6 @@ Retrieve a specific *unmanaged* Skykit device/display by pairing code.
 
 
 + Response 200
-
-    + Headers
-
-            content-type: application/json
-            cache-control: no-cache
 
     + Body
 
@@ -97,28 +137,18 @@ Retrieve a specific *unmanaged* Skykit device/display by pairing code.
 
 + Response 403
 
-    + Headers
-
-            content-type: text/html; charset=utf-8
-            cache-control: no-cache
-
-    + Body
+    + Body 
 
             {
-                "error": "403 Forbidden"
+                "403 Forbidden"
             }
 
 + Response 404
 
-    + Headers
-
-            content-type: text/html; charset=utf-8
-            cache-control: no-cache
-
     + Body
 
             {
-                "error": "404 Not Found"
+                "404 Not Found"
             }
 
 
@@ -140,11 +170,10 @@ Retrieve a specific Skykit device/display by MAC address.
 
 
 
-+ Response 200
++ Response 200 ( application/json)
 
     + Headers
 
-            content-type: application/json
             cache-control: no-cache
 
     + Body
@@ -179,7 +208,7 @@ Retrieve a specific Skykit device/display by MAC address.
     + Body
 
             {
-                "error": "403 Forbidden"
+                "403 Forbidden"
             }
 
 + Response 404
@@ -192,57 +221,65 @@ Retrieve a specific Skykit device/display by MAC address.
     + Body
 
             {
-                "error": "404 Not Found"
+                "404 Not Found"
             }
 
 
 
-### GET /api/v1/devices/{urlsafe_key}
+### GET /api/v1/devices/{urlsafe_key}  -- *managed device*
 
 + Parameters
 
-    + urlsafe_key: `ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgID4woQKDA` (required, string) - The device's entity key.
+    + urlsafe_key: `ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgID4woQKDA` (required, string) - The managed device's entity key.
 
-+ Request (application/json)
++ Request (by key)
 
     + Headers
 
             Accept: application/json
             Authorization: 6C346588BD4C6D722A1165B43C51C
 
-+ Response 200 (application/json)
-
-    + Headers
-
++ Response 200 ( by key)
 
     + Body
 
-            {
-				"status": "ACTIVE", 
-				"lastSync": "2015-06-22T18:31:42.678Z", 
-				"kind": "admin#directory#chromeosdevice", 
-				"ethernetMacAddress": "3863bb98f675", 
-				"tenantCode": "some_tenant 3", 
-				"macAddress": "38b1db95806d", 
-				"orgUnitPath": "/Agosto/Beta/Fairchild Semi", 
-				"serialNumber": "5CD45183S6", 
-				"updated": "2015-06-22 21:01:17", 
-				"gcmRegistrationId": "blah blah 3", 
-				"created": "2015-06-22 21:01:17", 
-				"annotatedUser": "fairchild@skykit.com", 
-				"bootMode": "Verified", 
-				"etag": "\"MO4FtId2-yiZq_-3TpU3AZTf2Ak/q2J1QVycAwick78q5218-w2DMgw\"", 
-				"deviceId": "e80a9161-4367-4189-be90-450e5e29501b", 
-				"lastEnrollmentTime": "2015-05-07T21:15:17.285Z", 
-				"platformVersion": "6812.88.0 (Official Build) stable-channel zako", 
-				"model": "HP Chromebox CB1-(000-099) / HP Chromebox G1", 
-				"osVersion": "42.0.2311.153", 
-				"firmwareVersion": ""
-			}
+            {"annotatedLocation": null, 
+            "deviceId": null, 
+            "etag": null, 
+            "apiKey": "8fdcb1bf2bd548018ce0f598663149bc", 
+            "status": null, 
+            "gcmRegistrationId": "cf70a8d78a6dfa6df76df049", 
+            "tenantCode": "acme_inc", 
+            "key": "ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHIbCxIOQ2hyb21lT3NEZXZpY2UYgICAgICAwAkM", 
+            "pairingCode": null, 
+            "kind": null, 
+            "panelModel": null, 
+            "isUnmanagedDevice": false, 
+            "lastEnrollmentTime": null, 
+            "logglyLink": null, 
+            "osVersion": null, 
+            "firmwareVersion": null, 
+            "panelInput": null, 
+            "macAddress": "18cf5e8f8bca", 
+            "updated": "2015-11-03 18:19:31", 
+            "name": "None None", 
+            "model": null, 
+            "tenantName": "Acme, Inc.", 
+            "bootMode": null, 
+            "tenantKey": "ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFudEVudGl0eUdyb3VwDAsSBlRlbmFudBiAgICAgIDACAw", 
+            "annotatedUser": null, 
+            "orgUnitPath": null, 
+            "platformVersion": null, 
+            "lastSync": null, 
+            "created": "2015-11-03 18:19:31", 
+            "serialNumber": null, 
+            "chromeDeviceDomain": "local.agosto.com", 
+            "notes": null, 
+            "ethernetMacAddress": null, 
+            "contentServerUrl": "https://skykit-contentmanager-int.appspot.com/content"
+            }
 			
-+ Response 403 (application/json)
-
-    + Headers
++ Response 403 (by key)
 
     + Body
 
