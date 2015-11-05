@@ -666,6 +666,20 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertNotEqual(self.tenant_key, updated_display.tenant_key)
         self.assertEqual(self.another_tenant_key, updated_display.tenant_key)
 
+    def test_put_adds_tenant_code_for_unmanaged_device(self):
+        device = ChromeOsDevice.create_unmanaged(gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                                 mac_address=self.MAC_ADDRESS)
+        key = device.put()
+        request_body = {
+            'tenantCode': self.TENANT_CODE
+        }
+        self.app.put('/api/v1/devices/{0}'.format(key.urlsafe()),
+                     json.dumps(request_body),
+                     headers=self.api_token_authorization_header)
+        updated_display = key.get()
+        self.assertNotEqual(self.tenant_key, updated_display.tenant_key)
+
+
     ##################################################################################################################
     ## delete
     ##################################################################################################################
