@@ -8,6 +8,7 @@ from webapp2 import RequestHandler
 from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address, update_chrome_os_device)
 from content_manager_api import ContentManagerApi
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
+from device_message_processor import post_unmanaged_device_info
 from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
@@ -194,7 +195,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 if tenant and tenant.key != device.tenant_key:
                     device.tenant_key = tenant.key
                     if device.is_unmanaged_device:
-                        logging.info(' PUT add the tenant to device.')
+                        logging.info(' PUT add the tenant to unmanaged device.')
+                        post_unmanaged_device_info(gcm_registration_id=device.gcm_registration_id,
+                                                   device_urlsafe_key=device.key.urlsafe())
                     else:
                         logging.info(' PUT update tenant on device.')
                         device.put()

@@ -1,3 +1,4 @@
+import device_message_processor
 from env_setup import setup_test_paths
 from utils.web_util import build_uri
 from webtest import AppError
@@ -675,6 +676,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {
             'tenantCode': self.TENANT_CODE
         }
+        when(device_message_processor).post_unmanaged_device_info(any_matcher(self.GCM_REGISTRATION_ID),
+                                                                  any_matcher(key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
@@ -690,6 +693,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {
             'tenantCode': self.TENANT_CODE
         }
+        when(device_message_processor).post_unmanaged_device_info(any_matcher(self.GCM_REGISTRATION_ID),
+                                                                  any_matcher(key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
