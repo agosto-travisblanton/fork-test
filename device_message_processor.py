@@ -21,17 +21,6 @@ def change_intent(gcm_registration_id, payload):
         logging.exception(e)
 
 
-def send_unmanaged_device_info(gcm_registration_id, device_urlsafe_key):
-    registration_ids = [gcm_registration_id]
-    data_dictionary = dict(deviceKey=device_urlsafe_key, apiToken=config.UNMANAGED_API_TOKEN)
-    google_cloud_messaging = GoogleCloudMessaging()
-    test_mode = config.GCM_TEST_MODE
-    try:
-        google_cloud_messaging.notify(registration_ids, data_dictionary, test_mode=test_mode)
-        logging.info(
-            'send_unmanaged_device_info posted {0} to GCM with gcm_registration_id = {1} and test_mode = {2}.'.format(
-                str(data_dictionary),
-                gcm_registration_id,
-                test_mode))
-    except Exception, e:
-        logging.exception(e)
+def post_unmanaged_device_info(gcm_registration_id, device_urlsafe_key):
+    payload = "skykit.com/skdchromeapp/unmanaged/{0}/{1}".format(device_urlsafe_key, config.UNMANAGED_API_TOKEN)
+    change_intent(gcm_registration_id=gcm_registration_id, payload=payload)
