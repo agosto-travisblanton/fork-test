@@ -1,16 +1,16 @@
 import json
 import logging
 
+from google.appengine.ext import ndb
+from google.appengine.ext.deferred import deferred
 from webapp2 import RequestHandler
 
-from google.appengine.ext.deferred import deferred
-from google.appengine.ext import ndb
+from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address, update_chrome_os_device)
+from content_manager_api import ContentManagerApi
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
+from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
-from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address, update_chrome_os_device)
-from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup
-from content_manager_api import ContentManagerApi
 from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
@@ -192,17 +192,21 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             if tenant_code:
                 tenant = Tenant.find_by_tenant_code(tenant_code)
                 if tenant and tenant.key != device.tenant_key:
-                    logging.info('  PUT updating the tenant.')
                     device.tenant_key = tenant.key
-                    device.put()
-                    deferred.defer(ContentManagerApi().update_device,
-                                   device_urlsafe_key=device.key.urlsafe(),
-                                   _queue='content-server',
-                                   _countdown=5)
+                    if device.is_unmanaged_device:
+                        logging.info(' PUT add the tenant to device.')
+                    else:
+                        logging.info(' PUT update tenant on device.')
+                        device.put()
+                        deferred.defer(ContentManagerApi().update_device,
+                                       device_urlsafe_key=device.key.urlsafe(),
+                                       _queue='content-server',
+                                       _countdown=5)
             device.put()
-            deferred.defer(update_chrome_os_device,
-                           device_urlsafe_key=device.key.urlsafe(),
-                           _queue='directory-api')
+            if not device.is_unmanaged_device:
+                deferred.defer(update_chrome_os_device,
+                               device_urlsafe_key=device.key.urlsafe(),
+                               _queue='directory-api')
             self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
 
