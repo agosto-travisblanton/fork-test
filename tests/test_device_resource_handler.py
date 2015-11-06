@@ -666,9 +666,11 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertNotEqual(self.tenant_key, updated_display.tenant_key)
         self.assertEqual(self.another_tenant_key, updated_display.tenant_key)
 
-    def test_put_adds_tenant_code_for_unmanaged_device(self):
+    def test_put_adds_tenant_key_for_unmanaged_device(self):
         device = ChromeOsDevice.create_unmanaged(gcm_registration_id=self.GCM_REGISTRATION_ID,
                                                  mac_address=self.MAC_ADDRESS)
+        self.assertTrue(device.is_unmanaged_device)
+        self.assertIsNone(device.tenant_key)
         key = device.put()
         request_body = {
             'tenantCode': self.TENANT_CODE
@@ -677,8 +679,35 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
         updated_display = key.get()
-        self.assertNotEqual(self.tenant_key, updated_display.tenant_key)
+        self.assertEqual(self.tenant_key, updated_display.tenant_key)
 
+    def test_get_following_unmanaged_tenant_update_yields_all_tenant_information_on_device(self):
+        device = ChromeOsDevice.create_unmanaged(gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                                 mac_address=self.MAC_ADDRESS)
+        self.assertTrue(device.is_unmanaged_device)
+        self.assertIsNone(device.tenant_key)
+        key = device.put()
+        request_body = {
+            'tenantCode': self.TENANT_CODE
+        }
+        self.app.put('/api/v1/devices/{0}'.format(key.urlsafe()),
+                     json.dumps(request_body),
+                     headers=self.api_token_authorization_header)
+        updated_display = key.get()
+        self.assertEqual(self.tenant_key, updated_display.tenant_key)
+
+        request_parameters = {}
+        uri = application.router.build(None,
+                                       'device',
+                                       None,
+                                       {'device_urlsafe_key': key.urlsafe()})
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertTrue(response_json['isUnmanagedDevice'])
+        self.assertEqual(response_json['tenantCode'], self.TENANT_CODE)
+        self.assertEqual(response_json['contentServerUrl'], self.CONTENT_SERVER_URL)
+        self.assertEqual(response_json['gcmRegistrationId'], self.GCM_REGISTRATION_ID)
+        self.assertEqual(response_json['macAddress'], self.MAC_ADDRESS)
 
     ##################################################################################################################
     ## delete

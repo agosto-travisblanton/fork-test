@@ -194,9 +194,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 if tenant and tenant.key != device.tenant_key:
                     device.tenant_key = tenant.key
                     if device.is_unmanaged_device:
-                        logging.info(' PUT add the tenant code to device.')
+                        logging.info(' PUT add the tenant to device.')
                     else:
-                        logging.info(' PUT update tenant code on device.')
+                        logging.info(' PUT update tenant on device.')
                         device.put()
                         deferred.defer(ContentManagerApi().update_device,
                                        device_urlsafe_key=device.key.urlsafe(),
