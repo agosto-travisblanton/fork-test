@@ -4,7 +4,7 @@ setup_test_paths()
 
 from agar.test import BaseTest
 from google_cloud_messaging import GoogleCloudMessaging
-from device_message_processor import (change_intent, send_unmanaged_device_info)
+from device_message_processor import (change_intent, post_unmanaged_device_info)
 from mockito import when
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
@@ -30,4 +30,4 @@ class TestDeviceMessageProcessor(BaseTest):
         device_urlsafe_key = 'ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgIDrop4KDA'
         data_dictionary = dict(deviceKey=device_urlsafe_key, apiToken=config.UNMANAGED_API_TOKEN)
         when(GoogleCloudMessaging).notify(registration_ids, data_dictionary, test_mode=False).thenReturn(None)
-        send_unmanaged_device_info(gcm_registration_id, device_urlsafe_key)
+        post_unmanaged_device_info(gcm_registration_id, device_urlsafe_key)
