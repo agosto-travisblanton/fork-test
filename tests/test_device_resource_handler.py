@@ -362,6 +362,37 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json['gcmRegistrationId'], 'g1111')
         self.assertEqual(response_json['macAddress'], 'm1111')
 
+    def test_get_list_by_gcm_registration_id_returns_not_found_for_non_existent_id(self):
+        gcm_registration_id = 'bogus'
+        request_parameters = {'gcmRegistrationId': gcm_registration_id}
+        uri = build_uri('devices-retrieval')
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 404 Unable to find Chrome OS device by GCM registration ID: {0}'.format(
+            gcm_registration_id) in context.exception.message)
+
+    def test_get_list_by_gcm_registration_id_returns_http_status_ok(self):
+        gcm_registration_id = '123123123123'
+        device = ChromeOsDevice.create_unmanaged(gcm_registration_id=gcm_registration_id,
+                                                 mac_address=self.MAC_ADDRESS)
+        device.put()
+        request_parameters = {'gcmRegistrationId': gcm_registration_id}
+        uri = build_uri('devices-retrieval')
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        self.assertOK(response)
+
+    def test_get_list_by_gcm_registration_id_returns_single_resource(self):
+        gcm_registration_id = '123123123123'
+        device = ChromeOsDevice.create_unmanaged(gcm_registration_id=gcm_registration_id,
+                                                 mac_address=self.MAC_ADDRESS)
+        device.put()
+        request_parameters = {'gcmRegistrationId': gcm_registration_id}
+        uri = build_uri('devices-retrieval')
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['gcmRegistrationId'], device.gcm_registration_id)
+
+
     ##################################################################################################################
     # get_devices_by_tenant
     ##################################################################################################################
