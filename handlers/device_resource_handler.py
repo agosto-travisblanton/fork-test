@@ -110,6 +110,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 self.response.set_status(status, error_message)
                 return
             if self.is_unmanaged_device is True:
+
+
                 device = ChromeOsDevice.create_unmanaged(gcm_registration_id, device_mac_address)
                 device_key = device.put()
                 device_uri = self.request.app.router.build(None,
