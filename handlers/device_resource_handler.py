@@ -125,22 +125,33 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 self.response.set_status(status, error_message)
                 return
             if self.is_unmanaged_device is True:
-                if ChromeOsDevice.unmanaged_device_already_registered(gcm_registration_id, device_mac_address):
-                    status = 400
-                    error_message = 'Cannot register because macAddress or GCM Registration ID ' \
-                                    'already assigned to an unmanaged device.'
+                unmanaged_device = ChromeOsDevice.get_unmanaged_device_by_mac_address(device_mac_address)
+                if None is not unmanaged_device:
+                    post_unmanaged_device_info(gcm_registration_id=unmanaged_device.gcm_registration_id,
+                                               device_urlsafe_key=unmanaged_device.key.urlsafe())
+                    status = 409
+                    error_message = 'Registration conflict because macAddress is already assigned to ' \
+                                    'an unmanaged device.'
                     self.response.set_status(status, error_message)
                     return
-                else:
-                    device = ChromeOsDevice.create_unmanaged(gcm_registration_id, device_mac_address)
-                    device_key = device.put()
-                    device_uri = self.request.app.router.build(None,
+                unmanaged_device = ChromeOsDevice.get_unmanaged_device_by_gcm_registration_id(gcm_registration_id)
+                if None is not unmanaged_device:
+                    post_unmanaged_device_info(gcm_registration_id=unmanaged_device.gcm_registration_id,
+                                               device_urlsafe_key=unmanaged_device.key.urlsafe())
+                    status = 409
+                    error_message = 'Registration conflict because gcmRegistrationId is already assigned to ' \
+                                    'an unmanaged device.'
+                    self.response.set_status(status, error_message)
+                    return
+                device = ChromeOsDevice.create_unmanaged(gcm_registration_id, device_mac_address)
+                device_key = device.put()
+                device_uri = self.request.app.router.build(None,
                                                                'device-pairing-code',
                                                                None,
                                                                {'device_urlsafe_key': device_key.urlsafe()})
-                    self.response.headers['Location'] = device_uri
-                    self.response.headers.pop('Content-Type', None)
-                    self.response.set_status(status)
+                self.response.headers['Location'] = device_uri
+                self.response.headers.pop('Content-Type', None)
+                self.response.set_status(status)
             else:
                 if ChromeOsDevice.mac_address_already_assigned(device_mac_address):
                     status = 400
