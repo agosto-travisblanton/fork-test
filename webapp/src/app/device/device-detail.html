@@ -197,7 +197,7 @@
                   <div class="form-group">
                     <label for="notes" class="col-sm-3 control-label">Loggly link</label>
 
-                    <div class="col-sm-6" style="padding-top:8px;">
+                    <div class="col-sm-6 margin-top-05">
                       <a ng-href="{{deviceDetailsCtrl.currentDevice.logglyLink}}">{{deviceDetailsCtrl.currentDevice.logglyLink}}</a>
                       <br>
                     </div>
@@ -299,6 +299,17 @@
                     </div>
                   </div>
                   <div class="form-group">
+                    <label for="unmanaged" class="col-sm-3 control-label">Unmanaged</label>
+
+                    <div class="col-sm-6 margin-top-05">
+                      <input type="checkbox"
+                             name="unmanaged"
+                             id="unmanaged"
+                             ng-disabled="true"
+                             ng-model="deviceDetailsCtrl.currentDevice.isUnmanagedDevice">
+                    </div>
+                  </div>
+                  <div class="form-group">
                     <label for="created" class="col-sm-3 control-label">Created timestamp</label>
 
                     <div class="col-sm-6">
@@ -389,7 +400,7 @@
                           <th>Serial number</th>
                           <th>WiFi mac address</th>
                           <th>Ether mac address</th>
-                          <th>Provisioning date</th>
+                          <th>Provisioned date</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -405,7 +416,7 @@
                         </tbody>
                       </table>
                       <div class="row">
-                        <div class="col-sm-2" style="text-align: right">
+                        <div class="col-sm-2 text-right">
                           <label for="volume">Reset:</label>
                         </div>
                         <div class="col-sm-2">
@@ -441,7 +452,7 @@
                           <th>Serial number</th>
                           <th>WiFi mac address</th>
                           <th>Ether mac address</th>
-                          <th>Provisioning date</th>
+                          <th>Provisioned date</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -457,7 +468,7 @@
                         </tbody>
                       </table>
                       <div class="row">
-                        <div class="col-sm-2" style="text-align: right">
+                        <div class="col-sm-2 text-right">
                           <label for="volume">Volume:</label>
                         </div>
                         <div class="col-sm-2">
@@ -508,7 +519,7 @@
                           <th>Serial number</th>
                           <th>WiFi mac address</th>
                           <th>Ether mac address</th>
-                          <th>Provisioning date</th>
+                          <th>Provisioned date</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -524,7 +535,7 @@
                         </tbody>
                       </table>
                       <div class="row">
-                        <div class="col-sm-2" style="text-align: right">
+                        <div class="col-sm-2 text-right">
                           <label for="volume">Command:</label>
                         </div>
                         <div class="col-sm-3">

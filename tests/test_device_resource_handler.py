@@ -167,13 +167,23 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     ##################################################################################################################
     # post unmanaged device
     ##################################################################################################################
-
     def test_device_resource_handler_unmanaged_post_returns_created_status_code(self):
-        request_body = {'macAddress': self.MAC_ADDRESS,
-                        'gcmRegistrationId': self.GCM_REGISTRATION_ID}
+        new_mac_address = '1111111111'
+        new_gcm_registration_id = '222222222'
+        request_body = {'macAddress': new_mac_address,
+                        'gcmRegistrationId': new_gcm_registration_id}
         response = self.app.post('/api/v1/devices', json.dumps(request_body),
                                  headers=self.unmanaged_registration_token_authorization_header)
-        self.assertEqual(201, response.status_code)
+        self.assertEqual(201, response.status_int)
+
+    def test_device_resource_handler_unmanaged_post_returns_cannot_register_when_already_assigned(self):
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body),
+                          headers=self.unmanaged_registration_token_authorization_header)
+        self.assertTrue('Bad response: 400 Cannot register because macAddress or GCM Registration ID already assigned'
+                        ' to an unmanaged device.' in context.exception.message)
 
     def test_device_resource_handler_unmanaged_post_returns_bad_response_for_empty_gcm(self):
         request_body = {'macAddress': self.MAC_ADDRESS,
@@ -194,23 +204,29 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         in context.exception.message)
 
     def test_device_resource_handler_unmanaged_post_populates_location_header(self):
-        request_body = {'macAddress': self.MAC_ADDRESS,
-                        'gcmRegistrationId': self.GCM_REGISTRATION_ID}
+        new_mac_address = '1111111111'
+        new_gcm_registration_id = '222222222'
+        request_body = {'macAddress': new_mac_address,
+                        'gcmRegistrationId': new_gcm_registration_id}
         response = self.app.post('/api/v1/devices', json.dumps(request_body),
                                  headers=self.unmanaged_registration_token_authorization_header)
         self.assertIsNotNone(response.headers['Location'])
 
     def test_device_resource_handler_unmanaged_post_populates_location_header_with_devices_route(self):
-        request_body = {'macAddress': self.MAC_ADDRESS,
-                        'gcmRegistrationId': self.GCM_REGISTRATION_ID}
+        new_mac_address = '1111111111'
+        new_gcm_registration_id = '222222222'
+        request_body = {'macAddress': new_mac_address,
+                        'gcmRegistrationId': new_gcm_registration_id}
         response = self.app.post('/api/v1/devices', json.dumps(request_body),
                                  headers=self.unmanaged_registration_token_authorization_header)
         location_uri_components = str(response.headers['Location']).split('/')
         self.assertEqual(location_uri_components[5], "devices")
 
     def test_device_resource_handler_unmanaged_post_populates_location_header_with_resolvable_resource(self):
-        request_body = {'macAddress': self.MAC_ADDRESS,
-                        'gcmRegistrationId': self.GCM_REGISTRATION_ID}
+        new_mac_address = '1111111111'
+        new_gcm_registration_id = '222222222'
+        request_body = {'macAddress': new_mac_address,
+                        'gcmRegistrationId': new_gcm_registration_id}
         response = self.app.post('/api/v1/devices', json.dumps(request_body),
                                  headers=self.unmanaged_registration_token_authorization_header)
         uri = response.headers['Location']
@@ -220,8 +236,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertLength(3, response_json)
         self.assertIsNotNone(response_json['pairingCode'])
-        self.assertEqual(response_json['gcmRegistrationId'], self.GCM_REGISTRATION_ID)
-        self.assertEqual(response_json['macAddress'], self.MAC_ADDRESS)
+        self.assertEqual(response_json['gcmRegistrationId'], new_gcm_registration_id)
+        self.assertEqual(response_json['macAddress'], new_mac_address)
 
     #################################################################################################################
     # get_list
@@ -279,7 +295,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json['deviceId'], device.device_id)
 
     def test_get_list_mac_address_query_parameter_payload_single_resource_even_when_dupes(self):
-        #TODO would like a decent mocking framework to assert we're logging this edge case as an error
+        # TODO would like a decent mocking framework to assert we're logging this edge case as an error
         mac_address = '2342342342342'
         device_1 = ChromeOsDevice.create_managed(
             tenant_key=self.tenant_key,
@@ -326,7 +342,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json['gcmRegistrationId'], device.gcm_registration_id)
 
     def test_get_list_pairing_code_query_parameter_payload_single_resource_when_dupes(self):
-        #TODO would like a decent mocking framework to assert we're logging this edge case as an error
+        # TODO would like a decent mocking framework to assert we're logging this edge case as an error
         device_1 = ChromeOsDevice.create_unmanaged(
             gcm_registration_id='g1111',
             mac_address='m1111')
@@ -345,6 +361,36 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         device = self.managed_device_key.get()
         self.assertEqual(response_json['gcmRegistrationId'], 'g1111')
         self.assertEqual(response_json['macAddress'], 'm1111')
+
+    def test_get_list_by_gcm_registration_id_returns_not_found_for_non_existent_id(self):
+        gcm_registration_id = 'bogus'
+        request_parameters = {'gcmRegistrationId': gcm_registration_id}
+        uri = build_uri('devices-retrieval')
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 404 Unable to find Chrome OS device by GCM registration ID: {0}'.format(
+            gcm_registration_id) in context.exception.message)
+
+    def test_get_list_by_gcm_registration_id_returns_http_status_ok(self):
+        gcm_registration_id = '123123123123'
+        device = ChromeOsDevice.create_unmanaged(gcm_registration_id=gcm_registration_id,
+                                                 mac_address=self.MAC_ADDRESS)
+        device.put()
+        request_parameters = {'gcmRegistrationId': gcm_registration_id}
+        uri = build_uri('devices-retrieval')
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        self.assertOK(response)
+
+    def test_get_list_by_gcm_registration_id_returns_single_resource(self):
+        gcm_registration_id = '123123123123'
+        device = ChromeOsDevice.create_unmanaged(gcm_registration_id=gcm_registration_id,
+                                                 mac_address=self.MAC_ADDRESS)
+        device.put()
+        request_parameters = {'gcmRegistrationId': gcm_registration_id}
+        uri = build_uri('devices-retrieval')
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['gcmRegistrationId'], device.gcm_registration_id)
 
 
     ##################################################################################################################

@@ -22,6 +22,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     def get_list(self):
         pairing_code = self.request.get('pairingCode')
         device_mac_address = self.request.get('macAddress')
+        gcm_registration_id = self.request.get('gcmRegistrationId')
         if device_mac_address:
             query = ChromeOsDevice.query(ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
                                                 ChromeOsDevice.ethernet_mac_address == device_mac_address))
@@ -34,6 +35,19 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 logging.error(error_message)
             else:
                 error_message = "Unable to find Chrome OS device by MAC address: {0}".format(device_mac_address)
+                self.response.set_status(404, error_message)
+        elif gcm_registration_id:
+            query = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id)
+            query_results = query.fetch()
+            if len(query_results) is 1:
+                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+            elif len(query_results) > 1:
+                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+                error_message = "Multiple devices have GCM registration ID {0}".format(gcm_registration_id)
+                logging.error(error_message)
+            else:
+                error_message = "Unable to find Chrome OS device by GCM registration ID: {0}".format(
+                    gcm_registration_id)
                 self.response.set_status(404, error_message)
         elif pairing_code:
             query = ChromeOsDevice.query(ChromeOsDevice.pairing_code == pairing_code)
@@ -55,6 +69,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             # json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
             query_results = query.fetch(1000)
             json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
+
 
     @requires_api_token
     def get_devices_by_tenant(self, tenant_urlsafe_key):
@@ -110,15 +125,22 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 self.response.set_status(status, error_message)
                 return
             if self.is_unmanaged_device is True:
-                device = ChromeOsDevice.create_unmanaged(gcm_registration_id, device_mac_address)
-                device_key = device.put()
-                device_uri = self.request.app.router.build(None,
-                                                           'device-pairing-code',
-                                                           None,
-                                                           {'device_urlsafe_key': device_key.urlsafe()})
-                self.response.headers['Location'] = device_uri
-                self.response.headers.pop('Content-Type', None)
-                self.response.set_status(status)
+                if ChromeOsDevice.unmanaged_device_already_registered(gcm_registration_id, device_mac_address):
+                    status = 400
+                    error_message = 'Cannot register because macAddress or GCM Registration ID ' \
+                                    'already assigned to an unmanaged device.'
+                    self.response.set_status(status, error_message)
+                    return
+                else:
+                    device = ChromeOsDevice.create_unmanaged(gcm_registration_id, device_mac_address)
+                    device_key = device.put()
+                    device_uri = self.request.app.router.build(None,
+                                                               'device-pairing-code',
+                                                               None,
+                                                               {'device_urlsafe_key': device_key.urlsafe()})
+                    self.response.headers['Location'] = device_uri
+                    self.response.headers.pop('Content-Type', None)
+                    self.response.set_status(status)
             else:
                 if ChromeOsDevice.mac_address_already_assigned(device_mac_address):
                     status = 400

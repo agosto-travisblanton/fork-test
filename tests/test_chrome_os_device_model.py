@@ -144,3 +144,33 @@ class TestChromeOsDeviceModel(BaseTest):
 
     def test_mac_address_already_assigned_for_case_where_it_has_not_yet_been_assigned(self):
         self.assertFalse(ChromeOsDevice.mac_address_already_assigned('0326f1e61930d'))
+
+    def test_unmanaged_device_already_registered_when_gcm_and_mac_exist(self):
+        device = ChromeOsDevice.create_unmanaged(self.TEST_GCM_REGISTRATION_ID, self.MAC_ADDRESS)
+        device.put()
+        already_registered = ChromeOsDevice.unmanaged_device_already_registered(self.TEST_GCM_REGISTRATION_ID,
+                                                                                self.MAC_ADDRESS)
+        self.assertTrue(already_registered)
+
+    def test_unmanaged_device_already_registered_when_gcm_only_exists(self):
+        new_mac_address = '03271e619341'
+        device = ChromeOsDevice.create_unmanaged(self.TEST_GCM_REGISTRATION_ID, new_mac_address)
+        device.put()
+        already_registered = ChromeOsDevice.unmanaged_device_already_registered(self.TEST_GCM_REGISTRATION_ID,
+                                                                                new_mac_address)
+        self.assertTrue(already_registered)
+
+    def test_unmanaged_device_already_registered_when_mac_address_only_exists(self):
+        new_gcm_registration_id = '11111111'
+        device = ChromeOsDevice.create_unmanaged(new_gcm_registration_id, self.MAC_ADDRESS)
+        device.put()
+        already_registered = ChromeOsDevice.unmanaged_device_already_registered(new_gcm_registration_id,
+                                                                                self.MAC_ADDRESS)
+        self.assertTrue(already_registered)
+
+    def test_unmanaged_device_not_already_registered_when_gcm_and_mac_address_are_new(self):
+        new_gcm_registration_id = '11111111'
+        new_mac_address = '03271e619341'
+        already_registered = ChromeOsDevice.unmanaged_device_already_registered(new_gcm_registration_id,
+                                                                                new_mac_address)
+        self.assertFalse(already_registered)

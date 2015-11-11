@@ -1,6 +1,7 @@
 import uuid
 
 from google.appengine.ext import ndb
+
 from restler.decorators import ae_ndb_serializer
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>. Bob MacNeal <bob.macneal@agosto.com>'
@@ -237,6 +238,16 @@ class ChromeOsDevice(ndb.Model):
             is_unmanaged_device=True
         )
         return device
+
+    @classmethod
+    def unmanaged_device_already_registered(cls, gcm_registration_id, mac_address):
+        mac_address_assigned = ChromeOsDevice.query(
+            ndb.AND(ChromeOsDevice.mac_address == mac_address,
+                    ChromeOsDevice.is_unmanaged_device == True)).count() > 0
+        gcm_registration_id_assigned = ChromeOsDevice.query(
+            ndb.AND(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
+                    ChromeOsDevice.is_unmanaged_device == True)).count() > 0
+        return mac_address_assigned is True or gcm_registration_id_assigned is True
 
     @classmethod
     def mac_address_already_assigned(cls, device_mac_address):
