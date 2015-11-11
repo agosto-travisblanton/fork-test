@@ -240,14 +240,28 @@ class ChromeOsDevice(ndb.Model):
         return device
 
     @classmethod
-    def unmanaged_device_already_registered(cls, gcm_registration_id, mac_address):
-        mac_address_assigned = ChromeOsDevice.query(
-            ndb.AND(ChromeOsDevice.mac_address == mac_address,
-                    ChromeOsDevice.is_unmanaged_device == True)).count() > 0
-        gcm_registration_id_assigned = ChromeOsDevice.query(
-            ndb.AND(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
-                    ChromeOsDevice.is_unmanaged_device == True)).count() > 0
-        return mac_address_assigned is True or gcm_registration_id_assigned is True
+    def get_unmanaged_device_by_mac_address(cls, mac_address):
+        if mac_address:
+            device_key = ChromeOsDevice.query(ndb.AND(ChromeOsDevice.mac_address == mac_address,
+                                                      ChromeOsDevice.is_unmanaged_device == True)).get(keys_only=True)
+            if None is device_key:
+                return None
+            else:
+                return device_key.get()
+        else:
+            return None
+
+    @classmethod
+    def get_unmanaged_device_by_gcm_registration_id(cls, gcm_registration_id):
+        if gcm_registration_id:
+            device_key = ChromeOsDevice.query(ndb.AND(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
+                                                      ChromeOsDevice.is_unmanaged_device == True)).get(keys_only=True)
+            if None is device_key:
+                return None
+            else:
+                return device_key.get()
+        else:
+            return None
 
     @classmethod
     def mac_address_already_assigned(cls, device_mac_address):
