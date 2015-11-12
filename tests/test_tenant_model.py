@@ -87,12 +87,12 @@ class TestTenantModel(BaseTest):
         self.assertEqual(self.NAME, tenant_created.name)
         self.assertEqual(self.domain_key, tenant_created.domain_key)
 
-    def test_is_unique_returns_false_when_name_is_found(self):
-        uniqueness_check = Tenant.is_unique(self.NAME)
+    def test_is_tenant_code_unique_returns_false_when_code_found(self):
+        uniqueness_check = Tenant.is_tenant_code_unique(self.TENANT_CODE)
         self.assertFalse(uniqueness_check)
 
-    def test_is_unique_returns_true_when_name_not_found(self):
-        uniqueness_check = Tenant.is_unique('Foobar')
+    def test_is_unique_returns_true_when_code_not_found(self):
+        uniqueness_check = Tenant.is_tenant_code_unique('foobar_inc')
         self.assertTrue(uniqueness_check)
 
     def test_class_version_is_only_set_by_pre_put_hook_method(self):

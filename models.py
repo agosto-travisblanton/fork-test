@@ -132,12 +132,8 @@ class Tenant(ndb.Model):
                 return key.get()
 
     @classmethod
-    def is_unique(cls, name):
-        tenant = cls.find_by_name(name)
-        if tenant is not None and name == name:
-            return False
-        else:
-            return True
+    def is_tenant_code_unique(cls, tenant_code):
+        return None is Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
 
     @classmethod
     def find_devices(cls, tenant_key):
