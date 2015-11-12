@@ -75,25 +75,29 @@ class TenantsHandler(RequestHandler):
             else:
                 active = bool(active)
             if status == 201:
-                tenant = Tenant.create(name=name,
-                                       tenant_code=tenant_code,
-                                       admin_email=admin_email,
-                                       content_server_url=content_server_url,
-                                       content_manager_base_url=content_manager_base_url,
-                                       domain_key=domain_key,
-                                       active=active)
-                tenant_key = tenant.put()
-                content_manager_api = ContentManagerApi()
-                notify_content_manager = content_manager_api.create_tenant(tenant)
-                if not notify_content_manager:
-                    logging.info('Failed to notify content manager about new tenant {0}'.format(name))
-                tenant_uri = self.request.app.router.build(None,
-                                                           'manage-tenant',
-                                                           None,
-                                                           {'tenant_key': tenant_key.urlsafe()})
-                self.response.headers['Location'] = tenant_uri
-                self.response.headers.pop('Content-Type', None)
-                self.response.set_status(201)
+                if Tenant.is_tenant_code_unique(tenant_code):
+                    tenant = Tenant.create(name=name,
+                                           tenant_code=tenant_code,
+                                           admin_email=admin_email,
+                                           content_server_url=content_server_url,
+                                           content_manager_base_url=content_manager_base_url,
+                                           domain_key=domain_key,
+                                           active=active)
+                    tenant_key = tenant.put()
+                    content_manager_api = ContentManagerApi()
+                    notify_content_manager = content_manager_api.create_tenant(tenant)
+                    if not notify_content_manager:
+                        logging.info('Failed to notify content manager about new tenant {0}'.format(name))
+                    tenant_uri = self.request.app.router.build(None,
+                                                               'manage-tenant',
+                                                               None,
+                                                               {'tenant_key': tenant_key.urlsafe()})
+                    self.response.headers['Location'] = tenant_uri
+                    self.response.headers.pop('Content-Type', None)
+                    self.response.set_status(201)
+                else:
+                    error_message = "Conflict. Tenant code \"{0}\" is already assigned to a tenant.".format(tenant_code)
+                    self.response.set_status(409, error_message)
             else:
                 self.response.set_status(status, error_message)
         else:

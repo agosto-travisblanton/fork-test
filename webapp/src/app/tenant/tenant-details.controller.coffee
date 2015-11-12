@@ -3,15 +3,15 @@
 appModule = angular.module('skykitDisplayDeviceManagement')
 
 appModule.controller 'TenantDetailsCtrl', ($log,
-                                           $stateParams,
-                                           TenantsService,
-                                           DomainsService,
-                                           DevicesService,
-                                           DistributorsService,
-                                           $state,
-                                           sweet,
-                                           ProgressBarService,
-                                           $cookies) ->
+  $stateParams,
+  TenantsService,
+  DomainsService,
+  DevicesService,
+  DistributorsService,
+  $state,
+  sweet,
+  ProgressBarService,
+  $cookies) ->
   @currentTenant = {
     key: undefined,
     name: undefined,
@@ -59,8 +59,11 @@ appModule.controller 'TenantDetailsCtrl', ($log,
 
   @onFailureTenantSave = (errorObject) ->
     ProgressBarService.complete()
-    $log.error errorObject
-    sweet.show('Oops...', 'Unable to save the tenant.', 'error')
+    if errorObject.status is 409
+      sweet.show('Oops...', 'Tenant code unavailable. Please try a different tenant code.', 'error')
+    else
+      $log.error errorObject
+      sweet.show('Oops...', 'Unable to save the tenant.', 'error')
 
   @editItem = (item) ->
     $state.go 'editDevice', {deviceKey: item.key, tenantKey: $stateParams.tenantKey}
