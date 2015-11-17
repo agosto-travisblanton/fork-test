@@ -52,7 +52,7 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     controller: "WelcomeCtrl",
     controllerAs: 'welcomeCtrl',
     ncyBreadcrumb: {
-      label: 'Home page'
+      label: 'Skykit Provisioning'
     }
   })
   $stateProvider.state("welcome", {
@@ -65,7 +65,7 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     controller: "WelcomeCtrl"
     controllerAs: 'welcomeCtrl',
     ncyBreadcrumb: {
-      label: 'Home page'
+      label: 'Skykit Provisioning'
     }
   })
   $stateProvider.state("version", {
