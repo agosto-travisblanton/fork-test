@@ -1,11 +1,10 @@
 import json
 import logging
 
+from google.appengine.ext import ndb
+
 from app_config import config
 from http_client import HttpClient, HttpClientRequest
-from google.appengine.ext import ndb
-from agar.env import on_production_server, on_integration_server
-
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -35,11 +34,10 @@ class ContentManagerApi(object):
                 url, tenant.admin_email, tenant.tenant_code))
             return True
         else:
-            if on_integration_server or on_production_server:
-                error_message = 'Unable to create tenant {0} in Content Manager. Status code: {1}'.format(
+            error_message = 'Unable to create tenant {0} in Content Manager. Status code: {1}'.format(
                     tenant.name, http_client_response.status_code)
-                logging.error(error_message)
-                raise RuntimeError(error_message)
+            logging.error(error_message)
+            raise RuntimeError(error_message)
 
     def create_device(self, device_urlsafe_key):
         key = ndb.Key(urlsafe=device_urlsafe_key)
@@ -49,7 +47,8 @@ class ContentManagerApi(object):
             payload = {
                 "device_key": device_urlsafe_key,
                 "api_key": chrome_os_device.api_key,
-                "tenant_code": tenant.tenant_code
+                "tenant_code": tenant.tenant_code,
+                "serial_number": chrome_os_device.serial_number
             }
             url = "{content_manager_base_url}/provisioning/v1/displays".format(
                 content_manager_base_url=tenant.content_manager_base_url)
@@ -59,11 +58,12 @@ class ContentManagerApi(object):
             http_client_response = HttpClient().post(http_client_request)
             if http_client_response.status_code == 201:
                 logging.info(
-                    'create_device to Content Mgr: url={0}, device_key={1}, api_key={2}, tenant_code={3}'.format(
+                    'create_device to CM: url={0}, device_key={1}, api_key={2}, tenant_code={3}, SN = {4}'.format(
                         url,
                         device_urlsafe_key,
                         chrome_os_device.api_key,
-                        tenant.tenant_code))
+                        tenant.tenant_code,
+                        chrome_os_device.serial_number))
                 return True
             else:
                 error_message = 'Unable to create device in Content Manager with tenant code {0}. Status code: {1}, ' \

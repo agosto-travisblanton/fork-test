@@ -47,9 +47,10 @@ class TestContentManagerApi(BaseTest):
                                     active=True)
         self.tenant_key = self.tenant.put()
         self.device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                            device_id='f7ds8970dfasd8f70ad987',
-                                            gcm_registration_id='fad7f890ad7f8ad0s7fa8s',
-                                            mac_address='54271e619346')
+                                                    device_id='f7ds8970dfasd8f70ad987',
+                                                    gcm_registration_id='fad7f890ad7f8ad0s7fa8s',
+                                                    mac_address='54271e619346',
+                                                    serial_number='SN000123')
         self.device_key = self.device.put()
 
     ##################################################################################################################
@@ -61,14 +62,14 @@ class TestContentManagerApi(BaseTest):
         result = self.content_manager_api.create_tenant(self.tenant)
         self.assertTrue(result)
 
-    # def test_unsuccessful_create_tenant_raises_error(self):
-    #     error_code = 400
-    #     when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=error_code))
-    #     with self.assertRaises(RuntimeError) as context:
-    #         self.content_manager_api.create_tenant(self.tenant)
-    #     error_message = 'Unable to create tenant {0} in Content Manager. Status code: {1}'.format(
-    #         self.NAME, error_code)
-    #     self.assertEqual(error_message, str(context.exception))
+    def test_unsuccessful_create_tenant_raises_error(self):
+        error_code = 400
+        when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=error_code))
+        with self.assertRaises(RuntimeError) as context:
+            self.content_manager_api.create_tenant(self.tenant)
+        error_message = 'Unable to create tenant {0} in Content Manager. Status code: {1}'.format(
+            self.NAME, error_code)
+        self.assertEqual(error_message, str(context.exception))
 
     ##################################################################################################################
     ## create_device

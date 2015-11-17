@@ -70,7 +70,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             query_results = query.fetch(1000)
             json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
 
-
     @requires_api_token
     def get_devices_by_tenant(self, tenant_urlsafe_key):
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
