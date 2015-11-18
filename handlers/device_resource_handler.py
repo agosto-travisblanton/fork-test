@@ -5,10 +5,11 @@ from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 from webapp2 import RequestHandler
 
+from app_config import config
 from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address, update_chrome_os_device)
 from content_manager_api import ContentManagerApi
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
-from device_message_processor import post_unmanaged_device_info
+from device_message_processor import post_unmanaged_device_info, change_intent
 from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
@@ -258,6 +259,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             status = 404
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
         else:
+            change_intent(device.gcm_registration_id, config.PLAYER_RESET_COMMAND)
+            logging.info(
+                'Player reset command issued prior to deleting device with key {0}'.format(device.key.urlsafe()))
             device.key.delete()
             self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
