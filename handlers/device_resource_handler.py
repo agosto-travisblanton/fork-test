@@ -98,7 +98,17 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     def get(self, device_urlsafe_key):
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
         if self.is_unmanaged_device is False:
-            deferred.defer(refresh_device, device_urlsafe_key=device_urlsafe_key, _queue='directory-api')
+            if None == device.device_id:
+                deferred.defer(refresh_device_by_mac_address,
+                               device_urlsafe_key=device_urlsafe_key,
+                               device_mac_address=device.mac_address,
+                               _queue='directory-api',
+                               _countdown=5)
+            else:
+                deferred.defer(refresh_device,
+                               device_urlsafe_key=device_urlsafe_key,
+                               _queue='directory-api',
+                               _countdown=5)
         return json_response(self.response, device, strategy=CHROME_OS_DEVICE_STRATEGY)
 
     @requires_unmanaged_registration_token
@@ -146,9 +156,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 device = ChromeOsDevice.create_unmanaged(gcm_registration_id, device_mac_address)
                 device_key = device.put()
                 device_uri = self.request.app.router.build(None,
-                                                               'device-pairing-code',
-                                                               None,
-                                                               {'device_urlsafe_key': device_key.urlsafe()})
+                                                           'device-pairing-code',
+                                                           None,
+                                                           {'device_urlsafe_key': device_key.urlsafe()})
                 self.response.headers['Location'] = device_uri
                 self.response.headers.pop('Content-Type', None)
                 self.response.set_status(status)
@@ -166,8 +176,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     error_message = 'Invalid or inactive tenant for managed device.'
                 if status == 201:
                     device = ChromeOsDevice.create_managed(tenant_key=tenant_key,
-                                                   gcm_registration_id=gcm_registration_id,
-                                                   mac_address=device_mac_address)
+                                                           gcm_registration_id=gcm_registration_id,
+                                                           mac_address=device_mac_address)
                     key = device.put()
                     deferred.defer(refresh_device_by_mac_address,
                                    device_urlsafe_key=key.urlsafe(),
