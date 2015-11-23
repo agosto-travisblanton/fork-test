@@ -3,7 +3,7 @@ import json
 from google.appengine.ext import ndb
 import logging
 from webapp2 import RequestHandler
-from decorators import api_token_required
+from decorators import requires_api_token
 from models import Domain
 from restler.serializers import json_response
 from strategy import DOMAIN_STRATEGY
@@ -14,7 +14,7 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 class DomainsHandler(RequestHandler, KeyValidatorMixin):
-    @api_token_required
+    @requires_api_token
     def get(self, domain_key=None):
         if None == domain_key:
             distributor_key = self.request.headers.get('X-Provisioning-Distributor')
@@ -25,12 +25,15 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
             result = self.validate_and_get(domain_key, Domain, abort_on_not_found=True)
         json_response(self.response, result, strategy=DOMAIN_STRATEGY)
 
-    @api_token_required
+    @requires_api_token
     def post(self):
         if self.request.body is not str('') and self.request.body is not None:
             status = 201
             error_message = None
             request_json = json.loads(self.request.body)
+
+
+
             name = request_json.get('name')
             if name is None or name == '':
                 status = 400
@@ -68,7 +71,7 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
             logging.info("Problem creating Domain. No request body.")
             self.response.set_status(400, 'Did not receive request body.')
 
-    @api_token_required
+    @requires_api_token
     def put(self, domain_key):
         key = ndb.Key(urlsafe=domain_key)
         domain = key.get()
@@ -80,7 +83,7 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
 
-    @api_token_required
+    @requires_api_token
     def delete(self, domain_key):
         key = ndb.Key(urlsafe=domain_key)
         device = key.get()

@@ -129,9 +129,34 @@ def _API_TOKEN():
 app_API_TOKEN = _API_TOKEN()
 
 
+def _UNMANAGED_API_TOKEN():
+    if on_development_server or not on_server:
+        return 'A1365B43C51C46588BD4C6D5016C0'
+    if on_integration_server:
+        return 'A1365B43C51C46588BD4C6D5016C0'
+    if on_production_server:
+        return 'A1365B43C51C46588BD4C6D5016C0'
+    return None
+
+
+app_UNMANAGED_API_TOKEN = _UNMANAGED_API_TOKEN()
+
+
+def _UNMANAGED_REGISTRATION_TOKEN():
+    if on_development_server or not on_server:
+        return '43C51C8BD4C6D723A1365B6C34658'
+    if on_integration_server:
+        return '43C51C8BD4C6D723A1365B6C34658'
+    if on_production_server:
+        return '43C51C8BD4C6D723A1365B6C34658'
+    return None
+
+
+app_UNMANAGED_REGISTRATION_TOKEN = _UNMANAGED_REGISTRATION_TOKEN()
+
+
 def _CONTENT_MANAGER_API_SERVER_KEY():
     if on_development_server or not on_server:
-        # return 'nDsguD7jXCuoCVFhCTKXvAkhmAdzjG9Q'
         return 'EqwbumxWrJzybkDerDbm9yLBteJqZi7X'
     if on_integration_server:
         return 'EqwbumxWrJzybkDerDbm9yLBteJqZi7X'
@@ -142,18 +167,6 @@ def _CONTENT_MANAGER_API_SERVER_KEY():
 
 app_CONTENT_MANAGER_API_SERVER_KEY = _CONTENT_MANAGER_API_SERVER_KEY()
 
-
-def _IMPERSONATION_ADMIN_EMAIL_ADDRESS():
-    if on_development_server or not on_server:
-        return 'administrator@skykit.com'
-    if on_integration_server:
-        return 'admin@dev.agosto.com'
-    if on_production_server:
-        return 'skykit.api@skykit.agosto.com'
-    return None
-
-
-app_IMPERSONATION_ADMIN_EMAIL_ADDRESS = _IMPERSONATION_ADMIN_EMAIL_ADDRESS()
 
 
 def _DEFAULT_AGOSTO_DEVICE_DOMAIN():

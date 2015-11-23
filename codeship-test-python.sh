@@ -8,7 +8,7 @@ printf "\n${COLOR_LIGHT_GREEN}===> Configuring AppEngine SDK environment...${COL
 
 export APPENGINE_SDK=/home/rof/appengine/python_appengine
 
-cd ~/src/bitbucket.org/agosto_administrator/skykit-display-device
+cd ~/src/bitbucket.org/agosto/skykit-display-device
 
 
 printf "\n${COLOR_LIGHT_GREEN}===> Running Python tests...${COLOR_OFF}\n"

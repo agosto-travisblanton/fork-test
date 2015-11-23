@@ -1,7 +1,7 @@
 import logging
-from google_cloud_messaging import GoogleCloudMessaging
-from app_config import config
 
+from app_config import config
+from google_cloud_messaging import GoogleCloudMessaging
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -19,3 +19,8 @@ def change_intent(gcm_registration_id, payload):
             test_mode))
     except Exception, e:
         logging.exception(e)
+
+
+def post_unmanaged_device_info(gcm_registration_id, device_urlsafe_key):
+    payload = "skykit.com/skdchromeapp/unmanaged/{0}/{1}".format(device_urlsafe_key, config.UNMANAGED_API_TOKEN)
+    change_intent(gcm_registration_id=gcm_registration_id, payload=payload)

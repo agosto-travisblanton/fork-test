@@ -3,224 +3,12 @@ HOST: https://skykit-display-device-int.appspot.com
 
 # Skykit Provisioning API
 
-## Group Displays
-
-### GET /api/v1/displays
-Retrieve all displays (managed and unmanaged) from Skykit Provisioning
-
-+ Request (application/json)
-
-    + Headers
-
-            Accept: application/json
-            Authorization: 6C346588BD4C6D722A1165B43C51C
-
-
-
-+ Response 200 (application/json)
-
-    + Headers
-
-
-    + Body
-
-            {
-                "paging": {
-                    "has_next": false, 
-                    "has_prev": false, 
-                    "next_cursor": null, 
-                    "prev_cursor": null
-                }, 
-                "objects": [
-                    {
-                        "key": "ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyFAsSB0Rpc3BsYXkYgICAgJnOlAkM", 
-                        "gcm_registration_id": "c098d70a8d78a6dfa6df76dfas7", 
-                        "annotated_location": "Agosto HQ Reception Area", 
-                        "annotated_user": "administrator@skykit.com", 
-                        "firmware_version": "Google_Panther.4920.24.26", 
-                        "boot_mode": "Verified", 
-                        "platform_version": "6946.55.0 (Official Build) stable-channel panther", 
-                        "os_version": "43.0.2357.81", 
-                        "org_unit_path": "/Beta/Agosto Internal", 
-                        "mac_address": "54271e6950ed", 
-                        "serial_number": "E3MSCX012112", 
-                        "api_key": "6a5cb915-68b9-4474-bd5f-5e6ac4ba4a63", 
-                        "status": "DEPROVISIONED", 
-                        "updated": "2015-07-30 19:06:23", 
-                        "managed_display": true, 
-                        "device_id": "964f4e0b-a06a-4ba8-97ab-5db2ba9f9cbd", 
-                        "kind": "admin#directory#chromeosdevice", 
-                        "created": "2015-07-30 19:06:21", 
-                        "notes": "Some notes about the device from Directory API.", 
-                        "ethernet_mac_address": "c454443bebe3", 
-                        "last_sync": "2015-07-16T19:09:02.108Z", 
-                        "last_enrollment_time": "2014-08-06T19:27:01.969Z", 
-                        "model": "ASUS Chromebox",
-                        "tenant": {
-                            "updated": "2015-07-08 21:27:32", 
-                            "name": "Foobar", 
-                            "created": "2015-07-02 20:32:48", 
-                            "content_server_url": "https://skykit-contentmanager-int.appspot.com", 
-                            "chrome_device_domain": "foobar.com", 
-                            "tenant_code": "foobar", 
-                            "active": true, 
-                            "admin_email": "admin@foobar.com"
-                        } 
-                    },
-                    ...
-                ]
-            }
-
-
-+ Response 403 (application/json)
-
-    + Headers
-
-    + Body
-
-            {
-                "error": "HTTP request API token is invalid."
-            }
-
-
-### GET /api/v1/displays?macAddress={mac_address}
-Retrieve a specific Skykit display by MAC address.
-
-+ Parameters
-
-    + mac_address: `38b1db95806d` (required, string) - The device's MAC address for wireless or Ethernet networking.
-
-+ Request (application/json)
-
-    + Headers
-
-            Accept: application/json
-            Authorization: 6C346588BD4C6D722A1165B43C51C
-
-
-
-+ Response 200 (application/json)
-
-    + Headers
-
-            Alternate-Protocol: 443:quic,p=1
-            Cache-Control: no-cache
-
-    + Body
-
-            {
-                "paging": {
-                    "has_next": false, 
-                    "has_prev": false, 
-                    "next_cursor": null, 
-                    "prev_cursor": null
-                }, "objects": [
-                    {
-                        "gcm_registration_id": "c098d70a8d78a6dfa6df76dfas7", 
-                        "annotated_location": "Agosto HQ Reception Area", 
-                        "annotated_user": "administrator@skykit.com", 
-                        "firmware_version": "Google_Panther.4920.24.26", 
-                        "boot_mode": "Verified", 
-                        "platform_version": "6946.55.0 (Official Build) stable-channel panther", 
-                        "os_version": "43.0.2357.81", 
-                        "org_unit_path": "/Beta/Agosto Internal", 
-                        "mac_address": "54271e6950ed", 
-                        "serial_number": "E3MSCX012112", 
-                        "api_key": "6a5cb915-68b9-4474-bd5f-5e6ac4ba4a63", 
-                        "status": "DEPROVISIONED", 
-                        "updated": "2015-07-30 19:06:23", 
-                        "managed_display": true, 
-                        "key": "ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyFAsSB0Rpc3BsYXkYgICAgJnOlAkM", 
-                            "tenant": {"updated": "2015-07-08 21:27:32", 
-                            "name": "Foobar", 
-                            "created": "2015-07-02 20:32:48", 
-                            "content_server_url": "https://skykit-contentmanager-int.appspot.com", 
-                            "chrome_device_domain": "foobar.com", 
-                            "tenant_code": "foobar", 
-                            "active": true, 
-                            "admin_email": "admin@foobar.com"
-                        }, 
-                        "device_id": "964f4e0b-a06a-4ba8-97ab-5db2ba9f9cbd", 
-                        "kind": "admin#directory#chromeosdevice", 
-                        "created": "2015-07-30 19:06:21", 
-                        "notes": "", 
-                        "ethernet_mac_address": "c454443bebe3", 
-                        "last_sync": "2015-07-16T19:09:02.108Z", 
-                        "last_enrollment_time": "2014-08-06T19:27:01.969Z", 
-                        "model": "ASUS Chromebox"
-                    }
-                ]
-            }
-
-
-
-+ Response 403 (application/json)
-
-    + Headers
-
-    + Body
-
-            {
-                "error": "HTTP request API token is invalid."
-            }
-
-### PUT /api/v1/displays/{urlsafe_key}
-
-Update Skykit display information.
-
-
-+ Parameters
-
-    + urlsafe_key: `ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgID4woQKDA` (required, string) - The display's entity key.
-
-+ Request (application/json)
-
-    + Headers
-
-            Accept: application/json
-            Authorization: 6C346588BD4C6D722A1165B43C51C
-
-    + Body
-
-            {
-				"macAddress":"38b1db95806d",
-				"gcmRegistrationId":"blah blah 3",
-				"tenantKey": {The tenant's entity key}
-			}
-
-+ Response 204 (application/json)
-
-    + Headers
-
-            Alternate-Protocol: 443:quic,p=1
-            Cache-Control: no-cache
-
-+ Response 403 (application/json)
-
-    + Headers
-
-    + Body
-
-            {
-                "error": "HTTP request API token is invalid."
-            }
-			
-+ Response 404 (text/html)
-
-    + Headers
-
-    + Body
-
-            Unrecognized display with key: {0}: {the display's entity key}
-
-
-
 ## Group Devices
 
 ### GET /api/v1/devices
-Retrieve all devices from Skykit Provisioning
+Retrieve all *managed* and *unmanaged* devices from Skykit Provisioning
 
-+ Request (application/json)
++ Request
 
     + Headers
 
@@ -229,38 +17,84 @@ Retrieve all devices from Skykit Provisioning
 
 
 
-+ Response 200 (application/json)
-
-    + Headers
-
++ Response
 
     + Body
 
             [
-				{
-					"status": "ACTIVE", 
-					"lastSync": "2015-06-22T18:31:42.678Z", 
-					"kind": "admin#directory#chromeosdevice", 
-					"ethernetMacAddress": "3863bb98f675", 
-					"macAddress": "38b1db95806d", 
-					"orgUnitPath": "/Agosto/Beta/Fairchild Semi", 
-					"serialNumber": "5CD45183S6", 
-					"annotatedUser": "fairchild@skykit.com", 
-					"bootMode": "Verified", 
-					"etag": "\"MO4FtId2-yiZq_-3TpU3AZTf2Ak/q2J1QVycAwick78q5218-w2DMgw\"", 
-					"deviceId": "e80a9161-4367-4189-be90-450e5e29501b", 
-					"lastEnrollmentTime": "2015-05-07T21:15:17.285Z", 
-					"platformVersion": "6812.88.0 (Official Build) stable-channel zako", 
-					"model": "HP Chromebox CB1-(000-099) / HP Chromebox G1", 
-					"osVersion": "42.0.2311.153", 
-					"firmwareVersion": ""
-				},
+				{"kind": null, 
+				"model": null, 
+				"lastSync": null, 
+				"tenantName": null, 
+				"notes": null, 
+				"tenantCode": null, 
+				"name": "None None", 
+				"lastEnrollmentTime": null, 
+				"firmwareVersion": null, 
+				"created": "2015-11-03 18:19:20", 
+				"chromeDeviceDomain": null, 
+				"isUnmanagedDevice": true, 
+				"annotatedUser": null, 
+				"deviceId": null, 
+				"etag": null, 
+				"key": "ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHIbCxIOQ2hyb21lT3NEZXZpY2UYgICAgICAwAoM", 
+				"orgUnitPath": null, 
+				"contentServerUrl": null, 
+				"gcmRegistrationId": "cf70a8d78a6dfa6df76df049", 
+				"serialNumber": null, 
+				"bootMode": null, 
+				"panelInput": null, 
+				"logglyLink": null, 
+				"tenantKey": null, 
+				"pairingCode": "7eb8-50d2-1c04-dc36", 
+				"status": null, 
+				"macAddress": "38cf5e8f8bdd", 
+				"platformVersion": null, 
+				"updated": "2015-11-03 18:19:20", 
+				"annotatedLocation": null, 
+				"osVersion": null, 
+				"panelModel": null, 
+				"ethernetMacAddress": null, 
+				"apiKey": "a0f518aebfd04a7196df7a6c8b2aa29c"},
+				 
+				{"kind": null, 
+				"model": null, 
+				"lastSync": null, 
+				"tenantName": "Acme, Inc.", 
+				"notes": null, 
+				"tenantCode": "acme_inc", 
+				"name": "None None", 
+				"lastEnrollmentTime": null, 
+				"firmwareVersion": null, 
+				"created": "2015-11-03 18:19:31", 
+				"chromeDeviceDomain": "local.agosto.com", 
+				"isUnmanagedDevice": false, 
+				"annotatedUser": null, 
+				"deviceId": null, 
+				"etag": null, 
+				"key": "ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHIbCxIOQ2hyb21lT3NEZXZpY2UYgICAgICAwAkM", 
+				"orgUnitPath": null, 
+				"contentServerUrl": "https://skykit-contentmanager-int.appspot.com/content", 
+				"gcmRegistrationId": "cf70a8d78a6dfa6df76df049", 
+				"serialNumber": null, 
+				"bootMode": null, 
+				"panelInput": null, 
+				"logglyLink": null, 
+				"tenantKey": "ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFudEVudGl0eUdyb3VwDAsSBlRlbmFudBiAgICAgIDACAw", 
+				"pairingCode": null, 
+				"status": null, 
+				"macAddress": "18cf5e8f8bca", 
+				"platformVersion": null, 
+				"updated": "2015-11-03 18:19:31", 
+				"annotatedLocation": null, 
+				"osVersion": null, 
+				"panelModel": null, 
+				"ethernetMacAddress": null, 
+				"apiKey": "8fdcb1bf2bd548018ce0f598663149bc"},
 				... 
 			]
 
-+ Response 403 (application/json)
-
-    + Headers
++ Response 403
 
     + Body
 
@@ -268,6 +102,55 @@ Retrieve all devices from Skykit Provisioning
                 "error": "HTTP request API token is invalid."
             }
             
+### GET /api/v1/devices?pairingCode={pairing_code}
+Retrieve a specific *unmanaged* Skykit device/display by pairing code.
+
++ Parameters
+
+    + pairing_code: `7eb8-50d2-1c04-dc36` (required, string) - Code displayed by the player following an unmanaged device registration.
+
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/json
+            Authorization: 6C346588BD4C6D722A1165B43C51C
+
+
+
++ Response 200
+
+    + Body
+
+            {
+				"apiKey": "a0f518aebfd04a7196df7a6c8b2aa29c",
+				"isUnmanagedDevice": "true",
+				"macAddress": "38b1db95806d",
+				"pairingCode": "7eb8-50d2-1c04-dc36",
+				"key": "ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHIbCxIOQ2hyb21lT3NEZXZpY2UYgICAgICAwAoM",
+				"gcmRegistrationId": "cf70a8d78a6dfa6df76df049",
+				"created": "2015-11-03 18:19:20",
+				"updated": "2015-11-03 18:19:20"
+			}
+
+
++ Response 403
+
+    + Body 
+
+            {
+                "403 Forbidden"
+            }
+
++ Response 404
+
+    + Body
+
+            {
+                "404 Not Found"
+            }
+
 
 ### GET /api/v1/devices?macAddress={mac_address}
 Retrieve a specific Skykit device/display by MAC address.
@@ -276,7 +159,9 @@ Retrieve a specific Skykit device/display by MAC address.
 
     + mac_address: `38b1db95806d` (required, string) - The device's MAC address for wireless or Ethernet networking.
 
-+ Request (application/json)
+
+
++ Request
 
     + Headers
 
@@ -285,12 +170,11 @@ Retrieve a specific Skykit device/display by MAC address.
 
 
 
-+ Response 200 (application/json)
++ Response 200 ( application/json)
 
     + Headers
 
-            Alternate-Protocol: 443:quic,p=1
-            Cache-Control: no-cache
+            cache-control: no-cache
 
     + Body
 
@@ -314,63 +198,88 @@ Retrieve a specific Skykit device/display by MAC address.
 			}
 
 
-+ Response 403 (application/json)
++ Response 403
 
     + Headers
+
+            content-type: text/html; charset=utf-8
+            cache-control: no-cache
 
     + Body
 
             {
-                "error": "HTTP request API token is invalid."
+                "403 Forbidden"
+            }
+
++ Response 404
+
+    + Headers
+
+            content-type: text/html; charset=utf-8
+            cache-control: no-cache
+
+    + Body
+
+            {
+                "404 Not Found"
             }
 
 
-### GET /api/v1/devices/{urlsafe_key}
+
+### GET /api/v1/devices/{urlsafe_key}  -- *managed device*
 
 + Parameters
 
-    + urlsafe_key: `ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgID4woQKDA` (required, string) - The device's entity key.
+    + urlsafe_key: `ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgID4woQKDA` (required, string) - The managed device's entity key.
 
-+ Request (application/json)
++ Request (by key)
 
     + Headers
 
             Accept: application/json
             Authorization: 6C346588BD4C6D722A1165B43C51C
 
-+ Response 200 (application/json)
-
-    + Headers
-
++ Response 200 ( by key)
 
     + Body
 
-            {
-				"status": "ACTIVE", 
-				"lastSync": "2015-06-22T18:31:42.678Z", 
-				"kind": "admin#directory#chromeosdevice", 
-				"ethernetMacAddress": "3863bb98f675", 
-				"tenantCode": "some_tenant 3", 
-				"macAddress": "38b1db95806d", 
-				"orgUnitPath": "/Agosto/Beta/Fairchild Semi", 
-				"serialNumber": "5CD45183S6", 
-				"updated": "2015-06-22 21:01:17", 
-				"gcmRegistrationId": "blah blah 3", 
-				"created": "2015-06-22 21:01:17", 
-				"annotatedUser": "fairchild@skykit.com", 
-				"bootMode": "Verified", 
-				"etag": "\"MO4FtId2-yiZq_-3TpU3AZTf2Ak/q2J1QVycAwick78q5218-w2DMgw\"", 
-				"deviceId": "e80a9161-4367-4189-be90-450e5e29501b", 
-				"lastEnrollmentTime": "2015-05-07T21:15:17.285Z", 
-				"platformVersion": "6812.88.0 (Official Build) stable-channel zako", 
-				"model": "HP Chromebox CB1-(000-099) / HP Chromebox G1", 
-				"osVersion": "42.0.2311.153", 
-				"firmwareVersion": ""
-			}
+            {"annotatedLocation": null, 
+            "deviceId": null, 
+            "etag": null, 
+            "apiKey": "8fdcb1bf2bd548018ce0f598663149bc", 
+            "status": null, 
+            "gcmRegistrationId": "cf70a8d78a6dfa6df76df049", 
+            "tenantCode": "acme_inc", 
+            "key": "ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHIbCxIOQ2hyb21lT3NEZXZpY2UYgICAgICAwAkM", 
+            "pairingCode": null, 
+            "kind": null, 
+            "panelModel": null, 
+            "isUnmanagedDevice": false, 
+            "lastEnrollmentTime": null, 
+            "logglyLink": null, 
+            "osVersion": null, 
+            "firmwareVersion": null, 
+            "panelInput": null, 
+            "macAddress": "18cf5e8f8bca", 
+            "updated": "2015-11-03 18:19:31", 
+            "name": "None None", 
+            "model": null, 
+            "tenantName": "Acme, Inc.", 
+            "bootMode": null, 
+            "tenantKey": "ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFudEVudGl0eUdyb3VwDAsSBlRlbmFudBiAgICAgIDACAw", 
+            "annotatedUser": null, 
+            "orgUnitPath": null, 
+            "platformVersion": null, 
+            "lastSync": null, 
+            "created": "2015-11-03 18:19:31", 
+            "serialNumber": null, 
+            "chromeDeviceDomain": "local.agosto.com", 
+            "notes": null, 
+            "ethernetMacAddress": null, 
+            "contentServerUrl": "https://skykit-contentmanager-int.appspot.com/content"
+            }
 			
-+ Response 403 (application/json)
-
-    + Headers
++ Response 403 (by key)
 
     + Body
 

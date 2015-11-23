@@ -1,22 +1,18 @@
 from webapp2 import RequestHandler
 
-from decorators import api_token_required, identity_required, distributor_required
+from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 
 
-class BogusHandler1(RequestHandler):
+class BogusHandler(RequestHandler):
 
-    @api_token_required
+    @requires_api_token
     def get(self):
         pass
 
-
-class BogusHandler2(RequestHandler):
-    @identity_required
-    def get(self):
+    @requires_registration_token
+    def post(self):
         pass
 
-
-class BogusHandler3(RequestHandler):
-    @distributor_required
-    def get(self):
+    @requires_unmanaged_registration_token
+    def put(self):
         pass
