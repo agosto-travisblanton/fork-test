@@ -11,7 +11,7 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 class TestDeviceHeartbeatModel(BaseTest):
     DISK_UTILIZATION = 26
     MEMORY_UTILIZATION = 63
-    CURRENTLY_PLAYING = 'content'
+    PROGRAM = 'some program'
     CURRENT_CLASS_VERSION = 1
 
     def setUp(self):
@@ -38,7 +38,7 @@ class TestDeviceHeartbeatModel(BaseTest):
         self.heartbeat = DeviceHeartbeat.create(device_key=self.device_key,
                                                 disk_utilization=self.DISK_UTILIZATION,
                                                 memory_utilization=self.MEMORY_UTILIZATION,
-                                                currently_playing=self.CURRENTLY_PLAYING)
+                                                currently_playing=self.PROGRAM)
         self.heartbeat.put()
 
     def test_find_by_device_key_returns_expected_heartbeat_representation(self):
@@ -46,7 +46,7 @@ class TestDeviceHeartbeatModel(BaseTest):
         self.assertIsNotNone(heartbeat)
         self.assertEqual(heartbeat.disk_utilization, self.DISK_UTILIZATION)
         self.assertEqual(heartbeat.memory_utilization, self.MEMORY_UTILIZATION)
-        self.assertEqual(heartbeat.currently_playing, self.CURRENTLY_PLAYING)
+        self.assertEqual(heartbeat.program, self.PROGRAM)
         self.assertTrue(heartbeat.up)
 
     def test_class_version_is_only_set_by_pre_put_hook_method(self):

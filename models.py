@@ -279,7 +279,7 @@ class DeviceHeartbeat(ndb.Model):
     up = ndb.BooleanProperty(default=True, required=True, indexed=True)
     disk_utilization = ndb.IntegerProperty(required=False, indexed=True)
     memory_utilization = ndb.IntegerProperty(required=False, indexed=True)
-    currently_playing = ndb.StringProperty(required=False, indexed=True)
+    program = ndb.StringProperty(required=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
     @classmethod
