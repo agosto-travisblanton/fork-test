@@ -165,6 +165,7 @@ class Tenant(ndb.Model):
         self.class_version = 1
 
 
+
 @ae_ndb_serializer
 class ChromeOsDevice(ndb.Model):
     tenant_key = ndb.KeyProperty(required=False, indexed=True)
@@ -268,6 +269,37 @@ class ChromeOsDevice(ndb.Model):
 
     def _pre_put_hook(self):
         self.class_version = 3
+
+
+@ae_ndb_serializer
+class DeviceHeartbeat(ndb.Model):
+    device_key = ndb.KeyProperty(kind=ChromeOsDevice, required=True, indexed=True)
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
+    up = ndb.BooleanProperty(default=True, required=True, indexed=True)
+    disk_utilization = ndb.IntegerProperty(required=False, indexed=True)
+    memory_utilization = ndb.IntegerProperty(required=False, indexed=True)
+    currently_playing = ndb.StringProperty(required=False, indexed=True)
+    class_version = ndb.IntegerProperty()
+
+    @classmethod
+    def create(cls, device_key, disk_utilization, memory_utilization, currently_playing):
+        return cls(
+            device_key=device_key,
+            disk_utilization=disk_utilization,
+            memory_utilization=memory_utilization,
+            currently_playing=currently_playing
+        )
+
+    @classmethod
+    def find_by_device_key(cls, device_key):
+        if device_key:
+            key = DeviceHeartbeat.query(DeviceHeartbeat.device_key == device_key).get(keys_only=True)
+            if None is not key:
+                return key.get()
+
+    def _pre_put_hook(self):
+        self.class_version = 1
 
 
 @ae_ndb_serializer

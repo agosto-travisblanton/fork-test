@@ -257,6 +257,62 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         self.response.set_status(status, message)
 
     @requires_api_token
+    def heartbeat(self, device_urlsafe_key):
+        status = 204
+        message = None
+        device = None
+        try:
+            device = ndb.Key(urlsafe=device_urlsafe_key).get()
+        except Exception, e:
+            logging.exception(e)
+        if device is None:
+            status = 404
+            message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
+        else:
+            request_json = json.loads(self.request.body)
+            notes = request_json.get('notes')
+            if notes:
+                device.notes = notes
+            gcm_registration_id = request_json.get('gcmRegistrationId')
+            if gcm_registration_id:
+                logging.info('  PUT updating the gcmRegistrationId.')
+                device.gcm_registration_id = gcm_registration_id
+            panel_model = request_json.get('panelModel')
+            if panel_model:
+                device.panel_model = panel_model
+            else:
+                device.panel_model = None
+            panel_input = request_json.get('panelInput')
+            if panel_input:
+                device.panel_input = panel_input
+            else:
+                device.panel_input = None
+            tenant_code = request_json.get('tenantCode')
+            if tenant_code:
+                tenant = Tenant.find_by_tenant_code(tenant_code)
+                if tenant and tenant.key != device.tenant_key:
+                    device.tenant_key = tenant.key
+                    if device.is_unmanaged_device:
+                        logging.info(' PUT add the tenant to unmanaged device.')
+                        post_unmanaged_device_info(gcm_registration_id=device.gcm_registration_id,
+                                                   device_urlsafe_key=device.key.urlsafe())
+                    else:
+                        logging.info(' PUT update tenant on device.')
+                        device.put()
+                        deferred.defer(ContentManagerApi().update_device,
+                                       device_urlsafe_key=device.key.urlsafe(),
+                                       _queue='content-server',
+                                       _countdown=5)
+            device.put()
+            if not device.is_unmanaged_device:
+                deferred.defer(update_chrome_os_device,
+                               device_urlsafe_key=device.key.urlsafe(),
+                               _queue='directory-api')
+            self.response.headers.pop('Content-Type', None)
+        self.response.set_status(status, message)
+
+
+    @requires_api_token
     def delete(self, device_urlsafe_key):
         status = 204
         message = None

@@ -59,6 +59,13 @@ application = WSGIApplication(
         ############################################################
         # device registration
         ############################################################
+        Route(r'/api/v1/devices/<device_urlsafe_key>/heartbeat',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='devices-heartbeat',
+              handler_method='heartbeat',
+              methods=['PUT']
+              ),
+
         Route(r'/api/v1/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='devices-retrieval',

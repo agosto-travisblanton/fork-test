@@ -13,7 +13,6 @@ class TestTenantModel(BaseTest):
     ADMIN_EMAIL = 'foo@bar.com'
     CONTENT_SERVER_URL = 'https://www.content.com'
     CONTENT_MANAGER_BASE_URL = 'https://skykit-contentmanager-int.appspot.com'
-    CONTENT_SERVER_API_KEY = 'API KEY'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     TENANT_CODE = 'foobar'
     ENTITY_GROUP_NAME = 'tenantEntityGroup'
