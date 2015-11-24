@@ -1,5 +1,6 @@
 import json
 import logging
+from datetime import datetime
 
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
@@ -10,7 +11,7 @@ from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address
 from content_manager_api import ContentManagerApi
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from device_message_processor import post_unmanaged_device_info, change_intent
-from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup, DeviceHeartbeat
+from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY
@@ -258,16 +259,14 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @requires_api_token
     def heartbeat(self, device_urlsafe_key):
-        try:
-            device_key = ndb.Key(urlsafe=device_urlsafe_key)
-        except Exception, e:
-            logging.exception(e)
-
         status = 204
         message = None
-
-        heartbeat = DeviceHeartbeat.find_by_device_key(device_key)
-        if heartbeat is None:
+        device = None
+        try:
+            device = ndb.Key(urlsafe=device_urlsafe_key).get()
+        except Exception, e:
+            logging.exception(e)
+        if device is None:
             status = 404
             message = 'Unrecognized heartbeat device_key: {0}'.format(device_urlsafe_key)
         else:
@@ -275,17 +274,18 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             disk_utilization = request_json.get('disk')
             if disk_utilization:
                 disk_utilization = int(disk_utilization)
-                if heartbeat.disk_utilization != disk_utilization:
-                    heartbeat.disk_utilization = disk_utilization
+                if device.disk_utilization != disk_utilization:
+                    device.disk_utilization = disk_utilization
             memory_utilization = request_json.get('memory')
             if memory_utilization:
                 memory_utilization = int(memory_utilization)
-                if heartbeat.memory_utilization != memory_utilization:
-                    heartbeat.memory_utilization = memory_utilization
+                if device.memory_utilization != memory_utilization:
+                    device.memory_utilization = memory_utilization
             program_playing = request_json.get('playing')
             if program_playing:
-                heartbeat.program_playing = program_playing
-            heartbeat.put()
+                device.program_playing = program_playing
+            device.heartbeat_updated = datetime.utcnow()
+            device.put()
             self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
 
