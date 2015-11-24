@@ -10,7 +10,7 @@ from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address
 from content_manager_api import ContentManagerApi
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from device_message_processor import post_unmanaged_device_info, change_intent
-from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup
+from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup, DeviceHeartbeat
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY
@@ -258,59 +258,36 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @requires_api_token
     def heartbeat(self, device_urlsafe_key):
-        status = 204
-        message = None
-        device = None
         try:
-            device = ndb.Key(urlsafe=device_urlsafe_key).get()
+            device_key = ndb.Key(urlsafe=device_urlsafe_key)
         except Exception, e:
             logging.exception(e)
-        if device is None:
+
+        status = 204
+        message = None
+
+        heartbeat = DeviceHeartbeat.find_by_device_key(device_key)
+        if heartbeat is None:
             status = 404
-            message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
+            message = 'Unrecognized heartbeat device_key: {0}'.format(device_urlsafe_key)
         else:
             request_json = json.loads(self.request.body)
-            notes = request_json.get('notes')
-            if notes:
-                device.notes = notes
-            gcm_registration_id = request_json.get('gcmRegistrationId')
-            if gcm_registration_id:
-                logging.info('  PUT updating the gcmRegistrationId.')
-                device.gcm_registration_id = gcm_registration_id
-            panel_model = request_json.get('panelModel')
-            if panel_model:
-                device.panel_model = panel_model
-            else:
-                device.panel_model = None
-            panel_input = request_json.get('panelInput')
-            if panel_input:
-                device.panel_input = panel_input
-            else:
-                device.panel_input = None
-            tenant_code = request_json.get('tenantCode')
-            if tenant_code:
-                tenant = Tenant.find_by_tenant_code(tenant_code)
-                if tenant and tenant.key != device.tenant_key:
-                    device.tenant_key = tenant.key
-                    if device.is_unmanaged_device:
-                        logging.info(' PUT add the tenant to unmanaged device.')
-                        post_unmanaged_device_info(gcm_registration_id=device.gcm_registration_id,
-                                                   device_urlsafe_key=device.key.urlsafe())
-                    else:
-                        logging.info(' PUT update tenant on device.')
-                        device.put()
-                        deferred.defer(ContentManagerApi().update_device,
-                                       device_urlsafe_key=device.key.urlsafe(),
-                                       _queue='content-server',
-                                       _countdown=5)
-            device.put()
-            if not device.is_unmanaged_device:
-                deferred.defer(update_chrome_os_device,
-                               device_urlsafe_key=device.key.urlsafe(),
-                               _queue='directory-api')
+            disk_utilization = request_json.get('disk')
+            if disk_utilization:
+                disk_utilization = int(disk_utilization)
+                if heartbeat.disk_utilization != disk_utilization:
+                    heartbeat.disk_utilization = disk_utilization
+            memory_utilization = request_json.get('memory')
+            if memory_utilization:
+                memory_utilization = int(memory_utilization)
+                if heartbeat.memory_utilization != memory_utilization:
+                    heartbeat.memory_utilization = memory_utilization
+            program_playing = request_json.get('playing')
+            if program_playing:
+                heartbeat.program_playing = program_playing
+            heartbeat.put()
             self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
-
 
     @requires_api_token
     def delete(self, device_urlsafe_key):

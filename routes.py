@@ -65,7 +65,6 @@ application = WSGIApplication(
               handler_method='heartbeat',
               methods=['PUT']
               ),
-
         Route(r'/api/v1/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='devices-retrieval',

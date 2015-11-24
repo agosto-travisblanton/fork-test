@@ -279,16 +279,16 @@ class DeviceHeartbeat(ndb.Model):
     up = ndb.BooleanProperty(default=True, required=True, indexed=True)
     disk_utilization = ndb.IntegerProperty(required=False, indexed=True)
     memory_utilization = ndb.IntegerProperty(required=False, indexed=True)
-    program = ndb.StringProperty(required=False, indexed=True)
+    program_playing = ndb.StringProperty(required=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
     @classmethod
-    def create(cls, device_key, disk_utilization, memory_utilization, currently_playing):
+    def create(cls, device_key, disk_utilization, memory_utilization, program_playing):
         return cls(
             device_key=device_key,
             disk_utilization=disk_utilization,
             memory_utilization=memory_utilization,
-            currently_playing=currently_playing
+            program_playing=program_playing
         )
 
     @classmethod
