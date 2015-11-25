@@ -1,5 +1,6 @@
 import json
 import logging
+from datetime import datetime
 
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
@@ -253,6 +254,38 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 deferred.defer(update_chrome_os_device,
                                device_urlsafe_key=device.key.urlsafe(),
                                _queue='directory-api')
+            self.response.headers.pop('Content-Type', None)
+        self.response.set_status(status, message)
+
+    @requires_api_token
+    def heartbeat(self, device_urlsafe_key):
+        status = 204
+        message = None
+        device = None
+        try:
+            device = ndb.Key(urlsafe=device_urlsafe_key).get()
+        except Exception, e:
+            logging.exception(e)
+        if device is None:
+            status = 404
+            message = 'Unrecognized heartbeat device_key: {0}'.format(device_urlsafe_key)
+        else:
+            request_json = json.loads(self.request.body)
+            disk_utilization = request_json.get('disk')
+            if disk_utilization:
+                disk_utilization = int(disk_utilization)
+                if device.disk_utilization != disk_utilization:
+                    device.disk_utilization = disk_utilization
+            memory_utilization = request_json.get('memory')
+            if memory_utilization:
+                memory_utilization = int(memory_utilization)
+                if device.memory_utilization != memory_utilization:
+                    device.memory_utilization = memory_utilization
+            program_playing = request_json.get('playing')
+            if program_playing:
+                device.program_playing = program_playing
+            device.heartbeat_updated = datetime.utcnow()
+            device.put()
             self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
 

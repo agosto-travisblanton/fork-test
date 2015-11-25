@@ -197,6 +197,11 @@ class ChromeOsDevice(ndb.Model):
     pairing_code = ndb.StringProperty(required=False, indexed=True)
     panel_model = ndb.StringProperty(required=False, indexed=True)
     panel_input = ndb.StringProperty(required=False, indexed=True)
+    heartbeat_updated = ndb.DateTimeProperty(required=False, auto_now=False, indexed=True)
+    up = ndb.BooleanProperty(default=True, required=True, indexed=True)
+    disk_utilization = ndb.IntegerProperty(default=0, required=True, indexed=True)
+    memory_utilization = ndb.IntegerProperty(default=0, required=True, indexed=True)
+    program_playing = ndb.StringProperty(required=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):

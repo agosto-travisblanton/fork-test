@@ -36,6 +36,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     IMPERSONATION_EMAIL = 'test@test.com'
     DEVICE_NOTES = 'This is a device note'
     PAIRING_CODE = '0e8f-fc4e-d632-09dc'
+    DISK_UTILIZATION = 26
+    MEMORY_UTILIZATION = 63
+    PROGRAM = 'some program'
 
     def setUp(self):
         super(TestDeviceResourceHandler, self).setUp()
@@ -794,6 +797,100 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         json.dumps(request_body),
                         headers=self.api_token_authorization_header)
         self.assertIsNone(self.managed_device_key.get())
+
+    ##################################################################################################################
+    ## heartbeat
+    ##################################################################################################################
+
+    def test_device_resource_put_no_authorization_header_returns_forbidden(self):
+        request_body = {'disk': self.DISK_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'playing': self.PROGRAM}
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        response = self.put(uri, params=request_body, headers=self.empty_header)
+        self.assertForbidden(response)
+
+    def test_put_heartbeat_http_status_no_content(self):
+        self.managed_device.program_playing = None
+        self.managed_device.put()
+        request_body = {'disk': self.DISK_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'playing': self.PROGRAM}
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        response = self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        self.assertEqual('204 No Content', response.status)
+
+    def test_put_heartbeat_updates_disk_utilization(self):
+        self.managed_device.disk_utilization = self.DISK_UTILIZATION
+        self.managed_device.memory_utilization = self.MEMORY_UTILIZATION
+        self.managed_device.program_playing = self.PROGRAM
+        self.managed_device.put()
+        request_body = {'disk': self.DISK_UTILIZATION - 1,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'playing': self.PROGRAM}
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        updated_heartbeat = self.managed_device_key.get()
+        self.assertNotEqual(updated_heartbeat.disk_utilization, self.DISK_UTILIZATION)
+        self.assertEqual(updated_heartbeat.memory_utilization, self.MEMORY_UTILIZATION)
+        self.assertEqual(updated_heartbeat.program_playing, self.PROGRAM)
+
+    def test_put_heartbeat_updates_memory_utilization(self):
+        self.managed_device.disk_utilization = self.DISK_UTILIZATION
+        self.managed_device.memory_utilization = self.MEMORY_UTILIZATION
+        self.managed_device.program_playing = self.PROGRAM
+        self.managed_device.put()
+        request_body = {'disk': self.DISK_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION - 1,
+                        'playing': self.PROGRAM}
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        updated_heartbeat = self.managed_device_key.get()
+        self.assertNotEqual(updated_heartbeat.memory_utilization, self.MEMORY_UTILIZATION)
+        self.assertEqual(updated_heartbeat.disk_utilization, self.DISK_UTILIZATION)
+        self.assertEqual(updated_heartbeat.program_playing, self.PROGRAM)
+
+    def test_put_heartbeat_updates_program_playing(self):
+        self.managed_device.disk_utilization = self.DISK_UTILIZATION
+        self.managed_device.memory_utilization = self.MEMORY_UTILIZATION
+        self.managed_device.program_playing = self.PROGRAM
+        self.managed_device.put()
+        request_body = {'disk': self.DISK_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'playing': 'Chronicles of Bob'}
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        updated_heartbeat = self.managed_device_key.get()
+        self.assertNotEqual(updated_heartbeat.program_playing, self.PROGRAM)
+        self.assertEqual(updated_heartbeat.memory_utilization, self.MEMORY_UTILIZATION)
+        self.assertEqual(updated_heartbeat.disk_utilization, self.DISK_UTILIZATION)
+
+    def test_put_heartbeat_cannot_update_up_status(self):
+        self.managed_device.disk_utilization = self.DISK_UTILIZATION
+        self.managed_device.memory_utilization = self.MEMORY_UTILIZATION
+        self.managed_device.program_playing = self.PROGRAM
+        self.managed_device.put()
+        request_body = {'disk': self.DISK_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'playing': self.PROGRAM}
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        updated_heartbeat = self.managed_device_key.get()
+        self.assertEqual(updated_heartbeat.up, updated_heartbeat.up)
+
+    def test_put_heartbeat_sets_heartbeat_updated_timestamp(self):
+        self.managed_device.disk_utilization = self.DISK_UTILIZATION
+        self.managed_device.memory_utilization = self.MEMORY_UTILIZATION
+        self.managed_device.program_playing = self.PROGRAM
+        self.managed_device.put()
+        self.assertIsNone(self.managed_device.heartbeat_updated)
+        request_body = {'disk': self.DISK_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'playing': self.PROGRAM}
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        device = self.managed_device_key.get()
+        self.assertIsNotNone(device.heartbeat_updated)
 
     def __create_tenant(self, code, name, email):
         tenant = Tenant.create(tenant_code=code,
