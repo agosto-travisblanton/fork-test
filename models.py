@@ -201,7 +201,9 @@ class ChromeOsDevice(ndb.Model):
     up = ndb.BooleanProperty(default=True, required=True, indexed=True)
     disk_utilization = ndb.IntegerProperty(default=0, required=True, indexed=True)
     memory_utilization = ndb.IntegerProperty(default=0, required=True, indexed=True)
-    program_playing = ndb.StringProperty(required=False, indexed=True)
+    program = ndb.StringProperty(required=False, indexed=True)
+    program_id = ndb.StringProperty(required=False, indexed=True)
+    last_error = ndb.StringProperty(required=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):
