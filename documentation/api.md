@@ -3,6 +3,43 @@ HOST: https://skykit-display-device-int.appspot.com
 
 # Skykit Provisioning API
 
+
+## Group Device Heartbeat
+
+### PUT /api/v1/devices/{urlsafe_key}/heartbeat
+
+Update Skykit device status.
+
+
++ Parameters
+
+    + urlsafe_key: `ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgID4woQKDA` (required, string) - The device's entity key.
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/json
+            Authorization: 6C346588BD4C6D722A1165B43C51C
+
+    + Body
+
+            {
+				"disk":25,
+				"memory":65,
+				"program":"program name",
+				"programId":"program identifier",
+				"lastError":"error description"
+			}
+
++ Response 204 (application/json)
+
+    + Headers
+
+            Alternate-Protocol: 443:quic,p=1
+            Cache-Control: no-cache
+            
+
 ## Group Managed Devices
 
 ### GET /api/v1/devices

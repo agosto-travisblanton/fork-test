@@ -281,9 +281,18 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 memory_utilization = int(memory_utilization)
                 if device.memory_utilization != memory_utilization:
                     device.memory_utilization = memory_utilization
-            program_playing = request_json.get('playing')
-            if program_playing:
-                device.program_playing = program_playing
+            program = request_json.get('program')
+            if program:
+                if device.program != program:
+                    device.program = program
+            program_id = request_json.get('programId')
+            if program_id:
+                if device.program_id != program_id:
+                    device.program_id = program_id
+            last_error = request_json.get('lastError')
+            if last_error:
+                if device.last_error != last_error:
+                    device.last_error = last_error
             device.heartbeat_updated = datetime.utcnow()
             device.put()
             self.response.headers.pop('Content-Type', None)
