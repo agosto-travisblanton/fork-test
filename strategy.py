@@ -64,6 +64,7 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'notes': lambda o, field_name, context: o.key.get().notes},
     {'serialNumber': lambda o, field_name, context: o.key.get().serial_number},
     {'gcmRegistrationId': lambda o, field_name, context: o.key.get().gcm_registration_id},
+    {'up': lambda o, field_name, context: o.key.get().up},
     {'contentServerUrl': lambda o, field_name,
                                 context: o.tenant_key.get().content_server_url if o.tenant_key is not None else None},
     {'model': lambda o, field_name, context: o.key.get().model},
