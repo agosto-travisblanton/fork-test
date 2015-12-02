@@ -31,6 +31,7 @@ class AppConfig(Config):
     DEFAULT_AGOSTO_DEVICE_DOMAIN = None
     PLAYER_RESET_COMMAND = None
     PLAYER_VOLUME_COMMAND = None
+    PLAYER_UNRESPONSIVE_SECONDS_THRESHOLD = None
 
 
 config = AppConfig.get_config()
