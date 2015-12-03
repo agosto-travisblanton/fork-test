@@ -81,7 +81,7 @@ class TestDeviceMonitoring(BaseTest):
     ## chunking
     ##################################################################################################################
 
-    def test_device_chunking_with_unresponsive_devices(self):
+    def test_device_chunking_with_unresponsive_devices_creates_issues(self):
         number_of_devices = 120
         self.__build_unresponsive_devices(tenant_key=self.tenant_key, number_to_build=number_of_devices)
         device_heartbeat_status_sweep()
@@ -90,7 +90,7 @@ class TestDeviceMonitoring(BaseTest):
         for issue in issues:
             self.assertFalse(issue.up)
 
-    def test_device_chunking_with_responsive_devices(self):
+    def test_device_chunking_with_responsive_devices_does_not_create_issues(self):
         number_of_devices = 120
         self.__build_unresponsive_devices(tenant_key=self.tenant_key, number_to_build=number_of_devices)
         device_heartbeat_status_sweep()
