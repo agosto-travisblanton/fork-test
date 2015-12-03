@@ -66,6 +66,7 @@ class TestDeviceIssueLogModel(BaseTest):
         self.assertEqual(issue.memory_utilization, self.MEMORY_UTILIZATION)
         self.assertEqual(issue.program, self.PROGRAM)
         self.assertIsNone(issue.program_id)
+        self.assertIsNone(issue.last_error)
         self.assertIsNone(issue.created)
         self.assertIsNone(issue.updated)
 

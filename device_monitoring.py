@@ -2,12 +2,16 @@ import logging
 from datetime import datetime
 
 from app_config import config
-from models import ChromeOsDevice
+from models import ChromeOsDevice, DeviceIssueLog
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 def device_heartbeat_status_task():
+    device_down_sweep()
+
+
+def device_down_sweep():
     devices = ChromeOsDevice.query().fetch()
     current_time = datetime.utcnow()
     for device in devices:
@@ -15,6 +19,15 @@ def device_heartbeat_status_task():
         if seconds > config.PLAYER_UNRESPONSIVE_SECONDS_THRESHOLD:
             device.up = False
             device.put()
-            logging.info("{0} seconds down for {1}.".format(seconds, device.key.urlsafe()))
-        pass
-    logging.info("Device heartbeat status task run at {0}".format(current_time))
+            issue = DeviceIssueLog.create(device_key=device.key,
+                                          category=config.DEVICE_ISSUE_PLAYER_DOWN,
+                                          up=False,
+                                          disk_utilization=device.disk_utilization,
+                                          memory_utilization=device.memory_utilization,
+                                          program=device.program,
+                                          program_id=device.program_id,
+                                          last_error=device.last_error)
+            issue.put()
+            logging.info("{0} seconds down for device key {1}, issue key = {2}.".format(seconds, device.key.urlsafe(),
+                                                                                        issue.key.urlsafe()))
+    logging.info("device_down_sweep run at {0}".format(current_time))
