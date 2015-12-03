@@ -1,6 +1,8 @@
 import logging
 from datetime import datetime
 
+from google.appengine.ext.deferred import deferred
+
 from app_config import config
 from models import ChromeOsDevice, DeviceIssueLog
 
@@ -11,10 +13,11 @@ def device_heartbeat_status_sweep():
     query = ChromeOsDevice.query(ChromeOsDevice.up == True)
     devices, cursor, more = query.fetch_page(page_size=config.DEVICE_SWEEP_PAGING_SIZE)
     current_time = datetime.utcnow()
-    __sweep_devices(devices, current_time)
+    deferred.defer(__sweep_devices, devices=devices, current_time=current_time, _queue='device-monitor', _countdown=5)
     while more is True:
         devices, cursor, more = query.fetch_page(page_size=config.DEVICE_SWEEP_PAGING_SIZE, start_cursor=cursor)
-        __sweep_devices(devices, current_time)
+        deferred.defer(__sweep_devices, devices=devices, current_time=current_time, _queue='device-monitor',
+                       _countdown=5)
 
 
 def __sweep_devices(devices, current_time):
