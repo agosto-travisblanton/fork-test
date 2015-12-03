@@ -11,7 +11,7 @@ from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address
 from content_manager_api import ContentManagerApi
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from device_message_processor import post_unmanaged_device_info, change_intent
-from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup
+from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup, DeviceIssueLog
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY
@@ -263,7 +263,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         message = None
         device = None
         try:
-            device = ndb.Key(urlsafe=device_urlsafe_key).get()
+            device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
         except Exception, e:
             logging.exception(e)
         if device is None:
@@ -293,6 +293,17 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             if last_error:
                 if device.last_error != last_error:
                     device.last_error = last_error
+            device_previously_down = device.up is False
+            if device_previously_down:
+                issue_up = DeviceIssueLog.create(device_key=device.key,
+                                                 category=config.DEVICE_ISSUE_PLAYER_UP,
+                                                 up=True,
+                                                 disk_utilization=disk_utilization,
+                                                 memory_utilization=memory_utilization,
+                                                 program=program,
+                                                 program_id=program_id,
+                                                 last_error=last_error)
+                issue_up.put()
             device.heartbeat_updated = datetime.utcnow()
             device.put()
             self.response.headers.pop('Content-Type', None)

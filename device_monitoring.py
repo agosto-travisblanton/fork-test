@@ -7,11 +7,7 @@ from models import ChromeOsDevice, DeviceIssueLog
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
-def device_heartbeat_status_task():
-    device_down_sweep()
-
-
-def device_down_sweep():
+def device_heartbeat_status_sweep():
     devices = ChromeOsDevice.query().fetch()
     current_time = datetime.utcnow()
     for device in devices:
@@ -28,6 +24,6 @@ def device_down_sweep():
                                           program_id=device.program_id,
                                           last_error=device.last_error)
             issue.put()
-            logging.info("{0} seconds down for device key {1}, issue key = {2}.".format(seconds, device.key.urlsafe(),
-                                                                                        issue.key.urlsafe()))
-    logging.info("device_down_sweep run at {0}".format(current_time))
+            logging.info("Down {0} seconds. device key = {1} and issue key = {2}.".format(seconds, device.key.urlsafe(),
+                                                                                          issue.key.urlsafe()))
+    logging.info("device_heartbeat_status_sweep run at {0}".format(current_time))

@@ -292,7 +292,7 @@ class DeviceIssueLog(ndb.Model):
     class_version = ndb.IntegerProperty()
 
     @classmethod
-    def create(cls, device_key, category, up, disk_utilization, memory_utilization,
+    def create(cls, device_key, category, up, disk_utilization=0, memory_utilization=0,
                program=None, program_id=None, last_error=None):
         return cls(device_key=device_key,
                    category=category,
@@ -302,6 +302,10 @@ class DeviceIssueLog(ndb.Model):
                    program=program,
                    program_id=program_id,
                    last_error=last_error)
+
+    @classmethod
+    def get_all_by_device_key(cls, device_key):
+        return DeviceIssueLog.query(DeviceIssueLog.device_key == device_key).fetch()
 
     def _pre_put_hook(self):
         self.class_version = 1

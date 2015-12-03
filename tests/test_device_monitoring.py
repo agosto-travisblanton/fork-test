@@ -1,15 +1,17 @@
 from app_config import config
+from device_monitoring import device_heartbeat_status_sweep
 from env_setup import setup_test_paths
 
 setup_test_paths()
 
+from models import Tenant, ChromeOsDevice, Distributor, Domain, DeviceIssueLog
 from agar.test import BaseTest
-from models import Domain, Distributor, DeviceIssueLog, ChromeOsDevice, Tenant
+from datetime import datetime, timedelta
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
-class TestDeviceIssueLogModel(BaseTest):
+class TestDeviceMonitoring(BaseTest):
     ADMIN_EMAIL = 'foo@bar.com'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     CONTENT_SERVER_API_KEY = 'API KEY'
@@ -22,13 +24,12 @@ class TestDeviceIssueLogModel(BaseTest):
     TENANT_NAME = 'Foobar, Inc,'
     DISTRIBUTOR_NAME = 'agosto'
     IMPERSONATION_EMAIL = 'test@test.com'
-    DISK_UTILIZATION = 99
-    MEMORY_UTILIZATION = 8
+    DISK_UTILIZATION = 26
+    MEMORY_UTILIZATION = 63
     PROGRAM = 'some program'
-    CURRENT_CLASS_VERSION = 1
 
     def setUp(self):
-        super(TestDeviceIssueLogModel, self).setUp()
+        super(TestDeviceMonitoring, self).setUp()
         self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
                                               active=True)
         self.distributor_key = self.distributor.put()
@@ -50,42 +51,29 @@ class TestDeviceIssueLogModel(BaseTest):
             gcm_registration_id=self.GCM_REGISTRATION_ID,
             device_id=self.DEVICE_ID,
             mac_address=self.MAC_ADDRESS)
+        self.device.disk_utilization = self.DISK_UTILIZATION
+        self.device.memory_utilization = self.MEMORY_UTILIZATION
+        self.device.program = self.PROGRAM
+        self.device.heartbeat_updated = datetime.utcnow()
         self.device_key = self.device.put()
 
-    def test_create_returns_expected_device_issue_representation(self):
-        issue = DeviceIssueLog.create(device_key=self.device_key,
-                                      category=config.DEVICE_ISSUE_PLAYER_DOWN,
-                                      up=False,
-                                      disk_utilization=self.DISK_UTILIZATION,
-                                      memory_utilization=self.MEMORY_UTILIZATION,
-                                      program=self.PROGRAM)
-        self.assertEqual(issue.device_key, self.device_key)
-        self.assertEqual(issue.category, 'Down')
+    ##################################################################################################################
+    ## device_heartbeat_status_sweep
+    ##################################################################################################################
+
+    def test_device_heartbeat_status_sweep_adds_a_device_down_issue_for_unresponsive_device(self):
+        elapsed_seconds = config.PLAYER_UNRESPONSIVE_SECONDS_THRESHOLD + 1
+        self.device.heartbeat_updated = datetime.utcnow() - timedelta(seconds=elapsed_seconds)
+        self.device.put()
+        device_heartbeat_status_sweep()
+        issues = DeviceIssueLog.get_all_by_device_key(self.device_key)
+        self.assertLength(1, issues)
+        issue = issues[0]
         self.assertFalse(issue.up)
+        self.assertEqual(issue.category, config.DEVICE_ISSUE_PLAYER_DOWN)
+        self.assertEqual(issue.device_key, self.device_key)
         self.assertEqual(issue.disk_utilization, self.DISK_UTILIZATION)
         self.assertEqual(issue.memory_utilization, self.MEMORY_UTILIZATION)
+        self.assertIsNone(issue.last_error)
         self.assertEqual(issue.program, self.PROGRAM)
         self.assertIsNone(issue.program_id)
-        self.assertIsNone(issue.last_error)
-        self.assertIsNone(issue.created)
-        self.assertIsNone(issue.updated)
-
-    def test_class_version_is_only_set_by_pre_put_hook_method(self):
-        issue = DeviceIssueLog.create(device_key=self.device_key,
-                                      category=config.DEVICE_ISSUE_PLAYER_DOWN,
-                                      up=False)
-        issue.class_version = 47
-        issue.put()
-        self.assertEqual(issue.class_version, self.CURRENT_CLASS_VERSION)
-
-    def test_get_all_by_device_key(self):
-        issue_down = DeviceIssueLog.create(device_key=self.device_key,
-                                           category=config.DEVICE_ISSUE_PLAYER_DOWN,
-                                           up=False)
-        issue_down.put()
-        issue_up = DeviceIssueLog.create(device_key=self.device_key,
-                                         category=config.DEVICE_ISSUE_PLAYER_UP,
-                                         up=True)
-        issue_up.put()
-        issues = DeviceIssueLog.get_all_by_device_key(self.device_key)
-        self.assertLength(2, issues)
