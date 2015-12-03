@@ -278,6 +278,40 @@ class ChromeOsDevice(ndb.Model):
 
 
 @ae_ndb_serializer
+class DeviceIssueLog(ndb.Model):
+    device_key = ndb.KeyProperty(kind=ChromeOsDevice, required=True, indexed=True)
+    category = ndb.StringProperty(required=True, indexed=True)
+    up = ndb.BooleanProperty(default=True, required=False, indexed=True)
+    program = ndb.StringProperty(required=False, indexed=True)
+    program_id = ndb.StringProperty(required=False, indexed=True)
+    last_error = ndb.StringProperty(required=False, indexed=True)
+    disk_utilization = ndb.IntegerProperty(default=0, required=True, indexed=True)
+    memory_utilization = ndb.IntegerProperty(default=0, required=True, indexed=True)
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    updated = ndb.DateTimeProperty(auto_now=True)
+    class_version = ndb.IntegerProperty()
+
+    @classmethod
+    def create(cls, device_key, category, up, disk_utilization=0, memory_utilization=0,
+               program=None, program_id=None, last_error=None):
+        return cls(device_key=device_key,
+                   category=category,
+                   up=up,
+                   disk_utilization=disk_utilization,
+                   memory_utilization=memory_utilization,
+                   program=program,
+                   program_id=program_id,
+                   last_error=last_error)
+
+    @classmethod
+    def get_all_by_device_key(cls, device_key):
+        return DeviceIssueLog.query(DeviceIssueLog.device_key == device_key).fetch()
+
+    def _pre_put_hook(self):
+        self.class_version = 1
+
+
+@ae_ndb_serializer
 class User(ndb.Model):
     class_version = ndb.IntegerProperty()
     created = ndb.DateTimeProperty(auto_now_add=True)

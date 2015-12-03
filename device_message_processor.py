@@ -20,7 +20,6 @@ def change_intent(gcm_registration_id, payload):
     except Exception, e:
         logging.exception(e)
 
-
 def post_unmanaged_device_info(gcm_registration_id, device_urlsafe_key):
     payload = "skykit.com/skdchromeapp/unmanaged/{0}/{1}".format(device_urlsafe_key, config.UNMANAGED_API_TOKEN)
     change_intent(gcm_registration_id=gcm_registration_id, payload=payload)

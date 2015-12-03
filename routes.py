@@ -185,6 +185,16 @@ application = WSGIApplication(
               ),
 
         ############################################################
+        # Device Monitoring
+        ############################################################
+        Route(r'/api/v1/monitor/devices',
+              handler='handlers.monitor_devices_handler.MonitorDevicesHandler',
+              name='monitor-devices',
+              handler_method='last_contact_check',
+              methods=['GET'],
+              ),
+
+        ############################################################
         # /dev/ routes secured by admin:required
         ############################################################
         Route(

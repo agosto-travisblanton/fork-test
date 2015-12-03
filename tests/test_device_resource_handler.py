@@ -13,7 +13,7 @@ from chrome_os_devices_api import (refresh_device_by_mac_address, refresh_device
 from agar.test import BaseTest, WebTest
 from mockito import when, any as any_matcher
 from routes import application
-from models import ChromeOsDevice, Tenant, Distributor, Domain
+from models import ChromeOsDevice, Tenant, Distributor, Domain, DeviceIssueLog
 from app_config import config
 
 
@@ -930,12 +930,35 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         device = self.managed_device_key.get()
         self.assertIsNotNone(device.heartbeat_updated)
 
-    def __initialize_heartbeat_info(self):
+    def test_put_heartbeat_invokes_a_device_issue_log_up_toggle_if_device_was_previously_down(self):
+        self.__initialize_heartbeat_info(up=False)
+        issues = DeviceIssueLog.get_all_by_device_key(self.managed_device.key)
+        self.assertLength(0, issues)
+        request_body = {'disk': self.DISK_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        issues = DeviceIssueLog.get_all_by_device_key(self.managed_device.key)
+        self.assertLength(1, issues)
+        self.assertTrue(issues[0].up)
+        self.assertEqual(issues[0].category, config.DEVICE_ISSUE_PLAYER_UP)
+        self.assertEqual(issues[0].disk_utilization, self.DISK_UTILIZATION)
+        self.assertEqual(issues[0].memory_utilization, self.MEMORY_UTILIZATION)
+        self.assertEqual(issues[0].program, self.PROGRAM)
+        self.assertEqual(issues[0].program_id, self.PROGRAM_ID)
+        self.assertEqual(issues[0].last_error, self.LAST_ERROR)
+
+    def __initialize_heartbeat_info(self, up=True):
         self.managed_device.disk_utilization = self.DISK_UTILIZATION
         self.managed_device.memory_utilization = self.MEMORY_UTILIZATION
         self.managed_device.program = self.PROGRAM
         self.managed_device.program_id = self.PROGRAM_ID
         self.managed_device.last_error = self.LAST_ERROR
+        self.managed_device.up = up
         self.managed_device.put()
 
     def __create_tenant(self, code, name, email):
