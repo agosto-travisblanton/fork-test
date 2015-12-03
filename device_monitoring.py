@@ -8,8 +8,16 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 def device_heartbeat_status_sweep():
-    devices = ChromeOsDevice.query().fetch()
+    query = ChromeOsDevice.query(ChromeOsDevice.up == True)
+    devices, cursor, more = query.fetch_page(page_size=config.DEVICE_SWEEP_PAGING_SIZE)
     current_time = datetime.utcnow()
+    __sweep_devices(devices, current_time)
+    while more is True:
+        devices, cursor, more = query.fetch_page(page_size=config.DEVICE_SWEEP_PAGING_SIZE, start_cursor=cursor)
+        __sweep_devices(devices, current_time)
+
+
+def __sweep_devices(devices, current_time):
     for device in devices:
         seconds = (current_time - device.heartbeat_updated).seconds
         if seconds > config.PLAYER_UNRESPONSIVE_SECONDS_THRESHOLD:

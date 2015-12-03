@@ -55,7 +55,6 @@ class TestDeviceMonitoring(BaseTest):
         self.device.memory_utilization = self.MEMORY_UTILIZATION
         self.device.program = self.PROGRAM
         self.device.heartbeat_updated = datetime.utcnow()
-        self.device_key = self.device.put()
 
     ##################################################################################################################
     ## device_heartbeat_status_sweep
@@ -64,16 +63,60 @@ class TestDeviceMonitoring(BaseTest):
     def test_device_heartbeat_status_sweep_adds_a_device_down_issue_for_unresponsive_device(self):
         elapsed_seconds = config.PLAYER_UNRESPONSIVE_SECONDS_THRESHOLD + 1
         self.device.heartbeat_updated = datetime.utcnow() - timedelta(seconds=elapsed_seconds)
-        self.device.put()
+        device_key = self.device.put()
         device_heartbeat_status_sweep()
-        issues = DeviceIssueLog.get_all_by_device_key(self.device_key)
+        issues = DeviceIssueLog.get_all_by_device_key(device_key)
         self.assertLength(1, issues)
         issue = issues[0]
         self.assertFalse(issue.up)
         self.assertEqual(issue.category, config.DEVICE_ISSUE_PLAYER_DOWN)
-        self.assertEqual(issue.device_key, self.device_key)
+        self.assertEqual(issue.device_key, device_key)
         self.assertEqual(issue.disk_utilization, self.DISK_UTILIZATION)
         self.assertEqual(issue.memory_utilization, self.MEMORY_UTILIZATION)
         self.assertIsNone(issue.last_error)
         self.assertEqual(issue.program, self.PROGRAM)
         self.assertIsNone(issue.program_id)
+
+    ##################################################################################################################
+    ## chunking
+    ##################################################################################################################
+
+    def test_device_chunking_with_unresponsive_devices(self):
+        number_of_devices = 120
+        self.__build_unresponsive_devices(tenant_key=self.tenant_key, number_to_build=number_of_devices)
+        device_heartbeat_status_sweep()
+        issues = DeviceIssueLog.query().fetch()
+        self.assertTrue(len(issues) == number_of_devices)
+        for issue in issues:
+            self.assertFalse(issue.up)
+
+    def test_device_chunking_with_responsive_devices(self):
+        number_of_devices = 120
+        self.__build_unresponsive_devices(tenant_key=self.tenant_key, number_to_build=number_of_devices)
+        device_heartbeat_status_sweep()
+        issues = DeviceIssueLog.query(DeviceIssueLog.up == True).fetch()
+        self.assertTrue(len(issues) == 0)
+
+    def __build_unresponsive_devices(self, tenant_key, number_to_build):
+        self.__build_devices(tenant_key=tenant_key, number_to_build=number_to_build, responsive=False)
+
+    def __build_responsive_devices(self, tenant_key, number_to_build):
+        self.__build_devices(self, tenant_key, number_to_build, responsive=True)
+
+    def __build_devices(self,tenant_key, number_to_build, responsive):
+        results = []
+        if responsive:
+            elapsed_seconds = config.PLAYER_UNRESPONSIVE_SECONDS_THRESHOLD - 1
+        else:
+            elapsed_seconds = config.PLAYER_UNRESPONSIVE_SECONDS_THRESHOLD + 1
+        for i in range(number_to_build):
+            device = ChromeOsDevice.create_managed(tenant_key=tenant_key,
+                                                   mac_address='mac{0}'.format(i),
+                                                   gcm_registration_id='gcm{0}'.format(i),
+                                                   device_id='d{0}'.format(i))
+            device.heartbeat_updated = datetime.utcnow() - timedelta(seconds=elapsed_seconds)
+            device.up = True
+            device.put()
+            results.append(device)
+        return results
+
