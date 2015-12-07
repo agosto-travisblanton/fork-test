@@ -41,6 +41,9 @@ class AppConfig(Config):
     DEVICE_ISSUE_STORAGE_NORMAL = None
     DEVICE_SWEEP_PAGING_SIZE = None
 
+    DISK_UTILIZATION_THREHSHOLD = None
+    MEMORY_UTILIZATION_THREHSHOLD = None
+
 
 
 config = AppConfig.get_config()
