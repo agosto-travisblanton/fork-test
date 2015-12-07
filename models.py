@@ -2,6 +2,7 @@ import uuid
 
 from google.appengine.ext import ndb
 
+from app_config import config
 from restler.decorators import ae_ndb_serializer
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>. Bob MacNeal <bob.macneal@agosto.com>'
@@ -306,6 +307,20 @@ class DeviceIssueLog(ndb.Model):
     @classmethod
     def get_all_by_device_key(cls, device_key):
         return DeviceIssueLog.query(DeviceIssueLog.device_key == device_key).fetch()
+
+    @classmethod
+    def is_device_memory_high(cls, device_key):
+        memory_high = DeviceIssueLog.query(ndb.AND(DeviceIssueLog.device_key == device_key,
+                                                   DeviceIssueLog.category == config.DEVICE_ISSUE_MEMORY_HIGH)).order(
+            -cls.updated).fetch(1)
+        return True
+
+    @classmethod
+    def is_device_storage_low(cls, device_key):
+        storage_low = DeviceIssueLog.query(ndb.AND(DeviceIssueLog.device_key == device_key,
+                                                   DeviceIssueLog.category == config.DEVICE_ISSUE_STORAGE_LOW)).order(
+            -cls.updated).fetch(1)
+        return True
 
     def _pre_put_hook(self):
         self.class_version = 1

@@ -89,3 +89,9 @@ class TestDeviceIssueLogModel(BaseTest):
         issue_up.put()
         issues = DeviceIssueLog.get_all_by_device_key(self.device_key)
         self.assertLength(2, issues)
+
+    def test_is_device_memory_high(self):
+        pass
+
+    def test_is_device_storage_low(self):
+        pass

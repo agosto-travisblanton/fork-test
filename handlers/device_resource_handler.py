@@ -304,6 +304,22 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                  program_id=program_id,
                                                  last_error=last_error)
                 issue_up.put()
+            device_memory_previously_high = device.memory_utilization > config.MEMORY_UTILIZATION_THREHSHOLD
+            if device_memory_previously_high:
+
+                issue_up = DeviceIssueLog.create(device_key=device.key,
+                                                 category=config.DEVICE_ISSUE_PLAYER_UP,
+                                                 up=True,
+                                                 disk_utilization=disk_utilization,
+                                                 memory_utilization=memory_utilization,
+                                                 program=program,
+                                                 program_id=program_id,
+                                                 last_error=last_error)
+                issue_up.put()
+            device_storage_previously_low = device.disk_utilization > config.DISK_UTILIZATION_THREHSHOLD
+            if device_storage_previously_low:
+                pass
+
             device.heartbeat_updated = datetime.utcnow()
             device.put()
             self.response.headers.pop('Content-Type', None)
