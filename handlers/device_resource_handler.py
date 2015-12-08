@@ -293,45 +293,49 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             if last_error:
                 if device.last_error != last_error:
                     device.last_error = last_error
-            device_previously_down = device.up is False
-            if device_previously_down:
-                issue_up = DeviceIssueLog.create(device_key=device.key,
-                                                 category=config.DEVICE_ISSUE_PLAYER_UP,
-                                                 up=True,
-                                                 storage_utilization=storage,
-                                                 memory_utilization=memory,
-                                                 program=program,
-                                                 program_id=program_id,
-                                                 last_error=last_error)
-                issue_up.resolved = True
-                issue_up.resolved_datetime = datetime.utcnow()
-                issue_up.put()
-            device_has_memory_issues = DeviceIssueLog.device_has_unresolved_memory_issues(device.key)
-            if device_has_memory_issues and device.memory_utilization < config.MEMORY_UTILIZATION_THREHSHOLD:
-                issue_log = DeviceIssueLog.create(device_key=device.key,
-                                                  category=config.DEVICE_ISSUE_MEMORY_NORMAL,
-                                                  up=True,
-                                                  storage_utilization=storage,
-                                                  memory_utilization=memory,
-                                                  program=program,
-                                                  program_id=program_id,
-                                                  last_error=last_error)
-                issue_log.resolved = True
-                issue_log.resolved_datetime = datetime.utcnow()
-                issue_log.put()
-            device_has_storage_issues = DeviceIssueLog.device_has_unresolved_storage_issues(device.key)
-            if device_has_storage_issues and device.memory_utilization < config.STORAGE_UTILIZATION_THREHSHOLD:
-                issue_log = DeviceIssueLog.create(device_key=device.key,
-                                                  category=config.DEVICE_ISSUE_MEMORY_NORMAL,
-                                                  up=True,
-                                                  storage_utilization=storage,
-                                                  memory_utilization=memory,
-                                                  program=program,
-                                                  program_id=program_id,
-                                                  last_error=last_error)
-                issue_log.resolved = True
-                issue_log.resolved_datetime = datetime.utcnow()
-                issue_log.put()
+            previously_down = device.up is False
+            if previously_down:
+                new_log_entry = DeviceIssueLog.create(device_key=device.key,
+                                                      category=config.DEVICE_ISSUE_PLAYER_UP,
+                                                      up=True,
+                                                      storage_utilization=storage,
+                                                      memory_utilization=memory,
+                                                      program=program,
+                                                      program_id=program_id,
+                                                      last_error=last_error,
+                                                      resolved=True,
+                                                      resolved_datetime=datetime.utcnow())
+                new_log_entry.put()
+            prior_memory_issues = DeviceIssueLog.device_has_unresolved_memory_issues(device.key)
+            if prior_memory_issues and device.memory_utilization < config.MEMORY_UTILIZATION_THREHSHOLD:
+                resolved_datetime = datetime.utcnow()
+                DeviceIssueLog.resolve_device_memory_issues(device_key=device.key, resolved_datetime=resolved_datetime)
+                new_log_entry = DeviceIssueLog.create(device_key=device.key,
+                                                      category=config.DEVICE_ISSUE_MEMORY_NORMAL,
+                                                      up=True,
+                                                      storage_utilization=storage,
+                                                      memory_utilization=memory,
+                                                      program=program,
+                                                      program_id=program_id,
+                                                      last_error=last_error,
+                                                      resolved=True,
+                                                      resolved_datetime=resolved_datetime)
+                new_log_entry.put()
+            prior_storage_issues = DeviceIssueLog.device_has_unresolved_storage_issues(device.key)
+            if prior_storage_issues and device.memory_utilization < config.STORAGE_UTILIZATION_THREHSHOLD:
+                resolved_datetime = datetime.utcnow()
+                DeviceIssueLog.resolve_device_storage_issues(device_key=device.key, resolved_datetime=resolved_datetime)
+                new_log_entry = DeviceIssueLog.create(device_key=device.key,
+                                                      category=config.DEVICE_ISSUE_STORAGE_NORMAL,
+                                                      up=True,
+                                                      storage_utilization=storage,
+                                                      memory_utilization=memory,
+                                                      program=program,
+                                                      program_id=program_id,
+                                                      last_error=last_error,
+                                                      resolved=True,
+                                                      resolved_datetime=resolved_datetime)
+                new_log_entry.put()
 
             device.heartbeat_updated = datetime.utcnow()
             device.put()

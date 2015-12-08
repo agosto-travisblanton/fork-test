@@ -47,7 +47,8 @@ def sweep_devices_for_responsiveness(devices, current_time):
                                           memory_utilization=device.memory_utilization,
                                           program=device.program,
                                           program_id=device.program_id,
-                                          last_error=device.last_error)
+                                          last_error=device.last_error,
+                                          resolved=False)
             issue.put()
             logging.info("Down {0} seconds. device key = {1} and issue key = {2}.".format(seconds, device.key.urlsafe(),
                                                                                           issue.key.urlsafe()))
@@ -70,7 +71,8 @@ def sweep_devices_for_exceeding_thresholds(devices, current_time):
                                               memory_utilization=device.memory_utilization,
                                               program=device.program,
                                               program_id=device.program_id,
-                                              last_error=device.last_error)
+                                              last_error=device.last_error,
+                                              resolved=False)
                 issue.put()
                 logging.info("Disk utilization alert. device key = {0} and issue key = {1}. Storage @ {2}%".format(
                     device.key.urlsafe(), issue.key.urlsafe(), device.storage_utilization))
@@ -82,7 +84,8 @@ def sweep_devices_for_exceeding_thresholds(devices, current_time):
                                           memory_utilization=device.memory_utilization,
                                           program=device.program,
                                           program_id=device.program_id,
-                                          last_error=device.last_error)
+                                          last_error=device.last_error,
+                                          resolved=False)
             issue.put()
             logging.info("Memory utilization alert. device key = {0} and issue key = {1}. Memory @ {2}%".format(
                 device.key.urlsafe(), issue.key.urlsafe(), device.memory_utilization))
