@@ -25,7 +25,7 @@ class TestMonitorDevicesHandler(BaseTest, WebTest):
     TENANT_NAME = 'Foobar, Inc,'
     DISTRIBUTOR_NAME = 'agosto'
     IMPERSONATION_EMAIL = 'test@test.com'
-    DISK_UTILIZATION = 26
+    STORAGE_UTILIZATION = 26
     MEMORY_UTILIZATION = 63
     PROGRAM = 'some program'
 
@@ -52,7 +52,7 @@ class TestMonitorDevicesHandler(BaseTest, WebTest):
             gcm_registration_id=self.GCM_REGISTRATION_ID,
             device_id=self.DEVICE_ID,
             mac_address=self.MAC_ADDRESS)
-        self.managed_device.disk_utilization = self.DISK_UTILIZATION
+        self.managed_device.storage_utilization = self.STORAGE_UTILIZATION
         self.managed_device.memory_utilization = self.MEMORY_UTILIZATION
         self.managed_device.program = self.PROGRAM
         self.managed_device.heartbeat_updated = datetime.utcnow()
@@ -60,7 +60,6 @@ class TestMonitorDevicesHandler(BaseTest, WebTest):
         self.api_token_authorization_header = {
             'Authorization': config.API_TOKEN
         }
-
         self.empty_header = {}
 
     ##################################################################################################################

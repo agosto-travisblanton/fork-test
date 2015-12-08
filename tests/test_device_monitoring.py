@@ -21,7 +21,7 @@ class TestDeviceMonitoring(BaseTest):
     TENANT_NAME = 'Foobar, Inc,'
     DISTRIBUTOR_NAME = 'agosto'
     IMPERSONATION_EMAIL = 'test@test.com'
-    DISK_UTILIZATION = 26
+    STORAGE_UTILIZATION = 26
     MEMORY_UTILIZATION = 63
 
     def setUp(self):
@@ -49,14 +49,14 @@ class TestDeviceMonitoring(BaseTest):
     def test_sweep_devices_for_responsiveness_with_unresponsive_devices_creates_issues(self):
         number_of_devices = 3
         devices = self.__build_devices(tenant_key=self.tenant_key, number_to_build=number_of_devices, responsive=False,
-                                       memory=self.MEMORY_UTILIZATION, storage=self.DISK_UTILIZATION)
+                                       memory=self.MEMORY_UTILIZATION, storage=self.STORAGE_UTILIZATION)
         sweep_devices_for_responsiveness(devices, datetime.utcnow())
         issues = DeviceIssueLog.query().fetch()
         self.assertTrue(len(issues) == number_of_devices)
         for issue in issues:
             self.assertFalse(issue.up)
             self.assertEqual(issue.category, config.DEVICE_ISSUE_PLAYER_DOWN)
-            self.assertEqual(issue.disk_utilization, self.DISK_UTILIZATION)
+            self.assertEqual(issue.storage_utilization, self.STORAGE_UTILIZATION)
             self.assertEqual(issue.memory_utilization, self.MEMORY_UTILIZATION)
 
     def test_sweep_devices_for_responsiveness_with_responsive_devices_does_not_generate_issues(self):
@@ -73,7 +73,7 @@ class TestDeviceMonitoring(BaseTest):
     def test_sweep_devices_for_exceeding_thresholds_with_devices_exceeding_memory_threshold_creates_issues(self):
         number_of_devices = 3
         high_memory = config.MEMORY_UTILIZATION_THREHSHOLD + 1
-        normal_storage = config.DISK_UTILIZATION_THREHSHOLD - 1
+        normal_storage = config.STORAGE_UTILIZATION_THREHSHOLD - 1
         devices = self.__build_devices(tenant_key=self.tenant_key, number_to_build=number_of_devices, responsive=True,
                                        memory=high_memory, storage=normal_storage)
         sweep_devices_for_exceeding_thresholds(devices, datetime.utcnow())
@@ -83,11 +83,11 @@ class TestDeviceMonitoring(BaseTest):
             self.assertTrue(issue.up)
             self.assertEqual(issue.category, config.DEVICE_ISSUE_MEMORY_HIGH)
             self.assertEqual(issue.memory_utilization, high_memory)
-            self.assertEqual(issue.disk_utilization, normal_storage)
+            self.assertEqual(issue.storage_utilization, normal_storage)
 
     def test_sweep_devices_for_exceeding_thresholds_with_devices_exceeding_storage_threshold_creates_issues(self):
         number_of_devices = 3
-        high_storage = config.DISK_UTILIZATION_THREHSHOLD + 1
+        high_storage = config.STORAGE_UTILIZATION_THREHSHOLD + 1
         normal_memory = config.MEMORY_UTILIZATION_THREHSHOLD - 1
         devices = self.__build_devices(tenant_key=self.tenant_key, number_to_build=number_of_devices, responsive=True,
                                        memory=normal_memory, storage=high_storage)
@@ -97,13 +97,13 @@ class TestDeviceMonitoring(BaseTest):
         for issue in issues:
             self.assertTrue(issue.up)
             self.assertEqual(issue.category, config.DEVICE_ISSUE_STORAGE_LOW)
-            self.assertEqual(issue.disk_utilization, high_storage)
+            self.assertEqual(issue.storage_utilization, high_storage)
             self.assertEqual(issue.memory_utilization, normal_memory)
 
     def test_sweep_devices_for_exceeding_thresholds_with_devices_not_exceeding_thresholds_does_not_generate_issues(
             self):
         number_of_devices = 3
-        normal_storage = config.DISK_UTILIZATION_THREHSHOLD - 1
+        normal_storage = config.STORAGE_UTILIZATION_THREHSHOLD - 1
         normal_memory = config.MEMORY_UTILIZATION_THREHSHOLD - 1
         devices = self.__build_devices(tenant_key=self.tenant_key, number_to_build=number_of_devices, responsive=True,
                                        memory=normal_memory, storage=normal_storage)
@@ -122,7 +122,7 @@ class TestDeviceMonitoring(BaseTest):
                                                    mac_address='mac{0}'.format(i),
                                                    gcm_registration_id='gcm{0}'.format(i),
                                                    device_id='d{0}'.format(i))
-            device.disk_utilization = storage
+            device.storage_utilization = storage
             device.memory_utilization = memory
             device.heartbeat_updated = datetime.utcnow() - timedelta(seconds=elapsed_seconds)
             device.up = True

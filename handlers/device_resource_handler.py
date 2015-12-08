@@ -271,16 +271,16 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             message = 'Unrecognized heartbeat device_key: {0}'.format(device_urlsafe_key)
         else:
             request_json = json.loads(self.request.body)
-            disk_utilization = request_json.get('disk')
-            if disk_utilization:
-                disk_utilization = int(disk_utilization)
-                if device.disk_utilization != disk_utilization:
-                    device.disk_utilization = disk_utilization
-            memory_utilization = request_json.get('memory')
-            if memory_utilization:
-                memory_utilization = int(memory_utilization)
-                if device.memory_utilization != memory_utilization:
-                    device.memory_utilization = memory_utilization
+            storage = request_json.get('disk')
+            if storage:
+                storage = int(storage)
+                if device.storage_utilization != storage:
+                    device.storage_utilization = storage
+            memory = request_json.get('memory')
+            if memory:
+                memory = int(memory)
+                if device.memory_utilization != memory:
+                    device.memory_utilization = memory
             program = request_json.get('program')
             if program:
                 if device.program != program:
@@ -298,27 +298,40 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 issue_up = DeviceIssueLog.create(device_key=device.key,
                                                  category=config.DEVICE_ISSUE_PLAYER_UP,
                                                  up=True,
-                                                 disk_utilization=disk_utilization,
-                                                 memory_utilization=memory_utilization,
+                                                 storage_utilization=storage,
+                                                 memory_utilization=memory,
                                                  program=program,
                                                  program_id=program_id,
                                                  last_error=last_error)
+                issue_up.resolved = True
+                issue_up.resolved_datetime = datetime.utcnow()
                 issue_up.put()
-            device_memory_previously_high = device.memory_utilization > config.MEMORY_UTILIZATION_THREHSHOLD
-            if device_memory_previously_high:
-
-                issue_up = DeviceIssueLog.create(device_key=device.key,
-                                                 category=config.DEVICE_ISSUE_PLAYER_UP,
-                                                 up=True,
-                                                 disk_utilization=disk_utilization,
-                                                 memory_utilization=memory_utilization,
-                                                 program=program,
-                                                 program_id=program_id,
-                                                 last_error=last_error)
-                issue_up.put()
-            device_storage_previously_low = device.disk_utilization > config.DISK_UTILIZATION_THREHSHOLD
-            if device_storage_previously_low:
-                pass
+            device_has_memory_issues = DeviceIssueLog.device_has_unresolved_memory_issues(device.key)
+            if device_has_memory_issues and device.memory_utilization < config.MEMORY_UTILIZATION_THREHSHOLD:
+                issue_log = DeviceIssueLog.create(device_key=device.key,
+                                                  category=config.DEVICE_ISSUE_MEMORY_NORMAL,
+                                                  up=True,
+                                                  storage_utilization=storage,
+                                                  memory_utilization=memory,
+                                                  program=program,
+                                                  program_id=program_id,
+                                                  last_error=last_error)
+                issue_log.resolved = True
+                issue_log.resolved_datetime = datetime.utcnow()
+                issue_log.put()
+            device_has_storage_issues = DeviceIssueLog.device_has_unresolved_storage_issues(device.key)
+            if device_has_storage_issues and device.memory_utilization < config.STORAGE_UTILIZATION_THREHSHOLD:
+                issue_log = DeviceIssueLog.create(device_key=device.key,
+                                                  category=config.DEVICE_ISSUE_MEMORY_NORMAL,
+                                                  up=True,
+                                                  storage_utilization=storage,
+                                                  memory_utilization=memory,
+                                                  program=program,
+                                                  program_id=program_id,
+                                                  last_error=last_error)
+                issue_log.resolved = True
+                issue_log.resolved_datetime = datetime.utcnow()
+                issue_log.put()
 
             device.heartbeat_updated = datetime.utcnow()
             device.put()

@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 
 from google.appengine.ext import ndb
 
@@ -200,7 +201,7 @@ class ChromeOsDevice(ndb.Model):
     panel_input = ndb.StringProperty(required=False, indexed=True)
     heartbeat_updated = ndb.DateTimeProperty(required=False, auto_now=False, indexed=True)
     up = ndb.BooleanProperty(default=True, required=True, indexed=True)
-    disk_utilization = ndb.IntegerProperty(default=0, required=True, indexed=True)
+    storage_utilization = ndb.IntegerProperty(default=0, required=True, indexed=True)
     memory_utilization = ndb.IntegerProperty(default=0, required=True, indexed=True)
     program = ndb.StringProperty(required=False, indexed=True)
     program_id = ndb.StringProperty(required=False, indexed=True)
@@ -286,19 +287,21 @@ class DeviceIssueLog(ndb.Model):
     program = ndb.StringProperty(required=False, indexed=True)
     program_id = ndb.StringProperty(required=False, indexed=True)
     last_error = ndb.StringProperty(required=False, indexed=True)
-    disk_utilization = ndb.IntegerProperty(default=0, required=True, indexed=True)
+    storage_utilization = ndb.IntegerProperty(default=0, required=True, indexed=True)
     memory_utilization = ndb.IntegerProperty(default=0, required=True, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
+    resolved = ndb.BooleanProperty(default=False, required=True, indexed=True)
+    resolved_datetime = ndb.DateTimeProperty(required=False, auto_now=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
     @classmethod
-    def create(cls, device_key, category, up, disk_utilization=0, memory_utilization=0,
+    def create(cls, device_key, category, up, storage_utilization=0, memory_utilization=0,
                program=None, program_id=None, last_error=None):
         return cls(device_key=device_key,
                    category=category,
                    up=up,
-                   disk_utilization=disk_utilization,
+                   storage_utilization=storage_utilization,
                    memory_utilization=memory_utilization,
                    program=program,
                    program_id=program_id,
@@ -309,18 +312,42 @@ class DeviceIssueLog(ndb.Model):
         return DeviceIssueLog.query(DeviceIssueLog.device_key == device_key).fetch()
 
     @classmethod
-    def is_device_memory_high(cls, device_key):
-        memory_high = DeviceIssueLog.query(ndb.AND(DeviceIssueLog.device_key == device_key,
-                                                   DeviceIssueLog.category == config.DEVICE_ISSUE_MEMORY_HIGH)).order(
-            -cls.updated).fetch(1)
-        return True
+    def device_has_unresolved_memory_issues(cls, device_key):
+        return cls._has_unresolved_issues(device_key, config.DEVICE_ISSUE_MEMORY_HIGH)
 
     @classmethod
-    def is_device_storage_low(cls, device_key):
-        storage_low = DeviceIssueLog.query(ndb.AND(DeviceIssueLog.device_key == device_key,
-                                                   DeviceIssueLog.category == config.DEVICE_ISSUE_STORAGE_LOW)).order(
-            -cls.updated).fetch(1)
-        return True
+    def device_has_unresolved_storage_issues(cls, device_key):
+        return cls._has_unresolved_issues(device_key, config.DEVICE_ISSUE_STORAGE_LOW)
+
+    @classmethod
+    def resolve_device_memory_issues(cls, device_key):
+        cls._resolve_device_issue(device_key, config.DEVICE_ISSUE_MEMORY_HIGH)
+
+    @classmethod
+    def resolve_device_storage_issues(cls, device_key):
+        cls._resolve_device_issue(device_key, config.DEVICE_ISSUE_STORAGE_LOW)
+
+    @staticmethod
+    def _has_unresolved_issues(device_key, category):
+        issues = DeviceIssueLog.query(
+            ndb.AND(DeviceIssueLog.device_key == device_key,
+                    DeviceIssueLog.category == category,
+                    DeviceIssueLog.resolved == False,
+                    DeviceIssueLog.resolved_datetime == None)).get(keys_only=True)
+        return False if issues is None else True
+
+    @staticmethod
+    def _resolve_device_issue(device_key, category):
+        issues = DeviceIssueLog.query(
+            ndb.AND(DeviceIssueLog.device_key == device_key,
+                    DeviceIssueLog.category == category,
+                    DeviceIssueLog.resolved == False,
+                    DeviceIssueLog.resolved_datetime == None)).fetch()
+        resolution_time_stamp = datetime.utcnow()
+        for issue in issues:
+            issue.resolved = True
+            issue.resolved_datetime = resolution_time_stamp
+            issue.put()
 
     def _pre_put_hook(self):
         self.class_version = 1

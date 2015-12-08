@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from app_config import config
 from env_setup import setup_test_paths
 
@@ -22,7 +24,7 @@ class TestDeviceIssueLogModel(BaseTest):
     TENANT_NAME = 'Foobar, Inc,'
     DISTRIBUTOR_NAME = 'agosto'
     IMPERSONATION_EMAIL = 'test@test.com'
-    DISK_UTILIZATION = 99
+    STORAGE_UTILIZATION = 99
     MEMORY_UTILIZATION = 8
     PROGRAM = 'some program'
     CURRENT_CLASS_VERSION = 1
@@ -56,13 +58,13 @@ class TestDeviceIssueLogModel(BaseTest):
         issue = DeviceIssueLog.create(device_key=self.device_key,
                                       category=config.DEVICE_ISSUE_PLAYER_DOWN,
                                       up=False,
-                                      disk_utilization=self.DISK_UTILIZATION,
+                                      storage_utilization=self.STORAGE_UTILIZATION,
                                       memory_utilization=self.MEMORY_UTILIZATION,
                                       program=self.PROGRAM)
         self.assertEqual(issue.device_key, self.device_key)
         self.assertEqual(issue.category, 'Down')
         self.assertFalse(issue.up)
-        self.assertEqual(issue.disk_utilization, self.DISK_UTILIZATION)
+        self.assertEqual(issue.storage_utilization, self.STORAGE_UTILIZATION)
         self.assertEqual(issue.memory_utilization, self.MEMORY_UTILIZATION)
         self.assertEqual(issue.program, self.PROGRAM)
         self.assertIsNone(issue.program_id)
@@ -90,8 +92,82 @@ class TestDeviceIssueLogModel(BaseTest):
         issues = DeviceIssueLog.get_all_by_device_key(self.device_key)
         self.assertLength(2, issues)
 
-    def test_is_device_memory_high(self):
-        pass
+    def test_device_has_unresolved_memory_issue_returns_true_when_unresolved(self):
+        issue = DeviceIssueLog.create(device_key=self.device_key,
+                                      category=config.DEVICE_ISSUE_MEMORY_HIGH,
+                                      up=True)
+        issue.put()
+        self.assertFalse(issue.resolved)
+        self.assertEqual(issue.category, 'Memory high')
+        self.assertIsNone(issue.resolved_datetime)
+        self.assertTrue(DeviceIssueLog.device_has_unresolved_memory_issues(self.device_key))
 
-    def test_is_device_storage_low(self):
-        pass
+    def test_device_has_unresolved_memory_issue_returns_false_when_none(self):
+        issue = DeviceIssueLog.create(device_key=self.device_key,
+                                      category=config.DEVICE_ISSUE_MEMORY_HIGH,
+                                      up=True)
+        issue.resolved = True
+        issue.resolved_datetime = datetime.utcnow()
+        issue.put()
+        self.assertTrue(issue.resolved)
+        self.assertIsNotNone(issue.resolved_datetime)
+        self.assertFalse(DeviceIssueLog.device_has_unresolved_memory_issues(self.device_key))
+
+    def test_resolve_device_memory_issues(self):
+        issue_1 = DeviceIssueLog.create(device_key=self.device_key,
+                                        category=config.DEVICE_ISSUE_MEMORY_HIGH,
+                                        up=True)
+        issue_1.put()
+        self.assertFalse(issue_1.resolved)
+        self.assertIsNone(issue_1.resolved_datetime)
+        issue_2 = DeviceIssueLog.create(device_key=self.device_key,
+                                        category=config.DEVICE_ISSUE_MEMORY_HIGH,
+                                        up=True)
+        issue_2.put()
+        self.assertFalse(issue_2.resolved)
+        self.assertIsNone(issue_2.resolved_datetime)
+        DeviceIssueLog.resolve_device_memory_issues(self.device_key)
+        self.assertTrue(issue_1.resolved)
+        self.assertIsNotNone(issue_1.resolved_datetime)
+        self.assertTrue(issue_2.resolved)
+        self.assertIsNotNone(issue_2.resolved_datetime)
+
+    def test_device_has_unresolved_storage_issue_returns_true_when_unresolved(self):
+        issue = DeviceIssueLog.create(device_key=self.device_key,
+                                      category=config.DEVICE_ISSUE_STORAGE_LOW,
+                                      up=True)
+        issue.put()
+        self.assertFalse(issue.resolved)
+        self.assertEqual(issue.category, 'Storage low')
+        self.assertIsNone(issue.resolved_datetime)
+        self.assertTrue(DeviceIssueLog.device_has_unresolved_storage_issues(self.device_key))
+
+    def test_device_has_unresolved_storage_issue_returns_false_when_none(self):
+        issue = DeviceIssueLog.create(device_key=self.device_key,
+                                      category=config.DEVICE_ISSUE_STORAGE_LOW,
+                                      up=True)
+        issue.resolved = True
+        issue.resolved_datetime = datetime.utcnow()
+        issue.put()
+        self.assertTrue(issue.resolved)
+        self.assertIsNotNone(issue.resolved_datetime)
+        self.assertFalse(DeviceIssueLog.device_has_unresolved_storage_issues(self.device_key))
+
+    def test_resolve_device_storage_issues(self):
+        issue_1 = DeviceIssueLog.create(device_key=self.device_key,
+                                        category=config.DEVICE_ISSUE_STORAGE_LOW,
+                                        up=True)
+        issue_1.put()
+        self.assertFalse(issue_1.resolved)
+        self.assertIsNone(issue_1.resolved_datetime)
+        issue_2 = DeviceIssueLog.create(device_key=self.device_key,
+                                        category=config.DEVICE_ISSUE_STORAGE_LOW,
+                                        up=True)
+        issue_2.put()
+        self.assertFalse(issue_2.resolved)
+        self.assertIsNone(issue_2.resolved_datetime)
+        DeviceIssueLog.resolve_device_storage_issues(self.device_key)
+        self.assertTrue(issue_1.resolved)
+        self.assertIsNotNone(issue_1.resolved_datetime)
+        self.assertTrue(issue_2.resolved)
+        self.assertIsNotNone(issue_2.resolved_datetime)
