@@ -113,25 +113,6 @@ class TestDeviceIssueLogModel(BaseTest):
         self.assertIsNotNone(issue.resolved_datetime)
         self.assertFalse(DeviceIssueLog.device_has_unresolved_memory_issues(self.device_key))
 
-    def test_resolve_device_memory_issues(self):
-        issue_1 = DeviceIssueLog.create(device_key=self.device_key,
-                                        category=config.DEVICE_ISSUE_MEMORY_HIGH,
-                                        up=True)
-        issue_1.put()
-        self.assertFalse(issue_1.resolved)
-        self.assertIsNone(issue_1.resolved_datetime)
-        issue_2 = DeviceIssueLog.create(device_key=self.device_key,
-                                        category=config.DEVICE_ISSUE_MEMORY_HIGH,
-                                        up=True)
-        issue_2.put()
-        self.assertFalse(issue_2.resolved)
-        self.assertIsNone(issue_2.resolved_datetime)
-        DeviceIssueLog.resolve_device_memory_issues(self.device_key, datetime.utcnow())
-        self.assertTrue(issue_1.resolved)
-        self.assertIsNotNone(issue_1.resolved_datetime)
-        self.assertTrue(issue_2.resolved)
-        self.assertIsNotNone(issue_2.resolved_datetime)
-
     def test_device_has_unresolved_storage_issue_returns_true_when_unresolved(self):
         issue = DeviceIssueLog.create(device_key=self.device_key,
                                       category=config.DEVICE_ISSUE_STORAGE_LOW,
@@ -166,8 +147,47 @@ class TestDeviceIssueLogModel(BaseTest):
         issue_2.put()
         self.assertFalse(issue_2.resolved)
         self.assertIsNone(issue_2.resolved_datetime)
-        DeviceIssueLog.resolve_device_storage_issues(self.device_key, datetime.utcnow())
+        resolved_datetime = datetime.utcnow()
+        DeviceIssueLog.resolve_device_storage_issues(self.device_key, resolved_datetime)
         self.assertTrue(issue_1.resolved)
-        self.assertIsNotNone(issue_1.resolved_datetime)
+        self.assertEqual(issue_1.resolved_datetime, resolved_datetime)
         self.assertTrue(issue_2.resolved)
-        self.assertIsNotNone(issue_2.resolved_datetime)
+        self.assertEqual(issue_2.resolved_datetime, resolved_datetime)
+
+    def test_resolve_device_memory_issues(self):
+        issue_1 = DeviceIssueLog.create(device_key=self.device_key,
+                                        category=config.DEVICE_ISSUE_MEMORY_HIGH,
+                                        up=True)
+        issue_1.put()
+        self.assertFalse(issue_1.resolved)
+        self.assertIsNone(issue_1.resolved_datetime)
+        issue_2 = DeviceIssueLog.create(device_key=self.device_key,
+                                        category=config.DEVICE_ISSUE_MEMORY_HIGH,
+                                        up=True)
+        issue_2.put()
+        self.assertFalse(issue_2.resolved)
+        self.assertIsNone(issue_2.resolved_datetime)
+        resolved_datetime = datetime.utcnow()
+        DeviceIssueLog.resolve_device_memory_issues(self.device_key, resolved_datetime)
+        self.assertTrue(issue_1.resolved)
+        self.assertEqual(issue_1.resolved_datetime, resolved_datetime)
+        self.assertTrue(issue_2.resolved)
+        self.assertEqual(issue_2.resolved_datetime, resolved_datetime)
+
+    def test_resolve_device_down_issues(self):
+        issue = DeviceIssueLog.create(device_key=self.device_key,
+                                      category=config.DEVICE_ISSUE_PLAYER_DOWN,
+                                      up=False,
+                                      storage_utilization=self.STORAGE_UTILIZATION,
+                                      memory_utilization=self.MEMORY_UTILIZATION,
+                                      program=self.PROGRAM,
+                                      resolved=False)
+        issue.put()
+        self.assertFalse(issue.up)
+        self.assertFalse(issue.resolved)
+        self.assertIsNone(issue.resolved_datetime)
+        resolved_datetime = datetime.utcnow()
+        DeviceIssueLog.resolve_device_down_issues(self.device_key, resolved_datetime)
+        self.assertTrue(issue.resolved)
+        self.assertEqual(issue.resolved_datetime, resolved_datetime)
+        self.assertTrue(issue.up)
