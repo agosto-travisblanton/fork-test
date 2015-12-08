@@ -98,7 +98,7 @@ class TestDeviceIssueLogModel(BaseTest):
                                       up=True)
         issue.put()
         self.assertFalse(issue.resolved)
-        self.assertEqual(issue.category, 'Memory high')
+        self.assertEqual(issue.category, config.DEVICE_ISSUE_MEMORY_HIGH)
         self.assertIsNone(issue.resolved_datetime)
         self.assertTrue(DeviceIssueLog.device_has_unresolved_memory_issues(self.device_key))
 
