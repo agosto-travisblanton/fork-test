@@ -72,8 +72,8 @@ class TestDeviceMonitoring(BaseTest):
 
     def test_sweep_devices_for_exceeding_thresholds_with_devices_exceeding_memory_threshold_creates_issues(self):
         number_of_devices = 3
-        high_memory = config.MEMORY_UTILIZATION_THREHSHOLD + 1
-        normal_storage = config.STORAGE_UTILIZATION_THREHSHOLD - 1
+        high_memory = config.MEMORY_UTILIZATION_THRESHOLD + 1
+        normal_storage = config.STORAGE_UTILIZATION_THRESHOLD - 1
         devices = self.__build_devices(tenant_key=self.tenant_key, number_to_build=number_of_devices, responsive=True,
                                        memory=high_memory, storage=normal_storage)
         sweep_devices_for_exceeding_thresholds(devices, datetime.utcnow())
@@ -87,8 +87,8 @@ class TestDeviceMonitoring(BaseTest):
 
     def test_sweep_devices_for_exceeding_thresholds_with_devices_exceeding_storage_threshold_creates_issues(self):
         number_of_devices = 3
-        high_storage = config.STORAGE_UTILIZATION_THREHSHOLD + 1
-        normal_memory = config.MEMORY_UTILIZATION_THREHSHOLD - 1
+        high_storage = config.STORAGE_UTILIZATION_THRESHOLD + 1
+        normal_memory = config.MEMORY_UTILIZATION_THRESHOLD - 1
         devices = self.__build_devices(tenant_key=self.tenant_key, number_to_build=number_of_devices, responsive=True,
                                        memory=normal_memory, storage=high_storage)
         sweep_devices_for_exceeding_thresholds(devices, datetime.utcnow())
@@ -103,8 +103,8 @@ class TestDeviceMonitoring(BaseTest):
     def test_sweep_devices_for_exceeding_thresholds_with_devices_not_exceeding_thresholds_does_not_generate_issues(
             self):
         number_of_devices = 3
-        normal_storage = config.STORAGE_UTILIZATION_THREHSHOLD - 1
-        normal_memory = config.MEMORY_UTILIZATION_THREHSHOLD - 1
+        normal_storage = config.STORAGE_UTILIZATION_THRESHOLD - 1
+        normal_memory = config.MEMORY_UTILIZATION_THRESHOLD - 1
         devices = self.__build_devices(tenant_key=self.tenant_key, number_to_build=number_of_devices, responsive=True,
                                        memory=normal_memory, storage=normal_storage)
         sweep_devices_for_exceeding_thresholds(devices, datetime.utcnow())

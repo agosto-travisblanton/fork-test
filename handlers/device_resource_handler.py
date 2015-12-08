@@ -308,8 +308,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                       resolved=True,
                                                       resolved_datetime=datetime.utcnow())
                 new_log_entry.put()
-            prior_memory_issues = DeviceIssueLog.device_has_unresolved_memory_issues(device.key)
-            if prior_memory_issues and device.memory_utilization < config.MEMORY_UTILIZATION_THREHSHOLD:
+            previous_memory_issues = DeviceIssueLog.device_has_unresolved_memory_issues(device.key)
+            if previous_memory_issues and device.memory_utilization < config.MEMORY_UTILIZATION_THRESHOLD:
                 DeviceIssueLog.resolve_device_memory_issues(device_key=device.key, resolved_datetime=resolved_datetime)
                 new_log_entry = DeviceIssueLog.create(device_key=device.key,
                                                       category=config.DEVICE_ISSUE_MEMORY_NORMAL,
@@ -322,8 +322,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                       resolved=True,
                                                       resolved_datetime=resolved_datetime)
                 new_log_entry.put()
-            prior_storage_issues = DeviceIssueLog.device_has_unresolved_storage_issues(device.key)
-            if prior_storage_issues and device.memory_utilization < config.STORAGE_UTILIZATION_THREHSHOLD:
+            previous_storage_issues = DeviceIssueLog.device_has_unresolved_storage_issues(device.key)
+            if previous_storage_issues and device.memory_utilization < config.STORAGE_UTILIZATION_THRESHOLD:
                 DeviceIssueLog.resolve_device_storage_issues(device_key=device.key, resolved_datetime=resolved_datetime)
                 new_log_entry = DeviceIssueLog.create(device_key=device.key,
                                                       category=config.DEVICE_ISSUE_STORAGE_NORMAL,

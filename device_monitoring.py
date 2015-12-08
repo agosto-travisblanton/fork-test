@@ -53,7 +53,7 @@ def sweep_devices_for_responsiveness(devices, current_time):
 
 def sweep_devices_for_exceeding_thresholds(devices, current_time):
     for device in devices:
-        if device.storage_utilization > config.STORAGE_UTILIZATION_THREHSHOLD:
+        if device.storage_utilization > config.STORAGE_UTILIZATION_THRESHOLD:
             issue = DeviceIssueLog.create(device_key=device.key,
                                           category=config.DEVICE_ISSUE_STORAGE_LOW,
                                           up=True,
@@ -64,7 +64,7 @@ def sweep_devices_for_exceeding_thresholds(devices, current_time):
                                           last_error=device.last_error,
                                           resolved=False)
             issue.put()
-        if device.memory_utilization > config.MEMORY_UTILIZATION_THREHSHOLD:
+        if device.memory_utilization > config.MEMORY_UTILIZATION_THRESHOLD:
             issue = DeviceIssueLog.create(device_key=device.key,
                                           category=config.DEVICE_ISSUE_MEMORY_HIGH,
                                           up=True,

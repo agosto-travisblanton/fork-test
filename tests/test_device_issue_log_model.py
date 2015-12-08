@@ -188,6 +188,6 @@ class TestDeviceIssueLogModel(BaseTest):
         self.assertIsNone(issue.resolved_datetime)
         resolved_datetime = datetime.utcnow()
         DeviceIssueLog.resolve_device_down_issues(self.device_key, resolved_datetime)
+        self.assertTrue(issue.up)
         self.assertTrue(issue.resolved)
         self.assertEqual(issue.resolved_datetime, resolved_datetime)
-        self.assertTrue(issue.up)
