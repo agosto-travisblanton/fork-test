@@ -293,8 +293,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             if last_error:
                 if device.last_error != last_error:
                     device.last_error = last_error
+            resolved_datetime = datetime.utcnow()
             previously_down = device.up is False
             if previously_down:
+                DeviceIssueLog.resolve_device_down_issues(device_key=device.key, resolved_datetime=resolved_datetime)
                 new_log_entry = DeviceIssueLog.create(device_key=device.key,
                                                       category=config.DEVICE_ISSUE_PLAYER_UP,
                                                       up=True,
@@ -308,7 +310,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 new_log_entry.put()
             prior_memory_issues = DeviceIssueLog.device_has_unresolved_memory_issues(device.key)
             if prior_memory_issues and device.memory_utilization < config.MEMORY_UTILIZATION_THREHSHOLD:
-                resolved_datetime = datetime.utcnow()
                 DeviceIssueLog.resolve_device_memory_issues(device_key=device.key, resolved_datetime=resolved_datetime)
                 new_log_entry = DeviceIssueLog.create(device_key=device.key,
                                                       category=config.DEVICE_ISSUE_MEMORY_NORMAL,
@@ -323,7 +324,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 new_log_entry.put()
             prior_storage_issues = DeviceIssueLog.device_has_unresolved_storage_issues(device.key)
             if prior_storage_issues and device.memory_utilization < config.STORAGE_UTILIZATION_THREHSHOLD:
-                resolved_datetime = datetime.utcnow()
                 DeviceIssueLog.resolve_device_storage_issues(device_key=device.key, resolved_datetime=resolved_datetime)
                 new_log_entry = DeviceIssueLog.create(device_key=device.key,
                                                       category=config.DEVICE_ISSUE_STORAGE_NORMAL,
@@ -337,6 +337,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                       resolved_datetime=resolved_datetime)
                 new_log_entry.put()
 
+            device.up = True
             device.heartbeat_updated = datetime.utcnow()
             device.put()
             self.response.headers.pop('Content-Type', None)

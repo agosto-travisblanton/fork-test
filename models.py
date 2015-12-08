@@ -321,6 +321,10 @@ class DeviceIssueLog(ndb.Model):
         return cls._has_unresolved_issues(device_key, config.DEVICE_ISSUE_STORAGE_LOW)
 
     @classmethod
+    def resolve_device_down_issues(cls, device_key, resolved_datetime):
+        cls._resolve_device_issue(device_key, config.DEVICE_ISSUE_PLAYER_DOWN, resolved_datetime)
+
+    @classmethod
     def resolve_device_memory_issues(cls, device_key, resolved_datetime):
         cls._resolve_device_issue(device_key, config.DEVICE_ISSUE_MEMORY_HIGH, resolved_datetime)
 
@@ -345,6 +349,7 @@ class DeviceIssueLog(ndb.Model):
                     DeviceIssueLog.resolved == False,
                     DeviceIssueLog.resolved_datetime == None)).fetch()
         for issue in issues:
+            issue.up = True
             issue.resolved = True
             issue.resolved_datetime = resolved_datetime
             issue.put()
