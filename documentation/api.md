@@ -8,7 +8,7 @@ HOST: https://skykit-display-device-int.appspot.com
 
 ### PUT /api/v1/devices/{urlsafe_key}/heartbeat
 
-Update Skykit device status.
+Update Skykit device status. Emanates from the player.
 
 
 + Parameters
@@ -39,6 +39,37 @@ Update Skykit device status.
             Alternate-Protocol: 443:quic,p=1
             Cache-Control: no-cache
             
+
+## Group Device Monitoring Chron
+
+### GET /api/v1/monitoring/devices
+
+Sweep through devices to record issues: 
+1. unresponsiveness (no request in 4 minutes); 
+2. low storage (>90%); or 
+3. high memory use (>90%).
+
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/json
+            Authorization: 6C346588BD4C6D722A1165B43C51C
+
+    + Body
+
+            {
+			}
+
++ Response 200 (application/json)
+
+    + Headers
+
+            Alternate-Protocol: 443:quic,p=1
+            Cache-Control: no-cache
+            
+
 
 ## Group Managed Devices
 
