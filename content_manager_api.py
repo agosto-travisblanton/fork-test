@@ -47,8 +47,8 @@ class ContentManagerApi(object):
             payload = {
                 "device_key": device_urlsafe_key,
                 "api_key": chrome_os_device.api_key,
-                "tenant_code": tenant.tenant_code,
-                "serial_number": chrome_os_device.serial_number
+                "tenant_code": tenant.tenant_code
+                # "serial_number": chrome_os_device.serial_number
             }
             url = "{content_manager_base_url}/provisioning/v1/displays".format(
                 content_manager_base_url=tenant.content_manager_base_url)
