@@ -119,7 +119,7 @@ class TestDeviceIssueLogModel(BaseTest):
                                       up=True)
         issue.put()
         self.assertFalse(issue.resolved)
-        self.assertEqual(issue.category, 'Storage low')
+        self.assertEqual(issue.category, 'Storage available low')
         self.assertIsNone(issue.resolved_datetime)
         self.assertTrue(DeviceIssueLog.device_has_unresolved_storage_issues(self.device_key))
 

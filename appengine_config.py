@@ -223,7 +223,7 @@ app_DEVICE_ISSUE_PLAYER_UP = _DEVICE_ISSUE_PLAYER_UP()
 
 
 def _DEVICE_ISSUE_MEMORY_HIGH():
-    return 'Memory high'
+    return 'Memory usage high'
 
 
 app_DEVICE_ISSUE_MEMORY_HIGH = _DEVICE_ISSUE_MEMORY_HIGH()
@@ -237,7 +237,7 @@ app_DEVICE_ISSUE_MEMORY_NORMAL = _DEVICE_ISSUE_MEMORY_NORMAL()
 
 
 def _DEVICE_ISSUE_STORAGE_LOW():
-    return 'Storage low'
+    return 'Storage available low'
 
 
 app_DEVICE_ISSUE_STORAGE_LOW = _DEVICE_ISSUE_STORAGE_LOW()

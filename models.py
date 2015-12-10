@@ -205,6 +205,9 @@ class ChromeOsDevice(ndb.Model):
     program = ndb.StringProperty(required=False, indexed=True)
     program_id = ndb.StringProperty(required=False, indexed=True)
     last_error = ndb.StringProperty(required=False, indexed=True)
+    os = ndb.StringProperty(required=False, indexed=False)
+    connection_type = ndb.StringProperty(required=False, indexed=True)
+    sk_player_version = ndb.StringProperty(required=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):
