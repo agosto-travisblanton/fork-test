@@ -381,187 +381,204 @@
             </div>
           </div>
         </tab>
-        <tab heading="Reset">
+        <tab heading="Issues">
           <div>
             <div class="panel panel-default">
               <div class="panel-heading">
-                <h3 class="panel-title">Device reset</h3>
+                <h3 class="panel-title">Device issues</h3>
               </div>
               <div class="panel-body">
-                <form name="commandForm"
-                      class="form-horizontal"
-                      ng-submit="deviceDetailsCtrl.onClickResetSendButton()"
-                      novalidate>
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <table name="device-table" class="table table-responsive table-striped">
-                        <thead>
-                        <tr>
-                          <th>Serial number</th>
-                          <th>WiFi mac address</th>
-                          <th>Ether mac address</th>
-                          <th>Provisioned date</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                          <td class="reset-device-serial-number">{{deviceDetailsCtrl.currentDevice.serialNumber}}</td>
-                          <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}</td>
-                          <td class="reset-device-ethernet-mac-address">{{
-                            deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                          </td>
-                          <td class="reset-device-provisioning-date">{{ deviceDetailsCtrl.currentDevice.created }}
-                          </td>
-                        </tr>
-                        </tbody>
-                      </table>
-                      <div class="row">
-                        <div class="col-sm-2 text-right">
-                          <label for="volume">Reset:</label>
-                        </div>
-                        <div class="col-sm-2">
-                          <button type="submit"
-                                  class="btn btn-primary btn-default"><i class="fa fa-fw fa-building"></i>
-                            Send
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </form>
               </div>
             </div>
           </div>
         </tab>
-        <tab heading="Volume">
+        <tab heading="Commands">
           <div>
             <div class="panel panel-default">
               <div class="panel-heading">
-                <h3 class="panel-title">Device volume</h3>
+                <h3 class="panel-title">Device commands</h3>
               </div>
               <div class="panel-body">
-                <form name="volumeForm"
-                      class="form-horizontal"
-                      ng-submit="deviceDetailsCtrl.onClickVolumeSendButton()"
-                      novalidate>
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <table name="device-table" class="table table-responsive table-striped">
-                        <thead>
-                        <tr>
-                          <th>Serial number</th>
-                          <th>WiFi mac address</th>
-                          <th>Ether mac address</th>
-                          <th>Provisioned date</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                          <td class="reset-device-serial-number">{{deviceDetailsCtrl.currentDevice.serialNumber}}</td>
-                          <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}</td>
-                          <td class="reset-device-ethernet-mac-address">{{
-                            deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                          </td>
-                          <td class="reset-device-provisioning-date">{{ deviceDetailsCtrl.currentDevice.created }}
-                          </td>
-                        </tr>
-                        </tbody>
-                      </table>
-                      <div class="row">
-                        <div class="col-sm-2 text-right">
-                          <label for="volume">Volume:</label>
+                <div>
+                  <div class="panel panel-default">
+                    <div class="panel-heading">
+                      <h3 class="panel-title">Reset</h3>
+                    </div>
+                    <div class="panel-body">
+                      <form name="commandForm"
+                            class="form-horizontal"
+                            ng-submit="deviceDetailsCtrl.onClickResetSendButton()"
+                            novalidate>
+                        <div class="row">
+                          <div class="col-sm-12">
+                            <table name="device-table" class="table table-responsive table-striped">
+                              <thead>
+                              <tr>
+                                <th>Serial number</th>
+                                <th>WiFi mac address</th>
+                                <th>Ether mac address</th>
+                                <th>Provisioned date</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                              <tr>
+                                <td class="reset-device-serial-number">{{deviceDetailsCtrl.currentDevice.serialNumber}}</td>
+                                <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}</td>
+                                <td class="reset-device-ethernet-mac-address">{{
+                                  deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
+                                </td>
+                                <td class="reset-device-provisioning-date">{{ deviceDetailsCtrl.currentDevice.created }}
+                                </td>
+                              </tr>
+                              </tbody>
+                            </table>
+                            <div class="row">
+                              <div class="col-sm-2 text-right">
+                                <label for="volume">Reset:</label>
+                              </div>
+                              <div class="col-sm-2">
+                                <button type="submit"
+                                        class="btn btn-primary btn-default"><i class="fa fa-fw fa-building"></i>
+                                  Send
+                                </button>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <div class="col-sm-2">
-                          <input type="number"
-                                 class="form-control"
-                                 name="volume"
-                                 id="volume"
-                                 ng-model="deviceDetailsCtrl.currentDevice.volume"
-                                 min="1"
-                                 max="100"
-                                 ngMinlength="1"
-                                 ngMaxlength="3"
-                                 ng-required="true">
-                          <span ng-show="volumeForm.$invalid">1-100 is allowed</span>
-                        </div>
-                        <div class="col-sm-2">
-                          <button type="submit"
-                                  class="btn btn-primary btn-default"
-                                  ng-disabled="!volumeForm.$dirty || volumeForm.$invalid">
-                            <i class="fa fa-fw fa-building"></i>
-                            Send
-                          </button>
-                        </div>
-                      </div>
+                      </form>
                     </div>
                   </div>
-                </form>
+                </div>
+                <div>
+                  <div class="panel panel-default">
+                    <div class="panel-heading">
+                      <h3 class="panel-title">Volume</h3>
+                    </div>
+                    <div class="panel-body">
+                      <form name="volumeForm"
+                            class="form-horizontal"
+                            ng-submit="deviceDetailsCtrl.onClickVolumeSendButton()"
+                            novalidate>
+                        <div class="row">
+                          <div class="col-sm-12">
+                            <table name="device-table" class="table table-responsive table-striped">
+                              <thead>
+                              <tr>
+                                <th>Serial number</th>
+                                <th>WiFi mac address</th>
+                                <th>Ether mac address</th>
+                                <th>Provisioned date</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                              <tr>
+                                <td class="reset-device-serial-number">{{deviceDetailsCtrl.currentDevice.serialNumber}}</td>
+                                <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}</td>
+                                <td class="reset-device-ethernet-mac-address">{{
+                                  deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
+                                </td>
+                                <td class="reset-device-provisioning-date">{{ deviceDetailsCtrl.currentDevice.created }}
+                                </td>
+                              </tr>
+                              </tbody>
+                            </table>
+                            <div class="row">
+                              <div class="col-sm-2 text-right">
+                                <label for="volume">Volume:</label>
+                              </div>
+                              <div class="col-sm-2">
+                                <input type="number"
+                                       class="form-control"
+                                       name="volume"
+                                       id="volume"
+                                       ng-model="deviceDetailsCtrl.currentDevice.volume"
+                                       min="1"
+                                       max="100"
+                                       ngMinlength="1"
+                                       ngMaxlength="3"
+                                       ng-required="true">
+                                <span ng-show="volumeForm.$invalid">1-100 is allowed</span>
+                              </div>
+                              <div class="col-sm-2">
+                                <button type="submit"
+                                        class="btn btn-primary btn-default"
+                                        ng-disabled="!volumeForm.$dirty || volumeForm.$invalid">
+                                  <i class="fa fa-fw fa-building"></i>
+                                  Send
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div class="panel panel-default">
+                    <div class="panel-heading">
+                      <h3 class="panel-title">Custom</h3>
+                    </div>
+                    <div class="panel-body">
+                      <form name="commandForm"
+                            class="form-horizontal"
+                            ng-submit="deviceDetailsCtrl.onClickCommandSendButton()"
+                            novalidate>
+                        <div class="row">
+                          <div class="col-sm-12">
+                            <table name="device-table" class="table table-responsive table-striped">
+                              <thead>
+                              <tr>
+                                <th>Serial number</th>
+                                <th>WiFi mac address</th>
+                                <th>Ether mac address</th>
+                                <th>Provisioned date</th>
+                              </tr>
+                              </thead>
+                              <tbody>
+                              <tr>
+                                <td class="reset-device-serial-number">{{deviceDetailsCtrl.currentDevice.serialNumber}}</td>
+                                <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}</td>
+                                <td class="reset-device-ethernet-mac-address">{{
+                                  deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
+                                </td>
+                                <td class="reset-device-provisioning-date">{{ deviceDetailsCtrl.currentDevice.created }}
+                                </td>
+                              </tr>
+                              </tbody>
+                            </table>
+                            <div class="row">
+                              <div class="col-sm-2 text-right">
+                                <label for="volume">Command:</label>
+                              </div>
+                              <div class="col-sm-3">
+                                <input type="text"
+                                       class="form-control"
+                                       name="custom"
+                                       id="custom"
+                                       ng-model="deviceDetailsCtrl.currentDevice.custom"
+                                       ng-required="true">
+                              </div>
+                              <div class="col-sm-2">
+                                <button type="submit"
+                                        class="btn btn-primary btn-default"
+                                        ng-disabled="!commandForm.$dirty || commandForm.$invalid"><i
+                                  class="fa fa-fw fa-building"></i>
+                                  Send
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </tab>
-        <tab heading="Command">
-          <div>
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Device command</h3>
-              </div>
-              <div class="panel-body">
-                <form name="commandForm"
-                      class="form-horizontal"
-                      ng-submit="deviceDetailsCtrl.onClickCommandSendButton()"
-                      novalidate>
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <table name="device-table" class="table table-responsive table-striped">
-                        <thead>
-                        <tr>
-                          <th>Serial number</th>
-                          <th>WiFi mac address</th>
-                          <th>Ether mac address</th>
-                          <th>Provisioned date</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                          <td class="reset-device-serial-number">{{deviceDetailsCtrl.currentDevice.serialNumber}}</td>
-                          <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}</td>
-                          <td class="reset-device-ethernet-mac-address">{{
-                            deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                          </td>
-                          <td class="reset-device-provisioning-date">{{ deviceDetailsCtrl.currentDevice.created }}
-                          </td>
-                        </tr>
-                        </tbody>
-                      </table>
-                      <div class="row">
-                        <div class="col-sm-2 text-right">
-                          <label for="volume">Command:</label>
-                        </div>
-                        <div class="col-sm-3">
-                          <input type="text"
-                                 class="form-control"
-                                 name="custom"
-                                 id="custom"
-                                 ng-model="deviceDetailsCtrl.currentDevice.custom"
-                                 ng-required="true">
-                        </div>
-                        <div class="col-sm-2">
-                          <button type="submit"
-                                  class="btn btn-primary btn-default"
-                                  ng-disabled="!commandForm.$dirty || commandForm.$invalid"><i
-                            class="fa fa-fw fa-building"></i>
-                            Send
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </tab>
+
       </tabset>
     </div>
   </div>
