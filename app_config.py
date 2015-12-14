@@ -44,6 +44,8 @@ class AppConfig(Config):
     STORAGE_UTILIZATION_THRESHOLD = None
     MEMORY_UTILIZATION_THRESHOLD = None
 
+    LATEST_DEVICE_ISSUES_FETCH_COUNT = None
+
 
 
 config = AppConfig.get_config()

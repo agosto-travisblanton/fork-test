@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 import device_message_processor
 from env_setup import setup_test_paths
 from utils.web_util import build_uri
@@ -1031,6 +1033,106 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertTrue(issues[1].resolved)
         self.assertIsNotNone(issues[0].resolved_datetime)
         self.assertIsNotNone(issues[1].resolved_datetime)
+
+    ##################################################################################################################
+    ## device issues
+    ##################################################################################################################
+
+    def test_get_latest_issues_without_token_returns_forbidden(self):
+        request_body = {}
+        uri = build_uri('device-issues', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        response = self.get(uri, params=request_body, headers=self.empty_header)
+        self.assertForbidden(response)
+
+    def test_get_latest_issues_with_token_returns_http_status_ok(self):
+        request_parameters = {}
+        uri = build_uri('device-issues', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        self.assertOK(response)
+
+    def test_get_latest_issues_returns_expected_elapsed_time_since_created_json(self):
+        issue = DeviceIssueLog.create(device_key=self.managed_device_key,
+                                      category=config.DEVICE_ISSUE_PLAYER_DOWN,
+                                      up=False,
+                                      storage_utilization=self.STORAGE_UTILIZATION,
+                                      memory_utilization=self.MEMORY_UTILIZATION,
+                                      program=self.PROGRAM,
+                                      resolved=False)
+        issue.created = datetime.utcnow() - timedelta(seconds=59)
+        issue.put()
+        request_parameters = {}
+        uri = build_uri('device-issues', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json[0]['elapsed_time'], '59 seconds')
+
+        issue.created = datetime.utcnow() - timedelta(seconds=90)
+        issue.put()
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json[0]['elapsed_time'], '1.5 minutes')
+
+        issue.created = datetime.utcnow() - timedelta(minutes=59)
+        issue.put()
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json[0]['elapsed_time'], '59.0 minutes')
+
+        issue.created = datetime.utcnow() - timedelta(minutes=90)
+        issue.put()
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json[0]['elapsed_time'], '1.5 hours')
+
+        issue.created = datetime.utcnow() - timedelta(hours=23)
+        issue.put()
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json[0]['elapsed_time'], '23.0 hours')
+
+        issue.created = datetime.utcnow() - timedelta(hours=48)
+        issue.put()
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json[0]['elapsed_time'], '2.0 days')
+
+    def test_get_latest_issues_returns_expected_issue_order_with_latest_first(self):
+        issue = DeviceIssueLog.create(device_key=self.managed_device_key,
+                                      category=config.DEVICE_ISSUE_STORAGE_LOW,
+                                      up=False,
+                                      storage_utilization=99,
+                                      memory_utilization=self.MEMORY_UTILIZATION,
+                                      program=self.PROGRAM,
+                                      resolved=False)
+        issue.created = datetime.utcnow() - timedelta(hours=48)
+        issue.put()
+        issue = DeviceIssueLog.create(device_key=self.managed_device_key,
+                                      category=config.DEVICE_ISSUE_MEMORY_HIGH,
+                                      up=False,
+                                      storage_utilization=self.STORAGE_UTILIZATION,
+                                      memory_utilization=98,
+                                      program=self.PROGRAM,
+                                      resolved=False)
+        issue.created = datetime.utcnow() - timedelta(hours=2)
+        issue.put()
+        issue = DeviceIssueLog.create(device_key=self.managed_device_key,
+                                      category=config.DEVICE_ISSUE_PLAYER_DOWN,
+                                      up=False,
+                                      storage_utilization=self.STORAGE_UTILIZATION,
+                                      memory_utilization=self.MEMORY_UTILIZATION,
+                                      program=self.PROGRAM,
+                                      resolved=False)
+        issue.created = datetime.utcnow() - timedelta(minutes=10)
+        issue.put()
+        request_parameters = {}
+        uri = build_uri('device-issues', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertLength(3, response_json)
+        self.assertEqual(response_json[0]['category'], config.DEVICE_ISSUE_PLAYER_DOWN)
+        self.assertEqual(response_json[1]['category'], config.DEVICE_ISSUE_MEMORY_HIGH)
+        self.assertEqual(response_json[2]['category'], config.DEVICE_ISSUE_STORAGE_LOW)
+
 
     def __initialize_heartbeat_info(self, up=True):
         self.managed_device.storage_utilization = self.STORAGE_UTILIZATION

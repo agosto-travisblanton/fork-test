@@ -1,6 +1,10 @@
-from models import (Tenant, ChromeOsDevice, Distributor, Domain)
+from datetime import datetime
+
+from models import (Tenant, ChromeOsDevice, Distributor, Domain, DeviceIssueLog)
 from restler.serializers import ModelStrategy
 from google.appengine.ext import ndb
+
+from utils.datetime_util import elapsed_time_message
 
 TENANT_FIELDS = [
     'name',
@@ -77,6 +81,19 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'panelModel': lambda o, field_name, context: o.key.get().panel_model},
     {'panelInput': lambda o, field_name, context: o.key.get().panel_input}
 ]
+
+DEVICE_ISSUE_LOG_STRATEGY = ModelStrategy(DeviceIssueLog)
+DEVICE_ISSUE_LOG_STRATEGY += [
+    {'category': lambda o, field_name, context: o.key.get().category},
+    {'up': lambda o, field_name, context: o.key.get().up},
+    {'storage_utilization': lambda o, field_name, context: o.key.get().storage_utilization},
+    {'memory_utilization': lambda o, field_name, context: o.key.get().memory_utilization},
+    {'program': lambda o, field_name, context: o.key.get().program},
+    {'created': lambda o, field_name, context: o.key.get().created},
+    {'elapsed_time': lambda o, field_name, context: elapsed_time_message(o.key.get().created, datetime.utcnow())}
+]
+
+
 
 # DEVICE_STRATEGY = ModelStrategy(Device)
 # DEVICE_STRATEGY += [

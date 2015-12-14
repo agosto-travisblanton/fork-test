@@ -388,6 +388,37 @@
                 <h3 class="panel-title">Device issues</h3>
               </div>
               <div class="panel-body">
+                <div class="row">
+                  <div class="col-lg-12">
+                    <table name="devices-table" class="table table-responsive">
+                      <thead>
+                      <tr>
+                        <th width="3px"></th>
+                        <th>Category</th>
+                        <th>Memory</th>
+                        <th>Storage</th>
+                        <th>Program</th>
+                        <th>Created</th>
+                        <th></th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <tr ng-hide="deviceDetailsCtrl.issues.length">
+                        <td class="text-center text-danger" colspan="7">No issues</td>
+                      </tr>
+                      <tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:'-threat_level'">
+                        <td class="issue-danger-background"></td>
+                        <td>{{ item.category }}</td>
+                        <td>{{ item.memory_utilization }}</td>
+                        <td>{{ item.storage_utilization }}</td>
+                        <td>{{ item.program }}</td>
+                        <td>{{ item.created }}</td>
+                        <td class="issue-danger-text"><i class="fa fa-fw fa-ambulance"/> {{ item.elapsed }}</td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -422,8 +453,11 @@
                               </thead>
                               <tbody>
                               <tr>
-                                <td class="reset-device-serial-number">{{deviceDetailsCtrl.currentDevice.serialNumber}}</td>
-                                <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}</td>
+                                <td class="reset-device-serial-number">
+                                  {{deviceDetailsCtrl.currentDevice.serialNumber}}
+                                </td>
+                                <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
+                                </td>
                                 <td class="reset-device-ethernet-mac-address">{{
                                   deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
                                 </td>
@@ -472,8 +506,11 @@
                               </thead>
                               <tbody>
                               <tr>
-                                <td class="reset-device-serial-number">{{deviceDetailsCtrl.currentDevice.serialNumber}}</td>
-                                <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}</td>
+                                <td class="reset-device-serial-number">
+                                  {{deviceDetailsCtrl.currentDevice.serialNumber}}
+                                </td>
+                                <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
+                                </td>
                                 <td class="reset-device-ethernet-mac-address">{{
                                   deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
                                 </td>
@@ -537,8 +574,11 @@
                               </thead>
                               <tbody>
                               <tr>
-                                <td class="reset-device-serial-number">{{deviceDetailsCtrl.currentDevice.serialNumber}}</td>
-                                <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}</td>
+                                <td class="reset-device-serial-number">
+                                  {{deviceDetailsCtrl.currentDevice.serialNumber}}
+                                </td>
+                                <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
+                                </td>
                                 <td class="reset-device-ethernet-mac-address">{{
                                   deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
                                 </td>
