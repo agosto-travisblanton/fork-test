@@ -413,10 +413,11 @@
                         <td>{{ item.storage_utilization }}%</td>
                         <td>{{ item.program }}</td>
                         <td>{{ item.created }}</td>
-                        <td class="issue-{{ item.level_descriptor}}-text" style="white-space: nowrap">
-                          <i
-                            ng-class="item.level==1? 'fa fa-fw fa-warning' : item.level==0? 'fa fa-fw fa-check-circle': 'fa fa-fw fa-ambulance'"/>
-                          &nbsp;{{ item.elapsed_time }}</td>
+                        <td class="issue-{{ item.level_descriptor}}-text">
+                          <i ng-class="item.level==1? 'fa fa-fw fa-warning' :
+                          item.level==0? 'fa fa-fw fa-check-circle': 'fa fa-fw fa-ambulance'"></i>
+                          {{ item.elapsed_time }}
+                        </td>
                       </tr>
                       </tbody>
                     </table>
