@@ -271,6 +271,13 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             message = 'Unrecognized heartbeat device_key: {0}'.format(device_urlsafe_key)
         else:
             request_json = json.loads(self.request.body)
+            mac_address = request_json.get('macAddress')
+            if mac_address:
+                if device.mac_address != mac_address or device.ethernet_mac_address != mac_address:
+                    info_message = \
+                        "Heartbeat rec'd an unrecognized macAdress {0} for device {1}".format(mac_address,
+                                                                                              device_urlsafe_key)
+                    logging.info(info_message)
             storage = request_json.get('storage')
             if storage:
                 storage = int(storage)
@@ -293,6 +300,18 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             if last_error:
                 if device.last_error != last_error:
                     device.last_error = last_error
+            sk_player_version = request_json.get('playerVersion')
+            if sk_player_version:
+                if device.sk_player_version != sk_player_version:
+                    device.sk_player_version = sk_player_version
+            os = request_json.get('os')
+            if os:
+                if device.os != os:
+                    device.os = os
+            os_version = request_json.get('osVersion')
+            if os_version:
+                if device.os_version != os_version:
+                    device.os_version = os_version
             resolved_datetime = datetime.utcnow()
             previously_down = device.up is False
             if previously_down:

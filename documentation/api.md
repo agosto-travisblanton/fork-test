@@ -25,10 +25,14 @@ Update Skykit device status. Emanates from the player.
     + Body
 
             {
-				"storage":25,
-				"memory":65,
+                "macAddress": "d0df9a904b99",
 				"program":"program name",
 				"programId":"program identifier",
+                "playerVersion" : "v1",
+				"storage":25,
+				"memory":65,
+                "os": "",
+                "osVersion" : "",
 				"lastError":"error description"
 			}
 
