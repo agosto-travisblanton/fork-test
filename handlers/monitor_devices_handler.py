@@ -7,7 +7,6 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 class MonitorDevicesHandler(RequestHandler):
-    @requires_api_token
     def last_contact_check(self):
         device_heartbeat_sweep()
         device_threshold_sweep()

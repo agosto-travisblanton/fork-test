@@ -72,22 +72,11 @@ class TestMonitorDevicesHandler(BaseTest, WebTest):
         self.assertEqual(response.status, '202 Accepted')
         self.assertEqual(response.status_int, 202)
 
-    def test_get_last_contact_check_with_no_authorization_header_returns_forbidden(self):
-        request_parameters = {}
-        uri = build_uri('monitor-devices')
-        response = self.get(uri, params=request_parameters, headers=self.empty_header)
-        self.assertForbidden(response)
-
-    # NOTE: This test can be used if deferred.defer is removed from device_heartbeat_status_sweep
-    # def test_get_last_contact_check_toggles_up_to_false_when_threshold_met(self):
+    # def test_get_last_contact_check_with_no_authorization_header_returns_forbidden(self):
     #     request_parameters = {}
     #     uri = build_uri('monitor-devices')
-    #     self.assertTrue(self.managed_device.up)
-    #     elapsed_seconds = config.PLAYER_UNRESPONSIVE_SECONDS_THRESHOLD + 1
-    #     self.managed_device.heartbeat_updated = datetime.utcnow() - timedelta(seconds=elapsed_seconds)
-    #     self.managed_device.put()
-    #     self.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
-    #     self.assertFalse(self.managed_device.up)
+    #     response = self.get(uri, params=request_parameters, headers=self.empty_header)
+    #     self.assertForbidden(response)
 
     def test_get_last_contact_check_does_not_toggle_up_when_threshold_not_met(self):
         request_parameters = {}
