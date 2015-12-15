@@ -404,16 +404,19 @@
                       </thead>
                       <tbody>
                       <tr ng-hide="deviceDetailsCtrl.issues.length">
-                        <td class="text-center text-danger" colspan="7">No issues</td>
+                        <td class="text-center text-warning" colspan="7">No issues for this device</td>
                       </tr>
-                      <tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:'-threat_level'">
-                        <td class="issue-danger-background"></td>
+                      <tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:'-level'">
+                        <td class="issue-{{ item.level_descriptor}}-background"></td>
                         <td>{{ item.category }}</td>
-                        <td>{{ item.memory_utilization }}</td>
-                        <td>{{ item.storage_utilization }}</td>
+                        <td>{{ item.memory_utilization }}%</td>
+                        <td>{{ item.storage_utilization }}%</td>
                         <td>{{ item.program }}</td>
                         <td>{{ item.created }}</td>
-                        <td class="issue-danger-text"><i class="fa fa-fw fa-ambulance"/> {{ item.elapsed }}</td>
+                        <td class="issue-{{ item.level_descriptor}}-text">
+                          <i
+                            ng-class="item.level==1? 'fa fa-fw fa-warning' : item.level==0? 'fa fa-fw fa-check-circle': 'fa fa-fw fa-ambulance'"/>
+                          {{ item.elapsed_time }}</td>
                       </tr>
                       </tbody>
                     </table>
