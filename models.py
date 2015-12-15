@@ -293,13 +293,24 @@ class DeviceIssueLog(ndb.Model):
     memory_utilization = ndb.IntegerProperty(default=0, required=True, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
+    level = ndb.IntegerProperty(default=0, required=True, indexed=True)
+    level_descriptor = ndb.StringProperty(default='normal', required=True, indexed=True)
     resolved = ndb.BooleanProperty(default=False, required=True, indexed=True)
     resolved_datetime = ndb.DateTimeProperty(required=False, auto_now=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
     @classmethod
-    def create(cls, device_key, category, up, storage_utilization=0, memory_utilization=0,
+    def create(cls, device_key, category, up=True, storage_utilization=0, memory_utilization=0,
                program=None, program_id=None, last_error=None, resolved=False, resolved_datetime=None):
+        if category in [config.DEVICE_ISSUE_MEMORY_HIGH, config.DEVICE_ISSUE_STORAGE_LOW]:
+            level = IssueLevel.Warning
+            level_descriptor = str(IssueLevel.Warning)
+        elif category in [config.DEVICE_ISSUE_PLAYER_DOWN]:
+            level = IssueLevel.Danger
+            level_descriptor = str(IssueLevel.Danger)
+        else:
+            level = IssueLevel.Normal
+            level_descriptor = str(IssueLevel.Normal)
         return cls(device_key=device_key,
                    category=category,
                    up=up,
@@ -309,7 +320,9 @@ class DeviceIssueLog(ndb.Model):
                    program_id=program_id,
                    last_error=last_error,
                    resolved=resolved,
-                   resolved_datetime=resolved_datetime)
+                   resolved_datetime=resolved_datetime,
+                   level=level,
+                   level_descriptor=level_descriptor)
 
     @classmethod
     def get_all_by_device_key(cls, device_key):
@@ -354,6 +367,15 @@ class DeviceIssueLog(ndb.Model):
         for issue in issues:
             issue.up = True
             issue.resolved = True
+            if category in [config.DEVICE_ISSUE_MEMORY_HIGH, config.DEVICE_ISSUE_STORAGE_LOW]:
+                issue.level = IssueLevel.Warning
+                issue.level_descriptor = str(IssueLevel.Warning)
+            elif category in [config.DEVICE_ISSUE_PLAYER_DOWN]:
+                issue.level = IssueLevel.Danger
+                issue.level_descriptor = str(IssueLevel.Danger)
+            else:
+                issue.level = IssueLevel.Normal
+                issue.level_descriptor = str(IssueLevel.Normal)
             issue.resolved_datetime = resolved_datetime
             issue.put()
 
@@ -424,3 +446,18 @@ class DistributorUser(ndb.Model):
 
     def _pre_put_hook(self):
         self.class_version = 1
+
+
+class IssueLevel:
+    def __init__(self):
+        pass
+
+    def __str__(self):
+        if self.value == IssueLevel.Normal:
+            return 'normal'
+        if self.value == IssueLevel.Warning:
+            return 'warning'
+        if self.value == IssueLevel.Danger:
+            return 'danger'
+
+    Normal, Warning, Danger = range(3)

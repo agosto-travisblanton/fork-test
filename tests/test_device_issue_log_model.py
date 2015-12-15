@@ -6,7 +6,7 @@ from env_setup import setup_test_paths
 setup_test_paths()
 
 from agar.test import BaseTest
-from models import Domain, Distributor, DeviceIssueLog, ChromeOsDevice, Tenant
+from models import Domain, Distributor, DeviceIssueLog, ChromeOsDevice, Tenant, IssueLevel
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -151,8 +151,12 @@ class TestDeviceIssueLogModel(BaseTest):
         DeviceIssueLog.resolve_device_storage_issues(self.device_key, resolved_datetime)
         self.assertTrue(issue_1.resolved)
         self.assertEqual(issue_1.resolved_datetime, resolved_datetime)
+        self.assertEqual(issue_1.level, IssueLevel.Warning)
+        self.assertEqual(issue_1.level_descriptor, str(IssueLevel.Warning))
         self.assertTrue(issue_2.resolved)
         self.assertEqual(issue_2.resolved_datetime, resolved_datetime)
+        self.assertEqual(issue_2.level, IssueLevel.Warning)
+        self.assertEqual(issue_2.level_descriptor, str(IssueLevel.Warning))
 
     def test_resolve_device_memory_issues(self):
         issue_1 = DeviceIssueLog.create(device_key=self.device_key,
@@ -171,8 +175,12 @@ class TestDeviceIssueLogModel(BaseTest):
         DeviceIssueLog.resolve_device_memory_issues(self.device_key, resolved_datetime)
         self.assertTrue(issue_1.resolved)
         self.assertEqual(issue_1.resolved_datetime, resolved_datetime)
+        self.assertEqual(issue_1.level, IssueLevel.Warning)
+        self.assertEqual(issue_1.level_descriptor, str(IssueLevel.Warning))
         self.assertTrue(issue_2.resolved)
         self.assertEqual(issue_2.resolved_datetime, resolved_datetime)
+        self.assertEqual(issue_2.level, IssueLevel.Warning)
+        self.assertEqual(issue_2.level_descriptor, str(IssueLevel.Warning))
 
     def test_resolve_device_down_issues(self):
         issue = DeviceIssueLog.create(device_key=self.device_key,
@@ -186,8 +194,12 @@ class TestDeviceIssueLogModel(BaseTest):
         self.assertFalse(issue.up)
         self.assertFalse(issue.resolved)
         self.assertIsNone(issue.resolved_datetime)
+        self.assertEqual(issue.level, IssueLevel.Danger)
+        self.assertEqual(issue.level_descriptor, str(IssueLevel.Danger))
         resolved_datetime = datetime.utcnow()
         DeviceIssueLog.resolve_device_down_issues(self.device_key, resolved_datetime)
         self.assertTrue(issue.up)
+        self.assertEqual(issue.level, IssueLevel.Danger)
+        self.assertEqual(issue.level_descriptor, str(IssueLevel.Danger))
         self.assertTrue(issue.resolved)
         self.assertEqual(issue.resolved_datetime, resolved_datetime)

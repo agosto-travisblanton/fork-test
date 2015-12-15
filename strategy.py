@@ -90,6 +90,8 @@ DEVICE_ISSUE_LOG_STRATEGY += [
     {'memory_utilization': lambda o, field_name, context: o.key.get().memory_utilization},
     {'program': lambda o, field_name, context: o.key.get().program},
     {'created': lambda o, field_name, context: o.key.get().created},
+    {'level': lambda o, field_name, context: o.key.get().level},
+    {'level_descriptor': lambda o, field_name, context: o.key.get().level_descriptor},
     {'elapsed_time': lambda o, field_name, context: elapsed_time_message(o.key.get().created, datetime.utcnow())}
 ]
 

@@ -209,14 +209,14 @@ app_DEVICE_SWEEP_PAGING_SIZE = _DEVICE_SWEEP_PAGING_SIZE()
 
 
 def _DEVICE_ISSUE_PLAYER_DOWN():
-    return 'Down'
+    return 'Player down'
 
 
 app_DEVICE_ISSUE_PLAYER_DOWN = _DEVICE_ISSUE_PLAYER_DOWN()
 
 
 def _DEVICE_ISSUE_PLAYER_UP():
-    return 'Up'
+    return 'Player Up'
 
 
 app_DEVICE_ISSUE_PLAYER_UP = _DEVICE_ISSUE_PLAYER_UP()
