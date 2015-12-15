@@ -807,7 +807,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     ##################################################################################################################
 
     def test_device_resource_put_no_authorization_header_returns_forbidden(self):
-        request_body = {'disk': self.STORAGE_UTILIZATION,
+        request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
                         'program': self.PROGRAM}
         uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
@@ -815,7 +815,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertForbidden(response)
 
     def test_put_heartbeat_http_status_no_content(self):
-        request_body = {'disk': self.STORAGE_UTILIZATION,
+        request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
                         'program': self.PROGRAM}
         uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
@@ -824,7 +824,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_put_heartbeat_updates_storage_utilization(self):
         self.__initialize_heartbeat_info()
-        request_body = {'disk': self.STORAGE_UTILIZATION - 1,
+        request_body = {'storage': self.STORAGE_UTILIZATION - 1,
                         'memory': self.MEMORY_UTILIZATION,
                         'program': self.PROGRAM,
                         'programId': self.PROGRAM_ID,
@@ -839,7 +839,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_put_heartbeat_updates_memory_utilization(self):
         self.__initialize_heartbeat_info()
-        request_body = {'disk': self.STORAGE_UTILIZATION,
+        request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION - 1,
                         'program': self.PROGRAM,
                         'programId': self.PROGRAM_ID,
@@ -856,7 +856,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_put_heartbeat_updates_program(self):
         self.__initialize_heartbeat_info()
-        request_body = {'disk': self.STORAGE_UTILIZATION,
+        request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
                         'program': 'Chronicles of Bob',
                         'programId': self.PROGRAM_ID,
@@ -873,7 +873,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_put_heartbeat_updates_program_id(self):
         self.__initialize_heartbeat_info()
-        request_body = {'disk': self.STORAGE_UTILIZATION,
+        request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
                         'program': self.PROGRAM,
                         'programId': 'some program id',
@@ -890,7 +890,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_put_heartbeat_updates_last_error(self):
         self.__initialize_heartbeat_info()
-        request_body = {'disk': self.STORAGE_UTILIZATION,
+        request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
                         'program': self.PROGRAM,
                         'programId': self.PROGRAM_ID,
@@ -907,7 +907,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_put_heartbeat_cannot_update_up_status(self):
         self.__initialize_heartbeat_info()
-        request_body = {'disk': self.STORAGE_UTILIZATION,
+        request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
                         'program': self.PROGRAM,
                         'programId': self.PROGRAM_ID,
@@ -921,7 +921,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_put_heartbeat_sets_heartbeat_updated_timestamp(self):
         self.__initialize_heartbeat_info()
         self.assertIsNone(self.managed_device.heartbeat_updated)
-        request_body = {'disk': self.STORAGE_UTILIZATION,
+        request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
                         'program': self.PROGRAM,
                         'programId': self.PROGRAM_ID,
@@ -936,7 +936,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.__initialize_heartbeat_info(up=False)
         issues = DeviceIssueLog.get_all_by_device_key(self.managed_device.key)
         self.assertLength(0, issues)
-        request_body = {'disk': self.STORAGE_UTILIZATION,
+        request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
                         'program': self.PROGRAM,
                         'programId': self.PROGRAM_ID,
@@ -965,7 +965,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                       program=self.PROGRAM,
                                       resolved=False)
         issue.put()
-        request_body = {'disk': self.STORAGE_UTILIZATION,
+        request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
                         'program': self.PROGRAM,
                         'programId': self.PROGRAM_ID,
@@ -991,7 +991,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                       program=self.PROGRAM,
                                       resolved=False)
         issue.put()
-        request_body = {'disk': self.STORAGE_UTILIZATION,
+        request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
                         'program': self.PROGRAM,
                         'programId': self.PROGRAM_ID,
@@ -1017,7 +1017,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                       program=self.PROGRAM,
                                       resolved=False)
         issue.put()
-        request_body = {'disk': self.STORAGE_UTILIZATION,
+        request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
                         'program': self.PROGRAM,
                         'programId': self.PROGRAM_ID,

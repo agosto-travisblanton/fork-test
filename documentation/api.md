@@ -25,7 +25,7 @@ Update Skykit device status. Emanates from the player.
     + Body
 
             {
-				"disk":25,
+				"storage":25,
 				"memory":65,
 				"program":"program name",
 				"programId":"program identifier",
