@@ -216,7 +216,7 @@ app_DEVICE_ISSUE_PLAYER_DOWN = _DEVICE_ISSUE_PLAYER_DOWN()
 
 
 def _DEVICE_ISSUE_PLAYER_UP():
-    return 'Player Up'
+    return 'Player up'
 
 
 app_DEVICE_ISSUE_PLAYER_UP = _DEVICE_ISSUE_PLAYER_UP()

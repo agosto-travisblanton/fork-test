@@ -54,7 +54,7 @@ class TestDeviceIssueLogModel(BaseTest):
             mac_address=self.MAC_ADDRESS)
         self.device_key = self.device.put()
 
-    def test_create_returns_expected_device_issue_representation(self):
+    def test_create_returns_expected_device_issue_representation_for_down_device(self):
         issue = DeviceIssueLog.create(device_key=self.device_key,
                                       category=config.DEVICE_ISSUE_PLAYER_DOWN,
                                       up=False,
@@ -62,8 +62,12 @@ class TestDeviceIssueLogModel(BaseTest):
                                       memory_utilization=self.MEMORY_UTILIZATION,
                                       program=self.PROGRAM)
         self.assertEqual(issue.device_key, self.device_key)
-        self.assertEqual(issue.category, 'Down')
+        self.assertEqual(issue.category, config.DEVICE_ISSUE_PLAYER_DOWN)
+        self.assertEqual(issue.level, IssueLevel.Danger)
+        self.assertEqual(issue.level_descriptor, str(IssueLevel.Danger))
         self.assertFalse(issue.up)
+        self.assertFalse(issue.resolved)
+        self.assertIsNone(issue.resolved_datetime)
         self.assertEqual(issue.storage_utilization, self.STORAGE_UTILIZATION)
         self.assertEqual(issue.memory_utilization, self.MEMORY_UTILIZATION)
         self.assertEqual(issue.program, self.PROGRAM)
@@ -71,6 +75,19 @@ class TestDeviceIssueLogModel(BaseTest):
         self.assertIsNone(issue.last_error)
         self.assertIsNone(issue.created)
         self.assertIsNone(issue.updated)
+
+    def test_create_returns_expected_device_issue_representation_for_up_device(self):
+        issue = DeviceIssueLog.create(device_key=self.device_key,
+                                      category=config.DEVICE_ISSUE_PLAYER_UP,
+                                      up=True,
+                                      storage_utilization=self.STORAGE_UTILIZATION,
+                                      memory_utilization=self.MEMORY_UTILIZATION,
+                                      program=self.PROGRAM)
+        self.assertEqual(issue.device_key, self.device_key)
+        self.assertEqual(issue.category, config.DEVICE_ISSUE_PLAYER_UP)
+        self.assertEqual(issue.level, IssueLevel.Normal)
+        self.assertEqual(issue.level_descriptor, str(IssueLevel.Normal))
+        self.assertTrue(issue.up)
 
     def test_class_version_is_only_set_by_pre_put_hook_method(self):
         issue = DeviceIssueLog.create(device_key=self.device_key,
