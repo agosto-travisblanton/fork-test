@@ -40,6 +40,24 @@ body {
 .margin-top-05 {
   margin-top: 0.5em; }
 
+.issue-warning-background {
+  background-color: orange;
+}
+.issue-warning-text {
+  color: orange;
+}
+.issue-danger-background {
+  background-color: red;
+}
+.issue-danger-text {
+  color: red;
+}
+.issue-normal-background {
+  background-color: green;
+}
+.issue-normal-text {
+  color: green;
+}
 .navbar-default {
   background-color: $top-navbar-background-color;
   border-color: darken($top-navbar-background-color, 10%);

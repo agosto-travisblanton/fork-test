@@ -57,7 +57,7 @@ application = WSGIApplication(
               ),
 
         ############################################################
-        # device registration
+        # device
         ############################################################
         Route(r'/api/v1/devices/<device_urlsafe_key>/heartbeat',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
@@ -86,6 +86,12 @@ application = WSGIApplication(
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='device-pairing-code',
               handler_method='get_pairing_code',
+              methods=['GET']
+              ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/issues',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='device-issues',
+              handler_method='get_latest_issues',
               methods=['GET']
               ),
         Route(r'/api/v1/devices/<device_urlsafe_key>/commands',

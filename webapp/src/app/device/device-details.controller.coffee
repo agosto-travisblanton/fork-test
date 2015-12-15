@@ -3,13 +3,13 @@
 appModule = angular.module('skykitDisplayDeviceManagement')
 
 appModule.controller 'DeviceDetailsCtrl', ($log,
-                                           $stateParams,
-                                           $state,
-                                           DevicesService,
-                                           TenantsService,
-                                           CommandsService,
-                                           sweet,
-                                           ProgressBarService) ->
+    $stateParams,
+    $state,
+    DevicesService,
+    TenantsService,
+    CommandsService,
+    sweet,
+    ProgressBarService) ->
   @tenantKey = $stateParams.tenantKey
   @currentDevice = {
     key: undefined
@@ -43,11 +43,11 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     custom: undefined
   }
   @editMode = !!$stateParams.deviceKey
+  @issues = []
 
   @initialize = () ->
     @panelModels = DevicesService.getPanelModels()
     @panelInputs = DevicesService.getPanelInputs()
-
     tenantsPromise = TenantsService.fetchAllTenants()
     tenantsPromise.then (data) =>
       @tenants = data
@@ -57,6 +57,9 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       devicePromise.then (data) =>
         @currentDevice = data
         @setSelectedOptions()
+      issuesPromise = DevicesService.getIssuesByKey($stateParams.deviceKey)
+      issuesPromise.then (data) =>
+        @issues = data
 
   @setSelectedOptions = () ->
     if @currentDevice.panelModel == null

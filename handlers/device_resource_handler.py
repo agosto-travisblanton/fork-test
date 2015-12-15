@@ -14,7 +14,7 @@ from device_message_processor import post_unmanaged_device_info, change_intent
 from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup, DeviceIssueLog
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
-from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY
+from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY, DEVICE_ISSUE_LOG_STRATEGY
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -342,6 +342,13 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             device.put()
             self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
+
+    @requires_api_token
+    def get_latest_issues(self, device_urlsafe_key):
+        device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
+        query = DeviceIssueLog.query(DeviceIssueLog.device_key == device.key).order(-DeviceIssueLog.created)
+        latest_issues = query.fetch(config.LATEST_DEVICE_ISSUES_FETCH_COUNT)
+        return json_response(self.response, latest_issues, strategy=DEVICE_ISSUE_LOG_STRATEGY)
 
     @requires_api_token
     def delete(self, device_urlsafe_key):
