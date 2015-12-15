@@ -271,7 +271,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             message = 'Unrecognized heartbeat device_key: {0}'.format(device_urlsafe_key)
         else:
             request_json = json.loads(self.request.body)
-            storage = request_json.get('disk')
+            storage = request_json.get('storage')
             if storage:
                 storage = int(storage)
                 if device.storage_utilization != storage:
