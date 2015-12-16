@@ -918,9 +918,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         updated_heartbeat = self.managed_device_key.get()
         self.assertEqual(updated_heartbeat.up, updated_heartbeat.up)
 
-    def test_put_heartbeat_sets_heartbeat_updated_timestamp(self):
+    def test_put_heartbeat_updates_heartbeat_timestamp(self):
         self.__initialize_heartbeat_info()
-        self.assertIsNone(self.managed_device.heartbeat_updated)
+        original_heartbeat_timestamp = self.managed_device.heartbeat_updated
+        self.assertIsNotNone(original_heartbeat_timestamp)
         request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
                         'program': self.PROGRAM,
@@ -930,7 +931,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
         self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
         device = self.managed_device_key.get()
-        self.assertIsNotNone(device.heartbeat_updated)
+        self.assertGreater(device.heartbeat_updated, original_heartbeat_timestamp)
+        # self.assertGreaterEqual(device.heartbeat_updated, self.managed_device.heartbeat_updated)
 
     def test_put_heartbeat_invokes_a_device_issue_log_up_toggle_if_device_was_previously_down(self):
         self.__initialize_heartbeat_info(up=False)
