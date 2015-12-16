@@ -406,7 +406,7 @@
                       <tr ng-hide="deviceDetailsCtrl.issues.length">
                         <td class="text-center text-warning" colspan="7">No issues for this device</td>
                       </tr>
-                      <tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:'-level'">
+                      <tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:['-level','-updated']">
                         <td class="issue-{{ item.level_descriptor}}-background"></td>
                         <td>{{ item.category }}</td>
                         <td>{{ item.memory_utilization }}%</td>

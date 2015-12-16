@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 
 from google.appengine.ext import ndb
 
@@ -208,6 +209,7 @@ class ChromeOsDevice(ndb.Model):
     last_error = ndb.StringProperty(required=False, indexed=True)
     connection_type = ndb.StringProperty(required=False, indexed=True)
     sk_player_version = ndb.StringProperty(required=False, indexed=True)
+    heartbeat_interval_minutes = ndb.IntegerProperty(default=2, required=True, indexed=False)
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):
@@ -231,7 +233,12 @@ class ChromeOsDevice(ndb.Model):
             api_key=str(uuid.uuid4().hex),
             serial_number=serial_number,
             model=model,
-            is_unmanaged_device=False)
+            is_unmanaged_device=False,
+            storage_utilization=0,
+            memory_utilization=0,
+            heartbeat_updated=datetime.utcnow(),
+            program='****initial****',
+            heartbeat_interval_minutes=2)
         return device
 
     @classmethod
@@ -242,8 +249,12 @@ class ChromeOsDevice(ndb.Model):
             api_key=str(uuid.uuid4().hex),
             pairing_code='{0}-{1}-{2}-{3}'.format(str(uuid.uuid4().hex)[:4], str(uuid.uuid4().hex)[:4],
                                                   str(uuid.uuid4().hex)[:4], str(uuid.uuid4().hex)[:4]),
-            is_unmanaged_device=True
-        )
+            is_unmanaged_device=True,
+            storage_utilization=0,
+            memory_utilization=0,
+            heartbeat_updated=datetime.utcnow(),
+            program='****initial****',
+            heartbeat_interval_minutes=2)
         return device
 
     @classmethod
