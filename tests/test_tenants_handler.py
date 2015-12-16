@@ -191,6 +191,31 @@ class TestTenantsHandler(BaseTest, WebTest):
         self.assertTrue('Bad response: 400 The domain key parameter is invalid.'
                         in context.exception.message)
 
+    def test_post_returns_conflict_when_encountering_an_existing_tenant_code(self):
+        existing_tenant_code = 'acme_inc'
+        existing_tenant = Tenant.create(tenant_code=existing_tenant_code,
+                                        name='Acme, Inc.',
+                                        content_server_url=self.CONTENT_SERVER_URL,
+                                        content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                                        domain_key=self.domain_key,
+                                        admin_email=self.ADMIN_EMAIL,
+                                        active=True)
+        existing_tenant.put()
+        request_parameters = {'name': 'Acme, Inc.',
+                              'tenant_code': existing_tenant_code,
+                              'admin_email': self.ADMIN_EMAIL,
+                              'content_server_url': self.CONTENT_SERVER_URL,
+                              'content_manager_base_url': self.CONTENT_MANAGER_BASE_URL,
+                              'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
+                              'domain_key': self.domain_key.urlsafe(),
+                              'active': True}
+        uri = application.router.build(None, 'tenants', None, {})
+        with self.assertRaises(AppError) as context:
+            self.app.post_json(uri, params=request_parameters, headers=self.headers)
+        error_message = "Bad response: 409 Conflict. Tenant code \"{0}\" is already assigned to a tenant.".format(
+            existing_tenant_code)
+        self.assertTrue(error_message in context.exception.message)
+
     ##################################################################################################################
     ## put
     ##################################################################################################################

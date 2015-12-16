@@ -83,6 +83,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
         self.empty_header = {}
 
+
     ##################################################################################################################
     # post ChromeOsDevice
     ##################################################################################################################
@@ -780,6 +781,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_delete_http_status_no_content(self):
         request_body = {}
+        when(device_message_processor).change_intent(any_matcher(), config.PLAYER_RESET_COMMAND).thenReturn(None)
         response = self.app.delete('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                                    json.dumps(request_body),
                                    headers=self.api_token_authorization_header)
@@ -787,6 +789,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_delete_removes_device(self):
         request_body = {}
+        when(device_message_processor).change_intent(any_matcher(), config.PLAYER_RESET_COMMAND).thenReturn(None)
         self.app.delete('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                         json.dumps(request_body),
                         headers=self.api_token_authorization_header)
