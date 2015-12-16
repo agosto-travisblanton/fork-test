@@ -20,7 +20,8 @@
     "lodash": "~3.10.0",
     "ngprogress": "~1.1.2",
     "restangular": "~1.5.1",
-    "sweetalert": "~1.1.0"
+    "sweetalert": "~1.1.0",
+    "angular-bootstrap-datetimepicker": "~0.4.0"
   },
   "overrides": {
     "bootstrap-sass-official": {
