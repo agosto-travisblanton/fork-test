@@ -1,6 +1,5 @@
 from webapp2 import RequestHandler
 
-from decorators import requires_api_token
 from device_monitoring import device_heartbeat_sweep, device_threshold_sweep
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
