@@ -64,7 +64,7 @@ class TestDeviceIssueLogModel(BaseTest):
         self.assertEqual(issue.device_key, self.device_key)
         self.assertEqual(issue.category, config.DEVICE_ISSUE_PLAYER_DOWN)
         self.assertEqual(issue.level, IssueLevel.Danger)
-        self.assertEqual(issue.level_descriptor, str(IssueLevel.Danger))
+        self.assertEqual(issue.level_descriptor, IssueLevel.stringify(IssueLevel.Danger))
         self.assertFalse(issue.up)
         self.assertFalse(issue.resolved)
         self.assertIsNone(issue.resolved_datetime)
@@ -86,7 +86,7 @@ class TestDeviceIssueLogModel(BaseTest):
         self.assertEqual(issue.device_key, self.device_key)
         self.assertEqual(issue.category, config.DEVICE_ISSUE_PLAYER_UP)
         self.assertEqual(issue.level, IssueLevel.Normal)
-        self.assertEqual(issue.level_descriptor, str(IssueLevel.Normal))
+        self.assertEqual(issue.level_descriptor, IssueLevel.stringify(IssueLevel.Normal))
         self.assertTrue(issue.up)
 
     def test_class_version_is_only_set_by_pre_put_hook_method(self):
@@ -169,11 +169,11 @@ class TestDeviceIssueLogModel(BaseTest):
         self.assertTrue(issue_1.resolved)
         self.assertEqual(issue_1.resolved_datetime, resolved_datetime)
         self.assertEqual(issue_1.level, IssueLevel.Warning)
-        self.assertEqual(issue_1.level_descriptor, str(IssueLevel.Warning))
+        self.assertEqual(issue_1.level_descriptor, IssueLevel.stringify(IssueLevel.Warning))
         self.assertTrue(issue_2.resolved)
         self.assertEqual(issue_2.resolved_datetime, resolved_datetime)
         self.assertEqual(issue_2.level, IssueLevel.Warning)
-        self.assertEqual(issue_2.level_descriptor, str(IssueLevel.Warning))
+        self.assertEqual(issue_2.level_descriptor, IssueLevel.stringify(IssueLevel.Warning))
 
     def test_resolve_device_memory_issues(self):
         issue_1 = DeviceIssueLog.create(device_key=self.device_key,
@@ -193,11 +193,11 @@ class TestDeviceIssueLogModel(BaseTest):
         self.assertTrue(issue_1.resolved)
         self.assertEqual(issue_1.resolved_datetime, resolved_datetime)
         self.assertEqual(issue_1.level, IssueLevel.Warning)
-        self.assertEqual(issue_1.level_descriptor, str(IssueLevel.Warning))
+        self.assertEqual(issue_1.level_descriptor, IssueLevel.stringify(IssueLevel.Warning))
         self.assertTrue(issue_2.resolved)
         self.assertEqual(issue_2.resolved_datetime, resolved_datetime)
         self.assertEqual(issue_2.level, IssueLevel.Warning)
-        self.assertEqual(issue_2.level_descriptor, str(IssueLevel.Warning))
+        self.assertEqual(issue_2.level_descriptor, IssueLevel.stringify(IssueLevel.Warning))
 
     def test_resolve_device_down_issues(self):
         issue = DeviceIssueLog.create(device_key=self.device_key,
@@ -212,11 +212,11 @@ class TestDeviceIssueLogModel(BaseTest):
         self.assertFalse(issue.resolved)
         self.assertIsNone(issue.resolved_datetime)
         self.assertEqual(issue.level, IssueLevel.Danger)
-        self.assertEqual(issue.level_descriptor, str(IssueLevel.Danger))
+        self.assertEqual(issue.level_descriptor, IssueLevel.stringify(IssueLevel.Danger))
         resolved_datetime = datetime.utcnow()
         DeviceIssueLog.resolve_device_down_issues(self.device_key, resolved_datetime)
         self.assertTrue(issue.up)
         self.assertEqual(issue.level, IssueLevel.Danger)
-        self.assertEqual(issue.level_descriptor, str(IssueLevel.Danger))
+        self.assertEqual(issue.level_descriptor, IssueLevel.stringify(IssueLevel.Danger))
         self.assertTrue(issue.resolved)
         self.assertEqual(issue.resolved_datetime, resolved_datetime)

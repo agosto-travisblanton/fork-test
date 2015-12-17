@@ -315,13 +315,13 @@ class DeviceIssueLog(ndb.Model):
                program=None, program_id=None, last_error=None, resolved=False, resolved_datetime=None):
         if category in [config.DEVICE_ISSUE_MEMORY_HIGH, config.DEVICE_ISSUE_STORAGE_LOW]:
             level = IssueLevel.Warning
-            level_descriptor = str(IssueLevel.Warning)
+            level_descriptor = IssueLevel.stringify(IssueLevel.Warning)
         elif category in [config.DEVICE_ISSUE_PLAYER_DOWN]:
             level = IssueLevel.Danger
-            level_descriptor = str(IssueLevel.Danger)
+            level_descriptor = IssueLevel.stringify(IssueLevel.Danger)
         else:
             level = IssueLevel.Normal
-            level_descriptor = str(IssueLevel.Normal)
+            level_descriptor = IssueLevel.stringify(IssueLevel.Normal)
         return cls(device_key=device_key,
                    category=category,
                    up=up,
@@ -380,13 +380,13 @@ class DeviceIssueLog(ndb.Model):
             issue.resolved = True
             if category in [config.DEVICE_ISSUE_MEMORY_HIGH, config.DEVICE_ISSUE_STORAGE_LOW]:
                 issue.level = IssueLevel.Warning
-                issue.level_descriptor = str(IssueLevel.Warning)
+                issue.level_descriptor = IssueLevel.stringify(IssueLevel.Warning)
             elif category in [config.DEVICE_ISSUE_PLAYER_DOWN]:
                 issue.level = IssueLevel.Danger
-                issue.level_descriptor = str(IssueLevel.Danger)
+                issue.level_descriptor = IssueLevel.stringify(IssueLevel.Danger)
             else:
                 issue.level = IssueLevel.Normal
-                issue.level_descriptor = str(IssueLevel.Normal)
+                issue.level_descriptor = IssueLevel.stringify(IssueLevel.Normal)
             issue.resolved_datetime = resolved_datetime
             issue.put()
 
@@ -460,15 +460,15 @@ class DistributorUser(ndb.Model):
 
 
 class IssueLevel:
-    def __init__(self):
-        pass
-
-    def __str__(self):
-        if self.value == IssueLevel.Normal:
-            return 'normal'
-        if self.value == IssueLevel.Warning:
-            return 'warning'
-        if self.value == IssueLevel.Danger:
-            return 'danger'
-
     Normal, Warning, Danger = range(3)
+
+    @classmethod
+    def stringify(cls, enumeration):
+        if enumeration == cls.Normal:
+            return 'normal'
+        elif enumeration == cls.Warning:
+            return 'warning'
+        elif enumeration == cls.Danger:
+            return 'danger'
+        else:
+            return None
