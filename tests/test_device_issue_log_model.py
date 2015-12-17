@@ -226,8 +226,7 @@ class TestDeviceIssueLogModel(BaseTest):
                                                           category=config.DEVICE_ISSUE_MEMORY_HIGH,
                                                           up=True,
                                                           storage_utilization=self.STORAGE_UTILIZATION,
-                                                          memory_utilization=self.MEMORY_UTILIZATION,
-                                                          program=self.PROGRAM))
+                                                          memory_utilization=self.MEMORY_UTILIZATION))
 
     def test_no_matching_issues_returns_false_when_matching_issue_exists(self):
         issue = DeviceIssueLog.create(device_key=self.device_key,
@@ -241,20 +240,17 @@ class TestDeviceIssueLogModel(BaseTest):
                                                            category=config.DEVICE_ISSUE_MEMORY_HIGH,
                                                            up=True,
                                                            storage_utilization=self.STORAGE_UTILIZATION,
-                                                           memory_utilization=self.MEMORY_UTILIZATION,
-                                                           program=self.PROGRAM))
+                                                           memory_utilization=self.MEMORY_UTILIZATION))
 
     def test_no_matching_issues_returns_true_when_similar_but_not_matching_issue_exists(self):
         issue = DeviceIssueLog.create(device_key=self.device_key,
                                       category=config.DEVICE_ISSUE_MEMORY_HIGH,
                                       up=True,
                                       storage_utilization=self.STORAGE_UTILIZATION + 5,
-                                      memory_utilization=self.MEMORY_UTILIZATION,
-                                      program=self.PROGRAM)
+                                      memory_utilization=self.MEMORY_UTILIZATION)
         issue.put()
         self.assertTrue(DeviceIssueLog.no_matching_issues(device_key=self.device_key,
                                                           category=config.DEVICE_ISSUE_MEMORY_HIGH,
                                                           up=True,
                                                           storage_utilization=self.STORAGE_UTILIZATION,
-                                                          memory_utilization=self.MEMORY_UTILIZATION,
-                                                          program=self.PROGRAM))
+                                                          memory_utilization=self.MEMORY_UTILIZATION))

@@ -342,9 +342,9 @@ class DeviceIssueLog(ndb.Model):
                                       ndb.AND(DeviceIssueLog.category == category),
                                       ndb.AND(DeviceIssueLog.storage_utilization == storage_utilization),
                                       ndb.AND(DeviceIssueLog.memory_utilization == memory_utilization),
-                                      ndb.AND(DeviceIssueLog.program == program),
-                                      ndb.AND(DeviceIssueLog.program_id == program_id),
-                                      ndb.AND(DeviceIssueLog.last_error == last_error),
+                                      # ndb.AND(DeviceIssueLog.program == program),
+                                      # ndb.AND(DeviceIssueLog.program_id == program_id),
+                                      # ndb.AND(DeviceIssueLog.last_error == last_error),
                                       ndb.AND(DeviceIssueLog.up == up),
                                       ndb.AND(DeviceIssueLog.resolved == False)
                                       ).get(keys_only=True)
