@@ -32,6 +32,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     DEVICE_ID = '132e235a-b346-4a37-a100-de49fa753a2a'
     GCM_REGISTRATION_ID = '8d70a8d78a6dfa6df76dfasd'
     MAC_ADDRESS = '54271e619346'
+    ETHERNET_MAC_ADDRESS = '8e271e619346'
     TENANT_CODE = 'foobar_inc'
     TENANT_NAME = 'Foobar, Inc,'
     DISTRIBUTOR_NAME = 'agosto'
@@ -1035,6 +1036,50 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertTrue(issues[1].resolved)
         self.assertIsNotNone(issues[0].resolved_datetime)
         self.assertIsNotNone(issues[1].resolved_datetime)
+
+    def test_put_heartbeat_populates_device_connection_type_for_ethernet_mac_address(self):
+        self.managed_device.ethernet_mac_address = self.ETHERNET_MAC_ADDRESS
+        self.managed_device.put()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        'macAddress': self.ETHERNET_MAC_ADDRESS
+                        }
+        self.assertIsNone(self.managed_device.connection_type)
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        self.assertIsNotNone(self.managed_device.connection_type)
+        self.assertEqual(self.managed_device.connection_type, config.ETHERNET_CONNECTION)
+
+    def test_put_heartbeat_populates_device_connection_type_for_wifi_mac_address(self):
+        self.managed_device.mac_address = self.MAC_ADDRESS
+        self.managed_device.put()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        'macAddress': self.MAC_ADDRESS
+                        }
+        self.assertIsNone(self.managed_device.connection_type)
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        self.assertIsNotNone(self.managed_device.connection_type)
+        self.assertEqual(self.managed_device.connection_type, config.WIFI_CONNECTION)
+
+    def test_put_heartbeat_does_not_populate_device_connection_type_for_unrecognized_mac_address(self):
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        'macAddress': '22234234234'
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        self.assertIsNone(self.managed_device.connection_type)
 
     ##################################################################################################################
     ## device issues
