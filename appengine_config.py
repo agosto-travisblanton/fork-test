@@ -293,7 +293,7 @@ app_ETHERNET_CONNECTION = _ETHERNET_CONNECTION()
 
 
 def _WIFI_CONNECTION():
-    return 'Wifi'
+    return 'WiFi'
 
 
 app_WIFI_CONNECTION = _WIFI_CONNECTION()
