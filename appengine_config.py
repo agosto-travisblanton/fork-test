@@ -285,6 +285,19 @@ def _PLAYER_VOLUME_COMMAND():
 app_PLAYER_VOLUME_COMMAND = _PLAYER_VOLUME_COMMAND()
 
 
+def _ETHERNET_CONNECTION():
+    return 'Ethernet'
+
+
+app_ETHERNET_CONNECTION = _ETHERNET_CONNECTION()
+
+
+def _WIFI_CONNECTION():
+    return 'WiFi'
+
+
+app_WIFI_CONNECTION = _WIFI_CONNECTION()
+
 def _STORMPATH_CLIENT():
     """
     http://docs.stormpath.com/python/quickstart/#create-a-client

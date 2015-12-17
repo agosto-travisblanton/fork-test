@@ -273,11 +273,17 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             request_json = json.loads(self.request.body)
             mac_address = request_json.get('macAddress')
             if mac_address:
-                if device.mac_address != mac_address or device.ethernet_mac_address != mac_address:
-                    info_message = \
-                        "Heartbeat rec'd an unrecognized macAdress {0} for device {1}".format(mac_address,
-                                                                                              device_urlsafe_key)
-                    logging.info(info_message)
+                if device.is_unmanaged_device == False and ChromeOsDevice.mac_address_already_assigned(mac_address):
+                    if device.ethernet_mac_address == mac_address:
+                        device.connection_type = config.ETHERNET_CONNECTION
+                    elif device.mac_address == mac_address:
+                        device.connection_type = config.WIFI_CONNECTION
+                else:
+                    if device.mac_address != mac_address or device.ethernet_mac_address != mac_address:
+                        info_message = \
+                            "Heartbeat got an unrecognized macAddress {0} for device {1}".format(mac_address,
+                                                                                                 device_urlsafe_key)
+                        logging.info(info_message)
             storage = request_json.get('storage')
             if storage:
                 storage = int(storage)

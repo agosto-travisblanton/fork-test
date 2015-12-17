@@ -47,6 +47,9 @@ class AppConfig(Config):
 
     LATEST_DEVICE_ISSUES_FETCH_COUNT = None
 
+    ETHERNET_CONNECTION = None
+    WIFI_CONNECTION = None
+
 
 
 config = AppConfig.get_config()
