@@ -58,12 +58,18 @@ describe 'DevicesService', ->
 
   describe '.getIssuesByKey', ->
     it 'retrieve issues associated with supplied key, returning a promise', ->
+      now = new Date()
+      epochEnd = moment(now).unix()
+      now.setDate(now.getDate() - 1)
+      epochStart = moment(now).unix()
+      expect(epochEnd).toBeGreaterThan(epochStart);
       deviceKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFudEVudGl0eUdyb3VwDAsSBlRlbmFudBiAgICAgMCvCgw'
       deviceRestangularService = {get: ->}
       spyOn(Restangular, 'oneUrl').and.returnValue deviceRestangularService
       spyOn(deviceRestangularService, 'get').and.returnValue promise
-      actual = DevicesService.getIssuesByKey deviceKey
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{deviceKey}/issues"
+      actual = DevicesService.getIssuesByKey(deviceKey, epochStart, epochEnd)
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices',
+        "api/v1/devices/#{deviceKey}/issues?start=#{epochStart}&end=#{epochEnd}"
       expect(deviceRestangularService.get).toHaveBeenCalled()
       expect(actual).toBe promise
 

@@ -126,6 +126,10 @@ describe 'DeviceDetailsCtrl', ->
           DevicesService: DevicesService
           TenantsService: TenantsService
         }
+        now = new Date()
+        @epochEnd = moment(new Date()).unix()
+        now.setDate(now.getDate() - 1)
+        @epochStart = moment(now).unix()
         controller.initialize()
 
       it 'defines currentDevice property', ->
@@ -151,8 +155,8 @@ describe 'DeviceDetailsCtrl', ->
         getDevicePromise.resolve device
         expect(controller.currentDevice).toBe device
 
-      it 'calls DevicesService.getIssuesByKey to retrieve the issues for a given device', ->
-        expect(DevicesService.getIssuesByKey).toHaveBeenCalledWith $stateParams.deviceKey
+      it 'calls DevicesService.getIssuesByKey to retrieve the issues for a given device and datetime range', ->
+        expect(DevicesService.getIssuesByKey).toHaveBeenCalledWith($stateParams.deviceKey, @epochStart, @epochEnd)
 
       it "the 'then' handler caches the retrieved issues for a given device key in the controller", ->
         getDeviceIssuesPromise.resolve issues
@@ -318,3 +322,22 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'displays a sweet alert', ->
         expect(sweet.show).toHaveBeenCalledWith('Oops...', "Command error: #{@error.data}", 'error')
+
+  describe '.onClickRefreshButton', ->
+    beforeEach ->
+      $stateParams.deviceKey = 'fkasdhfjfa9s8udyva7dygoudyg'
+      controller = $controller 'DeviceDetailsCtrl', {
+        $stateParams: $stateParams
+        $state: $state
+        DevicesService: DevicesService
+      }
+      now = new Date()
+      controller.epochEnd = moment(new Date()).unix()
+      now.setDate(now.getDate() - 5)
+      controller.epochStart = moment(now).unix()
+      spyOn(DevicesService, 'getIssuesByKey').and.returnValue getDeviceIssuesPromise
+      controller.onClickRefreshButton()
+
+    it 'refreshes issues for a given device within the specified datetime range', ->
+      expect(DevicesService.getIssuesByKey).toHaveBeenCalledWith(
+        $stateParams.deviceKey, controller.epochStart, controller.epochEnd)

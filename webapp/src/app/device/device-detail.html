@@ -388,7 +388,39 @@
                 <h3 class="panel-title">Device issues</h3>
               </div>
               <div class="panel-body">
-                <div class="row">
+                <form name="tenantForm"
+                      class="form-horizontal"
+                      ng-submit="deviceDetailsCtrl.onClickRefreshButton()"
+                      novalidate>
+                  <div class="row">
+                    <div class="col-sm-offset-6 col-sm-2">
+                      <label for="startTime" class="control-label">From</label>
+                      <input type="text" class="form-control input-sm"
+                             datetimepicker
+                             datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
+                             placeholder="{{deviceDetailsCtrl.startTime}}"
+                             name="startTime"
+                             id="startTime"
+                             ng-model="deviceDetailsCtrl.startTime">
+                    </div>
+                    <div class="col-sm-2">
+                      <label for="endTime" class="control-label">To</label>
+                      <input type="text" class="form-control input-sm"
+                             datetimepicker
+                             datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
+                             placeholder="{{deviceDetailsCtrl.endTime}}"
+                             name="endTime"
+                             id="endTime"
+                             ng-model="deviceDetailsCtrl.endTime">
+                    </div>
+                    <div class="col-sm-2 margin-top-15">
+                      <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-fw fa-refresh"></i> Refresh
+                      </button>
+                    </div>
+                  </div>
+                </form>
+                <div class="row margin-top-15">
                   <div class="col-lg-12">
                     <table name="devices-table" class="table table-responsive">
                       <thead>

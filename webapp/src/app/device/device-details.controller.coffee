@@ -44,6 +44,8 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   }
   @editMode = !!$stateParams.deviceKey
   @issues = []
+  @pickerOptions = "{icons:{next:'glyphicon glyphicon-arrow-right',
+    previous:'glyphicon glyphicon-arrow-left',up:'glyphicon glyphicon-arrow-up',down:'glyphicon glyphicon-arrow-down'}}"
 
   @initialize = () ->
     @panelModels = DevicesService.getPanelModels()
@@ -57,7 +59,14 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       devicePromise.then (data) =>
         @currentDevice = data
         @setSelectedOptions()
-      issuesPromise = DevicesService.getIssuesByKey($stateParams.deviceKey)
+
+      now = new Date()
+      @endTime = now.toLocaleString().replace(/,/g , "")
+      now.setDate(now.getDate() - 1)
+      @startTime = now.toLocaleString().replace(/,/g , "")
+      @epochStart = moment(new Date(@startTime)).unix()
+      @epochEnd = moment(new Date(@endTime)).unix()
+      issuesPromise = DevicesService.getIssuesByKey($stateParams.deviceKey, @epochStart, @epochEnd)
       issuesPromise.then (data) =>
         @issues = data
 
@@ -132,5 +141,13 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @onCommandFailure = (error) ->
     ProgressBarService.complete()
     sweet.show('Oops...', "Command error: #{error.data}", 'error')
+
+  @onClickRefreshButton = () ->
+    @epochStart = moment(new Date(@startTime)).unix()
+    @epochEnd = moment(new Date(@endTime)).unix()
+    issuesPromise = DevicesService.getIssuesByKey($stateParams.deviceKey, @epochStart, @epochEnd)
+    issuesPromise.then (data) =>
+      @issues = data
+
 
   @

@@ -26,6 +26,8 @@ module.exports = function (config) {
       'bower_components/angular-breadcrumb/dist/angular-breadcrumb.js',
       'bower_components/angular-directive.g-signin/google-plus-signin.js',
       'bower_components/ngprogress/build/ngprogress.js',
+      'bower_components/angular-bootstrap-datetimepicker-directive/angular-bootstrap-datetimepicker-directive.min.js',
+      'bower_components/moment/min/moment.min.js',
       'src/app/index.coffee',
       'src/app/**/*.coffee',
       'specs/**/*.coffee'

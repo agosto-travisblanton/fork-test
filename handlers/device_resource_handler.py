@@ -370,8 +370,14 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @requires_api_token
     def get_latest_issues(self, device_urlsafe_key):
+        start_epoch = int(self.request.params['start'])
+        end_epoch = int(self.request.params['end'])
+        start = datetime.utcfromtimestamp(start_epoch)
+        end = datetime.utcfromtimestamp(end_epoch)
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
-        query = DeviceIssueLog.query(DeviceIssueLog.device_key == device.key).order(-DeviceIssueLog.created)
+        query = DeviceIssueLog.query(DeviceIssueLog.device_key == device.key,
+                                     ndb.AND(DeviceIssueLog.created > start),
+                                     ndb.AND(DeviceIssueLog.created <= end)).order(-DeviceIssueLog.created)
         latest_issues = query.fetch(config.LATEST_DEVICE_ISSUES_FETCH_COUNT)
         return json_response(self.response, latest_issues, strategy=DEVICE_ISSUE_LOG_STRATEGY)
 
