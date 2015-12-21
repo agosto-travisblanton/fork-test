@@ -11,8 +11,7 @@ skykitDisplayDeviceManagement = angular.module('skykitDisplayDeviceManagement', 
   'ui.bootstrap',
   'ncy-angular-breadcrumb',
   'directive.g+signin',
-  'ngProgress',
-  'ui.bootstrap.datetimepicker'
+  'ngProgress'
 ])
 
 skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
