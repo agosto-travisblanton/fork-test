@@ -206,14 +206,14 @@
                     <th>Notes</th>
                     <th>Provisioned date</th>
                     <th class="text-center">Status</th>
-                    <th>&nbsp;</th>
                   </tr>
                   </thead>
                   <tbody>
                   <tr ng-hide="tenantDetailsCtrl.currentTenantDisplays.length">
-                    <td colspan="8" class="text-center text-danger">No displays</td>
+                    <td colspan="7" class="text-center text-danger">No displays</td>
                   </tr>
-                  <tr ng-repeat="item in tenantDetailsCtrl.currentTenantDisplays | orderBy:'-created' ">
+                  <tr ng-repeat="item in tenantDetailsCtrl.currentTenantDisplays | orderBy:'-created' "
+                      ng-click="tenantDetailsCtrl.editItem(item)">
                     <td class="tenant-display-serial-number">
                       <a name="edit-device" class="btn" ng-click="tenantDetailsCtrl.editItem(item)"
                          title="Device detail">{{item.serialNumber}}</a>
@@ -235,9 +235,6 @@
                     </td>
                     <td class="display-up text-center">
                       <i class="fa fa-fw fa-tv" ng-style="item.up === true ? { color:'green' } : { color:'red' }"></i></td>
-                    <td class="text-center">
-                      <a name="edit-device" class="btn" ng-click="tenantDetailsCtrl.editItem(item)"
-                         title="Device detail"><i class="fa fa-fw fa-edit"></i></a></td>
                   </tr>
                   </tbody>
                 </table>
