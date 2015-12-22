@@ -1,8 +1,10 @@
+from app_config import config
 from env_setup import setup_test_paths
 
 setup_test_paths()
 
 import json
+from datetime import datetime
 from restler.serializers import to_json
 from strategy import CHROME_OS_DEVICE_STRATEGY
 from agar.test import BaseTest
@@ -62,19 +64,44 @@ class TestChromeOsDeviceModel(BaseTest):
         actual = ChromeOsDevice.get_by_device_id(self.TESTING_DEVICE_ID)
         self.assertIsNone(actual)
 
-    def test_create(self):
+    def test_create_managed(self):
         device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                                         device_id=self.TESTING_DEVICE_ID,
-                                                         gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
-                                                         mac_address=self.MAC_ADDRESS)
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
         self.assertIsNotNone(device)
         self.assertIsNotNone(device.api_key)
 
+    def test_create_managed_auto_sets_heartbeat_info(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
+        self.assertFalse(device.is_unmanaged_device)
+        self.assertTrue(device.up)
+        self.assertTrue(device.storage_utilization is 0)
+        self.assertTrue(device.memory_utilization is 0)
+        self.assertTrue(device.heartbeat_updated <= datetime.utcnow())
+        self.assertEqual(device.program, '****initial****')
+        self.assertEqual(device.program_id, '****initial****')
+        self.assertTrue(device.heartbeat_interval_minutes is config.PLAYER_HEARTBEAT_INTERVAL_MINUTES)
+
+    def test_create_unmanaged_auto_sets_heartbeat_info(self):
+        device = ChromeOsDevice.create_unmanaged(self.TEST_GCM_REGISTRATION_ID, self.MAC_ADDRESS)
+        self.assertTrue(device.is_unmanaged_device)
+        self.assertTrue(device.up)
+        self.assertTrue(device.storage_utilization is 0)
+        self.assertTrue(device.memory_utilization is 0)
+        self.assertTrue(device.heartbeat_updated <= datetime.utcnow())
+        self.assertEqual(device.program, '****initial****')
+        self.assertEqual(device.program_id, '****initial****')
+        self.assertTrue(device.heartbeat_interval_minutes is config.PLAYER_HEARTBEAT_INTERVAL_MINUTES)
+
     def test_json_serialization_strategy(self):
         device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                                 device_id=self.TESTING_DEVICE_ID,
-                                                 gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
-                                                 mac_address=self.MAC_ADDRESS)
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
         device.panel_model = self.DISPLAY_PANEL_MODEL
         device.panel_input = self.DISPLAY_PANEL_INPUT
         device.put()
@@ -93,11 +120,11 @@ class TestChromeOsDeviceModel(BaseTest):
 
     def test_json_serialization_strategy_with_optional_serial_number(self):
         device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                                 device_id=self.TESTING_DEVICE_ID,
-                                                 gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
-                                                 mac_address=self.MAC_ADDRESS,
-                                                 serial_number=self.SERIAL_NUMBER,
-                                                 model=self.MODEL)
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS,
+                                               serial_number=self.SERIAL_NUMBER,
+                                               model=self.MODEL)
         device.put()
         json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
         self.assertEqual(self.SERIAL_NUMBER, json_representation['serialNumber'])
@@ -107,19 +134,19 @@ class TestChromeOsDeviceModel(BaseTest):
 
     def test_class_version_is_only_set_by_pre_put_hook_method(self):
         device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                                 device_id=self.TESTING_DEVICE_ID,
-                                                 gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
-                                                 mac_address=self.MAC_ADDRESS,
-                                                 serial_number=self.SERIAL_NUMBER)
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS,
+                                               serial_number=self.SERIAL_NUMBER)
         device.class_version = 47
         device.put()
         self.assertEqual(device.class_version, self.CURRENT_CLASS_VERSION)
 
     def test_get_tenant_returns_tenant_representation(self):
         device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                                 device_id=self.TESTING_DEVICE_ID,
-                                                 gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
-                                                 mac_address=self.MAC_ADDRESS)
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
         device.put()
         tenant = device.get_tenant()
         self.assertEqual(tenant, self.tenant)
