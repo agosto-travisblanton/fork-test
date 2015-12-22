@@ -127,9 +127,10 @@ describe 'DeviceDetailsCtrl', ->
           TenantsService: TenantsService
         }
         now = new Date()
+        today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
         @epochEnd = moment(new Date()).unix()
-        now.setDate(now.getDate() - 1)
-        @epochStart = moment(now).unix()
+        today.setDate(today.getDate() - 1)
+        @epochStart = moment(today).unix()
         controller.initialize()
 
       it 'defines currentDevice property', ->

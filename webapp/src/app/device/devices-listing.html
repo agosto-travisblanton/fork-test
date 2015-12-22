@@ -25,14 +25,14 @@
               <th>Notes</th>
               <th>Provisioned date</th>
               <th class="text-center">Status</th>
-              <th>&nbsp;</th>
             </tr>
             </thead>
             <tbody>
             <tr ng-hide="devicesListingCtrl.devices.length">
-              <td class="no-devices text-center text-danger" colspan="8">No devices</td>
+              <td class="no-devices text-center text-danger" colspan="7">No devices</td>
             </tr>
-            <tr ng-repeat="item in devicesListingCtrl.devices | orderBy:'-created'">
+            <tr ng-repeat="item in devicesListingCtrl.devices | orderBy:'-created'"
+                ng-click="devicesListingCtrl.editItem(item)">
               <td class="display-serial-number">
                 <a name="edit-device" class="btn" ng-click="devicesListingCtrl.editItem(item)"
                    title="Device detail">{{item.serialNumber}}</a></td>
@@ -43,9 +43,6 @@
               <td class="display-provisioning-date">{{ item.created }}</td>
               <td class="display-up text-center">
                 <i class="fa fa-fw fa-tv" ng-style="item.up === true ? { color:'green' } : { color:'red' }"></i></td>
-              <td class="text-center">
-                <a name="edit-device" class="btn" ng-click="devicesListingCtrl.editItem(item)"
-                   title="Device detail"><i class="fa fa-fw fa-edit"></i></a></td>
             </tr>
             </tbody>
           </table>
