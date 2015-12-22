@@ -114,6 +114,7 @@ class Tenant(ndb.Model):
     chrome_device_domain = ndb.StringProperty()
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
     domain_key = ndb.KeyProperty(kind=Domain, required=True, indexed=True)
+    notification_email_list = ndb.StringProperty(required=False)
     class_version = ndb.IntegerProperty()
 
     def get_domain(self):
