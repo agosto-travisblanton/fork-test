@@ -1195,6 +1195,27 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json[1]['category'], config.DEVICE_ISSUE_MEMORY_HIGH)
         self.assertEqual(response_json[2]['category'], config.DEVICE_ISSUE_STORAGE_LOW)
 
+    def test_get_latest_issues_returns_zero_issues_with_out_of_range_datetime(self):
+        issue = DeviceIssueLog.create(device_key=self.managed_device_key,
+                                      category=config.DEVICE_ISSUE_STORAGE_LOW,
+                                      up=False,
+                                      storage_utilization=99,
+                                      memory_utilization=self.MEMORY_UTILIZATION,
+                                      program=self.PROGRAM,
+                                      resolved=False)
+        issue.created = datetime.utcnow()
+        issue.put()
+        start = datetime.utcnow() - timedelta(days=10)
+        end = datetime.utcnow() - timedelta(days=5)
+        start_epoch = int((start - datetime(1970, 1, 1)).total_seconds())
+        end_epoch = int((end - datetime(1970, 1, 1)).total_seconds())
+        request_parameters = {}
+        uri = build_uri('device-issues', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe(),
+                                                      'start': start_epoch, 'end': end_epoch})
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertLength(0, response_json)
+
     def __initialize_heartbeat_info(self, up=True):
         self.managed_device.storage_utilization = self.STORAGE_UTILIZATION
         self.managed_device.memory_utilization = self.MEMORY_UTILIZATION
