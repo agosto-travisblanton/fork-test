@@ -325,19 +325,54 @@ describe 'DeviceDetailsCtrl', ->
 
   describe '.onClickRefreshButton', ->
     beforeEach ->
+      devicesServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      spyOn(DevicesService, 'getIssuesByKey').and.returnValue getDeviceIssuesPromise
+      spyOn(progressBarService, 'start')
       $stateParams.deviceKey = 'fkasdhfjfa9s8udyva7dygoudyg'
       controller = $controller 'DeviceDetailsCtrl', {
         $stateParams: $stateParams
         $state: $state
         DevicesService: DevicesService
+        ProgressBarService: progressBarService
       }
-      now = new Date()
-      controller.epochEnd = moment(new Date()).unix()
-      now.setDate(now.getDate() - 5)
-      controller.epochStart = moment(now).unix()
-      spyOn(DevicesService, 'getIssuesByKey').and.returnValue getDeviceIssuesPromise
       controller.onClickRefreshButton()
 
-    it 'refreshes issues for a given device within the specified datetime range', ->
+    it 'starts the progress bar', ->
+      expect(progressBarService.start).toHaveBeenCalled()
+
+    it 'defines epochStart', ->
+      expect(controller.epochStart).toBeDefined()
+
+    it 'defines epochEnd', ->
+      expect(controller.epochEnd).toBeDefined()
+
+    it 'calls service to refresh issues for a given device within a specified datetime range', ->
       expect(DevicesService.getIssuesByKey).toHaveBeenCalledWith(
         $stateParams.deviceKey, controller.epochStart, controller.epochEnd)
+
+    describe '.onRefreshIssuesSuccess', ->
+      beforeEach ->
+        spyOn(progressBarService, 'complete')
+        controller.onRefreshIssuesSuccess(issues)
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'populates the issues array with two records', ->
+        expect(controller.issues.length).toBe 2
+
+    describe '.onRefreshIssuesFailure', ->
+      error_text = undefined
+
+      beforeEach ->
+        spyOn(progressBarService, 'complete')
+        spyOn(sweet, 'show')
+        error_text = '403 Forbidden'
+        error = {'data': error_text}
+        controller.onRefreshIssuesFailure(error)
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a sweet alert with error information', ->
+        expect(sweet.show).toHaveBeenCalledWith('Oops...', "Refresh error: #{error_text}", 'error')

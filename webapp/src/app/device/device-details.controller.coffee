@@ -3,13 +3,13 @@
 appModule = angular.module('skykitDisplayDeviceManagement')
 
 appModule.controller 'DeviceDetailsCtrl', ($log,
-    $stateParams,
-    $state,
-    DevicesService,
-    TenantsService,
-    CommandsService,
-    sweet,
-    ProgressBarService) ->
+  $stateParams,
+  $state,
+  DevicesService,
+  TenantsService,
+  CommandsService,
+  sweet,
+  ProgressBarService) ->
   @tenantKey = $stateParams.tenantKey
   @currentDevice = {
     key: undefined
@@ -61,9 +61,9 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
         @setSelectedOptions()
 
       now = new Date()
-      @endTime = now.toLocaleString().replace(/,/g , "")
+      @endTime = now.toLocaleString().replace(/,/g, "")
       now.setDate(now.getDate() - 1)
-      @startTime = now.toLocaleString().replace(/,/g , "")
+      @startTime = now.toLocaleString().replace(/,/g, "")
       @epochStart = moment(new Date(@startTime)).unix()
       @epochEnd = moment(new Date(@endTime)).unix()
       issuesPromise = DevicesService.getIssuesByKey($stateParams.deviceKey, @epochStart, @epochEnd)
@@ -143,11 +143,21 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     sweet.show('Oops...', "Command error: #{error.data}", 'error')
 
   @onClickRefreshButton = () ->
+    ProgressBarService.start()
     @epochStart = moment(new Date(@startTime)).unix()
     @epochEnd = moment(new Date(@endTime)).unix()
     issuesPromise = DevicesService.getIssuesByKey($stateParams.deviceKey, @epochStart, @epochEnd)
-    issuesPromise.then (data) =>
-      @issues = data
+    issuesPromise.then ((data) =>
+      @onRefreshIssuesSuccess(data)
+    ), (error) =>
+      @onRefreshIssuesFailure(error)
 
+  @onRefreshIssuesSuccess = (data) ->
+    ProgressBarService.complete()
+    @issues = data
+
+  @onRefreshIssuesFailure = (error) ->
+    ProgressBarService.complete()
+    sweet.show('Oops...', "Refresh error: #{error.data}", 'error')
 
   @
