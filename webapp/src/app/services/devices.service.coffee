@@ -12,8 +12,9 @@ angular.module('skykitDisplayDeviceManagement').factory 'DevicesService', ($http
       promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{deviceKey}").get()
       promise
 
-    getIssuesByKey: (deviceKey) ->
-      promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{deviceKey}/issues").get()
+    getIssuesByKey: (deviceKey, startEpoch, endEpoch) ->
+      promise = Restangular.oneUrl(SERVICE_NAME,
+        "api/v1/devices/#{deviceKey}/issues?start=#{startEpoch}&end=#{endEpoch}").get()
       promise
 
     getDevicesByTenant: (tenantKey) ->
