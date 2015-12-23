@@ -12,7 +12,7 @@ TENANT_FIELDS = [
     'admin_email',
     'content_server_url',
     'content_manager_base_url',
-    'notification_email_list',
+    'notification_emails',
     'active',
     'created',
     'updated'

@@ -114,7 +114,7 @@ class Tenant(ndb.Model):
     chrome_device_domain = ndb.StringProperty()
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
     domain_key = ndb.KeyProperty(kind=Domain, required=True, indexed=True)
-    notification_email_list = ndb.StringProperty(required=False)
+    notification_emails = ndb.StringProperty(repeated=True, indexed=False, required=False)
     class_version = ndb.IntegerProperty()
 
     def get_domain(self):
@@ -153,7 +153,7 @@ class Tenant(ndb.Model):
 
     @classmethod
     def create(cls, tenant_code, name, admin_email, content_server_url, domain_key, active,
-               content_manager_base_url, notification_email_list=None):
+               content_manager_base_url, notification_emails=[]):
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
                    tenant_code=tenant_code,
@@ -163,7 +163,7 @@ class Tenant(ndb.Model):
                    domain_key=domain_key,
                    active=active,
                    content_manager_base_url=content_manager_base_url,
-                   notification_email_list = notification_email_list)
+                   notification_emails=notification_emails)
 
     def _pre_put_hook(self):
         self.class_version = 1

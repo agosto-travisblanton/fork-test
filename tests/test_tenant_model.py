@@ -85,7 +85,7 @@ class TestTenantModel(BaseTest):
         self.assertEqual(self.CONTENT_MANAGER_BASE_URL, tenant_created.content_manager_base_url)
         self.assertEqual(self.NAME, tenant_created.name)
         self.assertEqual(self.domain_key, tenant_created.domain_key)
-        self.assertIsNone(tenant_created.notification_email_list)
+        self.assertLength(0, tenant_created.notification_emails)
 
     def test_is_tenant_code_unique_returns_false_when_code_found(self):
         uniqueness_check = Tenant.is_tenant_code_unique(self.TENANT_CODE)
