@@ -153,7 +153,7 @@ class Tenant(ndb.Model):
 
     @classmethod
     def create(cls, tenant_code, name, admin_email, content_server_url, domain_key, active,
-               content_manager_base_url):
+               content_manager_base_url, notification_email_list=None):
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
                    tenant_code=tenant_code,
@@ -162,7 +162,8 @@ class Tenant(ndb.Model):
                    content_server_url=content_server_url,
                    domain_key=domain_key,
                    active=active,
-                   content_manager_base_url=content_manager_base_url)
+                   content_manager_base_url=content_manager_base_url,
+                   notification_email_list = notification_email_list)
 
     def _pre_put_hook(self):
         self.class_version = 1
