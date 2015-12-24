@@ -13,6 +13,7 @@ appModule.controller 'TenantDetailsCtrl',
       content_server_url: undefined,
       content_manager_base_url: undefined,
       domain_key: undefined,
+      notification_emails: undefined,
       active: true
     }
     @selectedDomain = undefined
