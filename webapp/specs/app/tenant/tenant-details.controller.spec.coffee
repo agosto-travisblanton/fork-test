@@ -66,6 +66,7 @@ describe 'TenantDetailsCtrl', ->
       expect(controller.currentTenant.content_server_url).toBeUndefined()
       expect(controller.currentTenant.chrome_device_domain).toBeUndefined()
       expect(controller.currentTenant.domain_key).toBeUndefined()
+      expect(controller.currentTenant.notification_emails).toBeUndefined()
       expect(controller.currentTenant.active).toBeTruthy()
 
     it 'selectedDomain should be defined', ->
