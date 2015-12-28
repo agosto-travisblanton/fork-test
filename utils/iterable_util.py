@@ -93,3 +93,10 @@ def listable(might_be_listable):
     """
     return hasattr(might_be_listable, "__len__") and (not isinstance(might_be_listable, basestring))
 
+
+def comma_delimited_string_to_list(comma_delimited_string):
+    if comma_delimited_string is None or comma_delimited_string == '':
+        item_list = []
+    else:
+        item_list = [x.strip() for x in comma_delimited_string.split(',')]
+    return item_list
