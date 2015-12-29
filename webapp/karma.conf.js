@@ -28,6 +28,8 @@ module.exports = function (config) {
       'bower_components/ngprogress/build/ngprogress.js',
       'bower_components/angular-bootstrap-datetimepicker-directive/angular-bootstrap-datetimepicker-directive.min.js',
       'bower_components/moment/min/moment.min.js',
+      'bower_components/angular-material/angular-material.js',
+      'bower_components/angular-aria/angular-aria.js',
       'src/app/index.coffee',
       'src/app/**/*.coffee',
       'specs/**/*.coffee'
