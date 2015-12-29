@@ -73,10 +73,10 @@ describe 'skyKitProvisioning module and configuration', ->
   describe 'breadcrumbs', ->
     describe 'labels', ->
       it 'should resolve \'home\' state', ->
-        expect($state.get('home').ncyBreadcrumb.label).toBe 'SkyKit Provisioning'
+        expect($state.get('home').ncyBreadcrumb.label).toBe 'Skykit Provisioning'
 
       it 'should resolve \'welcome\' state', ->
-        expect($state.get('welcome').ncyBreadcrumb.label).toBe 'SkyKit Provisioning'
+        expect($state.get('welcome').ncyBreadcrumb.label).toBe 'Skykit Provisioning'
 
       it 'should resolve \'domains\' state', ->
         expect($state.get('domains').ncyBreadcrumb.label).toBe 'Domains'

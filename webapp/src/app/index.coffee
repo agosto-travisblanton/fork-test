@@ -54,7 +54,7 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     controller: "WelcomeCtrl",
     controllerAs: 'welcomeCtrl',
     ncyBreadcrumb: {
-      label: 'SkyKit Provisioning'
+      label: 'Skykit Provisioning'
     }
   })
   $stateProvider.state("welcome", {
@@ -67,7 +67,7 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     controller: "WelcomeCtrl"
     controllerAs: 'welcomeCtrl',
     ncyBreadcrumb: {
-      label: 'SkyKit Provisioning'
+      label: 'Skykit Provisioning'
     }
   })
   $stateProvider.state("version", {
