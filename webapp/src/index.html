@@ -57,11 +57,21 @@
   <md-subheader class="md-no-sticky">Platform admin portal</md-subheader>
   <md-list>
     <md-list-item>
-      <md-button ng-click="appController.goTo('platformAdminHome')">Dashboard</md-button>
+      <md-button ng-click="appController.goTo('tenants')">Tenants</md-button>
     </md-list-item>
     <md-list-item>
-      <md-button ng-click="appController.goTo('restaurantsListing')">Restaurants</md-button>
+      <md-button ng-click="appController.goTo('devices')">Devices</md-button>
     </md-list-item>
+    <md-list-item>
+      <md-button ng-click="appController.goTo('domains')">Domains</md-button>
+    </md-list-item>
+    <md-list-item>
+      <md-button ng-click="appController.goTo('version')">Version</md-button>
+    </md-list-item>
+    <md-list-item>
+      <md-button ng-click="appController.goTo('signout')">Sign out</md-button>
+    </md-list-item>
+
   </md-list>
 
 </md-sidenav>
