@@ -1,17 +1,21 @@
-<div id="wrapper" ng-controller="WelcomeCtrl as welcomeCtrl"
-     ng-init="welcomeCtrl.initialize()">
-  <div id="page-wrapper">
-    <div class="container-fluid">
-      <div ncy-breadcrumb></div>
-
-      <div class="row">
-        <div class="col-lg-12">
-          <h1 class="page-header">
-            {{ welcomeCtrl.identity.distributorName }}
-          </h1>
-          {{ welcomeCtrl.identity.email }}
+<md-content class="md-padding"
+            layout="row"
+            layout-wrap
+            layout-xs="column">
+  <div flex="30" flex-sm="20" flex-xs="20" ng-controller="WelcomeCtrl as welcomeCtrl"
+       ng-init="welcomeCtrl.initialize()">
+    <md-card>
+      <md-card-title>
+        <md-card-title-text>
+          <span class="md-headline">{{ welcomeCtrl.identity.distributorName }}</span>
+        </md-card-title-text>
+      </md-card-title>
+      <md-card-content>
+        <div>
+            {{ welcomeCtrl.identity.email }}
         </div>
-      </div>
-    </div>
+      </md-card-content>
+    </md-card>
   </div>
-</div>
+</md-content>
+
