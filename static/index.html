@@ -1,10 +1,15 @@
-<!doctype html><html ng-app="skykitDisplayDeviceManagement"><head><meta charset="utf-8"><title>SkyKit Provisioning</title><meta name="description" content=""><meta name="viewport" content="width=device-width"><link rel="stylesheet" href="styles/vendor-bc94c0a0.css"><link rel="stylesheet" href="styles/app-8b3b5b26.css"></head><body><!--[if lt IE 10]>
-<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-<![endif]--><div ui-view=""></div><script>
+<!DOCTYPE html><html lang="en"><head><title>Skykit Provisioning</title><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="description" content=""><meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no"><link rel="stylesheet" href="styles/vendor-1ff76341.css"><link rel="stylesheet" href="styles/app-8b3b5b26.css"><link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"><style type="text/css">
+    /**
+     * Hide when Angular is not yet loaded and initialized
+     */
+    [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+      display: none !important;
+    }
+  </style></head><body ng-app="skyKitProvisioning" layout="row" ng-controller="AppController as appController" ng-cloak=""><md-sidenav class="site-sidenav md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-lg')"><md-toolbar class="md-whiteframe-z1"></md-toolbar><md-list><md-list-item><md-button ng-click="appController.goTo('tenants')"><i class="fa fa-fw fa-group"></i> Tenants</md-button></md-list-item><md-list-item><md-button ng-click="appController.goTo('devices')"><i class="fa fa-fw fa-desktop"></i> Devices</md-button></md-list-item><md-list-item><md-button ng-click="appController.goTo('domains')"><i class="fa fa-fw fa-cube"></i> Domains</md-button></md-list-item><md-list-item><md-button ng-click="appController.goTo('version')"><i class="fa fa-fw fa-tag"></i> Version</md-button></md-list-item><md-list-item><md-button ng-click="appController.goTo('sign_out')"><i class="fa fa-fw fa-sign-out"></i> Sign out</md-button></md-list-item></md-list></md-sidenav><div flex="" layout="column" tabindex="-1" role="main" class="md-whiteframe-z2"><md-toolbar layout="row" class="md-whiteframe-z1"><md-button class="menu" ng-click="appController.toggleSidenav('left')" hide-gt-lg="" aria-label="Menu"><md-icon md-font-set="material-icons" class="md-light md-48">menu</md-icon></md-button><a class="navbar-brand" href="#/welcome"><img src="assets/images/skykit_logo2.png"></a><h3>Provisioning</h3></md-toolbar><div flex="" ui-view=""></div></div><script>
   (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
     function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
     e=o.createElement(i);r=o.getElementsByTagName(i)[0];
     e.src='//www.google-analytics.com/analytics.js';
     r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
   ga('create','UA-XXXXX-X');ga('send','pageview');
-</script><script src="scripts/vendor-72e61a3e.js"></script><script src="scripts/app-44087760.js"></script></body></html>
+</script><script src="scripts/vendor-b4e87a83.js"></script><script src="scripts/app-ba6adc51.js"></script></body></html>
