@@ -167,14 +167,20 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 if ChromeOsDevice.mac_address_already_assigned(device_mac_address):
                     status = 400
                     error_message = 'Cannot register because macAddress already assigned to managed device.'
+                    self.response.set_status(status, error_message)
+                    return
                 tenant_code = request_json.get('tenantCode')
                 if tenant_code is None or tenant_code == '':
                     status = 400
                     error_message = 'The tenantCode parameter is invalid.'
+                    self.response.set_status(status, error_message)
+                    return
                 tenant_key = Tenant.query(Tenant.tenant_code == tenant_code, Tenant.active == True).get(keys_only=True)
                 if tenant_key is None:
                     status = 400
-                    error_message = 'Invalid or inactive tenant for managed device.'
+                    error_message = 'Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
+                    self.response.set_status(status, error_message)
+                    return
                 if status == 201:
                     device = ChromeOsDevice.create_managed(tenant_key=tenant_key,
                                                            gcm_registration_id=gcm_registration_id,

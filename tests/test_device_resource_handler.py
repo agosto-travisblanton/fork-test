@@ -144,13 +144,13 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         in context.exception.message)
 
     def test_device_resource_handler_post_no_returns_bad_response_for_empty_tenant_code(self):
-        request_body = {'macAddress': self.MAC_ADDRESS,
+        request_body = {'macAddress': '232323243223',
                         'gcmRegistrationId': self.GCM_REGISTRATION_ID,
                         'tenantCode': None}
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
                           headers=self.api_token_authorization_header)
-        self.assertTrue('Bad response: 400 Invalid or inactive tenant for managed device.'
+        self.assertTrue('Bad response: 400 The tenantCode parameter is invalid.'
                         in context.exception.message)
 
     def test_device_resource_handler_post_no_returns_bad_response_for_empty_gcm(self):
@@ -171,6 +171,16 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             self.app.post('/api/v1/devices', json.dumps(request_body),
                           headers=self.api_token_authorization_header)
         self.assertTrue('Bad response: 400 The macAddress parameter is invalid.'
+                        in context.exception.message)
+
+    def test_post_managed_device_when_cannot_resolve_tenant(self):
+        request_body = {'macAddress': '232323243223',
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'tenantCode': 'unresolvable_tenant_code'}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body),
+                          headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 400 Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
                         in context.exception.message)
 
     ##################################################################################################################
