@@ -45,31 +45,25 @@
             md-is-locked-open="$mdMedia('gt-lg')">
 
   <md-toolbar class="md-whiteframe-z1">
-    <h3>&nbsp;</h3>
+    <!--<a class="navbar-brand" href="#/welcome"><img src="assets/images/skykit_logo2.png"></a>-->
   </md-toolbar>
 
-  <md-list>
-    <md-list-item>
-      <md-button ng-click="appController.goTo('home')">Start Here</md-button>
-    </md-list-item>
-  </md-list>
 
-  <md-subheader class="md-no-sticky">Platform admin portal</md-subheader>
   <md-list>
     <md-list-item>
-      <md-button ng-click="appController.goTo('tenants')">Tenants</md-button>
+      <md-button ng-click="appController.goTo('tenants')"><i class="fa fa-fw fa-group"></i> Tenants</md-button>
     </md-list-item>
     <md-list-item>
-      <md-button ng-click="appController.goTo('devices')">Devices</md-button>
+      <md-button ng-click="appController.goTo('devices')"><i class="fa fa-fw fa-desktop"></i> Devices</md-button>
     </md-list-item>
     <md-list-item>
-      <md-button ng-click="appController.goTo('domains')">Domains</md-button>
+      <md-button ng-click="appController.goTo('domains')"><i class="fa fa-fw fa-cube"></i> Domains</md-button>
     </md-list-item>
     <md-list-item>
-      <md-button ng-click="appController.goTo('version')">Version</md-button>
+      <md-button ng-click="appController.goTo('version')"><i class="fa fa-fw fa-tag"></i> Version</md-button>
     </md-list-item>
     <md-list-item>
-      <md-button ng-click="appController.goTo('signout')">Sign out</md-button>
+      <md-button ng-click="appController.goTo('signout')"><i class="fa fa-fw fa-sign-out"></i> Sign out</md-button>
     </md-list-item>
 
   </md-list>
@@ -83,7 +77,9 @@
     <md-button class="menu" ng-click="appController.toggleSidenav('left')" hide-gt-lg aria-label="Menu">
       <md-icon md-font-set="material-icons" class="md-light md-48">menu</md-icon>
     </md-button>
-    <h3>SkyKit Provisioning</h3>
+    <a class="navbar-brand" href="#/welcome"><img src="assets/images/skykit_logo2.png"></a>
+    <h3>Provisioning</h3>
+
   </md-toolbar>
 
   <!--<md-content flex id="content">-->
