@@ -8,7 +8,7 @@ describe 'VersionsCtrl', ->
   promise = undefined
 
 
-  beforeEach module('skykitDisplayDeviceManagement')
+  beforeEach module('skyKitProvisioning')
 
   beforeEach inject (_$controller_, _VersionsService_, _$state_) ->
     $controller = _$controller_
@@ -26,7 +26,7 @@ describe 'VersionsCtrl', ->
     ]
 
     beforeEach ->
-      promise = new skykitDisplayDeviceManagement.q.Mock
+      promise = new skyKitProvisioning.q.Mock
       spyOn(VersionsService, 'getVersions').and.returnValue promise
 
     it 'call VersionsService.getVersions to retrieve module versions', ->

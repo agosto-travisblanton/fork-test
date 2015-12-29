@@ -5,12 +5,12 @@ describe 'VersionsService', ->
   Restangular = undefined
   promise = undefined
 
-  beforeEach module('skykitDisplayDeviceManagement')
+  beforeEach module('skyKitProvisioning')
 
   beforeEach inject (_VersionsService_, _Restangular_) ->
     VersionsService = _VersionsService_
     Restangular = _Restangular_
-    promise = new skykitDisplayDeviceManagement.q.Mock
+    promise = new skyKitProvisioning.q.Mock
 
   describe '.getVersions', ->
     versionsRestangularService = undefined

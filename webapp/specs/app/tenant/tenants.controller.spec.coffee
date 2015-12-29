@@ -9,7 +9,7 @@ describe 'TenantsCtrl', ->
   promise = undefined
 
 
-  beforeEach module('skykitDisplayDeviceManagement')
+  beforeEach module('skyKitProvisioning')
 
   beforeEach inject (_$controller_, _TenantsService_, _$state_, _sweet_) ->
     $controller = _$controller_
@@ -30,7 +30,7 @@ describe 'TenantsCtrl', ->
     ]
 
     beforeEach ->
-      promise = new skykitDisplayDeviceManagement.q.Mock
+      promise = new skyKitProvisioning.q.Mock
       spyOn(TenantsService, 'fetchAllTenants').and.returnValue promise
 
     it 'call TenantsService.fetchAllTenants to retrieve all tenants', ->
@@ -62,7 +62,7 @@ describe 'TenantsCtrl', ->
     }
 
     beforeEach ->
-      promise = new skykitDisplayDeviceManagement.q.Mock
+      promise = new skyKitProvisioning.q.Mock
       spyOn(TenantsService, 'delete').and.returnValue promise
       spyOn controller, 'initialize'
       spyOn(sweet, 'show').and.callFake (options, callback) ->

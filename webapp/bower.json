@@ -1,5 +1,5 @@
 {
-  "name": "skykitDisplayDeviceManagement",
+  "name": "skyKitProvisioning",
   "version": "0.0.0",
   "dependencies": {
     "angular": "~1.4.1",
@@ -9,6 +9,7 @@
     "angular-cookies": "~1.4.1",
     "angular-directive.g-signin": "~0.1.2",
     "angular-h-sweetalert": "~1.4.5",
+    "angular-material": "~1.0.1",
     "angular-sanitize": "~1.4.1",
     "angular-spinner": "~0.6.2",
     "angular-touch": "~1.4.1",

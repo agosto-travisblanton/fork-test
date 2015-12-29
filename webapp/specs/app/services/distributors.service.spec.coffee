@@ -5,12 +5,12 @@ describe 'DistributorsService', ->
   Restangular = undefined
   promise = undefined
 
-  beforeEach module('skykitDisplayDeviceManagement')
+  beforeEach module('skyKitProvisioning')
 
   beforeEach inject (_DistributorsService_, _Restangular_) ->
     DistributorsService = _DistributorsService_
     Restangular = _Restangular_
-    promise = new skykitDisplayDeviceManagement.q.Mock
+    promise = new skyKitProvisioning.q.Mock
 
   describe 'service initialization', ->
     it 'the current distributor is undefined', ->

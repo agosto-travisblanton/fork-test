@@ -1,6 +1,6 @@
 'use strict'
 
-appModule = angular.module('skykitDisplayDeviceManagement')
+appModule = angular.module('skyKitProvisioning')
 
 appModule.controller 'DomainDetailsCtrl', ($log,
                                            $stateParams,

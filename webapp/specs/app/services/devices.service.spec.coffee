@@ -5,12 +5,12 @@ describe 'DevicesService', ->
   Restangular = undefined
   promise = undefined
 
-  beforeEach module('skykitDisplayDeviceManagement')
+  beforeEach module('skyKitProvisioning')
 
   beforeEach inject (_DevicesService_, _Restangular_) ->
     DevicesService = _DevicesService_
     Restangular = _Restangular_
-    promise = new skykitDisplayDeviceManagement.q.Mock
+    promise = new skyKitProvisioning.q.Mock
 
   describe '.getDevicesByTenant', ->
     it 'retrieve all devices associated to a tenant, returning a promise', ->

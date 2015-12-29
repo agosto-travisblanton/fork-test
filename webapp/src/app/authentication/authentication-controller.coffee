@@ -1,8 +1,8 @@
 'use strict'
 
-appModule = angular.module 'skykitDisplayDeviceManagement'
+app = angular.module 'skyKitProvisioning'
 
-appModule.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
+app.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
                                             identity,
                                             sweet,
                                             SessionsService,

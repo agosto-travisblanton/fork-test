@@ -1,6 +1,6 @@
 'use strict'
 
-appModule = angular.module('skykitDisplayDeviceManagement')
+appModule = angular.module('skyKitProvisioning')
 
 appModule.factory 'DomainsService', (Restangular) ->
   new class DomainsService

@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module('skykitDisplayDeviceManagement').factory 'DevicesService', ($http, $log, Restangular) ->
+angular.module('skyKitProvisioning').factory 'DevicesService', ($http, $log, Restangular) ->
   class DevicesService
     SERVICE_NAME = 'devices'
     @uriBase = 'v1/devices'

@@ -1,10 +1,12 @@
-<!doctype html>
-<html ng-app="skykitDisplayDeviceManagement">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
   <title>SkyKit Provisioning</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="description" content="">
-  <meta name="viewport" content="width=device-width">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no"/>
+
   <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
   <!-- build:css({.tmp/serve,src}) styles/vendor.css -->
@@ -19,14 +21,67 @@
   <!-- css files will be automatically insert here -->
   <!-- endinject -->
   <!-- endbuild -->
+
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <style type="text/css">
+    /**
+     * Hide when Angular is not yet loaded and initialized
+     */
+    [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+      display: none !important;
+    }
+  </style>
+
 </head>
-<body>
-<!--[if lt IE 10]>
-<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-<![endif]-->
 
-<div ui-view></div>
+<body ng-app="skyKitProvisioning"
+      layout="row"
+      ng-controller="AppController as appController"
+      ng-cloak>
 
+<md-sidenav class="site-sidenav md-sidenav-left md-whiteframe-z2"
+            md-component-id="left"
+            md-is-locked-open="$mdMedia('gt-lg')">
+
+  <md-toolbar class="md-whiteframe-z1">
+    <h3>&nbsp;</h3>
+  </md-toolbar>
+
+  <md-list>
+    <md-list-item>
+      <md-button ng-click="appController.goTo('home')">Start Here</md-button>
+    </md-list-item>
+  </md-list>
+
+  <md-subheader class="md-no-sticky">Platform admin portal</md-subheader>
+  <md-list>
+    <md-list-item>
+      <md-button ng-click="appController.goTo('platformAdminHome')">Dashboard</md-button>
+    </md-list-item>
+    <md-list-item>
+      <md-button ng-click="appController.goTo('restaurantsListing')">Restaurants</md-button>
+    </md-list-item>
+  </md-list>
+
+</md-sidenav>
+
+
+<div flex layout="column" tabIndex="-1" role="main" class="md-whiteframe-z2">
+
+  <md-toolbar layout="row" class="md-whiteframe-z1">
+    <md-button class="menu" ng-click="appController.toggleSidenav('left')" hide-gt-lg aria-label="Menu">
+      <md-icon md-font-set="material-icons" class="md-light md-48">menu</md-icon>
+    </md-button>
+    <h3>SkyKit Provisioning</h3>
+  </md-toolbar>
+
+  <!--<md-content flex id="content">-->
+  <!--</md-content>-->
+
+  <div flex ui-view></div>
+
+</div>
 <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
 <script>
   (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
@@ -41,7 +96,6 @@
 <!-- bower:js -->
 <!-- run `gulp inject` to automatically populate bower script dependencies -->
 <!-- endbower -->
-<script src="../bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.js"></script>
 <!-- endbuild -->
 
 <!-- build:js({.tmp/serve,.tmp/partials,src}) scripts/app.js -->
@@ -54,6 +108,13 @@
 <!-- endinject -->
 <!-- endbuild -->
 
-</body>
+<!-- Menu Toggle Script -->
+<!--<script>-->
+<!--$("#menu-toggle").click(function(e) {-->
+<!--e.preventDefault();-->
+<!--$("#wrapper").toggleClass("toggled");-->
+<!--});-->
+<!--</script>-->
 
+</body>
 </html>

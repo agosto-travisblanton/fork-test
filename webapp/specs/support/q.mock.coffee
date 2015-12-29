@@ -1,7 +1,7 @@
-window.skykitDisplayDeviceManagement ||= {}
-window.skykitDisplayDeviceManagement.q ||= {}
+window.skyKitProvisioning ||= {}
+window.skyKitProvisioning.q ||= {}
 
-class window.skykitDisplayDeviceManagement.q.Mock
+class window.skyKitProvisioning.q.Mock
 
   then: (@resolveFunc, @rejectFunc) ->
 

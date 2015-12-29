@@ -5,12 +5,12 @@ describe 'DomainsService', ->
   Restangular = undefined
   promise = undefined
 
-  beforeEach module('skykitDisplayDeviceManagement')
+  beforeEach module('skyKitProvisioning')
 
   beforeEach inject (_DomainsService_, _Restangular_) ->
     DomainsService = _DomainsService_
     Restangular = _Restangular_
-    promise = new skykitDisplayDeviceManagement.q.Mock
+    promise = new skyKitProvisioning.q.Mock
 
   describe '.save', ->
     it 'update an existing domain, returning a promise', ->

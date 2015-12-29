@@ -1,21 +1,22 @@
 'use strict'
 
-skykitDisplayDeviceManagement = angular.module('skykitDisplayDeviceManagement', [
-  'ngAnimate',
-  'ngCookies',
-  'ngTouch',
-  'ngSanitize',
-  'restangular',
-  'ui.router',
-  'hSweetAlert',
-  'ui.bootstrap',
-  'ncy-angular-breadcrumb',
-  'directive.g+signin',
-  'ngProgress',
+app = angular.module 'skyKitProvisioning', [
+  'ngAnimate'
+  'ngCookies'
+  'ngTouch'
+  'ngSanitize'
+  'restangular'
+  'ui.router'
+  'hSweetAlert'
+  'ui.bootstrap'
+  'ncy-angular-breadcrumb'
+  'directive.g+signin'
+  'ngProgress'
   'datetimepicker'
-])
+  'ngMaterial'
+]
 
-skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
+app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
 
   $stateProvider.state("sign_in", {
     resolve: {
@@ -53,7 +54,7 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     controller: "WelcomeCtrl",
     controllerAs: 'welcomeCtrl',
     ncyBreadcrumb: {
-      label: 'Skykit Provisioning'
+      label: 'SkyKit Provisioning'
     }
   })
   $stateProvider.state("welcome", {
@@ -66,7 +67,7 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     controller: "WelcomeCtrl"
     controllerAs: 'welcomeCtrl',
     ncyBreadcrumb: {
-      label: 'Skykit Provisioning'
+      label: 'SkyKit Provisioning'
     }
   })
   $stateProvider.state("version", {
@@ -204,7 +205,7 @@ skykitDisplayDeviceManagement.config ($stateProvider, $urlRouterProvider, Restan
     id: 'key'
   }
 
-skykitDisplayDeviceManagement.run ($cookies, Restangular) ->
+app.run ($cookies, Restangular) ->
 
   Restangular.addRequestInterceptor (elem, operation) ->
     Restangular.setDefaultHeaders {

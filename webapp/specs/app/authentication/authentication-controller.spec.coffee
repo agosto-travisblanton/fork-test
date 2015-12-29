@@ -17,7 +17,7 @@ describe 'AuthenticationCtrl', ->
   SessionsService = undefined
   ProgressBarService = undefined
 
-  beforeEach module('skykitDisplayDeviceManagement')
+  beforeEach module('skyKitProvisioning')
 
   beforeEach module(($provide) ->
     $provide.decorator '$timeout',
@@ -68,7 +68,7 @@ describe 'AuthenticationCtrl', ->
     promise = undefined
 
     beforeEach ->
-      promise = new skykitDisplayDeviceManagement.q.Mock()
+      promise = new skyKitProvisioning.q.Mock()
       spyOn(ProgressBarService, 'start')
       spyOn(SessionsService, 'login').and.callFake (authResult) -> return promise
       spyOn(controller, 'loginSuccess').and.callFake (response) ->
@@ -125,7 +125,7 @@ describe 'AuthenticationCtrl', ->
     promise = undefined
 
     beforeEach ->
-      promise = new skykitDisplayDeviceManagement.q.Mock()
+      promise = new skyKitProvisioning.q.Mock()
       spyOn(ProgressBarService, 'complete')
       spyOn(sweet, 'show')
 
