@@ -1,5 +1,5 @@
 from env_setup import setup_test_paths
-from utils.iterable_util import comma_delimited_string_to_list
+from utils.iterable_util import delimited_string_to_list
 from webtest import AppError
 
 setup_test_paths()
@@ -119,7 +119,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         uri = application.router.build(None, 'tenants', None, {})
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
         actual = Tenant.find_by_name(request_parameters['name'])
-        email_list = comma_delimited_string_to_list(emails)
+        email_list = delimited_string_to_list(emails)
         self.assertEqual(actual.notification_emails, email_list)
         self.assertIsNotNone(actual)
 
@@ -267,7 +267,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         self.assertEqual(expected.name, 'foobar')
         self.assertFalse(expected.active)
         self.assertNotEqual(expected.notification_emails, self.ORIGINAL_NOTIFICATION_EMAILS)
-        email_list = comma_delimited_string_to_list(notification_email)
+        email_list = delimited_string_to_list(notification_email)
         self.assertEqual(expected.notification_emails, email_list)
 
     def test_put_updates_domain_key_property(self):
