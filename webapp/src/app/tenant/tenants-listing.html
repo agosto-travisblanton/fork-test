@@ -1,17 +1,13 @@
-<div id="page-wrapper" ng-init="tenantsCtrl.initialize()">
-  <div class="container-fluid">
-    <!-- Page Heading -->
-    <div class="row">
-      <div class="col-lg-12">
-        <div ncy-breadcrumb></div>
-        <h1 class="page-header">
-          Tenants
-        </h1>
-      </div>
+<div ng-controller="TenantsCtrl" ng-init="tenantsCtrl.initialize()" layout="column" ng-cloak>
+  <md-toolbar class="md-hue-2">
+    <div class="md-toolbar-tools">
+      <h2 class="md-flex"><i class="fa fa-fw fa-group ng-scope"></i> Tenants</h2>
     </div>
+  </md-toolbar>
+  <md-content flex layout-padding>
     <div class="row">
       <div class="col-lg-12">
-        <div class="col-md-12 toolbar">
+        <div class="toolbar">
           <a id="button-add-tenant"
              class="btn btn-success"
              href="#/tenants/new"><i class="fa fa-fw fa-plus"></i> Add tenant</a>
@@ -41,5 +37,6 @@
         </table>
       </div>
     </div>
-  </div>
+  </md-content>
 </div>
+
