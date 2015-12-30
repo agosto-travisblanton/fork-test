@@ -1,5 +1,5 @@
 {
-  "name": "skyKitProvisioning",
+  "name": "skykitProvisioning",
   "version": "0.0.0",
   "dependencies": {
     "angular": "~1.4.1",
@@ -12,7 +12,6 @@
     "angular-material": "~1.0.1",
     "angular-sanitize": "~1.4.1",
     "angular-spinner": "~0.6.2",
-    "angular-touch": "~1.4.1",
     "angular-ui-router": "~0.2.13",
     "animate-css": "~3.2.6",
     "bootstrap-sass-official": "~3.3.4",
