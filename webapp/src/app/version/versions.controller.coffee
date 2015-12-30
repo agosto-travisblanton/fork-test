@@ -3,11 +3,11 @@
 appModule = angular.module 'skykitProvisioning'
 
 appModule.controller "VersionsCtrl", ($state, $log, VersionsService) ->
-  @versions = []
+  @version_data = []
 
   @initialize = ->
     promise = VersionsService.getVersions()
     promise.then (data) =>
-      @versions = data
+      @version_data = data
 
   @
