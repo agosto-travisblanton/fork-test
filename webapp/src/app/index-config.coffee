@@ -95,7 +95,7 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("tenants", {
     url: "/tenants",
-    templateUrl: "app/tenant/tenants.html",
+    templateUrl: "app/tenant/tenants-listing.html",
     controller: "TenantsCtrl",
     controllerAs: 'tenantsCtrl',
     ncyBreadcrumb: {
