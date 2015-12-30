@@ -9,7 +9,7 @@ describe 'DomainsCtrl', ->
   promise = undefined
 
 
-  beforeEach module('skyKitProvisioning')
+  beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _DomainsService_, _$state_, _sweet_) ->
     $controller = _$controller_
@@ -48,7 +48,7 @@ describe 'DomainsCtrl', ->
     ]
 
     beforeEach ->
-      promise = new skyKitProvisioning.q.Mock
+      promise = new skykitProvisioning.q.Mock
       spyOn(DomainsService, 'fetchAllDomains').and.returnValue promise
 
     it 'call DomainsService.fetchAllDomains to retrieve all domains', ->
@@ -80,7 +80,7 @@ describe 'DomainsCtrl', ->
     }
 
     beforeEach ->
-      promise = new skyKitProvisioning.q.Mock
+      promise = new skykitProvisioning.q.Mock
       spyOn(DomainsService, 'delete').and.returnValue promise
       spyOn controller, 'initialize'
       spyOn(sweet, 'show').and.callFake (options, callback) ->

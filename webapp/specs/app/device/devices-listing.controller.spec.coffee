@@ -13,7 +13,7 @@ describe 'DevicesListingCtrl', ->
     {key: 'dhjad897d987fadafg708hb55', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
   ]
 
-  beforeEach module('skyKitProvisioning')
+  beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _DevicesService_, _$stateParams_, _$state_) ->
     $controller = _$controller_
@@ -23,7 +23,7 @@ describe 'DevicesListingCtrl', ->
 
   describe 'initialization', ->
     beforeEach ->
-      promise = new skyKitProvisioning.q.Mock
+      promise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getDevicesByDistributor').and.returnValue promise
       controller = $controller 'DevicesListingCtrl', {}
       controller.distributorKey = 'some-key'

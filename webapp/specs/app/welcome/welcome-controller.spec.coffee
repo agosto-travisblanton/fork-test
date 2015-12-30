@@ -6,7 +6,7 @@ describe 'WelcomeCtrl', ->
   $rootScope = undefined
   $scope = undefined
 
-  beforeEach module('skyKitProvisioning')
+  beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _$rootScope_) ->
     $controller = _$controller_

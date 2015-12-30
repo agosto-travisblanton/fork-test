@@ -1,6 +1,6 @@
 'use strict'
 
-appModule = angular.module('skyKitProvisioning')
+appModule = angular.module('skykitProvisioning')
 
 appModule.factory 'VersionsService', (Restangular) ->
   new class VersionsService

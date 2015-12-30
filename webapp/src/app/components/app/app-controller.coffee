@@ -1,6 +1,6 @@
 'use strict;'
 
-app = angular.module 'skyKitProvisioning'
+app = angular.module 'skykitProvisioning'
 
 app.controller 'AppController', ($mdSidenav, $state) ->
   vm = @

@@ -8,7 +8,7 @@ describe 'DistributorsCtrl', ->
   promise = undefined
 
 
-  beforeEach module('skyKitProvisioning')
+  beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _$state_) ->
     $controller = _$controller_
@@ -31,7 +31,7 @@ describe 'DistributorsCtrl', ->
     ]
 
 #    beforeEach ->
-#      promise = new skyKitProvisioning.q.Mock
+#      promise = new skykitProvisioning.q.Mock
 #      spyOn(DistributorsService, 'fetchAllDistributors').and.returnValue promise
 #
 #    it 'call DistributorsService.fetchAllDistributors to retrieve all distributors', ->
@@ -63,7 +63,7 @@ describe 'DistributorsCtrl', ->
 #    }
 #
 #    beforeEach ->
-#      promise = new skyKitProvisioning.q.Mock
+#      promise = new skykitProvisioning.q.Mock
 #      spyOn(DistributorsService, 'delete').and.returnValue promise
 #      spyOn controller, 'initialize'
 #

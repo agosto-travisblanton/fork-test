@@ -1,6 +1,6 @@
 'use strict'
 
-app = angular.module 'skyKitProvisioning'
+app = angular.module 'skykitProvisioning'
 
 app.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
                                             identity,

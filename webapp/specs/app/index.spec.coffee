@@ -1,6 +1,6 @@
 'use strict'
 
-describe 'skyKitProvisioning module and configuration', ->
+describe 'skykitProvisioning module and configuration', ->
   $rootScope = undefined
   $state = undefined
   $injector = undefined
@@ -14,7 +14,7 @@ describe 'skyKitProvisioning module and configuration', ->
       spyOn(RestangularProvider, 'addResponseInterceptor').and.callThrough()
       spyOn(RestangularProvider, 'setRestangularFields').and.callThrough()
 
-    module 'skyKitProvisioning'
+    module 'skykitProvisioning'
 
     inject (_$rootScope_, _$state_, _$injector_, $templateCache) ->
       $rootScope = _$rootScope_

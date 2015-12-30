@@ -48,7 +48,7 @@ describe 'DeviceDetailsCtrl', ->
     {key: 'dhjad897d987fadafg708hb55', name: 'Foobar3', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
   ]
 
-  beforeEach module('skyKitProvisioning')
+  beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _DevicesService_, _TenantsService_, _CommandsService_, _sweet_, _$state_) ->
     $controller = _$controller_
@@ -72,11 +72,11 @@ describe 'DeviceDetailsCtrl', ->
 
   describe 'initialize', ->
     beforeEach ->
-      tenantsServicePromise = new skyKitProvisioning.q.Mock
+      tenantsServicePromise = new skykitProvisioning.q.Mock
       spyOn(TenantsService, 'fetchAllTenants').and.returnValue tenantsServicePromise
-      getDevicePromise = new skyKitProvisioning.q.Mock
+      getDevicePromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getDeviceByKey').and.returnValue getDevicePromise
-      getDeviceIssuesPromise = new skyKitProvisioning.q.Mock
+      getDeviceIssuesPromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getIssuesByKey').and.returnValue getDeviceIssuesPromise
       spyOn(DevicesService, 'getPanelModels').and.returnValue [{'id': 'Sony–FXD40LX2F'}, {'id': 'NEC–LCD4215'}]
       inputs = [
@@ -165,7 +165,7 @@ describe 'DeviceDetailsCtrl', ->
 
   describe '.onClickSaveButton', ->
     beforeEach ->
-      devicesServicePromise = new skyKitProvisioning.q.Mock
+      devicesServicePromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'save').and.returnValue devicesServicePromise
       spyOn($state, 'go')
       $stateParams = {}
@@ -205,7 +205,7 @@ describe 'DeviceDetailsCtrl', ->
 
   describe '.onClickResetSendButton', ->
     beforeEach ->
-      commandsServicePromise = new skyKitProvisioning.q.Mock
+      commandsServicePromise = new skykitProvisioning.q.Mock
       spyOn(CommandsService, 'reset').and.returnValue commandsServicePromise
       spyOn(progressBarService, 'start')
       spyOn(progressBarService, 'complete')
@@ -244,7 +244,7 @@ describe 'DeviceDetailsCtrl', ->
 
   describe '.onClickVolumeSendButton', ->
     beforeEach ->
-      commandsServicePromise = new skyKitProvisioning.q.Mock
+      commandsServicePromise = new skykitProvisioning.q.Mock
       spyOn(CommandsService, 'volume').and.returnValue commandsServicePromise
       spyOn(progressBarService, 'start')
       spyOn(progressBarService, 'complete')
@@ -285,7 +285,7 @@ describe 'DeviceDetailsCtrl', ->
 
   describe '.onClickCommandSendButton', ->
     beforeEach ->
-      commandsServicePromise = new skyKitProvisioning.q.Mock
+      commandsServicePromise = new skykitProvisioning.q.Mock
       spyOn(CommandsService, 'custom').and.returnValue(commandsServicePromise)
       spyOn(progressBarService, 'start')
       spyOn(progressBarService, 'complete')
@@ -326,7 +326,7 @@ describe 'DeviceDetailsCtrl', ->
 
   describe '.onClickRefreshButton', ->
     beforeEach ->
-      devicesServicePromise = new skyKitProvisioning.q.Mock
+      devicesServicePromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getIssuesByKey').and.returnValue getDeviceIssuesPromise
       spyOn(progressBarService, 'start')
       $stateParams.deviceKey = 'fkasdhfjfa9s8udyva7dygoudyg'

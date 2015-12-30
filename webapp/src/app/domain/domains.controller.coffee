@@ -1,6 +1,6 @@
 'use strict'
 
-appModule = angular.module 'skyKitProvisioning'
+appModule = angular.module 'skykitProvisioning'
 
 appModule.controller "DomainsCtrl", ($state, $log, DomainsService, sweet) ->
   @domains = []

@@ -1,7 +1,7 @@
-window.skyKitProvisioning ||= {}
-window.skyKitProvisioning.q ||= {}
+window.skykitProvisioning ||= {}
+window.skykitProvisioning.q ||= {}
 
-class window.skyKitProvisioning.q.Mock
+class window.skykitProvisioning.q.Mock
 
   then: (@resolveFunc, @rejectFunc) ->
 

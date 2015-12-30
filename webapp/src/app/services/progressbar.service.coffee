@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module('skyKitProvisioning').factory 'ProgressBarService', (ngProgressFactory) ->
+angular.module('skykitProvisioning').factory 'ProgressBarService', (ngProgressFactory) ->
 
   new class ProgressBarService
     constructor: ->

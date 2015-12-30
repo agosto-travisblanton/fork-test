@@ -5,7 +5,7 @@ describe 'NavbarCtrl', ->
   controller = undefined
   VersionsService = undefined
 
-  beforeEach module('skyKitProvisioning')
+  beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _VersionsService_) ->
     $controller = _$controller_

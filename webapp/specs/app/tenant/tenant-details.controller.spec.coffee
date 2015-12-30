@@ -20,7 +20,7 @@ describe 'TenantDetailsCtrl', ->
   sweet = undefined
   serviceInjection = undefined
 
-  beforeEach module('skyKitProvisioning')
+  beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _TenantsService_, _DomainsService_, _DevicesService_, _DistributorsService_,
     _$state_, _sweet_, _$log_) ->
@@ -46,11 +46,11 @@ describe 'TenantDetailsCtrl', ->
 
   describe 'initialization', ->
     beforeEach ->
-      tenantsServicePromise = new skyKitProvisioning.q.Mock
-      devicesServicePromise = new skyKitProvisioning.q.Mock
-      distributorsServicePromise = new skyKitProvisioning.q.Mock
-      distributorsDomainsServicePromise = new skyKitProvisioning.q.Mock
-      domainsServicePromise = new skyKitProvisioning.q.Mock
+      tenantsServicePromise = new skykitProvisioning.q.Mock
+      devicesServicePromise = new skykitProvisioning.q.Mock
+      distributorsServicePromise = new skykitProvisioning.q.Mock
+      distributorsDomainsServicePromise = new skykitProvisioning.q.Mock
+      domainsServicePromise = new skykitProvisioning.q.Mock
       spyOn(TenantsService, 'getTenantByKey').and.returnValue(tenantsServicePromise)
       spyOn(DevicesService, 'getDevicesByTenant').and.returnValue(devicesServicePromise)
       spyOn(DistributorsService, 'getDomainsByKey').and.returnValue(distributorsDomainsServicePromise)
@@ -138,7 +138,7 @@ describe 'TenantDetailsCtrl', ->
     domain_key = undefined
 
     beforeEach ->
-      tenantsServicePromise = new skyKitProvisioning.q.Mock
+      tenantsServicePromise = new skykitProvisioning.q.Mock
       spyOn(TenantsService, 'save').and.returnValue(tenantsServicePromise)
       spyOn($state, 'go')
       $stateParams = {}

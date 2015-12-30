@@ -5,7 +5,7 @@ describe 'MainCtrl', ->
   $rootScope = undefined
   controller = undefined
 
-  beforeEach module('skyKitProvisioning')
+  beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _$rootScope_) ->
     $rootScope = _$rootScope_

@@ -7,7 +7,7 @@ describe 'SessionsService', ->
   $httpBackend = undefined
   q = undefined
 
-  beforeEach module('skyKitProvisioning')
+  beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$httpBackend_, _$q_, _SessionsService_, _$http_, _Restangular_) ->
     SessionsService = _SessionsService_

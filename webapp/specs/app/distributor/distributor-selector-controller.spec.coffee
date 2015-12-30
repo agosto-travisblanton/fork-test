@@ -12,7 +12,7 @@ describe 'DistributorSelectorCtrl', ->
   DistributorsService = undefined
 
 
-  beforeEach module('skyKitProvisioning')
+  beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_,
                      _$state_,
@@ -48,7 +48,7 @@ describe 'DistributorSelectorCtrl', ->
     expectedCurrentUserKey = '32748092734827340'
 
     beforeEach ->
-      promise = new skyKitProvisioning.q.Mock()
+      promise = new skykitProvisioning.q.Mock()
       SessionsService.currentUserKey = expectedCurrentUserKey
       spyOn(DistributorsService, 'fetchAllByUser').and.callFake (currentUserKey) -> return promise
       spyOn(controller, 'selectDistributor')

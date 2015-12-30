@@ -1,6 +1,6 @@
 'use strict'
 
-appModule = angular.module('skyKitProvisioning')
+appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantDetailsCtrl',
   ($log, $stateParams, TenantsService, DomainsService, DevicesService, DistributorsService, $state, sweet,

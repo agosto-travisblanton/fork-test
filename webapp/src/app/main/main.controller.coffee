@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module("skyKitProvisioning").controller "MainCtrl", ($scope) ->
+angular.module("skykitProvisioning").controller "MainCtrl", ($scope) ->
   $scope.awesomeThings = [1,2,3,4,5,6]
 
   @
