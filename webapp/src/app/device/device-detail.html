@@ -11,660 +11,1278 @@
         <a href="/#/tenants/{{deviceDetailsCtrl.tenantKey}}">back to Tenant</a>
       </div>
     </div>
-    <div flex="80" flex-xs="100" layout="column">
-      <md-card>
-        <md-card-title>
-          <md-card-title-text>
-            <span class="md-headline">Device properties</span>
-          </md-card-title-text>
-        </md-card-title>
-          <md-card-content>
-            <tabset>
-              <tab heading="Properties">
-                <div>
-                  <div class="panel panel-default">
-                    <div class="panel-heading">
-                      <h3 class="panel-title">Device properties</h3>
-                    </div>
-                    <div class="panel-body">
-                      <form name="deviceForm"
-                            class="form-horizontal"
-                            ng-submit="deviceDetailsCtrl.onClickSaveButton()"
-                            novalidate>
+    <md-tabs md-dynamic-height md-border-bottom>
+      <md-tab label="Properties">
+        <md-content class="md-padding">
+          <form name="deviceForm"
+                class="form-horizontal"
+                ng-submit="deviceDetailsCtrl.onClickSaveButton()"
+                novalidate>
 
-                        <div class="form-group">
-                          <label for="serialNumber" class="col-sm-3 control-label">Serial number</label>
+            <div class="form-group">
+              <label for="serialNumber" class="col-sm-3 control-label">Serial number</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="serialNumber"
-                                   id="serialNumber"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.serialNumber">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="annotatedLocation" class="col-sm-3 control-label">Annotated location</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="serialNumber"
+                       id="serialNumber"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.serialNumber">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="annotatedLocation" class="col-sm-3 control-label">Annotated location</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="annotatedLocation"
-                                   id="annotatedLocation"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.annotatedLocation">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="annotatedUser" class="col-sm-3 control-label">Annotated user</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="annotatedLocation"
+                       id="annotatedLocation"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.annotatedLocation">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="annotatedUser" class="col-sm-3 control-label">Annotated user</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="annotatedUser"
-                                   id="annotatedUser"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.annotatedUser">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="apiKey" class="col-sm-3 control-label">API key</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="annotatedUser"
+                       id="annotatedUser"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.annotatedUser">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="apiKey" class="col-sm-3 control-label">API key</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="apiKey"
-                                   id="apiKey"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.apiKey">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="bootMode" class="col-sm-3 control-label">Boot mode</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="apiKey"
+                       id="apiKey"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.apiKey">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="bootMode" class="col-sm-3 control-label">Boot mode</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="bootMode"
-                                   id="bootMode"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.bootMode">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="chromeDeviceDomain" class="col-sm-3 control-label">Chrome device domain</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="bootMode"
+                       id="bootMode"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.bootMode">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="chromeDeviceDomain" class="col-sm-3 control-label">Chrome device domain</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="chromeDeviceDomain"
-                                   id="chromeDeviceDomain"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.chromeDeviceDomain">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="contentServerUrl" class="col-sm-3 control-label">Content server URL</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="chromeDeviceDomain"
+                       id="chromeDeviceDomain"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.chromeDeviceDomain">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="contentServerUrl" class="col-sm-3 control-label">Content server URL</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="contentServerUrl"
-                                   id="contentServerUrl"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.contentServerUrl">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="deviceId" class="col-sm-3 control-label">Device ID</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="contentServerUrl"
+                       id="contentServerUrl"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.contentServerUrl">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="deviceId" class="col-sm-3 control-label">Device ID</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="deviceId"
-                                   id="deviceId"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.deviceId">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="etag" class="col-sm-3 control-label">Etag</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="deviceId"
+                       id="deviceId"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.deviceId">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="etag" class="col-sm-3 control-label">Etag</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="etag"
-                                   id="etag"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.etag">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="firmwareVersion" class="col-sm-3 control-label">Firmware version</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="etag"
+                       id="etag"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.etag">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="firmwareVersion" class="col-sm-3 control-label">Firmware version</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="firmwareVersion"
-                                   id="firmwareVersion"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.firmwareVersion">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="gcmRegistrationId" class="col-sm-3 control-label">GCM registration ID</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="firmwareVersion"
+                       id="firmwareVersion"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.firmwareVersion">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="gcmRegistrationId" class="col-sm-3 control-label">GCM registration ID</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="gcmRegistrationId"
-                                   id="gcmRegistrationId"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.gcmRegistrationId">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="kind" class="col-sm-3 control-label">Kind</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="gcmRegistrationId"
+                       id="gcmRegistrationId"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.gcmRegistrationId">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="kind" class="col-sm-3 control-label">Kind</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="kind"
-                                   id="kind"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.kind">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="lastEnrollmentTime" class="col-sm-3 control-label">Last enrollment timestamp</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="kind"
+                       id="kind"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.kind">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="lastEnrollmentTime" class="col-sm-3 control-label">Last enrollment timestamp</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="lastEnrollmentTime"
-                                   id="lastEnrollmentTime"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.lastEnrollmentTime">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="lastSync" class="col-sm-3 control-label">Last sync timestamp</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="lastEnrollmentTime"
+                       id="lastEnrollmentTime"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.lastEnrollmentTime">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="lastSync" class="col-sm-3 control-label">Last sync timestamp</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="lastSync"
-                                   id="lastSync"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.lastSync">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="notes" class="col-sm-3 control-label">Loggly link</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="lastSync"
+                       id="lastSync"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.lastSync">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="notes" class="col-sm-3 control-label">Loggly link</label>
 
-                          <div class="col-sm-6 margin-top-05">
-                            <a ng-href="{{deviceDetailsCtrl.currentDevice.logglyLink}}">{{deviceDetailsCtrl.currentDevice.logglyLink}}</a>
-                            <br>
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="macAddress" class="col-sm-3 control-label">MAC address</label>
+              <div class="col-sm-6 margin-top-05">
+                <a ng-href="{{deviceDetailsCtrl.currentDevice.logglyLink}}">{{deviceDetailsCtrl.currentDevice.logglyLink}}</a>
+                <br>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="macAddress" class="col-sm-3 control-label">MAC address</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="macAddress"
-                                   id="macAddress"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.macAddress">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="ethernetMacAddress" class="col-sm-3 control-label">MAC address ethernet</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="macAddress"
+                       id="macAddress"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.macAddress">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="ethernetMacAddress" class="col-sm-3 control-label">MAC address ethernet</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="ethernetMacAddress"
-                                   id="ethernetMacAddress"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.ethernetMacAddress">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="model" class="col-sm-3 control-label">Model</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="ethernetMacAddress"
+                       id="ethernetMacAddress"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.ethernetMacAddress">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="model" class="col-sm-3 control-label">Model</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="model"
-                                   id="model"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.model">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="osVersion" class="col-sm-3 control-label">Operating system version</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="model"
+                       id="model"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.model">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="osVersion" class="col-sm-3 control-label">Operating system version</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="osVersion"
-                                   id="osVersion"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.osVersion">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="orgUnitPath" class="col-sm-3 control-label">Organizational unit path</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="osVersion"
+                       id="osVersion"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.osVersion">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="orgUnitPath" class="col-sm-3 control-label">Organizational unit path</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="orgUnitPath"
-                                   id="orgUnitPath"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.orgUnitPath">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="platformVersion" class="col-sm-3 control-label">Platform version</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="orgUnitPath"
+                       id="orgUnitPath"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.orgUnitPath">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="platformVersion" class="col-sm-3 control-label">Platform version</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="platformVersion"
-                                   id="platformVersion"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.platformVersion">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="status" class="col-sm-3 control-label">Status</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="platformVersion"
+                       id="platformVersion"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.platformVersion">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="status" class="col-sm-3 control-label">Status</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="status"
-                                   id="status"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.status">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="tenantCode" class="col-sm-3 control-label">Tenant code</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="status"
+                       id="status"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.status">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="tenantCode" class="col-sm-3 control-label">Tenant code</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="tenantCode"
-                                   id="tenantCode"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.tenantCode">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="unmanaged" class="col-sm-3 control-label">Unmanaged</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="tenantCode"
+                       id="tenantCode"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.tenantCode">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="unmanaged" class="col-sm-3 control-label">Unmanaged</label>
 
-                          <div class="col-sm-6 margin-top-05">
-                            <input type="checkbox"
-                                   name="unmanaged"
-                                   id="unmanaged"
-                                   ng-disabled="true"
-                                   ng-model="deviceDetailsCtrl.currentDevice.isUnmanagedDevice">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="created" class="col-sm-3 control-label">Created timestamp</label>
+              <div class="col-sm-6 margin-top-05">
+                <input type="checkbox"
+                       name="unmanaged"
+                       id="unmanaged"
+                       ng-disabled="true"
+                       ng-model="deviceDetailsCtrl.currentDevice.isUnmanagedDevice">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="created" class="col-sm-3 control-label">Created timestamp</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="created"
-                                   id="created"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.created">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="updated" class="col-sm-3 control-label">Updated timestamp</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="created"
+                       id="created"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.created">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="updated" class="col-sm-3 control-label">Updated timestamp</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="updated"
-                                   id="updated"
-                                   readonly
-                                   ng-model="deviceDetailsCtrl.currentDevice.updated">
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="notes" class="col-sm-3 control-label">Serial Control</label>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="updated"
+                       id="updated"
+                       readonly
+                       ng-model="deviceDetailsCtrl.currentDevice.updated">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="notes" class="col-sm-3 control-label">Serial Control</label>
 
-                          <div class="col-sm-3">
-                            <label>Panel model</label>
-                            <select
-                              id="panelModel"
-                              class="form-control"
-                              ng-model="deviceDetailsCtrl.currentDevice.panelModel"
-                              ng-options="p.displayName for p in deviceDetailsCtrl.panelModels track by p.id">
-                            </select>
-                          </div>
-                          <div class="col-sm-3">
-                            <label>Panel input</label>
-                            <select
-                              id="panelInput"
-                              class="form-control"
-                              ng-model="deviceDetailsCtrl.currentDevice.panelInput"
-                              ng-options="c.displayName for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">
-                            </select>
-                          </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="notes" class="col-sm-3 control-label">Notes</label>
+              <div class="col-sm-3">
+                <label>Panel model</label>
+                <select
+                  id="panelModel"
+                  class="form-control"
+                  ng-model="deviceDetailsCtrl.currentDevice.panelModel"
+                  ng-options="p.displayName for p in deviceDetailsCtrl.panelModels track by p.id">
+                </select>
+              </div>
+              <div class="col-sm-3">
+                <label>Panel input</label>
+                <select
+                  id="panelInput"
+                  class="form-control"
+                  ng-model="deviceDetailsCtrl.currentDevice.panelInput"
+                  ng-options="c.displayName for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="notes" class="col-sm-3 control-label">Notes</label>
 
-                          <div class="col-sm-6">
-                            <input type="text"
-                                   class="form-control"
-                                   name="notes"
-                                   id="notes"
-                                   ng-model="deviceDetailsCtrl.currentDevice.notes">
-                          </div>
-                        </div>
-                        <hr>
-                        <div class="form-group">
-                          <div class="col-sm-offset-3 col-sm-4">
-                            <button type="submit"
-                                    class="btn btn-primary btn-default"
-                                    ng-disabled="!deviceForm.$dirty || deviceForm.$invalid"><i class="fa fa-fw fa-save"></i>
-                              Save
-                            </button>
-                          </div>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
+              <div class="col-sm-6">
+                <input type="text"
+                       class="form-control"
+                       name="notes"
+                       id="notes"
+                       ng-model="deviceDetailsCtrl.currentDevice.notes">
+              </div>
+            </div>
+            <hr>
+            <div class="form-group">
+              <div class="col-sm-offset-3 col-sm-4">
+                <button type="submit"
+                        class="btn btn-primary btn-default"
+                        ng-disabled="!deviceForm.$dirty || deviceForm.$invalid"><i class="fa fa-fw fa-save"></i>
+                  Save
+                </button>
+              </div>
+            </div>
+          </form>
+        </md-content>
+      </md-tab>
+      <md-tab label="Vitals">
+        <md-content class="md-padding">
+          <div class="panel-body">
+            <form name="tenantForm"
+                  class="form-horizontal"
+                  ng-submit="deviceDetailsCtrl.onClickRefreshButton()"
+                  novalidate>
+              <div class="row">
+                <div class="col-sm-offset-6 col-sm-2">
+                  <label for="startTime" class="control-label">From</label>
+                  <input type="text" class="form-control input-sm"
+                         datetimepicker
+                         datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
+                         placeholder="{{deviceDetailsCtrl.startTime}}"
+                         name="startTime"
+                         id="startTime"
+                         ng-model="deviceDetailsCtrl.startTime">
                 </div>
-              </tab>
-              <tab heading="Issues">
-                <div>
-                  <div class="panel panel-default">
-                    <div class="panel-heading">
-                      <h3 class="panel-title">Device issues</h3>
-                    </div>
-                    <div class="panel-body">
-                      <form name="tenantForm"
-                            class="form-horizontal"
-                            ng-submit="deviceDetailsCtrl.onClickRefreshButton()"
-                            novalidate>
-                        <div class="row">
-                          <div class="col-sm-offset-6 col-sm-2">
-                            <label for="startTime" class="control-label">From</label>
-                            <input type="text" class="form-control input-sm"
-                                   datetimepicker
-                                   datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
-                                   placeholder="{{deviceDetailsCtrl.startTime}}"
-                                   name="startTime"
-                                   id="startTime"
-                                   ng-model="deviceDetailsCtrl.startTime">
-                          </div>
-                          <div class="col-sm-2">
-                            <label for="endTime" class="control-label">To</label>
-                            <input type="text" class="form-control input-sm"
-                                   datetimepicker
-                                   datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
-                                   placeholder="{{deviceDetailsCtrl.endTime}}"
-                                   name="endTime"
-                                   id="endTime"
-                                   ng-model="deviceDetailsCtrl.endTime">
-                          </div>
-                          <div class="col-sm-2 margin-top-15">
-                            <button type="submit" class="btn btn-primary">
-                              <i class="fa fa-fw fa-refresh"></i> Refresh
-                            </button>
-                          </div>
-                        </div>
-                      </form>
-                      <div class="row margin-top-15">
-                        <div class="col-lg-12">
-                          <table name="devices-table" class="table table-responsive">
+                <div class="col-sm-2">
+                  <label for="endTime" class="control-label">To</label>
+                  <input type="text" class="form-control input-sm"
+                         datetimepicker
+                         datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
+                         placeholder="{{deviceDetailsCtrl.endTime}}"
+                         name="endTime"
+                         id="endTime"
+                         ng-model="deviceDetailsCtrl.endTime">
+                </div>
+                <div class="col-sm-2 margin-top-15">
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fa fa-fw fa-refresh"></i> Refresh
+                  </button>
+                </div>
+              </div>
+            </form>
+            <div class="row margin-top-15">
+              <div class="col-lg-12">
+                <table name="devices-table" class="table table-responsive">
+                  <thead>
+                  <tr>
+                    <th width="3px"></th>
+                    <th>Category</th>
+                    <th>Memory</th>
+                    <th>Storage</th>
+                    <th>Program</th>
+                    <th>Created</th>
+                    <th></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr ng-hide="deviceDetailsCtrl.issues.length">
+                    <td class="text-center text-warning" colspan="7">No issues for this device</td>
+                  </tr>
+                  <tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:['-level','-updated']">
+                    <td class="issue-{{ item.level_descriptor}}-background"></td>
+                    <td>{{ item.category }}</td>
+                    <td>{{ item.memory_utilization }}%</td>
+                    <td>{{ item.storage_utilization }}%</td>
+                    <td>{{ item.program }}</td>
+                    <td>{{ item.created }}</td>
+                    <td class="issue-{{ item.level_descriptor}}-text">
+                      <i ng-class="item.level==1? 'fa fa-fw fa-warning' :
+                          item.level==0? 'fa fa-fw fa-check-circle': 'fa fa-fw fa-ambulance'"></i>
+                      {{ item.elapsed_time }}
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </md-content>
+      </md-tab>
+      <md-tab label="Commands">
+        <md-content class="md-padding">
+          <div>
+            <div class="panel panel-default">
+              <div>
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <h3 class="panel-title">Reset</h3>
+                  </div>
+                  <div class="panel-body">
+                    <form name="commandForm"
+                          class="form-horizontal"
+                          ng-submit="deviceDetailsCtrl.onClickResetSendButton()"
+                          novalidate>
+                      <div class="row">
+                        <div class="col-sm-12">
+                          <table name="device-table" class="table table-responsive table-striped">
                             <thead>
                             <tr>
-                              <th width="3px"></th>
-                              <th>Category</th>
-                              <th>Memory</th>
-                              <th>Storage</th>
-                              <th>Program</th>
-                              <th>Created</th>
-                              <th></th>
+                              <th>Serial number</th>
+                              <th>WiFi mac address</th>
+                              <th>Ether mac address</th>
+                              <th>Provisioned date</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-hide="deviceDetailsCtrl.issues.length">
-                              <td class="text-center text-warning" colspan="7">No issues for this device</td>
-                            </tr>
-                            <tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:['-level','-updated']">
-                              <td class="issue-{{ item.level_descriptor}}-background"></td>
-                              <td>{{ item.category }}</td>
-                              <td>{{ item.memory_utilization }}%</td>
-                              <td>{{ item.storage_utilization }}%</td>
-                              <td>{{ item.program }}</td>
-                              <td>{{ item.created }}</td>
-                              <td class="issue-{{ item.level_descriptor}}-text">
-                                <i ng-class="item.level==1? 'fa fa-fw fa-warning' :
-                          item.level==0? 'fa fa-fw fa-check-circle': 'fa fa-fw fa-ambulance'"></i>
-                                {{ item.elapsed_time }}
+                            <tr>
+                              <td class="reset-device-serial-number">
+                                {{deviceDetailsCtrl.currentDevice.serialNumber}}
+                              </td>
+                              <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
+                              </td>
+                              <td class="reset-device-ethernet-mac-address">{{
+                                deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
+                              </td>
+                              <td class="reset-device-provisioning-date">{{ deviceDetailsCtrl.currentDevice.created }}
                               </td>
                             </tr>
                             </tbody>
                           </table>
+                          <div class="row">
+                            <div class="col-sm-2 text-right">
+                              <label for="volume">Reset:</label>
+                            </div>
+                            <div class="col-sm-2">
+                              <button type="submit"
+                                      class="btn btn-primary btn-default"><i class="fa fa-fw fa-building"></i>
+                                Send
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </form>
                   </div>
                 </div>
-              </tab>
-              <tab heading="Commands">
-                <div>
-                  <div class="panel panel-default">
-                    <div class="panel-heading">
-                      <h3 class="panel-title">Device commands</h3>
-                    </div>
-                    <div class="panel-body">
-                      <div>
-                        <div class="panel panel-default">
-                          <div class="panel-heading">
-                            <h3 class="panel-title">Reset</h3>
-                          </div>
-                          <div class="panel-body">
-                            <form name="commandForm"
-                                  class="form-horizontal"
-                                  ng-submit="deviceDetailsCtrl.onClickResetSendButton()"
-                                  novalidate>
-                              <div class="row">
-                                <div class="col-sm-12">
-                                  <table name="device-table" class="table table-responsive table-striped">
-                                    <thead>
-                                    <tr>
-                                      <th>Serial number</th>
-                                      <th>WiFi mac address</th>
-                                      <th>Ether mac address</th>
-                                      <th>Provisioned date</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                      <td class="reset-device-serial-number">
-                                        {{deviceDetailsCtrl.currentDevice.serialNumber}}
-                                      </td>
-                                      <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
-                                      </td>
-                                      <td class="reset-device-ethernet-mac-address">{{
-                                        deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                                      </td>
-                                      <td class="reset-device-provisioning-date">{{ deviceDetailsCtrl.currentDevice.created }}
-                                      </td>
-                                    </tr>
-                                    </tbody>
-                                  </table>
-                                  <div class="row">
-                                    <div class="col-sm-2 text-right">
-                                      <label for="volume">Reset:</label>
-                                    </div>
-                                    <div class="col-sm-2">
-                                      <button type="submit"
-                                              class="btn btn-primary btn-default"><i class="fa fa-fw fa-building"></i>
-                                        Send
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </form>
-                          </div>
-                        </div>
-                      </div>
-                      <div>
-                        <div class="panel panel-default">
-                          <div class="panel-heading">
-                            <h3 class="panel-title">Volume</h3>
-                          </div>
-                          <div class="panel-body">
-                            <form name="volumeForm"
-                                  class="form-horizontal"
-                                  ng-submit="deviceDetailsCtrl.onClickVolumeSendButton()"
-                                  novalidate>
-                              <div class="row">
-                                <div class="col-sm-12">
-                                  <table name="device-table" class="table table-responsive table-striped">
-                                    <thead>
-                                    <tr>
-                                      <th>Serial number</th>
-                                      <th>WiFi mac address</th>
-                                      <th>Ether mac address</th>
-                                      <th>Provisioned date</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                      <td class="reset-device-serial-number">
-                                        {{deviceDetailsCtrl.currentDevice.serialNumber}}
-                                      </td>
-                                      <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
-                                      </td>
-                                      <td class="reset-device-ethernet-mac-address">{{
-                                        deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                                      </td>
-                                      <td class="reset-device-provisioning-date">{{ deviceDetailsCtrl.currentDevice.created }}
-                                      </td>
-                                    </tr>
-                                    </tbody>
-                                  </table>
-                                  <div class="row">
-                                    <div class="col-sm-2 text-right">
-                                      <label for="volume">Volume:</label>
-                                    </div>
-                                    <div class="col-sm-2">
-                                      <input type="number"
-                                             class="form-control"
-                                             name="volume"
-                                             id="volume"
-                                             ng-model="deviceDetailsCtrl.currentDevice.volume"
-                                             min="1"
-                                             max="100"
-                                             ngMinlength="1"
-                                             ngMaxlength="3"
-                                             ng-required="true">
-                                      <span ng-show="volumeForm.$invalid">1-100 is allowed</span>
-                                    </div>
-                                    <div class="col-sm-2">
-                                      <button type="submit"
-                                              class="btn btn-primary btn-default"
-                                              ng-disabled="!volumeForm.$dirty || volumeForm.$invalid">
-                                        <i class="fa fa-fw fa-building"></i>
-                                        Send
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </form>
+              </div>
+              <div>
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <h3 class="panel-title">Volume</h3>
+                  </div>
+                  <div class="panel-body">
+                    <form name="volumeForm"
+                          class="form-horizontal"
+                          ng-submit="deviceDetailsCtrl.onClickVolumeSendButton()"
+                          novalidate>
+                      <div class="row">
+                        <div class="col-sm-12">
+                          <table name="device-table" class="table table-responsive table-striped">
+                            <thead>
+                            <tr>
+                              <th>Serial number</th>
+                              <th>WiFi mac address</th>
+                              <th>Ether mac address</th>
+                              <th>Provisioned date</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                              <td class="reset-device-serial-number">
+                                {{deviceDetailsCtrl.currentDevice.serialNumber}}
+                              </td>
+                              <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
+                              </td>
+                              <td class="reset-device-ethernet-mac-address">{{
+                                deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
+                              </td>
+                              <td class="reset-device-provisioning-date">{{ deviceDetailsCtrl.currentDevice.created }}
+                              </td>
+                            </tr>
+                            </tbody>
+                          </table>
+                          <div class="row">
+                            <div class="col-sm-2 text-right">
+                              <label for="volume">Volume:</label>
+                            </div>
+                            <div class="col-sm-2">
+                              <input type="number"
+                                     class="form-control"
+                                     name="volume"
+                                     id="volume"
+                                     ng-model="deviceDetailsCtrl.currentDevice.volume"
+                                     min="1"
+                                     max="100"
+                                     ngMinlength="1"
+                                     ngMaxlength="3"
+                                     ng-required="true">
+                              <span ng-show="volumeForm.$invalid">1-100 is allowed</span>
+                            </div>
+                            <div class="col-sm-2">
+                              <button type="submit"
+                                      class="btn btn-primary btn-default"
+                                      ng-disabled="!volumeForm.$dirty || volumeForm.$invalid">
+                                <i class="fa fa-fw fa-building"></i>
+                                Send
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <div>
-                        <div class="panel panel-default">
-                          <div class="panel-heading">
-                            <h3 class="panel-title">Custom</h3>
-                          </div>
-                          <div class="panel-body">
-                            <form name="commandForm"
-                                  class="form-horizontal"
-                                  ng-submit="deviceDetailsCtrl.onClickCommandSendButton()"
-                                  novalidate>
-                              <div class="row">
-                                <div class="col-sm-12">
-                                  <table name="device-table" class="table table-responsive table-striped">
-                                    <thead>
-                                    <tr>
-                                      <th>Serial number</th>
-                                      <th>WiFi mac address</th>
-                                      <th>Ether mac address</th>
-                                      <th>Provisioned date</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                      <td class="reset-device-serial-number">
-                                        {{deviceDetailsCtrl.currentDevice.serialNumber}}
-                                      </td>
-                                      <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
-                                      </td>
-                                      <td class="reset-device-ethernet-mac-address">{{
-                                        deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                                      </td>
-                                      <td class="reset-device-provisioning-date">{{ deviceDetailsCtrl.currentDevice.created }}
-                                      </td>
-                                    </tr>
-                                    </tbody>
-                                  </table>
-                                  <div class="row">
-                                    <div class="col-sm-2 text-right">
-                                      <label for="volume">Command:</label>
-                                    </div>
-                                    <div class="col-sm-3">
-                                      <input type="text"
-                                             class="form-control"
-                                             name="custom"
-                                             id="custom"
-                                             ng-model="deviceDetailsCtrl.currentDevice.custom"
-                                             ng-required="true">
-                                    </div>
-                                    <div class="col-sm-2">
-                                      <button type="submit"
-                                              class="btn btn-primary btn-default"
-                                              ng-disabled="!commandForm.$dirty || commandForm.$invalid"><i
-                                        class="fa fa-fw fa-building"></i>
-                                        Send
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </form>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    </form>
                   </div>
                 </div>
-              </tab>
-
-            </tabset>
-
-          </md-card-content>
-      </md-card>
-    </div>
+              </div>
+              <div>
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <h3 class="panel-title">Custom</h3>
+                  </div>
+                  <div class="panel-body">
+                    <form name="commandForm"
+                          class="form-horizontal"
+                          ng-submit="deviceDetailsCtrl.onClickCommandSendButton()"
+                          novalidate>
+                      <div class="row">
+                        <div class="col-sm-12">
+                          <table name="device-table" class="table table-responsive table-striped">
+                            <thead>
+                            <tr>
+                              <th>Serial number</th>
+                              <th>WiFi mac address</th>
+                              <th>Ether mac address</th>
+                              <th>Provisioned date</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                              <td class="reset-device-serial-number">
+                                {{deviceDetailsCtrl.currentDevice.serialNumber}}
+                              </td>
+                              <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
+                              </td>
+                              <td class="reset-device-ethernet-mac-address">{{
+                                deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
+                              </td>
+                              <td class="reset-device-provisioning-date">{{ deviceDetailsCtrl.currentDevice.created }}
+                              </td>
+                            </tr>
+                            </tbody>
+                          </table>
+                          <div class="row">
+                            <div class="col-sm-2 text-right">
+                              <label for="volume">Command:</label>
+                            </div>
+                            <div class="col-sm-3">
+                              <input type="text"
+                                     class="form-control"
+                                     name="custom"
+                                     id="custom"
+                                     ng-model="deviceDetailsCtrl.currentDevice.custom"
+                                     ng-required="true">
+                            </div>
+                            <div class="col-sm-2">
+                              <button type="submit"
+                                      class="btn btn-primary btn-default"
+                                      ng-disabled="!commandForm.$dirty || commandForm.$invalid"><i
+                                class="fa fa-fw fa-building"></i>
+                                Send
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </md-content>
+      </md-tab>
+    </md-tabs>
   </md-content>
 </div>
+
+
+
+<!--<tabset>-->
+  <!--<tab heading="Properties">-->
+    <!--<div>-->
+      <!--<div class="panel panel-default">-->
+        <!--<div class="panel-heading">-->
+          <!--<h3 class="panel-title">Device properties</h3>-->
+        <!--</div>-->
+        <!--<div class="panel-body">-->
+          <!--<form name="deviceForm"-->
+                <!--class="form-horizontal"-->
+                <!--ng-submit="deviceDetailsCtrl.onClickSaveButton()"-->
+                <!--novalidate>-->
+
+            <!--<div class="form-group">-->
+              <!--<label for="serialNumber" class="col-sm-3 control-label">Serial number</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="serialNumber"-->
+                       <!--id="serialNumber"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.serialNumber">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="annotatedLocation" class="col-sm-3 control-label">Annotated location</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="annotatedLocation"-->
+                       <!--id="annotatedLocation"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.annotatedLocation">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="annotatedUser" class="col-sm-3 control-label">Annotated user</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="annotatedUser"-->
+                       <!--id="annotatedUser"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.annotatedUser">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="apiKey" class="col-sm-3 control-label">API key</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="apiKey"-->
+                       <!--id="apiKey"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.apiKey">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="bootMode" class="col-sm-3 control-label">Boot mode</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="bootMode"-->
+                       <!--id="bootMode"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.bootMode">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="chromeDeviceDomain" class="col-sm-3 control-label">Chrome device domain</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="chromeDeviceDomain"-->
+                       <!--id="chromeDeviceDomain"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.chromeDeviceDomain">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="contentServerUrl" class="col-sm-3 control-label">Content server URL</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="contentServerUrl"-->
+                       <!--id="contentServerUrl"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.contentServerUrl">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="deviceId" class="col-sm-3 control-label">Device ID</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="deviceId"-->
+                       <!--id="deviceId"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.deviceId">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="etag" class="col-sm-3 control-label">Etag</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="etag"-->
+                       <!--id="etag"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.etag">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="firmwareVersion" class="col-sm-3 control-label">Firmware version</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="firmwareVersion"-->
+                       <!--id="firmwareVersion"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.firmwareVersion">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="gcmRegistrationId" class="col-sm-3 control-label">GCM registration ID</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="gcmRegistrationId"-->
+                       <!--id="gcmRegistrationId"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.gcmRegistrationId">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="kind" class="col-sm-3 control-label">Kind</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="kind"-->
+                       <!--id="kind"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.kind">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="lastEnrollmentTime" class="col-sm-3 control-label">Last enrollment timestamp</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="lastEnrollmentTime"-->
+                       <!--id="lastEnrollmentTime"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.lastEnrollmentTime">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="lastSync" class="col-sm-3 control-label">Last sync timestamp</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="lastSync"-->
+                       <!--id="lastSync"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.lastSync">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="notes" class="col-sm-3 control-label">Loggly link</label>-->
+
+              <!--<div class="col-sm-6 margin-top-05">-->
+                <!--<a ng-href="{{deviceDetailsCtrl.currentDevice.logglyLink}}">{{deviceDetailsCtrl.currentDevice.logglyLink}}</a>-->
+                <!--<br>-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="macAddress" class="col-sm-3 control-label">MAC address</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="macAddress"-->
+                       <!--id="macAddress"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.macAddress">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="ethernetMacAddress" class="col-sm-3 control-label">MAC address ethernet</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="ethernetMacAddress"-->
+                       <!--id="ethernetMacAddress"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.ethernetMacAddress">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="model" class="col-sm-3 control-label">Model</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="model"-->
+                       <!--id="model"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.model">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="osVersion" class="col-sm-3 control-label">Operating system version</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="osVersion"-->
+                       <!--id="osVersion"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.osVersion">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="orgUnitPath" class="col-sm-3 control-label">Organizational unit path</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="orgUnitPath"-->
+                       <!--id="orgUnitPath"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.orgUnitPath">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="platformVersion" class="col-sm-3 control-label">Platform version</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="platformVersion"-->
+                       <!--id="platformVersion"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.platformVersion">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="status" class="col-sm-3 control-label">Status</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="status"-->
+                       <!--id="status"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.status">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="tenantCode" class="col-sm-3 control-label">Tenant code</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="tenantCode"-->
+                       <!--id="tenantCode"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.tenantCode">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="unmanaged" class="col-sm-3 control-label">Unmanaged</label>-->
+
+              <!--<div class="col-sm-6 margin-top-05">-->
+                <!--<input type="checkbox"-->
+                       <!--name="unmanaged"-->
+                       <!--id="unmanaged"-->
+                       <!--ng-disabled="true"-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.isUnmanagedDevice">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="created" class="col-sm-3 control-label">Created timestamp</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="created"-->
+                       <!--id="created"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.created">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="updated" class="col-sm-3 control-label">Updated timestamp</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="updated"-->
+                       <!--id="updated"-->
+                       <!--readonly-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.updated">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="notes" class="col-sm-3 control-label">Serial Control</label>-->
+
+              <!--<div class="col-sm-3">-->
+                <!--<label>Panel model</label>-->
+                <!--<select-->
+                  <!--id="panelModel"-->
+                  <!--class="form-control"-->
+                  <!--ng-model="deviceDetailsCtrl.currentDevice.panelModel"-->
+                  <!--ng-options="p.displayName for p in deviceDetailsCtrl.panelModels track by p.id">-->
+                <!--</select>-->
+              <!--</div>-->
+              <!--<div class="col-sm-3">-->
+                <!--<label>Panel input</label>-->
+                <!--<select-->
+                  <!--id="panelInput"-->
+                  <!--class="form-control"-->
+                  <!--ng-model="deviceDetailsCtrl.currentDevice.panelInput"-->
+                  <!--ng-options="c.displayName for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">-->
+                <!--</select>-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form-group">-->
+              <!--<label for="notes" class="col-sm-3 control-label">Notes</label>-->
+
+              <!--<div class="col-sm-6">-->
+                <!--<input type="text"-->
+                       <!--class="form-control"-->
+                       <!--name="notes"-->
+                       <!--id="notes"-->
+                       <!--ng-model="deviceDetailsCtrl.currentDevice.notes">-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--<hr>-->
+            <!--<div class="form-group">-->
+              <!--<div class="col-sm-offset-3 col-sm-4">-->
+                <!--<button type="submit"-->
+                        <!--class="btn btn-primary btn-default"-->
+                        <!--ng-disabled="!deviceForm.$dirty || deviceForm.$invalid"><i class="fa fa-fw fa-save"></i>-->
+                  <!--Save-->
+                <!--</button>-->
+              <!--</div>-->
+            <!--</div>-->
+          <!--</form>-->
+        <!--</div>-->
+      <!--</div>-->
+    <!--</div>-->
+  <!--</tab>-->
+  <!--<tab heading="Issues">-->
+    <!--<div>-->
+      <!--<div class="panel panel-default">-->
+        <!--<div class="panel-heading">-->
+          <!--<h3 class="panel-title">Device issues</h3>-->
+        <!--</div>-->
+        <!--<div class="panel-body">-->
+          <!--<form name="tenantForm"-->
+                <!--class="form-horizontal"-->
+                <!--ng-submit="deviceDetailsCtrl.onClickRefreshButton()"-->
+                <!--novalidate>-->
+            <!--<div class="row">-->
+              <!--<div class="col-sm-offset-6 col-sm-2">-->
+                <!--<label for="startTime" class="control-label">From</label>-->
+                <!--<input type="text" class="form-control input-sm"-->
+                       <!--datetimepicker-->
+                       <!--datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"-->
+                       <!--placeholder="{{deviceDetailsCtrl.startTime}}"-->
+                       <!--name="startTime"-->
+                       <!--id="startTime"-->
+                       <!--ng-model="deviceDetailsCtrl.startTime">-->
+              <!--</div>-->
+              <!--<div class="col-sm-2">-->
+                <!--<label for="endTime" class="control-label">To</label>-->
+                <!--<input type="text" class="form-control input-sm"-->
+                       <!--datetimepicker-->
+                       <!--datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"-->
+                       <!--placeholder="{{deviceDetailsCtrl.endTime}}"-->
+                       <!--name="endTime"-->
+                       <!--id="endTime"-->
+                       <!--ng-model="deviceDetailsCtrl.endTime">-->
+              <!--</div>-->
+              <!--<div class="col-sm-2 margin-top-15">-->
+                <!--<button type="submit" class="btn btn-primary">-->
+                  <!--<i class="fa fa-fw fa-refresh"></i> Refresh-->
+                <!--</button>-->
+              <!--</div>-->
+            <!--</div>-->
+          <!--</form>-->
+          <!--<div class="row margin-top-15">-->
+            <!--<div class="col-lg-12">-->
+              <!--<table name="devices-table" class="table table-responsive">-->
+                <!--<thead>-->
+                <!--<tr>-->
+                  <!--<th width="3px"></th>-->
+                  <!--<th>Category</th>-->
+                  <!--<th>Memory</th>-->
+                  <!--<th>Storage</th>-->
+                  <!--<th>Program</th>-->
+                  <!--<th>Created</th>-->
+                  <!--<th></th>-->
+                <!--</tr>-->
+                <!--</thead>-->
+                <!--<tbody>-->
+                <!--<tr ng-hide="deviceDetailsCtrl.issues.length">-->
+                  <!--<td class="text-center text-warning" colspan="7">No issues for this device</td>-->
+                <!--</tr>-->
+                <!--<tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:['-level','-updated']">-->
+                  <!--<td class="issue-{{ item.level_descriptor}}-background"></td>-->
+                  <!--<td>{{ item.category }}</td>-->
+                  <!--<td>{{ item.memory_utilization }}%</td>-->
+                  <!--<td>{{ item.storage_utilization }}%</td>-->
+                  <!--<td>{{ item.program }}</td>-->
+                  <!--<td>{{ item.created }}</td>-->
+                  <!--<td class="issue-{{ item.level_descriptor}}-text">-->
+                    <!--<i ng-class="item.level==1? 'fa fa-fw fa-warning' :-->
+                          <!--item.level==0? 'fa fa-fw fa-check-circle': 'fa fa-fw fa-ambulance'"></i>-->
+                    <!--{{ item.elapsed_time }}-->
+                  <!--</td>-->
+                <!--</tr>-->
+                <!--</tbody>-->
+              <!--</table>-->
+            <!--</div>-->
+          <!--</div>-->
+        <!--</div>-->
+      <!--</div>-->
+    <!--</div>-->
+  <!--</tab>-->
+  <!--<tab heading="Commands">-->
+    <!--<div>-->
+      <!--<div class="panel panel-default">-->
+        <!--<div class="panel-heading">-->
+          <!--<h3 class="panel-title">Device commands</h3>-->
+        <!--</div>-->
+        <!--<div class="panel-body">-->
+          <!--<div>-->
+            <!--<div class="panel panel-default">-->
+              <!--<div class="panel-heading">-->
+                <!--<h3 class="panel-title">Reset</h3>-->
+              <!--</div>-->
+              <!--<div class="panel-body">-->
+                <!--<form name="commandForm"-->
+                      <!--class="form-horizontal"-->
+                      <!--ng-submit="deviceDetailsCtrl.onClickResetSendButton()"-->
+                      <!--novalidate>-->
+                  <!--<div class="row">-->
+                    <!--<div class="col-sm-12">-->
+                      <!--<table name="device-table" class="table table-responsive table-striped">-->
+                        <!--<thead>-->
+                        <!--<tr>-->
+                          <!--<th>Serial number</th>-->
+                          <!--<th>WiFi mac address</th>-->
+                          <!--<th>Ether mac address</th>-->
+                          <!--<th>Provisioned date</th>-->
+                        <!--</tr>-->
+                        <!--</thead>-->
+                        <!--<tbody>-->
+                        <!--<tr>-->
+                          <!--<td class="reset-device-serial-number">-->
+                            <!--{{deviceDetailsCtrl.currentDevice.serialNumber}}-->
+                          <!--</td>-->
+                          <!--<td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}-->
+                          <!--</td>-->
+                          <!--<td class="reset-device-ethernet-mac-address">{{-->
+                            <!--deviceDetailsCtrl.currentDevice.ethernetMacAddress }}-->
+                          <!--</td>-->
+                          <!--<td class="reset-device-provisioning-date">{{ deviceDetailsCtrl.currentDevice.created }}-->
+                          <!--</td>-->
+                        <!--</tr>-->
+                        <!--</tbody>-->
+                      <!--</table>-->
+                      <!--<div class="row">-->
+                        <!--<div class="col-sm-2 text-right">-->
+                          <!--<label for="volume">Reset:</label>-->
+                        <!--</div>-->
+                        <!--<div class="col-sm-2">-->
+                          <!--<button type="submit"-->
+                                  <!--class="btn btn-primary btn-default"><i class="fa fa-fw fa-building"></i>-->
+                            <!--Send-->
+                          <!--</button>-->
+                        <!--</div>-->
+                      <!--</div>-->
+                    <!--</div>-->
+                  <!--</div>-->
+                <!--</form>-->
+              <!--</div>-->
+            <!--</div>-->
+          <!--</div>-->
+          <!--<div>-->
+            <!--<div class="panel panel-default">-->
+              <!--<div class="panel-heading">-->
+                <!--<h3 class="panel-title">Volume</h3>-->
+              <!--</div>-->
+              <!--<div class="panel-body">-->
+                <!--<form name="volumeForm"-->
+                      <!--class="form-horizontal"-->
+                      <!--ng-submit="deviceDetailsCtrl.onClickVolumeSendButton()"-->
+                      <!--novalidate>-->
+                  <!--<div class="row">-->
+                    <!--<div class="col-sm-12">-->
+                      <!--<table name="device-table" class="table table-responsive table-striped">-->
+                        <!--<thead>-->
+                        <!--<tr>-->
+                          <!--<th>Serial number</th>-->
+                          <!--<th>WiFi mac address</th>-->
+                          <!--<th>Ether mac address</th>-->
+                          <!--<th>Provisioned date</th>-->
+                        <!--</tr>-->
+                        <!--</thead>-->
+                        <!--<tbody>-->
+                        <!--<tr>-->
+                          <!--<td class="reset-device-serial-number">-->
+                            <!--{{deviceDetailsCtrl.currentDevice.serialNumber}}-->
+                          <!--</td>-->
+                          <!--<td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}-->
+                          <!--</td>-->
+                          <!--<td class="reset-device-ethernet-mac-address">{{-->
+                            <!--deviceDetailsCtrl.currentDevice.ethernetMacAddress }}-->
+                          <!--</td>-->
+                          <!--<td class="reset-device-provisioning-date">{{ deviceDetailsCtrl.currentDevice.created }}-->
+                          <!--</td>-->
+                        <!--</tr>-->
+                        <!--</tbody>-->
+                      <!--</table>-->
+                      <!--<div class="row">-->
+                        <!--<div class="col-sm-2 text-right">-->
+                          <!--<label for="volume">Volume:</label>-->
+                        <!--</div>-->
+                        <!--<div class="col-sm-2">-->
+                          <!--<input type="number"-->
+                                 <!--class="form-control"-->
+                                 <!--name="volume"-->
+                                 <!--id="volume"-->
+                                 <!--ng-model="deviceDetailsCtrl.currentDevice.volume"-->
+                                 <!--min="1"-->
+                                 <!--max="100"-->
+                                 <!--ngMinlength="1"-->
+                                 <!--ngMaxlength="3"-->
+                                 <!--ng-required="true">-->
+                          <!--<span ng-show="volumeForm.$invalid">1-100 is allowed</span>-->
+                        <!--</div>-->
+                        <!--<div class="col-sm-2">-->
+                          <!--<button type="submit"-->
+                                  <!--class="btn btn-primary btn-default"-->
+                                  <!--ng-disabled="!volumeForm.$dirty || volumeForm.$invalid">-->
+                            <!--<i class="fa fa-fw fa-building"></i>-->
+                            <!--Send-->
+                          <!--</button>-->
+                        <!--</div>-->
+                      <!--</div>-->
+                    <!--</div>-->
+                  <!--</div>-->
+                <!--</form>-->
+              <!--</div>-->
+            <!--</div>-->
+          <!--</div>-->
+          <!--<div>-->
+            <!--<div class="panel panel-default">-->
+              <!--<div class="panel-heading">-->
+                <!--<h3 class="panel-title">Custom</h3>-->
+              <!--</div>-->
+              <!--<div class="panel-body">-->
+                <!--<form name="commandForm"-->
+                      <!--class="form-horizontal"-->
+                      <!--ng-submit="deviceDetailsCtrl.onClickCommandSendButton()"-->
+                      <!--novalidate>-->
+                  <!--<div class="row">-->
+                    <!--<div class="col-sm-12">-->
+                      <!--<table name="device-table" class="table table-responsive table-striped">-->
+                        <!--<thead>-->
+                        <!--<tr>-->
+                          <!--<th>Serial number</th>-->
+                          <!--<th>WiFi mac address</th>-->
+                          <!--<th>Ether mac address</th>-->
+                          <!--<th>Provisioned date</th>-->
+                        <!--</tr>-->
+                        <!--</thead>-->
+                        <!--<tbody>-->
+                        <!--<tr>-->
+                          <!--<td class="reset-device-serial-number">-->
+                            <!--{{deviceDetailsCtrl.currentDevice.serialNumber}}-->
+                          <!--</td>-->
+                          <!--<td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}-->
+                          <!--</td>-->
+                          <!--<td class="reset-device-ethernet-mac-address">{{-->
+                            <!--deviceDetailsCtrl.currentDevice.ethernetMacAddress }}-->
+                          <!--</td>-->
+                          <!--<td class="reset-device-provisioning-date">{{ deviceDetailsCtrl.currentDevice.created }}-->
+                          <!--</td>-->
+                        <!--</tr>-->
+                        <!--</tbody>-->
+                      <!--</table>-->
+                      <!--<div class="row">-->
+                        <!--<div class="col-sm-2 text-right">-->
+                          <!--<label for="volume">Command:</label>-->
+                        <!--</div>-->
+                        <!--<div class="col-sm-3">-->
+                          <!--<input type="text"-->
+                                 <!--class="form-control"-->
+                                 <!--name="custom"-->
+                                 <!--id="custom"-->
+                                 <!--ng-model="deviceDetailsCtrl.currentDevice.custom"-->
+                                 <!--ng-required="true">-->
+                        <!--</div>-->
+                        <!--<div class="col-sm-2">-->
+                          <!--<button type="submit"-->
+                                  <!--class="btn btn-primary btn-default"-->
+                                  <!--ng-disabled="!commandForm.$dirty || commandForm.$invalid"><i-->
+                            <!--class="fa fa-fw fa-building"></i>-->
+                            <!--Send-->
+                          <!--</button>-->
+                        <!--</div>-->
+                      <!--</div>-->
+                    <!--</div>-->
+                  <!--</div>-->
+                <!--</form>-->
+              <!--</div>-->
+            <!--</div>-->
+          <!--</div>-->
+        <!--</div>-->
+      <!--</div>-->
+    <!--</div>-->
+  <!--</tab>-->
+
+<!--</tabset>-->
