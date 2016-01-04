@@ -193,7 +193,7 @@
           </div>
         </md-content>
       </md-tab>
-      <md-tab label="Linked displays">
+      <md-tab label="Managed devices">
         <md-content class="md-padding">
           <div flex="100" flex-sm="100" flex-xs="100" layout="column">
             <md-card>
@@ -206,13 +206,13 @@
                 <table class="table table-condensed table-responsive table-striped">
                   <thead>
                   <tr>
+                    <th><i class="fa fa-fw fa-wifi"></i> MAC</th>
+                    <th><i class="fa fa-fw fa-plug"></i> MAC</th>
                     <th>Serial number</th>
                     <th>Device ID</th>
-                    <th>Wifi mac address</th>
-                    <th>Ether mac address</th>
                     <th>Notes</th>
                     <th>Provisioned date</th>
-                    <th class="text-center">Status</th>
+                    <th></th>
                   </tr>
                   </thead>
                   <tbody>
@@ -221,6 +221,12 @@
                   </tr>
                   <tr ng-repeat="item in tenantDetailsCtrl.currentTenantDisplays | orderBy:'-created' "
                       ng-click="tenantDetailsCtrl.editItem(item)">
+                    <td class="tenant-display-mac-address">
+                      {{ item.macAddress }}
+                    </td>
+                    <td class="tenant-display-ethernet-mac-address">
+                      {{ item.ethernetMacAddress }}
+                    </td>
                     <td class="tenant-display-serial-number">
                       <a name="edit-device" class="btn" ng-click="tenantDetailsCtrl.editItem(item)"
                          title="Device detail">{{item.serialNumber}}</a>
@@ -228,21 +234,52 @@
                     <td class="tenant-display-id">
                       {{ item.deviceId }}
                     </td>
-                    <td class="tenant-display-mac-address">
-                      {{ item.macAddress }}
-                    </td>
-                    <td class="tenant-display-ethernet-mac-address">
-                      {{ item.ethernetMacAddress }}
-                    </td>
                     <td class="tenant-display-notes">
                       {{ item.notes }}
                     </td>
                     <td class="tenant-display-provisioning-date">
                       {{ item.created }}
                     </td>
-                    <td class="display-up text-center">
-                      <i class="fa fa-fw fa-tv" ng-style="item.up === true ? { color:'green' } : { color:'red' }"></i>
-                    </td>
+                    <td class="up-{{ item.up}}-background"></td>
+                  </tr>
+                  </tbody>
+                </table>
+              </md-card-content>
+            </md-card>
+          </div>
+        </md-content>
+      </md-tab>
+      <md-tab label="Unmanaged devices">
+        <md-content class="md-padding">
+          <div flex="100" flex-sm="100" flex-xs="100" layout="column">
+            <md-card>
+              <md-card-title>
+                <md-card-title-text>
+                  <span class="md-headline">{{ tenantDetailsCtrl.currentTenant.name }}</span>
+                </md-card-title-text>
+              </md-card-title>
+              <md-card-content>
+                <table class="table table-condensed table-responsive table-striped">
+                  <thead>
+                  <tr>
+                    <th><i class="fa fa-fw fa-wifi"></i> MAC</th>
+                    <th><i class="fa fa-fw fa-plug"></i> MAC</th>
+                    <th>Notes</th>
+                    <th>Provisioned date</th>
+                    <th></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr ng-hide="tenantDetailsCtrl.currentTenantUnmanagedDisplays.length">
+                    <td colspan="5" class="text-center text-danger">No displays</td>
+                  </tr>
+                  <tr ng-repeat="item in tenantDetailsCtrl.currentTenantUnmanagedDisplays | orderBy:'-created' "
+                      ng-click="tenantDetailsCtrl.editItem(item)">
+                    <td class="display-mac-address">{{ item.macAddress }}</td>
+                    <td class="display-ethernet-mac-address">{{ item.ethernetMacAddress }}</td>
+                    <td class="display-ethernet-mac-address">{{ item.notes }}</td>
+                    <td class="display-provisioning-date">{{ item.created }}</td>
+                    <td class="up-{{ item.up}}-background"></td>
                   </tr>
                   </tbody>
                 </table>

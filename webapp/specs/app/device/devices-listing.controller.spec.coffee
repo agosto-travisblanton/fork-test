@@ -7,10 +7,16 @@ describe 'DevicesListingCtrl', ->
   $state = undefined
   DevicesService = undefined
   promise = undefined
+  unmanagedPromise = undefined
   devices = [
     {key: 'dhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
     {key: 'dhjad897d987fadafg708y67d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
     {key: 'dhjad897d987fadafg708hb55', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
+  ]
+  unmanagedDevices = [
+    {key: 'uhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
+    {key: 'uhjad897d987fadafg708y67d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
+    {key: 'uhjad897d987fadafg708hb55', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
   ]
 
   beforeEach module('skykitProvisioning')
@@ -24,21 +30,35 @@ describe 'DevicesListingCtrl', ->
   describe 'initialization', ->
     beforeEach ->
       promise = new skykitProvisioning.q.Mock
+      unmanagedPromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getDevicesByDistributor').and.returnValue promise
+      spyOn(DevicesService, 'getUnmanagedDevicesByDistributor').and.returnValue unmanagedPromise
       controller = $controller 'DevicesListingCtrl', {}
       controller.distributorKey = 'some-key'
 
-    it 'displays should be an empty array', ->
+    it 'devices should be an array', ->
       expect(angular.isArray(controller.devices)).toBeTruthy()
 
-    it 'call DevicesService.getDevicesByDistributor to retrieve all distributor devices', ->
+    it 'unmanagedDevices should be an array', ->
+      expect(angular.isArray(controller.unmanagedDevices)).toBeTruthy()
+
+    it 'calls DevicesService.getDevicesByDistributor to retrieve all distributor devices', ->
       controller.initialize()
       expect(DevicesService.getDevicesByDistributor).toHaveBeenCalledWith controller.distributorKey
+
+    it 'calls DevicesService.getUnmanagedDevicesByDistributor to retrieve all distributor unmanaged devices', ->
+      controller.initialize()
+      expect(DevicesService.getUnmanagedDevicesByDistributor).toHaveBeenCalledWith controller.distributorKey
 
     it "the 'then' handler caches the retrieved devices in the controller", ->
       controller.initialize()
       promise.resolve devices
       expect(controller.devices).toBe devices
+
+    it "the 'then' handler caches the retrieved unmanaged devices in the controller", ->
+      controller.initialize()
+      unmanagedPromise.resolve unmanagedDevices
+      expect(controller.unmanagedDevices).toBe unmanagedDevices
 
   describe '.editItem', ->
     item = {key: 'ahjad897d987fadafg708fg71'}

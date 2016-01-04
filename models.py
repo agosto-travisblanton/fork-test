@@ -139,9 +139,12 @@ class Tenant(ndb.Model):
         return None is Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
 
     @classmethod
-    def find_devices(cls, tenant_key):
+    def find_devices(cls, tenant_key, unmanaged):
         if tenant_key:
-            return ChromeOsDevice.query(ChromeOsDevice.tenant_key == tenant_key).fetch(1000)
+            return ChromeOsDevice.query(
+                    ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
+                            ChromeOsDevice.is_unmanaged_device == unmanaged)
+            ).fetch(1000)
 
     @classmethod
     def get_impersonation_email(cls, urlsafe_tenant_key):

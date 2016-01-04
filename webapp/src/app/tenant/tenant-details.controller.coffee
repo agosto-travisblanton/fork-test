@@ -18,6 +18,7 @@ appModule.controller 'TenantDetailsCtrl',
     }
     @selectedDomain = undefined
     @currentTenantDisplays = []
+    @currentTenantUnmanagedDisplays = []
     @distributorDomains = []
     @editMode = !!$stateParams.tenantKey
 
@@ -26,9 +27,13 @@ appModule.controller 'TenantDetailsCtrl',
       tenantPromise.then (tenant) =>
         @currentTenant = tenant
         @onSuccessResolvingTenant tenant
-      displaysPromise = DevicesService.getDevicesByTenant $stateParams.tenantKey
-      displaysPromise.then (data) =>
+      devicesPromise = DevicesService.getDevicesByTenant $stateParams.tenantKey
+      devicesPromise.then (data) =>
         @currentTenantDisplays = data.objects
+
+      unmanagedDevicesPromise = DevicesService.getUnmanagedDevicesByTenant $stateParams.tenantKey
+      unmanagedDevicesPromise.then (data) =>
+        @currentTenantUnmanagedDisplays = data.objects
 
     @initialize = ->
       @currentDistributorKey = $cookies.get('currentDistributorKey')
