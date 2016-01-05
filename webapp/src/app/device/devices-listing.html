@@ -16,29 +16,45 @@
                     <table name="devices-table" class="table table-responsive">
                       <thead>
                       <tr>
+                        <th></th>
                         <th>Tenant code</th>
                         <th><i class="fa fa-fw fa-wifi"></i> MAC</th>
                         <th><i class="fa fa-fw fa-plug"></i> MAC</th>
                         <th>Serial number</th>
-                        <th>Device id</th>
-                        <th>Provisioned date</th>
+                        <th>Provisioned</th>
                         <th></th>
+                        <th></th>
+
                       </tr>
                       </thead>
                       <tbody>
                       <tr ng-hide="devicesListingCtrl.devices.length">
-                        <td class="no-devices text-center text-danger" colspan="7">No devices</td>
+                        <td class="no-devices text-center text-danger" colspan="8">No devices</td>
                       </tr>
-                      <tr ng-repeat="item in devicesListingCtrl.devices | orderBy:'-created'"
-                          ng-click="devicesListingCtrl.editItem(item)">
-                        <td class="display-tenant-code">{{ item.tenantCode }}</td>
-                        <td class="display-mac-address">{{ item.macAddress }}</td>
-                        <td class="display-ethernet-mac-address">{{ item.ethernetMacAddress }}</td>
-                        <td class="display-serial-number">
+                      <tr ng-repeat="item in devicesListingCtrl.devices | orderBy:'-created'">
+                        <td>
+                          <a class="btn" ng-click="devicesListingCtrl.editItem(item)"
+                             title="Device detail">
+                            <ng-md-icon icon="mode_edit" size="48">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"></path>
+                                <path
+                                  d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+                              </svg>
+                            </ng-md-icon>
+                          </a>
+                        </td>
+                        <td>{{ item.tenantCode }}</td>
+                        <td>{{ item.macAddress }}</td>
+                        <td>{{ item.ethernetMacAddress }}</td>
+                        <td>
                           <a name="edit-device" class="btn" ng-click="devicesListingCtrl.editItem(item)"
                              title="Device detail">{{item.serialNumber}}</a></td>
-                        <td class="display-device-id">{{ item.deviceId }}</td>
-                        <td class="display-provisioning-date">{{ item.created }}</td>
+                        <td>{{ item.created }}</td>
+                        <td>
+                          <md-button class="md-secondary"
+                                     ng-click="devicesListingCtrl.showDeviceDetails(item, $event)">More Info</md-button>
+                        </td>
                         <td class="up-{{ item.up}}-background"></td>
                       </tr>
                       </tbody>
@@ -58,25 +74,40 @@
                     <table name="devices-table" class="table table-responsive">
                       <thead>
                       <tr>
+                        <th></th>
                         <th>Tenant code</th>
                         <th><i class="fa fa-fw fa-wifi"></i> MAC</th>
                         <th><i class="fa fa-fw fa-plug"></i> MAC</th>
-                        <th>Notes</th>
-                        <th>Provisioned date</th>
+                        <th>Provisioned</th>
+                        <th></th>
                         <th></th>
                       </tr>
                       </thead>
                       <tbody>
                       <tr ng-hide="devicesListingCtrl.unmanagedDevices.length">
-                        <td class="no-devices text-center text-danger" colspan="5">No devices</td>
+                        <td class="no-devices text-center text-danger" colspan="7">No devices</td>
                       </tr>
-                      <tr ng-repeat="item in devicesListingCtrl.unmanagedDevices | orderBy:'-created'"
-                          ng-click="devicesListingCtrl.editItem(item)">
-                        <td class="display-tenant-code">{{ item.tenantCode }}</td>
-                        <td class="display-mac-address">{{ item.macAddress }}</td>
-                        <td class="display-ethernet-mac-address">{{ item.ethernetMacAddress }}</td>
-                        <td class="display-notes">{{ item.notes }}</td>
-                        <td class="display-provisioning-date">{{ item.created }}</td>
+                      <tr ng-repeat="item in devicesListingCtrl.unmanagedDevices | orderBy:'-created'">
+                        <td>
+                          <a class="btn" ng-click="devicesListingCtrl.editItem(item)"
+                             title="Device detail">
+                            <ng-md-icon icon="mode_edit" size="48">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"></path>
+                                <path
+                                  d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+                              </svg>
+                            </ng-md-icon>
+                          </a>
+                        </td>
+                        <td>{{ item.tenantCode }}</td>
+                        <td>{{ item.macAddress }}</td>
+                        <td>{{ item.ethernetMacAddress }}</td>
+                        <td>{{ item.created }}</td>
+                        <td>
+                          <md-button class="md-secondary"
+                                     ng-click="devicesListingCtrl.showDeviceDetails(item, $event)">More Info</md-button>
+                        </td>
                         <td class="up-{{ item.up}}-background"></td>
                       </tr>
                       </tbody>
