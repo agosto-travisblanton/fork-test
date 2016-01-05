@@ -4,7 +4,7 @@ appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantDetailsCtrl',
   ($log, $stateParams, TenantsService, DomainsService, DevicesService, DistributorsService, $state, sweet,
-    ProgressBarService, $cookies) ->
+    ProgressBarService, $cookies, $mdDialog) ->
     @currentTenant = {
       key: undefined,
       name: undefined,
@@ -75,5 +75,14 @@ appModule.controller 'TenantDetailsCtrl',
           newTenantCode = newTenantCode.replace(/\s+/g, '_')
           newTenantCode = newTenantCode.replace(/\W+/g, '')
         @currentTenant.tenant_code = newTenantCode
+
+    @showDeviceDetails = (item, event) ->
+      apiKey = item.apiKey
+      $mdDialog.show($mdDialog.alert()
+        .title('Device Details')
+        .textContent("API key: #{apiKey}")
+        .ariaLabel('Device details')
+        .ok('Close')
+        .targetEvent(event))
 
     @

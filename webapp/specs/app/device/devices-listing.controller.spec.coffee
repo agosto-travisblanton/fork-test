@@ -8,6 +8,7 @@ describe 'DevicesListingCtrl', ->
   DevicesService = undefined
   promise = undefined
   unmanagedPromise = undefined
+  $mdDialog = undefined
   devices = [
     {key: 'dhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
     {key: 'dhjad897d987fadafg708y67d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
@@ -21,11 +22,12 @@ describe 'DevicesListingCtrl', ->
 
   beforeEach module('skykitProvisioning')
 
-  beforeEach inject (_$controller_, _DevicesService_, _$stateParams_, _$state_) ->
+  beforeEach inject (_$controller_, _DevicesService_, _$stateParams_, _$state_, _$mdDialog_) ->
     $controller = _$controller_
     $stateParams = _$stateParams_
     DevicesService = _DevicesService_
     $state = _$state_
+    $mdDialog = _$mdDialog_
 
   describe 'initialization', ->
     beforeEach ->
@@ -71,4 +73,16 @@ describe 'DevicesListingCtrl', ->
       controller.editItem(item)
       expect($state.go).toHaveBeenCalledWith('editDevice', {deviceKey: item.key, tenantKey: ''})
 
+  describe '.showDeviceDetails', ->
+    beforeEach ->
+      serviceInjection = {
+        $mdDialog: $mdDialog
+      }
+      item = {apiKey: 'api key'}
+      spyOn($mdDialog, 'show')
+      controller = $controller 'DevicesListingCtrl', serviceInjection
+      controller.showDeviceDetails(item, {})
+
+    it 'calls $mdDialog', ->
+      expect($mdDialog.show).toHaveBeenCalled()
 
