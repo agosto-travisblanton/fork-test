@@ -1,8 +1,8 @@
-'use strict;'
+'use strict'
 
-app = angular.module 'skykitProvisioning'
+appModule = angular.module 'skykitProvisioning'
 
-app.controller 'AppController', ($mdSidenav, $state) ->
+appModule.controller 'AppController', ($mdSidenav, $state) ->
   vm = @
 
   vm.toggleSidenav = ->
