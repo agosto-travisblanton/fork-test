@@ -109,8 +109,12 @@ class TestTenantModel(BaseTest):
         self.assertIsNone(actual)
 
     def test_find_devices_returns_expected_device_count_for_tenant_key(self):
-        devices = Tenant.find_devices(self.tenant_key)
+        devices = Tenant.find_devices(self.tenant_key, unmanaged=False)
         self.assertLength(2, devices)
+
+    def test_find_devices_returns_expected_unmanaged_device_count_for_tenant_key(self):
+        devices = Tenant.find_devices(self.tenant_key, unmanaged=True)
+        self.assertLength(0, devices)
 
     def test_get_impersonation_email_for_tenant_key(self):
         urlsafe_tenant_key = self.tenant_key.urlsafe()

@@ -5,12 +5,12 @@ describe 'CommandsService', ->
   Restangular = undefined
   promise = undefined
 
-  beforeEach module('skykitDisplayDeviceManagement')
+  beforeEach module('skykitProvisioning')
 
   beforeEach inject (_CommandsService_, _Restangular_) ->
     CommandsService = _CommandsService_
     Restangular = _Restangular_
-    promise = new skykitDisplayDeviceManagement.q.Mock
+    promise = new skykitProvisioning.q.Mock
 
   describe '.reset', ->
     it 'prepares a device reset command, returning a promise', ->

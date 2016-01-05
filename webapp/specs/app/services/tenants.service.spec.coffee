@@ -5,12 +5,12 @@ describe 'TenantsService', ->
   Restangular = undefined
   promise = undefined
 
-  beforeEach module('skykitDisplayDeviceManagement')
+  beforeEach module('skykitProvisioning')
 
   beforeEach inject (_TenantsService_, _Restangular_) ->
     TenantsService = _TenantsService_
     Restangular = _Restangular_
-    promise = new skykitDisplayDeviceManagement.q.Mock
+    promise = new skykitProvisioning.q.Mock
 
   describe '.save', ->
     it 'update an existing tenant, returning a promise', ->

@@ -14,13 +14,14 @@ describe 'TenantDetailsCtrl', ->
   progressBarService = undefined
   tenantsServicePromise = undefined
   devicesServicePromise = undefined
+  unmanagedDevicesServicePromise = undefined
   distributorsServicePromise = undefined
   distributorsDomainsServicePromise = undefined
   domainsServicePromise = undefined
   sweet = undefined
   serviceInjection = undefined
 
-  beforeEach module('skykitDisplayDeviceManagement')
+  beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _TenantsService_, _DomainsService_, _DevicesService_, _DistributorsService_,
     _$state_, _sweet_, _$log_) ->
@@ -46,15 +47,17 @@ describe 'TenantDetailsCtrl', ->
 
   describe 'initialization', ->
     beforeEach ->
-      tenantsServicePromise = new skykitDisplayDeviceManagement.q.Mock
-      devicesServicePromise = new skykitDisplayDeviceManagement.q.Mock
-      distributorsServicePromise = new skykitDisplayDeviceManagement.q.Mock
-      distributorsDomainsServicePromise = new skykitDisplayDeviceManagement.q.Mock
-      domainsServicePromise = new skykitDisplayDeviceManagement.q.Mock
-      spyOn(TenantsService, 'getTenantByKey').and.returnValue(tenantsServicePromise)
-      spyOn(DevicesService, 'getDevicesByTenant').and.returnValue(devicesServicePromise)
-      spyOn(DistributorsService, 'getDomainsByKey').and.returnValue(distributorsDomainsServicePromise)
-      spyOn(DomainsService, 'getDomainByKey').and.returnValue(domainsServicePromise)
+      tenantsServicePromise = new skykitProvisioning.q.Mock
+      devicesServicePromise = new skykitProvisioning.q.Mock
+      unmanagedDevicesServicePromise = new skykitProvisioning.q.Mock
+      distributorsServicePromise = new skykitProvisioning.q.Mock
+      distributorsDomainsServicePromise = new skykitProvisioning.q.Mock
+      domainsServicePromise = new skykitProvisioning.q.Mock
+      spyOn(TenantsService, 'getTenantByKey').and.returnValue tenantsServicePromise
+      spyOn(DevicesService, 'getDevicesByTenant').and.returnValue devicesServicePromise
+      spyOn(DevicesService, 'getUnmanagedDevicesByTenant').and.returnValue unmanagedDevicesServicePromise
+      spyOn(DistributorsService, 'getDomainsByKey').and.returnValue distributorsDomainsServicePromise
+      spyOn(DomainsService, 'getDomainByKey').and.returnValue domainsServicePromise
 
     it 'currentTenant should be set', ->
       controller = $controller 'TenantDetailsCtrl', serviceInjection
@@ -76,6 +79,10 @@ describe 'TenantDetailsCtrl', ->
     it 'currentTenantDisplays property should be defined', ->
       controller = $controller 'TenantDetailsCtrl', serviceInjection
       expect(controller.currentTenantDisplays).toBeDefined()
+
+    it 'currentTenantUnmanagedDisplays property should be defined', ->
+      controller = $controller 'TenantDetailsCtrl', serviceInjection
+      expect(controller.currentTenantUnmanagedDisplays).toBeDefined()
 
     it 'distributorDomains property should be defined', ->
       controller = $controller 'TenantDetailsCtrl', serviceInjection
@@ -109,6 +116,14 @@ describe 'TenantDetailsCtrl', ->
         expect(DevicesService.getDevicesByTenant).toHaveBeenCalledWith($stateParams.tenantKey)
         expect(controller.currentTenantDisplays).toBe(devices)
 
+      it 'retrieve tenant\'s unmanaged devices by tenant key from DevicesService', ->
+        controller = $controller 'TenantDetailsCtrl', serviceInjection
+        unmanagedDevices = [{key: 'f8sa76d78fa978d6fa7dg7ds55'}, {key: 'f8sa76d78fa978d6fa7dg7ds56'}]
+        data = {objects: unmanagedDevices}
+        unmanagedDevicesServicePromise.resolve data
+        expect(DevicesService.getUnmanagedDevicesByTenant).toHaveBeenCalledWith $stateParams.tenantKey
+        expect(controller.currentTenantUnmanagedDisplays).toBe(unmanagedDevices)
+
     describe 'creating a new tenant', ->
       it 'editMode should be set to false', ->
         $stateParams = {}
@@ -138,7 +153,7 @@ describe 'TenantDetailsCtrl', ->
     domain_key = undefined
 
     beforeEach ->
-      tenantsServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      tenantsServicePromise = new skykitProvisioning.q.Mock
       spyOn(TenantsService, 'save').and.returnValue(tenantsServicePromise)
       spyOn($state, 'go')
       $stateParams = {}

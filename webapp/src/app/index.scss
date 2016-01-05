@@ -61,6 +61,12 @@ body {
 .issue-normal-text {
   color: green;
 }
+.up-true-background {
+  background-color: green;
+}
+.up-false-background {
+  background-color: red;
+}
 .navbar-default {
   background-color: $top-navbar-background-color;
   border-color: darken($top-navbar-background-color, 10%);

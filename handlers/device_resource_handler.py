@@ -75,7 +75,15 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     @requires_api_token
     def get_devices_by_tenant(self, tenant_urlsafe_key):
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
-        query = ChromeOsDevice.query(ChromeOsDevice.tenant_key == tenant_key)
+        unmanaged_filter = self.request.get('unmanaged')
+        if unmanaged_filter == '' or str(unmanaged_filter) == 'false':
+            unmanaged = False
+        else:
+            unmanaged = True
+        query = ChromeOsDevice.query(
+                ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
+                        ChromeOsDevice.is_unmanaged_device == unmanaged)
+        )
         query_forward = query.order(ChromeOsDevice.key)
         query_reverse = query.order(-ChromeOsDevice.key)
         result_data = self.fetch_page(query_forward, query_reverse)
@@ -84,13 +92,18 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     @requires_api_token
     def get_devices_by_distributor(self, distributor_urlsafe_key):
         device_list = []
+        unmanaged_filter = self.request.get('unmanaged')
+        if unmanaged_filter == '' or str(unmanaged_filter) == 'false':
+            unmanaged = False
+        else:
+            unmanaged = True
         distributor = ndb.Key(urlsafe=distributor_urlsafe_key)
         domain_keys = Domain.query(Domain.distributor_key == distributor).fetch(100, keys_only=True)
         tenant_list = Tenant.query(ancestor=TenantEntityGroup.singleton().key)
         tenant_list = filter(lambda x: x.active is True, tenant_list)
         domain_tenant_list = filter(lambda x: x.domain_key in domain_keys, tenant_list)
         for tenant in domain_tenant_list:
-            tenant_devices = Tenant.find_devices(tenant.key)
+            tenant_devices = Tenant.find_devices(tenant.key, unmanaged)
             for tenant_device in tenant_devices:
                 device_list.append(tenant_device)
         json_response(self.response, device_list, strategy=CHROME_OS_DEVICE_STRATEGY)

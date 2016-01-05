@@ -5,12 +5,12 @@ describe 'IdentityService', ->
   Restangular = undefined
   promise = undefined
 
-  beforeEach module('skykitDisplayDeviceManagement')
+  beforeEach module('skykitProvisioning')
 
   beforeEach inject (_IdentityService_, _Restangular_) ->
     IdentityService = _IdentityService_
     Restangular = _Restangular_
-    promise = new skykitDisplayDeviceManagement.q.Mock
+    promise = new skykitProvisioning.q.Mock
 
   describe '.getIdentity', ->
     identityRestangularService = undefined

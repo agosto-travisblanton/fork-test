@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module('skykitDisplayDeviceManagement').factory 'SessionsService', ($http,
+angular.module('skykitProvisioning').factory 'SessionsService', ($http,
                                                                             $log,
                                                                             $cookies,
                                                                             IdentityService,

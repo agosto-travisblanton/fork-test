@@ -1,6 +1,6 @@
 'use strict'
 
-describe 'skykitDisplayDeviceManagement module and configuration', ->
+describe 'skykitProvisioning module and configuration', ->
   $rootScope = undefined
   $state = undefined
   $injector = undefined
@@ -14,7 +14,7 @@ describe 'skykitDisplayDeviceManagement module and configuration', ->
       spyOn(RestangularProvider, 'addResponseInterceptor').and.callThrough()
       spyOn(RestangularProvider, 'setRestangularFields').and.callThrough()
 
-    module 'skykitDisplayDeviceManagement'
+    module 'skykitProvisioning'
 
     inject (_$rootScope_, _$state_, _$injector_, $templateCache) ->
       $rootScope = _$rootScope_
