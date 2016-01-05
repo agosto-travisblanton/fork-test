@@ -43,12 +43,6 @@
 <md-sidenav class="site-sidenav md-sidenav-left md-whiteframe-z2"
             md-component-id="left"
             md-is-locked-open="$mdMedia('gt-lg')">
-
-  <md-toolbar class="md-whiteframe-z1">
-    <!--<a class="app-brand" href="#/welcome"><img src="assets/images/skykit_logo2.png"></a>-->
-  </md-toolbar>
-
-
   <md-list>
     <md-list-item>
       <md-button ng-click="appController.goTo('tenants')"><i class="fa fa-fw fa-group"></i> Tenants</md-button>
@@ -65,9 +59,7 @@
     <md-list-item>
       <md-button ng-click="appController.goTo('sign_out')"><i class="fa fa-fw fa-sign-out"></i> Sign out</md-button>
     </md-list-item>
-
   </md-list>
-
 </md-sidenav>
 
 
@@ -79,23 +71,27 @@
     </md-button>
     <a class="navbar-brand" href="#/welcome"><img src="assets/images/skykit_logo2.png"></a>
     <h3>Provisioning</h3>
-
   </md-toolbar>
-
-  <!--<md-content flex id="content">-->
-  <!--</md-content>-->
 
   <div flex ui-view></div>
 
 </div>
 <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
 <script>
-  (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
-    function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
-    e=o.createElement(i);r=o.getElementsByTagName(i)[0];
-    e.src='//www.google-analytics.com/analytics.js';
-    r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
-  ga('create','UA-XXXXX-X');ga('send','pageview');
+  (function (b, o, i, l, e, r) {
+    b.GoogleAnalyticsObject = l;
+    b[l] || (b[l] =
+      function () {
+        (b[l].q = b[l].q || []).push(arguments)
+      });
+    b[l].l = +new Date;
+    e = o.createElement(i);
+    r = o.getElementsByTagName(i)[0];
+    e.src = '//www.google-analytics.com/analytics.js';
+    r.parentNode.insertBefore(e, r)
+  }(window, document, 'script', 'ga'));
+  ga('create', 'UA-XXXXX-X');
+  ga('send', 'pageview');
 </script>
 
 <!-- build:js(src) scripts/vendor.js -->
