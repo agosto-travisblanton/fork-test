@@ -7,6 +7,7 @@ describe 'TenantDetailsCtrl', ->
   $state = undefined
   $stateParams = undefined
   $log = undefined
+  $mdDialog = undefined
   TenantsService = undefined
   DomainsService = undefined
   DevicesService = undefined
@@ -24,7 +25,7 @@ describe 'TenantDetailsCtrl', ->
   beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _TenantsService_, _DomainsService_, _DevicesService_, _DistributorsService_,
-    _$state_, _sweet_, _$log_) ->
+    _$state_, _sweet_, _$log_, _$mdDialog_) ->
     $controller = _$controller_
     $state = _$state_
     $stateParams = {}
@@ -38,11 +39,13 @@ describe 'TenantDetailsCtrl', ->
     }
     sweet = _sweet_
     $log = _$log_
+    $mdDialog = _$mdDialog_
     scope = {}
     serviceInjection = {
       $scope: scope
       $stateParams: $stateParams
       ProgressBarService: progressBarService
+      $mdDialog: $mdDialog
     }
 
   describe 'initialization', ->
@@ -237,3 +240,13 @@ describe 'TenantDetailsCtrl', ->
       controller.currentTenant.tenant_code = 'barfoo_company'
       controller.autoGenerateTenantCode()
       expect(controller.currentTenant.tenant_code).toBe 'barfoo_company'
+
+  describe '.showDeviceDetails', ->
+    beforeEach ->
+      item = {apiKey: 'api key'}
+      spyOn($mdDialog, 'show')
+      controller = $controller 'TenantDetailsCtrl', serviceInjection
+      controller.showDeviceDetails(item, {})
+
+    it 'calls $mdDialog', ->
+      expect($mdDialog.show).toHaveBeenCalled()
