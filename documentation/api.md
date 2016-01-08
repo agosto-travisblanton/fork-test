@@ -33,7 +33,8 @@ Update Skykit device status. Emanates from the player.
 				"memory":65,
                 "os": "",
                 "osVersion" : "",
-				"lastError":"error description"
+				"lastError":"error description",
+                "timezone" : "UTC-6"
 			}
 
 + Response 204 (application/json)
