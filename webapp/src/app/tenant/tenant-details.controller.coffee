@@ -59,7 +59,8 @@ appModule.controller 'TenantDetailsCtrl',
     @onFailureTenantSave = (errorObject) ->
       ProgressBarService.complete()
       if errorObject.status is 409
-        sweet.show('Oops...', 'Tenant code unavailable. Please try a different tenant code.', 'error')
+        sweet.show('Oops...',
+          'Tenant code unavailable. Please modify tenant name to generate a unique tenant code.', 'error')
       else
         $log.error errorObject
         sweet.show('Oops...', 'Unable to save the tenant.', 'error')

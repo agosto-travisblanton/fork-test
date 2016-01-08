@@ -53,8 +53,16 @@ class IterableUtilTest(BaseTest, WebTest):
         self.assertEqual(email2, result[1])
         self.assertEqual(email3, result[2])
 
-    def test_semi_colon_delimited_string_with_one_item_and_no_delimiters(self):
+    def test_delimited_string_with_one_item_and_no_delimiters(self):
         email = 'admin@skykit.com'
-        result = delimited_string_to_list(email)
+        result = delimited_string_to_list(email, ';')
         self.assertLength(1, result)
         self.assertEqual(email, result[0])
+
+    def test_passing_empty_string(self):
+        result = delimited_string_to_list('')
+        self.assertLength(0, result)
+
+    def test_passing_none(self):
+        result = delimited_string_to_list(None)
+        self.assertLength(0, result)
