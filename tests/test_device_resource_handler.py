@@ -953,7 +953,24 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
         device = self.managed_device_key.get()
         self.assertGreater(device.heartbeat_updated, original_heartbeat_timestamp)
-        # self.assertGreaterEqual(device.heartbeat_updated, self.managed_device.heartbeat_updated)
+
+    def test_put_heartbeat_updates_timezone(self):
+        self.__initialize_heartbeat_info()
+        old_time_zone = 'UTC-5'
+        new_time_zone = 'UTC-6'
+        request_body = {'storage': self.STORAGE_UTILIZATION - 1,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        'timezone': new_time_zone
+                        }
+        self.managed_device.time_zone = old_time_zone
+        self.managed_device.put()
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        updated_heartbeat = self.managed_device_key.get()
+        self.assertNotEqual(updated_heartbeat.time_zone, old_time_zone)
 
     def test_put_heartbeat_invokes_a_device_issue_log_up_toggle_if_device_was_previously_down(self):
         self.__initialize_heartbeat_info(up=False)
