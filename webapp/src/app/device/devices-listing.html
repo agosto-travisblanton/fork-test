@@ -13,7 +13,7 @@
               <md-card>
                 <md-card-content>
                   <md-data-table-container layout="column">
-                    <table name="devices-table" class="table table-responsive table-striped">
+                    <table class="table table-responsive table-striped">
                       <thead>
                       <tr>
                         <th></th>
@@ -52,7 +52,8 @@
                         <td>{{ item.created }}</td>
                         <td>
                           <md-button class="md-secondary"
-                                     ng-click="devicesListingCtrl.showDeviceDetails(item, $event)">More Info</md-button>
+                                     ng-click="devicesListingCtrl.showDeviceDetails(item, $event)">More Info
+                          </md-button>
                         </td>
                         <td class="up-{{ item.up}}-background"></td>
                       </tr>
@@ -70,7 +71,7 @@
               <md-card>
                 <md-card-content>
                   <md-data-table-container layout="column">
-                    <table name="devices-table" class="table table-responsive table-striped">
+                    <table class="table table-responsive table-striped">
                       <thead>
                       <tr>
                         <th></th>
@@ -105,7 +106,8 @@
                         <td>{{ item.created }}</td>
                         <td>
                           <md-button class="md-secondary"
-                                     ng-click="devicesListingCtrl.showDeviceDetails(item, $event)">More Info</md-button>
+                                     ng-click="devicesListingCtrl.showDeviceDetails(item, $event)">More Info
+                          </md-button>
                         </td>
                         <td class="up-{{ item.up}}-background"></td>
                       </tr>
