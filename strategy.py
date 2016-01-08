@@ -82,6 +82,7 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'panelModel': lambda o, field_name, context: o.key.get().panel_model},
     {'panelInput': lambda o, field_name, context: o.key.get().panel_input},
     {'heartbeatInterval': lambda o, field_name, context: o.key.get().heartbeat_interval_minutes},
+    {'timezone': lambda o, field_name, context: o.key.get().time_zone},
     {'connectionType': lambda o, field_name, context: o.key.get().connection_type}
 ]
 

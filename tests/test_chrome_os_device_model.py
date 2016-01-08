@@ -31,6 +31,7 @@ class TestChromeOsDeviceModel(BaseTest):
     IMPERSONATION_EMAIL = 'test@test.com'
     DISPLAY_PANEL_MODEL = 'Sharp-PNE521'
     DISPLAY_PANEL_INPUT = 'sha6'
+    TIME_ZONE = 'UTC-6'
 
     def setUp(self):
         super(TestChromeOsDeviceModel, self).setUp()
@@ -104,6 +105,7 @@ class TestChromeOsDeviceModel(BaseTest):
                                                mac_address=self.MAC_ADDRESS)
         device.panel_model = self.DISPLAY_PANEL_MODEL
         device.panel_input = self.DISPLAY_PANEL_INPUT
+        device.time_zone = self.TIME_ZONE
         device.put()
         json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
         self.assertEqual(str(device.device_id), json_representation['deviceId'])
@@ -117,6 +119,7 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertEqual(str(device.mac_address), json_representation['macAddress'])
         self.assertEqual(str(device.panel_input), json_representation['panelInput'])
         self.assertEqual(str(device.panel_model), json_representation['panelModel'])
+        self.assertEqual(str(device.time_zone), json_representation['timezone'])
 
     def test_json_serialization_strategy_with_optional_serial_number(self):
         device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
