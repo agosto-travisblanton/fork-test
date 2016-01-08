@@ -200,7 +200,7 @@ describe 'TenantDetailsCtrl', ->
         expect($state.go).toHaveBeenCalledWith('tenants')
 
       it "show the error dialog", ->
-        expectedError = 'Tenant code unavailable. Please try a different tenant code.'
+        expectedError = 'Tenant code unavailable. Please modify tenant name to generate a unique tenant code.'
         expect(sweet.show).toHaveBeenCalledWith 'Oops...', expectedError, 'error'
 
     describe '.onFailureTenantSave general error', ->

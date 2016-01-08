@@ -98,5 +98,8 @@ def delimited_string_to_list(delimited_string, delimiter=','):
     if delimited_string is None or delimited_string == '':
         item_list = []
     else:
-        item_list = [x.strip() for x in delimited_string.split(delimiter)]
+        if delimiter not in delimited_string:
+            item_list = [delimited_string]
+        else:
+            item_list = [x.strip() for x in delimited_string.split(delimiter)]
     return item_list

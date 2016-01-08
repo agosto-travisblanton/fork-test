@@ -13,7 +13,7 @@
               <md-card>
                 <md-card-content>
                   <md-data-table-container layout="column">
-                    <table name="devices-table" class="table table-responsive">
+                    <table class="table table-responsive table-striped">
                       <thead>
                       <tr>
                         <th></th>
@@ -24,7 +24,6 @@
                         <th>Provisioned</th>
                         <th></th>
                         <th></th>
-
                       </tr>
                       </thead>
                       <tbody>
@@ -33,7 +32,7 @@
                       </tr>
                       <tr ng-repeat="item in devicesListingCtrl.devices | orderBy:'-created'">
                         <td>
-                          <a class="btn" ng-click="devicesListingCtrl.editItem(item)"
+                          <a ng-click="devicesListingCtrl.editItem(item)"
                              title="Device detail">
                             <ng-md-icon icon="mode_edit" size="48">
                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
@@ -53,7 +52,8 @@
                         <td>{{ item.created }}</td>
                         <td>
                           <md-button class="md-secondary"
-                                     ng-click="devicesListingCtrl.showDeviceDetails(item, $event)">More Info</md-button>
+                                     ng-click="devicesListingCtrl.showDeviceDetails(item, $event)">More Info
+                          </md-button>
                         </td>
                         <td class="up-{{ item.up}}-background"></td>
                       </tr>
@@ -71,7 +71,7 @@
               <md-card>
                 <md-card-content>
                   <md-data-table-container layout="column">
-                    <table name="devices-table" class="table table-responsive">
+                    <table class="table table-responsive table-striped">
                       <thead>
                       <tr>
                         <th></th>
@@ -89,7 +89,7 @@
                       </tr>
                       <tr ng-repeat="item in devicesListingCtrl.unmanagedDevices | orderBy:'-created'">
                         <td>
-                          <a class="btn" ng-click="devicesListingCtrl.editItem(item)"
+                          <a ng-click="devicesListingCtrl.editItem(item)"
                              title="Device detail">
                             <ng-md-icon icon="mode_edit" size="48">
                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
@@ -106,7 +106,8 @@
                         <td>{{ item.created }}</td>
                         <td>
                           <md-button class="md-secondary"
-                                     ng-click="devicesListingCtrl.showDeviceDetails(item, $event)">More Info</md-button>
+                                     ng-click="devicesListingCtrl.showDeviceDetails(item, $event)">More Info
+                          </md-button>
                         </td>
                         <td class="up-{{ item.up}}-background"></td>
                       </tr>
@@ -119,7 +120,6 @@
           </md-content>
         </md-tab>
       </md-tabs>
-
     </div>
   </md-content>
 </div>
