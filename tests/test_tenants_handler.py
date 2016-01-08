@@ -59,7 +59,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         expected = tenant_keys[0].get()
         self.assertEqual(response_json.get('key'), expected.key.urlsafe())
         self.assertEqual(response_json.get('name'), expected.name)
-        self.assertEqual(response_json.get('notification_emails'), expected.notification_emails)
+        self.assertEqual(response_json.get('notification_emails'), ', '.join(expected.notification_emails).strip(', '))
         self.assertEqual(response_json.get('created'), expected.created.strftime('%Y-%m-%d %H:%M:%S'))
         self.assertEqual(response_json.get('updated'), expected.updated.strftime('%Y-%m-%d %H:%M:%S'))
 
