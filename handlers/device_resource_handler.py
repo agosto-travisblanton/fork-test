@@ -337,6 +337,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             if os_version:
                 if device.os_version != os_version:
                     device.os_version = os_version
+            timezone = request_json.get('timezone')
+            if timezone:
+                if device.time_zone != timezone:
+                    device.time_zone = timezone
             resolved_datetime = datetime.utcnow()
             previously_down = device.up is False
             if previously_down:

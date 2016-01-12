@@ -163,7 +163,7 @@ describe 'DeviceDetailsCtrl', ->
         getDeviceIssuesPromise.resolve issues
         expect(controller.issues).toBe issues
 
-  describe '.onClickSaveButton', ->
+  describe '.onClickSaveNotes', ->
     beforeEach ->
       devicesServicePromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'save').and.returnValue devicesServicePromise
@@ -174,7 +174,7 @@ describe 'DeviceDetailsCtrl', ->
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.currentDevice.panelModel = {id: 'Sony-112'}
       controller.currentDevice.panelInput = {id: 'son01'}
-      controller.onClickSaveButton()
+      controller.onClickSaveNotes()
       devicesServicePromise.resolve()
 
     it 'starts the progress bar', ->
@@ -193,12 +193,83 @@ describe 'DeviceDetailsCtrl', ->
       it "the 'then' handler routes navigation to 'devices'", ->
         expect($state.go).toHaveBeenCalledWith 'devices'
 
-    describe '.onFailureDeviceSave', ->
+    describe '.onFailureDeviceSaveNotes', ->
       beforeEach ->
-        controller.onFailureDeviceSave()
+        spyOn(sweet, 'show')
+        controller.onFailureDeviceSaveNotes()
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a sweet alert', ->
+        expect(sweet.show).toHaveBeenCalledWith('Oops...', 'Unable to save the device notes.', 'error')
+
+      it "the 'then' handler routes navigation back to 'devices'", ->
+        expect($state.go).toHaveBeenCalledWith 'devices'
+
+  describe '.onClickSavePanels', ->
+    beforeEach ->
+      devicesServicePromise = new skykitProvisioning.q.Mock
+      spyOn(DevicesService, 'save').and.returnValue devicesServicePromise
+      spyOn($state, 'go')
+      $stateParams = {}
+      spyOn(progressBarService, 'start')
+      spyOn(progressBarService, 'complete')
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+      controller.currentDevice.panelModel = {id: 'Sony-112'}
+      controller.currentDevice.panelInput = {id: 'son01'}
+      controller.onClickSavePanels()
+      devicesServicePromise.resolve()
+
+    it 'starts the progress bar', ->
+      expect(progressBarService.start).toHaveBeenCalled()
+
+    it 'call DevicesService.save with the current device', ->
+      expect(DevicesService.save).toHaveBeenCalledWith controller.currentDevice
+
+    describe '.setPanelInfo', ->
+      it 'sets panel model None to null', ->
+        controller.currentDevice.panelModel = {id: 'None'}
+        controller.setPanelInfo()
+        expect(controller.currentDevice.panelModel).toBe null
+
+      it 'sets panel model to id', ->
+        panelModel = 'Foobar-122'
+        controller.currentDevice.panelModel = {id: panelModel}
+        controller.setPanelInfo()
+        expect(controller.currentDevice.panelModel).toBe panelModel
+
+      it 'sets panel input 0 to null', ->
+        controller.currentDevice.panelInput = {id: '0'}
+        controller.setPanelInfo()
+        expect(controller.currentDevice.panelInput).toBe null
+
+      it 'sets panel input to id', ->
+        panelInput = 'DVI'
+        controller.currentDevice.panelInput = {id: panelInput}
+        controller.setPanelInfo()
+        expect(controller.currentDevice.panelInput).toBe panelInput
+
+    describe '.onSuccessDeviceSave', ->
+      beforeEach ->
+        controller.onSuccessDeviceSave()
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it "the 'then' handler routes navigation to 'devices'", ->
+        expect($state.go).toHaveBeenCalledWith 'devices'
+
+    describe '.onFailureDeviceSavePanels', ->
+      beforeEach ->
+        spyOn(sweet, 'show')
+        controller.onFailureDeviceSavePanels()
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a sweet alert', ->
+        expect(sweet.show).toHaveBeenCalledWith('Oops...', 'Unable to save the serial control information.', 'error')
 
       it "the 'then' handler routes navigation back to 'devices'", ->
         expect($state.go).toHaveBeenCalledWith 'devices'
