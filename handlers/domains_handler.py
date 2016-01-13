@@ -1,13 +1,14 @@
 import json
+import logging
 
 from google.appengine.ext import ndb
-import logging
 from webapp2 import RequestHandler
+
 from decorators import requires_api_token
 from models import Domain
+from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import DOMAIN_STRATEGY
-from ndb_mixins import KeyValidatorMixin
 
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
@@ -31,9 +32,6 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
             status = 201
             error_message = None
             request_json = json.loads(self.request.body)
-
-
-
             name = request_json.get('name')
             if name is None or name == '':
                 status = 400

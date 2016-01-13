@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module('skykitDisplayDeviceManagement').factory 'IdentityService', ($log, Restangular) ->
+angular.module('skykitProvisioning').factory 'IdentityService', ($log, Restangular) ->
 
   new class IdentityService
 

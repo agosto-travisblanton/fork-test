@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
-from random import choice
+
+from decimal import Decimal
+
 from dateutil import tz
 from dateutil.tz import tzutc
 
@@ -136,3 +138,15 @@ def is_same_week(first, second):
     return date1.isocalendar()[1] == date2.isocalendar()[1]
 
 
+def elapsed_time_message(datetime_1, datetime_2):
+    seconds = abs(unix_time(datetime_1) - unix_time(datetime_2))
+    if seconds < 60:
+        return "{0} seconds".format(seconds)
+    minutes = round(Decimal(seconds / 60.0),1)
+    if minutes < 60.0:
+        return "{0} minutes".format(minutes)
+    hours = round(Decimal(seconds / 3600.0),1)
+    if hours < 24.0:
+        return "{0} hours".format(hours)
+    days = round(Decimal(seconds / 86400.0),1)
+    return "{0} days".format(days)

@@ -1,26 +1,22 @@
-<div id="wrapper" ng-init="deviceDetailsCtrl.initialize()">
-
-
-  <div ng-include="'app/components/navbar/navbar.html'"></div>
-
-  <div id="page-wrapper">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-lg-12">
-          <div ncy-breadcrumb></div>
-          <div ng-show="deviceDetailsCtrl.tenantKey.length > 0">
-            <a href="/#/tenants/{{deviceDetailsCtrl.tenantKey}}">back to Tenant</a>
-          </div>
-        </div>
+<div ng-controller="DeviceDetailsCtrl" ng-init="deviceDetailsCtrl.initialize()" layout="column" ng-cloak>
+  <md-toolbar class="md-hue-2">
+    <div class="md-toolbar-tools">
+      <h2 class="md-flex"><i class="fa fa-fw fa-desktop ng-scope"></i> Devices</h2>
+    </div>
+  </md-toolbar>
+  <md-content flex layout-padding>
+    <div flex="80" flex-xs="100" layout="column">
+      <div ncy-breadcrumb></div>
+      <div ng-show="deviceDetailsCtrl.tenantKey.length > 0">
+        <a href="/#/tenants/{{deviceDetailsCtrl.tenantKey}}">back to Tenant</a>
       </div>
-      <tabset>
-        <tab heading="Properties">
-          <div>
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Device properties</h3>
-              </div>
-              <div class="panel-body">
+    </div>
+    <md-tabs md-dynamic-height md-border-bottom>
+      <md-tab label="Properties">
+        <md-content class="md-padding">
+          <div flex="70" flex-sm="70" flex-xs="70" layout="column">
+            <md-card>
+              <md-card-content>
                 <form name="deviceForm"
                       class="form-horizontal"
                       ng-submit="deviceDetailsCtrl.onClickSaveButton()"
@@ -366,112 +362,181 @@
                              ng-model="deviceDetailsCtrl.currentDevice.notes">
                     </div>
                   </div>
-                  <hr>
-                  <div class="form-group">
-                    <div class="col-sm-offset-3 col-sm-4">
-                      <button type="submit"
-                              class="btn btn-primary btn-default"
-                              ng-disabled="!deviceForm.$dirty || deviceForm.$invalid"><i class="fa fa-fw fa-save"></i>
-                        Save
-                      </button>
+                  <md-card-actions layout="row" layout-align="end center">
+                    <md-button type="submit"
+                               ng-disabled="!deviceForm.$dirty || deviceForm.$invalid">
+                      <i class="fa fa-fw fa-save"></i>
+                      Save
+                    </md-button>
+                  </md-card-actions>
+
+                </form>
+              </md-card-content>
+            </md-card>
+          </div>
+        </md-content>
+      </md-tab>
+      <md-tab label="Vitals">
+        <md-content class="md-padding">
+          <div flex="100" flex-sm="100" flex-xs="100" layout="column">
+            <md-card>
+              <md-card-content>
+                <form name="tenantForm" class="form-horizontal" ng-submit="deviceDetailsCtrl.onClickRefreshButton()"
+                      novalidate>
+                  <div class="row">
+                    <div class="col-sm-offset-6 col-sm-2">
+                      <label for="startTime" class="control-label">From</label>
+                      <input type="text" class="form-control input-sm"
+                             datetimepicker
+                             datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
+                             placeholder="{{deviceDetailsCtrl.startTime}}"
+                             name="startTime"
+                             id="startTime"
+                             ng-model="deviceDetailsCtrl.startTime">
+                    </div>
+                    <div class="col-sm-2">
+                      <label for="endTime" class="control-label">To</label>
+                      <input type="text" class="form-control input-sm"
+                             datetimepicker
+                             datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
+                             placeholder="{{deviceDetailsCtrl.endTime}}"
+                             name="endTime"
+                             id="endTime"
+                             ng-model="deviceDetailsCtrl.endTime">
+                    </div>
+                    <div class="col-sm-2 margin-top-15">
+                      <md-button type="submit">
+                        <i class="fa fa-fw fa-refresh"></i> Refresh
+                      </md-button>
                     </div>
                   </div>
                 </form>
-              </div>
-            </div>
+                <div class="row margin-top-15">
+                  <div class="col-lg-12">
+                    <table  class="table table-responsive table-striped">
+                      <thead>
+                      <tr>
+                        <th width="3px"></th>
+                        <th>Category</th>
+                        <th>Memory</th>
+                        <th>Storage</th>
+                        <th>Program</th>
+                        <th>Created</th>
+                        <th></th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <tr ng-hide="deviceDetailsCtrl.issues.length">
+                        <td class="text-center text-warning" colspan="7">No issues for this device</td>
+                      </tr>
+                      <tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:['-level','-updated']">
+                        <td class="issue-{{ item.level_descriptor}}-background"></td>
+                        <td>{{ item.category }}</td>
+                        <td>{{ item.memory_utilization }}%</td>
+                        <td>{{ item.storage_utilization }}%</td>
+                        <td>{{ item.program }}</td>
+                        <td>{{ item.created }}</td>
+                        <td class="issue-{{ item.level_descriptor}}-text">
+                          <i ng-class="item.level==1? 'fa fa-fw fa-warning' :
+                          item.level==0? 'fa fa-fw fa-check-circle': 'fa fa-fw fa-ambulance'"></i>
+                          {{ item.elapsed_time }}
+                        </td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </md-card-content>
+            </md-card>
           </div>
-        </tab>
-        <tab heading="Reset">
-          <div>
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Device reset</h3>
-              </div>
-              <div class="panel-body">
-                <form name="commandForm"
-                      class="form-horizontal"
-                      ng-submit="deviceDetailsCtrl.onClickResetSendButton()"
+        </md-content>
+      </md-tab>
+      <md-tab label="Commands">
+        <md-content class="md-padding" layout="row" layout-wrap layout-align="center start" layout-xs="column">
+          <div flex="33" flex-sm="33" flex-xs="33" layout="column">
+            <md-card>
+              <md-card-title>
+                <md-card-title-text>
+                  <span class="md-headline">Reset</span>
+                </md-card-title-text>
+              </md-card-title>
+              <md-card-content>
+                <form name="resetForm" class="form-horizontal" ng-submit="deviceDetailsCtrl.onClickResetSendButton()"
                       novalidate>
                   <div class="row">
                     <div class="col-sm-12">
-                      <table name="device-table" class="table table-responsive table-striped">
+                      <table class="table table-responsive table-striped">
                         <thead>
                         <tr>
                           <th>Serial number</th>
-                          <th>WiFi mac address</th>
-                          <th>Ether mac address</th>
-                          <th>Provisioned date</th>
+                          <th>WiFi MAC</th>
+                          <th>Ether MAC</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr>
-                          <td class="reset-device-serial-number">{{deviceDetailsCtrl.currentDevice.serialNumber}}</td>
-                          <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}</td>
+                          <td class="reset-device-serial-number">
+                            {{deviceDetailsCtrl.currentDevice.serialNumber}}
+                          </td>
+                          <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
+                          </td>
                           <td class="reset-device-ethernet-mac-address">{{
                             deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                          </td>
-                          <td class="reset-device-provisioning-date">{{ deviceDetailsCtrl.currentDevice.created }}
                           </td>
                         </tr>
                         </tbody>
                       </table>
                       <div class="row">
-                        <div class="col-sm-2 text-right">
-                          <label for="volume">Reset:</label>
-                        </div>
-                        <div class="col-sm-2">
-                          <button type="submit"
-                                  class="btn btn-primary btn-default"><i class="fa fa-fw fa-building"></i>
-                            Send
-                          </button>
+                        <div class="col-sm-8 pull-right">
+                          <input type="text" class="form-control" readonly value="skykit.com/skdchromeapp/reset">
                         </div>
                       </div>
                     </div>
                   </div>
+                  <md-card-actions layout="row" layout-align="end center">
+                    <md-button type="submit"><i class="fa fa-fw fa-building"></i>
+                      Send to GCM
+                    </md-button>
+                  </md-card-actions>
                 </form>
-              </div>
-            </div>
+              </md-card-content>
+            </md-card>
           </div>
-        </tab>
-        <tab heading="Volume">
-          <div>
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Device volume</h3>
-              </div>
-              <div class="panel-body">
-                <form name="volumeForm"
-                      class="form-horizontal"
-                      ng-submit="deviceDetailsCtrl.onClickVolumeSendButton()"
+          <div flex="33" flex-sm="33" flex-xs="33" layout="column">
+            <md-card>
+              <md-card-title>
+                <md-card-title-text>
+                  <span class="md-headline">Volume</span>
+                </md-card-title-text>
+              </md-card-title>
+              <md-card-content>
+                <form name="volumeForm" class="form-horizontal" ng-submit="deviceDetailsCtrl.onClickVolumeSendButton()"
                       novalidate>
                   <div class="row">
                     <div class="col-sm-12">
-                      <table name="device-table" class="table table-responsive table-striped">
+                      <table class="table table-responsive table-striped">
                         <thead>
                         <tr>
                           <th>Serial number</th>
-                          <th>WiFi mac address</th>
-                          <th>Ether mac address</th>
-                          <th>Provisioned date</th>
+                          <th>WiFi MAC</th>
+                          <th>Ether MAC</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr>
-                          <td class="reset-device-serial-number">{{deviceDetailsCtrl.currentDevice.serialNumber}}</td>
-                          <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}</td>
+                          <td class="reset-device-serial-number">
+                            {{deviceDetailsCtrl.currentDevice.serialNumber}}
+                          </td>
+                          <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
+                          </td>
                           <td class="reset-device-ethernet-mac-address">{{
                             deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                          </td>
-                          <td class="reset-device-provisioning-date">{{ deviceDetailsCtrl.currentDevice.created }}
                           </td>
                         </tr>
                         </tbody>
                       </table>
                       <div class="row">
-                        <div class="col-sm-2 text-right">
-                          <label for="volume">Volume:</label>
-                        </div>
-                        <div class="col-sm-2">
+                        <div class="col-sm-3 pull-right">
                           <input type="number"
                                  class="form-control"
                                  name="volume"
@@ -482,63 +547,57 @@
                                  ngMinlength="1"
                                  ngMaxlength="3"
                                  ng-required="true">
-                          <span ng-show="volumeForm.$invalid">1-100 is allowed</span>
-                        </div>
-                        <div class="col-sm-2">
-                          <button type="submit"
-                                  class="btn btn-primary btn-default"
-                                  ng-disabled="!volumeForm.$dirty || volumeForm.$invalid">
-                            <i class="fa fa-fw fa-building"></i>
-                            Send
-                          </button>
+                          <!--<span ng-show="volumeForm.$invalid">1-100</span>-->
                         </div>
                       </div>
                     </div>
                   </div>
+                  <md-card-actions layout="row" layout-align="end center">
+                    <md-button type="submit"
+                               ng-disabled="!volumeForm.$dirty || volumeForm.$invalid">
+                      <i class="fa fa-fw fa-building"></i>
+                      Send to GCM
+                    </md-button>
+                  </md-card-actions>
                 </form>
-              </div>
-            </div>
+              </md-card-content>
+            </md-card>
           </div>
-        </tab>
-        <tab heading="Command">
-          <div>
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Device command</h3>
-              </div>
-              <div class="panel-body">
-                <form name="commandForm"
-                      class="form-horizontal"
-                      ng-submit="deviceDetailsCtrl.onClickCommandSendButton()"
+          <div flex="33" flex-sm="33" flex-xs="33" layout="column">
+            <md-card>
+              <md-card-title>
+                <md-card-title-text>
+                  <span class="md-headline">Custom</span>
+                </md-card-title-text>
+              </md-card-title>
+              <md-card-content>
+                <form name="customForm" class="form-horizontal" ng-submit="deviceDetailsCtrl.onClickCommandSendButton()"
                       novalidate>
                   <div class="row">
                     <div class="col-sm-12">
-                      <table name="device-table" class="table table-responsive table-striped">
+                      <table class="table table-responsive table-striped">
                         <thead>
                         <tr>
                           <th>Serial number</th>
-                          <th>WiFi mac address</th>
-                          <th>Ether mac address</th>
-                          <th>Provisioned date</th>
+                          <th>WiFi MAC</th>
+                          <th>Ether MAC</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr>
-                          <td class="reset-device-serial-number">{{deviceDetailsCtrl.currentDevice.serialNumber}}</td>
-                          <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}</td>
+                          <td class="reset-device-serial-number">
+                            {{deviceDetailsCtrl.currentDevice.serialNumber}}
+                          </td>
+                          <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
+                          </td>
                           <td class="reset-device-ethernet-mac-address">{{
                             deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                          </td>
-                          <td class="reset-device-provisioning-date">{{ deviceDetailsCtrl.currentDevice.created }}
                           </td>
                         </tr>
                         </tbody>
                       </table>
                       <div class="row">
-                        <div class="col-sm-2 text-right">
-                          <label for="volume">Command:</label>
-                        </div>
-                        <div class="col-sm-3">
+                        <div class="col-sm-8 pull-right">
                           <input type="text"
                                  class="form-control"
                                  name="custom"
@@ -546,23 +605,22 @@
                                  ng-model="deviceDetailsCtrl.currentDevice.custom"
                                  ng-required="true">
                         </div>
-                        <div class="col-sm-2">
-                          <button type="submit"
-                                  class="btn btn-primary btn-default"
-                                  ng-disabled="!commandForm.$dirty || commandForm.$invalid"><i
-                            class="fa fa-fw fa-building"></i>
-                            Send
-                          </button>
-                        </div>
                       </div>
                     </div>
                   </div>
+                  <md-card-actions layout="row" layout-align="end center">
+                    <md-button type="submit"
+                               ng-disabled="!customForm.$dirty || customForm.$invalid">
+                      <i class="fa fa-fw fa-building"></i>
+                      Send to GCM
+                    </md-button>
+                  </md-card-actions>
                 </form>
-              </div>
-            </div>
+              </md-card-content>
+            </md-card>
           </div>
-        </tab>
-      </tabset>
-    </div>
-  </div>
+        </md-content>
+      </md-tab>
+    </md-tabs>
+  </md-content>
 </div>

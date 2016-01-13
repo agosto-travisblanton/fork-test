@@ -21,7 +21,7 @@ describe 'DomainDetailsCtrl', ->
     updated: '2015-09-08 12:15:08'
   }
 
-  beforeEach module('skykitDisplayDeviceManagement')
+  beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _DomainsService_, _DistributorsService_, _sweet_) ->
     $controller = _$controller_
@@ -45,8 +45,8 @@ describe 'DomainDetailsCtrl', ->
 
   describe 'initialization', ->
     beforeEach ->
-      domainsServicePromise = new skykitDisplayDeviceManagement.q.Mock
-      distributorsServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      domainsServicePromise = new skykitProvisioning.q.Mock
+      distributorsServicePromise = new skykitProvisioning.q.Mock
       spyOn(DomainsService, 'getDomainByKey').and.returnValue domainsServicePromise
       spyOn(DistributorsService, 'getByName').and.returnValue distributorsServicePromise
 
@@ -74,7 +74,7 @@ describe 'DomainDetailsCtrl', ->
 
   describe '.onClickSaveButton', ->
     beforeEach ->
-      domainsServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      domainsServicePromise = new skykitProvisioning.q.Mock
       spyOn(DomainsService, 'save').and.returnValue domainsServicePromise
       $stateParams = {}
       spyOn(progressBarService, 'start')

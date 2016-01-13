@@ -1,4 +1,5 @@
 from env_setup import setup_test_paths
+from utils.iterable_util import delimited_string_to_list
 from webtest import AppError
 
 setup_test_paths()
@@ -21,6 +22,7 @@ class TestTenantsHandler(BaseTest, WebTest):
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     DISTRIBUTOR_NAME = 'agosto'
     IMPERSONATION_EMAIL = 'test@test.com'
+    ORIGINAL_NOTIFICATION_EMAILS = ['test@skykit.com', 'admin@skykit.com']
 
     def setUp(self):
         super(TestTenantsHandler, self).setUp()
@@ -57,6 +59,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         expected = tenant_keys[0].get()
         self.assertEqual(response_json.get('key'), expected.key.urlsafe())
         self.assertEqual(response_json.get('name'), expected.name)
+        self.assertEqual(response_json.get('notification_emails'), ', '.join(expected.notification_emails).strip(', '))
         self.assertEqual(response_json.get('created'), expected.created.strftime('%Y-%m-%d %H:%M:%S'))
         self.assertEqual(response_json.get('updated'), expected.updated.strftime('%Y-%m-%d %H:%M:%S'))
 
@@ -99,6 +102,9 @@ class TestTenantsHandler(BaseTest, WebTest):
     def test_post_create_new_tenant_persists_object(self):
         name = u'ABC'
         admin_email = u'foo@bar.com'
+        email_1 = 'admin1@skykit.com'
+        email_2 = 'admin2@skykit.com'
+        emails = "{0},{1}".format(email_1, email_2)
         when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(str('some key'))
         when(ContentManagerApi).create_tenant(any_matcher()).thenReturn(True)
         request_parameters = {'name': name,
@@ -108,10 +114,13 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': self.domain_key.urlsafe(),
+                              'notification_emails': emails,
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
         actual = Tenant.find_by_name(request_parameters['name'])
+        email_list = delimited_string_to_list(emails)
+        self.assertEqual(actual.notification_emails, email_list)
         self.assertIsNotNone(actual)
 
     def test_post_create_new_tenant_sets_location_header(self):
@@ -230,17 +239,20 @@ class TestTenantsHandler(BaseTest, WebTest):
             'content_server_url': 'https://www.foo.com',
             'content_server_api_key': 'some key',
             'domain_key': self.domain_key.urlsafe(),
-            'active': True
+            'active': True,
+            'notifications_emails': ''
         }
         response = self.app.put_json(uri, entity_body, headers=self.headers)
         self.assertEqual(204, response.status_int)
 
     def test_put_updates_selected_properties(self):
+        notification_email = 'foobar@skykit.com'
         tenant_keys = self.load_tenants()
         uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': tenant_keys[0].urlsafe()})
         expected = tenant_keys[0].get()
         self.assertEqual(expected.name, 'Testing tenant 0')
-        self.assertEqual(expected.active, True)
+        self.assertTrue(expected.active)
+        self.assertEqual(expected.notification_emails, self.ORIGINAL_NOTIFICATION_EMAILS)
         entity_body = {
             'name': 'foobar',
             'tenant_code': 'acme',
@@ -248,11 +260,15 @@ class TestTenantsHandler(BaseTest, WebTest):
             'content_server_url': 'https://www.foo.com',
             'content_server_api_key': 'some key',
             'domain_key': self.domain_key.urlsafe(),
-            'active': False
+            'active': False,
+            'notification_emails': notification_email
         }
         self.app.put_json(uri, entity_body, headers=self.headers)
         self.assertEqual(expected.name, 'foobar')
-        self.assertEqual(expected.active, False)
+        self.assertFalse(expected.active)
+        self.assertNotEqual(expected.notification_emails, self.ORIGINAL_NOTIFICATION_EMAILS)
+        email_list = delimited_string_to_list(notification_email)
+        self.assertEqual(expected.notification_emails, email_list)
 
     def test_put_updates_domain_key_property(self):
         new_domain_name = 'new.agosto.com'
@@ -318,6 +334,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                                    content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
                                    domain_key=domain_key,
                                    active=True)
+            tenant.notification_emails = self.ORIGINAL_NOTIFICATION_EMAILS
             tenant_key = tenant.put()
             tenant_keys.append(tenant_key)
         return tenant_keys

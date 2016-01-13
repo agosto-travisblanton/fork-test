@@ -1,10 +1,10 @@
 'use strict'
 
-appModule = angular.module('skykitDisplayDeviceManagement')
+appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantDetailsCtrl',
   ($log, $stateParams, TenantsService, DomainsService, DevicesService, DistributorsService, $state, sweet,
-    ProgressBarService, $cookies) ->
+    ProgressBarService, $cookies, $mdDialog) ->
     @currentTenant = {
       key: undefined,
       name: undefined,
@@ -13,10 +13,12 @@ appModule.controller 'TenantDetailsCtrl',
       content_server_url: undefined,
       content_manager_base_url: undefined,
       domain_key: undefined,
+      notification_emails: undefined,
       active: true
     }
     @selectedDomain = undefined
     @currentTenantDisplays = []
+    @currentTenantUnmanagedDisplays = []
     @distributorDomains = []
     @editMode = !!$stateParams.tenantKey
 
@@ -25,9 +27,13 @@ appModule.controller 'TenantDetailsCtrl',
       tenantPromise.then (tenant) =>
         @currentTenant = tenant
         @onSuccessResolvingTenant tenant
-      displaysPromise = DevicesService.getDevicesByTenant $stateParams.tenantKey
-      displaysPromise.then (data) =>
+      devicesPromise = DevicesService.getDevicesByTenant $stateParams.tenantKey
+      devicesPromise.then (data) =>
         @currentTenantDisplays = data.objects
+
+      unmanagedDevicesPromise = DevicesService.getUnmanagedDevicesByTenant $stateParams.tenantKey
+      unmanagedDevicesPromise.then (data) =>
+        @currentTenantUnmanagedDisplays = data.objects
 
     @initialize = ->
       @currentDistributorKey = $cookies.get('currentDistributorKey')
@@ -53,7 +59,8 @@ appModule.controller 'TenantDetailsCtrl',
     @onFailureTenantSave = (errorObject) ->
       ProgressBarService.complete()
       if errorObject.status is 409
-        sweet.show('Oops...', 'Tenant code unavailable. Please try a different tenant code.', 'error')
+        sweet.show('Oops...',
+          'Tenant code unavailable. Please modify tenant name to generate a unique tenant code.', 'error')
       else
         $log.error errorObject
         sweet.show('Oops...', 'Unable to save the tenant.', 'error')
@@ -69,5 +76,14 @@ appModule.controller 'TenantDetailsCtrl',
           newTenantCode = newTenantCode.replace(/\s+/g, '_')
           newTenantCode = newTenantCode.replace(/\W+/g, '')
         @currentTenant.tenant_code = newTenantCode
+
+    @showDeviceDetails = (item, event) ->
+      apiKey = item.apiKey
+      $mdDialog.show($mdDialog.alert()
+        .title('Device Details')
+        .textContent("API key: #{apiKey}")
+        .ariaLabel('Device details')
+        .ok('Close')
+        .targetEvent(event))
 
     @

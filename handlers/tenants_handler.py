@@ -9,6 +9,7 @@ from decorators import requires_api_token
 from models import Tenant, TenantEntityGroup, Domain
 from restler.serializers import json_response
 from strategy import TENANT_STRATEGY
+from utils.iterable_util import delimited_string_to_list
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
@@ -55,6 +56,7 @@ class TenantsHandler(RequestHandler):
             if content_manager_base_url is None or content_manager_base_url == '':
                 status = 400
                 error_message = 'The content manager base url parameter is invalid.'
+            notification_emails = delimited_string_to_list(request_json.get('notification_emails'))
             domain_key_input = request_json.get('domain_key')
             domain_key = None
             if domain_key_input is None or domain_key_input == '':
@@ -82,7 +84,8 @@ class TenantsHandler(RequestHandler):
                                            content_server_url=content_server_url,
                                            content_manager_base_url=content_manager_base_url,
                                            domain_key=domain_key,
-                                           active=active)
+                                           active=active,
+                                           notification_emails = notification_emails)
                     tenant_key = tenant.put()
                     content_manager_api = ContentManagerApi()
                     notify_content_manager = content_manager_api.create_tenant(tenant)
@@ -114,6 +117,8 @@ class TenantsHandler(RequestHandler):
         tenant.admin_email = request_json.get('admin_email')
         tenant.content_server_url = request_json.get('content_server_url')
         tenant.content_manager_base_url = request_json.get('content_manager_base_url')
+        email_list = delimited_string_to_list(request_json.get('notification_emails'))
+        tenant.notification_emails = email_list
         domain_key_input = request_json.get('domain_key')
         try:
             domain_key = ndb.Key(urlsafe=domain_key_input)

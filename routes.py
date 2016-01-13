@@ -57,8 +57,14 @@ application = WSGIApplication(
               ),
 
         ############################################################
-        # device registration
+        # device
         ############################################################
+        Route(r'/api/v1/devices/<device_urlsafe_key>/heartbeat',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='devices-heartbeat',
+              handler_method='heartbeat',
+              methods=['PUT']
+              ),
         Route(r'/api/v1/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='devices-retrieval',
@@ -80,6 +86,12 @@ application = WSGIApplication(
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='device-pairing-code',
               handler_method='get_pairing_code',
+              methods=['GET']
+              ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/issues',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='device-issues',
+              handler_method='get_latest_issues',
               methods=['GET']
               ),
         Route(r'/api/v1/devices/<device_urlsafe_key>/commands',
@@ -176,6 +188,16 @@ application = WSGIApplication(
               handler='handlers.domains_handler.DomainsHandler',
               name='manage-domain',
               methods=['GET', 'PUT', 'DELETE']
+              ),
+
+        ############################################################
+        # Device Monitoring
+        ############################################################
+        Route(r'/api/v1/monitor/devices',
+              handler='handlers.monitor_devices_handler.MonitorDevicesHandler',
+              name='monitor-devices',
+              handler_method='last_contact_check',
+              methods=['GET'],
               ),
 
         ############################################################

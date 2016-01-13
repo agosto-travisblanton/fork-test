@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module('skykitDisplayDeviceManagement').factory 'DevicesService', ($http, $log, Restangular) ->
+angular.module('skykitProvisioning').factory 'DevicesService', ($http, $log, Restangular) ->
   class DevicesService
     SERVICE_NAME = 'devices'
     @uriBase = 'v1/devices'
@@ -12,14 +12,33 @@ angular.module('skykitDisplayDeviceManagement').factory 'DevicesService', ($http
       promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{deviceKey}").get()
       promise
 
+    getIssuesByKey: (deviceKey, startEpoch, endEpoch) ->
+      promise = Restangular.oneUrl(SERVICE_NAME,
+        "api/v1/devices/#{deviceKey}/issues?start=#{startEpoch}&end=#{endEpoch}").get()
+      promise
+
     getDevicesByTenant: (tenantKey) ->
       unless tenantKey == undefined
-        promise = Restangular.one('tenants', tenantKey).doGET(SERVICE_NAME)
+        url = "api/v1/tenants/#{tenantKey}/devices?unmanaged=false"
+        promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        promise
+
+    getUnmanagedDevicesByTenant: (tenantKey) ->
+      unless tenantKey == undefined
+        url = "api/v1/tenants/#{tenantKey}/devices?unmanaged=true"
+        promise = Restangular.oneUrl(SERVICE_NAME, url).get()
         promise
 
     getDevicesByDistributor: (distributorKey) ->
       unless distributorKey == undefined
-        promise = Restangular.one('distributors', distributorKey).doGET(SERVICE_NAME)
+        url = "api/v1/distributors/#{distributorKey}/devices?unmanaged=false"
+        promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        promise
+
+    getUnmanagedDevicesByDistributor: (distributorKey) ->
+      unless distributorKey == undefined
+        url = "api/v1/distributors/#{distributorKey}/devices?unmanaged=true"
+        promise = Restangular.oneUrl(SERVICE_NAME, url).get()
         promise
 
     getDevices: ->

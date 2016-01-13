@@ -13,7 +13,6 @@ class TestTenantModel(BaseTest):
     ADMIN_EMAIL = 'foo@bar.com'
     CONTENT_SERVER_URL = 'https://www.content.com'
     CONTENT_MANAGER_BASE_URL = 'https://skykit-contentmanager-int.appspot.com'
-    CONTENT_SERVER_API_KEY = 'API KEY'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     TENANT_CODE = 'foobar'
     ENTITY_GROUP_NAME = 'tenantEntityGroup'
@@ -77,7 +76,7 @@ class TestTenantModel(BaseTest):
         self.assertEqual(tenant_created.name, name)
         self.assertFalse(tenant_created.active)
 
-    def test_create_sets_tenant_properties(self):
+    def test_create_initialized_tenant_properties(self):
         tenant_created = Tenant.find_by_name(self.NAME)
         self.assertTrue(tenant_created.active)
         self.assertEqual(self.TENANT_CODE, tenant_created.tenant_code)
@@ -86,6 +85,7 @@ class TestTenantModel(BaseTest):
         self.assertEqual(self.CONTENT_MANAGER_BASE_URL, tenant_created.content_manager_base_url)
         self.assertEqual(self.NAME, tenant_created.name)
         self.assertEqual(self.domain_key, tenant_created.domain_key)
+        self.assertLength(0, tenant_created.notification_emails)
 
     def test_is_tenant_code_unique_returns_false_when_code_found(self):
         uniqueness_check = Tenant.is_tenant_code_unique(self.TENANT_CODE)
@@ -109,8 +109,12 @@ class TestTenantModel(BaseTest):
         self.assertIsNone(actual)
 
     def test_find_devices_returns_expected_device_count_for_tenant_key(self):
-        devices = Tenant.find_devices(self.tenant_key)
+        devices = Tenant.find_devices(self.tenant_key, unmanaged=False)
         self.assertLength(2, devices)
+
+    def test_find_devices_returns_expected_unmanaged_device_count_for_tenant_key(self):
+        devices = Tenant.find_devices(self.tenant_key, unmanaged=True)
+        self.assertLength(0, devices)
 
     def test_get_impersonation_email_for_tenant_key(self):
         urlsafe_tenant_key = self.tenant_key.urlsafe()

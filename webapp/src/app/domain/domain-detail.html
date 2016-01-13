@@ -1,114 +1,111 @@
-<div id="wrapper">
-  <div ng-include="'app/components/navbar/navbar.html'"></div>
-  <div id="page-wrapper">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-lg-12">
-          <div ncy-breadcrumb></div>
-        </div>
-      </div>
-      <div>
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h3 class="panel-title">Domain properties</h3>
-          </div>
-          <div class="panel-body">
-            <form name="domainForm"
-                  class="form-horizontal"
-                  ng-submit="domainDetailsCtrl.onClickSaveButton()"
-                  novalidate>
-              <div class="form-group"
-                   ng-class="{ 'has-error' : domainForm.name.$invalid && !domainForm.name.$pristine }">
-                <label for="domainName" class="col-sm-2 control-label">Name</label>
-
-                <div class="col-sm-4">
-                  <input type="text"
-                         class="form-control"
-                         name="domainName"
-                         id="domainName"
-                         ng-model="domainDetailsCtrl.currentDomain.name" required>
-                </div>
-                <div class="col-sm-5">
-                  <p ng-show="domainForm.name.$invalid && !domainForm.name.$pristine"
-                     class="help-block">
-                    The name is required.
-                  </p>
-                </div>
-              </div>
-              <div class="form-group"
-                   ng-class="{ 'has-error' : domainForm.impersonation_admin_email_address.$invalid && !domainForm.impersonation_admin_email_address.$pristine }">
-                <label for="impersonationAdminEmailAddress" class="col-sm-2 control-label">Impersonation email</label>
-
-                <div class="col-sm-4">
-                  <input type="text"
-                         class="form-control"
-                         name="impersonationAdminEmailAddress"
-                         id="impersonationAdminEmailAddress"
-                         ng-model="domainDetailsCtrl.currentDomain.impersonation_admin_email_address" required>
-                </div>
-                <div class="col-sm-5">
-                  <p
-                    ng-show="domainForm.impersonationAdminEmailAddress.$invalid && !domainForm.impersonationAdminEmailAddress.$pristine"
-                    class="help-block">
-                    The impersonation email is required.
-                  </p>
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="distributorKey" class="col-sm-2 control-label">Distributor key</label>
-
-                <div class="col-sm-10">
-                  <input type="text"
-                         class="form-control"
-                         name="distributorKey"
-                         id="distributorKey"
-                         readonly
-                         ng-model="domainDetailsCtrl.currentDomain.distributor_key" required>
-                </div>
-                <div class="col-sm-5">
-                  <p
-                    ng-show="domainForm.distributorKey.$invalid && !domainForm.distributorKey.$pristine"
-                    class="help-block">
-                    A distributor key is required.
-                  </p>
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="entityKey" class="col-sm-2 control-label">Entity key</label>
-
-                <div class="col-sm-10">
-                  <input type="text"
-                         class="form-control"
-                         name="entityKey"
-                         id="entityKey"
-                         readonly
-                         ng-model="domainDetailsCtrl.currentDomain.key">
-                </div>
-
-              </div>
-
-              <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-9">
-                  <input type="checkbox"
-                         id="active"
-                         ng-model="domainDetailsCtrl.currentDomain.active"> <label
-                  for="active">Active</label>
-                </div>
-              </div>
-              <hr>
-              <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-4">
-                  <button type="submit"
-                          class="btn btn-primary btn-default"
-                          ng-disabled="!domainForm.$dirty || domainForm.$invalid"><i class="fa fa-fw fa-save"></i>
-                    Save
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
+<div ng-controller="DomainsCtrl" layout="column" ng-cloak>
+  <md-toolbar class="md-hue-2">
+    <div class="md-toolbar-tools">
+      <h2 class="md-flex"><i class="fa fa-fw fa-cube ng-scope"></i> Domains</h2>
     </div>
-  </div>
+  </md-toolbar>
+  <md-content flex layout-padding>
+    <div flex="80" flex-xs="100" layout="column">
+      <div ncy-breadcrumb></div>
+    </div>
+    <div flex="80" flex-xs="100" layout="column">
+      <md-card>
+        <md-card-title>
+          <md-card-title-text>
+            <span class="md-headline">Properties</span>
+          </md-card-title-text>
+        </md-card-title>
+        <form name="domainForm"
+              class="form-horizontal"
+              ng-submit="domainDetailsCtrl.onClickSaveButton()"
+              novalidate>
+          <md-card-content>
+            <div class="form-group"
+                 ng-class="{ 'has-error' : domainForm.name.$invalid && !domainForm.name.$pristine }">
+              <label for="domainName" class="col-sm-2 control-label">Name</label>
+
+              <div class="col-sm-4">
+                <input type="text"
+                       class="form-control"
+                       name="domainName"
+                       id="domainName"
+                       ng-model="domainDetailsCtrl.currentDomain.name" required>
+              </div>
+              <div class="col-sm-5">
+                <p ng-show="domainForm.name.$invalid && !domainForm.name.$pristine"
+                   class="help-block">
+                  The name is required.
+                </p>
+              </div>
+            </div>
+            <div class="form-group"
+                 ng-class="{ 'has-error' : domainForm.impersonation_admin_email_address.$invalid && !domainForm.impersonation_admin_email_address.$pristine }">
+              <label for="impersonationAdminEmailAddress" class="col-sm-2 control-label">Impersonation email</label>
+
+              <div class="col-sm-4">
+                <input type="text"
+                       class="form-control"
+                       name="impersonationAdminEmailAddress"
+                       id="impersonationAdminEmailAddress"
+                       ng-model="domainDetailsCtrl.currentDomain.impersonation_admin_email_address" required>
+              </div>
+              <div class="col-sm-5">
+                <p
+                  ng-show="domainForm.impersonationAdminEmailAddress.$invalid && !domainForm.impersonationAdminEmailAddress.$pristine"
+                  class="help-block">
+                  The impersonation email is required.
+                </p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="distributorKey" class="col-sm-2 control-label">Distributor key</label>
+
+              <div class="col-sm-10">
+                <input type="text"
+                       class="form-control"
+                       name="distributorKey"
+                       id="distributorKey"
+                       readonly
+                       ng-model="domainDetailsCtrl.currentDomain.distributor_key" required>
+              </div>
+              <div class="col-sm-5">
+                <p
+                  ng-show="domainForm.distributorKey.$invalid && !domainForm.distributorKey.$pristine"
+                  class="help-block">
+                  A distributor key is required.
+                </p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="entityKey" class="col-sm-2 control-label">Entity key</label>
+
+              <div class="col-sm-10">
+                <input type="text"
+                       class="form-control"
+                       name="entityKey"
+                       id="entityKey"
+                       readonly
+                       ng-model="domainDetailsCtrl.currentDomain.key">
+              </div>
+
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-9">
+                <input type="checkbox"
+                       id="active"
+                       ng-model="domainDetailsCtrl.currentDomain.active"> <label
+                for="active">Active</label>
+              </div>
+            </div>
+          </md-card-content>
+          <md-card-actions layout="row" layout-align="end center">
+            <md-button type="submit" ng-disabled="!domainForm.$dirty || domainForm.$invalid">
+              <i class="fa fa-fw fa-save"></i> Save
+            </md-button>
+          </md-card-actions>
+        </form>
+      </md-card>
+    </div>
+  </md-content>
 </div>

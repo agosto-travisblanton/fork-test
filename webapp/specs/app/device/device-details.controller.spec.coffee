@@ -7,6 +7,8 @@ describe 'DeviceDetailsCtrl', ->
   $state = undefined
   DevicesService = undefined
   devicesServicePromise = undefined
+  getDevicePromise = undefined
+  getDeviceIssuesPromise = undefined
   TenantsService = undefined
   tenantsServicePromise = undefined
   CommandsService = undefined
@@ -15,13 +17,38 @@ describe 'DeviceDetailsCtrl', ->
   progressBarService = undefined
   serviceInjection = undefined
   device = {key: 'dhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
+  issues = [
+    {
+      category: "Player down"
+      created: "2015-12-15 18:05:52"
+      elapsed_time: "37.3 minutes"
+      level: 2
+      level_descriptor: "danger"
+      memory_utilization: 40
+      program: "Test Content"
+      storage_utilization: 44
+      up: false
+    }
+    {
+      category: "Player up"
+      created: "2015-12-15 18:05:52"
+      elapsed_time: "37.3 minutes"
+      level: 0
+      level_descriptor: "normal"
+      memory_utilization: 40
+      program: "Test Content"
+      storage_utilization: 44
+      up: true
+    }
+  ]
+
   tenants = [
     {key: 'dhjad897d987fadafg708fg7d', name: 'Foobar1', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
     {key: 'dhjad897d987fadafg708y67d', name: 'Foobar2', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
     {key: 'dhjad897d987fadafg708hb55', name: 'Foobar3', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
   ]
 
-  beforeEach module('skykitDisplayDeviceManagement')
+  beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _DevicesService_, _TenantsService_, _CommandsService_, _sweet_, _$state_) ->
     $controller = _$controller_
@@ -45,10 +72,12 @@ describe 'DeviceDetailsCtrl', ->
 
   describe 'initialize', ->
     beforeEach ->
-      tenantsServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      tenantsServicePromise = new skykitProvisioning.q.Mock
       spyOn(TenantsService, 'fetchAllTenants').and.returnValue tenantsServicePromise
-      devicesServicePromise = new skykitDisplayDeviceManagement.q.Mock
-      spyOn(DevicesService, 'getDeviceByKey').and.returnValue devicesServicePromise
+      getDevicePromise = new skykitProvisioning.q.Mock
+      spyOn(DevicesService, 'getDeviceByKey').and.returnValue getDevicePromise
+      getDeviceIssuesPromise = new skykitProvisioning.q.Mock
+      spyOn(DevicesService, 'getIssuesByKey').and.returnValue getDeviceIssuesPromise
       spyOn(DevicesService, 'getPanelModels').and.returnValue [{'id': 'Sony–FXD40LX2F'}, {'id': 'NEC–LCD4215'}]
       inputs = [
         {
@@ -97,6 +126,11 @@ describe 'DeviceDetailsCtrl', ->
           DevicesService: DevicesService
           TenantsService: TenantsService
         }
+        now = new Date()
+        today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+        @epochEnd = moment(new Date()).unix()
+        today.setDate(today.getDate() - 1)
+        @epochStart = moment(today).unix()
         controller.initialize()
 
       it 'defines currentDevice property', ->
@@ -119,12 +153,19 @@ describe 'DeviceDetailsCtrl', ->
         expect(DevicesService.getDeviceByKey).toHaveBeenCalledWith $stateParams.deviceKey
 
       it "the 'then' handler caches the retrieved device in the controller", ->
-        devicesServicePromise.resolve device
+        getDevicePromise.resolve device
         expect(controller.currentDevice).toBe device
+
+      it 'calls DevicesService.getIssuesByKey to retrieve the issues for a given device and datetime range', ->
+        expect(DevicesService.getIssuesByKey).toHaveBeenCalledWith($stateParams.deviceKey, @epochStart, @epochEnd)
+
+      it "the 'then' handler caches the retrieved issues for a given device key in the controller", ->
+        getDeviceIssuesPromise.resolve issues
+        expect(controller.issues).toBe issues
 
   describe '.onClickSaveButton', ->
     beforeEach ->
-      devicesServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      devicesServicePromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'save').and.returnValue devicesServicePromise
       spyOn($state, 'go')
       $stateParams = {}
@@ -164,7 +205,7 @@ describe 'DeviceDetailsCtrl', ->
 
   describe '.onClickResetSendButton', ->
     beforeEach ->
-      commandsServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      commandsServicePromise = new skykitProvisioning.q.Mock
       spyOn(CommandsService, 'reset').and.returnValue commandsServicePromise
       spyOn(progressBarService, 'start')
       spyOn(progressBarService, 'complete')
@@ -203,7 +244,7 @@ describe 'DeviceDetailsCtrl', ->
 
   describe '.onClickVolumeSendButton', ->
     beforeEach ->
-      commandsServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      commandsServicePromise = new skykitProvisioning.q.Mock
       spyOn(CommandsService, 'volume').and.returnValue commandsServicePromise
       spyOn(progressBarService, 'start')
       spyOn(progressBarService, 'complete')
@@ -244,7 +285,7 @@ describe 'DeviceDetailsCtrl', ->
 
   describe '.onClickCommandSendButton', ->
     beforeEach ->
-      commandsServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      commandsServicePromise = new skykitProvisioning.q.Mock
       spyOn(CommandsService, 'custom').and.returnValue(commandsServicePromise)
       spyOn(progressBarService, 'start')
       spyOn(progressBarService, 'complete')
@@ -282,3 +323,57 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'displays a sweet alert', ->
         expect(sweet.show).toHaveBeenCalledWith('Oops...', "Command error: #{@error.data}", 'error')
+
+  describe '.onClickRefreshButton', ->
+    beforeEach ->
+      devicesServicePromise = new skykitProvisioning.q.Mock
+      spyOn(DevicesService, 'getIssuesByKey').and.returnValue getDeviceIssuesPromise
+      spyOn(progressBarService, 'start')
+      $stateParams.deviceKey = 'fkasdhfjfa9s8udyva7dygoudyg'
+      controller = $controller 'DeviceDetailsCtrl', {
+        $stateParams: $stateParams
+        $state: $state
+        DevicesService: DevicesService
+        ProgressBarService: progressBarService
+      }
+      controller.onClickRefreshButton()
+
+    it 'starts the progress bar', ->
+      expect(progressBarService.start).toHaveBeenCalled()
+
+    it 'defines epochStart', ->
+      expect(controller.epochStart).toBeDefined()
+
+    it 'defines epochEnd', ->
+      expect(controller.epochEnd).toBeDefined()
+
+    it 'calls service to refresh issues for a given device within a specified datetime range', ->
+      expect(DevicesService.getIssuesByKey).toHaveBeenCalledWith(
+        $stateParams.deviceKey, controller.epochStart, controller.epochEnd)
+
+    describe '.onRefreshIssuesSuccess', ->
+      beforeEach ->
+        spyOn(progressBarService, 'complete')
+        controller.onRefreshIssuesSuccess(issues)
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'populates the issues array with two records', ->
+        expect(controller.issues.length).toBe 2
+
+    describe '.onRefreshIssuesFailure', ->
+      error_text = undefined
+
+      beforeEach ->
+        spyOn(progressBarService, 'complete')
+        spyOn(sweet, 'show')
+        error_text = '403 Forbidden'
+        error = {'data': error_text}
+        controller.onRefreshIssuesFailure(error)
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a sweet alert with error information', ->
+        expect(sweet.show).toHaveBeenCalledWith('Oops...', "Refresh error: #{error_text}", 'error')

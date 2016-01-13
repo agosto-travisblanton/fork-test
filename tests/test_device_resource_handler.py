@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 import device_message_processor
 from env_setup import setup_test_paths
 from utils.web_util import build_uri
@@ -13,7 +15,7 @@ from chrome_os_devices_api import (refresh_device_by_mac_address, refresh_device
 from agar.test import BaseTest, WebTest
 from mockito import when, any as any_matcher
 from routes import application
-from models import ChromeOsDevice, Tenant, Distributor, Domain
+from models import ChromeOsDevice, Tenant, Distributor, Domain, DeviceIssueLog
 from app_config import config
 
 
@@ -30,12 +32,18 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     DEVICE_ID = '132e235a-b346-4a37-a100-de49fa753a2a'
     GCM_REGISTRATION_ID = '8d70a8d78a6dfa6df76dfasd'
     MAC_ADDRESS = '54271e619346'
+    ETHERNET_MAC_ADDRESS = '8e271e619346'
     TENANT_CODE = 'foobar_inc'
     TENANT_NAME = 'Foobar, Inc,'
     DISTRIBUTOR_NAME = 'agosto'
     IMPERSONATION_EMAIL = 'test@test.com'
     DEVICE_NOTES = 'This is a device note'
     PAIRING_CODE = '0e8f-fc4e-d632-09dc'
+    STORAGE_UTILIZATION = 26
+    MEMORY_UTILIZATION = 63
+    PROGRAM = 'some program'
+    PROGRAM_ID = 'ID-512341234'
+    LAST_ERROR = 'some error'
 
     def setUp(self):
         super(TestDeviceResourceHandler, self).setUp()
@@ -136,13 +144,13 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         in context.exception.message)
 
     def test_device_resource_handler_post_no_returns_bad_response_for_empty_tenant_code(self):
-        request_body = {'macAddress': self.MAC_ADDRESS,
+        request_body = {'macAddress': '232323243223',
                         'gcmRegistrationId': self.GCM_REGISTRATION_ID,
                         'tenantCode': None}
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
                           headers=self.api_token_authorization_header)
-        self.assertTrue('Bad response: 400 Invalid or inactive tenant for managed device.'
+        self.assertTrue('Bad response: 400 The tenantCode parameter is invalid.'
                         in context.exception.message)
 
     def test_device_resource_handler_post_no_returns_bad_response_for_empty_gcm(self):
@@ -163,6 +171,16 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             self.app.post('/api/v1/devices', json.dumps(request_body),
                           headers=self.api_token_authorization_header)
         self.assertTrue('Bad response: 400 The macAddress parameter is invalid.'
+                        in context.exception.message)
+
+    def test_post_managed_device_when_cannot_resolve_tenant(self):
+        request_body = {'macAddress': '232323243223',
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'tenantCode': 'unresolvable_tenant_code'}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body),
+                          headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 400 Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
                         in context.exception.message)
 
     ##################################################################################################################
@@ -419,12 +437,22 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_get_devices_by_tenant_entity_body_json(self):
         self.__build_list_devices(tenant_key=self.tenant_key, managed_number_to_build=20,
                                   unmanaged_number_to_build=0)
-        request_parameters = {}
+        request_parameters = {'unmanaged':'false'}
         uri = application.router.build(None, 'devices-by-tenant', None,
                                        {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
         self.assertLength(10, response_json['objects'])
+
+    def test_get_filter_unmanaged_devices_by_tenant_entity_body_json(self):
+        self.__build_list_devices(tenant_key=self.tenant_key, managed_number_to_build=20,
+                                  unmanaged_number_to_build=0)
+        request_parameters = {'unmanaged':'true'}
+        uri = application.router.build(None, 'devices-by-tenant', None,
+                                       {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertLength(0, response_json['objects'])
 
     #################################################################################################################
     # get_devices_by_distributor
@@ -794,6 +822,428 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         json.dumps(request_body),
                         headers=self.api_token_authorization_header)
         self.assertIsNone(self.managed_device_key.get())
+
+    ##################################################################################################################
+    ## heartbeat
+    ##################################################################################################################
+
+    def test_device_resource_put_no_authorization_header_returns_forbidden(self):
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM}
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        response = self.put(uri, params=request_body, headers=self.empty_header)
+        self.assertForbidden(response)
+
+    def test_put_heartbeat_http_status_no_content(self):
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM}
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        response = self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        self.assertEqual('204 No Content', response.status)
+
+    def test_put_heartbeat_updates_storage_utilization(self):
+        self.__initialize_heartbeat_info()
+        request_body = {'storage': self.STORAGE_UTILIZATION - 1,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        updated_heartbeat = self.managed_device_key.get()
+        self.assertNotEqual(updated_heartbeat.storage_utilization, self.STORAGE_UTILIZATION)
+        self.assertEqual(updated_heartbeat.memory_utilization, self.MEMORY_UTILIZATION)
+        self.assertEqual(updated_heartbeat.program, self.PROGRAM)
+
+    def test_put_heartbeat_updates_memory_utilization(self):
+        self.__initialize_heartbeat_info()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION - 1,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        updated_heartbeat = self.managed_device_key.get()
+        self.assertNotEqual(updated_heartbeat.memory_utilization, self.MEMORY_UTILIZATION)
+        self.assertEqual(updated_heartbeat.storage_utilization, self.STORAGE_UTILIZATION)
+        self.assertEqual(updated_heartbeat.program, self.PROGRAM)
+        self.assertEqual(updated_heartbeat.last_error, self.LAST_ERROR)
+        self.assertEqual(updated_heartbeat.program_id, self.PROGRAM_ID)
+
+    def test_put_heartbeat_updates_program(self):
+        self.__initialize_heartbeat_info()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': 'Chronicles of Bob',
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        updated_heartbeat = self.managed_device_key.get()
+        self.assertNotEqual(updated_heartbeat.program, self.PROGRAM)
+        self.assertEqual(updated_heartbeat.memory_utilization, self.MEMORY_UTILIZATION)
+        self.assertEqual(updated_heartbeat.storage_utilization, self.STORAGE_UTILIZATION)
+        self.assertEqual(updated_heartbeat.program_id, self.PROGRAM_ID)
+        self.assertEqual(updated_heartbeat.last_error, self.LAST_ERROR)
+
+    def test_put_heartbeat_updates_program_id(self):
+        self.__initialize_heartbeat_info()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': 'some program id',
+                        'lastError': self.LAST_ERROR,
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        updated_heartbeat = self.managed_device_key.get()
+        self.assertNotEqual(updated_heartbeat.program_id, self.PROGRAM_ID)
+        self.assertEqual(updated_heartbeat.program, self.PROGRAM)
+        self.assertEqual(updated_heartbeat.memory_utilization, self.MEMORY_UTILIZATION)
+        self.assertEqual(updated_heartbeat.storage_utilization, self.STORAGE_UTILIZATION)
+        self.assertEqual(updated_heartbeat.last_error, self.LAST_ERROR)
+
+    def test_put_heartbeat_updates_last_error(self):
+        self.__initialize_heartbeat_info()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': 'Houston, we have a problem'
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        updated_heartbeat = self.managed_device_key.get()
+        self.assertNotEqual(updated_heartbeat.last_error, self.LAST_ERROR)
+        self.assertEqual(updated_heartbeat.program, self.PROGRAM)
+        self.assertEqual(updated_heartbeat.memory_utilization, self.MEMORY_UTILIZATION)
+        self.assertEqual(updated_heartbeat.storage_utilization, self.STORAGE_UTILIZATION)
+        self.assertEqual(updated_heartbeat.program_id, self.PROGRAM_ID)
+
+    def test_put_heartbeat_cannot_update_up_status(self):
+        self.__initialize_heartbeat_info()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        updated_heartbeat = self.managed_device_key.get()
+        self.assertEqual(updated_heartbeat.up, updated_heartbeat.up)
+
+    def test_put_heartbeat_updates_heartbeat_timestamp(self):
+        self.__initialize_heartbeat_info()
+        original_heartbeat_timestamp = self.managed_device.heartbeat_updated
+        self.assertIsNotNone(original_heartbeat_timestamp)
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        device = self.managed_device_key.get()
+        self.assertGreater(device.heartbeat_updated, original_heartbeat_timestamp)
+        # self.assertGreaterEqual(device.heartbeat_updated, self.managed_device.heartbeat_updated)
+
+    def test_put_heartbeat_invokes_a_device_issue_log_up_toggle_if_device_was_previously_down(self):
+        self.__initialize_heartbeat_info(up=False)
+        issues = DeviceIssueLog.get_all_by_device_key(self.managed_device.key)
+        self.assertLength(0, issues)
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        issues = DeviceIssueLog.get_all_by_device_key(self.managed_device.key)
+        self.assertLength(1, issues)
+        self.assertTrue(issues[0].up)
+        self.assertEqual(issues[0].category, config.DEVICE_ISSUE_PLAYER_UP)
+        self.assertEqual(issues[0].storage_utilization, self.STORAGE_UTILIZATION)
+        self.assertEqual(issues[0].memory_utilization, self.MEMORY_UTILIZATION)
+        self.assertEqual(issues[0].program, self.PROGRAM)
+        self.assertEqual(issues[0].program_id, self.PROGRAM_ID)
+        self.assertEqual(issues[0].last_error, self.LAST_ERROR)
+
+    def test_put_heartbeat_can_resolve_previous_down_issues(self):
+        self.managed_device.up = False
+        self.managed_device.put()
+        issue = DeviceIssueLog.create(device_key=self.managed_device_key,
+                                      category=config.DEVICE_ISSUE_PLAYER_DOWN,
+                                      up=False,
+                                      storage_utilization=self.STORAGE_UTILIZATION,
+                                      memory_utilization=self.MEMORY_UTILIZATION,
+                                      program=self.PROGRAM,
+                                      resolved=False)
+        issue.put()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        issues = DeviceIssueLog.get_all_by_device_key(self.managed_device_key)
+        self.assertLength(2, issues)
+        self.assertEqual(issues[0].category, config.DEVICE_ISSUE_PLAYER_DOWN)
+        self.assertEqual(issues[1].category, config.DEVICE_ISSUE_PLAYER_UP)
+        self.assertTrue(issues[0].resolved)
+        self.assertTrue(issues[1].resolved)
+        self.assertIsNotNone(issues[0].resolved_datetime)
+        self.assertIsNotNone(issues[1].resolved_datetime)
+
+    def test_put_heartbeat_can_resolve_previous_memory_issues(self):
+        issue = DeviceIssueLog.create(device_key=self.managed_device_key,
+                                      category=config.DEVICE_ISSUE_MEMORY_HIGH,
+                                      up=True,
+                                      storage_utilization=self.STORAGE_UTILIZATION,
+                                      memory_utilization=config.MEMORY_UTILIZATION_THRESHOLD + 1,
+                                      program=self.PROGRAM,
+                                      resolved=False)
+        issue.put()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        issues = DeviceIssueLog.get_all_by_device_key(self.managed_device_key)
+        self.assertLength(2, issues)
+        self.assertEqual(issues[0].category, config.DEVICE_ISSUE_MEMORY_HIGH)
+        self.assertEqual(issues[1].category, config.DEVICE_ISSUE_MEMORY_NORMAL)
+        self.assertTrue(issues[0].resolved)
+        self.assertTrue(issues[1].resolved)
+        self.assertIsNotNone(issues[0].resolved_datetime)
+        self.assertIsNotNone(issues[1].resolved_datetime)
+
+    def test_put_heartbeat_can_resolve_previous_storage_issues(self):
+        issue = DeviceIssueLog.create(device_key=self.managed_device_key,
+                                      category=config.DEVICE_ISSUE_STORAGE_LOW,
+                                      up=True,
+                                      storage_utilization=config.STORAGE_UTILIZATION_THRESHOLD + 1,
+                                      memory_utilization=self.MEMORY_UTILIZATION,
+                                      program=self.PROGRAM,
+                                      resolved=False)
+        issue.put()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        issues = DeviceIssueLog.get_all_by_device_key(self.managed_device_key)
+        self.assertLength(2, issues)
+        self.assertEqual(issues[0].category, config.DEVICE_ISSUE_STORAGE_LOW)
+        self.assertEqual(issues[1].category, config.DEVICE_ISSUE_STORAGE_NORMAL)
+        self.assertTrue(issues[0].resolved)
+        self.assertTrue(issues[1].resolved)
+        self.assertIsNotNone(issues[0].resolved_datetime)
+        self.assertIsNotNone(issues[1].resolved_datetime)
+
+    def test_put_heartbeat_populates_device_connection_type_for_ethernet_mac_address(self):
+        self.managed_device.ethernet_mac_address = self.ETHERNET_MAC_ADDRESS
+        self.managed_device.put()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        'macAddress': self.ETHERNET_MAC_ADDRESS
+                        }
+        self.assertIsNone(self.managed_device.connection_type)
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        self.assertIsNotNone(self.managed_device.connection_type)
+        self.assertEqual(self.managed_device.connection_type, config.ETHERNET_CONNECTION)
+
+    def test_put_heartbeat_populates_device_connection_type_for_wifi_mac_address(self):
+        self.managed_device.mac_address = self.MAC_ADDRESS
+        self.managed_device.put()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        'macAddress': self.MAC_ADDRESS
+                        }
+        self.assertIsNone(self.managed_device.connection_type)
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        self.assertIsNotNone(self.managed_device.connection_type)
+        self.assertEqual(self.managed_device.connection_type, config.WIFI_CONNECTION)
+
+    def test_put_heartbeat_does_not_populate_device_connection_type_for_unrecognized_mac_address(self):
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        'macAddress': '22234234234'
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        self.assertIsNone(self.managed_device.connection_type)
+
+    ##################################################################################################################
+    ## device issues
+    ##################################################################################################################
+
+    def test_get_latest_issues_without_token_returns_forbidden(self):
+        request_body = {}
+        uri = build_uri('device-issues', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        response = self.get(uri, params=request_body, headers=self.empty_header)
+        self.assertForbidden(response)
+
+    def test_get_latest_issues_with_token_returns_http_status_ok(self):
+        start = datetime.utcnow() - timedelta(days=5)
+        end = datetime.utcnow()
+        start_epoch = int((start - datetime(1970, 1, 1)).total_seconds())
+        end_epoch = int((end - datetime(1970, 1, 1)).total_seconds())
+        request_parameters = {}
+        uri = build_uri('device-issues', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe(),
+                                                      'start': start_epoch, 'end': end_epoch})
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        self.assertOK(response)
+
+    def test_get_latest_issues_returns_expected_elapsed_time_since_created_json(self):
+        start = datetime.utcnow() - timedelta(days=5)
+        end = datetime.utcnow()
+        start_epoch = int((start - datetime(1970, 1, 1)).total_seconds())
+        end_epoch = int((end - datetime(1970, 1, 1)).total_seconds())
+        issue = DeviceIssueLog.create(device_key=self.managed_device_key,
+                                      category=config.DEVICE_ISSUE_PLAYER_DOWN,
+                                      up=False,
+                                      storage_utilization=self.STORAGE_UTILIZATION,
+                                      memory_utilization=self.MEMORY_UTILIZATION,
+                                      program=self.PROGRAM,
+                                      resolved=False)
+        issue.created = datetime.utcnow() - timedelta(seconds=59)
+        issue.put()
+        request_parameters = {}
+        uri = build_uri('device-issues', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe(),
+                                                      'start': start_epoch, 'end': end_epoch})
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json[0]['elapsed_time'], '59 seconds')
+
+        issue.created = datetime.utcnow() - timedelta(seconds=90)
+        issue.put()
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json[0]['elapsed_time'], '1.5 minutes')
+
+        issue.created = datetime.utcnow() - timedelta(minutes=59)
+        issue.put()
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json[0]['elapsed_time'], '59.0 minutes')
+
+        issue.created = datetime.utcnow() - timedelta(minutes=90)
+        issue.put()
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json[0]['elapsed_time'], '1.5 hours')
+
+        issue.created = datetime.utcnow() - timedelta(hours=23)
+        issue.put()
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json[0]['elapsed_time'], '23.0 hours')
+
+        issue.created = datetime.utcnow() - timedelta(hours=48)
+        issue.put()
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json[0]['elapsed_time'], '2.0 days')
+
+    def test_get_latest_issues_returns_expected_issue_order_with_latest_first(self):
+        start = datetime.utcnow() - timedelta(days=5)
+        end = datetime.utcnow()
+        start_epoch = int((start - datetime(1970, 1, 1)).total_seconds())
+        end_epoch = int((end - datetime(1970, 1, 1)).total_seconds())
+        issue = DeviceIssueLog.create(device_key=self.managed_device_key,
+                                      category=config.DEVICE_ISSUE_STORAGE_LOW,
+                                      up=False,
+                                      storage_utilization=99,
+                                      memory_utilization=self.MEMORY_UTILIZATION,
+                                      program=self.PROGRAM,
+                                      resolved=False)
+        issue.created = datetime.utcnow() - timedelta(hours=48)
+        issue.put()
+        issue = DeviceIssueLog.create(device_key=self.managed_device_key,
+                                      category=config.DEVICE_ISSUE_MEMORY_HIGH,
+                                      up=False,
+                                      storage_utilization=self.STORAGE_UTILIZATION,
+                                      memory_utilization=98,
+                                      program=self.PROGRAM,
+                                      resolved=False)
+        issue.created = datetime.utcnow() - timedelta(hours=2)
+        issue.put()
+        issue = DeviceIssueLog.create(device_key=self.managed_device_key,
+                                      category=config.DEVICE_ISSUE_PLAYER_DOWN,
+                                      up=False,
+                                      storage_utilization=self.STORAGE_UTILIZATION,
+                                      memory_utilization=self.MEMORY_UTILIZATION,
+                                      program=self.PROGRAM,
+                                      resolved=False)
+        issue.created = datetime.utcnow() - timedelta(minutes=10)
+        issue.put()
+        request_parameters = {}
+        uri = build_uri('device-issues', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe(),
+                                                      'start': start_epoch, 'end': end_epoch})
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertLength(3, response_json)
+        self.assertEqual(response_json[0]['category'], config.DEVICE_ISSUE_PLAYER_DOWN)
+        self.assertEqual(response_json[1]['category'], config.DEVICE_ISSUE_MEMORY_HIGH)
+        self.assertEqual(response_json[2]['category'], config.DEVICE_ISSUE_STORAGE_LOW)
+
+    def test_get_latest_issues_returns_zero_issues_with_out_of_range_datetime(self):
+        issue = DeviceIssueLog.create(device_key=self.managed_device_key,
+                                      category=config.DEVICE_ISSUE_STORAGE_LOW,
+                                      up=False,
+                                      storage_utilization=99,
+                                      memory_utilization=self.MEMORY_UTILIZATION,
+                                      program=self.PROGRAM,
+                                      resolved=False)
+        issue.created = datetime.utcnow()
+        issue.put()
+        start = datetime.utcnow() - timedelta(days=10)
+        end = datetime.utcnow() - timedelta(days=5)
+        start_epoch = int((start - datetime(1970, 1, 1)).total_seconds())
+        end_epoch = int((end - datetime(1970, 1, 1)).total_seconds())
+        request_parameters = {}
+        uri = build_uri('device-issues', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe(),
+                                                      'start': start_epoch, 'end': end_epoch})
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertLength(0, response_json)
+
+    def __initialize_heartbeat_info(self, up=True):
+        self.managed_device.storage_utilization = self.STORAGE_UTILIZATION
+        self.managed_device.memory_utilization = self.MEMORY_UTILIZATION
+        self.managed_device.program = self.PROGRAM
+        self.managed_device.program_id = self.PROGRAM_ID
+        self.managed_device.last_error = self.LAST_ERROR
+        self.managed_device.up = up
+        self.managed_device.put()
 
     def __create_tenant(self, code, name, email):
         tenant = Tenant.create(tenant_code=code,

@@ -28,8 +28,9 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
             try:
                 chrome_os_device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
             except Exception, e:
-                logging.info("Exception info on post: device_key = {0}, intent = {1}, exception = {2}".format(
-                    device_urlsafe_key, intent, e.message))
+                logging.exception(e)
+                logging.error("Exception info: device_urlsafe_key = {0}, intent = {1}".format(
+                    device_urlsafe_key, intent))
             if None is chrome_os_device:
                 status = 404
                 message = 'DeviceCommandsHandler: Device not found with key: {0}'.format(device_urlsafe_key)

@@ -7,6 +7,7 @@ describe 'TenantDetailsCtrl', ->
   $state = undefined
   $stateParams = undefined
   $log = undefined
+  $mdDialog = undefined
   TenantsService = undefined
   DomainsService = undefined
   DevicesService = undefined
@@ -14,16 +15,17 @@ describe 'TenantDetailsCtrl', ->
   progressBarService = undefined
   tenantsServicePromise = undefined
   devicesServicePromise = undefined
+  unmanagedDevicesServicePromise = undefined
   distributorsServicePromise = undefined
   distributorsDomainsServicePromise = undefined
   domainsServicePromise = undefined
   sweet = undefined
   serviceInjection = undefined
 
-  beforeEach module('skykitDisplayDeviceManagement')
+  beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _TenantsService_, _DomainsService_, _DevicesService_, _DistributorsService_,
-    _$state_, _sweet_, _$log_) ->
+    _$state_, _sweet_, _$log_, _$mdDialog_) ->
     $controller = _$controller_
     $state = _$state_
     $stateParams = {}
@@ -37,24 +39,28 @@ describe 'TenantDetailsCtrl', ->
     }
     sweet = _sweet_
     $log = _$log_
+    $mdDialog = _$mdDialog_
     scope = {}
     serviceInjection = {
       $scope: scope
       $stateParams: $stateParams
       ProgressBarService: progressBarService
+      $mdDialog: $mdDialog
     }
 
   describe 'initialization', ->
     beforeEach ->
-      tenantsServicePromise = new skykitDisplayDeviceManagement.q.Mock
-      devicesServicePromise = new skykitDisplayDeviceManagement.q.Mock
-      distributorsServicePromise = new skykitDisplayDeviceManagement.q.Mock
-      distributorsDomainsServicePromise = new skykitDisplayDeviceManagement.q.Mock
-      domainsServicePromise = new skykitDisplayDeviceManagement.q.Mock
-      spyOn(TenantsService, 'getTenantByKey').and.returnValue(tenantsServicePromise)
-      spyOn(DevicesService, 'getDevicesByTenant').and.returnValue(devicesServicePromise)
-      spyOn(DistributorsService, 'getDomainsByKey').and.returnValue(distributorsDomainsServicePromise)
-      spyOn(DomainsService, 'getDomainByKey').and.returnValue(domainsServicePromise)
+      tenantsServicePromise = new skykitProvisioning.q.Mock
+      devicesServicePromise = new skykitProvisioning.q.Mock
+      unmanagedDevicesServicePromise = new skykitProvisioning.q.Mock
+      distributorsServicePromise = new skykitProvisioning.q.Mock
+      distributorsDomainsServicePromise = new skykitProvisioning.q.Mock
+      domainsServicePromise = new skykitProvisioning.q.Mock
+      spyOn(TenantsService, 'getTenantByKey').and.returnValue tenantsServicePromise
+      spyOn(DevicesService, 'getDevicesByTenant').and.returnValue devicesServicePromise
+      spyOn(DevicesService, 'getUnmanagedDevicesByTenant').and.returnValue unmanagedDevicesServicePromise
+      spyOn(DistributorsService, 'getDomainsByKey').and.returnValue distributorsDomainsServicePromise
+      spyOn(DomainsService, 'getDomainByKey').and.returnValue domainsServicePromise
 
     it 'currentTenant should be set', ->
       controller = $controller 'TenantDetailsCtrl', serviceInjection
@@ -66,6 +72,7 @@ describe 'TenantDetailsCtrl', ->
       expect(controller.currentTenant.content_server_url).toBeUndefined()
       expect(controller.currentTenant.chrome_device_domain).toBeUndefined()
       expect(controller.currentTenant.domain_key).toBeUndefined()
+      expect(controller.currentTenant.notification_emails).toBeUndefined()
       expect(controller.currentTenant.active).toBeTruthy()
 
     it 'selectedDomain should be defined', ->
@@ -75,6 +82,10 @@ describe 'TenantDetailsCtrl', ->
     it 'currentTenantDisplays property should be defined', ->
       controller = $controller 'TenantDetailsCtrl', serviceInjection
       expect(controller.currentTenantDisplays).toBeDefined()
+
+    it 'currentTenantUnmanagedDisplays property should be defined', ->
+      controller = $controller 'TenantDetailsCtrl', serviceInjection
+      expect(controller.currentTenantUnmanagedDisplays).toBeDefined()
 
     it 'distributorDomains property should be defined', ->
       controller = $controller 'TenantDetailsCtrl', serviceInjection
@@ -108,6 +119,14 @@ describe 'TenantDetailsCtrl', ->
         expect(DevicesService.getDevicesByTenant).toHaveBeenCalledWith($stateParams.tenantKey)
         expect(controller.currentTenantDisplays).toBe(devices)
 
+      it 'retrieve tenant\'s unmanaged devices by tenant key from DevicesService', ->
+        controller = $controller 'TenantDetailsCtrl', serviceInjection
+        unmanagedDevices = [{key: 'f8sa76d78fa978d6fa7dg7ds55'}, {key: 'f8sa76d78fa978d6fa7dg7ds56'}]
+        data = {objects: unmanagedDevices}
+        unmanagedDevicesServicePromise.resolve data
+        expect(DevicesService.getUnmanagedDevicesByTenant).toHaveBeenCalledWith $stateParams.tenantKey
+        expect(controller.currentTenantUnmanagedDisplays).toBe(unmanagedDevices)
+
     describe 'creating a new tenant', ->
       it 'editMode should be set to false', ->
         $stateParams = {}
@@ -137,7 +156,7 @@ describe 'TenantDetailsCtrl', ->
     domain_key = undefined
 
     beforeEach ->
-      tenantsServicePromise = new skykitDisplayDeviceManagement.q.Mock
+      tenantsServicePromise = new skykitProvisioning.q.Mock
       spyOn(TenantsService, 'save').and.returnValue(tenantsServicePromise)
       spyOn($state, 'go')
       $stateParams = {}
@@ -181,7 +200,7 @@ describe 'TenantDetailsCtrl', ->
         expect($state.go).toHaveBeenCalledWith('tenants')
 
       it "show the error dialog", ->
-        expectedError = 'Tenant code unavailable. Please try a different tenant code.'
+        expectedError = 'Tenant code unavailable. Please modify tenant name to generate a unique tenant code.'
         expect(sweet.show).toHaveBeenCalledWith 'Oops...', expectedError, 'error'
 
     describe '.onFailureTenantSave general error', ->
@@ -221,3 +240,13 @@ describe 'TenantDetailsCtrl', ->
       controller.currentTenant.tenant_code = 'barfoo_company'
       controller.autoGenerateTenantCode()
       expect(controller.currentTenant.tenant_code).toBe 'barfoo_company'
+
+  describe '.showDeviceDetails', ->
+    beforeEach ->
+      item = {apiKey: 'api key'}
+      spyOn($mdDialog, 'show')
+      controller = $controller 'TenantDetailsCtrl', serviceInjection
+      controller.showDeviceDetails(item, {})
+
+    it 'calls $mdDialog', ->
+      expect($mdDialog.show).toHaveBeenCalled()

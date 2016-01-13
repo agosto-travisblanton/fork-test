@@ -1,6 +1,10 @@
-from models import (Tenant, ChromeOsDevice, Distributor, Domain)
+from datetime import datetime
+
+from models import (Tenant, ChromeOsDevice, Distributor, Domain, DeviceIssueLog)
 from restler.serializers import ModelStrategy
 from google.appengine.ext import ndb
+
+from utils.datetime_util import elapsed_time_message
 
 TENANT_FIELDS = [
     'name',
@@ -16,6 +20,7 @@ TENANT_STRATEGY = ModelStrategy(Tenant) + TENANT_FIELDS
 TENANT_STRATEGY += [
     {'key': lambda o, field_name, context: o.key.urlsafe()},
     {'domain_key': lambda o, field_name, context: o.domain_key.urlsafe() if o.domain_key else None},
+    {'notification_emails': lambda o, field_name, context: ', '.join(o.notification_emails).strip(', ')}
 ]
 
 DISTRIBUTOR_FIELDS = [
@@ -64,6 +69,7 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'notes': lambda o, field_name, context: o.key.get().notes},
     {'serialNumber': lambda o, field_name, context: o.key.get().serial_number},
     {'gcmRegistrationId': lambda o, field_name, context: o.key.get().gcm_registration_id},
+    {'up': lambda o, field_name, context: o.key.get().up},
     {'contentServerUrl': lambda o, field_name,
                                 context: o.tenant_key.get().content_server_url if o.tenant_key is not None else None},
     {'model': lambda o, field_name, context: o.key.get().model},
@@ -74,8 +80,26 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'isUnmanagedDevice': lambda o, field_name, context: o.key.get().is_unmanaged_device},
     {'pairingCode': lambda o, field_name, context: o.key.get().pairing_code},
     {'panelModel': lambda o, field_name, context: o.key.get().panel_model},
-    {'panelInput': lambda o, field_name, context: o.key.get().panel_input}
+    {'panelInput': lambda o, field_name, context: o.key.get().panel_input},
+    {'heartbeatInterval': lambda o, field_name, context: o.key.get().heartbeat_interval_minutes},
+    {'connectionType': lambda o, field_name, context: o.key.get().connection_type}
 ]
+
+DEVICE_ISSUE_LOG_STRATEGY = ModelStrategy(DeviceIssueLog)
+DEVICE_ISSUE_LOG_STRATEGY += [
+    {'category': lambda o, field_name, context: o.key.get().category},
+    {'up': lambda o, field_name, context: o.key.get().up},
+    {'storage_utilization': lambda o, field_name, context: o.key.get().storage_utilization},
+    {'memory_utilization': lambda o, field_name, context: o.key.get().memory_utilization},
+    {'program': lambda o, field_name, context: o.key.get().program},
+    {'created': lambda o, field_name, context: o.key.get().created},
+    {'updated': lambda o, field_name, context: o.key.get().updated},
+    {'level': lambda o, field_name, context: o.key.get().level},
+    {'level_descriptor': lambda o, field_name, context: o.key.get().level_descriptor},
+    {'elapsed_time': lambda o, field_name, context: elapsed_time_message(o.key.get().created, datetime.utcnow())}
+]
+
+
 
 # DEVICE_STRATEGY = ModelStrategy(Device)
 # DEVICE_STRATEGY += [
