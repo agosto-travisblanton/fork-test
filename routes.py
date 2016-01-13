@@ -201,6 +201,16 @@ application = WSGIApplication(
               ),
 
         ############################################################
+        # Player Command Events
+        ############################################################
+        Route(r'/api/v1/player-command-events/<urlsafe_event_key>',
+              handler='handlers.player_command_events_handler.PlayerCommandEventsHandler',
+              name='manage-event',
+              handler_method='command_confirmation',
+              methods=['PUT']
+              ),
+
+        ############################################################
         # /dev/ routes secured by admin:required
         ############################################################
         Route(
