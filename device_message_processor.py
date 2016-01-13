@@ -14,9 +14,8 @@ def change_intent(gcm_registration_id, payload):
     player_command_event = PlayerCommandEvent.create(
             payload=payload,
             gcm_registration_id=gcm_registration_id)
-    player_command_event_key = player_command_event.put()
-    confirmation_uri = build_uri(route_name='command-confirmation', params_dict={'player_command_event_key':
-                                                                               player_command_event_key.urlsafe()})
+    event_key = player_command_event.put()
+    confirmation_uri = build_uri('manage-event', params_dict={'urlsafe_event_key': event_key.urlsafe()})
     registration_ids = [gcm_registration_id]
     data_dictionary = {"intent": payload,
                        "confirmation": confirmation_uri}
