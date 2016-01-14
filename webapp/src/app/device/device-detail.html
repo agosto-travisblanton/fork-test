@@ -560,7 +560,7 @@
             <md-card>
               <md-card-title>
                 <md-card-title-text>
-                  <span class="md-headline">Events</span>
+                  <span class="md-headline">Command History</span>
                 </md-card-title-text>
               </md-card-title>
               <md-card-content>
@@ -571,7 +571,7 @@
                       <tr>
                         <th>Payload</th>
                         <th>Updated UTC</th>
-                        <th style="text-align: right;">Confirmed</th>
+                        <th style="width:1px"></th>
                       </tr>
                       </thead>
                       <tbody>
@@ -581,7 +581,7 @@
                       <tr ng-repeat="item in deviceDetailsCtrl.commandEvents | orderBy:['-level','-updated']">
                         <td>{{ item.payload }}</td>
                         <td>{{ item.updated }}</td>
-                        <td style="text-align: right;">{{ item.confirmed }}</td>
+                        <td class="up-{{ item.confirmed}}-background"></td>
                       </tr>
                       </tbody>
                     </table>
