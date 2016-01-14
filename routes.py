@@ -210,6 +210,13 @@ application = WSGIApplication(
               methods=['PUT']
               ),
 
+        Route(r'/api/v1/player-command-events/<device_urlsafe_key>',
+              handler='handlers.player_command_events_handler.PlayerCommandEventsHandler',
+              name='player-command-events',
+              handler_method='get_player_command_events',
+              methods=['GET']
+              ),
+
         ############################################################
         # /dev/ routes secured by admin:required
         ############################################################

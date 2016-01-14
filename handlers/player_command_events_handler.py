@@ -5,6 +5,9 @@ from webapp2 import RequestHandler
 from decorators import requires_api_token
 from models import PlayerCommandEvent
 from ndb_mixins import KeyValidatorMixin
+from restler.serializers import json_response
+from strategy import PLAYER_COMMAND_EVENT_STRATEGY
+
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -20,3 +23,8 @@ class PlayerCommandEventsHandler(RequestHandler, KeyValidatorMixin):
         command_event.put()
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
+
+    @requires_api_token
+    def get_player_command_events(self, device_urlsafe_key):
+        events = PlayerCommandEvent.get_events_by_device_key(device_urlsafe_key)
+        return json_response(self.response, events, strategy=PLAYER_COMMAND_EVENT_STRATEGY)

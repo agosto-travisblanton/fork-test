@@ -38,3 +38,23 @@ class TestPlayerCommandEventModel(BaseTest):
         event.class_version = 47
         event.put()
         self.assertEqual(event.class_version, self.CURRENT_CLASS_VERSION)
+
+    def test_get_events_by_device_key_in_reverse_order_updated(self):
+        number_of_device_events = 3
+        self.__build_command_events(device_urlsafe_key='some-other-key', number_of_events=2)
+        self.__build_command_events(device_urlsafe_key=self.DEVICE_URLSAFE_KEY,
+                                    number_of_events=number_of_device_events)
+        device_events_list = PlayerCommandEvent.get_events_by_device_key(self.DEVICE_URLSAFE_KEY)
+        self.assertLength(number_of_device_events, device_events_list)
+        self.assertEqual(device_events_list[0].payload, 'payload-2')
+        self.assertEqual(device_events_list[1].payload, 'payload-1')
+        self.assertEqual(device_events_list[2].payload, 'payload-0')
+
+    def __build_command_events(self, device_urlsafe_key, number_of_events):
+        for i in range(number_of_events):
+            payload = 'payload-{0}'.format(i)
+            event = PlayerCommandEvent.create(
+                    device_urlsafe_key=device_urlsafe_key,
+                    payload=payload,
+                    gcm_registration_id=self.GCM_REGISTRATION_ID)
+            event.put()

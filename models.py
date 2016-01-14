@@ -499,6 +499,12 @@ class PlayerCommandEvent(ndb.Model):
                    gcm_registration_id=gcm_registration_id,
                    player_has_confirmed=player_has_confirmed)
 
+    @classmethod
+    def get_events_by_device_key(self, device_urlsafe_key, last_number=100):
+        query = PlayerCommandEvent.query(PlayerCommandEvent.device_urlsafe_key == device_urlsafe_key).order(
+                -PlayerCommandEvent.updated)
+        return query.fetch(last_number)
+
     def _pre_put_hook(self):
         self.class_version = 1
 
