@@ -17,19 +17,21 @@ class TestPlayerCommandEventModel(BaseTest):
         super(TestPlayerCommandEventModel, self).setUp()
 
     def test_create_returns_expected_player_command_event_representation(self):
-        event = PlayerCommandEvent.create(intent=self.INTENT, gcm_registration_id=self.GCM_REGISTRATION_ID)
+        event = PlayerCommandEvent.create(payload=self.INTENT, gcm_registration_id=self.GCM_REGISTRATION_ID)
         self.assertIsNone(event.created)
         self.assertIsNone(event.updated)
+        self.assertFalse(event.player_has_confirmed)
         event_key = event.put()
         persisted_event = event_key.get()
         self.assertIsNotNone(persisted_event.key)
-        self.assertEqual(persisted_event.intent, self.INTENT)
+        self.assertEqual(persisted_event.payload, self.INTENT)
         self.assertEqual(persisted_event.gcm_registration_id, self.GCM_REGISTRATION_ID)
         self.assertIsNotNone(persisted_event.created)
         self.assertIsNotNone(persisted_event.updated)
+        self.assertFalse(persisted_event.player_has_confirmed)
 
     def test_class_version_is_only_set_by_pre_put_hook_method(self):
-        event = PlayerCommandEvent.create(intent=self.INTENT, gcm_registration_id=self.GCM_REGISTRATION_ID)
+        event = PlayerCommandEvent.create(payload=self.INTENT, gcm_registration_id=self.GCM_REGISTRATION_ID)
         event.class_version = 47
         event.put()
         self.assertEqual(event.class_version, self.CURRENT_CLASS_VERSION)

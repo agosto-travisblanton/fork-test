@@ -483,23 +483,22 @@ class DistributorUser(ndb.Model):
 
 @ae_ndb_serializer
 class PlayerCommandEvent(ndb.Model):
-    intent = ndb.StringProperty(required=True, indexed=True)
+    payload = ndb.StringProperty(required=True, indexed=True)
     gcm_registration_id = ndb.StringProperty(required=True, indexed=True)
     gcm_message_id = ndb.StringProperty(required=False, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
-    orphaned = ndb.BooleanProperty(default=True, required=True, indexed=True)
+    player_has_confirmed = ndb.BooleanProperty(default=False, required=True, indexed=True)
     class_version = ndb.IntegerProperty()
 
     @classmethod
-    def create(cls, intent, gcm_registration_id, orphaned=True):
-        return cls(intent=intent,
+    def create(cls, payload, gcm_registration_id, player_has_confirmed=False):
+        return cls(payload=payload,
                    gcm_registration_id=gcm_registration_id,
-                   orphaned=orphaned)
+                   player_has_confirmed=player_has_confirmed)
 
     def _pre_put_hook(self):
         self.class_version = 1
-
 
 class IssueLevel:
     Normal, Warning, Danger = range(3)

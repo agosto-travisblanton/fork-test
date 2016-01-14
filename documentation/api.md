@@ -742,3 +742,43 @@ Retrieve all tenants from Skykit Provisioning
             {
                 "error": "HTTP request API token is invalid."
             }
+            
+## Group Player Command Confirmation
+### PUT /api/v1/player-command-events/<urlsafe_event_key>
+
+Confirm that a player command has been received.
+
+
++ Parameters
+
+    + urlsafe_event_key: `ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgID4woQKDA` (required, string) - The command event's entity key.
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/json
+            Authorization: 6C346588BD4C6D722A1165B43C51C
+
+    + Body
+
+            {
+			}
+
++ Response 204 (application/json)
+
+    + Headers
+
+            Alternate-Protocol: 443:quic,p=1
+            Cache-Control: no-cache
+
++ Response 403 (application/json)
+
+    + Headers
+
+    + Body
+
+            {
+                "error": "HTTP request API token is invalid."
+            }
+			
