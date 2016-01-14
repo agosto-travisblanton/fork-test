@@ -555,6 +555,47 @@
             </md-card>
           </div>
         </md-content>
+        <md-content class="md-padding" layout="row" layout-wrap layout-xs="column">
+          <div flex="100" flex-sm="100" flex-xs="100" layout="column">
+            <md-card>
+              <md-card-title>
+                <md-card-title-text>
+                  <span class="md-headline">Events</span>
+                </md-card-title-text>
+              </md-card-title>
+              <md-card-content>
+                <div class="row margin-top-15">
+                  <div class="col-lg-12">
+                    <table class="table table-responsive table-striped">
+                      <thead>
+                      <tr>
+                        <th>Payload</th>
+                        <th>GCM Registration ID</th>
+                        <th>Created</th>
+                        <th>Updated</th>
+                        <th>Confirmed</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <tr ng-hide="deviceDetailsCtrl.commandEvents.length">
+                        <td class="text-center text-warning" colspan="5">No commands for this device</td>
+                      </tr>
+                      <tr ng-repeat="item in deviceDetailsCtrl.commandEvents | orderBy:['-level','-updated']">
+                        <td>{{ item.payload }}</td>
+                        <td>{{ item.gcmRegistrationId }}%</td>
+                        <td>{{ item.created }}%</td>
+                        <td>{{ item.updated }}</td>
+                        <td>{{ item.created }}</td>
+                        <td>{{ item.confirmed }}</td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </md-card-content>
+            </md-card>
+          </div>
+        </md-content>
       </md-tab>
     </md-tabs>
   </md-content>

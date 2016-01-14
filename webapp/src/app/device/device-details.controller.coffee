@@ -42,6 +42,13 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     volume: undefined
     custom: undefined
   }
+  @commandEvents = [
+    payload: undefined
+    gcmRegistrationId: undefined
+    created: undefined
+    updated: undefined
+    confirmed: undefined
+  ]
   @editMode = !!$stateParams.deviceKey
   @issues = []
   @pickerOptions = "{icons:{next:'glyphicon glyphicon-arrow-right',
