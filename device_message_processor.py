@@ -9,9 +9,10 @@ from utils.web_util import build_uri
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
 
-def change_intent(gcm_registration_id, payload):
+def change_intent(gcm_registration_id, payload, device_urlsafe_key):
     test_mode = config.GCM_TEST_MODE
     player_command_event = PlayerCommandEvent.create(
+            device_urlsafe_key=device_urlsafe_key,
             payload=payload,
             gcm_registration_id=gcm_registration_id)
     event_key = player_command_event.put()
@@ -32,4 +33,4 @@ def change_intent(gcm_registration_id, payload):
 
 def post_unmanaged_device_info(gcm_registration_id, device_urlsafe_key):
     payload = "skykit.com/skdchromeapp/unmanaged/{0}/{1}".format(device_urlsafe_key, config.UNMANAGED_API_TOKEN)
-    change_intent(gcm_registration_id=gcm_registration_id, payload=payload)
+    change_intent(gcm_registration_id=gcm_registration_id, payload=payload, device_urlsafe_key=device_urlsafe_key)

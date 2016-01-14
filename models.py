@@ -483,6 +483,7 @@ class DistributorUser(ndb.Model):
 
 @ae_ndb_serializer
 class PlayerCommandEvent(ndb.Model):
+    device_urlsafe_key = ndb.StringProperty(required=True, indexed=True)
     payload = ndb.StringProperty(required=True, indexed=True)
     gcm_registration_id = ndb.StringProperty(required=True, indexed=True)
     gcm_message_id = ndb.StringProperty(required=False, indexed=True)
@@ -492,8 +493,9 @@ class PlayerCommandEvent(ndb.Model):
     class_version = ndb.IntegerProperty()
 
     @classmethod
-    def create(cls, payload, gcm_registration_id, player_has_confirmed=False):
-        return cls(payload=payload,
+    def create(cls, device_urlsafe_key, payload, gcm_registration_id, player_has_confirmed=False):
+        return cls(device_urlsafe_key=device_urlsafe_key,
+                   payload=payload,
                    gcm_registration_id=gcm_registration_id,
                    player_has_confirmed=player_has_confirmed)
 

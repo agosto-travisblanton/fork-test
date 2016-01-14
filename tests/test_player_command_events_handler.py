@@ -13,10 +13,12 @@ class TestPlayerCommandEventsHandler(BaseTest, WebTest):
     APPLICATION = application
     INTENT = 'skykit.com/skdchromeapp/reset'
     GCM_REGISTRATION_ID = 'APA91bH0sONxgUSSUtERv-SGZHYvThi3jRv_p4ASYdTTLjgLntaZhyL9ti8aE-SWZm8ju1z0stjziWLvVdRt0'
+    DEVICE_URLSAFE_KEY = 'kljlkjlkjlkjlkjlkjljlkj'
 
     def setUp(self):
         super(TestPlayerCommandEventsHandler, self).setUp()
-        self.event = PlayerCommandEvent.create(payload=self.INTENT, gcm_registration_id=self.GCM_REGISTRATION_ID)
+        self.event = PlayerCommandEvent.create(device_urlsafe_key=self.DEVICE_URLSAFE_KEY,
+                                               payload=self.INTENT, gcm_registration_id=self.GCM_REGISTRATION_ID)
         self.event_key = self.event.put()
         self.headers = {
             'Authorization': config.API_TOKEN

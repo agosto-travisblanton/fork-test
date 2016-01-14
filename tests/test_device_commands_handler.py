@@ -25,6 +25,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
     MAC_ADDRESS = '54271e619346'
     DISTRIBUTOR_NAME = 'agosto'
     IMPERSONATION_EMAIL = 'test@test.com'
+    DEVICE_URLSAFE_KEY = 'asdkalskdfjalksdj'
 
     def setUp(self):
         super(TestDeviceCommandsHandler, self).setUp()
