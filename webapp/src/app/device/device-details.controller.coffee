@@ -42,13 +42,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     volume: undefined
     custom: undefined
   }
-  @commandEvents = [
-    payload: undefined
-    gcmRegistrationId: undefined
-    created: undefined
-    updated: undefined
-    confirmed: undefined
-  ]
+  @commandEvents = []
   @editMode = !!$stateParams.deviceKey
   @issues = []
   @pickerOptions = "{icons:{next:'glyphicon glyphicon-arrow-right',
@@ -66,7 +60,9 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       devicePromise.then (data) =>
         @currentDevice = data
         @setSelectedOptions()
-
+      commandEventsPromise = DevicesService.getCommandEventsByKey($stateParams.deviceKey)
+      commandEventsPromise.then (data) =>
+        @commandEvents = data
       now = new Date()
       today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
       @endTime = now.toLocaleString().replace(/,/g, "")

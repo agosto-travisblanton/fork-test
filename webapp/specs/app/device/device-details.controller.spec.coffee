@@ -9,6 +9,7 @@ describe 'DeviceDetailsCtrl', ->
   devicesServicePromise = undefined
   getDevicePromise = undefined
   getDeviceIssuesPromise = undefined
+  getPlayerCommandEventsPromise = undefined
   TenantsService = undefined
   tenantsServicePromise = undefined
   CommandsService = undefined
@@ -41,7 +42,20 @@ describe 'DeviceDetailsCtrl', ->
       up: true
     }
   ]
-
+  commandEvents = [
+    {
+      payload: 'skykit.com/skdchromeapp/reset'
+      gcmRegistrationId: 'asdfasdfasdfadfsa1'
+      updated: '2016-01-14 18:45:44'
+      confirmed: false
+    }
+    {
+      payload: 'skykit.com/skdchromeapp/stop'
+      gcmRegistrationId: 'asdfasdfasdfadfsa2'
+      updated: '2016-01-14 18:23:30'
+      confirmed: false
+    }
+  ]
   tenants = [
     {key: 'dhjad897d987fadafg708fg7d', name: 'Foobar1', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
     {key: 'dhjad897d987fadafg708y67d', name: 'Foobar2', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
@@ -76,6 +90,8 @@ describe 'DeviceDetailsCtrl', ->
       spyOn(TenantsService, 'fetchAllTenants').and.returnValue tenantsServicePromise
       getDevicePromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getDeviceByKey').and.returnValue getDevicePromise
+      getPlayerCommandEventsPromise = new skykitProvisioning.q.Mock
+      spyOn(DevicesService, 'getCommandEventsByKey').and.returnValue getPlayerCommandEventsPromise
       getDeviceIssuesPromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getIssuesByKey').and.returnValue getDeviceIssuesPromise
       spyOn(DevicesService, 'getPanelModels').and.returnValue [{'id': 'Sony–FXD40LX2F'}, {'id': 'NEC–LCD4215'}]
@@ -109,6 +125,12 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'currentDevice property should be defined', ->
         expect(controller.currentDevice).toBeDefined()
+
+      it 'commandEvents array should be defined', ->
+        expect(controller.commandEvents).toBeDefined()
+
+      it 'issues array should be defined', ->
+        expect(controller.issues).toBeDefined()
 
       it 'call TenantsService.fetchAllTenants to retrieve all tenants', ->
         expect(TenantsService.fetchAllTenants).toHaveBeenCalled()
@@ -152,6 +174,9 @@ describe 'DeviceDetailsCtrl', ->
       it 'calls DevicesService.getByKey to retrieve the selected device', ->
         expect(DevicesService.getDeviceByKey).toHaveBeenCalledWith $stateParams.deviceKey
 
+      it 'calls DevicesService.getCommandEventsByKey to retrieve command events for device', ->
+        expect(DevicesService.getCommandEventsByKey).toHaveBeenCalledWith $stateParams.deviceKey
+
       it "the 'then' handler caches the retrieved device in the controller", ->
         getDevicePromise.resolve device
         expect(controller.currentDevice).toBe device
@@ -162,6 +187,10 @@ describe 'DeviceDetailsCtrl', ->
       it "the 'then' handler caches the retrieved issues for a given device key in the controller", ->
         getDeviceIssuesPromise.resolve issues
         expect(controller.issues).toBe issues
+
+      it "the 'then' handler caches the retrieved command events in the controller", ->
+        getPlayerCommandEventsPromise.resolve commandEvents
+        expect(controller.commandEvents).toBe commandEvents
 
   describe '.onClickSaveNotes', ->
     beforeEach ->

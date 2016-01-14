@@ -556,7 +556,7 @@
           </div>
         </md-content>
         <md-content class="md-padding" layout="row" layout-wrap layout-xs="column">
-          <div flex="100" flex-sm="100" flex-xs="100" layout="column">
+          <div flex="66" flex-sm="66" flex-xs="66" layout="column">
             <md-card>
               <md-card-title>
                 <md-card-title-text>
@@ -570,10 +570,8 @@
                       <thead>
                       <tr>
                         <th>Payload</th>
-                        <th>GCM Registration ID</th>
-                        <th>Created</th>
-                        <th>Updated</th>
-                        <th>Confirmed</th>
+                        <th>Updated UTC</th>
+                        <th style="text-align: right;">Confirmed</th>
                       </tr>
                       </thead>
                       <tbody>
@@ -582,11 +580,8 @@
                       </tr>
                       <tr ng-repeat="item in deviceDetailsCtrl.commandEvents | orderBy:['-level','-updated']">
                         <td>{{ item.payload }}</td>
-                        <td>{{ item.gcmRegistrationId }}%</td>
-                        <td>{{ item.created }}%</td>
                         <td>{{ item.updated }}</td>
-                        <td>{{ item.created }}</td>
-                        <td>{{ item.confirmed }}</td>
+                        <td style="text-align: right;">{{ item.confirmed }}</td>
                       </tr>
                       </tbody>
                     </table>
