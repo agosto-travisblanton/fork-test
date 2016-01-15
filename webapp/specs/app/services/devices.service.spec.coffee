@@ -83,7 +83,7 @@ describe 'DevicesService', ->
       now.setDate(now.getDate() - 1)
       epochStart = moment(now).unix()
       expect(epochEnd).toBeGreaterThan(epochStart);
-      deviceKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFudEVudGl0eUdyb3VwDAsSBlRlbmFudBiAgICAgMCvCgw'
+      deviceKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw'
       deviceRestangularService = {get: ->}
       spyOn(Restangular, 'oneUrl').and.returnValue deviceRestangularService
       spyOn(deviceRestangularService, 'get').and.returnValue promise
@@ -93,3 +93,13 @@ describe 'DevicesService', ->
       expect(deviceRestangularService.get).toHaveBeenCalled()
       expect(actual).toBe promise
 
+  describe '.getCommandEventsByKey', ->
+    it 'retrieve command events associated with supplied key, returning a promise', ->
+      deviceKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw'
+      deviceRestangularService = {get: ->}
+      spyOn(Restangular, 'oneUrl').and.returnValue deviceRestangularService
+      spyOn(deviceRestangularService, 'get').and.returnValue promise
+      actual = DevicesService.getCommandEventsByKey(deviceKey)
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices',"/api/v1/player-command-events/#{deviceKey}"
+      expect(deviceRestangularService.get).toHaveBeenCalled()
+      expect(actual).toBe promise

@@ -17,6 +17,11 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($http, $log, Res
         "api/v1/devices/#{deviceKey}/issues?start=#{startEpoch}&end=#{endEpoch}").get()
       promise
 
+    getCommandEventsByKey: (deviceKey) ->
+      promise = Restangular.oneUrl(SERVICE_NAME,
+        "/api/v1/player-command-events/#{deviceKey}").get()
+      promise
+
     getDevicesByTenant: (tenantKey) ->
       unless tenantKey == undefined
         url = "api/v1/tenants/#{tenantKey}/devices?unmanaged=false"

@@ -483,6 +483,7 @@ class DistributorUser(ndb.Model):
 
 @ae_ndb_serializer
 class PlayerCommandEvent(ndb.Model):
+    device_urlsafe_key = ndb.StringProperty(required=True, indexed=True)
     payload = ndb.StringProperty(required=True, indexed=True)
     gcm_registration_id = ndb.StringProperty(required=True, indexed=True)
     gcm_message_id = ndb.StringProperty(required=False, indexed=True)
@@ -492,10 +493,17 @@ class PlayerCommandEvent(ndb.Model):
     class_version = ndb.IntegerProperty()
 
     @classmethod
-    def create(cls, payload, gcm_registration_id, player_has_confirmed=False):
-        return cls(payload=payload,
+    def create(cls, device_urlsafe_key, payload, gcm_registration_id, player_has_confirmed=False):
+        return cls(device_urlsafe_key=device_urlsafe_key,
+                   payload=payload,
                    gcm_registration_id=gcm_registration_id,
                    player_has_confirmed=player_has_confirmed)
+
+    @classmethod
+    def get_events_by_device_key(self, device_urlsafe_key, last_number=100):
+        query = PlayerCommandEvent.query(PlayerCommandEvent.device_urlsafe_key == device_urlsafe_key).order(
+                -PlayerCommandEvent.updated)
+        return query.fetch(last_number)
 
     def _pre_put_hook(self):
         self.class_version = 1

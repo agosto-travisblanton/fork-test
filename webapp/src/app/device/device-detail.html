@@ -555,6 +555,42 @@
             </md-card>
           </div>
         </md-content>
+        <md-content class="md-padding" layout="row" layout-wrap layout-xs="column">
+          <div flex="66" flex-sm="66" flex-xs="66" layout="column">
+            <md-card>
+              <md-card-title>
+                <md-card-title-text>
+                  <span class="md-headline">History</span>
+                </md-card-title-text>
+              </md-card-title>
+              <md-card-content>
+                <div class="row margin-top-15">
+                  <div class="col-lg-12">
+                    <table class="table table-responsive table-striped">
+                      <thead>
+                      <tr>
+                        <th>Command</th>
+                        <th>Updated UTC</th>
+                        <th style="width:1px"></th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <tr ng-hide="deviceDetailsCtrl.commandEvents.length">
+                        <td class="text-center text-warning" colspan="5">No commands for this device</td>
+                      </tr>
+                      <tr ng-repeat="item in deviceDetailsCtrl.commandEvents | orderBy:['-level','-updated']">
+                        <td>{{ item.payload }}</td>
+                        <td>{{ item.updated }}</td>
+                        <td class="up-{{ item.confirmed}}-background"></td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </md-card-content>
+            </md-card>
+          </div>
+        </md-content>
       </md-tab>
     </md-tabs>
   </md-content>

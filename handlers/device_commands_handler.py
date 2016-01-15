@@ -37,7 +37,7 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
                 message = 'DeviceCommandsHandler: Device not found with key: {0}'.format(device_urlsafe_key)
                 logging.info(message)
             else:
-                change_intent(chrome_os_device.gcm_registration_id, intent)
+                change_intent(chrome_os_device.gcm_registration_id, intent, device_urlsafe_key)
         self.response.set_status(status, message)
 
     @requires_api_token
@@ -55,7 +55,7 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
             message = 'DeviceCommandsHandler reset: Device not found with key: {0}'.format(device_urlsafe_key)
             logging.info(message)
         else:
-            change_intent(chrome_os_device.gcm_registration_id, config.PLAYER_RESET_COMMAND)
+            change_intent(chrome_os_device.gcm_registration_id, config.PLAYER_RESET_COMMAND,device_urlsafe_key)
         self.response.set_status(status, message)
 
     @requires_api_token
@@ -80,7 +80,7 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
                 logging.info(message)
             else:
                 intent = "{0}{1}".format(config.PLAYER_VOLUME_COMMAND, int(volume))
-                change_intent(chrome_os_device.gcm_registration_id, intent)
+                change_intent(chrome_os_device.gcm_registration_id, intent, device_urlsafe_key)
         self.response.set_status(status, message)
 
     @requires_api_token
@@ -104,7 +104,7 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
                 message = 'DeviceCommandsHandler command: Device not found with key: {0}'.format(device_urlsafe_key)
                 logging.info(message)
             else:
-                change_intent(chrome_os_device.gcm_registration_id, intent)
+                change_intent(chrome_os_device.gcm_registration_id, intent, device_urlsafe_key)
         self.response.set_status(status, message)
 
     @staticmethod
