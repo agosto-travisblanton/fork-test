@@ -8,6 +8,8 @@ setup()
 import os
 from agar.env import on_development_server, on_server, on_production_server, on_integration_server, appid
 
+on_stage_server = on_server and appid.lower().endswith('-stage')
+
 
 ##############################################################################
 # APPLICATION SETTINGS
@@ -23,9 +25,8 @@ app_APP_ROOT = _APP_ROOT()
 def _APP_NAME():
     if on_development_server or on_integration_server or not on_server:
         return 'skykit-display-device-int'
-    if on_production_server:
-        return 'skykit-provisioning'
-    return None
+    else:
+        return appid
 
 
 app_APP_NAME = _APP_NAME()
@@ -50,6 +51,8 @@ app_PRIVATE_KEY = _PRIVATE_KEY()
 def _SERVICE_ACCOUNT_EMAIL():
     if on_development_server or on_integration_server or not on_server:
         return '390010375778-87capuus77kispm64q27iah4kl0rorv4@developer.gserviceaccount.com'
+    if on_stage_server:
+        return 'service-247@skykit-provisioning-stage.iam.gserviceaccount.com'
     if on_production_server:
         return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0@developer.gserviceaccount.com'
     return None
@@ -73,6 +76,8 @@ def _CLIENT_ID():
         return '390010375778-87capuus77kispm64q27iah4kl0rorv4.apps.googleusercontent.com'
     if on_integration_server:
         return '390010375778-87capuus77kispm64q27iah4kl0rorv4.apps.googleusercontent.com'
+    if on_stage_server:
+        return '106935685560101973796'
     if on_production_server:
         return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0.apps.googleusercontent.com'
     return None
@@ -86,6 +91,8 @@ def _OAUTH_CLIENT_ID():
         return '390010375778-gidaqujfhgkqrc5lat9t890mhc0nhutt.apps.googleusercontent.com'
     if on_integration_server:
         return '390010375778-gidaqujfhgkqrc5lat9t890mhc0nhutt.apps.googleusercontent.com'
+    if on_stage_server:
+        return '1087929808190-q8s9bhpu79ju7fkqblnl3nn2th0efv57.apps.googleusercontent.com'
     if on_production_server:
         return '613606096818-tfkv6eedbrbc4hltamdjgc7nk25k37mk.apps.googleusercontent.com'
     return None
@@ -98,6 +105,8 @@ app_OAUTH_CLIENT_ID = _OAUTH_CLIENT_ID()
 #         return '5uw_Cj78Iygf3rfnJKZ_SVVO'
 #     if on_integration_server:
 #         return 'h-PGaqnkAfRhjVTtbxcgSLD5'
+#     if on_stage_server:
+#         return 'SkT2kDa3nViHTJXLuUYbSbzE'
 #     if on_production_server:
 #         return 'NWCFk0IyE8QPqD2CDwloKvjH'
 #     return None
@@ -108,6 +117,8 @@ def _PUBLIC_API_SERVER_KEY():
         return 'AIzaSyAzS-hwl5dV-Wn4g5opG_34gGYplgJT1Fc'
     if on_integration_server:
         return 'AIzaSyAzS-hwl5dV-Wn4g5opG_34gGYplgJT1Fc'
+    if on_stage_server:
+        return 'AIzaSyB0mE3DWNt8iFFvZ60TQyTgl3NpKK6-BQA'
     if on_production_server:
         return 'AIzaSyBcZQf7qcJibJmBKHDaqgdRwf2XQ3MZFiY'
     return None
@@ -120,6 +131,8 @@ def _API_TOKEN():
     if on_development_server or not on_server:
         return '6C346588BD4C6D722A1165B43C51C'
     if on_integration_server:
+        return '6C346588BD4C6D722A1165B43C51C'
+    if on_stage_server:
         return '6C346588BD4C6D722A1165B43C51C'
     if on_production_server:
         return '6C346588BD4C6D722A1165B43C51C'
@@ -134,6 +147,8 @@ def _UNMANAGED_API_TOKEN():
         return 'A1365B43C51C46588BD4C6D5016C0'
     if on_integration_server:
         return 'A1365B43C51C46588BD4C6D5016C0'
+    if on_stage_server:
+        return 'A1365B43C51C46588BD4C6D5016C0'
     if on_production_server:
         return 'A1365B43C51C46588BD4C6D5016C0'
     return None
@@ -146,6 +161,8 @@ def _UNMANAGED_REGISTRATION_TOKEN():
     if on_development_server or not on_server:
         return '43C51C8BD4C6D723A1365B6C34658'
     if on_integration_server:
+        return '43C51C8BD4C6D723A1365B6C34658'
+    if on_stage_server:
         return '43C51C8BD4C6D723A1365B6C34658'
     if on_production_server:
         return '43C51C8BD4C6D723A1365B6C34658'
@@ -160,6 +177,8 @@ def _CONTENT_MANAGER_API_SERVER_KEY():
         return 'EqwbumxWrJzybkDerDbm9yLBteJqZi7X'
     if on_integration_server:
         return 'EqwbumxWrJzybkDerDbm9yLBteJqZi7X'
+    if on_stage_server:
+        return 'OTJkMGNjMmYzMmZlNjI4MDVmNGVlMjEx'
     if on_production_server:
         return 'uXyQWMr3mAUvLFhvYuzYnfehkKop7ZCe'
     return None
@@ -174,6 +193,8 @@ def _DEFAULT_AGOSTO_DEVICE_DOMAIN():
         return 'local.agosto.com'
     if on_integration_server:
         return 'dev.agosto.com'
+    if on_stage_server:
+        return 'dev-staging.agosto.com'  # FIXME
     if on_production_server:
         return 'skykit.agosto.com'
     return None
@@ -185,6 +206,8 @@ def _GOOGLE_CUSTOMER_ID():
     if on_development_server or not on_server:
         return 'my_customer'
     if on_integration_server:
+        return 'my_customer'
+    if on_stage_server:
         return 'my_customer'
     if on_production_server:
         return 'my_customer'
