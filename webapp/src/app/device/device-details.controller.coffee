@@ -172,7 +172,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     ProgressBarService.complete()
     sweet.show('Oops...', "Refresh error: #{error.data}", 'error')
 
-  @onClickPowerOnButton = () ->
+  @onClickPowerOnSendButton = () ->
     if @editMode
       ProgressBarService.start()
       promise = CommandsService.powerOn $stateParams.deviceKey
@@ -186,7 +186,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     ProgressBarService.complete()
     sweet.show('Oops...', "Power on error: #{error.data}", 'error')
 
-  @onClickPowerOffButton = () ->
+  @onClickPowerOffSendButton = () ->
     if @editMode
       ProgressBarService.start()
       promise = CommandsService.powerOff $stateParams.deviceKey
