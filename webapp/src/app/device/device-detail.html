@@ -388,169 +388,197 @@
       </md-tab>
       <md-tab label="Commands">
         <md-content class="md-padding" layout="row" layout-wrap layout-align="center start" layout-xs="column">
-          <div flex="33" flex-sm="33" flex-xs="33" layout="column">
+          <div flex="100" flex-sm="100" flex-xs="100" layout="column">
             <md-card>
-              <md-card-title>
-                <md-card-title-text>
-                  <span class="md-headline">Reset</span>
-                </md-card-title-text>
-              </md-card-title>
               <md-card-content>
-                <form name="resetForm" class="form-horizontal" ng-submit="deviceDetailsCtrl.onClickResetSendButton()"
-                      novalidate>
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <table class="table table-responsive table-striped">
-                        <thead>
-                        <tr>
-                          <th>Serial number</th>
-                          <th>WiFi MAC</th>
-                          <th>Ether MAC</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                          <td class="reset-device-serial-number">
-                            {{deviceDetailsCtrl.currentDevice.serialNumber}}
-                          </td>
-                          <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
-                          </td>
-                          <td class="reset-device-ethernet-mac-address">{{
-                            deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                          </td>
-                        </tr>
-                        </tbody>
-                      </table>
-                      <div class="row">
-                        <div class="col-sm-8 pull-right">
-                          <input type="text" class="form-control" readonly value="skykit.com/skdchromeapp/reset">
-                        </div>
-                      </div>
-                    </div>
+                <div class="row">
+                  <div class="col-sm-12">
+                    <table class="table table-responsive table-striped">
+                      <thead>
+                      <tr>
+                        <th>Serial number</th>
+                        <th>WiFi MAC</th>
+                        <th>Ether MAC</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <tr>
+                        <td class="reset-device-serial-number">
+                          {{deviceDetailsCtrl.currentDevice.serialNumber}}
+                        </td>
+                        <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
+                        </td>
+                        <td class="reset-device-ethernet-mac-address">{{
+                          deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
+                        </td>
+                      </tr>
+                      </tbody>
+                    </table>
                   </div>
-                  <md-card-actions layout="row" layout-align="end center">
-                    <md-button type="submit"><i class="fa fa-fw fa-building"></i>
-                      Send to GCM
-                    </md-button>
-                  </md-card-actions>
-                </form>
-              </md-card-content>
-            </md-card>
-          </div>
-          <div flex="33" flex-sm="33" flex-xs="33" layout="column">
-            <md-card>
-              <md-card-title>
-                <md-card-title-text>
-                  <span class="md-headline">Volume</span>
-                </md-card-title-text>
-              </md-card-title>
-              <md-card-content>
-                <form name="volumeForm" class="form-horizontal" ng-submit="deviceDetailsCtrl.onClickVolumeSendButton()"
-                      novalidate>
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <table class="table table-responsive table-striped">
-                        <thead>
-                        <tr>
-                          <th>Serial number</th>
-                          <th>WiFi MAC</th>
-                          <th>Ether MAC</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                          <td class="reset-device-serial-number">
-                            {{deviceDetailsCtrl.currentDevice.serialNumber}}
-                          </td>
-                          <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
-                          </td>
-                          <td class="reset-device-ethernet-mac-address">{{
-                            deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                          </td>
-                        </tr>
-                        </tbody>
-                      </table>
-                      <div class="row">
-                        <div class="col-sm-3 pull-right">
-                          <input type="number"
-                                 class="form-control"
-                                 name="volume"
-                                 id="volume"
-                                 ng-model="deviceDetailsCtrl.currentDevice.volume"
-                                 min="1"
-                                 max="100"
-                                 ngMinlength="1"
-                                 ngMaxlength="3"
-                                 ng-required="true">
-                          <!--<span ng-show="volumeForm.$invalid">1-100</span>-->
-                        </div>
-                      </div>
-                    </div>
+                </div>
+                <md-content class="md-padding" layout="row" layout-wrap layout-xs="column">
+                  <div flex="33" flex-sm="33" flex-xs="33" layout="column">
+                    <md-card>
+                      <md-card-title>
+                        <md-card-title-text>
+                          <span class="md-headline">Power on</span>
+                        </md-card-title-text>
+                      </md-card-title>
+                      <md-card-content>
+                        <form name="powerOnForm" class="form-horizontal" ng-submit="deviceDetailsCtrl.onClickPowerOnButton()"
+                              novalidate>
+                          <div class="row">
+                            <div class="col-sm-12">
+                              <div class="row">
+                                <div class="col-sm-9 pull-right">
+                                  <input type="text" class="form-control" readonly value="skykit.com/skdchromeapp/tv/on">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <md-card-actions layout="row" layout-align="end center">
+                            <md-button type="submit"><i class="fa fa-fw fa-building"></i>
+                              Send to GCM
+                            </md-button>
+                          </md-card-actions>
+                        </form>
+                      </md-card-content>
+                    </md-card>
                   </div>
-                  <md-card-actions layout="row" layout-align="end center">
-                    <md-button type="submit"
-                               ng-disabled="!volumeForm.$dirty || volumeForm.$invalid">
-                      <i class="fa fa-fw fa-building"></i>
-                      Send to GCM
-                    </md-button>
-                  </md-card-actions>
-                </form>
-              </md-card-content>
-            </md-card>
-          </div>
-          <div flex="33" flex-sm="33" flex-xs="33" layout="column">
-            <md-card>
-              <md-card-title>
-                <md-card-title-text>
-                  <span class="md-headline">Custom</span>
-                </md-card-title-text>
-              </md-card-title>
-              <md-card-content>
-                <form name="customForm" class="form-horizontal" ng-submit="deviceDetailsCtrl.onClickCommandSendButton()"
-                      novalidate>
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <table class="table table-responsive table-striped">
-                        <thead>
-                        <tr>
-                          <th>Serial number</th>
-                          <th>WiFi MAC</th>
-                          <th>Ether MAC</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                          <td class="reset-device-serial-number">
-                            {{deviceDetailsCtrl.currentDevice.serialNumber}}
-                          </td>
-                          <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
-                          </td>
-                          <td class="reset-device-ethernet-mac-address">{{
-                            deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                          </td>
-                        </tr>
-                        </tbody>
-                      </table>
-                      <div class="row">
-                        <div class="col-sm-8 pull-right">
-                          <input type="text"
-                                 class="form-control"
-                                 name="custom"
-                                 id="custom"
-                                 ng-model="deviceDetailsCtrl.currentDevice.custom"
-                                 ng-required="true">
-                        </div>
-                      </div>
-                    </div>
+                  <div flex="33" flex-sm="33" flex-xs="33" layout="column">
+                    <md-card>
+                      <md-card-title>
+                        <md-card-title-text>
+                          <span class="md-headline">Power off</span>
+                        </md-card-title-text>
+                      </md-card-title>
+                      <md-card-content>
+                        <form name="powerOffForm" class="form-horizontal" ng-submit="deviceDetailsCtrl.onClickPowerOffButton()"
+                              novalidate>
+                          <div class="row">
+                            <div class="col-sm-12">
+                              <div class="row">
+                                <div class="col-sm-9 pull-right">
+                                  <input type="text" class="form-control" readonly value="skykit.com/skdchromeapp/tv/off">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <md-card-actions layout="row" layout-align="end center">
+                            <md-button type="submit"><i class="fa fa-fw fa-building"></i>
+                              Send to GCM
+                            </md-button>
+                          </md-card-actions>
+                        </form>
+                      </md-card-content>
+                    </md-card>
                   </div>
-                  <md-card-actions layout="row" layout-align="end center">
-                    <md-button type="submit"
-                               ng-disabled="!customForm.$dirty || customForm.$invalid">
-                      <i class="fa fa-fw fa-building"></i>
-                      Send to GCM
-                    </md-button>
-                  </md-card-actions>
-                </form>
+                  <div flex="33" flex-sm="33" flex-xs="33" layout="column">
+                    <md-card>
+                      <md-card-title>
+                        <md-card-title-text>
+                          <span class="md-headline">Reset</span>
+                        </md-card-title-text>
+                      </md-card-title>
+                      <md-card-content>
+                        <form name="resetForm" class="form-horizontal" ng-submit="deviceDetailsCtrl.onClickResetSendButton()"
+                              novalidate>
+                          <div class="row">
+                            <div class="col-sm-12">
+                              <div class="row">
+                                <div class="col-sm-9 pull-right">
+                                  <input type="text" class="form-control" readonly value="skykit.com/skdchromeapp/reset">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <md-card-actions layout="row" layout-align="end center">
+                            <md-button type="submit"><i class="fa fa-fw fa-building"></i>
+                              Send to GCM
+                            </md-button>
+                          </md-card-actions>
+                        </form>
+                      </md-card-content>
+                    </md-card>
+                  </div>
+                </md-content>
+                <md-content class="md-padding" layout="row" layout-wrap layout-xs="column">
+                  <div flex="33" flex-sm="33" flex-xs="33" layout="column">
+                    <md-card>
+                      <md-card-title>
+                        <md-card-title-text>
+                          <span class="md-headline">Volume</span>
+                        </md-card-title-text>
+                      </md-card-title>
+                      <md-card-content>
+                        <form name="volumeForm" class="form-horizontal" ng-submit="deviceDetailsCtrl.onClickVolumeSendButton()"
+                              novalidate>
+                          <div class="row">
+                            <div class="col-sm-12">
+                              <div class="row">
+                                <div class="col-sm-3 pull-right">
+                                  <input type="number"
+                                         class="form-control"
+                                         name="volume"
+                                         id="volume"
+                                         ng-model="deviceDetailsCtrl.currentDevice.volume"
+                                         min="1"
+                                         max="100"
+                                         ngMinlength="1"
+                                         ngMaxlength="3"
+                                         ng-required="true">
+                                  <!--<span ng-show="volumeForm.$invalid">1-100</span>-->
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <md-card-actions layout="row" layout-align="end center">
+                            <md-button type="submit"
+                                       ng-disabled="!volumeForm.$dirty || volumeForm.$invalid">
+                              <i class="fa fa-fw fa-building"></i>
+                              Send to GCM
+                            </md-button>
+                          </md-card-actions>
+                        </form>
+                      </md-card-content>
+                    </md-card>
+                  </div>
+                  <div flex="33" flex-sm="33" flex-xs="33" layout="column">
+                    <md-card>
+                      <md-card-title>
+                        <md-card-title-text>
+                          <span class="md-headline">Custom</span>
+                        </md-card-title-text>
+                      </md-card-title>
+                      <md-card-content>
+                        <form name="customForm" class="form-horizontal" ng-submit="deviceDetailsCtrl.onClickCommandSendButton()"
+                              novalidate>
+                          <div class="row">
+                            <div class="col-sm-12">
+                              <div class="row">
+                                <div class="col-sm-9 pull-right">
+                                  <input type="text"
+                                         class="form-control"
+                                         name="custom"
+                                         id="custom"
+                                         ng-model="deviceDetailsCtrl.currentDevice.custom"
+                                         ng-required="true">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <md-card-actions layout="row" layout-align="end center">
+                            <md-button type="submit"
+                                       ng-disabled="!customForm.$dirty || customForm.$invalid">
+                              <i class="fa fa-fw fa-building"></i>
+                              Send to GCM
+                            </md-button>
+                          </md-card-actions>
+                        </form>
+                      </md-card-content>
+                    </md-card>
+                  </div>
+                </md-content>
               </md-card-content>
             </md-card>
           </div>

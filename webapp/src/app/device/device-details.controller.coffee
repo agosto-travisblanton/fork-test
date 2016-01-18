@@ -3,13 +3,13 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'DeviceDetailsCtrl', ($log,
-    $stateParams,
-    $state,
-    DevicesService,
-    TenantsService,
-    CommandsService,
-    sweet,
-    ProgressBarService) ->
+  $stateParams,
+  $state,
+  DevicesService,
+  TenantsService,
+  CommandsService,
+  sweet,
+  ProgressBarService) ->
   @tenantKey = $stateParams.tenantKey
   @currentDevice = {
     key: undefined
@@ -171,6 +171,34 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @onRefreshIssuesFailure = (error) ->
     ProgressBarService.complete()
     sweet.show('Oops...', "Refresh error: #{error.data}", 'error')
+
+  @onClickPowerOnButton = () ->
+    if @editMode
+      ProgressBarService.start()
+      promise = CommandsService.powerOn $stateParams.deviceKey
+      promise.then @onPowerOnSuccess, @onPowerOnFailure
+
+  @onPowerOnSuccess = () ->
+    ProgressBarService.complete()
+    sweet.show('Success!', 'Sent a power on command to the device.', 'success')
+
+  @onPowerOnFailure = (error) ->
+    ProgressBarService.complete()
+    sweet.show('Oops...', "Power on error: #{error.data}", 'error')
+
+  @onClickPowerOffButton = () ->
+    if @editMode
+      ProgressBarService.start()
+      promise = CommandsService.powerOff $stateParams.deviceKey
+      promise.then @onPowerOffSuccess, @onPowerOffFailure
+
+  @onPowerOffSuccess = () ->
+    ProgressBarService.complete()
+    sweet.show('Success!', 'Sent a power off command to the device.', 'success')
+
+  @onPowerOffFailure = (error) ->
+    ProgressBarService.complete()
+    sweet.show('Oops...', "Power off error: #{error.data}", 'error')
 
   @setPanelInfo = () ->
     if @currentDevice.panelModel != null
