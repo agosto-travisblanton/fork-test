@@ -120,7 +120,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onResetSuccess = () ->
     ProgressBarService.complete()
-    sweet.show('Success!', 'Sent a reset command to the device.', 'success')
+    sweet.show('Success!', 'Sent a reset command to Google Cloud Messaging.', 'success')
 
   @onResetFailure = (error) ->
     ProgressBarService.complete()
@@ -134,7 +134,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onVolumeSuccess = (level) ->
     ProgressBarService.complete()
-    sweet.show('Success!', "Sent a volume level of #{level} to the device.", 'success')
+    sweet.show('Success!', "Sent a volume level of #{level} to Google Cloud Messaging.", 'success')
 
   @onVolumeFailure = (error) ->
     ProgressBarService.complete()
@@ -148,7 +148,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onCommandSuccess = (command) ->
     ProgressBarService.complete()
-    sweet.show('Success!', "Sent '#{command}' to the device.", 'success')
+    sweet.show('Success!', "Sent '#{command}' to Google Cloud Messaging.", 'success')
 
   @onCommandFailure = (error) ->
     ProgressBarService.complete()
@@ -180,7 +180,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onPowerOnSuccess = () ->
     ProgressBarService.complete()
-    sweet.show('Success!', 'Sent a power on command to the device.', 'success')
+    sweet.show('Success!', 'Sent a power on command to Google Cloud Messaging.', 'success')
 
   @onPowerOnFailure = (error) ->
     ProgressBarService.complete()
@@ -194,7 +194,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onPowerOffSuccess = () ->
     ProgressBarService.complete()
-    sweet.show('Success!', 'Sent a power off command to the device.', 'success')
+    sweet.show('Success!', 'Sent a power off command to Google Cloud Messaging.', 'success')
 
   @onPowerOffFailure = (error) ->
     ProgressBarService.complete()

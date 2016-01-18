@@ -328,7 +328,8 @@ describe 'DeviceDetailsCtrl', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
       it 'displays a sweet alert', ->
-        expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent a reset command to the device.', 'success')
+        expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent a reset command to Google Cloud Messaging.',
+          'success')
 
     describe '.onResetFailure', ->
       beforeEach ->
@@ -369,7 +370,7 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'displays a sweet alert', ->
         expect(sweet.show).toHaveBeenCalledWith('Success!',
-          "Sent a volume level of #{controller.currentDevice.volume} to the device.", 'success')
+          "Sent a volume level of #{controller.currentDevice.volume} to Google Cloud Messaging.", 'success')
 
     describe '.onVolumeFailure', ->
       beforeEach ->
@@ -409,8 +410,8 @@ describe 'DeviceDetailsCtrl', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
       it 'displays a sweet alert', ->
-        expect(sweet.show).toHaveBeenCalledWith('Success!', "Sent '#{controller.currentDevice.custom}' to the device.",
-          'success')
+        expect(sweet.show).toHaveBeenCalledWith('Success!',
+          "Sent '#{controller.currentDevice.custom}' to Google Cloud Messaging.", 'success')
 
     describe '.onCommandFailure', ->
       beforeEach ->
@@ -449,7 +450,8 @@ describe 'DeviceDetailsCtrl', ->
           expect(progressBarService.complete).toHaveBeenCalled()
 
         it 'displays a sweet alert', ->
-          expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent a power on command to the device.', 'success')
+          expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent a power on command to Google Cloud Messaging.',
+            'success')
 
       describe '.onPowerOnFailure', ->
         beforeEach ->
@@ -488,7 +490,8 @@ describe 'DeviceDetailsCtrl', ->
           expect(progressBarService.complete).toHaveBeenCalled()
 
         it 'displays a sweet alert', ->
-          expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent a power off command to the device.', 'success')
+          expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent a power off command to Google Cloud Messaging.',
+            'success')
 
       describe '.onPowerOffFailure', ->
         beforeEach ->
