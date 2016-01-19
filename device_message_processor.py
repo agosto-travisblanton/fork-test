@@ -18,9 +18,10 @@ def change_intent(gcm_registration_id, payload, device_urlsafe_key, host):
     event_key = player_command_event.put()
     confirmation_uri = "{0}{1}".format(host, build_uri('manage-event',
                                                        params_dict={'urlsafe_event_key': event_key.urlsafe()}))
-    logging.info('TEST $$$$$$$$ confirmation_uri=!{0}!'.format(confirmation_uri))
+    logging.info('TEST $$$$$$$$ confirmation_uri={0}'.format(confirmation_uri))
     data_dictionary = {"intent": payload,
                        "confirmation": confirmation_uri}
+    logging.info('TEST $$$$$$$$ payload={0}'.format(payload))
     registration_ids = [gcm_registration_id]
     google_cloud_messaging = GoogleCloudMessaging()
     try:
