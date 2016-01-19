@@ -152,7 +152,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 unmanaged_device = ChromeOsDevice.get_unmanaged_device_by_mac_address(device_mac_address)
                 if None is not unmanaged_device:
                     post_unmanaged_device_info(gcm_registration_id=unmanaged_device.gcm_registration_id,
-                                               device_urlsafe_key=unmanaged_device.key.urlsafe())
+                                               device_urlsafe_key=unmanaged_device.key.urlsafe(),
+                                               host=self.request.host_url)
                     status = 409
                     error_message = 'Registration conflict because macAddress is already assigned to ' \
                                     'an unmanaged device.'
@@ -161,7 +162,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 unmanaged_device = ChromeOsDevice.get_unmanaged_device_by_gcm_registration_id(gcm_registration_id)
                 if None is not unmanaged_device:
                     post_unmanaged_device_info(gcm_registration_id=unmanaged_device.gcm_registration_id,
-                                               device_urlsafe_key=unmanaged_device.key.urlsafe())
+                                               device_urlsafe_key=unmanaged_device.key.urlsafe(),
+                                               host=self.request.host_url)
                     status = 409
                     error_message = 'Registration conflict because gcmRegistrationId is already assigned to ' \
                                     'an unmanaged device.'
@@ -260,7 +262,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     if device.is_unmanaged_device:
                         logging.info(' PUT add the tenant to unmanaged device.')
                         post_unmanaged_device_info(gcm_registration_id=device.gcm_registration_id,
-                                                   device_urlsafe_key=device.key.urlsafe())
+                                                   device_urlsafe_key=device.key.urlsafe(), host=self.request.host_url)
                     else:
                         logging.info(' PUT update tenant on device.')
                         device.put()
@@ -417,9 +419,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             status = 404
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
         else:
-            change_intent(device.gcm_registration_id, config.PLAYER_RESET_COMMAND)
-            logging.info(
-                'Player reset command issued prior to deleting device with key {0}'.format(device.key.urlsafe()))
+            change_intent(
+                    gcm_registration_id=device.gcm_registration_id,
+                    payload=config.PLAYER_RESET_COMMAND,
+                    device_urlsafe_key=device_urlsafe_key,
+                    host=self.request.host_url)
             device.key.delete()
             self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
