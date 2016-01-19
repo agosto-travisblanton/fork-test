@@ -2,4 +2,4 @@ hash: 06af74587e
 module_yaml_files:
 - app.yaml
 - migration.yaml
-version: 37
+version: 36
