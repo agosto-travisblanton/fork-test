@@ -41,7 +41,7 @@ describe 'CommandsService', ->
   describe '.custom', ->
     it 'prepares a device custom command, returning a promise', ->
       key = 'l0eUdyb3VwDAsSBlRlbmFudBiAgICAgMCvCgw'
-      commandsRestangularService = { customPOST: -> }
+      commandsRestangularService = {customPOST: ->}
       spyOn(Restangular, 'oneUrl').and.returnValue commandsRestangularService
       spyOn(commandsRestangularService, 'customPOST').and.returnValue promise
       channel_change = 'skykit.com/skdchromeapp/channel/2'
@@ -51,4 +51,26 @@ describe 'CommandsService', ->
       actual = CommandsService.custom key, channel_change
       expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}"
       expect(commandsRestangularService.customPOST).toHaveBeenCalledWith(customCommand, 'commands/custom')
+      expect(actual).toBe promise
+
+  describe '.powerOn', ->
+    it 'prepares a power on command, returning a promise', ->
+      key = 'l0eUdyb3VwDAsSBlRlbmFudBiAgICAgMCvCgw'
+      commandsRestangularService = {post: ->}
+      spyOn(Restangular, 'oneUrl').and.returnValue commandsRestangularService
+      spyOn(commandsRestangularService, 'post').and.returnValue promise
+      actual = CommandsService.powerOn key
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}/commands/power-on"
+      expect(commandsRestangularService.post).toHaveBeenCalled()
+      expect(actual).toBe promise
+
+  describe '.powerOff', ->
+    it 'prepares a power off command, returning a promise', ->
+      key = 'l0eUdyb3VwDAsSBlRlbmFudBiAgICAgMCvCgw'
+      commandsRestangularService = {post: ->}
+      spyOn(Restangular, 'oneUrl').and.returnValue commandsRestangularService
+      spyOn(commandsRestangularService, 'post').and.returnValue promise
+      actual = CommandsService.powerOff key
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}/commands/power-off"
+      expect(commandsRestangularService.post).toHaveBeenCalled()
       expect(actual).toBe promise

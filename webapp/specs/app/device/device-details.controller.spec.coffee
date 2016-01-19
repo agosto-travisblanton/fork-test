@@ -328,7 +328,8 @@ describe 'DeviceDetailsCtrl', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
       it 'displays a sweet alert', ->
-        expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent a reset command to the device.', 'success')
+        expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent a reset command to Google Cloud Messaging.',
+          'success')
 
     describe '.onResetFailure', ->
       beforeEach ->
@@ -369,7 +370,7 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'displays a sweet alert', ->
         expect(sweet.show).toHaveBeenCalledWith('Success!',
-          "Sent a volume level of #{controller.currentDevice.volume} to the device.", 'success')
+          "Sent a volume level of #{controller.currentDevice.volume} to Google Cloud Messaging.", 'success')
 
     describe '.onVolumeFailure', ->
       beforeEach ->
@@ -409,8 +410,8 @@ describe 'DeviceDetailsCtrl', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
       it 'displays a sweet alert', ->
-        expect(sweet.show).toHaveBeenCalledWith('Success!', "Sent '#{controller.currentDevice.custom}' to the device.",
-          'success')
+        expect(sweet.show).toHaveBeenCalledWith('Success!',
+          "Sent '#{controller.currentDevice.custom}' to Google Cloud Messaging.", 'success')
 
     describe '.onCommandFailure', ->
       beforeEach ->
@@ -423,6 +424,86 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'displays a sweet alert', ->
         expect(sweet.show).toHaveBeenCalledWith('Oops...', "Command error: #{@error.data}", 'error')
+
+  describe '.onClickPowerOnSendButton', ->
+    beforeEach ->
+      commandsServicePromise = new skykitProvisioning.q.Mock
+      spyOn(CommandsService, 'powerOn').and.returnValue commandsServicePromise
+      spyOn(progressBarService, 'start')
+      spyOn(progressBarService, 'complete')
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+      controller.editMode = true
+      controller.onClickPowerOnSendButton()
+
+    it 'starts the progress bar', ->
+      expect(progressBarService.start).toHaveBeenCalled()
+
+    it 'call CommandsService.powerOn with the current device', ->
+      expect(CommandsService.powerOn).toHaveBeenCalledWith controller.currentDevice.key
+
+      describe '.onPowerOnSuccess', ->
+        beforeEach ->
+          spyOn(sweet, 'show')
+          controller.onPowerOnSuccess()
+
+        it 'stops the progress bar', ->
+          expect(progressBarService.complete).toHaveBeenCalled()
+
+        it 'displays a sweet alert', ->
+          expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent a power on command to Google Cloud Messaging.',
+            'success')
+
+      describe '.onPowerOnFailure', ->
+        beforeEach ->
+          @error = {data: '404 Not Found'}
+          spyOn(sweet, 'show')
+          controller.onPowerOnFailure @error
+
+        it 'stops the progress bar', ->
+          expect(progressBarService.complete).toHaveBeenCalled()
+
+        it 'displays a sweet alert', ->
+          expect(sweet.show).toHaveBeenCalledWith('Oops...', "Reset error: #{@error.data}", 'error')
+
+  describe '.onClickPowerOffSendButton', ->
+    beforeEach ->
+      commandsServicePromise = new skykitProvisioning.q.Mock
+      spyOn(CommandsService, 'powerOff').and.returnValue commandsServicePromise
+      spyOn(progressBarService, 'start')
+      spyOn(progressBarService, 'complete')
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+      controller.editMode = true
+      controller.onClickPowerOffSendButton()
+
+    it 'starts the progress bar', ->
+      expect(progressBarService.start).toHaveBeenCalled()
+
+    it 'call CommandsService.powerOff with the current device', ->
+      expect(CommandsService.powerOff).toHaveBeenCalledWith controller.currentDevice.key
+
+      describe '.onPowerOffSuccess', ->
+        beforeEach ->
+          spyOn(sweet, 'show')
+          controller.onPowerOffSuccess()
+
+        it 'stops the progress bar', ->
+          expect(progressBarService.complete).toHaveBeenCalled()
+
+        it 'displays a sweet alert', ->
+          expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent a power off command to Google Cloud Messaging.',
+            'success')
+
+      describe '.onPowerOffFailure', ->
+        beforeEach ->
+          @error = {data: '404 Not Found'}
+          spyOn(sweet, 'show')
+          controller.onPowerOnFailure @error
+
+        it 'stops the progress bar', ->
+          expect(progressBarService.complete).toHaveBeenCalled()
+
+        it 'displays a sweet alert', ->
+          expect(sweet.show).toHaveBeenCalledWith('Oops...', "Reset error: #{@error.data}", 'error')
 
   describe '.onClickRefreshButton', ->
     beforeEach ->

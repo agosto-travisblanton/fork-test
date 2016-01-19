@@ -235,3 +235,59 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
         self.assertTrue("404 DeviceCommandsHandler command: Device not found with key: {0}".format(bogus_key)
                         in context.exception.message)
+
+    ##################################################################################################################
+    ## power on
+    ##################################################################################################################
+    def test_post_device_power_on_returns_ok_status(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_POWER_ON_COMMAND).thenReturn(None)
+        uri = application.router.build(None,
+                                       'device-power-on-command',
+                                       None,
+                                       {'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
+        request_body = {}
+        response = self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        self.assertOK(response)
+
+    def test_post_device_power_on_with_bogus_device_key_returns_not_found_status(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_POWER_ON_COMMAND).thenReturn(None)
+        bogus_key = '0AXC19Z0DE'
+        uri = application.router.build(None,
+                                       'device-power-on-command',
+                                       None,
+                                       {'device_urlsafe_key': bogus_key})
+        request_body = {}
+        with self.assertRaises(AppError) as context:
+            self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        self.assertTrue("404 DeviceCommandsHandler power on: Device not found with key: {0}".format(bogus_key)
+                        in context.exception.message)
+
+    ##################################################################################################################
+    ## power off
+    ##################################################################################################################
+    def test_post_device_power_off_returns_ok_status(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_POWER_OFF_COMMAND).thenReturn(None)
+        uri = application.router.build(None,
+                                       'device-power-off-command',
+                                       None,
+                                       {'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
+        request_body = {}
+        response = self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        self.assertOK(response)
+
+    def test_post_device_power_off_with_bogus_device_key_returns_not_found_status(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_POWER_OFF_COMMAND).thenReturn(None)
+        bogus_key = '0AXC19Z0DE'
+        uri = application.router.build(None,
+                                       'device-power-off-command',
+                                       None,
+                                       {'device_urlsafe_key': bogus_key})
+        request_body = {}
+        with self.assertRaises(AppError) as context:
+            self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        self.assertTrue("404 DeviceCommandsHandler power off: Device not found with key: {0}".format(bogus_key)
+                        in context.exception.message)

@@ -24,7 +24,11 @@ class TestDeviceMessageProcessor(BaseTest):
         payload = 'skykit.com/skdchromeapp/reset'
         data_dictionary = {'intent': payload}
         when(GoogleCloudMessaging).notify(registration_ids, data_dictionary, test_mode=False).thenReturn(None)
-        change_intent(gcm_registration_id, payload, self.DEVICE_KEY)
+        change_intent(
+                gcm_registration_id=gcm_registration_id,
+                payload=payload,
+                device_urlsafe_key='asdlkfjadksfj',
+                host='http://localhost:3000')
 
     def test_send_unmanaged_device_info_invokes_google_cloud_messaging_notify_method(self):
         gcm_registration_id = self.TEST_GCM_REGISTRATION_ID
@@ -32,4 +36,4 @@ class TestDeviceMessageProcessor(BaseTest):
         device_urlsafe_key = 'ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgIDrop4KDA'
         data_dictionary = dict(deviceKey=device_urlsafe_key, apiToken=config.UNMANAGED_API_TOKEN)
         when(GoogleCloudMessaging).notify(registration_ids, data_dictionary, test_mode=False).thenReturn(None)
-        post_unmanaged_device_info(gcm_registration_id, device_urlsafe_key)
+        post_unmanaged_device_info(gcm_registration_id, device_urlsafe_key, 'http://localhost:3000/')
