@@ -194,7 +194,7 @@ def _DEFAULT_AGOSTO_DEVICE_DOMAIN():
     if on_integration_server:
         return 'dev.agosto.com'
     if on_stage_server:
-        return 'dev-staging.agosto.com'  # FIXME
+        return 'devstaging.skykit.com'
     if on_production_server:
         return 'skykit.agosto.com'
     return None
