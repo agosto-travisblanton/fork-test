@@ -24,5 +24,11 @@ appModule.factory 'CommandsService', (Restangular) ->
       promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}").customPOST(customCommand, 'commands/custom')
       promise
 
+    powerOn: (key) ->
+      promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}/commands/power-on").post()
+      promise
 
+    powerOff: (key) ->
+      promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}/commands/power-off").post()
+      promise
 

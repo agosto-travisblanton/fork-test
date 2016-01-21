@@ -120,7 +120,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onResetSuccess = () ->
     ProgressBarService.complete()
-    sweet.show('Success!', 'Sent a reset command to the device.', 'success')
+    sweet.show('Success!', 'Sent a reset command to Google Cloud Messaging.', 'success')
 
   @onResetFailure = (error) ->
     ProgressBarService.complete()
@@ -134,7 +134,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onVolumeSuccess = (level) ->
     ProgressBarService.complete()
-    sweet.show('Success!', "Sent a volume level of #{level} to the device.", 'success')
+    sweet.show('Success!', "Sent a volume level of #{level} to Google Cloud Messaging.", 'success')
 
   @onVolumeFailure = (error) ->
     ProgressBarService.complete()
@@ -148,7 +148,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onCommandSuccess = (command) ->
     ProgressBarService.complete()
-    sweet.show('Success!', "Sent '#{command}' to the device.", 'success')
+    sweet.show('Success!', "Sent '#{command}' to Google Cloud Messaging.", 'success')
 
   @onCommandFailure = (error) ->
     ProgressBarService.complete()
@@ -171,6 +171,34 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @onRefreshIssuesFailure = (error) ->
     ProgressBarService.complete()
     sweet.show('Oops...', "Refresh error: #{error.data}", 'error')
+
+  @onClickPowerOnSendButton = () ->
+    if @editMode
+      ProgressBarService.start()
+      promise = CommandsService.powerOn $stateParams.deviceKey
+      promise.then @onPowerOnSuccess, @onPowerOnFailure
+
+  @onPowerOnSuccess = () ->
+    ProgressBarService.complete()
+    sweet.show('Success!', 'Sent a power on command to Google Cloud Messaging.', 'success')
+
+  @onPowerOnFailure = (error) ->
+    ProgressBarService.complete()
+    sweet.show('Oops...', "Power on error: #{error.data}", 'error')
+
+  @onClickPowerOffSendButton = () ->
+    if @editMode
+      ProgressBarService.start()
+      promise = CommandsService.powerOff $stateParams.deviceKey
+      promise.then @onPowerOffSuccess, @onPowerOffFailure
+
+  @onPowerOffSuccess = () ->
+    ProgressBarService.complete()
+    sweet.show('Success!', 'Sent a power off command to Google Cloud Messaging.', 'success')
+
+  @onPowerOffFailure = (error) ->
+    ProgressBarService.complete()
+    sweet.show('Oops...', "Power off error: #{error.data}", 'error')
 
   @setPanelInfo = () ->
     if @currentDevice.panelModel != null

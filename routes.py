@@ -116,6 +116,18 @@ application = WSGIApplication(
               handler_method='custom',
               methods=['POST']
               ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/power-on',
+              handler='handlers.device_commands_handler.DeviceCommandsHandler',
+              name='device-power-on-command',
+              handler_method='power_on',
+              methods=['POST']
+              ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/power-off',
+              handler='handlers.device_commands_handler.DeviceCommandsHandler',
+              name='device-power-off-command',
+              handler_method='power_off',
+              methods=['POST']
+              ),
         Route(r'/api/v1/tenants/<tenant_urlsafe_key>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='devices-by-tenant',

@@ -308,6 +308,20 @@ def _PLAYER_VOLUME_COMMAND():
 app_PLAYER_VOLUME_COMMAND = _PLAYER_VOLUME_COMMAND()
 
 
+def _PLAYER_POWER_ON_COMMAND():
+    return 'skykit.com/skdchromeapp/tv/on'
+
+
+app_PLAYER_POWER_ON_COMMAND = _PLAYER_POWER_ON_COMMAND()
+
+
+def _PLAYER_POWER_OFF_COMMAND():
+    return 'skykit.com/skdchromeapp/tv/off'
+
+
+app_PLAYER_POWER_OFF_COMMAND = _PLAYER_POWER_OFF_COMMAND()
+
+
 def _PLAYER_HEARTBEAT_INTERVAL_MINUTES():
     return 2
 
