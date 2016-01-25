@@ -83,7 +83,11 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'panelInput': lambda o, field_name, context: o.key.get().panel_input},
     {'heartbeatInterval': lambda o, field_name, context: o.key.get().heartbeat_interval_minutes},
     {'timezone': lambda o, field_name, context: o.key.get().time_zone},
-    {'connectionType': lambda o, field_name, context: o.key.get().connection_type}
+    {'connectionType': lambda o, field_name, context: o.key.get().connection_type},
+    {'latitude': lambda o, field_name,
+                        context: o.key.get().geoLocation.lat if o.key.get().geoLocation is not None else None},
+    {'longitude': lambda o, field_name,
+                         context: o.key.get().geoLocation.lon if o.key.get().geoLocation is not None else None}
 ]
 
 DEVICE_ISSUE_LOG_STRATEGY = ModelStrategy(DeviceIssueLog)
