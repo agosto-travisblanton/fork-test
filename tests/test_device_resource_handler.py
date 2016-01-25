@@ -801,6 +801,31 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json['gcmRegistrationId'], self.GCM_REGISTRATION_ID)
         self.assertEqual(response_json['macAddress'], self.MAC_ADDRESS)
 
+    def test_put_lat_or_lon_none_nulls_geo_location(self):
+        request_body = {'latitude': None,
+                        'longitude': -146.549
+                        }
+        when(deferred).defer(any_matcher(update_chrome_os_device),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
+                                json.dumps(request_body),
+                                headers=self.api_token_authorization_header)
+        self.assertIsNone(self.managed_device.geo_location)
+
+    def test_put_valid_lat_or_lon_updates_geo_location(self):
+        latitude = 44.983579
+        longitude = -93.277544
+        request_body = {'latitude': latitude,
+                        'longitude': longitude
+                        }
+        when(deferred).defer(any_matcher(update_chrome_os_device),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
+                                json.dumps(request_body),
+                                headers=self.api_token_authorization_header)
+        self.assertEqual(self.managed_device.geo_location, ndb.GeoPt(latitude, longitude))
+
+
     ##################################################################################################################
     ## delete
     ##################################################################################################################

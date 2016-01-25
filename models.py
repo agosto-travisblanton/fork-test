@@ -217,7 +217,7 @@ class ChromeOsDevice(ndb.Model):
     heartbeat_interval_minutes = ndb.IntegerProperty(default=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES, required=True,
                                                      indexed=False)
     time_zone = ndb.StringProperty(required=False, indexed=True)
-    geoLocation = ndb.GeoPtProperty(required=False, indexed=True)
+    geo_location = ndb.GeoPtProperty(required=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):
