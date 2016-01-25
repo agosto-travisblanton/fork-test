@@ -1,3 +1,5 @@
+from google.appengine.ext import ndb
+
 from app_config import config
 from env_setup import setup_test_paths
 
@@ -192,3 +194,30 @@ class TestChromeOsDeviceModel(BaseTest):
     def test_get_unmanaged_device_by_gcm_registration_id_with_bogus_gcm_registration_id(self):
         unmanaged_device = ChromeOsDevice.get_unmanaged_device_by_gcm_registration_id('bogus')
         self.assertIsNone(unmanaged_device)
+
+    def test_json_serialization_strategy_of_geo_location_decomposes_into_lat_lon(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS,
+                                               serial_number=self.SERIAL_NUMBER,
+                                               model=self.MODEL)
+        latitude = 44.983579
+        longitude = -93.277544
+        device.geoLocation = ndb.GeoPt(latitude, longitude) # Agosto's geoLocation
+        device.put()
+        json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
+        self.assertEqual(latitude, json_representation['latitude'])
+        self.assertEqual(longitude, json_representation['longitude'])
+
+    def test_json_serialization_strategy_of_geo_location_when_geo_location_is_none(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS,
+                                               serial_number=self.SERIAL_NUMBER,
+                                               model=self.MODEL)
+        device.put()
+        json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
+        self.assertIsNone(json_representation['latitude'])
+        self.assertIsNone(json_representation['longitude'])

@@ -108,6 +108,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response = self.app.post('/api/v1/devices', json.dumps(request_body),
                                  headers=self.api_token_authorization_header)
         self.assertEqual('201 Created', response.status)
+        self.assertEqual(201, response.status_int)
 
     def test_post_managed_device_returns_resource_url_in_location_header(self):
         tenant = self.tenant_key.get()
@@ -193,6 +194,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'gcmRegistrationId': new_gcm_registration_id}
         response = self.app.post('/api/v1/devices', json.dumps(request_body),
                                  headers=self.unmanaged_registration_token_authorization_header)
+        self.assertEqual('201 Created', response.status)
         self.assertEqual(201, response.status_int)
 
     def test_device_resource_handler_unmanaged_post_returns_cannot_register_when_mac_address_already_assigned(self):
@@ -707,6 +709,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                 json.dumps(request_body),
                                 headers=self.api_token_authorization_header)
         self.assertEqual('204 No Content', response.status)
+        self.assertEqual(204, response.status_int)
 
     def test_put_updates_device_notes(self):
         new_note = 'new note'
