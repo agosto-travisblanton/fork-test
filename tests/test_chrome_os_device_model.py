@@ -204,7 +204,7 @@ class TestChromeOsDeviceModel(BaseTest):
                                                model=self.MODEL)
         latitude = 44.983579
         longitude = -93.277544
-        device.geoLocation = ndb.GeoPt(latitude, longitude) # Agosto's geoLocation
+        device.geo_location = ndb.GeoPt(latitude, longitude) # Agosto's geoLocation
         device.put()
         json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
         self.assertEqual(latitude, json_representation['latitude'])

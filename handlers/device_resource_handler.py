@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 from datetime import datetime
 
 from google.appengine.ext import ndb
@@ -20,6 +21,9 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob
 
 
 class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidatorMixin):
+    LATITUDE_PATTERN = '^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?)'
+    LONGITUDE_PATTERN = '\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$'
+
     @requires_api_token
     def get_list(self):
         pairing_code = self.request.get('pairingCode')
@@ -240,6 +244,17 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             notes = request_json.get('notes')
             if notes:
                 device.notes = notes
+            latitude = request_json.get('latitude')
+            longitude = request_json.get('longitude')
+            if latitude is None or longitude is None:
+                device.geo_location = None
+            else:
+                if re.match(self.LATITUDE_PATTERN, str(latitude)) is None or re.match(self.LONGITUDE_PATTERN,
+                                                                                      str(longitude)) is None:
+                    logging.warning(
+                            'Invalid latitude {0} or longitude {1} detected.'.format(str(latitude), str(longitude)))
+                else:
+                    device.geo_location = ndb.GeoPt(latitude, longitude)
             gcm_registration_id = request_json.get('gcmRegistrationId')
             if gcm_registration_id:
                 logging.info('  PUT updating the gcmRegistrationId.')
