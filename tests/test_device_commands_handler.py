@@ -143,7 +143,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
                                                      config.PLAYER_DELETE_CONTENT_COMMAND).thenReturn(None)
         uri = application.router.build(None,
-                                       'device-delete_content-command',
+                                       'device-delete-content-command',
                                        None,
                                        {'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
         request_body = {}
@@ -155,7 +155,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
                                                      config.PLAYER_DELETE_CONTENT_COMMAND).thenReturn(None)
         bogus_key = '0AXC19Z0DE'
         uri = application.router.build(None,
-                                       'device-delete_content-command',
+                                       'device-delete-content-command',
                                        None,
                                        {'device_urlsafe_key': bogus_key})
         request_body = {}

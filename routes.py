@@ -130,7 +130,7 @@ application = WSGIApplication(
               ),
         Route(r'/api/v1/devices/<device_urlsafe_key>/commands/content-delete',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
-              name='device-delete_content-command',
+              name='device-delete-content-command',
               handler_method='content_delete',
               methods=['POST']
               ),
