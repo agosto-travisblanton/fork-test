@@ -139,6 +139,20 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     ProgressBarService.complete()
     sweet.show('Oops...', "Reset error: #{error.data}", 'error')
 
+  @onClickContentDeleteSendButton = () ->
+    if @editMode
+      ProgressBarService.start()
+      promise = CommandsService.contentDelete $stateParams.deviceKey
+      promise.then @onContentDeleteSuccess, @onContentDeleteFailure
+
+  @onContentDeleteSuccess = () ->
+    ProgressBarService.complete()
+    sweet.show('Success!', 'Sent a content delete command to Google Cloud Messaging.', 'success')
+
+  @onContentDeleteFailure = (error) ->
+    ProgressBarService.complete()
+    sweet.show('Oops...', "Content delete error: #{error.data}", 'error')
+
   @onClickVolumeSendButton = () ->
     if @editMode
       ProgressBarService.start()

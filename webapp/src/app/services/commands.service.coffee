@@ -10,6 +10,10 @@ appModule.factory 'CommandsService', (Restangular) ->
       promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}/commands/reset").post()
       promise
 
+    contentDelete: (key) ->
+      promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}/commands/content-delete").post()
+      promise
+
     volume: (key, volume) ->
       volumeCommand = {
         volume: volume

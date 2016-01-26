@@ -57,7 +57,7 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
         if None is chrome_os_device:
             status = 404
             message = 'DeviceCommandsHandler reset: Device not found with key: {0}'.format(device_urlsafe_key)
-            logging.info(message)
+            logging.warning(message)
         else:
             change_intent(
                     gcm_registration_id=chrome_os_device.gcm_registration_id,
@@ -85,7 +85,7 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
             if None is chrome_os_device:
                 status = 404
                 message = 'DeviceCommandsHandler volume: Device not found with key: {0}'.format(device_urlsafe_key)
-                logging.info(message)
+                logging.warning(message)
             else:
                 intent = "{0}{1}".format(config.PLAYER_VOLUME_COMMAND, int(volume))
                 change_intent(gcm_registration_id=chrome_os_device.gcm_registration_id,
@@ -113,7 +113,7 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
             if None is chrome_os_device:
                 status = 404
                 message = 'DeviceCommandsHandler command: Device not found with key: {0}'.format(device_urlsafe_key)
-                logging.info(message)
+                logging.warning(message)
             else:
                 change_intent(gcm_registration_id=chrome_os_device.gcm_registration_id,
                               payload=intent,
@@ -133,8 +133,8 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
             logging.exception(e)
         if None is chrome_os_device:
             status = 404
-            message = 'DeviceCommandsHandler power on: Device not found with key: {0}'.format(device_urlsafe_key)
-            logging.info(message)
+            message = 'DeviceCommandsHandler power_on: Device not found with key: {0}'.format(device_urlsafe_key)
+            logging.warning(message)
         else:
             change_intent(
                     gcm_registration_id=chrome_os_device.gcm_registration_id,
@@ -155,12 +155,34 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
             logging.exception(e)
         if None is chrome_os_device:
             status = 404
-            message = 'DeviceCommandsHandler power off: Device not found with key: {0}'.format(device_urlsafe_key)
-            logging.info(message)
+            message = 'DeviceCommandsHandler power_off: Device not found with key: {0}'.format(device_urlsafe_key)
+            logging.warning(message)
         else:
             change_intent(
                     gcm_registration_id=chrome_os_device.gcm_registration_id,
                     payload=config.PLAYER_POWER_OFF_COMMAND,
+                    device_urlsafe_key=device_urlsafe_key,
+                    host=self.request.host_url)
+        self.response.set_status(status, message)
+
+    @requires_api_token
+    def content_delete(self, device_urlsafe_key):
+        status = 200
+        message = None
+        chrome_os_device = None
+        try:
+            device_key = ndb.Key(urlsafe=device_urlsafe_key)
+            chrome_os_device = device_key.get()
+        except Exception, e:
+            logging.exception(e)
+        if None is chrome_os_device:
+            status = 404
+            message = 'DeviceCommandsHandler content_delete: Device not found with key: {0}'.format(device_urlsafe_key)
+            logging.warning(message)
+        else:
+            change_intent(
+                    gcm_registration_id=chrome_os_device.gcm_registration_id,
+                    payload=config.PLAYER_DELETE_CONTENT_COMMAND,
                     device_urlsafe_key=device_urlsafe_key,
                     host=self.request.host_url)
         self.response.set_status(status, message)

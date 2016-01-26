@@ -128,6 +128,12 @@ application = WSGIApplication(
               handler_method='power_off',
               methods=['POST']
               ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/content-delete',
+              handler='handlers.device_commands_handler.DeviceCommandsHandler',
+              name='device-delete_content-command',
+              handler_method='content_delete',
+              methods=['POST']
+              ),
         Route(r'/api/v1/tenants/<tenant_urlsafe_key>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='devices-by-tenant',
