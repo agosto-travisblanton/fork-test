@@ -76,7 +76,7 @@ describe 'CommandsService', ->
       expect(actual).toBe promise
 
   describe '.contentDelete', ->
-    it 'prepares a power off command, returning a promise', ->
+    it 'prepares a content delete command, returning a promise', ->
       key = 'l0eUdyb3VwDAsSBlRlbmFudBiAgICAgMCvCgw'
       commandsRestangularService = {post: ->}
       spyOn(Restangular, 'oneUrl').and.returnValue commandsRestangularService
