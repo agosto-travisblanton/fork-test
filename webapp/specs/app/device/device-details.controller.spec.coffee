@@ -539,6 +539,46 @@ describe 'DeviceDetailsCtrl', ->
         it 'displays a sweet alert', ->
           expect(sweet.show).toHaveBeenCalledWith('Oops...', "Reset error: #{@error.data}", 'error')
 
+  describe '.onClickContentDeleteSendButton', ->
+    beforeEach ->
+      commandsServicePromise = new skykitProvisioning.q.Mock
+      spyOn(CommandsService, 'contentDelete').and.returnValue commandsServicePromise
+      spyOn(progressBarService, 'start')
+      spyOn(progressBarService, 'complete')
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+      controller.editMode = true
+      controller.onClickContentDeleteSendButton()
+
+    it 'starts the progress bar', ->
+      expect(progressBarService.start).toHaveBeenCalled()
+
+    it 'calls CommandsService.contentDelete with the current device', ->
+      expect(CommandsService.contentDelete).toHaveBeenCalledWith controller.currentDevice.key
+
+      describe '.onContentDeleteSuccess', ->
+        beforeEach ->
+          spyOn(sweet, 'show')
+          controller.onContentDeleteSuccess()
+
+        it 'stops the progress bar', ->
+          expect(progressBarService.complete).toHaveBeenCalled()
+
+        it 'displays a sweet alert', ->
+          expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent a content delete command to Google Cloud Messaging.',
+            'success')
+
+      describe '.onContentDeleteFailure', ->
+        beforeEach ->
+          @error = {data: '404 Not Found'}
+          spyOn(sweet, 'show')
+          controller.onContentDeleteFailure @error
+
+        it 'stops the progress bar', ->
+          expect(progressBarService.complete).toHaveBeenCalled()
+
+        it 'displays a sweet alert', ->
+          expect(sweet.show).toHaveBeenCalledWith('Oops...', "Content delete error: #{@error.data}", 'error')
+
   describe '.onClickRefreshButton', ->
     beforeEach ->
       devicesServicePromise = new skykitProvisioning.q.Mock

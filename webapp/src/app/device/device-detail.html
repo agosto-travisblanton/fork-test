@@ -462,6 +462,46 @@
                     <md-card>
                       <md-card-title>
                         <md-card-title-text>
+                          <span class="md-headline">Content delete</span>
+                        </md-card-title-text>
+                      </md-card-title>
+                      <md-card-content>
+                        <form name="resetForm" class="form-horizontal"
+                              ng-submit="deviceDetailsCtrl.onClickContentDeleteSendButton()"
+                              novalidate>
+                          <md-card-actions layout="row" layout-align="end center">
+                            <md-button type="submit"><i class="fa fa-fw fa-building"></i>
+                              Send to GCM
+                            </md-button>
+                          </md-card-actions>
+                        </form>
+                      </md-card-content>
+                    </md-card>
+                  </div>
+                  <div flex="25" flex-sm="25" flex-xs="25" layout="column">
+                    <md-card>
+                      <md-card-title>
+                        <md-card-title-text>
+                          <span class="md-headline">Reset</span>
+                        </md-card-title-text>
+                      </md-card-title>
+                      <md-card-content>
+                        <form name="resetForm" class="form-horizontal"
+                              ng-submit="deviceDetailsCtrl.onClickResetSendButton()"
+                              novalidate>
+                          <md-card-actions layout="row" layout-align="end center">
+                            <md-button type="submit"><i class="fa fa-fw fa-building"></i>
+                              Send to GCM
+                            </md-button>
+                          </md-card-actions>
+                        </form>
+                      </md-card-content>
+                    </md-card>
+                  </div>
+                  <div flex="25" flex-sm="25" flex-xs="25" layout="column">
+                    <md-card>
+                      <md-card-title>
+                        <md-card-title-text>
                           <span class="md-headline">Power on</span>
                         </md-card-title-text>
                       </md-card-title>
@@ -498,26 +538,6 @@
                       </md-card-content>
                     </md-card>
                   </div>
-                  <div flex="25" flex-sm="25" flex-xs="25" layout="column">
-                    <md-card>
-                      <md-card-title>
-                        <md-card-title-text>
-                          <span class="md-headline">Reset</span>
-                        </md-card-title-text>
-                      </md-card-title>
-                      <md-card-content>
-                        <form name="resetForm" class="form-horizontal"
-                              ng-submit="deviceDetailsCtrl.onClickResetSendButton()"
-                              novalidate>
-                          <md-card-actions layout="row" layout-align="end center">
-                            <md-button type="submit"><i class="fa fa-fw fa-building"></i>
-                              Send to GCM
-                            </md-button>
-                          </md-card-actions>
-                        </form>
-                      </md-card-content>
-                    </md-card>
-                  </div>
                 </md-content>
                 <md-content class="md-padding" layout="row" layout-wrap layout-xs="column">
                   <div flex="25" flex-sm="25" flex-xs="25" layout="column">
@@ -533,7 +553,7 @@
                           <div class="row">
                             <div class="col-sm-12">
                               <div class="row">
-                                <div class="col-sm-3 pull-right">
+                                <div class="col-sm-5 pull-right">
                                   <input type="number"
                                          class="form-control"
                                          name="volume"
@@ -544,7 +564,6 @@
                                          ngMinlength="1"
                                          ngMaxlength="3"
                                          ng-required="true">
-                                  <!--<span ng-show="volumeForm.$invalid">1-100</span>-->
                                 </div>
                               </div>
                             </div>

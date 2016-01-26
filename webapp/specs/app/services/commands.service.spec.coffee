@@ -74,3 +74,14 @@ describe 'CommandsService', ->
       expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}/commands/power-off"
       expect(commandsRestangularService.post).toHaveBeenCalled()
       expect(actual).toBe promise
+
+  describe '.contentDelete', ->
+    it 'prepares a power off command, returning a promise', ->
+      key = 'l0eUdyb3VwDAsSBlRlbmFudBiAgICAgMCvCgw'
+      commandsRestangularService = {post: ->}
+      spyOn(Restangular, 'oneUrl').and.returnValue commandsRestangularService
+      spyOn(commandsRestangularService, 'post').and.returnValue promise
+      actual = CommandsService.contentDelete key
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}/commands/content-delete"
+      expect(commandsRestangularService.post).toHaveBeenCalled()
+      expect(actual).toBe promise
