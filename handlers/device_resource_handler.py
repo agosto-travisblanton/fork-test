@@ -34,8 +34,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                 ChromeOsDevice.ethernet_mac_address == device_mac_address))
             query_results = query.fetch()
             if len(query_results) is 1:
-                if ChromeOsDevice.rogue_unmanaged_device_check(device_mac_address):
-                    # delete device and return a 404
+                if ChromeOsDevice.is_rogue_unmanaged_device(device_mac_address):
+                    self.delete(query_results[0].key.urlsafe())
                     error_message = "Rogue unmanaged device with MAC address: {0} no longer exists.".format(
                         device_mac_address)
                     self.response.set_status(404, error_message)
