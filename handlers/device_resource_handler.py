@@ -34,7 +34,13 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                 ChromeOsDevice.ethernet_mac_address == device_mac_address))
             query_results = query.fetch()
             if len(query_results) is 1:
-                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+                if ChromeOsDevice.is_rogue_unmanaged_device(device_mac_address):
+                    self.delete(query_results[0].key.urlsafe())
+                    error_message = "Rogue unmanaged device with MAC address: {0} no longer exists.".format(
+                        device_mac_address)
+                    self.response.set_status(404, error_message)
+                else:
+                    json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
             elif len(query_results) > 1:
                 json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
                 error_message = "Multiple devices have MAC address {0}".format(device_mac_address)
