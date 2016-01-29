@@ -300,6 +300,14 @@ class ChromeOsDevice(ndb.Model):
                        ChromeOsDevice.ethernet_mac_address == device_mac_address)).count() > 0
         return mac_address_assigned_to_device
 
+    @classmethod
+    def rogue_unmanaged_device_check(cls, mac_address):
+        device = ChromeOsDevice.get_unmanaged_device_by_mac_address(mac_address)
+        if device is not None and device.tenant_key is None:
+            return True
+        else:
+            return False
+
     def _pre_put_hook(self):
         self.class_version = 3
 

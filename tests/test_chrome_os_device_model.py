@@ -195,6 +195,25 @@ class TestChromeOsDeviceModel(BaseTest):
         unmanaged_device = ChromeOsDevice.get_unmanaged_device_by_gcm_registration_id('bogus')
         self.assertIsNone(unmanaged_device)
 
+    def test_rogue_unmanaged_device_check_without_tenant_key_returns_true(self):
+        device = ChromeOsDevice.create_unmanaged(self.TEST_GCM_REGISTRATION_ID, self.MAC_ADDRESS)
+        device.put()
+        self.assertTrue(ChromeOsDevice.rogue_unmanaged_device_check(self.MAC_ADDRESS))
+
+    def test_rogue_unmanaged_device_check_with_tenant_key_returns_false(self):
+        device = ChromeOsDevice.create_unmanaged(self.TEST_GCM_REGISTRATION_ID, self.MAC_ADDRESS)
+        device.tenant_key = self.tenant_key
+        device.put()
+        self.assertFalse(ChromeOsDevice.rogue_unmanaged_device_check(self.MAC_ADDRESS))
+
+    # def rogue_unmanaged_device_check(cls, mac_address):
+    #     device = ChromeOsDevice.get_unmanaged_device_by_mac_address(mac_address)
+    #     if device is not None and device.tenant_key is None:
+    #         return True
+    #     else:
+    #         return False
+
+
     def test_json_serialization_strategy_of_geo_location_decomposes_into_lat_lon(self):
         device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
                                                device_id=self.TESTING_DEVICE_ID,
