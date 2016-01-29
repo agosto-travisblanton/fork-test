@@ -422,6 +422,33 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['gcmRegistrationId'], device.gcm_registration_id)
 
+    def test_get_list_by_mac_address_on_rogue_unmanged_device_without_tenant_key_deletes_device(self):
+        mac_address = '2e871e619346'
+        unmanaged_device = ChromeOsDevice.create_unmanaged(self.GCM_REGISTRATION_ID, mac_address)
+        unmanaged_device_key = unmanaged_device.put()
+        self.assertIsNone(unmanaged_device.tenant_key)
+        self.assertIsNotNone(unmanaged_device)
+        request_parameters = {'macAddress': mac_address}
+        uri = build_uri('devices-retrieval')
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 404 Rogue unmanaged device with MAC address: {0} no longer exists.'.format(
+                mac_address) in context.exception.message)
+        self.assertIsNone(unmanaged_device_key.get())
+
+    def test_get_list_by_mac_address_on_rogue_unmanged_device_with_tenant_key_does_not_delete_device(self):
+        mac_address = '2e871e619346'
+        unmanaged_device = ChromeOsDevice.create_unmanaged(self.GCM_REGISTRATION_ID, mac_address)
+        unmanaged_device.tenant_key = self.tenant_key
+        unmanaged_device_key = unmanaged_device.put()
+        self.assertIsNotNone(unmanaged_device.tenant_key)
+        self.assertIsNotNone(unmanaged_device)
+        request_parameters = {'macAddress': mac_address}
+        uri = build_uri('devices-retrieval')
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        self.assertIsNotNone(unmanaged_device_key.get())
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['macAddress'], mac_address)
 
     ##################################################################################################################
     # get_devices_by_tenant
