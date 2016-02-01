@@ -634,17 +634,19 @@
                       <thead>
                       <tr>
                         <th>Command</th>
-                        <th>Updated UTC</th>
+                        <th>Posted UTC</th>
+                        <th>Confirmed UTC</th>
                         <th style="width:1px"></th>
                       </tr>
                       </thead>
                       <tbody>
                       <tr ng-hide="deviceDetailsCtrl.commandEvents.length">
-                        <td class="text-center text-warning" colspan="5">No commands for this device</td>
+                        <td class="text-center text-warning" colspan="4">No commands posted for this device</td>
                       </tr>
-                      <tr ng-repeat="item in deviceDetailsCtrl.commandEvents | orderBy:['-level','-updated']">
+                      <tr ng-repeat="item in deviceDetailsCtrl.commandEvents | orderBy:['-postedTime']">
                         <td>{{ item.payload }}</td>
-                        <td>{{ item.updated }}</td>
+                        <td>{{ item.postedTime }}</td>
+                        <td>{{ item.confirmedTime }}</td>
                         <td class="up-{{ item.confirmed}}-background"></td>
                       </tr>
                       </tbody>
