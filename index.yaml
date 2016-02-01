@@ -17,7 +17,7 @@ indexes:
 - kind: PlayerCommandEvent
   properties:
   - name: device_urlsafe_key
-  - name: updated
+  - name: posted
     direction: desc
 
 - kind: PlayerCommandEvent
