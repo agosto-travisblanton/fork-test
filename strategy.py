@@ -4,7 +4,7 @@ from google.appengine.ext import ndb
 
 from models import (Tenant, ChromeOsDevice, Distributor, Domain, DeviceIssueLog, PlayerCommandEvent)
 from restler.serializers import ModelStrategy
-from utils.datetime_util import elapsed_time_message
+from utils.datetime_util import elapsed_time_message, convert_timezone
 
 TENANT_FIELDS = [
     'name',
@@ -123,7 +123,7 @@ PLAYER_COMMAND_EVENT_STRATEGY += [
     {'deviceKey': lambda o, field_name, context: o.key.get().device_urlsafe_key},
     {'payload': lambda o, field_name, context: o.key.get().payload},
     {'gcmRegistrationId': lambda o, field_name, context: o.key.get().gcm_registration_id},
-    {'postedTime': lambda o, field_name, context: o.key.get().posted},
-    {'confirmedTime': lambda o, field_name, context: o.key.get().confirmed},
+    {'postedTime': lambda o, field_name, context: convert_timezone(o.key.get().posted, 'US/Central')},
+    {'confirmedTime': lambda o, field_name, context: convert_timezone(o.key.get().confirmed, 'US/Central')},
     {'confirmed': lambda o, field_name, context: o.key.get().player_has_confirmed}
 ]
