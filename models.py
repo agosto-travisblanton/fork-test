@@ -496,8 +496,8 @@ class PlayerCommandEvent(ndb.Model):
     payload = ndb.StringProperty(required=True, indexed=True)
     gcm_registration_id = ndb.StringProperty(required=True, indexed=True)
     gcm_message_id = ndb.StringProperty(required=False, indexed=True)
-    created = ndb.DateTimeProperty(auto_now_add=True)
-    updated = ndb.DateTimeProperty(auto_now=True)
+    posted = ndb.DateTimeProperty(auto_now_add=True)
+    confirmed = ndb.DateTimeProperty(required=False, indexed=True)
     player_has_confirmed = ndb.BooleanProperty(default=False, required=True, indexed=True)
     class_version = ndb.IntegerProperty()
 
@@ -511,7 +511,7 @@ class PlayerCommandEvent(ndb.Model):
     @classmethod
     def get_events_by_device_key(self, device_urlsafe_key, last_number=100):
         query = PlayerCommandEvent.query(PlayerCommandEvent.device_urlsafe_key == device_urlsafe_key).order(
-                -PlayerCommandEvent.updated)
+                -PlayerCommandEvent.posted)
         return query.fetch(last_number)
 
     def _pre_put_hook(self):

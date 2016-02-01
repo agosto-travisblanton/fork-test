@@ -7,6 +7,7 @@ from models import PlayerCommandEvent
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import PLAYER_COMMAND_EVENT_STRATEGY
+from datetime import datetime
 
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
@@ -19,6 +20,7 @@ class PlayerCommandEventsHandler(RequestHandler, KeyValidatorMixin):
             command_event = self.validate_and_get(urlsafe_event_key, PlayerCommandEvent, abort_on_not_found=True)
         except Exception, e:
             logging.exception(e)
+        command_event.confirmed = datetime.utcnow()
         command_event.player_has_confirmed = True
         command_event.put()
         self.response.headers.pop('Content-Type', None)
