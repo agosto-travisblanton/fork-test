@@ -20,7 +20,7 @@ class TestPlayerCommandEventModel(BaseTest):
     def test_create_returns_expected_player_command_event_representation(self):
         event = PlayerCommandEvent.create(device_urlsafe_key=self.DEVICE_URLSAFE_KEY,
                                           payload=self.INTENT, gcm_registration_id=self.GCM_REGISTRATION_ID)
-        self.assertIsNone(event.posted)
+        self.assertIsNotNone(event.posted)
         self.assertIsNone(event.confirmed)
         self.assertFalse(event.player_has_confirmed)
         event_key = event.put()
