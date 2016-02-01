@@ -380,3 +380,21 @@ def _STORMPATH_AUTH_APP():
 app_STORMPATH_AUTH_APP = _STORMPATH_AUTH_APP()
 
 webapp2_extras_sessions_secret_key = '94eda847-0ea9-4f49-b96c-1434ec318563'
+
+##############################################################################
+# MAILGUN SETTINGS
+##############################################################################
+
+def _MAILGUN_APIKEY():
+    return "key-7g5zunub4weun65nb9aop2kcsgher-l0"
+app_MAILGUN_APIKEY = _MAILGUN_APIKEY()
+
+
+def _MAILGUN_MESSAGES_URL():
+    return "https://api.mailgun.net/v2/skykit.com/messages"
+app_MAILGUN_MESSAGES_URL = _MAILGUN_MESSAGES_URL()
+
+
+def _MAILGUN_STATS_URL():
+    return "https://api.mailgun.net/v2/skykit.com/stats"
+app_MAILGUN_STATS_URL = _MAILGUN_STATS_URL()

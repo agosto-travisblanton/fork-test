@@ -54,6 +54,11 @@ class AppConfig(Config):
     ETHERNET_CONNECTION = None
     WIFI_CONNECTION = None
 
+    MAILGUN_MESSAGES_URL = None
+    MAILGUN_STATS_URL = None
+    MAILGUN_APIKEY = None
+    MAILGUN_DEADLINE = 15
+
 
 
 config = AppConfig.get_config()
