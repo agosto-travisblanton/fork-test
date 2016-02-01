@@ -59,6 +59,8 @@ class AppConfig(Config):
     MAILGUN_APIKEY = None
     MAILGUN_DEADLINE = 15
 
+    EMAIL_SUPPORT = False
+
 
 
 config = AppConfig.get_config()

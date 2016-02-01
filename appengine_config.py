@@ -398,3 +398,18 @@ app_MAILGUN_MESSAGES_URL = _MAILGUN_MESSAGES_URL()
 def _MAILGUN_STATS_URL():
     return "https://api.mailgun.net/v2/skykit.com/stats"
 app_MAILGUN_STATS_URL = _MAILGUN_STATS_URL()
+
+
+def _EMAIL_SUPPORT():
+    if on_development_server or not on_server:
+        return True
+    if on_integration_server:
+        return True
+    if on_stage_server:
+        return True
+    if on_production_server:
+        return True
+    return False
+
+
+app_EMAIL_SUPPORT = _EMAIL_SUPPORT()
