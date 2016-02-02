@@ -35,8 +35,8 @@ class MailUtil(object):
                 if result.status_code != 200:
                     logging.error(return_text)
             except Exception, exp:
-                logging.error("Error on URL Fetch. Message may not have been delivered! %s" % exp)
                 return_text = "Error on URL Fetch. Message may not have been delivered! %s" % exp
+                logging.error(return_text)
         else:
             return_text = "Email support is set to False."
             logging.warning(return_text)
