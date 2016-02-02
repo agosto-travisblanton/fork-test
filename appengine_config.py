@@ -415,7 +415,7 @@ app_MAIL_FROM = _MAIL_FROM()
 
 def _EMAIL_SUPPORT():
     if on_development_server or not on_server:
-        return False
+        return True
     if on_integration_server:
         return True
     if on_stage_server:
