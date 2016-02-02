@@ -54,6 +54,13 @@ class AppConfig(Config):
     ETHERNET_CONNECTION = None
     WIFI_CONNECTION = None
 
+    MAIL_MESSAGES_URL = None
+    MAIL_EVENTS_URL = None
+    MAIL_API_KEY = None
+    MAIL_FROM = None
+
+    EMAIL_SUPPORT = False
+
 
 
 config = AppConfig.get_config()

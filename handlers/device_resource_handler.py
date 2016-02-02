@@ -16,6 +16,7 @@ from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup, DeviceIssu
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY, DEVICE_ISSUE_LOG_STRATEGY
+from utils.mail_util import MailUtil
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -23,6 +24,7 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob
 class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidatorMixin):
     LATITUDE_PATTERN = '^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?)'
     LONGITUDE_PATTERN = '\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$'
+    MAILGUN_QUEUED_MESSAGE = 'Queued. Thank you.'
 
     @requires_api_token
     def get_list(self):
@@ -227,6 +229,15 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     self.response.headers['Location'] = device_uri
                     self.response.headers.pop('Content-Type', None)
                     self.response.set_status(status)
+                    tenant_notification_emails = Tenant.find_by_tenant_code(tenant_code).notification_emails
+                    if tenant_notification_emails is not None:
+                        response = MailUtil.send_message(
+                            recipients=tenant_notification_emails,
+                            subject='Device Added',
+                            text='A new device was added with MAC address {0}.'.format(device_mac_address))
+                        response_json = json.loads(response)
+                        if response_json['message'] is not self.MAILGUN_QUEUED_MESSAGE:
+                            logging.warning('Tenant notification email for device add was not queued.')
                 else:
                     self.response.set_status(status, error_message)
         else:
