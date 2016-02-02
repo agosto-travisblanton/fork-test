@@ -54,10 +54,10 @@ class AppConfig(Config):
     ETHERNET_CONNECTION = None
     WIFI_CONNECTION = None
 
-    MAILGUN_MESSAGES_URL = None
-    MAILGUN_STATS_URL = None
-    MAILGUN_APIKEY = None
-    MAILGUN_DEADLINE = 15
+    MAIL_MESSAGES_URL = None
+    MAIL_EVENTS_URL = None
+    MAIL_API_KEY = None
+    MAIL_FROM = None
 
     EMAIL_SUPPORT = False
 

@@ -382,27 +382,40 @@ app_STORMPATH_AUTH_APP = _STORMPATH_AUTH_APP()
 webapp2_extras_sessions_secret_key = '94eda847-0ea9-4f49-b96c-1434ec318563'
 
 ##############################################################################
-# MAILGUN SETTINGS
+# MAIL SETTINGS
 ##############################################################################
 
-def _MAILGUN_APIKEY():
+def _MAIL_API_KEY():
     return "key-7g5zunub4weun65nb9aop2kcsgher-l0"
-app_MAILGUN_APIKEY = _MAILGUN_APIKEY()
 
 
-def _MAILGUN_MESSAGES_URL():
-    return "https://api.mailgun.net/v2/skykit.com/messages"
-app_MAILGUN_MESSAGES_URL = _MAILGUN_MESSAGES_URL()
+app_MAIL_API_KEY = _MAIL_API_KEY()
 
 
-def _MAILGUN_STATS_URL():
-    return "https://api.mailgun.net/v2/skykit.com/stats"
-app_MAILGUN_STATS_URL = _MAILGUN_STATS_URL()
+def _MAIL_MESSAGES_URL():
+    return "https://api.mailgun.net/v3/skykit.com/messages"
+
+
+app_MAIL_MESSAGES_URL = _MAIL_MESSAGES_URL()
+
+
+def _MAIL_EVENTS_URL():
+    return "https://api.mailgun.net/v3/skykit.com/events"
+
+
+app_MAIL_EVENTS_URL = _MAIL_EVENTS_URL()
+
+
+def _MAIL_FROM():
+    return "Skykit Provisioning <noreply-provisioning@skykit.com>"
+
+
+app_MAIL_FROM = _MAIL_FROM()
 
 
 def _EMAIL_SUPPORT():
     if on_development_server or not on_server:
-        return True
+        return False
     if on_integration_server:
         return True
     if on_stage_server:
