@@ -34,8 +34,8 @@ class MailUtil(object):
                 return_text = result.content
                 if result.status_code != 200:
                     logging.error(return_text)
-            except Exception, exp:
-                return_text = "Error on URL Fetch. Message not delivered! %s" % exp
+            except Exception, exception:
+                return_text = 'Mail error fetching {0}: {1}'.format(config.MAIL_MESSAGES_URL, exception)
                 logging.error(return_text)
         else:
             return_text = "Email support is set to False."
