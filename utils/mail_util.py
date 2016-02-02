@@ -15,16 +15,16 @@ class MailUtil(object):
 
     @staticmethod
     def send_message(recipients, subject, html=None, text=None, attachment=None):
-        payload = {'from': config.MAIL_FROM,
-                   'to': recipients,
-                   'subject': subject
-                   }
-        if html:
-            payload['html'] = html
-        if text:
-            payload['text'] = text
-        attachments = [("attachment", attachment)] if attachment else None
         if config.EMAIL_SUPPORT:
+            payload = {'from': config.MAIL_FROM,
+                       'to': recipients,
+                       'subject': subject
+                       }
+            if html:
+                payload['html'] = html
+            if text:
+                payload['text'] = text
+            attachments = [("attachment", attachment)] if attachment else None
             try:
                 result = requests.post(
                     config.MAIL_MESSAGES_URL,
@@ -38,8 +38,8 @@ class MailUtil(object):
                 logging.error("Error on URL Fetch. Message may not have been delivered! %s" % exp)
                 return_text = "Error on URL Fetch. Message may not have been delivered! %s" % exp
         else:
-            logging.warning("Message not sent.")
-            return_text = "No message sent."
+            return_text = "Email support is set to False."
+            logging.warning(return_text)
         return return_text
 
     @staticmethod

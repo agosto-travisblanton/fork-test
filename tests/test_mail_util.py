@@ -14,6 +14,7 @@ class TestMailUtil(BaseTest):
     RECIPIENTS = ['bob.macneal@agosto.com']
     QUEUED_MESSAGE = 'Queued. Thank you.'
     MAIL_DOMAIN = 'skykit.com>'
+    EMAIL_SUPPORT_FALSE = 'Email support is set to False.'
 
     def setUp(self):
         super(TestMailUtil, self).setUp()
@@ -29,7 +30,7 @@ class TestMailUtil(BaseTest):
             recipients=self.RECIPIENTS,
             subject='my subject',
             text='my message')
-        self.assertEqual('No message sent.', response)
+        self.assertEqual(self.EMAIL_SUPPORT_FALSE, response)
 
     # def test_send_get_recipient_log_entries_returns_expected_item(self):
     #     subject = 'Mysterious silence.'
