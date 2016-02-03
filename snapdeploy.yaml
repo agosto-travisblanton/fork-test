@@ -2,4 +2,5 @@ hash: 53f3a4f95b
 module_yaml_files:
 - app.yaml
 - migration.yaml
-version: 37
+- proof_of_play.yaml
+version: 38
