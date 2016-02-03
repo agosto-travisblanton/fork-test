@@ -97,6 +97,7 @@ skip_files:
 - ^coverage/.*
 - ^coverage_html_report/.*
 - ^migration/.*
+- ^proof_of_play/.*
 - ^scripts/.*
 - ^snapdeploy.yaml
 - ^images/readme.md
