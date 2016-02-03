@@ -23,3 +23,9 @@ queue:
   retry_parameters:
     task_retry_limit: 3
     task_age_limit: 1h
+
+- name: backuprestore
+  rate: 30/s
+  bucket_size: 30
+  retry_parameters:
+    task_retry_limit: 3
