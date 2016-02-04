@@ -3,8 +3,9 @@
 appModule = angular.module 'skykitProvisioning'
 
 appModule.controller "ProofOfPlayCtrl", ($state, $log) ->
-  @domains = []
+
 
   @initialize = ->
+#    alert 'proofOfPlayCtrl init!'
 
   @
