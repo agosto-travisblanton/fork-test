@@ -1,5 +1,5 @@
 application: skykit-display-device-int
-module: migration
+module: proof_of_play
 version: snapshot
 runtime: python27
 api_version: 1
@@ -27,11 +27,11 @@ libraries:
 
 handlers:
 - url: /_ah/start
-  script: routes_migration.application
+  script: routes_proof_of_play.application
   secure: optional
 
-- url: /migration/.*
-  script: routes_migration.application
+- url: /proof-of-play/.*
+  script: routes_proof_of_play.application
   login: admin
 
 skip_files:
