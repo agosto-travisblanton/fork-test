@@ -174,6 +174,15 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     controller: 'DeviceDetailsCtrl'
     controllerAs: 'deviceDetailsCtrl'
   })
+  $stateProvider.state("proof", {
+    url: "/proof",
+    templateUrl: "app/proof/index.html",
+    controller: "ProofOfPlayCtrl",
+    controllerAs: 'proofOfPlayCtrl',
+    ncyBreadcrumb: {
+      label: 'Proof of Play'
+    }
+  })
 
   $urlRouterProvider.otherwise '/sign_in'
 
