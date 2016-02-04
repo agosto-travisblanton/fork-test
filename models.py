@@ -169,6 +169,27 @@ class Tenant(ndb.Model):
                    content_manager_base_url=content_manager_base_url,
                    notification_emails=notification_emails)
 
+    @classmethod
+    def turn_off_proof_of_play(cls, tenant_code):
+        tenant = Tenant.find_by_tenant_code(tenant_code)
+        managed_devices = Tenant.find_devices(tenant.key, unmanaged=False)
+        for device in managed_devices:
+            device.proof_of_play_logging = False
+            device.proof_of_play_editable = False
+            device.put()
+        tenant.proof_of_play_logging = False
+        tenant.put()
+
+    @classmethod
+    def turn_on_proof_of_play(cls, tenant_code):
+        tenant = Tenant.find_by_tenant_code(tenant_code)
+        managed_devices = Tenant.find_devices(tenant.key, unmanaged=False)
+        for device in managed_devices:
+            device.proof_of_play_editable = True
+            device.put()
+        tenant.proof_of_play_logging = True
+        tenant.put()
+
     def _pre_put_hook(self):
         self.class_version = 1
 
@@ -220,6 +241,7 @@ class ChromeOsDevice(ndb.Model):
     time_zone = ndb.StringProperty(required=False, indexed=True)
     geo_location = ndb.GeoPtProperty(required=False, indexed=True)
     proof_of_play_logging = ndb.BooleanProperty(default=False, required=True, indexed=True)
+    proof_of_play_editable = ndb.BooleanProperty(default=False, required=True)
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):

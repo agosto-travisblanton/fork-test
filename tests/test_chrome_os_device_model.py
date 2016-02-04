@@ -243,6 +243,16 @@ class TestChromeOsDeviceModel(BaseTest):
         device.put()
         self.assertFalse(device.proof_of_play_logging)
 
+    def test_create_sets_proof_of_play_editable_to_false(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS,
+                                               serial_number=self.SERIAL_NUMBER,
+                                               model=self.MODEL)
+        device.put()
+        self.assertFalse(device.proof_of_play_editable)
+
     def test_json_serialization_strategy_of_proof_of_play_logging(self):
         device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
                                                device_id=self.TESTING_DEVICE_ID,

@@ -136,3 +136,33 @@ class TestTenantModel(BaseTest):
     def test_get_domain_returns_domain_representation(self):
         domain = self.tenant.get_domain()
         self.assertEqual(domain, self.domain)
+
+    def test_turn_off_proof_of_play(self):
+        self.tenant.proof_of_play_logging = True
+        self.tenant.put()
+        self.assertTrue(self.tenant.proof_of_play_logging)
+        devices = Tenant.find_devices(self.tenant_key, unmanaged=False)
+        for device in devices:
+            device.proof_of_play_logging = True
+            device.proof_of_play_editable = True
+            device.put()
+        Tenant.turn_off_proof_of_play(self.TENANT_CODE)
+        self.assertFalse(self.tenant.proof_of_play_logging)
+        for device in devices:
+            self.assertFalse(device.proof_of_play_logging)
+            self.assertFalse(device.proof_of_play_editable)
+
+    def test_turn_on_proof_of_play(self):
+        self.tenant.proof_of_play_logging = False
+        self.tenant.put()
+        self.assertFalse(self.tenant.proof_of_play_logging)
+        devices = Tenant.find_devices(self.tenant_key, unmanaged=False)
+        for device in devices:
+            device.proof_of_play_logging = False
+            device.proof_of_play_editable = False
+            device.put()
+        Tenant.turn_on_proof_of_play(self.TENANT_CODE)
+        self.assertTrue(self.tenant.proof_of_play_logging)
+        for device in devices:
+            self.assertFalse(device.proof_of_play_logging)
+            self.assertTrue(device.proof_of_play_editable)
