@@ -1,5 +1,5 @@
 application: skykit-display-device-int
-module: proof_of_play
+module: proofplay
 version: snapshot
 runtime: python27
 api_version: 1
