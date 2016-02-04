@@ -76,6 +76,18 @@ class TestTenantModel(BaseTest):
         self.assertEqual(tenant_created.name, name)
         self.assertFalse(tenant_created.active)
 
+    def test_create_sets_an_proof_of_play_logging_to_faAddlse(self):
+        tenant = Tenant.create(tenant_code=self.TENANT_CODE,
+                               name=self.NAME,
+                               admin_email=self.ADMIN_EMAIL,
+                               content_server_url=self.CONTENT_SERVER_URL,
+                               content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                               domain_key=self.domain_key,
+                               active=False)
+        tenant.put()
+        tenant_created = Tenant.find_by_name(self.NAME)
+        self.assertFalse(tenant_created.proof_of_play_logging)
+
     def test_create_initialized_tenant_properties(self):
         tenant_created = Tenant.find_by_name(self.NAME)
         self.assertTrue(tenant_created.active)

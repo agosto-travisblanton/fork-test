@@ -115,6 +115,7 @@ class Tenant(ndb.Model):
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
     domain_key = ndb.KeyProperty(kind=Domain, required=True, indexed=True)
     notification_emails = ndb.StringProperty(repeated=True, indexed=False, required=False)
+    proof_of_play_logging = ndb.BooleanProperty(default=False, required=True, indexed=True)
     class_version = ndb.IntegerProperty()
 
     def get_domain(self):
