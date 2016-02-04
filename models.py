@@ -219,6 +219,7 @@ class ChromeOsDevice(ndb.Model):
                                                      indexed=False)
     time_zone = ndb.StringProperty(required=False, indexed=True)
     geo_location = ndb.GeoPtProperty(required=False, indexed=True)
+    proof_of_play_logging = ndb.BooleanProperty(default=False, required=True, indexed=True)
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):

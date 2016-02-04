@@ -20,6 +20,7 @@ TENANT_STRATEGY = ModelStrategy(Tenant) + TENANT_FIELDS
 TENANT_STRATEGY += [
     {'key': lambda o, field_name, context: o.key.urlsafe()},
     {'domain_key': lambda o, field_name, context: o.domain_key.urlsafe() if o.domain_key else None},
+    {'proofOfPlayLogging': lambda o, field_name, context: o.domain_key.urlsafe() if o.domain_key else None},
     {'notification_emails': lambda o, field_name, context: ', '.join(o.notification_emails).strip(', ')}
 ]
 
@@ -84,6 +85,7 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'heartbeatInterval': lambda o, field_name, context: o.key.get().heartbeat_interval_minutes},
     {'timezone': lambda o, field_name, context: o.key.get().time_zone},
     {'connectionType': lambda o, field_name, context: o.key.get().connection_type},
+    {'proofOfPlayLogging': lambda o, field_name, context: o.key.get().proof_of_play_logging},
     {'latitude': lambda o, field_name,
                         context: o.key.get().geo_location.lat if o.key.get().geo_location is not None else None},
     {'longitude': lambda o, field_name,

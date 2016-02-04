@@ -232,3 +232,25 @@ class TestChromeOsDeviceModel(BaseTest):
         json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
         self.assertIsNone(json_representation['latitude'])
         self.assertIsNone(json_representation['longitude'])
+
+    def test_create_sets_proof_of_play_logging_to_false(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS,
+                                               serial_number=self.SERIAL_NUMBER,
+                                               model=self.MODEL)
+        device.put()
+        self.assertFalse(device.proof_of_play_logging)
+
+    def test_json_serialization_strategy_of_proof_of_play_logging(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS,
+                                               serial_number=self.SERIAL_NUMBER,
+                                               model=self.MODEL)
+        device.proof_of_play_logging = True
+        device.put()
+        json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
+        self.assertTrue(json_representation['proofOfPlayLogging'])

@@ -76,7 +76,7 @@ class TestTenantModel(BaseTest):
         self.assertEqual(tenant_created.name, name)
         self.assertFalse(tenant_created.active)
 
-    def test_create_sets_an_proof_of_play_logging_to_faAddlse(self):
+    def test_create_sets_proof_of_play_logging_to_false(self):
         tenant = Tenant.create(tenant_code=self.TENANT_CODE,
                                name=self.NAME,
                                admin_email=self.ADMIN_EMAIL,
