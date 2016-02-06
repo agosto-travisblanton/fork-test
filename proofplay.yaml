@@ -27,12 +27,11 @@ libraries:
 
 handlers:
 - url: /_ah/start
-  script: routes_proof_of_play.application
+  script: routes_proofplay.application
   secure: optional
 
-- url: /proof-of-play/.*
-  script: routes_proof_of_play.application
-  login: admin
+- url: /proofplay/.*
+  script: routes_proofplay.application
 
 skip_files:
 - ^webapp/.*

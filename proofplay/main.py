@@ -1,11 +1,58 @@
-from webapp2 import RequestHandler as BaseHandler
-import datetime
+from webapp2 import RequestHandler
 from utils import get_location_from_serial, create_merged_dictionary
-from data_processing import *
 from database_calls import *
+from data_processing import *
+import logging
+import json
+from google.appengine.ext import deferred
 
 
-class MultiResourceByDate(BaseHandler):
+def handle_posting_a_new_program_play(incoming_data):
+    print "!!!"
+    for each_log in incoming_data["data"]:
+        logging.info("INCOMING JSON ARRAY")
+        logging.info(each_log)
+        try:
+            raw_event_id = insert_raw_program_play_event_data(each_log)
+            resource = each_log["resource_name"]
+            resource_id = each_log["resource_id"]
+            serial_number = each_log["serial_number"]
+            device_key = each_log["device_key"]
+            tenant_code = each_log["tenant_code"]
+            started_at = datetime.datetime.strptime(each_log["started_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
+            ended_at = datetime.datetime.strptime(each_log["ended_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
+
+            location_name = get_location_from_serial(serial_number)
+
+            if location_name:
+                location_id = insert_new_location_or_get_existing(location_name)
+                resource_id = insert_new_resource_or_get_existing(resource, resource_id)
+                device_id = insert_new_device_or_get_existing(location_id, serial_number, device_key, tenant_code)
+                insert_new_program_record(location_id, device_id, resource_id, started_at, ended_at)
+                mark_raw_event_complete(raw_event_id)
+
+            else:
+                logging.warn("ERROR: WAS NOT ABLE TO FIND A MATCHING LOCATION WITH THIS SERIAL_NUMBER")
+
+        except KeyError:
+            logging.warn("ERROR: KEYERROR IN POSTING A NEW PROGRAM PLAY")
+
+
+class PostNewProgramPlay(RequestHandler):
+    def post(self):
+        incoming = json.loads(self.request.body)
+        deferred.defer(handle_posting_a_new_program_play, incoming)
+        final = json.dumps({"success": True, "message": "NEW PROGRAM WILL BE PROCESSED IN THE TASK QUEUE"})
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(final)
+
+    def get(self):
+        final = json.dumps({"success": True, "resources": retrieve_all_resources()})
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(final)
+
+
+class MultiResourceByDate(RequestHandler):
     def get(self, start_date, end_date, resources):
         start_date = datetime.datetime.fromtimestamp(int(start_date))
         end_date = datetime.datetime.fromtimestamp(int(end_date))
@@ -53,7 +100,7 @@ class MultiResourceByDate(BaseHandler):
         self.response.write(csv_to_publish)
 
 
-class OneResourceByDate(BaseHandler):
+class OneResourceByDate(RequestHandler):
     def get(self, start_date, end_date, resource):
         start_date = datetime.datetime.fromtimestamp(int(start_date))
         end_date = datetime.datetime.fromtimestamp(int(end_date))
@@ -97,7 +144,7 @@ class OneResourceByDate(BaseHandler):
         self.response.write(csv_to_publish)
 
 
-class OneResourceByLocation(BaseHandler):
+class OneResourceByLocation(RequestHandler):
     def get(self, start_date, end_date, resource):
         start_date = datetime.datetime.fromtimestamp(int(start_date))
         end_date = datetime.datetime.fromtimestamp(int(end_date))

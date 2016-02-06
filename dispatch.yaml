@@ -1,5 +1,5 @@
 dispatch:
   - url: "*/migration/*"
     module: migration
-  - url: "*/proof-of-play/*"
+  - url: "*/proofplay/*"
     module: proofplay

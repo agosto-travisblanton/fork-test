@@ -1,9 +1,14 @@
 from models import Resource, ProgramRecord, Location, ScheduleWentLive, Device, GamestopStoreLocation, ProgramPlayEvent
-from index import db
+from db import Session
 import datetime
 
+def retrieve_all_resources():
+    session = Session()
+    resources = [resource.resource_name for resource in session.query(Resource).all()]
+    return resources
 
 def insert_raw_program_play_event_data(each_log):
+    session = Session()
     new_raw_event = ProgramPlayEvent(
             resource_name=each_log["resource_name"],
             resource_id=each_log["resource_id"],
@@ -13,19 +18,23 @@ def insert_raw_program_play_event_data(each_log):
             started_at=datetime.datetime.strptime(each_log["started_at"], '%Y-%m-%dT%H:%M:%S.%fZ'),
             ended_at=datetime.datetime.strptime(each_log["ended_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
     )
-    db.session.add(new_raw_event)
-    db.session.commit()
+    session.add(new_raw_event)
+    session.commit()
     return new_raw_event.id
 
 
 def mark_raw_event_complete(raw_event_id):
-    entry = ProgramPlayEvent.query.filter_by(id=raw_event_id).first()
+    session = Session()
+
+    entry = session.query(ProgramPlayEvent).filter_by(id=raw_event_id).first()
     if entry:
         entry.completed = True
-        db.session.commit()
+        session.commit()
 
 
 def insert_new_program_record(location_id, device_id, resource_id, started_at, ended_at):
+    session = Session()
+
     new_program_record = ProgramRecord(
             location_id=location_id,
             resource_id=resource_id,
@@ -34,20 +43,22 @@ def insert_new_program_record(location_id, device_id, resource_id, started_at, e
             ended_at=ended_at
     )
 
-    db.session.add(new_program_record)
-    db.session.commit()
+    session.add(new_program_record)
+    session.commit()
 
 
 def insert_new_resource_or_get_existing(resource_name, resource_identifier):
-    resource_exits = Resource.query.filter_by(resource_name=resource_name).first()
+    session = Session()
+
+    resource_exits = session.query(Resource).filter_by(resource_name=resource_name).first()
 
     if not resource_exits:
         new_resource = Resource(
                 resource_name=resource_name,
                 resource_identifier=resource_identifier
         )
-        db.session.add(new_resource)
-        db.session.commit()
+        session.add(new_resource)
+        session.commit()
         return new_resource.id
 
     else:
@@ -55,21 +66,25 @@ def insert_new_resource_or_get_existing(resource_name, resource_identifier):
 
 
 def insert_new_location_or_get_existing(location_identifier):
-    location_exists = Location.query.filter_by(location_identifier=location_identifier).first()
+    session = Session()
+
+    location_exists = session.query(Location).filter_by(location_identifier=location_identifier).first()
 
     if not location_exists:
         new_location = Location(
                 location_identifier=location_identifier
         )
-        db.session.add(new_location)
-        db.session.commit()
+        session.add(new_location)
+        session.commit()
         return new_location.id
 
     return location_exists.id
 
 
 def insert_new_device_or_get_existing(location_id, serial_number, device_key, tenant_code):
-    device_exists = Device.query.filter_by(serial_number=serial_number).first()
+    session = Session()
+
+    device_exists = session.query(Device).filter_by(serial_number=serial_number).first()
 
     if not device_exists:
         new_device = Device(
@@ -80,15 +95,17 @@ def insert_new_device_or_get_existing(location_id, serial_number, device_key, te
 
         )
 
-        db.session.add(new_device)
-        db.session.commit()
+        session.add(new_device)
+        session.commit()
         return new_device.id
 
     return device_exists.id
 
 
 def insert_new_gamestop_store_location(location_name, serial_number):
-    already_exists = GamestopStoreLocation.query.filter_by(serial_number=serial_number).first()
+    session = Session()
+
+    already_exists = session.query(GamestopStoreLocation).filter_by(serial_number=serial_number).first()
 
     if not already_exists:
         new_pair = GamestopStoreLocation(
@@ -96,12 +113,13 @@ def insert_new_gamestop_store_location(location_name, serial_number):
                 serial_number=serial_number
         )
 
-        db.session.add(new_pair)
-        db.session.commit()
+        session.add(new_pair)
+        session.commit()
 
 
 def get_gamestop_store_location_from_serial_via_db(serial):
-    location_id = GamestopStoreLocation.query.filter_by(serial_number=serial).first()
+    session = Session()
+    location_id = session.query(GamestopStoreLocation).filter_by(serial_number=serial).first()
 
     if location_id:
         return location_id.location_name
@@ -124,9 +142,11 @@ def transform_resource_data_between_date_range_by_location(from_db):
 
 
 def get_raw_program_record_data_for_resource_between_date_ranges_by_location(start_date, end_date, resource):
-    resource_id = Resource.query.filter_by(resource_name=resource).first().id
+    session = Session()
 
-    rows = ProgramRecord.query.filter(
+    resource_id = session.query(Resource).filter_by(resource_name=resource).first().id
+
+    rows = session.query(ProgramRecord).filter(
             ProgramRecord.ended_at.between(start_date, end_date)).filter(
             ProgramRecord.resource_id == resource_id).all()
 
@@ -162,9 +182,10 @@ def transform_resource_data_between_date_ranges_by_date(from_db):
 
 
 def get_raw_program_record_data_for_resource_between_date_ranges_by_date(start_date, end_date, resource):
-    resource_id = Resource.query.filter_by(resource_name=resource).first().id
+    session = Session()
+    resource_id = session.query(Resource).filter_by(resource_name=resource).first().id
 
-    rows = ProgramRecord.query.filter(
+    rows = session.query(ProgramRecord).filter(
             ProgramRecord.ended_at.between(start_date, end_date)).filter(
             ProgramRecord.resource_id == resource_id).all()
 

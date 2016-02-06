@@ -1,6 +1,5 @@
 import csv
 import StringIO
-import datetime
 from utils import join_array_of_strings, order_dictionary_with_datetimes_as_keys
 
 

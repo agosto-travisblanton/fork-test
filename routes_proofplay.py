@@ -18,8 +18,9 @@ application = WSGIApplication(
         ),
 
         Route(
-            r'/proof-of-play/',
-            methods=['GET']
+            r'/proofplay/api/v1/0ac1b95dc3f93d9132b796986ed11cd4/post_new_program_play',
+            handler="proofplay.main.PostNewProgramPlay",
+            name="proof"
         )
     ]
 )
