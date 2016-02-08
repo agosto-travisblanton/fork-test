@@ -5,22 +5,20 @@ appModule = angular.module 'skykitProvisioning'
 appModule.controller "ProofOfPlayCtrl", ($state, $log, $scope, ProofPlayService) ->
   @something = "test"
 
-  @tabs = [
-    {title: "One-Resource", content: "test2"},
-    {title: "Multi-Resource", content: "test4"}
-  ]
+  @tab = {title: "One-Resource", content: "test2"}
 
-  @test = "test"
+  @tab2 = {title: "Multi-Resource", content: "test2"}
+
+  @radioButtonChoices = {
+      group1 : 'By Location',
+      group2 : 'By Date',
+    };
 
   @onTabSelected = (tab) =>
     console.log(tab)
 
-  @removeTab = (tab) =>
-    console.log(tab)
-
-
-  ProofPlayService.getAllResources()
-    .then (data) =>
-      console.log(data)
-
+#  ProofPlayService.getAllResources()
+#    .then (data) =>
+#      console.log(data)
+#
   @

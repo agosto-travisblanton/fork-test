@@ -9,8 +9,9 @@
             <md-card-actions layout="column" layout-align="center center">
                 <md-card-title>
                     <md-card-title-text>
-                        <h1 class="md-display-2">Welcome to Skykit Proof of Play Reporting</h1>
-                        <h5>Please select a tab to begin generating a report</h5>
+                        <h1 class="md-display-2">Proof of Play</h1>
+                        <h5>Select a tab to generate your report</h5>
+
                     </md-card-title-text>
                 </md-card-title>
             </md-card-actions>
@@ -18,19 +19,111 @@
     </md-content>
     <md-content>
         <md-tabs md-dynamic-height md-center-tabs>
-            <div ng-repeat="tab in vm.tabs">
-                <md-tab label="{{tab.title}}" md-on-select="vm.onTabSelected(tab)">
-                    <div style="padding: 25px; height: 100%; text-align: center;">
-                        <h3>{{tab.title}}</h3>
-                        <h5>{{tab.content}}</h5>
-                        <div class="col-md-6 col-md-offset-3" >
-                            <md-input-container class="md-block">
-                                <label>Title</label>
-                            </md-input-container>
+            <md-tab label="{{vm.tab.title}}" md-on-select="vm.onTabSelected(tab)">
+                <div style="padding: 25px; height: 100%; text-align: center;">
+                    <h3>{{vm.tab.title}}</h3>
+                    <div class="col-md-6 col-md-offset-3">
+                        <hr/>
+
+                        <md-input-container class="md-block">
+                            <h5>Please choose the type of report you would like to generate:</h5>
+                            <md-radio-group ng-model="vm.radioButtonChoices.selection">
+                                <md-radio-button value="1">{{vm.radioButtonChoices.group1}}</md-radio-button>
+                                <md-radio-button value="2">{{vm.radioButtonChoices.group2}}</md-radio-button>
+                            </md-radio-group>
+
+                            <hr/>
+                        </md-input-container>
+                        <div class="row">
+                            <md-content class="md-padding">
+                                <form ng-submit="$event.preventDefault()">
+                                    <md-autocomplete
+                                            md-no-cache="ctrl.noCache"
+                                            md-selected-item="ctrl.selectedItem"
+                                            md-search-text-change="ctrl.searchTextChange(ctrl.searchText)"
+                                            md-search-text="ctrl.searchText"
+                                            md-selected-item-change="ctrl.selectedItemChange(item)"
+                                            md-items="item in ctrl.querySearch(ctrl.searchText)"
+                                            md-item-text="item.display"
+                                            md-min-length="0"
+                                            placeholder="Which Resource?">
+                                        <md-item-template>
+                                            <span md-highlight-text="ctrl.searchText" md-highlight-flags="^i">{{item.display}}</span>
+                                        </md-item-template>
+                                        <md-not-found>
+                                            No states matching "{{ctrl.searchText}}" were found.
+                                            <a ng-click="ctrl.newState(ctrl.searchText)">Create a new one!</a>
+                                        </md-not-found>
+                                    </md-autocomplete>
+                                </form>
+                                <hr/>
+
+                                <div class="col-md-3 col-md-offset-1">
+
+                                    <h4>Start Date</h4>
+                                    <md-datepicker ng-model="myDate" md-placeholder="Enter date"></md-datepicker>
+                                </div>
+                                <div class="col-md-3 col-md-offset-3">
+
+                                    <h4>End Date</h4>
+                                    <md-datepicker ng-model="myDate" md-placeholder="Enter date"></md-datepicker>
+                                </div>
+                            </md-content>
                         </div>
+                        <hr/>
+                        <md-button class="md-raised" style="margin-top: 25px">Submit</md-button>
                     </div>
-                </md-tab>
-            </div>
+
+                </div>
+            </md-tab>
+           <md-tab label="{{vm.tab2.title}}">
+                <div style="padding: 25px; text-align: center;">
+                    <h3>{{vm.tab2.title}}</h3>
+                    <div class="col-md-6 col-md-offset-3">
+                        <hr/>
+                        </md-input-container>
+                        <div class="row">
+                            <md-content class="md-padding">
+                                <form ng-submit="$event.preventDefault()">
+                                    <md-autocomplete
+                                            md-no-cache="ctrl.noCache"
+                                            md-selected-item="ctrl.selectedItem"
+                                            md-search-text-change="ctrl.searchTextChange(ctrl.searchText)"
+                                            md-search-text="ctrl.searchText"
+                                            md-selected-item-change="ctrl.selectedItemChange(item)"
+                                            md-items="item in ctrl.querySearch(ctrl.searchText)"
+                                            md-item-text="item.display"
+                                            md-min-length="0"
+                                            placeholder="Which Resource?">
+                                        <md-item-template>
+                                            <span md-highlight-text="ctrl.searchText" md-highlight-flags="^i">{{item.display}}</span>
+                                        </md-item-template>
+                                        <md-not-found>
+                                            No states matching "{{ctrl.searchText}}" were found.
+                                            <a ng-click="ctrl.newState(ctrl.searchText)">Create a new one!</a>
+                                        </md-not-found>
+                                    </md-autocomplete>
+                                </form>
+                                <hr/>
+
+                                <div class="col-md-3 col-md-offset-1">
+
+                                    <h4>Start Date</h4>
+                                    <md-datepicker ng-model="myDate" md-placeholder="Enter date"></md-datepicker>
+                                </div>
+                                <div class="col-md-3 col-md-offset-3">
+
+                                    <h4>End Date</h4>
+                                    <md-datepicker ng-model="myDate" md-placeholder="Enter date"></md-datepicker>
+                                </div>
+                            </md-content>
+                        </div>
+                        <hr/>
+                        <md-button class="md-raised" style="margin-top: 25px">Submit</md-button>
+                    </div>
+
+                </div>
+            </md-tab>
         </md-tabs>
     </md-content>
 </div>
