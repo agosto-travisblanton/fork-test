@@ -203,7 +203,7 @@ describe 'DeviceDetailsCtrl', ->
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.currentDevice.panelModel = {id: 'Sony-112'}
       controller.currentDevice.panelInput = {id: 'son01'}
-      controller.onClickSaveNotes()
+      controller.onClickSaveDeviceUpdates()
       devicesServicePromise.resolve()
 
     it 'starts the progress bar', ->

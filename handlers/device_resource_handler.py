@@ -302,6 +302,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                        device_urlsafe_key=device.key.urlsafe(),
                                        _queue='content-server',
                                        _countdown=5)
+            proof_of_play_logging = request_json.get('proofOfPlayLogging')
+            if str(proof_of_play_logging).lower() == 'true' or str(proof_of_play_logging).lower() == 'false':
+                device.proof_of_play_logging = bool(proof_of_play_logging)
             device.put()
             if not device.is_unmanaged_device:
                 deferred.defer(update_chrome_os_device,

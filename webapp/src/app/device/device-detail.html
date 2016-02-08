@@ -239,10 +239,19 @@
                     {{deviceDetailsCtrl.currentDevice.updated}}
                   </div>
                 </div>
-                <form name="notesForm"
+                <form name="deviceUpdateForm"
                       class="form-horizontal"
-                      ng-submit="deviceDetailsCtrl.onClickSaveNotes()"
+                      ng-submit="deviceDetailsCtrl.onClickSaveDeviceUpdates()"
                       novalidate>
+                  <div class="form-group" ng-hide="!deviceDetailsCtrl.currentDevice.proofOfPlayEditable"  >
+                    <div  class="col-sm-12">
+                      <label>Proof of play logging</label>
+                      <div>
+                        <input type="checkbox"
+                               ng-model="deviceDetailsCtrl.currentDevice.proofOfPlayLogging"> <span>Enable</span>
+                      </div>
+                    </div>
+                  </div>
                   <div class="form-group">
                     <div  class="col-sm-12">
                       <label>Notes</label>
@@ -256,7 +265,7 @@
                   </div>
                   <md-card-actions layout="row" layout-align="end center">
                     <md-button type="submit"
-                               ng-disabled="!notesForm.$dirty || notesForm.$invalid">
+                               ng-disabled="!deviceUpdateForm.$dirty || deviceUpdateForm.$invalid">
                       <i class="fa fa-fw fa-save"></i>
                       Save
                     </md-button>
