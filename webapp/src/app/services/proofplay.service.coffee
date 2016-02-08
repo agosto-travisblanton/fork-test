@@ -5,7 +5,7 @@ angular.module('skykitProvisioning')
   new class ProofPlayService
 
     constructor: ->
-      @uriBase = '/api/v1/proofplay'
+      @uriBase = 'proofplay/api/v1/'
 
     getAllResources: () ->
       $http.get(@uriBase + '/retrieve_all_resources')

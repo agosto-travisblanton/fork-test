@@ -178,7 +178,7 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     url: "/proof",
     templateUrl: "app/proof/index.html",
     controller: "ProofOfPlayCtrl",
-    controllerAs: 'proofOfPlayCtrl',
+    controllerAs: 'vm',
     ncyBreadcrumb: {
       label: 'Proof of Play'
     }
