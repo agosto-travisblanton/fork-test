@@ -12,6 +12,7 @@ TENANT_FIELDS = [
     'admin_email',
     'content_server_url',
     'content_manager_base_url',
+    'proof_of_play_logging',
     'active',
     'created',
     'updated'
@@ -20,7 +21,6 @@ TENANT_STRATEGY = ModelStrategy(Tenant) + TENANT_FIELDS
 TENANT_STRATEGY += [
     {'key': lambda o, field_name, context: o.key.urlsafe()},
     {'domain_key': lambda o, field_name, context: o.domain_key.urlsafe() if o.domain_key else None},
-    {'proofOfPlayLogging': lambda o, field_name, context: o.domain_key.urlsafe() if o.domain_key else None},
     {'notification_emails': lambda o, field_name, context: ', '.join(o.notification_emails).strip(', ')}
 ]
 

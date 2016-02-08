@@ -76,6 +76,12 @@ class TenantsHandler(RequestHandler):
                 error_message = 'The active parameter is invalid.'
             else:
                 active = bool(active)
+            proof_of_play_logging = request_json.get('proof_of_play_logging')
+            if proof_of_play_logging is None or active == '' or (str(proof_of_play_logging).lower() != 'true' and str(proof_of_play_logging).lower() != 'false'):
+                status = 400
+                error_message = 'The proof_of_play_logging parameter is invalid.'
+            else:
+                proof_of_play_logging = bool(proof_of_play_logging)
             if status == 201:
                 if Tenant.is_tenant_code_unique(tenant_code):
                     tenant = Tenant.create(name=name,
@@ -85,7 +91,8 @@ class TenantsHandler(RequestHandler):
                                            content_manager_base_url=content_manager_base_url,
                                            domain_key=domain_key,
                                            active=active,
-                                           notification_emails = notification_emails)
+                                           notification_emails = notification_emails,
+                                           proof_of_play_logging=proof_of_play_logging)
                     tenant_key = tenant.put()
                     content_manager_api = ContentManagerApi()
                     notify_content_manager = content_manager_api.create_tenant(tenant)
@@ -120,13 +127,14 @@ class TenantsHandler(RequestHandler):
         email_list = delimited_string_to_list(request_json.get('notification_emails'))
         tenant.notification_emails = email_list
         domain_key_input = request_json.get('domain_key')
+        tenant.proof_of_play_logging = request_json.get('proof_of_play_logging')
+        tenant.active = request_json.get('active')
         try:
             domain_key = ndb.Key(urlsafe=domain_key_input)
         except Exception, e:
             logging.exception(e)
         if domain_key:
             tenant.domain_key = domain_key
-        tenant.active = request_json.get('active')
         tenant.put()
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)

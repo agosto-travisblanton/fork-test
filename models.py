@@ -157,7 +157,7 @@ class Tenant(ndb.Model):
 
     @classmethod
     def create(cls, tenant_code, name, admin_email, content_server_url, domain_key, active,
-               content_manager_base_url, notification_emails=[]):
+               content_manager_base_url, notification_emails=[], proof_of_play_logging=False):
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
                    tenant_code=tenant_code,
@@ -167,7 +167,8 @@ class Tenant(ndb.Model):
                    domain_key=domain_key,
                    active=active,
                    content_manager_base_url=content_manager_base_url,
-                   notification_emails=notification_emails)
+                   notification_emails=notification_emails,
+                   proof_of_play_logging=proof_of_play_logging)
 
     @classmethod
     def turn_off_proof_of_play(cls, tenant_code):

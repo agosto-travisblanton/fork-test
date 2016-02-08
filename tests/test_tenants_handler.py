@@ -94,6 +94,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': self.domain_key.urlsafe(),
+                              'proof_of_play_logging': False,
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
@@ -115,6 +116,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': self.domain_key.urlsafe(),
                               'notification_emails': emails,
+                              'proof_of_play_logging': False,
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
@@ -135,6 +137,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': self.domain_key.urlsafe(),
+                              'proof_of_play_logging': False,
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
@@ -157,6 +160,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': self.domain_key.urlsafe(),
+                              'proof_of_play_logging': False,
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
@@ -176,6 +180,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': self.domain_key.urlsafe(),
+                              'proof_of_play_logging': False,
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         self.app.post(uri, json.dumps(request_parameters), headers=self.headers)
@@ -193,6 +198,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': '',
+                              'proof_of_play_logging': False,
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         with self.assertRaises(AppError) as context:
@@ -217,6 +223,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_manager_base_url': self.CONTENT_MANAGER_BASE_URL,
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': self.domain_key.urlsafe(),
+                              'proof_of_play_logging': False,
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         with self.assertRaises(AppError) as context:
@@ -224,6 +231,47 @@ class TestTenantsHandler(BaseTest, WebTest):
         error_message = "Bad response: 409 Conflict. Tenant code \"{0}\" is already assigned to a tenant.".format(
             existing_tenant_code)
         self.assertTrue(error_message in context.exception.message)
+
+    def test_post_returns_bad_request_when_proof_of_play_logging_is_invalid(self):
+        name = u'ABC'
+        admin_email = u'foo@bar.com'
+        when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(str('some key'))
+        when(ContentManagerApi).create_tenant(any_matcher()).thenReturn(True)
+        request_parameters = {'name': name,
+                              'tenant_code': 'acme',
+                              'admin_email': admin_email,
+                              'content_server_url': 'https://skykit-contentmanager-int.appspot.com/content',
+                              'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
+                              'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
+                              'domain_key': '',
+                              'proof_of_play_logging': 'invalid input',
+                              'active': True}
+        uri = application.router.build(None, 'tenants', None, {})
+        with self.assertRaises(AppError) as context:
+            self.app.post_json(uri, params=request_parameters, headers=self.headers)
+        self.assertTrue('Bad response: 400 The proof_of_play_logging parameter is invalid.'
+                        in context.exception.message)
+
+    def test_post_returns_bad_request_when_active_is_invalid(self):
+        name = u'ABC'
+        admin_email = u'foo@bar.com'
+        when(ContentManagerApi).create_tenant(name, admin_email).thenReturn(str('some key'))
+        when(ContentManagerApi).create_tenant(any_matcher()).thenReturn(True)
+        request_parameters = {'name': name,
+                              'tenant_code': 'acme',
+                              'admin_email': admin_email,
+                              'content_server_url': 'https://skykit-contentmanager-int.appspot.com/content',
+                              'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
+                              'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
+                              'proof_of_play_logging': False,
+                              'active': 'invalid input',
+                              'domain_key': ''}
+        uri = application.router.build(None, 'tenants', None, {})
+        with self.assertRaises(AppError) as context:
+            self.app.post_json(uri, params=request_parameters, headers=self.headers)
+        self.assertTrue('Bad response: 400 The active parameter is invalid.'
+                        in context.exception.message)
+
 
     ##################################################################################################################
     ## put
@@ -240,6 +288,7 @@ class TestTenantsHandler(BaseTest, WebTest):
             'content_server_api_key': 'some key',
             'domain_key': self.domain_key.urlsafe(),
             'active': True,
+            'proof_of_play_logging': False,
             'notifications_emails': ''
         }
         response = self.app.put_json(uri, entity_body, headers=self.headers)
@@ -261,6 +310,7 @@ class TestTenantsHandler(BaseTest, WebTest):
             'content_server_api_key': 'some key',
             'domain_key': self.domain_key.urlsafe(),
             'active': False,
+            'proof_of_play_logging': False,
             'notification_emails': notification_email
         }
         self.app.put_json(uri, entity_body, headers=self.headers)
@@ -287,6 +337,7 @@ class TestTenantsHandler(BaseTest, WebTest):
             'content_server_url': 'https://www.foo.com',
             'content_server_api_key': 'some key',
             'domain_key': new_domain_key.urlsafe(),
+            'proof_of_play_logging': False,
             'active': False
         }
         self.app.put_json(uri, entity_body, headers=self.headers)
