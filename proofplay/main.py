@@ -8,7 +8,6 @@ from google.appengine.ext import deferred
 
 
 def handle_posting_a_new_program_play(incoming_data):
-    print "!!!"
     for each_log in incoming_data["data"]:
         logging.info("INCOMING JSON ARRAY")
         logging.info(each_log)
@@ -144,7 +143,7 @@ class OneResourceByDate(RequestHandler):
         self.response.write(csv_to_publish)
 
 
-class OneResourceByLocation(RequestHandler):
+class OneResourceByDevice(RequestHandler):
     def get(self, start_date, end_date, resource):
         start_date = datetime.datetime.fromtimestamp(int(start_date))
         end_date = datetime.datetime.fromtimestamp(int(end_date))
