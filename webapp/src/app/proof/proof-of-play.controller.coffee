@@ -2,25 +2,25 @@
 
 appModule = angular.module 'skykitProvisioning'
 
-appModule.controller "ProofOfPlayCtrl", ($state, $log) ->
-  vm = this;
-  vm.something = "test"
+appModule.controller "ProofOfPlayCtrl", ($state, $log, $scope, ProofPlayService) ->
+  @something = "test"
 
-  vm.tabs = [
+  @tabs = [
     {title: "One-Resource", content: "test2"},
     {title: "Multi-Resource", content: "test4"}
   ]
 
-  console.log vm.tabs
+  @test = "test"
 
-  vm.test = "test"
-
-  vm.onTabSelected = (tab) =>
+  @onTabSelected = (tab) =>
     console.log(tab)
 
-  vm.removeTab = (tab) =>
+  @removeTab = (tab) =>
     console.log(tab)
 
-  return vm
 
+  ProofPlayService.getAllResources()
+    .then (data) =>
+      console.log(data)
 
+  @
