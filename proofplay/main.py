@@ -7,34 +7,12 @@ import json
 from google.appengine.ext import deferred
 
 
-def handle_posting_a_new_program_play(incoming_data):
-    for each_log in incoming_data["data"]:
-        logging.info("INCOMING JSON ARRAY")
-        logging.info(each_log)
-        try:
-            raw_event_id = insert_raw_program_play_event_data(each_log)
-            resource = each_log["resource_name"]
-            resource_id = each_log["resource_id"]
-            serial_number = each_log["serial_number"]
-            device_key = each_log["device_key"]
-            tenant_code = each_log["tenant_code"]
-            started_at = datetime.datetime.strptime(each_log["started_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
-            ended_at = datetime.datetime.strptime(each_log["ended_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
-
-            location_name = get_location_from_serial(serial_number)
-
-            if location_name:
-                location_id = insert_new_location_or_get_existing(location_name)
-                resource_id = insert_new_resource_or_get_existing(resource, resource_id)
-                device_id = insert_new_device_or_get_existing(location_id, serial_number, device_key, tenant_code)
-                insert_new_program_record(location_id, device_id, resource_id, started_at, ended_at)
-                mark_raw_event_complete(raw_event_id)
-
-            else:
-                logging.warn("ERROR: WAS NOT ABLE TO FIND A MATCHING LOCATION WITH THIS SERIAL_NUMBER")
-
-        except KeyError:
-            logging.warn("ERROR: KEYERROR IN POSTING A NEW PROGRAM PLAY")
+class RetrieveAllResources(RequestHandler):
+    def get(self):
+        resources = retrieve_all_resources()
+        final = json.dumps({"resources": resources})
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(final)
 
 
 class PostNewProgramPlay(RequestHandler):
@@ -174,3 +152,33 @@ class OneResourceByDevice(RequestHandler):
         self.response.headers['Content-Type'] = 'text/csv'
         self.response.headers['Content-Disposition'] = 'attachment; filename=one-resource-by-date.csv'
         self.response.write(csv_to_publish)
+
+
+def handle_posting_a_new_program_play(incoming_data):
+    for each_log in incoming_data["data"]:
+        logging.info("INCOMING JSON ARRAY")
+        logging.info(each_log)
+        try:
+            raw_event_id = insert_raw_program_play_event_data(each_log)
+            resource = each_log["resource_name"]
+            resource_id = each_log["resource_id"]
+            serial_number = each_log["serial_number"]
+            device_key = each_log["device_key"]
+            tenant_code = each_log["tenant_code"]
+            started_at = datetime.datetime.strptime(each_log["started_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
+            ended_at = datetime.datetime.strptime(each_log["ended_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
+
+            location_name = get_location_from_serial(serial_number)
+
+            if location_name:
+                location_id = insert_new_location_or_get_existing(location_name)
+                resource_id = insert_new_resource_or_get_existing(resource, resource_id)
+                device_id = insert_new_device_or_get_existing(location_id, serial_number, device_key, tenant_code)
+                insert_new_program_record(location_id, device_id, resource_id, started_at, ended_at)
+                mark_raw_event_complete(raw_event_id)
+
+            else:
+                logging.warn("ERROR: WAS NOT ABLE TO FIND A MATCHING LOCATION WITH THIS SERIAL_NUMBER")
+
+        except KeyError:
+            logging.warn("ERROR: KEYERROR IN POSTING A NEW PROGRAM PLAY")

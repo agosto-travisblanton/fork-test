@@ -4,9 +4,7 @@ import datetime
 
 
 def retrieve_all_resources():
-    session = Session()
-    resources = [resource.resource_name for resource in session.query(Resource).all()]
-    return resources
+    return [resource.resource_name for resource in Session().query(Resource).all()]
 
 
 def insert_raw_program_play_event_data(each_log):

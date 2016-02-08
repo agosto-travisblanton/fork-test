@@ -1,21 +1,40 @@
-<div ng-controller="ProofOfPlayCtrl" layout="column" ng-cloak>
-  <md-toolbar class="md-hue-2">
-    <div class="md-toolbar-tools">
-      <h2 class="md-flex"><i class="fa fa-fw fa-film ng-scope"></i> Proof of Play</h2>
-    </div>
-  </md-toolbar>
-  <md-content>
-    <div flex="90" flex-sm="90" flex-xs="90" layout="column">
-      <md-card>
-        <md-card-title>
-          <md-card-title-text>
-            <span class="md-headline">Log Report</span>
-          </md-card-title-text>
-        </md-card-title>
-        <md-card-content>
-        </md-card-content>
-      </md-card>
-    </div>
-  </md-content>
-</div>
+<div ng-controller="ProofOfPlayCtrl as vm" layout="column" ng-cloak>
+    <md-toolbar class="md-hue-2">
+        <div class="md-toolbar-tools">
+            <h2 class="md-flex"><i class="fa fa-fw fa-film ng-scope"></i>Proof of Play</h2>
+        </div>
+    </md-toolbar>
+    <md-content class="md-padding">
+        <md-card>
+            <md-card-actions layout="column" layout-align="center center">
+                <md-card-title>
+                    <md-card-title-text>
+                        <h1 class="md-display-2">Welcome to Skykit Proof of Play Reporting</h1>
+                        <h5>Please select a tab to begin generating a report</h5>
+                    </md-card-title-text>
+                </md-card-title>
+            </md-card-actions>
+        </md-card>
+    </md-content>
+    <md-content>
+        <md-tabs md-dynamic-height md-center-tabs>
+            <div ng-repeat="tab in vm.tabs">
+                <md-tab label="{{tab.title}}" md-on-select="vm.onTabSelected(tab)">
+                    <div style="padding: 25px; height: 100%; text-align: center;">
+                        <h3>{{tab.title}}</h3>
 
+                        <h5>{{tab.content}}</h5>
+                        <div class="col-md-6 col-md-offset-3" >
+                            <md-input-container class="md-block">
+                                <label>Title</label>
+                                <input ng-model="user.title">
+                            </md-input-container>
+                        </div>
+                    </div>
+
+
+                </md-tab>
+            </div>
+        </md-tabs>
+    </md-content>
+</div>

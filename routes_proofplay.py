@@ -38,5 +38,10 @@ application = WSGIApplication(
                     handler="proofplay.main.OneResourceByDevice",
                     name="OneResourceByDevice"
             ),
+            Route(
+                    r'/proofplay/api/v1/retrieve_all_resources',
+                    handler="proofplay.main.RetrieveAllResources",
+                    name="RetrieveAllResources"
+            ),
         ]
 )
