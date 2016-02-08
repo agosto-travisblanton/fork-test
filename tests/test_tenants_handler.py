@@ -7,7 +7,7 @@ setup_test_paths()
 import json
 from content_manager_api import ContentManagerApi
 from agar.test import BaseTest, WebTest
-from models import Tenant, TENANT_ENTITY_GROUP_NAME, Distributor, Domain
+from models import Tenant, TENANT_ENTITY_GROUP_NAME, Distributor, Domain, ChromeOsDevice
 from routes import application
 from mockito import when, any as any_matcher, verify
 from app_config import config
@@ -342,6 +342,81 @@ class TestTenantsHandler(BaseTest, WebTest):
         }
         self.app.put_json(uri, entity_body, headers=self.headers)
         self.assertEqual(expected.domain_key, new_domain_key)
+
+    def test_put_turns_off_proof_of_play_logging(self):
+        tenant = Tenant.create(tenant_code='acme',
+                               name='Acme',
+                               admin_email=self.ADMIN_EMAIL,
+                               content_server_url=self.CONTENT_SERVER_URL,
+                               content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                               domain_key=self.domain_key,
+                               proof_of_play_logging=True,
+                               active=True)
+        tenant_key = tenant.put()
+        device = ChromeOsDevice.create_managed(
+            tenant_key=tenant_key,
+            gcm_registration_id='gcm',
+            mac_address='mac')
+        device.proof_of_play_logging = True
+        device.proof_of_play_editable = True
+        device.put()
+        uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': tenant_key.urlsafe()})
+        entity_body = {
+            'name': 'foobar',
+            'tenant_code': 'acme',
+            'admin_email': 'foo@bar.com',
+            'content_server_url': 'https://www.foo.com',
+            'content_server_api_key': 'some key',
+            'domain_key': self.domain_key.urlsafe(),
+            'active': False,
+            'proof_of_play_logging': False
+        }
+        self.assertTrue(tenant.proof_of_play_logging)
+        self.assertTrue(device.proof_of_play_logging)
+        self.assertTrue(device.proof_of_play_editable)
+        self.app.put_json(uri, entity_body, headers=self.headers)
+        updated_tenant = tenant_key.get()
+        self.assertFalse(updated_tenant.proof_of_play_logging)
+        self.assertFalse(device.proof_of_play_logging)
+        self.assertFalse(device.proof_of_play_editable)
+
+    def test_put_turns_on_proof_of_play_logging(self):
+        tenant = Tenant.create(tenant_code='acme',
+                               name='Acme',
+                               admin_email=self.ADMIN_EMAIL,
+                               content_server_url=self.CONTENT_SERVER_URL,
+                               content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                               domain_key=self.domain_key,
+                               proof_of_play_logging=False,
+                               active=True)
+        tenant_key = tenant.put()
+        device = ChromeOsDevice.create_managed(
+            tenant_key=tenant_key,
+            gcm_registration_id='gcm',
+            mac_address='mac')
+        device.proof_of_play_logging = True
+        device.proof_of_play_editable = False
+        device.put()
+        uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': tenant_key.urlsafe()})
+        entity_body = {
+            'name': 'foobar',
+            'tenant_code': 'acme',
+            'admin_email': 'foo@bar.com',
+            'content_server_url': 'https://www.foo.com',
+            'content_server_api_key': 'some key',
+            'domain_key': self.domain_key.urlsafe(),
+            'active': False,
+            'proof_of_play_logging': True
+        }
+        self.assertFalse(tenant.proof_of_play_logging)
+        self.assertTrue(device.proof_of_play_logging)
+        self.assertFalse(device.proof_of_play_editable)
+        self.app.put_json(uri, entity_body, headers=self.headers)
+        updated_tenant = tenant_key.get()
+        self.assertTrue(updated_tenant.proof_of_play_logging)
+        self.assertTrue(device.proof_of_play_logging)
+        self.assertTrue(device.proof_of_play_editable)
+
 
     ##################################################################################################################
     ## delete

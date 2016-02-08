@@ -127,8 +127,14 @@ class TenantsHandler(RequestHandler):
         email_list = delimited_string_to_list(request_json.get('notification_emails'))
         tenant.notification_emails = email_list
         domain_key_input = request_json.get('domain_key')
-        tenant.proof_of_play_logging = request_json.get('proof_of_play_logging')
         tenant.active = request_json.get('active')
+        proof_of_play_logging = request_json.get('proof_of_play_logging')
+        if str(proof_of_play_logging).lower() == 'true' or str(proof_of_play_logging).lower() == 'false':
+            tenant.proof_of_play_logging = bool(proof_of_play_logging)
+            if tenant.proof_of_play_logging is False:
+                Tenant.turn_off_proof_of_play(tenant.tenant_code)
+            elif tenant.proof_of_play_logging is True:
+                Tenant.turn_on_proof_of_play(tenant.tenant_code)
         try:
             domain_key = ndb.Key(urlsafe=domain_key_input)
         except Exception, e:
