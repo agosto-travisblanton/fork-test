@@ -171,24 +171,15 @@ class Tenant(ndb.Model):
                    proof_of_play_logging=proof_of_play_logging)
 
     @classmethod
-    def turn_off_proof_of_play(cls, tenant_code):
+    def toggle_proof_of_play(cls, tenant_code, enable):
         tenant = Tenant.find_by_tenant_code(tenant_code)
         managed_devices = Tenant.find_devices(tenant.key, unmanaged=False)
         for device in managed_devices:
-            device.proof_of_play_logging = False
-            device.proof_of_play_editable = False
+            if not enable:
+                device.proof_of_play_logging = enable
+            device.proof_of_play_editable = enable
             device.put()
-        tenant.proof_of_play_logging = False
-        tenant.put()
-
-    @classmethod
-    def turn_on_proof_of_play(cls, tenant_code):
-        tenant = Tenant.find_by_tenant_code(tenant_code)
-        managed_devices = Tenant.find_devices(tenant.key, unmanaged=False)
-        for device in managed_devices:
-            device.proof_of_play_editable = True
-            device.put()
-        tenant.proof_of_play_logging = True
+        tenant.proof_of_play_logging = enable
         tenant.put()
 
     def _pre_put_hook(self):

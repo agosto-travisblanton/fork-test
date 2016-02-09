@@ -137,7 +137,7 @@ class TestTenantModel(BaseTest):
         domain = self.tenant.get_domain()
         self.assertEqual(domain, self.domain)
 
-    def test_turn_off_proof_of_play(self):
+    def test_toggle_proof_of_play_off(self):
         self.tenant.proof_of_play_logging = True
         self.tenant.put()
         self.assertTrue(self.tenant.proof_of_play_logging)
@@ -146,13 +146,13 @@ class TestTenantModel(BaseTest):
             device.proof_of_play_logging = True
             device.proof_of_play_editable = True
             device.put()
-        Tenant.turn_off_proof_of_play(self.TENANT_CODE)
+        Tenant.toggle_proof_of_play(tenant_code=self.TENANT_CODE, enable=False)
         self.assertFalse(self.tenant.proof_of_play_logging)
         for device in devices:
             self.assertFalse(device.proof_of_play_logging)
             self.assertFalse(device.proof_of_play_editable)
 
-    def test_turn_on_proof_of_play(self):
+    def test_toggle_proof_of_play_on(self):
         self.tenant.proof_of_play_logging = False
         self.tenant.put()
         self.assertFalse(self.tenant.proof_of_play_logging)
@@ -161,7 +161,7 @@ class TestTenantModel(BaseTest):
             device.proof_of_play_logging = False
             device.proof_of_play_editable = False
             device.put()
-        Tenant.turn_on_proof_of_play(self.TENANT_CODE)
+        Tenant.toggle_proof_of_play(tenant_code=self.TENANT_CODE, enable=True)
         self.assertTrue(self.tenant.proof_of_play_logging)
         for device in devices:
             self.assertFalse(device.proof_of_play_logging)

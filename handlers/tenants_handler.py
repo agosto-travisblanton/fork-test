@@ -131,10 +131,7 @@ class TenantsHandler(RequestHandler):
         proof_of_play_logging = request_json.get('proof_of_play_logging')
         if str(proof_of_play_logging).lower() == 'true' or str(proof_of_play_logging).lower() == 'false':
             tenant.proof_of_play_logging = bool(proof_of_play_logging)
-            if tenant.proof_of_play_logging is False:
-                Tenant.turn_off_proof_of_play(tenant.tenant_code)
-            elif tenant.proof_of_play_logging is True:
-                Tenant.turn_on_proof_of_play(tenant.tenant_code)
+            Tenant.toggle_proof_of_play(tenant_code=tenant.tenant_code, enable=tenant.proof_of_play_logging)
         try:
             domain_key = ndb.Key(urlsafe=domain_key_input)
         except Exception, e:
