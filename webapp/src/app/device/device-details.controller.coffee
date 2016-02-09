@@ -11,6 +11,21 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     sweet,
     ProgressBarService) ->
   @tenantKey = $stateParams.tenantKey
+
+  @currentTenant = {
+    key: undefined,
+    name: undefined,
+    tenant_code: undefined,
+    admin_email: undefined,
+    content_server_url: undefined,
+    content_manager_base_url: undefined,
+    domain_key: undefined,
+    notification_emails: undefined,
+    proof_of_play_logging: false,
+    active: true
+  }
+
+
   @currentDevice = {
     key: undefined
     gcmRegistrationId: undefined
@@ -43,6 +58,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     custom: undefined
     latitude: undefined
     longitude: undefined
+    proofOfPlayLogging: false
   }
   @commandEvents = []
   @editMode = !!$stateParams.deviceKey
@@ -103,7 +119,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     $log.error errorObject
     sweet.show('Oops...', 'Unable to save the serial control information.', 'error')
 
-  @onClickSaveNotes = () ->
+  @onClickSaveDevice = () ->
     ProgressBarService.start()
     @setPanelInfo()
     promise = DevicesService.save @currentDevice

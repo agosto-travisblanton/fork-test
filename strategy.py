@@ -12,6 +12,7 @@ TENANT_FIELDS = [
     'admin_email',
     'content_server_url',
     'content_manager_base_url',
+    'proof_of_play_logging',
     'active',
     'created',
     'updated'
@@ -84,6 +85,8 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'heartbeatInterval': lambda o, field_name, context: o.key.get().heartbeat_interval_minutes},
     {'timezone': lambda o, field_name, context: o.key.get().time_zone},
     {'connectionType': lambda o, field_name, context: o.key.get().connection_type},
+    {'proofOfPlayLogging': lambda o, field_name, context: o.key.get().proof_of_play_logging},
+    {'proofOfPlayEditable': lambda o, field_name, context: o.key.get().proof_of_play_editable},
     {'latitude': lambda o, field_name,
                         context: o.key.get().geo_location.lat if o.key.get().geo_location is not None else None},
     {'longitude': lambda o, field_name,

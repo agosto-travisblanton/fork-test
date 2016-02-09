@@ -149,7 +149,12 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($http, $log, Res
         }
         {
           'id': 'nec1'
-          'displayName': 'TBD'
+          'displayName': 'VGA'
+          'parentId': 'NEC-LCD4215'
+        }
+        {
+          'id': 'nec2'
+          'displayName': 'DVI1'
           'parentId': 'NEC-LCD4215'
         }
       ]

@@ -115,6 +115,7 @@ class Tenant(ndb.Model):
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
     domain_key = ndb.KeyProperty(kind=Domain, required=True, indexed=True)
     notification_emails = ndb.StringProperty(repeated=True, indexed=False, required=False)
+    proof_of_play_logging = ndb.BooleanProperty(default=False, required=True, indexed=True)
     class_version = ndb.IntegerProperty()
 
     def get_domain(self):
@@ -156,7 +157,7 @@ class Tenant(ndb.Model):
 
     @classmethod
     def create(cls, tenant_code, name, admin_email, content_server_url, domain_key, active,
-               content_manager_base_url, notification_emails=[]):
+               content_manager_base_url, notification_emails=[], proof_of_play_logging=False):
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
                    tenant_code=tenant_code,
@@ -166,7 +167,20 @@ class Tenant(ndb.Model):
                    domain_key=domain_key,
                    active=active,
                    content_manager_base_url=content_manager_base_url,
-                   notification_emails=notification_emails)
+                   notification_emails=notification_emails,
+                   proof_of_play_logging=proof_of_play_logging)
+
+    @classmethod
+    def toggle_proof_of_play(cls, tenant_code, enable):
+        tenant = Tenant.find_by_tenant_code(tenant_code)
+        managed_devices = Tenant.find_devices(tenant.key, unmanaged=False)
+        for device in managed_devices:
+            if not enable:
+                device.proof_of_play_logging = enable
+            device.proof_of_play_editable = enable
+            device.put()
+        tenant.proof_of_play_logging = enable
+        tenant.put()
 
     def _pre_put_hook(self):
         self.class_version = 1
@@ -218,6 +232,8 @@ class ChromeOsDevice(ndb.Model):
                                                      indexed=False)
     time_zone = ndb.StringProperty(required=False, indexed=True)
     geo_location = ndb.GeoPtProperty(required=False, indexed=True)
+    proof_of_play_logging = ndb.BooleanProperty(default=False, required=True, indexed=True)
+    proof_of_play_editable = ndb.BooleanProperty(default=False, required=True)
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):
