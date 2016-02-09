@@ -14,6 +14,15 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", ($state, $log, $timeout, Pr
     end: null
   }
 
+  @selected_resources = []
+
+  @addToSelectedResource = () =>
+    if @isResourceValid()
+      @selected_resources.push @searchText
+    @areResourcesValid()
+    @isDisabled()
+
+
   @loading = true
 
   loadAllResources = =>
@@ -31,7 +40,7 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", ($state, $log, $timeout, Pr
   @formValidity = {
     start_date: false,
     end_date: false,
-    resource: false,
+    resources: false,
   }
 
   @disabled = true
@@ -39,11 +48,15 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", ($state, $log, $timeout, Pr
 
   @isResourceValid = () =>
     if @searchText in @resources
-      @formValidity.resource = @searchText
+      if @searchText not in @selected_resources
+        true
     else
-      @formValidity.resource = null
-    @isDisabled()
+      false
 
+
+  @areResourcesValid = () =>
+    console.log((@selected_resources.length > 0))
+    @formValidity.resources = (@selected_resources.length > 0)
 
   @isStartDateValid = () =>
     @formValidity.start_date = (@dateTimeSelection.start instanceof Date)
@@ -57,12 +70,12 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", ($state, $log, $timeout, Pr
 
   @isDisabled = () =>
     console.log(@formValidity)
-    if @formValidity.start_date and @formValidity.end_date and @formValidity.resource
+    if @formValidity.start_date and @formValidity.end_date and @formValidity.resources
       @disabled = false
       @final = {
         start_date_unix: moment(@dateTimeSelection.start).unix(),
         end_date_unix: moment(@dateTimeSelection.end).unix(),
-        resource: @searchText,
+        resources: @selected_resources,
       }
     else
       @disabled = true
