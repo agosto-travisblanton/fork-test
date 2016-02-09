@@ -192,7 +192,7 @@ describe 'DeviceDetailsCtrl', ->
         getPlayerCommandEventsPromise.resolve commandEvents
         expect(controller.commandEvents).toBe commandEvents
 
-  describe '.onClickSaveNotes', ->
+  describe '.onClickSaveDevice', ->
     beforeEach ->
       devicesServicePromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'save').and.returnValue devicesServicePromise
@@ -203,7 +203,7 @@ describe 'DeviceDetailsCtrl', ->
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.currentDevice.panelModel = {id: 'Sony-112'}
       controller.currentDevice.panelInput = {id: 'son01'}
-      controller.onClickSaveDeviceUpdates()
+      controller.onClickSaveDevice()
       devicesServicePromise.resolve()
 
     it 'starts the progress bar', ->

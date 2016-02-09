@@ -119,7 +119,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     $log.error errorObject
     sweet.show('Oops...', 'Unable to save the serial control information.', 'error')
 
-  @onClickSaveDeviceUpdates = () ->
+  @onClickSaveDevice = () ->
     ProgressBarService.start()
     @setPanelInfo()
     promise = DevicesService.save @currentDevice
