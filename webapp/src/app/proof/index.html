@@ -20,10 +20,9 @@
 
                                         <form ng-submit="$event.preventDefault()">
                                             <md-autocomplete
-                                                    md-no-cache="vm.no_cache"
                                                     md-selected-item="vm.selectedItem"
                                                     md-search-text="vm.searchText"
-                                                    md-items="item in vm.querySearch(vm.resources)"
+                                                    md-items="item in vm.querySearch(vm.resources, vm.searchText)"
                                                     md-item-text="item"
                                                     md-min-length="0"
                                                     md-search-text-change="vm.isResourceValid()"
@@ -69,15 +68,14 @@
                                         <div class="col-sm-3">
                                             <h4 class="proof-of-play-label">Start Date</h4>
                                             <md-datepicker ng-model="vm.dateTimeSelection.start"
-                                                           ng-change="vm.isStartDateValid()"
-                                                           required
+                                                           ng-change="vm.isStartDateValid(vm.dateTimeSelection.start)"
                                                            md-placeholder="Enter date"></md-datepicker>
                                         </div>
                                         <div class="col-sm-3 col-sm-offset-4">
 
                                             <h4 class="proof-of-play-label">End Date</h4>
                                             <md-datepicker ng-model="vm.dateTimeSelection.end"
-                                                           ng-change="vm.isEndDateValid()"
+                                                           ng-change="vm.isEndDateValid(vm.dateTimeSelection.end)"
                                                            required
                                                            md-placeholder="Enter date"></md-datepicker>
                                         </div>
@@ -111,10 +109,9 @@
 
                                             <form ng-submit="$event.preventDefault()">
                                                 <md-autocomplete
-                                                        md-no-cache="vm.no_cache"
                                                         md-selected-item="vm.selectedItem"
                                                         md-search-text="vm.searchText"
-                                                        md-items="item in vm.querySearch(vm.resources)"
+                                                        md-items="item in vm.querySearch(vm.resources, vm.searchText)"
                                                         md-item-text="item"
                                                         md-min-length="0"
                                                         md-search-text-change="vm.isResourceValid()"

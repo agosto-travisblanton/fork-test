@@ -7,41 +7,12 @@ appModule.controller "ProofOfPlayOneResourceCtrl", ($state, $log, $timeout, Proo
     group1: 'By Location',
     group2: 'By Date',
     selection: null
-  };
+  }
 
   @dateTimeSelection = {
     start: null,
     end: null
   }
-
-  @no_cache = true
-
-  @loading = true
-
-  loadAllResources = =>
-    ProofPlayService.getAllResources()
-    .then (data) =>
-      @loading = false
-      return data.data.resources
-
-  createFilterFor = (query) =>
-    query = angular.lowercase(query);
-    (resource) ->
-      resource = angular.lowercase(resource);
-      return (resource.indexOf(query) == 0)
-
-
-  @querySearch = (resources) =>
-    if @searchText
-      new_resources = resources.filter(createFilterFor(@searchText))
-      return new_resources
-    else
-      return resources
-
-  loadAllResources()
-  .then (data) =>
-    @resources = data
-
 
   @formValidity = {
     start_date: false,
@@ -50,11 +21,30 @@ appModule.controller "ProofOfPlayOneResourceCtrl", ($state, $log, $timeout, Proo
     type: false
   }
 
+  @no_cache = true
+  @loading = true
   @disabled = true
+
+  loadAllResources = =>
+    ProofPlayService.getAllResources()
+    .then (data) =>
+      data.data.resources
+
+
+  loadAllResources()
+  .then (data) =>
+    @loading = false
+    @resources = data
+
+
+  @querySearch = (resources, searchText) =>
+    ProofPlayService.querySearch(resources, searchText)
+
 
   @isRadioValid = () =>
     @formValidity.type = @radioButtonChoices.selection
     @isDisabled()
+
 
   @isResourceValid = () =>
     if @searchText in @resources

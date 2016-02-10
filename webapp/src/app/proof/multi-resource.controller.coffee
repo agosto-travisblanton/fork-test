@@ -3,61 +3,10 @@
 appModule = angular.module 'skykitProvisioning'
 
 appModule.controller "ProofOfPlayMultiResourceCtrl", ($state, $log, $timeout, ProofPlayService) ->
-  @radioButtonChoices = {
-    group1: 'By Location',
-    group2: 'By Date',
-    selection: null
-  };
-
   @dateTimeSelection = {
     start: null,
     end: null
   }
-
-  @selected_resources = []
-
-  @addToSelectedResource = () =>
-    if @isResourceValid()
-      @selected_resources.push @searchText
-      index = @resources.indexOf(@searchText);
-      @resources.splice(index, 1)
-      @searchText = ''
-    @areResourcesValid()
-    @isDisabled()
-
-
-  @no_cache = true
-
-
-  createFilterFor = (query) =>
-    query = angular.lowercase(query)
-    (resource) ->
-      resource = angular.lowercase(resource);
-      return (resource.indexOf(query) == 0)
-
-
-  @querySearch = (resources) =>
-    if @searchText
-      new_resources = resources.filter(createFilterFor(@searchText))
-      return new_resources
-    else
-      return resources
-
-
-
-  @loading = true
-
-  loadAllResources = =>
-    ProofPlayService.getAllResources()
-    .then (data) =>
-      @loading = false
-      return data.data.resources
-
-
-  loadAllResources()
-  .then (data) =>
-    @resources = data
-
 
   @formValidity = {
     start_date: false,
@@ -65,20 +14,49 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", ($state, $log, $timeout, Pr
     resources: false,
   }
 
+  @no_cache = true
+  @loading = true
   @disabled = true
+  @selected_resources = []
+
+  @addToSelectedResource = () =>
+    if @isResourceValid()
+      @selected_resources.push @searchText
+      index = @resources.indexOf @searchText
+      @resources.splice index, 1
+      @searchText = ''
+    @areResourcesValid()
+    @isDisabled()
+
+  @querySearch = (resources, searchText) =>
+    ProofPlayService.querySearch(resources, searchText)
+
+
+  loadAllResources = =>
+    ProofPlayService.getAllResources()
+    .then (data) =>
+      data.data.resources
+
+
+  loadAllResources()
+  .then (data) =>
+    @loading = false
+    @resources = data
 
 
   @isResourceValid = () =>
     if @searchText in @resources
       if @searchText not in @selected_resources
         true
+      else
+        false
     else
       false
 
 
   @areResourcesValid = () =>
-    console.log((@selected_resources.length > 0))
     @formValidity.resources = (@selected_resources.length > 0)
+    @isDisabled()
 
   @isStartDateValid = () =>
     @formValidity.start_date = (@dateTimeSelection.start instanceof Date)
@@ -98,7 +76,6 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", ($state, $log, $timeout, Pr
 
 
   @isDisabled = () =>
-    console.log(@formValidity)
     if @formValidity.start_date and @formValidity.end_date and @formValidity.resources
       @disabled = false
       @final = {
@@ -106,6 +83,7 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", ($state, $log, $timeout, Pr
         end_date_unix: moment(@dateTimeSelection.end).unix(),
         resources: @selected_resources,
       }
+
     else
       @disabled = true
 
