@@ -4,7 +4,10 @@ import datetime
 
 
 def retrieve_all_resources():
-    return [resource.resource_name for resource in Session().query(Resource).all()]
+    session = Session()
+    search = session.query(Resource).all()
+    session.close()
+    return [resource.resource_name for resource in search]
 
 
 def insert_raw_program_play_event_data(each_log):
@@ -20,6 +23,7 @@ def insert_raw_program_play_event_data(each_log):
     )
     session.add(new_raw_event)
     session.commit()
+    session.close()
     return new_raw_event.id
 
 
@@ -30,6 +34,7 @@ def mark_raw_event_complete(raw_event_id):
     if entry:
         entry.completed = True
         session.commit()
+    session.close()
 
 
 def insert_new_program_record(location_id, device_id, resource_id, started_at, ended_at):
@@ -45,6 +50,7 @@ def insert_new_program_record(location_id, device_id, resource_id, started_at, e
 
     session.add(new_program_record)
     session.commit()
+    session.close()
 
 
 def insert_new_resource_or_get_existing(resource_name, resource_identifier):
@@ -59,9 +65,11 @@ def insert_new_resource_or_get_existing(resource_name, resource_identifier):
         )
         session.add(new_resource)
         session.commit()
+        session.close()
         return new_resource.id
 
     else:
+        session.close()
         return resource_exits.id
 
 
@@ -76,8 +84,10 @@ def insert_new_location_or_get_existing(location_identifier):
         )
         session.add(new_location)
         session.commit()
+        session.close()
         return new_location.id
 
+    session.close()
     return location_exists.id
 
 
@@ -97,8 +107,10 @@ def insert_new_device_or_get_existing(location_id, serial_number, device_key, te
 
         session.add(new_device)
         session.commit()
+        session.close()
         return new_device.id
 
+    session.close()
     return device_exists.id
 
 
@@ -115,11 +127,13 @@ def insert_new_gamestop_store_location(location_name, serial_number):
 
         session.add(new_pair)
         session.commit()
+        session.close()
 
 
 def get_gamestop_store_location_from_serial_via_db(serial):
     session = Session()
     location_id = session.query(GamestopStoreLocation).filter_by(serial_number=serial).first()
+    session.close()
 
     if location_id:
         return location_id.location_name
@@ -163,6 +177,7 @@ def get_raw_program_record_data_for_resource_between_date_ranges_by_location(sta
         from_db.append(d)
 
     all_results = transform_resource_data_between_date_range_by_location(from_db)
+    session.close()
     return all_results
 
 
@@ -204,4 +219,5 @@ def get_raw_program_record_data_for_resource_between_date_ranges_by_date(start_d
         from_db.append(d)
 
     all_results = transform_resource_data_between_date_ranges_by_date(from_db)
+    session.close()
     return all_results
