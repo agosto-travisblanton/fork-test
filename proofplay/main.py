@@ -3,7 +3,6 @@ from utils import get_location_from_serial, create_merged_dictionary
 from database_calls import *
 from data_processing import *
 import logging
-import time
 import json
 from google.appengine.ext import deferred
 
@@ -21,11 +20,6 @@ class PostNewProgramPlay(RequestHandler):
         incoming = json.loads(self.request.body)
         deferred.defer(handle_posting_a_new_program_play, incoming)
         final = json.dumps({"success": True, "message": "NEW PROGRAM WILL BE PROCESSED IN THE TASK QUEUE"})
-        self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(final)
-
-    def get(self):
-        final = json.dumps({"success": True, "resources": retrieve_all_resources()})
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(final)
 
