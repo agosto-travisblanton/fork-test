@@ -6,3 +6,4 @@
 ghostdriver.log
 functional_tests/.screenshots/*.png
 venv
+venv2
