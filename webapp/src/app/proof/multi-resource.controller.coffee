@@ -26,6 +26,25 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", ($state, $log, $timeout, Pr
     @isDisabled()
 
 
+  @no_cache = true
+
+
+  createFilterFor = (query) =>
+    query = angular.lowercase(query)
+    (resource) ->
+      resource = angular.lowercase(resource);
+      return (resource.indexOf(query) == 0)
+
+
+  @querySearch = (resources) =>
+    if @searchText
+      new_resources = resources.filter(createFilterFor(@searchText))
+      return new_resources
+    else
+      return resources
+
+
+
   @loading = true
 
   loadAllResources = =>

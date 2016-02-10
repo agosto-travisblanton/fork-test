@@ -14,6 +14,8 @@ appModule.controller "ProofOfPlayOneResourceCtrl", ($state, $log, $timeout, Proo
     end: null
   }
 
+  @no_cache = true
+
   @loading = true
 
   loadAllResources = =>
@@ -22,6 +24,19 @@ appModule.controller "ProofOfPlayOneResourceCtrl", ($state, $log, $timeout, Proo
       @loading = false
       return data.data.resources
 
+  createFilterFor = (query) =>
+    query = angular.lowercase(query);
+    (resource) ->
+      resource = angular.lowercase(resource);
+      return (resource.indexOf(query) == 0)
+
+
+  @querySearch = (resources) =>
+    if @searchText
+      new_resources = resources.filter(createFilterFor(@searchText))
+      return new_resources
+    else
+      return resources
 
   loadAllResources()
   .then (data) =>

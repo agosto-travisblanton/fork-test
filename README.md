@@ -56,3 +56,8 @@ $ gulp serve
 ```sh
 $ gulp test
 ```
+
+To update coverage
+```sh
+$ gulp build
+```
