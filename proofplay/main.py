@@ -73,9 +73,9 @@ class MultiResourceByDate(RequestHandler):
                 now
         )
 
-        self.response.headers['Content-Type'] = 'text/csv'
-        self.response.headers['Content-Disposition'] = 'attachment; filename=one-resource-by-date.csv'
-        self.response.write(csv_to_publish)
+        self.response.headers['Content-Type'] = 'application/csv'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=multi-resource-by-date.csv'
+        self.response.write(bytes(csv_to_publish.getvalue()))
 
 
 class OneResourceByDate(RequestHandler):
@@ -117,9 +117,9 @@ class OneResourceByDate(RequestHandler):
                 now
         )
 
-        self.response.headers['Content-Type'] = 'text/csv'
+        self.response.headers['Content-Type'] = 'application/csv'
         self.response.headers['Content-Disposition'] = 'attachment; filename=one-resource-by-date.csv'
-        self.response.write(csv_to_publish)
+        self.response.write(bytes(csv_to_publish.getvalue()))
 
 
 class OneResourceByDevice(RequestHandler):
@@ -150,9 +150,9 @@ class OneResourceByDevice(RequestHandler):
                 datetime.datetime.now()
         )
 
-        self.response.headers['Content-Type'] = 'text/csv'
-        self.response.headers['Content-Disposition'] = 'attachment; filename=one-resource-by-date.csv'
-        self.response.write(csv_to_publish)
+        self.response.headers['Content-Type'] = 'application/csv'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=one-resource-by-device.csv'
+        self.response.write(bytes(csv_to_publish.getvalue()))
 
 
 def handle_posting_a_new_program_play(incoming_data):

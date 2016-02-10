@@ -31,7 +31,7 @@ angular.module('skykitProvisioning')
       allResources = []
 
       for each in resources
-        allResources = allResources + "-" + item
+        allResources = allResources + "-" + each
 
       window.open(@uriBase + '/multi_resource_by_date/' + start_date + '/' + end_date + '/' + allResources, '_blank')
 

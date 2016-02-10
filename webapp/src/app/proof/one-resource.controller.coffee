@@ -73,6 +73,10 @@ appModule.controller "ProofOfPlayOneResourceCtrl", ($state, $log, $timeout, Proo
       @disabled = true
 
   @submit = () =>
-    console.log(@final)
+    if @final.type is "1"
+      ProofPlayService.downloadCSVForSingleResourceAcrossDateRangeByLocation(@final.start_date_unix, @final.end_date_unix, @final.resource)
+
+    else
+      ProofPlayService.downloadCSVForSingleResourceAcrossDateRangeByDate(@final.start_date_unix, @final.end_date_unix, @final.resource)
 
   @

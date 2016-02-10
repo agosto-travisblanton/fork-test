@@ -6,7 +6,7 @@
     </md-toolbar>
     <md-content>
         <md-tabs md-dynamic-height>
-            <!---<md-tab label="{{vm.tab.title}}" layout-align="center center">
+            <md-tab label="{{vm.tab.title}}" layout-align="center center">
 
                 <div ng-controller="ProofOfPlayOneResourceCtrl as vm" layout="column" ng-cloak>
                     <div style="padding-top: 25px; padding-left: 50px; text-align: left"
@@ -95,7 +95,7 @@
                     </div>
 
                 </div>
-            </md-tab> --->
+            </md-tab>
 
             <md-tab label="{{vm.tab2.title}}" layout-align="center center">
                 <div ng-controller="ProofOfPlayMultiResourceCtrl as vm" layout="column" ng-cloak>
@@ -192,7 +192,12 @@
                                         <div ng-show="vm.selected_resources.length > 0">
                                             <md-list>
                                                 <ol>
-                                                    <li ng-repeat="item in vm.selected_resources">{{ item }}</li>
+                                                    <li ng-repeat="item in vm.selected_resources">
+                                                        {{ item }}
+                                                          <md-button md-no-ink class="md-primary" ng-click="vm.removeFromSelectedResource(item)">X</md-button>
+                                                        </button>
+
+                                                    </li>
                                                 </ol>
                                             </md-list>
                                         </div>

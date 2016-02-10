@@ -19,6 +19,9 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", ($state, $log, $timeout, Pr
   @addToSelectedResource = () =>
     if @isResourceValid()
       @selected_resources.push @searchText
+      index = @resources.indexOf(@searchText);
+      @resources.splice(index, 1)
+      @searchText = ''
     @areResourcesValid()
     @isDisabled()
 
@@ -67,6 +70,13 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", ($state, $log, $timeout, Pr
     @formValidity.end_date = (@dateTimeSelection.end instanceof Date)
     @isDisabled()
 
+  @removeFromSelectedResource = (item) =>
+    index = @selected_resources.indexOf(item);
+    @selected_resources.splice(index, 1)
+    @resources.push item
+    @areResourcesValid()
+    @isDisabled()
+
 
   @isDisabled = () =>
     console.log(@formValidity)
@@ -81,6 +91,6 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", ($state, $log, $timeout, Pr
       @disabled = true
 
   @submit = () =>
-    console.log(@final)
+    ProofPlayService.downloadCSVForMultipleResources(@final.start_date_unix, @final.end_date_unix, @final.resources)
 
   @

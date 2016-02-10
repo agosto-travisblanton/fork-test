@@ -183,6 +183,7 @@ def transform_resource_data_between_date_ranges_by_date(from_db):
 
 def get_raw_program_record_data_for_resource_between_date_ranges_by_date(start_date, end_date, resource):
     session = Session()
+    print resource
     resource_id = session.query(Resource).filter_by(resource_name=resource).first().id
 
     rows = session.query(ProgramRecord).filter(
