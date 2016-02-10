@@ -10,4 +10,4 @@ else:
 
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
 session_factory = sessionmaker(bind=engine)
-Session = scoped_session(session_factory)
+Session = session_factory

@@ -105,7 +105,7 @@ def setup_test_paths():
 
     if 'APPENGINE_SDK' not in os.environ:
         logging.error('APPENGINE_SDK environment variable is not set; exiting...')
-    sdk_path = os.environ['APPENGINE_SDK']
+    sdk_path = "/Applications/GoogleAppEngineLauncher.app/Contents/Resources/GoogleAppEngine-default.bundle/Contents/Resources/google_appengine"
 
     sys.path.insert(0, sdk_path)
     import dev_appserver
