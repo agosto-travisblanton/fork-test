@@ -9,5 +9,5 @@ else:
     SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://root@localhost/provisioning'
 
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
-session_factory = sessionmaker(bind=engine)
+session_factory = sessionmaker(bind=engine, expire_on_commit=False)
 Session = session_factory
