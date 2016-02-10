@@ -1,7 +1,7 @@
 'use strict'
 
 angular.module('skykitProvisioning')
-.factory 'ProofPlayService', ($http, $q) ->
+.factory 'ProofPlayService', ($http, $q, $window) ->
   new class ProofPlayService
 
     constructor: ->
@@ -21,19 +21,19 @@ angular.module('skykitProvisioning')
 
 
     downloadCSVForSingleResourceAcrossDateRangeByDate: (start_date, end_date, resource) ->
-      window.open(@uriBase + '/one_resource_by_date/' + start_date + '/' + end_date + '/' + resource, '_blank')
-
+      $window.open(@uriBase + '/one_resource_by_date/' + start_date + '/' + end_date + '/' + resource, '_blank')
+      return true
 
     downloadCSVForSingleResourceAcrossDateRangeByLocation: (start_date, end_date, resource) ->
-      window.open(@uriBase + '/one_resource_by_device/' + start_date + '/' + end_date + '/' + resource, '_blank')
-
+      $window.open(@uriBase + '/one_resource_by_device/' + start_date + '/' + end_date + '/' + resource, '_blank')
+      return true
     downloadCSVForMultipleResources: (start_date, end_date, resources) ->
       allResources = []
 
       for each in resources
         allResources = allResources + "-" + each
 
-      window.open(@uriBase + '/multi_resource_by_date/' + start_date + '/' + end_date + '/' + allResources, '_blank')
-
+      $window.open(@uriBase + '/multi_resource_by_date/' + start_date + '/' + end_date + '/' + allResources, '_blank')
+      return true
     test: () ->
       0
