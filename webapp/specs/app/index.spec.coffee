@@ -28,8 +28,8 @@ describe 'skykitProvisioning module and configuration', ->
     it 'should resolve \'home\' state', ->
       expect($state.href('home', {})).toEqual('#/')
 
-    it 'should resolve \'version\' state', ->
-      expect($state.href('version', {})).toEqual('#/version')
+    it 'should resolve \'proof\' state', ->
+      expect($state.href('proof', {})).toEqual('#/proof')
 
     it 'should resolve \'domains\' state', ->
       expect($state.href('domains', {})).toEqual('#/domains')
@@ -95,6 +95,9 @@ describe 'skykitProvisioning module and configuration', ->
 
       it 'should resolve \'editDevice\' state', ->
         expect($state.get('editDevice').ncyBreadcrumb.label).toBe '{{ deviceDetailsCtrl.currentDevice.key }}'
+
+      it 'should resolve \'proof\' state', ->
+        expect($state.get('proof').ncyBreadcrumb.label).toBe 'Proof of Play'
 
     describe 'parents', ->
       it 'should resolve \'newTenant\' state', ->
