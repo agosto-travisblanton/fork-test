@@ -8,7 +8,7 @@ appModule.controller "WelcomeCtrl", (VersionsService) ->
 
   vm.initialize = ->
     promise = VersionsService.getVersions()
-    promise.then (data) =>
+    promise.then (data) ->
       vm.version_data = data
 
   vm
