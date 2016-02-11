@@ -2,7 +2,7 @@
 
 appModule = angular.module 'skykitProvisioning'
 
-appModule.controller "ProofOfPlayOneResourceCtrl", ($state, $log, $timeout, ProofPlayService) ->
+appModule.controller "ProofOfPlayOneResourceCtrl", (ProofPlayService) ->
   @radioButtonChoices = {
     group1: 'By Location',
     group2: 'By Date',
@@ -25,54 +25,49 @@ appModule.controller "ProofOfPlayOneResourceCtrl", ($state, $log, $timeout, Proo
   @loading = true
   @disabled = true
 
-  loadAllResources = =>
+
+  @initialize = =>
     ProofPlayService.getAllResources()
     .then (data) =>
-      data.data.resources
-
-
-  loadAllResources()
-  .then (data) =>
-    @loading = false
-    @resources = data
+      @loading = false
+      @resources = data.data.resources
 
 
   @querySearch = (resources, searchText) =>
     ProofPlayService.querySearch(resources, searchText)
 
 
-  @isRadioValid = () =>
-    @formValidity.type = @radioButtonChoices.selection
+  @isRadioValid = (selection) =>
+    @formValidity.type = selection
     @isDisabled()
 
 
-  @isResourceValid = () =>
-    if @searchText in @resources
-      @formValidity.resource = @searchText
+  @isResourceValid = (searchText) =>
+    if searchText in @resources
+      @formValidity.resource = searchText
     else
       @formValidity.resource = null
     @isDisabled()
 
 
-  @isStartDateValid = () =>
-    @formValidity.start_date = (@dateTimeSelection.start instanceof Date)
+  @isStartDateValid = (start_date) =>
+    @formValidity.start_date = (start_date instanceof Date)
     @isDisabled()
 
 
-  @isEndDateValid = () =>
-    @formValidity.end_date = (@dateTimeSelection.end instanceof Date)
+  @isEndDateValid = (end_date) =>
+    @formValidity.end_date = (end_date instanceof Date)
     @isDisabled()
 
 
   @isDisabled = () =>
-    console.log(@formValidity)
     if @formValidity.start_date and @formValidity.end_date and @formValidity.type and @formValidity.resource
       @disabled = false
       @final = {
         start_date_unix: moment(@dateTimeSelection.start).unix(),
         end_date_unix: moment(@dateTimeSelection.end).unix(),
         resource: @searchText,
-        type: @radioButtonChoices.selection,
+        type: @radioButtonChoices.selection
       }
     else
       @disabled = true

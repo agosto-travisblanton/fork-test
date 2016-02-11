@@ -1,5 +1,5 @@
 from webapp2 import RequestHandler
-from utils import get_location_from_serial, create_merged_dictionary
+from utils import create_merged_dictionary
 from database_calls import *
 from data_processing import *
 import logging
@@ -163,17 +163,18 @@ def handle_posting_a_new_program_play(incoming_data):
             started_at = datetime.datetime.strptime(each_log["started_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
             ended_at = datetime.datetime.strptime(each_log["ended_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
 
-            location_name = get_location_from_serial(serial_number)
-
-            if location_name:
+            if 'location_id' in each_log:
+                location_name = each_log["location_id"]
                 location_id = insert_new_location_or_get_existing(location_name)
-                resource_id = insert_new_resource_or_get_existing(resource, resource_id)
-                device_id = insert_new_device_or_get_existing(location_id, serial_number, device_key, tenant_code)
-                insert_new_program_record(location_id, device_id, resource_id, started_at, ended_at)
-                mark_raw_event_complete(raw_event_id)
 
             else:
-                logging.warn("ERROR: WAS NOT ABLE TO FIND A MATCHING LOCATION WITH THIS SERIAL_NUMBER")
+                location_id = None
+
+            resource_id = insert_new_resource_or_get_existing(resource, resource_id)
+            device_id = insert_new_device_or_get_existing(location_id, serial_number, device_key, tenant_code)
+            insert_new_program_record(location_id, device_id, resource_id, started_at, ended_at)
+            mark_raw_event_complete(raw_event_id)
+
 
         except KeyError:
             logging.warn("ERROR: KEYERROR IN POSTING A NEW PROGRAM PLAY")

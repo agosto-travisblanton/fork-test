@@ -76,22 +76,28 @@ class Location(Base):
 
     id = Column(Integer, primary_key=True)
     location_identifier = Column(String(255), unique=True, nullable=False)
+    dma_code = Column(String(255), nullable=True)
+    state = Column(String(255), nullable=True)
+    city = Column(String(255), nullable=True)
 
-    def __init__(self, location_identifier):
+    def __init__(self, location_identifier, dma_code=None, state=None, city=None):
         self.location_identifier = location_identifier
+        self.dma_code = dma_code
+        self.state = state
+        self.city = city
 
 
 class Device(Base):
     __tablename__ = "device"
 
     id = Column(Integer, primary_key=True)
-    location_id = Column(Integer, ForeignKey('location.id'))
+    location_id = Column(Integer, ForeignKey('location.id'), nullable=True)
     full_location = relationship("Location", backref="Device")
     serial_number = Column(String(255), nullable=False)
     device_key = Column(String(255), nullable=False)
     tenant_code = Column(String(255), nullable=False)
 
-    def __init__(self, location_id, serial_number, tenant_code, device_key):
+    def __init__(self, serial_number, tenant_code, device_key, location_id=None):
         self.location_id = location_id
         self.serial_number = serial_number
         self.tenant_code = tenant_code
@@ -102,7 +108,7 @@ class ProgramRecord(Base):
     __tablename__ = "program_record"
 
     id = Column(Integer, primary_key=True)
-    location_id = Column(Integer, ForeignKey('location.id'), nullable=False)
+    location_id = Column(Integer, ForeignKey('location.id'), nullable=True)
     resource_id = Column(Integer, ForeignKey('resource.id'), nullable=False)
     device_id = Column(Integer, ForeignKey('device.id'), nullable=False)
     full_location = relationship("Location", backref="ProgramRecord")

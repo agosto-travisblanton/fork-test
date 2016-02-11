@@ -10,7 +10,7 @@
 
                 <div ng-controller="ProofOfPlayOneResourceCtrl as vm" layout="column" ng-cloak>
                     <div style="padding-top: 25px; padding-left: 50px; text-align: left"
-                         class="col-md-7">
+                         class="col-md-7" ng-init="vm.initialize()">
                         <md-card>
                             <md-card-content>
                                 <md-content class="md-padding">
@@ -25,8 +25,8 @@
                                                     md-items="item in vm.querySearch(vm.resources, vm.searchText)"
                                                     md-item-text="item"
                                                     md-min-length="0"
-                                                    md-search-text-change="vm.isResourceValid()"
-                                                    md-selected-item-change="vm.isResourceValid()"
+                                                    md-search-text-change="vm.isResourceValid(vm.searchText)"
+                                                    md-selected-item-change="vm.isResourceValid(vm.searchText)"
                                                     placeholder="Select a resource">
                                                 <md-item-template>
                                         <span md-highlight-text="vm.searchText"
@@ -52,7 +52,7 @@
                                     <md-input-container class="md-block">
                                         <h4 class="proof-of-play-label">Report Type</h4>
                                         <md-radio-group ng-model="vm.radioButtonChoices.selection"
-                                                        ng-change="vm.isRadioValid()">
+                                                        ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
                                             <md-radio-button value="1">{{vm.radioButtonChoices.group1}}
                                             </md-radio-button>
                                             <md-radio-button value="2">{{vm.radioButtonChoices.group2}}
@@ -114,8 +114,8 @@
                                                         md-items="item in vm.querySearch(vm.resources, vm.searchText)"
                                                         md-item-text="item"
                                                         md-min-length="0"
-                                                        md-search-text-change="vm.isResourceValid()"
-                                                        md-selected-item-change="vm.isResourceValid()"
+                                                        md-search-text-change="vm.isResourceValid(vm.searchText)"
+                                                        md-selected-item-change="vm.isResourceValid(vm.searchText)"
                                                         placeholder="Select a resource">
                                                     <md-item-template>
                                         <span md-highlight-text="vm.searchText"

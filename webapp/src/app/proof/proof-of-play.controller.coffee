@@ -2,7 +2,7 @@
 
 appModule = angular.module 'skykitProvisioning'
 
-appModule.controller "ProofOfPlayCtrl", ($state, $log, $timeout, ProofPlayService) ->
+appModule.controller "ProofOfPlayCtrl", () ->
   @tab = {title: "One-Resource"}
   @tab2 = {title: "Multi-Resource"}
 
