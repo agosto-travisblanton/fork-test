@@ -97,7 +97,7 @@
 
             <md-tab label="{{vm.tab2.title}}" layout-align="center center">
                 <div ng-controller="ProofOfPlayMultiResourceCtrl as vm" layout="column" ng-cloak>
-                    <div class="row">
+                    <div class="row" ng-init="vm.initialize()">
                         <div style="padding-top: 25px; padding-left: 50px; text-align: left"
                              class="col-md-7">
                             <md-card>
@@ -127,7 +127,7 @@
                                                 </md-autocomplete>
                                                 <br/>
 
-                                                <md-button class="md-raised" ng-click="vm.addToSelectedResource()"
+                                                <md-button class="md-raised" ng-click="vm.addToSelectedResources(vm.searchText)"
                                                            style="float: right">Add
                                                 </md-button>
                                                 <br/>
@@ -155,7 +155,7 @@
                                             <div class="col-sm-3">
                                                 <h4 class="proof-of-play-label">Start Date</h4>
                                                 <md-datepicker ng-model="vm.dateTimeSelection.start"
-                                                               ng-change="vm.isStartDateValid()"
+                                                               ng-change="vm.isStartDateValid(vm.dateTimeSelection.start)"
                                                                required
                                                                md-placeholder="Enter date"></md-datepicker>
                                             </div>
@@ -163,7 +163,7 @@
 
                                                 <h4 class="proof-of-play-label">End Date</h4>
                                                 <md-datepicker ng-model="vm.dateTimeSelection.end"
-                                                               ng-change="vm.isEndDateValid()"
+                                                               ng-change="vm.isEndDateValid(vgit m.dateTimeSelection.end)"
                                                                required
                                                                md-placeholder="Enter date"></md-datepicker>
                                             </div>

@@ -2,7 +2,7 @@
 
 appModule = angular.module 'skykitProvisioning'
 
-appModule.controller "ProofOfPlayMultiResourceCtrl", ($state, $log, $timeout, ProofPlayService) ->
+appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService) ->
   @dateTimeSelection = {
     start: null,
     end: null
@@ -19,10 +19,16 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", ($state, $log, $timeout, Pr
   @disabled = true
   @selected_resources = []
 
-  @addToSelectedResource = () =>
-    if @isResourceValid()
-      @selected_resources.push @searchText
-      index = @resources.indexOf @searchText
+  @initialize = =>
+    ProofPlayService.getAllResources()
+    .then (data) =>
+      @loading = false
+      @resources =  data.data.resources
+
+  @addToSelectedResources = (searchText) =>
+    if @isResourceValid(searchText)
+      @selected_resources.push searchText
+      index = @resources.indexOf searchText
       @resources.splice index, 1
       @searchText = ''
     @areResourcesValid()
@@ -32,21 +38,9 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", ($state, $log, $timeout, Pr
     ProofPlayService.querySearch(resources, searchText)
 
 
-  loadAllResources = =>
-    ProofPlayService.getAllResources()
-    .then (data) =>
-      data.data.resources
-
-
-  loadAllResources()
-  .then (data) =>
-    @loading = false
-    @resources = data
-
-
-  @isResourceValid = () =>
-    if @searchText in @resources
-      if @searchText not in @selected_resources
+  @isResourceValid = (searchText) =>
+    if searchText in @resources
+      if searchText not in @selected_resources
         true
       else
         false
@@ -58,13 +52,13 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", ($state, $log, $timeout, Pr
     @formValidity.resources = (@selected_resources.length > 0)
     @isDisabled()
 
-  @isStartDateValid = () =>
-    @formValidity.start_date = (@dateTimeSelection.start instanceof Date)
+  @isStartDateValid = (start_date) =>
+    @formValidity.start_date = (start_date instanceof Date)
     @isDisabled()
 
 
-  @isEndDateValid = () =>
-    @formValidity.end_date = (@dateTimeSelection.end instanceof Date)
+  @isEndDateValid = (end_date) =>
+    @formValidity.end_date = (end_date instanceof Date)
     @isDisabled()
 
   @removeFromSelectedResource = (item) =>
