@@ -22,7 +22,7 @@ class TestLocationModel(BaseTest):
     LOCATION_NAME = 'Store #456'
     LOCATION_CODE = 'store_456'
     TIMEZONE = 'US/Arizona'
-    TIMEZONE_OFFSET = 0
+    TIMEZONE_OFFSET = -7
 
     def setUp(self):
         super(TestLocationModel, self).setUp()

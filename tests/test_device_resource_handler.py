@@ -1213,7 +1213,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                                       'start': start_epoch, 'end': end_epoch})
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json[0]['elapsed_time'], '59 seconds')
 
         issue.created = datetime.utcnow() - timedelta(seconds=90)
         issue.put()
