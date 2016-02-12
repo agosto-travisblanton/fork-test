@@ -1,5 +1,8 @@
 import uuid
+
 from datetime import datetime
+from utils.timezone_util import TimezoneUtil
+
 
 from google.appengine.ext import ndb
 
@@ -535,6 +538,47 @@ class PlayerCommandEvent(ndb.Model):
 
     def _pre_put_hook(self):
         self.class_version = 1
+
+
+@ae_ndb_serializer
+class Location(ndb.Model):
+    name = ndb.StringProperty(required=True, indexed=True)
+    location_code = ndb.StringProperty(required=True, indexed=True)
+    timezone = ndb.StringProperty(required=True, indexed=True)
+    timezone_offset = ndb.IntegerProperty(required=True, indexed=True) #computed property
+    address = ndb.StringProperty(required=False, indexed=True)
+    city = ndb.StringProperty(required=False, indexed=True)
+    state = ndb.StringProperty(required=False, indexed=True)
+    postal_code = ndb.StringProperty(required=False, indexed=True)
+    latitude = ndb.StringProperty(required=False, indexed=True)
+    longitude = ndb.StringProperty(required=False, indexed=True)
+    dma = ndb.StringProperty(required=False, indexed=True)
+    tenant_key = ndb.KeyProperty(kind=Tenant, required=True, indexed=True)
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    updated = ndb.DateTimeProperty(auto_now=True)
+    active = ndb.BooleanProperty(default=True, required=True, indexed=True)
+    class_version = ndb.IntegerProperty()
+
+    @classmethod
+    def create(cls, tenant_key, name, location_code, timezone):
+        timezone_offset = TimezoneUtil.get_offset(timezone)
+        return cls(tenant_key=tenant_key,
+                   name=name,
+                   location_code=location_code,
+                   timezone=timezone,
+                   timezone_offset=timezone_offset)
+
+    @classmethod
+    def find_by_location_code(cls, location_code):
+        if location_code:
+            key = Location.query(Location.location_code == location_code).get(keys_only=True)
+            if None is not key:
+                return key.get()
+
+
+    def _pre_put_hook(self):
+        self.class_version = 1
+
 
 class IssueLevel:
     Normal, Warning, Danger = range(3)
