@@ -106,7 +106,7 @@ def setup_test_paths():
     if 'APPENGINE_SDK' not in os.environ:
         logging.error('APPENGINE_SDK environment variable is not set; exiting...')
     sdk_path = os.environ['APPENGINE_SDK']
-
+    
     sys.path.insert(0, sdk_path)
     import dev_appserver
     dev_appserver.fix_sys_path()

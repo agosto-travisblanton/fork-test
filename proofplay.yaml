@@ -1,0 +1,57 @@
+application: skykit-display-device-int
+module: proofplay
+version: snapshot
+runtime: python27
+api_version: 1
+threadsafe: true
+
+env_variables:
+  DJANGO_SETTINGS_MODULE: 'settings'
+
+builtins:
+- deferred: on
+- remote_api: on
+- appstats: on
+
+libraries:
+- name: django
+  version: "1.3"
+- name: webapp2
+  version: latest
+- name: numpy
+  version: latest
+- name: PIL
+  version: latest
+- name: pycrypto
+  version: latest
+
+handlers:
+- url: /_ah/start
+  script: routes_proofplay.application
+  secure: optional
+
+- url: /proofplay/.*
+  script: routes_proofplay.application
+
+skip_files:
+- ^webapp/.*
+- ^coverage/.*
+- ^coverage_html_report/.*
+- ^monitor/.*
+- ^events/.*
+- ^pa/.*
+- ^scripts/.*
+- ^images/readme.md
+- ^local/.*
+- ^tests/.*
+- ^simtests/.*
+- ^static/app/node_modules/.*
+- ^.hg/.*
+- ^.idea/.*
+- ^.*~
+- ^.*\.py[co]
+- ^.*\.po
+- ^.*\.pot
+- ^\.DS_Store.*
+- ^.*\.egg-info
+- ^(.*/)?.*static/node_modules/.*

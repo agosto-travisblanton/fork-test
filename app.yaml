@@ -29,6 +29,8 @@ libraries:
   version: "1.1.7"
 - name: webob
   version: "1.1.1"
+- name: MySQLdb
+  version: "latest"
 
 handlers:
 - url: /(robots\.txt)
@@ -97,7 +99,6 @@ skip_files:
 - ^coverage/.*
 - ^coverage_html_report/.*
 - ^migration/.*
-- ^proof_of_play/.*
 - ^scripts/.*
 - ^snapdeploy.yaml
 - ^images/readme.md

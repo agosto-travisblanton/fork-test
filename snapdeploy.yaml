@@ -2,5 +2,5 @@ hash: e68ce9d25f
 module_yaml_files:
 - app.yaml
 - migration.yaml
-- proof_of_play.yaml
+- proofplay.yaml
 version: 39

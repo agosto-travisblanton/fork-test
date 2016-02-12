@@ -1,8 +1,10 @@
 from routes import application as default_application
 from routes_migration import application as migration_application
+from routes_proofplay import application as proofplay_application
 
 MODULE_APPLICATIONS = {
-    'migration': migration_application
+    'migration': migration_application,
+    'proofplay': proofplay_application
 }
 
 
