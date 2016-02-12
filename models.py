@@ -561,7 +561,7 @@ class Location(ndb.Model):
 
     @classmethod
     def create(cls, tenant_key, name, location_code, timezone):
-        timezone_offset = TimezoneUtil.get_offset(timezone)
+        timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
         return cls(tenant_key=tenant_key,
                    name=name,
                    location_code=location_code,
