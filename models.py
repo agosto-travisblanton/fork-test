@@ -1,5 +1,8 @@
 import uuid
+
 from datetime import datetime
+from utils.timezone_util import TimezoneUtil
+
 
 from google.appengine.ext import ndb
 
@@ -115,6 +118,7 @@ class Tenant(ndb.Model):
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
     domain_key = ndb.KeyProperty(kind=Domain, required=True, indexed=True)
     notification_emails = ndb.StringProperty(repeated=True, indexed=False, required=False)
+    proof_of_play_logging = ndb.BooleanProperty(default=False, required=True, indexed=True)
     class_version = ndb.IntegerProperty()
 
     def get_domain(self):
@@ -156,7 +160,7 @@ class Tenant(ndb.Model):
 
     @classmethod
     def create(cls, tenant_code, name, admin_email, content_server_url, domain_key, active,
-               content_manager_base_url, notification_emails=[]):
+               content_manager_base_url, notification_emails=[], proof_of_play_logging=False):
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
                    tenant_code=tenant_code,
@@ -166,7 +170,20 @@ class Tenant(ndb.Model):
                    domain_key=domain_key,
                    active=active,
                    content_manager_base_url=content_manager_base_url,
-                   notification_emails=notification_emails)
+                   notification_emails=notification_emails,
+                   proof_of_play_logging=proof_of_play_logging)
+
+    @classmethod
+    def toggle_proof_of_play(cls, tenant_code, enable):
+        tenant = Tenant.find_by_tenant_code(tenant_code)
+        managed_devices = Tenant.find_devices(tenant.key, unmanaged=False)
+        for device in managed_devices:
+            if not enable:
+                device.proof_of_play_logging = enable
+            device.proof_of_play_editable = enable
+            device.put()
+        tenant.proof_of_play_logging = enable
+        tenant.put()
 
     def _pre_put_hook(self):
         self.class_version = 1
@@ -218,6 +235,8 @@ class ChromeOsDevice(ndb.Model):
                                                      indexed=False)
     time_zone = ndb.StringProperty(required=False, indexed=True)
     geo_location = ndb.GeoPtProperty(required=False, indexed=True)
+    proof_of_play_logging = ndb.BooleanProperty(default=False, required=True, indexed=True)
+    proof_of_play_editable = ndb.BooleanProperty(default=False, required=True)
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):
@@ -519,6 +538,47 @@ class PlayerCommandEvent(ndb.Model):
 
     def _pre_put_hook(self):
         self.class_version = 1
+
+
+@ae_ndb_serializer
+class Location(ndb.Model):
+    name = ndb.StringProperty(required=True, indexed=True)
+    location_code = ndb.StringProperty(required=True, indexed=True)
+    timezone = ndb.StringProperty(required=True, indexed=True)
+    timezone_offset = ndb.IntegerProperty(required=True, indexed=True) #computed property
+    address = ndb.StringProperty(required=False, indexed=True)
+    city = ndb.StringProperty(required=False, indexed=True)
+    state = ndb.StringProperty(required=False, indexed=True)
+    postal_code = ndb.StringProperty(required=False, indexed=True)
+    latitude = ndb.StringProperty(required=False, indexed=True)
+    longitude = ndb.StringProperty(required=False, indexed=True)
+    dma = ndb.StringProperty(required=False, indexed=True)
+    tenant_key = ndb.KeyProperty(kind=Tenant, required=True, indexed=True)
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    updated = ndb.DateTimeProperty(auto_now=True)
+    active = ndb.BooleanProperty(default=True, required=True, indexed=True)
+    class_version = ndb.IntegerProperty()
+
+    @classmethod
+    def create(cls, tenant_key, name, location_code, timezone):
+        timezone_offset = TimezoneUtil.get_offset(timezone)
+        return cls(tenant_key=tenant_key,
+                   name=name,
+                   location_code=location_code,
+                   timezone=timezone,
+                   timezone_offset=timezone_offset)
+
+    @classmethod
+    def find_by_location_code(cls, location_code):
+        if location_code:
+            key = Location.query(Location.location_code == location_code).get(keys_only=True)
+            if None is not key:
+                return key.get()
+
+
+    def _pre_put_hook(self):
+        self.class_version = 1
+
 
 class IssueLevel:
     Normal, Warning, Danger = range(3)

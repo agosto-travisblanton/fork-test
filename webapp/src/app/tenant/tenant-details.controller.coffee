@@ -14,6 +14,7 @@ appModule.controller 'TenantDetailsCtrl',
       content_manager_base_url: undefined,
       domain_key: undefined,
       notification_emails: undefined,
+      proof_of_play_logging: false,
       active: true
     }
     @selectedDomain = undefined

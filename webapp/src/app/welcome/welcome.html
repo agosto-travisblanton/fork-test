@@ -1,21 +1,37 @@
-<md-content class="md-padding"
-            layout="row"
-            layout-wrap
-            layout-xs="column">
-  <div flex="30" flex-sm="20" flex-xs="20" ng-controller="WelcomeCtrl as welcomeCtrl"
-       ng-init="welcomeCtrl.initialize()">
-    <md-card>
-      <md-card-title>
-        <md-card-title-text>
-          <span class="md-headline">{{ welcomeCtrl.identity.distributorName }}</span>
-        </md-card-title-text>
-      </md-card-title>
-      <md-card-content>
-        <div>
-            {{ welcomeCtrl.identity.email }}
-        </div>
-      </md-card-content>
-    </md-card>
-  </div>
-</md-content>
+<div ng-controller="WelcomeCtrl as welcomeCtrl" ng-init="welcomeCtrl.initialize()" layout="column" ng-cloak>
+  <md-content flex layout-padding>
+    <div flex="35" flex-sm="35" flex-xs="35" layout="column">
+      <md-card>
+        <md-card-title>
+          <md-card-title-text>
+            <span class="md-headline"><i class="fa fa-fw fa-tag ng-scope"></i> Version</span>
+          </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+          <table class="table">
+            <tbody>
+            <tr>
+              <td class="text-right col-md-3">Hostname:</td>
+              <td class="col-md-3">{{welcomeCtrl.version_data.hostname}}</td>
+            </tr>
+            <tr>
+              <td class="text-right col-md-3">Web module:</td>
+              <td class="col-md-3">{{welcomeCtrl.version_data.web_module_name}}</td>
+            </tr>
+            <tr>
+              <td class="text-right col-md-3">Web version:</td>
+              <td class="col-md-3">{{welcomeCtrl.version_data.web_version_name}}</td>
+            </tr>
+            <tr>
+              <td class="text-right col-md-3">Instance id:</td>
+              <td class="col-md-3">{{welcomeCtrl.version_data.current_instance_id}}</td>
+            </tr>
+            </tbody>
+          </table>
+        </md-card-content>
+      </md-card>
+    </div>
+  </md-content>
+</div>
+
 
