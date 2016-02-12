@@ -1,7 +1,7 @@
 'use strict'
 
 angular.module('skykitProvisioning')
-.factory 'ProofPlayService', ($http, $q, $window) ->
+.factory 'ProofPlayService', ($http, $q, $window, $cookies) ->
   new class ProofPlayService
 
     constructor: ->
@@ -17,12 +17,19 @@ angular.module('skykitProvisioning')
     getAllResources: () ->
       deferred = $q.defer()
       if @cachedResources
-        deferred.resolve(@cachedResources)
+        deferred.
+        resolve(@cachedResources)
       else
-        $http.get(@uriBase + '/retrieve_all_resources')
+        distributorKey = $cookies.get('currentDistributorKey')
+        $http.get(@uriBase + '/retrieve_all_resources',
+          headers: {
+            'X-Provisioning-Distributor': distributorKey
+          }
+        )
         .then (data) =>
           @cachedResource = data
           deferred.resolve(data)
+
       deferred.promise
 
     downloadCSVForSingleResourceAcrossDateRangeByDate: (start_date, end_date, resource) ->

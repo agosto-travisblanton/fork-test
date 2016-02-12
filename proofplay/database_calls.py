@@ -1,4 +1,4 @@
-from models import Resource, ProgramRecord, Location, ScheduleWentLive, Device, GamestopStoreLocation, ProgramPlayEvent
+from proofplay_models import Resource, ProgramRecord, Location, ScheduleWentLive, Device, GamestopStoreLocation, ProgramPlayEvent
 from db import Session
 import datetime
 

@@ -18,9 +18,9 @@ def format_raw_program_record_data_for_single_resource_by_location(dictionary):
 def generate_date_range_csv_for_single_resource_by_location(start_date, end_date, resource, dictionary, created_time):
     tmp = StringIO.StringIO()
     writer = csv.writer(tmp)
-    writer.writerow(["Creation_Date", "Start_Date", "End_Date", "Start_Time", "End_Time", "Content"])
+    writer.writerow(["Creation Date", "Start Date", "End Date", "Start Time", "End Time", "Content"])
     writer.writerow([str(created_time), str(start_date), str(end_date), "12:00 AM", "11:59 PM", resource])
-    writer.writerow(["Location", "Player", "PlayCount"])
+    writer.writerow(["Location", "Player", "Play Count"])
 
     for key, value in dictionary.iteritems():
         writer.writerow([str(key), value["Player"], value["PlayCount"]])
@@ -33,16 +33,16 @@ def generate_date_range_csv_for_a_multiple_resources(start_date, end_date, resou
     tmp = StringIO.StringIO()
     writer = csv.writer(tmp)
     all_resources_as_string = join_array_of_strings(resources)
-    writer.writerow(["Creation_Date", "Start_Date", "End_Date", "Start_Time", "End_Time", "Content"])
+    writer.writerow(["Creation Date", "Start Date", "End Date", "Start Time", "End Time", "Content"])
     writer.writerow([str(now), str(start_date), str(end_date), "12:00 AM", "11:59 PM",
                      all_resources_as_string])
-    writer.writerow(["File", "Date", "LocationCount", "PlayerCount", "ChannelCount", "PlayCount"])
+    writer.writerow(["File", "Date", "Location Count", "Display Count", "Play Count"])
 
     for resource in resources:
         resource_data = dictionary[resource]
         for item in order_dictionary_with_datetimes_as_keys(resource_data):
             writer.writerow([resource, str(item), resource_data[item]["LocationCount"],
-                             resource_data[item]["PlayerCount"], " ", resource_data[item]["PlayCount"]])
+                             resource_data[item]["PlayerCount"], resource_data[item]["PlayCount"]])
 
     tmp.seek(0)
     return tmp
@@ -51,14 +51,14 @@ def generate_date_range_csv_for_a_multiple_resources(start_date, end_date, resou
 def generate_date_range_csv_for_a_single_resource(start_date, end_date, resource, dictionary, now):
     tmp = StringIO.StringIO()
     writer = csv.writer(tmp)
-    writer.writerow(["Creation_Date", "Start_Date", "End_Date", "Start_Time", "End_Time", "Content"])
+    writer.writerow(["Creation Date", "Start Date", "End Date", "Start Time", "End Time", "Content"])
     writer.writerow([str(now), str(start_date), str(end_date), "12:00 AM", "11:59 PM", resource])
-    writer.writerow(["File", "Date", "LocationCount", "PlayerCount", "ChannelCount", "PlayCount"])
+    writer.writerow(["File", "Date", "Location Count", "Player Count", "Play Count"])
 
     resource_data = dictionary[resource]
     for item in order_dictionary_with_datetimes_as_keys(resource_data):
         writer.writerow([resource, str(item), resource_data[item]["LocationCount"],
-                         resource_data[item]["PlayerCount"], " ", resource_data[item]["PlayCount"]])
+                         resource_data[item]["PlayerCount"], resource_data[item]["PlayCount"]])
 
     tmp.seek(0)
     return tmp

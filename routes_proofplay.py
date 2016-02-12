@@ -43,5 +43,10 @@ application = WSGIApplication(
                     handler="proofplay.main.RetrieveAllResources",
                     name="RetrieveAllResources"
             ),
+            Route(
+                    r'/proofplay/api/v1/tenants',
+                    handler="proofplay.main.GetTenant",
+                    name="GetTenant"
+            ),
         ]
 )

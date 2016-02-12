@@ -3,7 +3,7 @@ from env_setup import setup_test_paths
 setup_test_paths()
 
 import unittest
-from proofplay.models import Base
+from proofplay.proofplay_models import Base
 from proofplay.db import Session
 from sqlalchemy import create_engine
 from agar.test import BaseTest

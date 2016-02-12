@@ -86,6 +86,20 @@ class Location(Base):
         self.state = state
         self.city = city
 
+# final notes
+# change from player to display
+# take out all columns where no data (channel count)
+# , instead of ; in header
+# Tabs ####
+# content reports
+# location reports
+# display reports
+# MULTI-SELECT FOR ALL
+# for multi-select for location, content on the left, display, serial in that order
+
+
+
+
 
 class Device(Base):
     __tablename__ = "device"
@@ -95,6 +109,7 @@ class Device(Base):
     full_location = relationship("Location", backref="Device")
     serial_number = Column(String(255), nullable=False)
     device_key = Column(String(255), nullable=False)
+    # device_code
     tenant_code = Column(String(255), nullable=False)
 
     def __init__(self, serial_number, tenant_code, device_key, location_id=None):

@@ -4,11 +4,34 @@ from database_calls import *
 from data_processing import *
 import logging
 import json
-from google.appengine.ext import deferred
+from models import Domain, Tenant, TenantEntityGroup
+from google.appengine.ext import deferred, ndb
+
+
+def get_tenant_list_from_distributor_key(distributor_key):
+    distributor = ndb.Key(urlsafe=distributor_key)
+    domain_keys = Domain.query(Domain.distributor_key == distributor).fetch(100, keys_only=True)
+    tenant_list = Tenant.query(ancestor=TenantEntityGroup.singleton().key)
+    tenant_list = filter(lambda x: x.active is True, tenant_list)
+    result = filter(lambda x: x.domain_key in domain_keys, tenant_list)
+    return result
+
+
+class GetTenant(RequestHandler):
+    def get(self):
+        distributor_key = self.request.headers.get('X-Provisioning-Distributor')
+        results = get_tenant_list_from_distributor_key(distributor_key)
+        final = [result.name for result in results]
+        json_final = json.dumps({"result": final})
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(json_final)
 
 
 class RetrieveAllResources(RequestHandler):
     def get(self):
+        distributor_key = self.request.headers.get('X-Provisioning-Distributor')
+        result = get_tenant_list_from_distributor_key(distributor_key)
+        print result
         resources = retrieve_all_resources()
         final = json.dumps({"resources": resources})
         self.response.headers['Content-Type'] = 'application/json'
@@ -174,7 +197,6 @@ def handle_posting_a_new_program_play(incoming_data):
             device_id = insert_new_device_or_get_existing(location_id, serial_number, device_key, tenant_code)
             insert_new_program_record(location_id, device_id, resource_id, started_at, ended_at)
             mark_raw_event_complete(raw_event_id)
-
 
         except KeyError:
             logging.warn("ERROR: KEYERROR IN POSTING A NEW PROGRAM PLAY")

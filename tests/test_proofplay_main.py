@@ -1,28 +1,14 @@
 from env_setup import setup_test_paths
 
 setup_test_paths()
+
 import webtest
 from base_sql_test_config import SQLBaseTest
-import webapp2
-from proofplay.models import Resource, ProgramRecord
+from proofplay.proofplay_models import Resource, ProgramRecord
 from routes_proofplay import application
 import json
 from proofplay.dev.make_mock_data import get_one_to_send
-import base64
-import pickle
-from google.appengine.ext import deferred
 from utils.web_util import build_uri
-
-
-def submit_deferred(taskq):
-    tasks = taskq.GetTasks("default")
-    taskq.FlushQueue("default")
-    while tasks:
-        for task in tasks:
-            (func, args, opts) = pickle.loads(base64.b64decode(task["body"]))
-            func(*args)
-        tasks = taskq.GetTasks("default")
-        taskq.FlushQueue("default")
 
 
 class TestMain(SQLBaseTest):

@@ -11,7 +11,7 @@ from proofplay.database_calls import insert_new_resource_or_get_existing, insert
     get_raw_program_record_data_for_resource_between_date_ranges_by_location, insert_new_gamestop_store_location
 import datetime
 
-from proofplay.models import Resource, ProgramRecord, Device, Location, GamestopStoreLocation
+from proofplay.proofplay_models import Resource, ProgramRecord, Device, Location, GamestopStoreLocation
 
 
 class TestDatabase(SQLBaseTest):
