@@ -9,18 +9,9 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 class TimezoneUtil(object):
 
     @staticmethod
-    def get_offset(timezone):
-
-        tz = pytz.timezone(timezone)
-
-        #Implement The Google Maps Time Zone API
-        #https://developers.google.com/maps/documentation/timezone/intro
-        #Google maps API Key AIzaSyBcZQf7qcJibJmBKHDaqgdRwf2XQ3MZFiY for Prod
-        #Google maps API Key AIzaSyB0mE3DWNt8iFFvZ60TQyTgl3NpKK6-BQA for Stage
-        #Google maps API Key AIzaSyAzS-hwl5dV-Wn4g5opG_34gGYplgJT1Fc for INT
+    def get_timezone_offset(timezone):
+        zone = pytz.timezone(timezone)
         now = datetime.datetime.utcnow()
-
-        tz_offset = tz.utcoffset(now)
-
-        return 0
+        timezone_offset = int(zone.utcoffset(now).total_seconds()/3600)
+        return timezone_offset
 
