@@ -1,6 +1,35 @@
 import csv
 import StringIO
 from utils import join_array_of_strings, order_dictionary_with_datetimes_as_keys
+import datetime
+
+
+def transform_resource_data_between_date_range_by_location(from_db):
+    to_return = {}
+
+    for item in from_db:
+        location_id = item["location_id"]
+        if location_id not in to_return:
+            to_return[location_id] = []
+
+        to_return[location_id].append(item)
+
+    return to_return
+
+
+def transform_resource_data_between_date_ranges_by_date(from_db):
+    to_return = {}
+
+    for item in from_db:
+        started_at = item["started_at"]
+        midnight_start_day = str(datetime.datetime.combine(started_at.date(), datetime.time()))
+
+        if midnight_start_day not in to_return:
+            to_return[midnight_start_day] = []
+
+        to_return[midnight_start_day].append(item)
+
+    return to_return
 
 
 def format_raw_program_record_data_for_single_resource_by_location(dictionary):

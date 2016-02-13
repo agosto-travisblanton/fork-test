@@ -1,38 +1,25 @@
 from webapp2 import RequestHandler
-from utils import create_merged_dictionary
+from utils import create_merged_dictionary, join_array_of_strings
 from database_calls import *
 from data_processing import *
 import logging
 import json
-from models import Domain, Tenant, TenantEntityGroup
-from google.appengine.ext import deferred, ndb
+from google.appengine.ext import deferred
 
 
-def get_tenant_list_from_distributor_key(distributor_key):
-    distributor = ndb.Key(urlsafe=distributor_key)
-    domain_keys = Domain.query(Domain.distributor_key == distributor).fetch(100, keys_only=True)
-    tenant_list = Tenant.query(ancestor=TenantEntityGroup.singleton().key)
-    tenant_list = filter(lambda x: x.active is True, tenant_list)
-    result = filter(lambda x: x.domain_key in domain_keys, tenant_list)
-    return result
-
-
-class GetTenant(RequestHandler):
+class GetTenants(RequestHandler):
     def get(self):
         distributor_key = self.request.headers.get('X-Provisioning-Distributor')
         results = get_tenant_list_from_distributor_key(distributor_key)
-        final = [result.name for result in results]
-        json_final = json.dumps({"result": final})
+        tenants = [result.name for result in results]
+        json_final = json.dumps({"tenants": tenants})
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json_final)
 
 
-class RetrieveAllResources(RequestHandler):
-    def get(self):
-        distributor_key = self.request.headers.get('X-Provisioning-Distributor')
-        result = get_tenant_list_from_distributor_key(distributor_key)
-        print result
-        resources = retrieve_all_resources()
+class RetrieveAllResourcesOfTenant(RequestHandler):
+    def get(self, tenant):
+        resources = retrieve_all_resources_of_tenant(tenant)
         final = json.dumps({"resources": resources})
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(final)
@@ -48,7 +35,7 @@ class PostNewProgramPlay(RequestHandler):
 
 
 class MultiResourceByDate(RequestHandler):
-    def get(self, start_date, end_date, resources):
+    def get(self, start_date, end_date, resources, tenant):
         start_date = datetime.datetime.fromtimestamp(int(start_date))
         end_date = datetime.datetime.fromtimestamp(int(end_date))
         if end_date < start_date:
@@ -66,10 +53,11 @@ class MultiResourceByDate(RequestHandler):
         all_of_the_dictionaries_to_get_data_on = [
             {
                 "resource": resource,
-                "raw_data": get_raw_program_record_data_for_resource_between_date_ranges_by_date(
+                "raw_data": program_record_for_resource_by_date(
                         midnight_start_day,
                         just_before_next_day_end_date,
-                        resource
+                        resource,
+                        tenant
                 )
             } for resource in all_the_resources_final]
 
@@ -96,7 +84,7 @@ class MultiResourceByDate(RequestHandler):
 
 
 class OneResourceByDate(RequestHandler):
-    def get(self, start_date, end_date, resource):
+    def get(self, start_date, end_date, resource, tenant):
         start_date = datetime.datetime.fromtimestamp(int(start_date))
         end_date = datetime.datetime.fromtimestamp(int(end_date))
 
@@ -109,10 +97,11 @@ class OneResourceByDate(RequestHandler):
                 seconds=1
         )
 
-        raw_data = get_raw_program_record_data_for_resource_between_date_ranges_by_date(
+        raw_data = program_record_for_resource_by_date(
                 midnight_start_day,
                 just_before_next_day_end_date,
-                resource
+                resource,
+                tenant
         )
 
         to_put_in = {
@@ -140,7 +129,7 @@ class OneResourceByDate(RequestHandler):
 
 
 class OneResourceByDevice(RequestHandler):
-    def get(self, start_date, end_date, resource):
+    def get(self, start_date, end_date, resource, tenant):
         start_date = datetime.datetime.fromtimestamp(int(start_date))
         end_date = datetime.datetime.fromtimestamp(int(end_date))
 
@@ -153,8 +142,8 @@ class OneResourceByDevice(RequestHandler):
                 seconds=1
         )
 
-        dictionary = get_raw_program_record_data_for_resource_between_date_ranges_by_location(
-                midnight_start_day, just_before_next_day_end_date, resource
+        dictionary = program_record_for_resource_by_location(
+                midnight_start_day, just_before_next_day_end_date, resource, tenant
         )
 
         formatted_dictionary = format_raw_program_record_data_for_single_resource_by_location(dictionary)
@@ -183,6 +172,7 @@ def handle_posting_a_new_program_play(incoming_data):
             serial_number = each_log["serial_number"]
             device_key = each_log["device_key"]
             tenant_code = each_log["tenant_code"]
+            device_code = each_log["device_code"]
             started_at = datetime.datetime.strptime(each_log["started_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
             ended_at = datetime.datetime.strptime(each_log["ended_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
 
@@ -193,8 +183,8 @@ def handle_posting_a_new_program_play(incoming_data):
             else:
                 location_id = None
 
-            resource_id = insert_new_resource_or_get_existing(resource, resource_id)
-            device_id = insert_new_device_or_get_existing(location_id, serial_number, device_key, tenant_code)
+            resource_id = insert_new_resource_or_get_existing(resource, resource_id, tenant_code)
+            device_id = insert_new_device_or_get_existing(location_id, serial_number, device_key, device_code, tenant_code)
             insert_new_program_record(location_id, device_id, resource_id, started_at, ended_at)
             mark_raw_event_complete(raw_event_id)
 

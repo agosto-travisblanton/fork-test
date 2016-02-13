@@ -7,8 +7,8 @@ from base_sql_test_config import SQLBaseTest
 from proofplay.database_calls import insert_new_resource_or_get_existing, insert_new_program_record, \
     insert_new_location_or_get_existing, \
     insert_new_device_or_get_existing, get_gamestop_store_location_from_serial_via_db, \
-    get_raw_program_record_data_for_resource_between_date_ranges_by_date, \
-    get_raw_program_record_data_for_resource_between_date_ranges_by_location, insert_new_gamestop_store_location
+    program_record_for_resource_by_date, \
+    program_record_for_resource_by_location, insert_new_gamestop_store_location
 import datetime
 
 from proofplay.proofplay_models import Resource, ProgramRecord, Device, Location, GamestopStoreLocation
@@ -90,7 +90,7 @@ class TestDatabase(SQLBaseTest):
             ]
         }
 
-        self.assertEqual(get_raw_program_record_data_for_resource_between_date_ranges_by_location(
+        self.assertEqual(program_record_for_resource_by_location(
                 self.started_at,
                 self.ended_at,
                 self.resource_name
@@ -108,7 +108,7 @@ class TestDatabase(SQLBaseTest):
             ]
         }
 
-        self.assertEqual(get_raw_program_record_data_for_resource_between_date_ranges_by_date(
+        self.assertEqual(program_record_for_resource_by_date(
                 self.started_at,
                 self.ended_at,
                 self.resource_name

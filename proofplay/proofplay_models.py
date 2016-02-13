@@ -1,6 +1,5 @@
 import datetime
 from sqlalchemy.ext.declarative import declarative_base
-
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -32,43 +31,18 @@ class ProgramPlayEvent(Base):
         self.completed = completed
 
 
-class GamestopStoreLocation(Base):
-    __tablename__ = "gamestop_store_location"
-
-    id = Column(Integer, primary_key=True)
-    location_name = Column(String(255), nullable=False)
-    serial_number = Column(String(255), unique=True, nullable=False)
-
-    def __init__(self, location_name, serial_number):
-        self.location_name = location_name
-        self.serial_number = serial_number
-
-
-class ScheduleWentLive(Base):
-    __tablename__ = "schedule_went_live"
-
-    id = Column(Integer, primary_key=True)
-    schedule = Column(String(255), unique=True, nullable=False)
-    played_at = Column(DateTime, nullable=False)
-    device_id = Column(Integer, ForeignKey('device.id'), nullable=False)
-    full_device = relationship("Device", backref="ScheduleWentLive")
-
-    def __init__(self, schedule, played_at, device_id):
-        self.schedule = schedule
-        self.played_at = played_at
-        self.device_id = device_id
-
-
 class Resource(Base):
     __tablename__ = "resource"
 
     id = Column(Integer, primary_key=True)
     resource_name = Column(String(255), unique=True, nullable=False)
     resource_identifier = Column(String(255), unique=True, nullable=False)
+    tenant_code = Column(String(255), nullable=False)
 
-    def __init__(self, resource_name, resource_identifier):
+    def __init__(self, resource_name, resource_identifier, tenant_code):
         self.resource_name = resource_name
         self.resource_identifier = resource_identifier
+        self.tenant_code = tenant_code
 
 
 class Location(Base):
@@ -86,20 +60,6 @@ class Location(Base):
         self.state = state
         self.city = city
 
-# final notes
-# change from player to display
-# take out all columns where no data (channel count)
-# , instead of ; in header
-# Tabs ####
-# content reports
-# location reports
-# display reports
-# MULTI-SELECT FOR ALL
-# for multi-select for location, content on the left, display, serial in that order
-
-
-
-
 
 class Device(Base):
     __tablename__ = "device"
@@ -109,13 +69,14 @@ class Device(Base):
     full_location = relationship("Location", backref="Device")
     serial_number = Column(String(255), nullable=False)
     device_key = Column(String(255), nullable=False)
-    # device_code
+    device_code = Column(String(255), nullable=False)
     tenant_code = Column(String(255), nullable=False)
 
-    def __init__(self, serial_number, tenant_code, device_key, location_id=None):
+    def __init__(self, serial_number, tenant_code, device_key, device_code, location_id=None):
         self.location_id = location_id
         self.serial_number = serial_number
         self.tenant_code = tenant_code
+        self.device_code = device_code
         self.device_key = device_key
 
 
@@ -131,7 +92,6 @@ class ProgramRecord(Base):
     full_device = relationship("Device", backref="ProgramRecord")
     started_at = Column(DateTime, nullable=False)
     ended_at = Column(DateTime, nullable=False)
-
     created_on = Column(DateTime, nullable=False)
 
     def __init__(self, location_id, resource_id, device_id, started_at, ended_at):

@@ -21,6 +21,7 @@ appModule.controller "ProofOfPlayOneResourceCtrl", (ProofPlayService) ->
     type: false
   }
 
+  @chosen_tenant = null
   @no_cache = true
   @loading = true
   @disabled = true

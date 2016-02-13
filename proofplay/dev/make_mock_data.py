@@ -12,8 +12,9 @@ def create_data_to_send(to_go_back):
     for number in xrange(1, 5):
         serial_number_choices = ["F5MSCX001896", "F5MSCX001736", "F5MSCX001889"]
         location_ids = ["6034", "6023", "6022"]
-        tenant_code = ["GAMESTOP", "GAMSETOP", "GAMESTOP"]
+        tenant_code = ["gamestop", "gamestop", "gamestop"]
         serial_number_key_choices = ["2342344", "434234", "455566"]
+        device_codes = ["my-device-1", "my-device-2", "my-device-3"]
         resource_choices = ["GSAD_5553", "GSAD_5447", "GSAD_2222"]
         resource_ids = ["234234", "55555", "342433"]
 
@@ -26,9 +27,10 @@ def create_data_to_send(to_go_back):
         data = {
             'resource_name': resource_choices[random_num],
             'resource_id': resource_ids[random_num],
-            'device_key': serial_number_key_choices[random_num],
+            'device_key': serial_number_key_choices[random.randint(0, 2)],
             'serial_number': serial_number_choices[random.randint(0, 2)],
             'location_id': location_ids[random_num],
+            'device_code': device_codes[random_num],
             'started_at': started_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'ended_at': ended_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'tenant_code': tenant_code[random_num]
