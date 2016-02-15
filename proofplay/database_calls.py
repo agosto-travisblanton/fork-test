@@ -85,14 +85,14 @@ def insert_new_resource_or_get_existing(resource_name, resource_identifier, tena
         return resource_exits.id
 
 
-def insert_new_location_or_get_existing(location_identifier):
+def insert_new_location_or_get_existing(customer_location_code):
     session = Session()
 
-    location_exists = session.query(Location).filter_by(location_identifier=location_identifier).first()
+    location_exists = session.query(Location).filter_by(customer_location_code=customer_location_code).first()
 
     if not location_exists:
         new_location = Location(
-                location_identifier=location_identifier
+                customer_location_code=customer_location_code
         )
         session.add(new_location)
         session.commit()
@@ -103,7 +103,7 @@ def insert_new_location_or_get_existing(location_identifier):
     return location_exists.id
 
 
-def insert_new_device_or_get_existing(location_id, serial_number, device_key, device_code, tenant_code):
+def insert_new_device_or_get_existing(location_id, serial_number, device_key, customer_display_code, tenant_code):
     session = Session()
 
     device_exists = session.query(Device).filter_by(serial_number=serial_number).first()
@@ -113,7 +113,7 @@ def insert_new_device_or_get_existing(location_id, serial_number, device_key, de
                 location_id=location_id,
                 serial_number=serial_number,
                 device_key=device_key,
-                device_code=device_code,
+                customer_display_code=customer_display_code,
                 tenant_code=tenant_code
 
         )

@@ -29,8 +29,8 @@ def create_data_to_send(to_go_back):
             'resource_id': resource_ids[random_num],
             'device_key': serial_number_key_choices[random.randint(0, 2)],
             'serial_number': serial_number_choices[random.randint(0, 2)],
-            'location_id': location_ids[random_num],
-            'device_code': device_codes[random_num],
+            'customer_location_code': location_ids[random_num],
+            'customer_display_code': device_codes[random_num],
             'started_at': started_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'ended_at': ended_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'tenant_code': tenant_code[random_num]

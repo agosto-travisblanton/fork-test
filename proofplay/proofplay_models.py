@@ -49,13 +49,13 @@ class Location(Base):
     __tablename__ = "location"
 
     id = Column(Integer, primary_key=True)
-    location_identifier = Column(String(255), unique=True, nullable=False)
+    customer_location_code = Column(String(255), unique=True, nullable=False)
     dma_code = Column(String(255), nullable=True)
     state = Column(String(255), nullable=True)
     city = Column(String(255), nullable=True)
 
-    def __init__(self, location_identifier, dma_code=None, state=None, city=None):
-        self.location_identifier = location_identifier
+    def __init__(self, customer_location_code, dma_code=None, state=None, city=None):
+        self.customer_location_code = customer_location_code
         self.dma_code = dma_code
         self.state = state
         self.city = city
@@ -69,14 +69,14 @@ class Device(Base):
     full_location = relationship("Location", backref="Device")
     serial_number = Column(String(255), nullable=False)
     device_key = Column(String(255), nullable=False)
-    device_code = Column(String(255), nullable=False)
+    customer_display_code = Column(String(255), nullable=False)
     tenant_code = Column(String(255), nullable=False)
 
-    def __init__(self, serial_number, tenant_code, device_key, device_code, location_id=None):
+    def __init__(self, serial_number, tenant_code, device_key, customer_display_code, location_id=None):
         self.location_id = location_id
         self.serial_number = serial_number
         self.tenant_code = tenant_code
-        self.device_code = device_code
+        self.customer_display_code = customer_display_code
         self.device_key = device_key
 
 
