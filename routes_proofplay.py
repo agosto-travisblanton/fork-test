@@ -38,6 +38,11 @@ application = WSGIApplication(
                     name="OneResourceByDevice"
             ),
             Route(
+                    r'/proofplay/api/v1/multi_resource_by_device/<start_date>/<end_date>/<resources>/<tenant>',
+                    handler="proofplay.main.MultiResourceByDevice",
+                    name="MultiResourceByDevice"
+            ),
+            Route(
                     r'/proofplay/api/v1/retrieve_all_resources/<tenant>',
                     handler="proofplay.main.RetrieveAllResourcesOfTenant",
                     name="RetrieveAllResources"

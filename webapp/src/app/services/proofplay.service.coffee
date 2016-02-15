@@ -48,23 +48,23 @@ angular.module('skykitProvisioning')
       )
 
 
-    downloadCSVForSingleResourceAcrossDateRangeByDate: (start_date, end_date, resource) ->
-      $window.open(@uriBase + '/one_resource_by_date/' + start_date + '/' + end_date + '/' + resource + '/' + @chosenTenant
-      , '_blank')
-      return true
-
-    downloadCSVForSingleResourceAcrossDateRangeByLocation: (start_date, end_date, resource) ->
-      $window.open(@uriBase + '/one_resource_by_device/' + start_date + '/' + end_date + '/' + resource + '/' + @chosenTenant
-      , '_blank')
-      return true
-
-    downloadCSVForMultipleResources: (start_date, end_date, resources) ->
+    downloadCSVForMultipleResourcesByDate: (start_date, end_date, resources) ->
       allResources = []
 
       for each in resources
         allResources = allResources + "-" + each
 
       $window.open(@uriBase + '/multi_resource_by_date/' + start_date + '/' + end_date + '/' + allResources + '/' + @chosenTenant
+      , '_blank')
+      return true
+
+    downloadCSVForMultipleResourcesByDevice: (start_date, end_date, resources) ->
+      allResources = []
+
+      for each in resources
+        allResources = allResources + "-" + each
+
+      $window.open(@uriBase + '/multi_resource_by_device/' + start_date + '/' + end_date + '/' + allResources + '/' + @chosenTenant
       , '_blank')
       return true
 

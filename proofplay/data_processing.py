@@ -8,11 +8,11 @@ def transform_resource_data_between_date_range_by_location(from_db):
     to_return = {}
 
     for item in from_db:
-        location_id = item["location_id"]
-        if location_id not in to_return:
-            to_return[location_id] = []
+        device_id = item["device_id"]
+        if device_id not in to_return:
+            to_return[device_id] = []
 
-        to_return[location_id].append(item)
+        to_return[device_id].append(item)
 
     return to_return
 
@@ -38,21 +38,23 @@ def format_raw_program_record_data_for_single_resource_by_location(dictionary):
     for key, value in dictionary.iteritems():
         all_results[key] = {
             "PlayCount": len(value),
-            "Player": value[0]["device_id"]
+            "Device": value[0]["device_id"]
         }
 
     return all_results
 
 
-def generate_date_range_csv_for_single_resource_by_location(start_date, end_date, resource, dictionary, created_time):
+def generate_date_range_csv_by_location(start_date, end_date, resources, array_of_data, created_time):
     tmp = StringIO.StringIO()
     writer = csv.writer(tmp)
-    writer.writerow(["Creation Date", "Start Date", "End Date", "Start Time", "End Time", "Content"])
-    writer.writerow([str(created_time), str(start_date), str(end_date), "12:00 AM", "11:59 PM", resource])
-    writer.writerow(["Location", "Player", "Play Count"])
 
-    for key, value in dictionary.iteritems():
-        writer.writerow([str(key), value["Player"], value["PlayCount"]])
+    writer.writerow(["Creation Date", "Start Date", "End Date", "Content"])
+    writer.writerow([str(created_time), str(start_date), str(end_date), ', '.join(resources)])
+    writer.writerow(["Content", "Display", "Location", "Play Count"])
+
+    for item in array_of_data:
+        for key, value in item.iteritems():
+            writer.writerow([value["Content"], value["Display"], value["Location"], value["Play Count"]])
 
     tmp.seek(0)
     return tmp
@@ -114,15 +116,14 @@ def get_total_play_count_of_resource_between_date_range_for_all_locations(dictio
     resource = dictionary["resource"]
     raw_data = dictionary["raw_data"]
 
-    to_return = {
-        resource: {}
-    }
+    to_return = {}
 
     for key, value in raw_data.iteritems():
-        to_return[resource][key] = {
-            "LocationCount": calculate_location_count(value),
-            "PlayerCount": calculate_serial_count(value),
-            "PlayCount": len(value),
+        to_return[key] = {
+            "Content": resource,
+            "Display": key,
+            "Location": value[0]["location_id"],
+            "Play Count": len(value),
         }
 
     return to_return

@@ -12,12 +12,8 @@ describe 'ProofOfPlayCtrl', ->
 
   describe 'at the start', ->
     it 'tab dict values should equal', ->
-      tab = {
-        title: 'One-Resource',
+      resource = {
+        title: 'Resource',
 
       }
-      tab2 = {
-        title: "Multi-Resource"
-      }
-      expect(angular.equals(tab, controller.tab)).toBeTruthy()
-      expect(angular.equals(tab2, controller.tab2)).toBeTruthy()
+      expect(angular.equals(resource, controller.resource)).toBeTruthy()
