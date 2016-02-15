@@ -1,5 +1,4 @@
 from webapp2 import RequestHandler
-from utils import create_merged_dictionary, join_array_of_strings
 from database_calls import *
 from data_processing import *
 import logging
@@ -149,24 +148,15 @@ class MultiResourceByDate(RequestHandler):
                 )
             } for resource in all_the_resources_final]
 
-        resulting_dictionaries_of_data = list(map(
-                get_total_play_count_of_resource_between_date_range_for_all_locations,
-                all_of_the_dictionaries_to_get_data_on
-        ))
-        print "resulting dasdlfkjasdjfksda"
+        formatted_data = format_program_record_data_with_array_of_resources(all_of_the_dictionaries_to_get_data_on)
 
-        print resulting_dictionaries_of_data
-
-        merged_dict = create_merged_dictionary(resulting_dictionaries_of_data)
-
-        # print merged_dict
         now = datetime.datetime.now()
 
         csv_to_publish = generate_date_range_csv_by_date(
                 midnight_start_day,
                 just_before_next_day_end_date,
                 all_the_resources_final,
-                merged_dict,
+                formatted_data,
                 now
         )
 

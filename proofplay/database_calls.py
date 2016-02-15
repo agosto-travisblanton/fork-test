@@ -151,7 +151,7 @@ def get_raw_program_record_data(start_date, end_date, resource, tenant_code):
 
     for program_record in rows:
         d = {
-            "location_id": program_record.full_location.location_identifier,
+            "location_id": program_record.full_location.customer_location_code,
             "device_id": program_record.full_device.serial_number,
             "resource_id": program_record.full_resource.resource_name,
             "started_at": program_record.started_at,

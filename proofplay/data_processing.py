@@ -3,6 +3,8 @@ import StringIO
 from utils import join_array_of_strings, order_dictionary_with_datetimes_as_keys
 import datetime
 
+from collections import OrderedDict
+
 
 def transform_resource_data_between_date_range_by_location(from_db):
     to_return = {}
@@ -63,20 +65,35 @@ def generate_date_range_csv_by_location(start_date, end_date, resources, array_o
 def generate_date_range_csv_by_date(start_date, end_date, resources, dictionary, now):
     tmp = StringIO.StringIO()
     writer = csv.writer(tmp)
-    all_resources_as_string = join_array_of_strings(resources)
-    writer.writerow(["Creation Date", "Start Date", "End Date", "Start Time", "End Time", "Content"])
+    all_resources_as_string = ', '.join(resources)
+    writer.writerow(["Creation Date", "Start Date", "End Date", "Start Time", "End Time", "All Content"])
     writer.writerow([str(now), str(start_date), str(end_date), "12:00 AM", "11:59 PM",
                      all_resources_as_string])
-    writer.writerow(["File", "Date", "Location Count", "Display Count", "Play Count"])
+    writer.writerow(["Content", "Date", "Location Count", "Display Count", "Play Count"])
 
-    for resource in resources:
-        resource_data = dictionary[resource]
-        for item in order_dictionary_with_datetimes_as_keys(resource_data):
-            writer.writerow([resource, str(item), resource_data[item]["LocationCount"],
-                             resource_data[item]["PlayerCount"], resource_data[item]["PlayCount"]])
+    for key, value in dictionary.iteritems():
+        for sub_key, sub_value in dictionary[key].iteritems():
+            writer.writerow([key, str(sub_key), sub_value["LocationCount"],
+                             sub_value["PlayerCount"], sub_value["PlayCount"]])
 
     tmp.seek(0)
     return tmp
+
+
+def format_program_record_data_with_array_of_resources(incoming_array):
+    to_return = {}
+
+    for item in incoming_array:
+        to_return[item["resource"]] = OrderedDict()
+        ordered_raw_data = OrderedDict(sorted(item["raw_data"].items(), key=lambda t: t))
+
+        for key, value in ordered_raw_data.iteritems():
+            to_return[item["resource"]][key] = {}
+            to_return[item["resource"]][key]["LocationCount"] = calculate_location_count(value)
+            to_return[item["resource"]][key]["PlayerCount"] = calculate_serial_count(value)
+            to_return[item["resource"]][key]["PlayCount"] = len(value)
+
+    return to_return
 
 
 def calculate_location_count(value):
