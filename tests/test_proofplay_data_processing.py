@@ -10,9 +10,7 @@ import datetime
 
 from proofplay.data_processing import calculate_location_count, calculate_serial_count, \
     format_raw_program_record_data_for_single_resource_by_location, \
-    generate_date_range_csv_for_single_resource_by_location, \
-    get_total_play_count_of_resource_between_date_range_for_all_locations, \
-    generate_date_range_csv_for_a_single_resource, generate_date_range_csv_for_a_multiple_resources
+    get_total_play_count_of_resource_between_date_range_for_all_locations, generate_date_range_csv_by_date
 
 
 class TestDataProcessing(BaseTest):
@@ -76,96 +74,96 @@ class TestDataProcessing(BaseTest):
 
         self.assertEqual(format_raw_program_record_data_for_single_resource_by_location(example_input), expected_output)
 
-    def test_generate_date_range_csv_for_single_resource_by_location(self):
-        dictionary = {
-            u'6023': {'Player': u'F5MSCX001939', 'PlayCount': 16},
-            u'6034': {'Player': u'F5MSCX001896', 'PlayCount': 11}
-        }
-        resource = "some_resource"
+    # def test_generate_date_range_csv_for_single_resource_by_location(self):
+    #     dictionary = {
+    #         u'6023': {'Player': u'F5MSCX001939', 'PlayCount': 16},
+    #         u'6034': {'Player': u'F5MSCX001896', 'PlayCount': 11}
+    #     }
+    #     resource = "some_resource"
+    #
+    #     now = datetime.datetime.now()
+    #
+    #     generated_csv = generate_date_range_csv_for_single_resource_by_location(
+    #             self.start_date,
+    #             self.end_date,
+    #             resource,
+    #             dictionary,
+    #             now
+    #     )
+    #
+    #     expected_output_top_row = 'Creation_Date,Start_Date,End_Date,Start_Time,End_Time,Content'
+    #
+    #     expected_output = expected_output_top_row + '\r\n2016-01-27 12:41:27.273825,2011-04-04 10:30:00,2011-04-10 10:30:00,12:00 AM,11:59 PM,some_resource\r\nLocation,Player,PlayCount\r\n6023,F5MSCX001939,16\r\n6034,F5MSCX001896,11\r\n'
+    #
+    #     modified_output = expected_output.split("\r\n")
+    #
+    #     second_row = modified_output[1].split(",")
+    #
+    #     second_row[0] = str(now)
+    #
+    #     second_row_back_joined = ','.join(second_row)
+    #
+    #     modified_output[1] = second_row_back_joined
+    #
+    #     modified_output = '\r\n'.join(modified_output)
+    #
+    #     self.assertEqual(modified_output, generated_csv.read())
 
-        now = datetime.datetime.now()
-
-        generated_csv = generate_date_range_csv_for_single_resource_by_location(
-                self.start_date,
-                self.end_date,
-                resource,
-                dictionary,
-                now
-        )
-
-        expected_output_top_row = 'Creation_Date,Start_Date,End_Date,Start_Time,End_Time,Content'
-
-        expected_output = expected_output_top_row + '\r\n2016-01-27 12:41:27.273825,2011-04-04 10:30:00,2011-04-10 10:30:00,12:00 AM,11:59 PM,some_resource\r\nLocation,Player,PlayCount\r\n6023,F5MSCX001939,16\r\n6034,F5MSCX001896,11\r\n'
-
-        modified_output = expected_output.split("\r\n")
-
-        second_row = modified_output[1].split(",")
-
-        second_row[0] = str(now)
-
-        second_row_back_joined = ','.join(second_row)
-
-        modified_output[1] = second_row_back_joined
-
-        modified_output = '\r\n'.join(modified_output)
-
-        self.assertEqual(modified_output, generated_csv.read())
-
-    def test_generate_date_range_csv_for_a_single_resource(self):
-        dictionary = {
-            "some_resource": {
-                '2016-01-23 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 2},
-                '2016-01-09 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 2},
-                '2016-01-17 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 1},
-                '2016-01-10 00:00:00': {'LocationCount': 1, 'PlayerCount': 2, 'PlayCount': 2},
-                '2016-01-13 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 2},
-                '2016-01-19 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 1},
-                '2016-01-12 00:00:00': {'LocationCount': 2, 'PlayerCount': 2, 'PlayCount': 2},
-                '2016-01-15 00:00:00': {'LocationCount': 1, 'PlayerCount': 2, 'PlayCount': 2},
-                '2016-01-08 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 1},
-                '2016-01-21 00:00:00': {'LocationCount': 2, 'PlayerCount': 2, 'PlayCount': 2},
-                '2016-01-24 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 1},
-                '2016-01-11 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 1},
-                '2016-01-25 00:00:00': {'LocationCount': 0, 'PlayerCount': 0, 'PlayCount': 0},
-                '2016-01-16 00:00:00': {'LocationCount': 2, 'PlayerCount': 2, 'PlayCount': 2},
-                '2016-01-26 00:00:00': {'LocationCount': 0, 'PlayerCount': 0, 'PlayCount': 0},
-                '2016-01-27 00:00:00': {'LocationCount': 0, 'PlayerCount': 0, 'PlayCount': 0},
-                '2016-01-14 00:00:00': {'LocationCount': 1, 'PlayerCount': 2, 'PlayCount': 2},
-                '2016-01-20 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 1},
-                '2016-01-22 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 1},
-                '2016-01-18 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 2}
-            }
-        }
-
-        resource = "some_resource"
-
-        now = datetime.datetime.now()
-
-        generated_csv = generate_date_range_csv_for_a_single_resource(
-                self.start_date,
-                self.end_date,
-                resource,
-                dictionary,
-                now
-        )
-
-        expected_output_top_row = 'Creation_Date,Start_Date,End_Date,Start_Time,End_Time,Content'
-
-        expected_output = expected_output_top_row + '\r\n2016-01-27 13:52:55.106405,2011-04-04 10:30:00,2011-04-10 10:30:00,12:00 AM,11:59 PM,some_resource\r\nFile,Date,LocationCount,PlayerCount,ChannelCount,PlayCount\r\nsome_resource,2016-01-08 00:00:00,1,1, ,1\r\nsome_resource,2016-01-09 00:00:00,1,1, ,2\r\nsome_resource,2016-01-10 00:00:00,1,2, ,2\r\nsome_resource,2016-01-11 00:00:00,1,1, ,1\r\nsome_resource,2016-01-12 00:00:00,2,2, ,2\r\nsome_resource,2016-01-13 00:00:00,1,1, ,2\r\nsome_resource,2016-01-14 00:00:00,1,2, ,2\r\nsome_resource,2016-01-15 00:00:00,1,2, ,2\r\nsome_resource,2016-01-16 00:00:00,2,2, ,2\r\nsome_resource,2016-01-17 00:00:00,1,1, ,1\r\nsome_resource,2016-01-18 00:00:00,1,1, ,2\r\nsome_resource,2016-01-19 00:00:00,1,1, ,1\r\nsome_resource,2016-01-20 00:00:00,1,1, ,1\r\nsome_resource,2016-01-21 00:00:00,2,2, ,2\r\nsome_resource,2016-01-22 00:00:00,1,1, ,1\r\nsome_resource,2016-01-23 00:00:00,1,1, ,2\r\nsome_resource,2016-01-24 00:00:00,1,1, ,1\r\nsome_resource,2016-01-25 00:00:00,0,0, ,0\r\nsome_resource,2016-01-26 00:00:00,0,0, ,0\r\nsome_resource,2016-01-27 00:00:00,0,0, ,0\r\n'
-
-        modified_output = expected_output.split("\r\n")
-
-        second_row = modified_output[1].split(",")
-
-        second_row[0] = str(now)
-
-        second_row_back_joined = ','.join(second_row)
-
-        modified_output[1] = second_row_back_joined
-
-        modified_output = '\r\n'.join(modified_output)
-
-        self.assertEqual(modified_output, generated_csv.read())
+    # def test_generate_date_range_csv_for_a_single_resource(self):
+    #     dictionary = {
+    #         "some_resource": {
+    #             '2016-01-23 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 2},
+    #             '2016-01-09 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 2},
+    #             '2016-01-17 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 1},
+    #             '2016-01-10 00:00:00': {'LocationCount': 1, 'PlayerCount': 2, 'PlayCount': 2},
+    #             '2016-01-13 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 2},
+    #             '2016-01-19 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 1},
+    #             '2016-01-12 00:00:00': {'LocationCount': 2, 'PlayerCount': 2, 'PlayCount': 2},
+    #             '2016-01-15 00:00:00': {'LocationCount': 1, 'PlayerCount': 2, 'PlayCount': 2},
+    #             '2016-01-08 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 1},
+    #             '2016-01-21 00:00:00': {'LocationCount': 2, 'PlayerCount': 2, 'PlayCount': 2},
+    #             '2016-01-24 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 1},
+    #             '2016-01-11 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 1},
+    #             '2016-01-25 00:00:00': {'LocationCount': 0, 'PlayerCount': 0, 'PlayCount': 0},
+    #             '2016-01-16 00:00:00': {'LocationCount': 2, 'PlayerCount': 2, 'PlayCount': 2},
+    #             '2016-01-26 00:00:00': {'LocationCount': 0, 'PlayerCount': 0, 'PlayCount': 0},
+    #             '2016-01-27 00:00:00': {'LocationCount': 0, 'PlayerCount': 0, 'PlayCount': 0},
+    #             '2016-01-14 00:00:00': {'LocationCount': 1, 'PlayerCount': 2, 'PlayCount': 2},
+    #             '2016-01-20 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 1},
+    #             '2016-01-22 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 1},
+    #             '2016-01-18 00:00:00': {'LocationCount': 1, 'PlayerCount': 1, 'PlayCount': 2}
+    #         }
+    #     }
+    #
+    #     resource = "some_resource"
+    #
+    #     now = datetime.datetime.now()
+    #
+    #     generated_csv = generate_date_range_csv_for_a_single_resource(
+    #             self.start_date,
+    #             self.end_date,
+    #             resource,
+    #             dictionary,
+    #             now
+    #     )
+    #
+    #     expected_output_top_row = 'Creation_Date,Start_Date,End_Date,Start_Time,End_Time,Content'
+    #
+    #     expected_output = expected_output_top_row + '\r\n2016-01-27 13:52:55.106405,2011-04-04 10:30:00,2011-04-10 10:30:00,12:00 AM,11:59 PM,some_resource\r\nFile,Date,LocationCount,PlayerCount,ChannelCount,PlayCount\r\nsome_resource,2016-01-08 00:00:00,1,1, ,1\r\nsome_resource,2016-01-09 00:00:00,1,1, ,2\r\nsome_resource,2016-01-10 00:00:00,1,2, ,2\r\nsome_resource,2016-01-11 00:00:00,1,1, ,1\r\nsome_resource,2016-01-12 00:00:00,2,2, ,2\r\nsome_resource,2016-01-13 00:00:00,1,1, ,2\r\nsome_resource,2016-01-14 00:00:00,1,2, ,2\r\nsome_resource,2016-01-15 00:00:00,1,2, ,2\r\nsome_resource,2016-01-16 00:00:00,2,2, ,2\r\nsome_resource,2016-01-17 00:00:00,1,1, ,1\r\nsome_resource,2016-01-18 00:00:00,1,1, ,2\r\nsome_resource,2016-01-19 00:00:00,1,1, ,1\r\nsome_resource,2016-01-20 00:00:00,1,1, ,1\r\nsome_resource,2016-01-21 00:00:00,2,2, ,2\r\nsome_resource,2016-01-22 00:00:00,1,1, ,1\r\nsome_resource,2016-01-23 00:00:00,1,1, ,2\r\nsome_resource,2016-01-24 00:00:00,1,1, ,1\r\nsome_resource,2016-01-25 00:00:00,0,0, ,0\r\nsome_resource,2016-01-26 00:00:00,0,0, ,0\r\nsome_resource,2016-01-27 00:00:00,0,0, ,0\r\n'
+    #
+    #     modified_output = expected_output.split("\r\n")
+    #
+    #     second_row = modified_output[1].split(",")
+    #
+    #     second_row[0] = str(now)
+    #
+    #     second_row_back_joined = ','.join(second_row)
+    #
+    #     modified_output[1] = second_row_back_joined
+    #
+    #     modified_output = '\r\n'.join(modified_output)
+    #
+    #     self.assertEqual(modified_output, generated_csv.read())
 
     def test_generate_date_range_csv_for_a_multiple_resources(self):
         dictionary = objects_for_testing.date_range_multiple_resources_test_dictionary
@@ -173,7 +171,7 @@ class TestDataProcessing(BaseTest):
 
         now = datetime.datetime.now()
 
-        generated_csv = generate_date_range_csv_for_a_multiple_resources(
+        generated_csv = generate_date_range_csv_by_date(
                 self.start_date,
                 self.end_date,
                 resources,

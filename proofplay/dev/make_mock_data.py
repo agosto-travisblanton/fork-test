@@ -50,31 +50,27 @@ def generate_mock_data(to_send):
     print to_send["data"][-1]["ended_at"]
 
 
-def run():
-    for each in reversed(xrange(1, 501)):
+def make_one_days_worth_of_data(amount_a_day, started_at):
+    to_return = {}
+    to_return["data"] = []
+
+    for item in xrange(1, amount_a_day):
+        ended_at = started_at + datetime.timedelta(minutes=10)
+        to_return["data"].append(create_data_to_send(started_at, ended_at))
+        started_at += datetime.timedelta(minutes=10)
+
+    return to_return
+
+
+def queue_up_mock_data(day_amount, amount_a_day):
+    for each in reversed(xrange(1, day_amount)):
         started_at = datetime.datetime.now() - datetime.timedelta(days=each)
+        generate_mock_data(make_one_days_worth_of_data(amount_a_day, started_at))
 
-        to_send = {}
-        to_send["data"] = []
 
-        for item in xrange(1, 10):
-            ended_at = started_at + datetime.timedelta(minutes=10)
-            to_send["data"].append(create_data_to_send(started_at, ended_at))
-            started_at += datetime.timedelta(minutes=10)
-
-        generate_mock_data(to_send)
+def run():
+    queue_up_mock_data(500, 10)
 
 
 def just_one():
-    for each in reversed(xrange(500, 501)):
-        started_at = datetime.datetime.now() - datetime.timedelta(days=each)
-
-        to_send = {}
-        to_send["data"] = []
-
-        for item in xrange(1, 2):
-            ended_at = started_at + datetime.timedelta(minutes=10)
-            to_send["data"].append(create_data_to_send(started_at, ended_at))
-            started_at += datetime.timedelta(minutes=10)
-
-        generate_mock_data(to_send)
+    queue_up_mock_data(1, 10)

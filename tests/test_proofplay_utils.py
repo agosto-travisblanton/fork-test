@@ -5,9 +5,7 @@ setup_test_paths()
 from agar.test import BaseTest
 import responses
 import datetime
-from proofplay.utils import join_array_of_strings, create_merged_dictionary, order_dictionary_with_datetimes_as_keys, \
-    get_dict_of_stores_and_serials, get_location_from_serial
-import json
+from proofplay.utils import join_array_of_strings, create_merged_dictionary, order_dictionary_with_datetimes_as_keys
 
 
 class TestUtils(BaseTest):
@@ -86,26 +84,3 @@ class TestUtils(BaseTest):
 
         result = order_dictionary_with_datetimes_as_keys(input)
         self.assertEqual(expected_output, result)
-
-    @responses.activate
-    def test_get_dict_of_stores_and_serials(self):
-        responses.add(
-                responses.GET,
-                'https://skykit-gamestop-processor.appspot.com/api/v1/9839d92ca9be4a68bd62b5f77eafdd8c/give_the_serials',
-                body=json.dumps(self.device_serial_network_response), status=200,
-                content_type='application/json'
-        )
-
-        self.assertEqual(self.device_serial_network_response, get_dict_of_stores_and_serials())
-
-    @responses.activate
-    def test_get_location_from_serial(self):
-        responses.add(
-                responses.GET,
-                'https://skykit-gamestop-processor.appspot.com/api/v1/9839d92ca9be4a68bd62b5f77eafdd8c/give_the_serials',
-                body=json.dumps(self.device_serial_network_response), status=200,
-                content_type='application/json'
-        )
-
-        location_id = get_location_from_serial("F5MSCX001938")
-        self.assertEqual(location_id, 6023)
