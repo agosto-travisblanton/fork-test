@@ -8,6 +8,7 @@ from agar.test import BaseTest, WebTest
 from models import Distributor, Domain, Tenant, Location
 from routes import application
 from app_config import config
+from webtest import AppError
 
 
 class TestLocationsHandler(BaseTest, WebTest):
@@ -99,6 +100,83 @@ class TestLocationsHandler(BaseTest, WebTest):
         uri = application.router.build(None, 'location-create', None, {})
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
         self.assertEqual(201, response.status_int)
+
+    def test_post_returns_bad_response_for_missing_tenant_key(self):
+        request_parameters = {'tenantKey': '',
+                              'customerLocationName': 'Store 4532',
+                              'customerLocationCode': 'store_4532',
+                              'timezone': 'America/Phoenix',
+                              'active': True,
+                              'address': '123 Main St.',
+                              'city': 'Minneapolis',
+                              'state': 'MN',
+                              'postalCode': '55401',
+                              'latitude': 44.986656,
+                              'longitude': -93.258133,
+                              'dma': 'some dma code'
+                              }
+        uri = application.router.build(None, 'location-create', None, {})
+        with self.assertRaises(AppError) as context:
+            self.app.post_json(uri, params=request_parameters, headers=self.headers)
+        self.assertTrue('Bad response: 400 The tenant key parameter is invalid.'
+                        in context.exception.message)
+
+    def test_post_returns_bad_response_for_missing_customer_location_name(self):
+        request_parameters = {'tenantKey': self.tenant_key.urlsafe(),
+                              'customerLocationCode': 'store_4532',
+                              'timezone': 'America/Phoenix',
+                              'active': True,
+                              'address': '123 Main St.',
+                              'city': 'Minneapolis',
+                              'state': 'MN',
+                              'postalCode': '55401',
+                              'latitude': 44.986656,
+                              'longitude': -93.258133,
+                              'dma': 'some dma code'
+                              }
+        uri = application.router.build(None, 'location-create', None, {})
+        with self.assertRaises(AppError) as context:
+            self.app.post_json(uri, params=request_parameters, headers=self.headers)
+        self.assertTrue('Bad response: 400 The customer location name parameter is invalid.'
+                        in context.exception.message)
+
+    def test_post_returns_bad_response_for_missing_customer_location_code(self):
+        request_parameters = {'tenantKey': self.tenant_key.urlsafe(),
+                              'customerLocationName': 'Store 4532',
+                              'timezone': 'America/Phoenix',
+                              'active': True,
+                              'address': '123 Main St.',
+                              'city': 'Minneapolis',
+                              'state': 'MN',
+                              'postalCode': '55401',
+                              'latitude': 44.986656,
+                              'longitude': -93.258133,
+                              'dma': 'some dma code'
+                              }
+        uri = application.router.build(None, 'location-create', None, {})
+        with self.assertRaises(AppError) as context:
+            self.app.post_json(uri, params=request_parameters, headers=self.headers)
+        self.assertTrue('Bad response: 400 The customer location code parameter is invalid.'
+                        in context.exception.message)
+
+    def test_post_returns_bad_response_for_missing_timezone(self):
+        request_parameters = {'tenantKey': self.tenant_key.urlsafe(),
+                              'customerLocationName': 'Store 4532',
+                              'customerLocationCode': 'store_4532',
+                              'active': True,
+                              'address': '123 Main St.',
+                              'city': 'Minneapolis',
+                              'state': 'MN',
+                              'postalCode': '55401',
+                              'latitude': 44.986656,
+                              'longitude': -93.258133,
+                              'dma': 'some dma code'
+                              }
+        uri = application.router.build(None, 'location-create', None, {})
+        with self.assertRaises(AppError) as context:
+            self.app.post_json(uri, params=request_parameters, headers=self.headers)
+        self.assertTrue('Bad response: 400 The timezone parameter is invalid.'
+                        in context.exception.message)
 
     ##################################################################################################################
     ## get
