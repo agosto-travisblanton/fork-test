@@ -29,12 +29,12 @@ application = WSGIApplication(
             # RUN QUERIES
             ################################################################
             Route(
-                    r'/proofplay/api/v1/multi_resource_by_date/<start_date>/<end_date>/<resources>/<tenant>',
+                    r'/proofplay/api/v1/multi_resource_by_date/<start_date>/<end_date>/<resources>/<tenant>/<distributor_key>',
                     handler="proofplay.main.MultiResourceByDate",
                     name="MultiResourceByDate"
             ),
             Route(
-                    r'/proofplay/api/v1/multi_resource_by_device/<start_date>/<end_date>/<resources>/<tenant>',
+                    r'/proofplay/api/v1/multi_resource_by_device/<start_date>/<end_date>/<resources>/<tenant>/<distributor_key>',
                     handler="proofplay.main.MultiResourceByDevice",
                     name="MultiResourceByDevice"
             ),

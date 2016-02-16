@@ -6,11 +6,14 @@ import json
 from google.appengine.ext import deferred
 
 
+def get_tenants_from_headers(distributor_key):
+    results = get_tenant_list_from_distributor_key(distributor_key)
+    return [result.name for result in results]
+
+
 class GetTenants(RequestHandler):
     def get(self):
-        distributor_key = self.request.headers.get('X-Provisioning-Distributor')
-        results = get_tenant_list_from_distributor_key(distributor_key)
-        tenants = [result.name for result in results]
+        tenants = get_tenants_from_headers(self.request.headers.get('X-Provisioning-Distributor'))
         json_final = json.dumps({"tenants": tenants})
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json_final)
@@ -34,7 +37,11 @@ class PostNewProgramPlay(RequestHandler):
 
 
 class MultiResourceByDevice(RequestHandler):
-    def get(self, start_date, end_date, resources, tenant):
+    def get(self, start_date, end_date, resources, tenant, distributor_key):
+
+        if tenant not in get_tenants_from_headers(distributor_key):
+            return self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+
         ###########################################################
         # SETUP VARIABLES
         ###########################################################
@@ -85,7 +92,11 @@ class MultiResourceByDevice(RequestHandler):
 
 
 class MultiResourceByDate(RequestHandler):
-    def get(self, start_date, end_date, resources, tenant):
+    def get(self, start_date, end_date, resources, tenant, distributor_key):
+
+        if tenant not in get_tenants_from_headers(distributor_key):
+            return self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+
         ###########################################################
         # SETUP VARIABLES
         ###########################################################
