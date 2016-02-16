@@ -8,6 +8,7 @@ include =
     export/*.py
     goodyear_env.py
     handlers/*.py
+    proofplay/*.py
     i18n/*.py
     i18n_util.py
     migration/*.py
