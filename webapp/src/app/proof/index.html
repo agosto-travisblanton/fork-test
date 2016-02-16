@@ -83,18 +83,6 @@
 
                                             </div>
 
-                                             <md-input-container class="md-block">
-                                                <h4 class="proof-of-play-label">Report Type</h4>
-                                                <md-radio-group ng-model="vm.radioButtonChoices.selection"
-                                                                ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
-                                                    <md-radio-button value="1">{{vm.radioButtonChoices.group1}}
-                                                    </md-radio-button>
-                                                    <md-radio-button value="2">{{vm.radioButtonChoices.group2}}
-                                                    </md-radio-button>
-                                                </md-radio-group>
-
-                                            </md-input-container>
-
 
                                             <div class="row">
 
@@ -114,6 +102,21 @@
                                                                    md-placeholder="Enter date"></md-datepicker>
                                                 </div>
                                             </div>
+                                            <hr/>
+
+                                            <md-input-container class="md-block">
+                                                <h4 class="proof-of-play-label">Report Type</h4>
+                                                <md-radio-group
+                                                        ng-model="vm.radioButtonChoices.selection"
+                                                        ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
+                                                    <md-radio-button style="margin-left: 20px" value="1">{{vm.radioButtonChoices.group1}}
+                                                    </md-radio-button>
+                                                    <md-radio-button style="margin-left: 20px" value="2">
+                                                        {{vm.radioButtonChoices.group2}}
+                                                    </md-radio-button>
+                                                </md-radio-group>
+
+                                            </md-input-container>
 
                                             <hr/>
 
