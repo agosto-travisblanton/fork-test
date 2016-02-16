@@ -6,14 +6,9 @@ import json
 from google.appengine.ext import deferred
 
 
-def get_tenants_from_headers(distributor_key):
-    results = get_tenant_list_from_distributor_key(distributor_key)
-    return [result.name for result in results]
-
-
 class GetTenants(RequestHandler):
     def get(self):
-        tenants = get_tenants_from_headers(self.request.headers.get('X-Provisioning-Distributor'))
+        tenants = get_tenant_names_for_distributor(self.request.headers.get('X-Provisioning-Distributor'))
         json_final = json.dumps({"tenants": tenants})
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json_final)
@@ -21,6 +16,11 @@ class GetTenants(RequestHandler):
 
 class RetrieveAllResourcesOfTenant(RequestHandler):
     def get(self, tenant):
+        tenants = get_tenant_names_for_distributor(self.request.headers.get('X-Provisioning-Distributor'))
+        if tenant not in tenants:
+            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+            self.abort(403)
+
         resources = retrieve_all_resources_of_tenant(tenant)
         final = json.dumps({"resources": resources})
         self.response.headers['Content-Type'] = 'application/json'
@@ -39,8 +39,9 @@ class PostNewProgramPlay(RequestHandler):
 class MultiResourceByDevice(RequestHandler):
     def get(self, start_date, end_date, resources, tenant, distributor_key):
 
-        if tenant not in get_tenants_from_headers(distributor_key):
-            return self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+        if tenant not in get_tenant_names_for_distributor(distributor_key):
+            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+            self.abort(403)
 
         ###########################################################
         # SETUP VARIABLES
@@ -94,8 +95,9 @@ class MultiResourceByDevice(RequestHandler):
 class MultiResourceByDate(RequestHandler):
     def get(self, start_date, end_date, resources, tenant, distributor_key):
 
-        if tenant not in get_tenants_from_headers(distributor_key):
-            return self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+        if tenant not in get_tenant_names_for_distributor(distributor_key):
+            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+            self.abort(403)
 
         ###########################################################
         # SETUP VARIABLES
