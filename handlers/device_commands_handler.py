@@ -1,5 +1,6 @@
 import json
 import logging
+from google.appengine.ext import ndb
 
 from webapp2 import RequestHandler
 
