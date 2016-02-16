@@ -62,7 +62,7 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService) ->
     @isDisabled()
 
   @removeFromSelectedResource = (item) =>
-    index = @selected_resources.indexOf(item);
+    index = @selected_resources.indexOf(item)
     @selected_resources.splice(index, 1)
     @resources.push item
     @areResourcesValid()

@@ -277,6 +277,33 @@
           </div>
         </md-content>
       </md-tab>
+      <md-tab label="Locations">
+        <md-content class="md-padding">
+          <div flex="100" flex-sm="100" flex-xs="100" layout="column">
+            <md-card>
+              <md-card-title>
+                <md-card-title-text>
+                  <span class="md-headline">{{ tenantDetailsCtrl.currentTenant.name }}</span>
+                </md-card-title-text>
+              </md-card-title>
+              <md-card-content>
+                <table class="table table-responsive table-striped">
+                  <thead>
+                  <tr>
+                    <th></th>
+                    <th>Location Name</th>
+                    <th>Location Code</th>
+                    <th><i class="fa fa-fw fa-clock-o"></i> Timezone</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                </table>
+
+              </md-card-content>
+            </md-card>
+          </div>
+        </md-content>
+      </md-tab>
     </md-tabs>
   </md-content>
 </div>
