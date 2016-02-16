@@ -14,9 +14,9 @@ angular.module('skykitProvisioning')
       @chosenTenant = tenant
 
     createFilterFor: (query) ->
-      query = angular.lowercase(query);
+      query = angular.lowercase(query)
       (resource) ->
-        resource = angular.lowercase(resource);
+        resource = angular.lowercase(resource)
         return (resource.indexOf(query) == 0)
 
 
