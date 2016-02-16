@@ -1,8 +1,7 @@
 from datetime import datetime
-
 from google.appengine.ext import ndb
 
-from models import (Tenant, ChromeOsDevice, Distributor, Domain, DeviceIssueLog, PlayerCommandEvent)
+from models import (Tenant, ChromeOsDevice, Distributor, Domain, DeviceIssueLog, PlayerCommandEvent, Location)
 from restler.serializers import ModelStrategy
 from utils.datetime_util import elapsed_time_message, convert_timezone
 
@@ -90,7 +89,32 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'latitude': lambda o, field_name,
                         context: o.key.get().geo_location.lat if o.key.get().geo_location is not None else None},
     {'longitude': lambda o, field_name,
-                         context: o.key.get().geo_location.lon if o.key.get().geo_location is not None else None}
+                         context: o.key.get().geo_location.lon if o.key.get().geo_location is not None else None},
+    {'displayCode': lambda o, field_name, context: o.key.get().display_code},
+    {'displayDescription': lambda o, field_name, context: o.key.get().display_description}
+
+]
+
+LOCATION_STRATEGY = ModelStrategy(Location)
+LOCATION_STRATEGY += [
+    {'tenantKey': lambda o, field_name, context: o.tenant_key.urlsafe() if o.tenant_key is not None else None},
+    {'tenantName': lambda o, field_name, context: o.tenant_key.get().name if o.tenant_key is not None else None},
+    {'customerLocationCode': lambda o, field_name, context: o.key.get().customer_location_code},
+    {'customerLocationName': lambda o, field_name, context: o.key.get().customer_location_name},
+    {'timezone': lambda o, field_name, context: o.key.get().timezone},
+    {'timezoneOffset': lambda o, field_name, context: o.key.get().timezone_offset},
+    {'address': lambda o, field_name, context: o.key.get().address},
+    {'city': lambda o, field_name, context: o.key.get().city},
+    {'state': lambda o, field_name, context: o.key.get().state},
+    {'postalCode': lambda o, field_name, context: o.key.get().postal_code},
+    {'latitude': lambda o, field_name,
+        context: o.key.get().geo_location.lat if o.key.get().geo_location is not None else None},
+    {'longitude': lambda o, field_name,
+        context: o.key.get().geo_location.lon if o.key.get().geo_location is not None else None},
+    {'dma': lambda o, field_name, context: o.key.get().dma},
+    {'created': lambda o, field_name, context: o.key.get().created},
+    {'updated': lambda o, field_name, context: o.key.get().updated},
+    {'active': lambda o, field_name, context: o.key.get().active}
 ]
 
 DEVICE_ISSUE_LOG_STRATEGY = ModelStrategy(DeviceIssueLog)
