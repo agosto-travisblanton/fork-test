@@ -57,6 +57,27 @@ application = WSGIApplication(
               ),
 
         ############################################################
+        # Locations
+        ############################################################
+        Route(r'/api/v1/locations/<location_urlsafe_key>',
+              handler='handlers.locations_handler.LocationsHandler',
+              name='location-retrieval',
+              handler_method='get',
+              methods=['GET']
+              ),
+        Route(r'/api/v1/tenants/<tenant_urlsafe_key>/locations',
+              handler='handlers.locations_handler.LocationsHandler',
+              name='locations-list-retrieval',
+              handler_method='get_locations_by_tenant',
+              methods=['GET']
+              ),
+        Route(r'/api/v1/locations',
+              handler='handlers.locations_handler.LocationsHandler',
+              name='location-create',
+              methods=['POST']
+              ),
+
+        ############################################################
         # device
         ############################################################
         Route(r'/api/v1/devices/<device_urlsafe_key>/heartbeat',

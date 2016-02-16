@@ -1,13 +1,11 @@
 import uuid
 
 from datetime import datetime
-from utils.timezone_util import TimezoneUtil
-
-
 from google.appengine.ext import ndb
 
 from app_config import config
 from restler.decorators import ae_ndb_serializer
+from utils.timezone_util import TimezoneUtil
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>. Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -190,6 +188,45 @@ class Tenant(ndb.Model):
 
 
 @ae_ndb_serializer
+class Location(ndb.Model):
+    tenant_key = ndb.KeyProperty(kind=Tenant, required=True, indexed=True)
+    customer_location_code = ndb.StringProperty(required=True, indexed=True)
+    customer_location_name = ndb.StringProperty(required=True, indexed=True)
+    timezone = ndb.StringProperty(required=True, indexed=True)
+    timezone_offset = ndb.IntegerProperty(required=True, indexed=True)  # computed property
+    address = ndb.StringProperty(required=False, indexed=True)
+    city = ndb.StringProperty(required=False, indexed=True)
+    state = ndb.StringProperty(required=False, indexed=True)
+    postal_code = ndb.StringProperty(required=False, indexed=True)
+    geo_location = ndb.GeoPtProperty(required=False, indexed=True)
+    dma = ndb.StringProperty(required=False, indexed=True)
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    updated = ndb.DateTimeProperty(auto_now=True)
+    active = ndb.BooleanProperty(default=True, required=True, indexed=True)
+    class_version = ndb.IntegerProperty()
+
+    @classmethod
+    def create(cls, tenant_key, customer_location_name, customer_location_code, timezone):
+        timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
+
+        return cls(tenant_key=tenant_key,
+                   customer_location_name=customer_location_name,
+                   customer_location_code=customer_location_code,
+                   timezone=timezone,
+                   timezone_offset=timezone_offset)
+
+    @classmethod
+    def find_by_customer_location_code(cls, customer_location_code):
+        if customer_location_code:
+            key = Location.query(Location.customer_location_code == customer_location_code).get(keys_only=True)
+            if None is not key:
+                return key.get()
+
+    def _pre_put_hook(self):
+        self.class_version = 1
+
+
+@ae_ndb_serializer
 class ChromeOsDevice(ndb.Model):
     tenant_key = ndb.KeyProperty(required=False, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
@@ -237,6 +274,8 @@ class ChromeOsDevice(ndb.Model):
     geo_location = ndb.GeoPtProperty(required=False, indexed=True)
     proof_of_play_logging = ndb.BooleanProperty(default=False, required=True, indexed=True)
     proof_of_play_editable = ndb.BooleanProperty(default=False, required=True)
+    display_code = ndb.StringProperty(required=False, indexed=True)
+    display_description = ndb.StringProperty(required=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):
@@ -535,46 +574,6 @@ class PlayerCommandEvent(ndb.Model):
         query = PlayerCommandEvent.query(PlayerCommandEvent.device_urlsafe_key == device_urlsafe_key).order(
                 -PlayerCommandEvent.posted)
         return query.fetch(last_number)
-
-    def _pre_put_hook(self):
-        self.class_version = 1
-
-
-@ae_ndb_serializer
-class Location(ndb.Model):
-    name = ndb.StringProperty(required=True, indexed=True)
-    location_code = ndb.StringProperty(required=True, indexed=True)
-    timezone = ndb.StringProperty(required=True, indexed=True)
-    timezone_offset = ndb.IntegerProperty(required=True, indexed=True) #computed property
-    address = ndb.StringProperty(required=False, indexed=True)
-    city = ndb.StringProperty(required=False, indexed=True)
-    state = ndb.StringProperty(required=False, indexed=True)
-    postal_code = ndb.StringProperty(required=False, indexed=True)
-    latitude = ndb.StringProperty(required=False, indexed=True)
-    longitude = ndb.StringProperty(required=False, indexed=True)
-    dma = ndb.StringProperty(required=False, indexed=True)
-    tenant_key = ndb.KeyProperty(kind=Tenant, required=True, indexed=True)
-    created = ndb.DateTimeProperty(auto_now_add=True)
-    updated = ndb.DateTimeProperty(auto_now=True)
-    active = ndb.BooleanProperty(default=True, required=True, indexed=True)
-    class_version = ndb.IntegerProperty()
-
-    @classmethod
-    def create(cls, tenant_key, name, location_code, timezone):
-        timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
-        return cls(tenant_key=tenant_key,
-                   name=name,
-                   location_code=location_code,
-                   timezone=timezone,
-                   timezone_offset=timezone_offset)
-
-    @classmethod
-    def find_by_location_code(cls, location_code):
-        if location_code:
-            key = Location.query(Location.location_code == location_code).get(keys_only=True)
-            if None is not key:
-                return key.get()
-
 
     def _pre_put_hook(self):
         self.class_version = 1
