@@ -86,7 +86,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
           @currentDevice.panelModel = panelModel
       for panelInput in @panelInputs
         isParent = panelInput.parentId is @currentDevice.panelModel.id
-        if isParent and panelInput.displayName.toLowerCase() is @currentDevice.panelInput
+        if isParent and panelInput.id.toLowerCase() is @currentDevice.panelInput
           @currentDevice.panelInput = panelInput
 
   @onClickSavePanels = () ->
@@ -232,6 +232,6 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     if @currentDevice.panelModel != null
       @currentDevice.panelModel = if @currentDevice.panelModel.id == 'None' then null else @currentDevice.panelModel.id
     if @currentDevice.panelInput != null
-      @currentDevice.panelInput = if @currentDevice.panelInput.id == '0' then null else @currentDevice.panelInput.displayName.toLowerCase()
+      @currentDevice.panelInput = if @currentDevice.panelInput.id == 'None' then null else @currentDevice.panelInput.id.toLowerCase()
 
   @

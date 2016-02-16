@@ -97,17 +97,15 @@ describe 'DeviceDetailsCtrl', ->
       spyOn(DevicesService, 'getPanelModels').and.returnValue [{'id': 'Sony–FXD40LX2F'}, {'id': 'NEC–LCD4215'}]
       inputs = [
         {
-          'id': 'son1'
+          'id': 'HDMI2'
           'parentId': 'Sony–FXD40LX2F'
         }
         {
-          'id': 'son2'
-          'displayName': '0x09 INPUT1 YUV (Analog)'
+          'id': 'HDMI1'
           'parentId': 'Sony–FXD40LX2F'
         }
         {
-          'id': 'nec1'
-          'displayName': 'HDMI-1'
+          'id': 'VGA'
           'parentId': 'NEC–LCD4215'
         }
       ]
@@ -177,10 +175,6 @@ describe 'DeviceDetailsCtrl', ->
       it 'calls DevicesService.getCommandEventsByKey to retrieve command events for device', ->
         expect(DevicesService.getCommandEventsByKey).toHaveBeenCalledWith $stateParams.deviceKey
 
-      it "the 'then' handler caches the retrieved device in the controller", ->
-        getDevicePromise.resolve device
-        expect(controller.currentDevice).toBe device
-
       it 'calls DevicesService.getIssuesByKey to retrieve the issues for a given device and datetime range', ->
         expect(DevicesService.getIssuesByKey).toHaveBeenCalledWith($stateParams.deviceKey, @epochStart, @epochEnd)
 
@@ -202,7 +196,7 @@ describe 'DeviceDetailsCtrl', ->
       spyOn(progressBarService, 'complete')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.currentDevice.panelModel = {id: 'Sony-112'}
-      controller.currentDevice.panelInput = {id: 'son01'}
+      controller.currentDevice.panelInput = {id: 'HDMI1', parentId: 'Sony-112'}
       controller.onClickSaveNotes()
       devicesServicePromise.resolve()
 
@@ -246,7 +240,7 @@ describe 'DeviceDetailsCtrl', ->
       spyOn(progressBarService, 'complete')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.currentDevice.panelModel = {id: 'Sony-112'}
-      controller.currentDevice.panelInput = {id: 'son01'}
+      controller.currentDevice.panelInput = {id: 'HDMI1', parentId: 'Sony-112'}
       controller.onClickSavePanels()
       devicesServicePromise.resolve()
 
@@ -259,25 +253,28 @@ describe 'DeviceDetailsCtrl', ->
     describe '.setPanelInfo', ->
       it 'sets panel model None to null', ->
         controller.currentDevice.panelModel = {id: 'None'}
+        controller.currentDevice.panelInput = {id: 'None'}
         controller.setPanelInfo()
         expect(controller.currentDevice.panelModel).toBe null
 
       it 'sets panel model to id', ->
         panelModel = 'Foobar-122'
         controller.currentDevice.panelModel = {id: panelModel}
+        controller.currentDevice.panelInput = {id: 'DVI'}
         controller.setPanelInfo()
         expect(controller.currentDevice.panelModel).toBe panelModel
 
       it 'sets panel input 0 to null', ->
-        controller.currentDevice.panelInput = {id: '0'}
+        controller.currentDevice.panelInput = {id: 'None'}
         controller.setPanelInfo()
         expect(controller.currentDevice.panelInput).toBe null
 
       it 'sets panel input to id', ->
+        controller.currentDevice.panelModel = {id: 'Foobar-122'}
         panelInput = 'DVI'
         controller.currentDevice.panelInput = {id: panelInput}
         controller.setPanelInfo()
-        expect(controller.currentDevice.panelInput).toBe panelInput
+        expect(controller.currentDevice.panelInput).toBe panelInput.toLowerCase()
 
     describe '.onSuccessDeviceSave', ->
       beforeEach ->
@@ -313,7 +310,7 @@ describe 'DeviceDetailsCtrl', ->
       spyOn(progressBarService, 'complete')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.currentDevice.panelModel = {id: 'Sony-112'}
-      controller.currentDevice.panelInput = {id: 'son01'}
+      controller.currentDevice.panelInput = {id: 'HDMI1', parentId: 'Sony-112'}
       controller.onClickSaveGeoLocation()
       devicesServicePromise.resolve()
 
