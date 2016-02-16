@@ -3,61 +3,78 @@ import json
 import datetime
 import random
 
+resource_choices = [
+    {"name": "GSAD_5553", "id": "1000"},
+    {"name": "GSAD_5447", "id": "1001"},
+    {"name": "GSAD_2222", "id": "1002"},
+    {"name": "GSAD_5533", "id": "1003"},
+    {"name": "GSAD_4334", "id": "1004"}
+]
 
-def create_data_to_send(to_go_back):
-    to_send = {
-        "data": []
+first_random_numb = random.randint(0, 3)
+gamestop_stores_dict = {
+    "6034": {
+        "devices": [
+            {"serial_number": "F5MSCX001000", "device_key": "838383", "customer_display_code": "my-device-1"},
+            {"serial_number": "F5MSCX001001", "device_key": "4848484", "customer_display_code": "my-device-2"},
+            {"serial_number": "F5MSCX001002", "device_key": "3838383", "customer_display_code": "my-device-3"}
+        ],
+        "customer_location_code": "my-6034-location",
+        "tenant_code": "gamestop",
+        "resources": resource_choices
+    }
+}
+
+
+def create_data_to_send(started_at, ended_at):
+    gamestop_store = random.choice(gamestop_stores_dict.keys())
+    resource_choice = random.choice(gamestop_stores_dict[gamestop_store]["resources"])
+    device_choice = random.choice(gamestop_stores_dict[gamestop_store]["devices"])
+    return {
+        'resource_name': resource_choice["name"],
+        'resource_id': resource_choice["id"],
+        'device_key': device_choice["device_key"],
+        'serial_number': device_choice["serial_number"],
+        'customer_location_code': gamestop_store,
+        'customer_display_code': gamestop_stores_dict[gamestop_store]["customer_location_code"],
+        'started_at': started_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+        'ended_at': ended_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+        'tenant_code': gamestop_stores_dict[gamestop_store]["tenant_code"]
     }
 
-    for number in xrange(1, 5):
-        serial_number_choices = ["F5MSCX001896", "F5MSCX001736", "F5MSCX001889"]
-        location_ids = ["6034", "6023", "6022"]
-        tenant_code = ["gamestop", "gamestop", "gamestop"]
-        serial_number_key_choices = ["2342344", "434234", "455566"]
-        device_codes = ["my-device-1", "my-device-2", "my-device-3"]
-        resource_choices = ["GSAD_5553", "GSAD_5447", "GSAD_2222"]
-        resource_ids = ["234234", "55555", "342433"]
 
-        started_at = datetime.datetime.now() - datetime.timedelta(days=to_go_back) - datetime.timedelta(
-                hours=number)
-
-        ended_at = started_at + datetime.timedelta(minutes=10)
-
-        random_num = random.randint(0, 2)
-        data = {
-            'resource_name': resource_choices[random_num],
-            'resource_id': resource_ids[random_num],
-            'device_key': serial_number_key_choices[random.randint(0, 2)],
-            'serial_number': serial_number_choices[random.randint(0, 2)],
-            'customer_location_code': location_ids[random_num],
-            'customer_display_code': device_codes[random_num],
-            'started_at': started_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-            'ended_at': ended_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-            'tenant_code': tenant_code[random_num]
-        }
-
-        to_send["data"].append(data)
-
-    return to_send
-
-
-def generate_mock_data(to_go_back):
+def generate_mock_data(to_send):
     url = "http://localhost:8080/proofplay/api/v1/0ac1b95dc3f93d9132b796986ed11cd4/post_new_program_play"
-    to_send = create_data_to_send(to_go_back)
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
     r = requests.post(url, data=json.dumps(to_send), headers=headers)
-    print to_go_back
+    print to_send["data"][-1]["ended_at"]
 
 
 def run():
     for each in reversed(xrange(1, 501)):
-        generate_mock_data(each)
+        started_at = datetime.datetime.now() - datetime.timedelta(days=each)
+
+        to_send = {}
+        to_send["data"] = []
+
+        for item in xrange(1, 10):
+            ended_at = started_at + datetime.timedelta(minutes=10)
+            to_send["data"].append(create_data_to_send(started_at, ended_at))
+            started_at += datetime.timedelta(minutes=10)
+
+        generate_mock_data(to_send)
 
 
 def just_one():
-    generate_mock_data(1000)
-    return True
+    for each in reversed(xrange(500, 501)):
+        started_at = datetime.datetime.now() - datetime.timedelta(days=each)
 
+        to_send = {}
+        to_send["data"] = []
 
-def get_one_to_send():
-    return create_data_to_send(700)
+        for item in xrange(1, 2):
+            ended_at = started_at + datetime.timedelta(minutes=10)
+            to_send["data"].append(create_data_to_send(started_at, ended_at))
+            started_at += datetime.timedelta(minutes=10)
+
+        generate_mock_data(to_send)
