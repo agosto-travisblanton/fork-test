@@ -13,6 +13,7 @@ angular.module('skykitProvisioning')
     setTenant: (tenant) ->
       @chosenTenant = tenant
 
+
     createFilterFor: (query) ->
       query = angular.lowercase(query)
       (resource) ->
@@ -59,6 +60,7 @@ angular.module('skykitProvisioning')
       , '_blank')
       return true
 
+
     downloadCSVForMultipleResourcesByDevice: (start_date, end_date, resources) ->
       allResources = []
 
@@ -68,6 +70,7 @@ angular.module('skykitProvisioning')
       $window.open(@uriBase + '/multi_resource_by_device/' + start_date + '/' + end_date + '/' + allResources + '/' + @chosenTenant + "/" + $cookies.get('currentDistributorKey')
       , '_blank')
       return true
+
 
     querySearch: (resources, searchText) ->
       if searchText
