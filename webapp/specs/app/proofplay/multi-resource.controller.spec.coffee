@@ -15,6 +15,14 @@ describe 'ProofOfPlayMultiResourceCtrl', ->
     controller = $controller 'ProofOfPlayMultiResourceCtrl', {ProofPlayService: ProofPlayService}
 
   describe 'initialization', ->
+    it 'radioButtonChoices should equal', ->
+      radioButtonChoices = {
+        group1: 'By Device',
+        group2: 'By Date',
+        selection: null
+      }
+      expect(angular.equals(radioButtonChoices, controller.radioButtonChoices)).toBeTruthy()
+
     it 'dateTimeSelection should equal', ->
       dateTimeSelection = {
         start: null,
@@ -50,7 +58,8 @@ describe 'ProofOfPlayMultiResourceCtrl', ->
       querySearch = () ->
       spyOn(ProofPlayService, 'getAllResources').and.returnValue promise
       spyOn(ProofPlayService, 'querySearch').and.returnValue querySearch
-      spyOn(ProofPlayService, 'downloadCSVForMultipleResources').and.returnValue true
+      spyOn(ProofPlayService, 'downloadCSVForMultipleResourcesByDate').and.returnValue true
+      spyOn(ProofPlayService, 'downloadCSVForMultipleResourcesByDevice').and.returnValue true
 
 
     it 'call getAllResources to populate autocomplete with resources', ->
@@ -62,6 +71,10 @@ describe 'ProofOfPlayMultiResourceCtrl', ->
       controller.initialize()
       controller.querySearch(resourcesData.data.resources, "one")
       expect(ProofPlayService.querySearch).toHaveBeenCalled()
+
+    it "isRadioValid function sets formValidity type", ->
+      controller.isRadioValid("test")
+      expect(controller.formValidity.type).toBe "test"
 
     it "the 'then' handler caches the retrieved resources data in the controller and loading to be done", ->
       controller.initialize()
@@ -104,6 +117,7 @@ describe 'ProofOfPlayMultiResourceCtrl', ->
       controller.formValidity.start_date = true
       controller.formValidity.end_date = true
       controller.formValidity.resources = true
+      controller.formValidity.type = true
       controller.isDisabled()
       expect(controller.disabled).toBeFalsy()
 
@@ -128,7 +142,12 @@ describe 'ProofOfPlayMultiResourceCtrl', ->
       controller.final = {
         start_date_unix: moment(new Date()).unix(),
         end_date_unix: moment(new Date()).unix(),
-        resources: ["some", "resources"]
+        resources: ["some", "resources"],
+        type: "1"
       }
       controller.submit()
-      expect(ProofPlayService.downloadCSVForMultipleResources).toHaveBeenCalled()
+      expect(ProofPlayService.downloadCSVForMultipleResourcesByDevice).toHaveBeenCalled()
+
+      controller.final.type = "2"
+      controller.submit()
+      expect(ProofPlayService.downloadCSVForMultipleResourcesByDate).toHaveBeenCalled()

@@ -1,5 +1,4 @@
 from webapp2 import RequestHandler
-from utils import create_merged_dictionary
 from database_calls import *
 from data_processing import *
 import logging
@@ -7,9 +6,22 @@ import json
 from google.appengine.ext import deferred
 
 
-class RetrieveAllResources(RequestHandler):
+def get_tenants_from_headers(distributor_key):
+    results = get_tenant_list_from_distributor_key(distributor_key)
+    return [result.name for result in results]
+
+
+class GetTenants(RequestHandler):
     def get(self):
-        resources = retrieve_all_resources()
+        tenants = get_tenants_from_headers(self.request.headers.get('X-Provisioning-Distributor'))
+        json_final = json.dumps({"tenants": tenants})
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(json_final)
+
+
+class RetrieveAllResourcesOfTenant(RequestHandler):
+    def get(self, tenant):
+        resources = retrieve_all_resources_of_tenant(tenant)
         final = json.dumps({"resources": resources})
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(final)
@@ -24,8 +36,70 @@ class PostNewProgramPlay(RequestHandler):
         self.response.out.write(final)
 
 
+class MultiResourceByDevice(RequestHandler):
+    def get(self, start_date, end_date, resources, tenant, distributor_key):
+
+        if tenant not in get_tenants_from_headers(distributor_key):
+            return self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+
+        ###########################################################
+        # SETUP VARIABLES
+        ###########################################################
+        start_date = datetime.datetime.fromtimestamp(int(start_date))
+        end_date = datetime.datetime.fromtimestamp(int(end_date))
+
+        if end_date < start_date:
+            self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
+
+        midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
+        midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
+        just_before_next_day_end_date = (midnight_end_day + datetime.timedelta(days=1)) - datetime.timedelta(
+                seconds=1
+        )
+
+        all_the_resources = resources.split('-')
+        all_the_resources_final = all_the_resources[1:]
+        now = datetime.datetime.now()
+        ###########################################################
+
+        list_of_transformed_record_data_by_location = [
+            {
+                "resource": resource,
+                "raw_data": program_record_for_resource_by_location(
+                        midnight_start_day,
+                        just_before_next_day_end_date,
+                        resource,
+                        tenant
+                )
+            } for resource in all_the_resources_final]
+
+        formatted_record_data_for_each_resource = list(map(
+                get_total_play_count_of_resource_between_date_range_for_all_locations,
+                list_of_transformed_record_data_by_location
+        ))
+
+        csv_to_publish = generate_date_range_csv_by_location(
+                midnight_start_day,
+                just_before_next_day_end_date,
+                all_the_resources_final,
+                formatted_record_data_for_each_resource,
+                now
+        )
+
+        self.response.headers['Content-Type'] = 'application/csv'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=one-resource-by-device.csv'
+        self.response.write(bytes(csv_to_publish.getvalue()))
+
+
 class MultiResourceByDate(RequestHandler):
-    def get(self, start_date, end_date, resources):
+    def get(self, start_date, end_date, resources, tenant, distributor_key):
+
+        if tenant not in get_tenants_from_headers(distributor_key):
+            return self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+
+        ###########################################################
+        # SETUP VARIABLES
+        ###########################################################
         start_date = datetime.datetime.fromtimestamp(int(start_date))
         end_date = datetime.datetime.fromtimestamp(int(end_date))
         if end_date < start_date:
@@ -39,113 +113,34 @@ class MultiResourceByDate(RequestHandler):
 
         all_the_resources = resources.split('-')
         all_the_resources_final = all_the_resources[1:]
+        now = datetime.datetime.now()
 
-        all_of_the_dictionaries_to_get_data_on = [
+        ###########################################################
+
+        pre_formatted_program_record_by_date = [
             {
                 "resource": resource,
-                "raw_data": get_raw_program_record_data_for_resource_between_date_ranges_by_date(
+                # program_record is the transformed program record table data
+                "raw_data": program_record_for_resource_by_date(
                         midnight_start_day,
                         just_before_next_day_end_date,
-                        resource
+                        resource,
+                        tenant
                 )
             } for resource in all_the_resources_final]
 
-        resulting_dictionaries_of_data = list(map(
-                get_total_play_count_of_resource_between_date_range_for_all_locations,
-                all_of_the_dictionaries_to_get_data_on
-        ))
+        formatted_data = format_program_record_data_with_array_of_resources(pre_formatted_program_record_by_date)
 
-        merged_dict = create_merged_dictionary(resulting_dictionaries_of_data)
-
-        now = datetime.datetime.now()
-
-        csv_to_publish = generate_date_range_csv_for_a_multiple_resources(
+        csv_to_publish = generate_date_range_csv_by_date(
                 midnight_start_day,
                 just_before_next_day_end_date,
                 all_the_resources_final,
-                merged_dict,
+                formatted_data,
                 now
         )
 
         self.response.headers['Content-Type'] = 'application/csv'
         self.response.headers['Content-Disposition'] = 'attachment; filename=multi-resource-by-date.csv'
-        self.response.write(bytes(csv_to_publish.getvalue()))
-
-
-class OneResourceByDate(RequestHandler):
-    def get(self, start_date, end_date, resource):
-        start_date = datetime.datetime.fromtimestamp(int(start_date))
-        end_date = datetime.datetime.fromtimestamp(int(end_date))
-
-        if end_date < start_date:
-            self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
-
-        midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
-        midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
-        just_before_next_day_end_date = (midnight_end_day + datetime.timedelta(days=1)) - datetime.timedelta(
-                seconds=1
-        )
-
-        raw_data = get_raw_program_record_data_for_resource_between_date_ranges_by_date(
-                midnight_start_day,
-                just_before_next_day_end_date,
-                resource
-        )
-
-        to_put_in = {
-            "raw_data": raw_data,
-            "resource": resource
-        }
-
-        dictionary = get_total_play_count_of_resource_between_date_range_for_all_locations(
-                to_put_in
-        )
-
-        now = datetime.datetime.now()
-
-        csv_to_publish = generate_date_range_csv_for_a_single_resource(
-                midnight_start_day,
-                just_before_next_day_end_date,
-                resource,
-                dictionary,
-                now
-        )
-
-        self.response.headers['Content-Type'] = 'application/csv'
-        self.response.headers['Content-Disposition'] = 'attachment; filename=one-resource-by-date.csv'
-        self.response.write(bytes(csv_to_publish.getvalue()))
-
-
-class OneResourceByDevice(RequestHandler):
-    def get(self, start_date, end_date, resource):
-        start_date = datetime.datetime.fromtimestamp(int(start_date))
-        end_date = datetime.datetime.fromtimestamp(int(end_date))
-
-        if end_date < start_date:
-            self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
-
-        midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
-        midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
-        just_before_next_day_end_date = (midnight_end_day + datetime.timedelta(days=1)) - datetime.timedelta(
-                seconds=1
-        )
-
-        dictionary = get_raw_program_record_data_for_resource_between_date_ranges_by_location(
-                midnight_start_day, just_before_next_day_end_date, resource
-        )
-
-        formatted_dictionary = format_raw_program_record_data_for_single_resource_by_location(dictionary)
-
-        csv_to_publish = generate_date_range_csv_for_single_resource_by_location(
-                midnight_start_day,
-                just_before_next_day_end_date,
-                resource,
-                formatted_dictionary,
-                datetime.datetime.now()
-        )
-
-        self.response.headers['Content-Type'] = 'application/csv'
-        self.response.headers['Content-Disposition'] = 'attachment; filename=one-resource-by-device.csv'
         self.response.write(bytes(csv_to_publish.getvalue()))
 
 
@@ -155,26 +150,27 @@ def handle_posting_a_new_program_play(incoming_data):
         logging.info(each_log)
         try:
             raw_event_id = insert_raw_program_play_event_data(each_log)
-            resource = each_log["resource_name"]
+            resource_name = each_log["resource_name"]
             resource_id = each_log["resource_id"]
             serial_number = each_log["serial_number"]
             device_key = each_log["device_key"]
             tenant_code = each_log["tenant_code"]
+            customer_display_code = each_log["customer_display_code"]
             started_at = datetime.datetime.strptime(each_log["started_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
             ended_at = datetime.datetime.strptime(each_log["ended_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
 
-            if 'location_id' in each_log:
-                location_name = each_log["location_id"]
-                location_id = insert_new_location_or_get_existing(location_name)
+            if 'customer_location_code' in each_log:
+                customer_location_code = each_log["customer_location_code"]  # e.g. 6023 or "Store_6023"
+                location_id = insert_new_location_or_get_existing(customer_location_code)
 
             else:
                 location_id = None
 
-            resource_id = insert_new_resource_or_get_existing(resource, resource_id)
-            device_id = insert_new_device_or_get_existing(location_id, serial_number, device_key, tenant_code)
+            resource_id = insert_new_resource_or_get_existing(resource_name, resource_id, tenant_code)
+            device_id = insert_new_device_or_get_existing(location_id, serial_number, device_key, customer_display_code,
+                                                          tenant_code)
             insert_new_program_record(location_id, device_id, resource_id, started_at, ended_at)
             mark_raw_event_complete(raw_event_id)
-
 
         except KeyError:
             logging.warn("ERROR: KEYERROR IN POSTING A NEW PROGRAM PLAY")

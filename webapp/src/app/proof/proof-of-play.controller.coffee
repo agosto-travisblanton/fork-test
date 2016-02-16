@@ -2,8 +2,20 @@
 
 appModule = angular.module 'skykitProvisioning'
 
-appModule.controller "ProofOfPlayCtrl", () ->
-  @tab = {title: "One-Resource"}
-  @tab2 = {title: "Multi-Resource"}
+appModule.controller "ProofOfPlayCtrl", (ProofPlayService) ->
+  @resource = {title: "Resource"}
+  @chosen_tenant = null
+  @tenants = null
+
+  ProofPlayService.getAllTenants()
+  .then (data) =>
+    @tenants = data.data.tenants
+
+
+
+  @submitTenant = (tenant) =>
+    ProofPlayService.setTenant(tenant)
+    @chosen_tenant = (tenant)
+
 
   @

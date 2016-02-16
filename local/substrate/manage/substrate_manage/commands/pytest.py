@@ -1,6 +1,6 @@
 import sys
 import os
-import logging 
+import logging
 
 if __name__ == '__main__':
     if 'APPENGINE_SDK' not in os.environ:
