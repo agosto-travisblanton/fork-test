@@ -1,8 +1,6 @@
 import csv
 import StringIO
-from utils import join_array_of_strings, order_dictionary_with_datetimes_as_keys
 import datetime
-
 from collections import OrderedDict
 
 
@@ -32,18 +30,6 @@ def transform_resource_data_between_date_ranges_by_date(from_db):
         to_return[midnight_start_day].append(item)
 
     return to_return
-
-
-def format_raw_program_record_data_for_single_resource_by_location(dictionary):
-    all_results = {}
-
-    for key, value in dictionary.iteritems():
-        all_results[key] = {
-            "PlayCount": len(value),
-            "Device": value[0]["device_id"]
-        }
-
-    return all_results
 
 
 def generate_date_range_csv_by_location(start_date, end_date, resources, array_of_data, created_time):

@@ -22,7 +22,7 @@ def handle_posting_a_new_program_play(incoming_data):
             ended_at = datetime.datetime.strptime(each_log["ended_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
 
             if 'customer_location_code' in each_log:
-                customer_location_code = each_log["customer_location_code"] # e.g. 6023 or "Store_6023"
+                customer_location_code = each_log["customer_location_code"]  # e.g. 6023 or "Store_6023"
                 location_id = insert_new_location_or_get_existing(customer_location_code)
 
             else:
@@ -87,7 +87,7 @@ class MultiResourceByDevice(RequestHandler):
 
         ###########################################################
 
-        all_of_the_dictionaries_to_get_data_on = [
+        list_of_transformed_record_data_by_location = [
             {
                 "resource": resource,
                 "raw_data": program_record_for_resource_by_location(
@@ -98,16 +98,16 @@ class MultiResourceByDevice(RequestHandler):
                 )
             } for resource in all_the_resources_final]
 
-        resulting_dictionaries_of_data = list(map(
+        formatted_record_data_for_each_resource = list(map(
                 get_total_play_count_of_resource_between_date_range_for_all_locations,
-                all_of_the_dictionaries_to_get_data_on
+                list_of_transformed_record_data_by_location
         ))
 
         csv_to_publish = generate_date_range_csv_by_location(
                 midnight_start_day,
                 just_before_next_day_end_date,
                 all_the_resources_final,
-                resulting_dictionaries_of_data,
+                formatted_record_data_for_each_resource,
                 datetime.datetime.now()
         )
 
@@ -137,9 +137,10 @@ class MultiResourceByDate(RequestHandler):
 
         ###########################################################
 
-        all_of_the_dictionaries_to_get_data_on = [
+        pre_formatted_program_record_by_date = [
             {
                 "resource": resource,
+                # program_record is the transformed program record table data
                 "raw_data": program_record_for_resource_by_date(
                         midnight_start_day,
                         just_before_next_day_end_date,
@@ -148,7 +149,7 @@ class MultiResourceByDate(RequestHandler):
                 )
             } for resource in all_the_resources_final]
 
-        formatted_data = format_program_record_data_with_array_of_resources(all_of_the_dictionaries_to_get_data_on)
+        formatted_data = format_program_record_data_with_array_of_resources(pre_formatted_program_record_by_date)
 
         now = datetime.datetime.now()
 
