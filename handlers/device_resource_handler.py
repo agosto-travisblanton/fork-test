@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 from datetime import datetime
 
 from google.appengine.ext import ndb
@@ -15,11 +16,16 @@ from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup, DeviceIssu
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY, DEVICE_ISSUE_LOG_STRATEGY
+from utils.mail_util import MailUtil
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
 
 class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidatorMixin):
+    LATITUDE_PATTERN = '^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?)'
+    LONGITUDE_PATTERN = '\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$'
+    MAILGUN_QUEUED_MESSAGE = 'Queued. Thank you.'
+
     @requires_api_token
     def get_list(self):
         pairing_code = self.request.get('pairingCode')
@@ -30,7 +36,13 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                 ChromeOsDevice.ethernet_mac_address == device_mac_address))
             query_results = query.fetch()
             if len(query_results) is 1:
-                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+                if ChromeOsDevice.is_rogue_unmanaged_device(device_mac_address):
+                    self.delete(query_results[0].key.urlsafe())
+                    error_message = "Rogue unmanaged device with MAC address: {0} no longer exists.".format(
+                        device_mac_address)
+                    self.response.set_status(404, error_message)
+                else:
+                    json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
             elif len(query_results) > 1:
                 json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
                 error_message = "Multiple devices have MAC address {0}".format(device_mac_address)
@@ -152,7 +164,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 unmanaged_device = ChromeOsDevice.get_unmanaged_device_by_mac_address(device_mac_address)
                 if None is not unmanaged_device:
                     post_unmanaged_device_info(gcm_registration_id=unmanaged_device.gcm_registration_id,
-                                               device_urlsafe_key=unmanaged_device.key.urlsafe())
+                                               device_urlsafe_key=unmanaged_device.key.urlsafe(),
+                                               host=self.request.host_url)
                     status = 409
                     error_message = 'Registration conflict because macAddress is already assigned to ' \
                                     'an unmanaged device.'
@@ -161,7 +174,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 unmanaged_device = ChromeOsDevice.get_unmanaged_device_by_gcm_registration_id(gcm_registration_id)
                 if None is not unmanaged_device:
                     post_unmanaged_device_info(gcm_registration_id=unmanaged_device.gcm_registration_id,
-                                               device_urlsafe_key=unmanaged_device.key.urlsafe())
+                                               device_urlsafe_key=unmanaged_device.key.urlsafe(),
+                                               host=self.request.host_url)
                     status = 409
                     error_message = 'Registration conflict because gcmRegistrationId is already assigned to ' \
                                     'an unmanaged device.'
@@ -215,6 +229,15 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     self.response.headers['Location'] = device_uri
                     self.response.headers.pop('Content-Type', None)
                     self.response.set_status(status)
+                    tenant_notification_emails = Tenant.find_by_tenant_code(tenant_code).notification_emails
+                    if tenant_notification_emails is not None:
+                        response = MailUtil.send_message(
+                            recipients=tenant_notification_emails,
+                            subject='Device Added',
+                            text='A new device was added with MAC address {0}.'.format(device_mac_address))
+                        response_json = json.loads(response)
+                        if response_json['message'] is not self.MAILGUN_QUEUED_MESSAGE:
+                            logging.warning('Tenant notification email for device add was not queued.')
                 else:
                     self.response.set_status(status, error_message)
         else:
@@ -238,6 +261,17 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             notes = request_json.get('notes')
             if notes:
                 device.notes = notes
+            latitude = request_json.get('latitude')
+            longitude = request_json.get('longitude')
+            if latitude is None or longitude is None:
+                device.geo_location = None
+            else:
+                if re.match(self.LATITUDE_PATTERN, str(latitude)) is None or re.match(self.LONGITUDE_PATTERN,
+                                                                                      str(longitude)) is None:
+                    logging.warning(
+                            'Invalid latitude {0} or longitude {1} detected.'.format(str(latitude), str(longitude)))
+                else:
+                    device.geo_location = ndb.GeoPt(latitude, longitude)
             gcm_registration_id = request_json.get('gcmRegistrationId')
             if gcm_registration_id:
                 logging.info('  PUT updating the gcmRegistrationId.')
@@ -260,7 +294,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     if device.is_unmanaged_device:
                         logging.info(' PUT add the tenant to unmanaged device.')
                         post_unmanaged_device_info(gcm_registration_id=device.gcm_registration_id,
-                                                   device_urlsafe_key=device.key.urlsafe())
+                                                   device_urlsafe_key=device.key.urlsafe(), host=self.request.host_url)
                     else:
                         logging.info(' PUT update tenant on device.')
                         device.put()
@@ -337,6 +371,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             if os_version:
                 if device.os_version != os_version:
                     device.os_version = os_version
+            timezone = request_json.get('timezone')
+            if timezone:
+                if device.time_zone != timezone:
+                    device.time_zone = timezone
             resolved_datetime = datetime.utcnow()
             previously_down = device.up is False
             if previously_down:
@@ -413,9 +451,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             status = 404
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
         else:
-            change_intent(device.gcm_registration_id, config.PLAYER_RESET_COMMAND)
-            logging.info(
-                'Player reset command issued prior to deleting device with key {0}'.format(device.key.urlsafe()))
+            change_intent(
+                    gcm_registration_id=device.gcm_registration_id,
+                    payload=config.PLAYER_RESET_COMMAND,
+                    device_urlsafe_key=device_urlsafe_key,
+                    host=self.request.host_url)
             device.key.delete()
             self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)

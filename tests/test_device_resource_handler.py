@@ -108,6 +108,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response = self.app.post('/api/v1/devices', json.dumps(request_body),
                                  headers=self.api_token_authorization_header)
         self.assertEqual('201 Created', response.status)
+        self.assertEqual(201, response.status_int)
 
     def test_post_managed_device_returns_resource_url_in_location_header(self):
         tenant = self.tenant_key.get()
@@ -193,6 +194,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'gcmRegistrationId': new_gcm_registration_id}
         response = self.app.post('/api/v1/devices', json.dumps(request_body),
                                  headers=self.unmanaged_registration_token_authorization_header)
+        self.assertEqual('201 Created', response.status)
         self.assertEqual(201, response.status_int)
 
     def test_device_resource_handler_unmanaged_post_returns_cannot_register_when_mac_address_already_assigned(self):
@@ -420,6 +422,33 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['gcmRegistrationId'], device.gcm_registration_id)
 
+    def test_get_list_by_mac_address_on_rogue_unmanged_device_without_tenant_key_deletes_device(self):
+        mac_address = '2e871e619346'
+        unmanaged_device = ChromeOsDevice.create_unmanaged(self.GCM_REGISTRATION_ID, mac_address)
+        unmanaged_device_key = unmanaged_device.put()
+        self.assertIsNone(unmanaged_device.tenant_key)
+        self.assertIsNotNone(unmanaged_device)
+        request_parameters = {'macAddress': mac_address}
+        uri = build_uri('devices-retrieval')
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 404 Rogue unmanaged device with MAC address: {0} no longer exists.'.format(
+                mac_address) in context.exception.message)
+        self.assertIsNone(unmanaged_device_key.get())
+
+    def test_get_list_by_mac_address_on_rogue_unmanged_device_with_tenant_key_does_not_delete_device(self):
+        mac_address = '2e871e619346'
+        unmanaged_device = ChromeOsDevice.create_unmanaged(self.GCM_REGISTRATION_ID, mac_address)
+        unmanaged_device.tenant_key = self.tenant_key
+        unmanaged_device_key = unmanaged_device.put()
+        self.assertIsNotNone(unmanaged_device.tenant_key)
+        self.assertIsNotNone(unmanaged_device)
+        request_parameters = {'macAddress': mac_address}
+        uri = build_uri('devices-retrieval')
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        self.assertIsNotNone(unmanaged_device_key.get())
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['macAddress'], mac_address)
 
     ##################################################################################################################
     # get_devices_by_tenant
@@ -707,6 +736,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                 json.dumps(request_body),
                                 headers=self.api_token_authorization_header)
         self.assertEqual('204 No Content', response.status)
+        self.assertEqual(204, response.status_int)
 
     def test_put_updates_device_notes(self):
         new_note = 'new note'
@@ -797,6 +827,31 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json['contentServerUrl'], self.CONTENT_SERVER_URL)
         self.assertEqual(response_json['gcmRegistrationId'], self.GCM_REGISTRATION_ID)
         self.assertEqual(response_json['macAddress'], self.MAC_ADDRESS)
+
+    def test_put_lat_or_lon_none_nulls_geo_location(self):
+        request_body = {'latitude': None,
+                        'longitude': -146.549
+                        }
+        when(deferred).defer(any_matcher(update_chrome_os_device),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
+                                json.dumps(request_body),
+                                headers=self.api_token_authorization_header)
+        self.assertIsNone(self.managed_device.geo_location)
+
+    def test_put_valid_lat_or_lon_updates_geo_location(self):
+        latitude = 44.983579
+        longitude = -93.277544
+        request_body = {'latitude': latitude,
+                        'longitude': longitude
+                        }
+        when(deferred).defer(any_matcher(update_chrome_os_device),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
+                                json.dumps(request_body),
+                                headers=self.api_token_authorization_header)
+        self.assertEqual(self.managed_device.geo_location, ndb.GeoPt(latitude, longitude))
+
 
     ##################################################################################################################
     ## delete
@@ -953,7 +1008,24 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
         device = self.managed_device_key.get()
         self.assertGreater(device.heartbeat_updated, original_heartbeat_timestamp)
-        # self.assertGreaterEqual(device.heartbeat_updated, self.managed_device.heartbeat_updated)
+
+    def test_put_heartbeat_updates_timezone(self):
+        self.__initialize_heartbeat_info()
+        old_time_zone = 'UTC-5'
+        new_time_zone = 'UTC-6'
+        request_body = {'storage': self.STORAGE_UTILIZATION - 1,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        'timezone': new_time_zone
+                        }
+        self.managed_device.time_zone = old_time_zone
+        self.managed_device.put()
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        updated_heartbeat = self.managed_device_key.get()
+        self.assertNotEqual(updated_heartbeat.time_zone, old_time_zone)
 
     def test_put_heartbeat_invokes_a_device_issue_log_up_toggle_if_device_was_previously_down(self):
         self.__initialize_heartbeat_info(up=False)

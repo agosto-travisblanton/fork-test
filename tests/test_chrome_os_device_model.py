@@ -1,3 +1,5 @@
+from google.appengine.ext import ndb
+
 from app_config import config
 from env_setup import setup_test_paths
 
@@ -31,6 +33,7 @@ class TestChromeOsDeviceModel(BaseTest):
     IMPERSONATION_EMAIL = 'test@test.com'
     DISPLAY_PANEL_MODEL = 'Sharp-PNE521'
     DISPLAY_PANEL_INPUT = 'sha6'
+    TIME_ZONE = 'UTC-6'
 
     def setUp(self):
         super(TestChromeOsDeviceModel, self).setUp()
@@ -104,6 +107,7 @@ class TestChromeOsDeviceModel(BaseTest):
                                                mac_address=self.MAC_ADDRESS)
         device.panel_model = self.DISPLAY_PANEL_MODEL
         device.panel_input = self.DISPLAY_PANEL_INPUT
+        device.time_zone = self.TIME_ZONE
         device.put()
         json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
         self.assertEqual(str(device.device_id), json_representation['deviceId'])
@@ -117,6 +121,7 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertEqual(str(device.mac_address), json_representation['macAddress'])
         self.assertEqual(str(device.panel_input), json_representation['panelInput'])
         self.assertEqual(str(device.panel_model), json_representation['panelModel'])
+        self.assertEqual(str(device.time_zone), json_representation['timezone'])
 
     def test_json_serialization_strategy_with_optional_serial_number(self):
         device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
@@ -189,3 +194,41 @@ class TestChromeOsDeviceModel(BaseTest):
     def test_get_unmanaged_device_by_gcm_registration_id_with_bogus_gcm_registration_id(self):
         unmanaged_device = ChromeOsDevice.get_unmanaged_device_by_gcm_registration_id('bogus')
         self.assertIsNone(unmanaged_device)
+
+    def test_is_rogue_unmanaged_device_without_tenant_key_returns_true(self):
+        device = ChromeOsDevice.create_unmanaged(self.TEST_GCM_REGISTRATION_ID, self.MAC_ADDRESS)
+        device.put()
+        self.assertTrue(ChromeOsDevice.is_rogue_unmanaged_device(self.MAC_ADDRESS))
+
+    def test_is_rogue_unmanaged_device_check_with_tenant_key_returns_false(self):
+        device = ChromeOsDevice.create_unmanaged(self.TEST_GCM_REGISTRATION_ID, self.MAC_ADDRESS)
+        device.tenant_key = self.tenant_key
+        device.put()
+        self.assertFalse(ChromeOsDevice.is_rogue_unmanaged_device(self.MAC_ADDRESS))
+
+    def test_json_serialization_strategy_of_geo_location_decomposes_into_lat_lon(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS,
+                                               serial_number=self.SERIAL_NUMBER,
+                                               model=self.MODEL)
+        latitude = 44.983579
+        longitude = -93.277544
+        device.geo_location = ndb.GeoPt(latitude, longitude) # Agosto's geoLocation
+        device.put()
+        json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
+        self.assertEqual(latitude, json_representation['latitude'])
+        self.assertEqual(longitude, json_representation['longitude'])
+
+    def test_json_serialization_strategy_of_geo_location_when_geo_location_is_none(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS,
+                                               serial_number=self.SERIAL_NUMBER,
+                                               model=self.MODEL)
+        device.put()
+        json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
+        self.assertIsNone(json_representation['latitude'])
+        self.assertIsNone(json_representation['longitude'])

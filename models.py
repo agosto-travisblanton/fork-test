@@ -216,6 +216,8 @@ class ChromeOsDevice(ndb.Model):
     sk_player_version = ndb.StringProperty(required=False, indexed=True)
     heartbeat_interval_minutes = ndb.IntegerProperty(default=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES, required=True,
                                                      indexed=False)
+    time_zone = ndb.StringProperty(required=False, indexed=True)
+    geo_location = ndb.GeoPtProperty(required=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):
@@ -297,6 +299,14 @@ class ChromeOsDevice(ndb.Model):
                 ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
                        ChromeOsDevice.ethernet_mac_address == device_mac_address)).count() > 0
         return mac_address_assigned_to_device
+
+    @classmethod
+    def is_rogue_unmanaged_device(cls, mac_address):
+        device = ChromeOsDevice.get_unmanaged_device_by_mac_address(mac_address)
+        if device is not None and device.pairing_code is not None and device.tenant_key is None:
+            return True
+        else:
+            return False
 
     def _pre_put_hook(self):
         self.class_version = 3
@@ -479,6 +489,36 @@ class DistributorUser(ndb.Model):
     def _pre_put_hook(self):
         self.class_version = 1
 
+
+@ae_ndb_serializer
+class PlayerCommandEvent(ndb.Model):
+    device_urlsafe_key = ndb.StringProperty(required=True, indexed=True)
+    payload = ndb.StringProperty(required=True, indexed=True)
+    gcm_registration_id = ndb.StringProperty(required=True, indexed=True)
+    gcm_message_id = ndb.StringProperty(required=False, indexed=True)
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    updated = ndb.DateTimeProperty(auto_now=True)
+    posted = ndb.DateTimeProperty(required=True, indexed=True)
+    confirmed = ndb.DateTimeProperty(required=False, indexed=True)
+    player_has_confirmed = ndb.BooleanProperty(default=False, required=True, indexed=True)
+    class_version = ndb.IntegerProperty()
+
+    @classmethod
+    def create(cls, device_urlsafe_key, payload, gcm_registration_id, player_has_confirmed=False):
+        return cls(device_urlsafe_key=device_urlsafe_key,
+                   payload=payload,
+                   gcm_registration_id=gcm_registration_id,
+                   player_has_confirmed=player_has_confirmed,
+                   posted=datetime.utcnow())
+
+    @classmethod
+    def get_events_by_device_key(self, device_urlsafe_key, last_number=100):
+        query = PlayerCommandEvent.query(PlayerCommandEvent.device_urlsafe_key == device_urlsafe_key).order(
+                -PlayerCommandEvent.posted)
+        return query.fetch(last_number)
+
+    def _pre_put_hook(self):
+        self.class_version = 1
 
 class IssueLevel:
     Normal, Warning, Danger = range(3)

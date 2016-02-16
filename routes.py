@@ -116,6 +116,24 @@ application = WSGIApplication(
               handler_method='custom',
               methods=['POST']
               ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/power-on',
+              handler='handlers.device_commands_handler.DeviceCommandsHandler',
+              name='device-power-on-command',
+              handler_method='power_on',
+              methods=['POST']
+              ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/power-off',
+              handler='handlers.device_commands_handler.DeviceCommandsHandler',
+              name='device-power-off-command',
+              handler_method='power_off',
+              methods=['POST']
+              ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/content-delete',
+              handler='handlers.device_commands_handler.DeviceCommandsHandler',
+              name='device-delete-content-command',
+              handler_method='content_delete',
+              methods=['POST']
+              ),
         Route(r'/api/v1/tenants/<tenant_urlsafe_key>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='devices-by-tenant',
@@ -198,6 +216,23 @@ application = WSGIApplication(
               name='monitor-devices',
               handler_method='last_contact_check',
               methods=['GET'],
+              ),
+
+        ############################################################
+        # Player Command Events
+        ############################################################
+        Route(r'/api/v1/player-command-events/<urlsafe_event_key>',
+              handler='handlers.player_command_events_handler.PlayerCommandEventsHandler',
+              name='manage-event',
+              handler_method='command_confirmation',
+              methods=['PUT']
+              ),
+
+        Route(r'/api/v1/player-command-events/<device_urlsafe_key>',
+              handler='handlers.player_command_events_handler.PlayerCommandEventsHandler',
+              name='player-command-events',
+              handler_method='get_player_command_events',
+              methods=['GET']
               ),
 
         ############################################################

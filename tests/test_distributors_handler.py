@@ -186,7 +186,7 @@ class TestDistributorsHandler(BaseTest, WebTest):
                               'active': True}
         uri = application.router.build(None, 'distributor-creator', None, {})
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
-        self.assertEqual(201, response.status_code)
+        self.assertEqual('201 Created', response.status)
 
     def test_post_create_new_distributor_persists_object(self):
         name = u'Acme'
@@ -262,7 +262,7 @@ class TestDistributorsHandler(BaseTest, WebTest):
             'active': True
         }
         response = self.app.put_json(uri, entity_body, headers=self.headers)
-        self.assertEqual(204, response.status_code)
+        self.assertEqual('204 No Content', response.status)
 
     def test_put_updates_active_property(self):
         uri = application.router.build(None, 'manage-distributor', None, {'distributor_key': self.agosto_key.urlsafe()})
@@ -308,7 +308,7 @@ class TestDistributorsHandler(BaseTest, WebTest):
         uri = application.router.build(None, 'manage-distributor', None,
                                        {'distributor_key': url_safe_distributor_key})
         response = self.app.delete(uri, headers=self.headers)
-        self.assertEqual(204, response.status_code)
+        self.assertEqual(204, response.status_int)
 
     def test_delete_soft_deletes_distributor(self):
         url_safe_distributor_key = self.tierney_bros_key.urlsafe()
