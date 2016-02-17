@@ -99,7 +99,7 @@ def calculate_serial_count(array_of_db_data):
     return len(serials)
 
 
-def get_total_play_count_of_resource_between_date_range_for_all_locations(dictionary):
+def reformat_program_record_by_location(dictionary):
     resource = dictionary["resource"]
     raw_data = dictionary["raw_data"]
 
@@ -112,5 +112,7 @@ def get_total_play_count_of_resource_between_date_range_for_all_locations(dictio
             "Location": value[0]["location_id"],
             "Play Count": len(value),
         }
+
+    print to_return
 
     return to_return

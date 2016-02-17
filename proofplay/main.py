@@ -75,7 +75,7 @@ class MultiResourceByDevice(RequestHandler):
             } for resource in all_the_resources_final]
 
         formatted_record_data_for_each_resource = list(map(
-                get_total_play_count_of_resource_between_date_range_for_all_locations,
+                reformat_program_record_by_location,
                 list_of_transformed_record_data_by_location
         ))
 
