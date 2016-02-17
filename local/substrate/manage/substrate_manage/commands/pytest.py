@@ -1,6 +1,6 @@
 import sys
 import os
-import logging 
+import logging
 
 if __name__ == '__main__':
     if 'APPENGINE_SDK' not in os.environ:
@@ -9,10 +9,10 @@ if __name__ == '__main__':
 
     sys.path.insert(0, sdk_path)
     import dev_appserver
+
     dev_appserver.fix_sys_path()
     import pytest
 
-    #argv = ['-x', 'tests']
     argv = []
     argv.extend(sys.argv[1:])
 

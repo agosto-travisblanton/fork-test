@@ -7,7 +7,6 @@ import logging
 def get_project_root():
     """
     Returns the project root path.
-
     Starts in current working directory and traverses up until app.yaml is found.
     Assumes app.yaml is in project root.
     """
@@ -41,7 +40,6 @@ def setup():
 def setup_django(settings='settings', version='1.3', ):
     """
     Sets up the django libraries.
-
     :param settings: The name of the settings file. Default: ``'settings'``.
     :param version: The django version to set up. Default: ``'1.3'``.
     """
@@ -106,9 +104,8 @@ def setup_test_paths():
     if 'APPENGINE_SDK' not in os.environ:
         logging.error('APPENGINE_SDK environment variable is not set; exiting...')
     sdk_path = os.environ['APPENGINE_SDK']
-    
+
     sys.path.insert(0, sdk_path)
     import dev_appserver
     dev_appserver.fix_sys_path()
     import pytest
-

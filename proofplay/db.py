@@ -1,5 +1,4 @@
-from sqlalchemy.orm import scoped_session
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy import create_engine
 import os
 
@@ -10,4 +9,4 @@ else:
 
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
 session_factory = sessionmaker(bind=engine, expire_on_commit=False)
-Session = session_factory
+Session = scoped_session(session_factory)

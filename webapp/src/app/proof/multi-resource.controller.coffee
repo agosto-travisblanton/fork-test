@@ -3,6 +3,13 @@
 appModule = angular.module 'skykitProvisioning'
 
 appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService) ->
+  @radioButtonChoices = {
+    group1: 'By Device',
+    group2: 'By Date',
+    selection: null
+  }
+
+
   @dateTimeSelection = {
     start: null,
     end: null
@@ -23,7 +30,7 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService) ->
     ProofPlayService.getAllResources()
     .then (data) =>
       @loading = false
-      @resources =  data.data.resources
+      @resources = data.data.resources
 
   @addToSelectedResources = (searchText) =>
     if @isResourceValid(searchText)
@@ -34,8 +41,13 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService) ->
     @areResourcesValid()
     @isDisabled()
 
-  @querySearch = (resources, searchText) =>
+  @querySearch = (resources, searchText) ->
     ProofPlayService.querySearch(resources, searchText)
+
+
+  @isRadioValid = (selection) =>
+    @formValidity.type = selection
+    @isDisabled()
 
 
   @isResourceValid = (searchText) =>
@@ -70,18 +82,24 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService) ->
 
 
   @isDisabled = () =>
-    if @formValidity.start_date and @formValidity.end_date and @formValidity.resources
+    if @formValidity.start_date and @formValidity.end_date and @formValidity.resources and @formValidity.type
       @disabled = false
       @final = {
         start_date_unix: moment(@dateTimeSelection.start).unix(),
         end_date_unix: moment(@dateTimeSelection.end).unix(),
         resources: @selected_resources,
+        type: @radioButtonChoices.selection
+
       }
 
     else
       @disabled = true
 
   @submit = () =>
-    ProofPlayService.downloadCSVForMultipleResources(@final.start_date_unix, @final.end_date_unix, @final.resources)
+    if @final.type is "1"
+      ProofPlayService.downloadCSVForMultipleResourcesByDevice(@final.start_date_unix, @final.end_date_unix, @final.resources)
+
+    else
+      ProofPlayService.downloadCSVForMultipleResourcesByDate(@final.start_date_unix, @final.end_date_unix, @final.resources)
 
   @

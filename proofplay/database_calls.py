@@ -1,6 +1,21 @@
-from models import Resource, ProgramRecord, Location, ScheduleWentLive, Device, GamestopStoreLocation, ProgramPlayEvent
+from proofplay_models import Resource, ProgramRecord, Location, Device, ProgramPlayEvent
 from db import Session
+from data_processing import transform_resource_data_between_date_range_by_location, \
+    transform_resource_data_between_date_ranges_by_date
 import datetime
+from models import Domain, Tenant, TenantEntityGroup
+from google.appengine.ext import ndb
+
+
+def get_tenant_names_for_distributor(distributor_key):
+    return [result.name for result in get_tenant_list_from_distributor_key(distributor_key)]
+
+
+def retrieve_all_resources_of_tenant(tenant):
+    session = Session()
+    search = session.query(Resource).filter(Resource.tenant_code == tenant).all()
+    session.close()
+    return [resource.resource_name for resource in search]
 
 
 def retrieve_all_resources():
@@ -53,7 +68,7 @@ def insert_new_program_record(location_id, device_id, resource_id, started_at, e
     session.close()
 
 
-def insert_new_resource_or_get_existing(resource_name, resource_identifier):
+def insert_new_resource_or_get_existing(resource_name, resource_identifier, tenant_code):
     session = Session()
 
     resource_exits = session.query(Resource).filter_by(resource_name=resource_name).first()
@@ -61,7 +76,8 @@ def insert_new_resource_or_get_existing(resource_name, resource_identifier):
     if not resource_exits:
         new_resource = Resource(
                 resource_name=resource_name,
-                resource_identifier=resource_identifier
+                resource_identifier=resource_identifier,
+                tenant_code=tenant_code
         )
         session.add(new_resource)
         session.commit()
@@ -73,14 +89,14 @@ def insert_new_resource_or_get_existing(resource_name, resource_identifier):
         return resource_exits.id
 
 
-def insert_new_location_or_get_existing(location_identifier):
+def insert_new_location_or_get_existing(customer_location_code):
     session = Session()
 
-    location_exists = session.query(Location).filter_by(location_identifier=location_identifier).first()
+    location_exists = session.query(Location).filter_by(customer_location_code=customer_location_code).first()
 
     if not location_exists:
         new_location = Location(
-                location_identifier=location_identifier
+                customer_location_code=customer_location_code
         )
         session.add(new_location)
         session.commit()
@@ -91,7 +107,7 @@ def insert_new_location_or_get_existing(location_identifier):
     return location_exists.id
 
 
-def insert_new_device_or_get_existing(location_id, serial_number, device_key, tenant_code):
+def insert_new_device_or_get_existing(location_id, serial_number, device_key, customer_display_code, tenant_code):
     session = Session()
 
     device_exists = session.query(Device).filter_by(serial_number=serial_number).first()
@@ -101,6 +117,7 @@ def insert_new_device_or_get_existing(location_id, serial_number, device_key, te
                 location_id=location_id,
                 serial_number=serial_number,
                 device_key=device_key,
+                customer_display_code=customer_display_code,
                 tenant_code=tenant_code
 
         )
@@ -114,102 +131,32 @@ def insert_new_device_or_get_existing(location_id, serial_number, device_key, te
     return device_exists.id
 
 
-def insert_new_gamestop_store_location(location_name, serial_number):
-    session = Session()
-
-    already_exists = session.query(GamestopStoreLocation).filter_by(serial_number=serial_number).first()
-
-    if not already_exists:
-        new_pair = GamestopStoreLocation(
-                location_name=location_name,
-                serial_number=serial_number
-        )
-
-        session.add(new_pair)
-        session.commit()
-        session.close()
-
-
-def get_gamestop_store_location_from_serial_via_db(serial):
-    session = Session()
-    location_id = session.query(GamestopStoreLocation).filter_by(serial_number=serial).first()
-    session.close()
-
-    if location_id:
-        return location_id.location_name
-
-    else:
-        return False
-
-
-def transform_resource_data_between_date_range_by_location(from_db):
-    to_return = {}
-
-    for item in from_db:
-        location_id = item["location_id"]
-        if location_id not in to_return:
-            to_return[location_id] = []
-
-        to_return[location_id].append(item)
-
-    return to_return
-
-
-def get_raw_program_record_data_for_resource_between_date_ranges_by_location(start_date, end_date, resource):
-    session = Session()
-
-    resource_id = session.query(Resource).filter_by(resource_name=resource).first().id
-
-    rows = session.query(ProgramRecord).filter(
-            ProgramRecord.ended_at.between(start_date, end_date)).filter(
-            ProgramRecord.resource_id == resource_id).all()
-
-    from_db = []
-
-    for program_record in rows:
-        d = {}
-        d["location_id"] = program_record.full_location.location_identifier
-        d["device_id"] = program_record.full_device.serial_number
-        d["resource_id"] = program_record.full_resource.resource_name
-        d["started_at"] = program_record.started_at
-        d["ended_at"] = program_record.ended_at
-
-        from_db.append(d)
-
+def program_record_for_resource_by_location(start_date, end_date, resource, tenant_code):
+    from_db = get_raw_program_record_data(start_date, end_date, resource, tenant_code)
     all_results = transform_resource_data_between_date_range_by_location(from_db)
-    session.close()
     return all_results
 
 
-def transform_resource_data_between_date_ranges_by_date(from_db):
-    to_return = {}
-
-    for item in from_db:
-        started_at = item["started_at"]
-        midnight_start_day = str(datetime.datetime.combine(started_at.date(), datetime.time()))
-
-        if midnight_start_day not in to_return:
-            to_return[midnight_start_day] = []
-
-        to_return[midnight_start_day].append(item)
-
-    return to_return
+def program_record_for_resource_by_date(start_date, end_date, resource, tenant_code):
+    from_db = get_raw_program_record_data(start_date, end_date, resource, tenant_code)
+    all_results = transform_resource_data_between_date_ranges_by_date(from_db)
+    return all_results
 
 
-def get_raw_program_record_data_for_resource_between_date_ranges_by_date(start_date, end_date, resource):
+def get_raw_program_record_data(start_date, end_date, resource, tenant_code):
     session = Session()
-    print resource
     resource_id = session.query(Resource).filter_by(resource_name=resource).first().id
 
     rows = session.query(ProgramRecord).filter(
             ProgramRecord.ended_at.between(start_date, end_date)).filter(
-            ProgramRecord.resource_id == resource_id).all()
+            ProgramRecord.resource_id == resource_id).filter(
+        ProgramRecord.full_device.has(tenant_code=tenant_code)).all()
 
     from_db = []
 
     for program_record in rows:
         d = {
-            "location_id": program_record.full_location.location_identifier,
+            "location_id": program_record.full_location.customer_location_code,
             "device_id": program_record.full_device.serial_number,
             "resource_id": program_record.full_resource.resource_name,
             "started_at": program_record.started_at,
@@ -218,6 +165,14 @@ def get_raw_program_record_data_for_resource_between_date_ranges_by_date(start_d
 
         from_db.append(d)
 
-    all_results = transform_resource_data_between_date_ranges_by_date(from_db)
     session.close()
-    return all_results
+    return from_db
+
+
+def get_tenant_list_from_distributor_key(distributor_key):
+    distributor = ndb.Key(urlsafe=distributor_key)
+    domain_keys = Domain.query(Domain.distributor_key == distributor).fetch(100, keys_only=True)
+    tenant_list = Tenant.query(ancestor=TenantEntityGroup.singleton().key)
+    tenant_list = filter(lambda x: x.active is True, tenant_list)
+    result = filter(lambda x: x.domain_key in domain_keys, tenant_list)
+    return result
