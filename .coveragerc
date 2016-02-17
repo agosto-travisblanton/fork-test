@@ -22,6 +22,10 @@ include =
     utils/*.py
 
 
+omit =
+    proofplay/dev/*.py
+
+
 [report]
 # Regexes for lines to exclude from consideration
 exclude_lines =

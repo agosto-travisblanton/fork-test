@@ -9,10 +9,10 @@ if __name__ == '__main__':
 
     sys.path.insert(0, sdk_path)
     import dev_appserver
+
     dev_appserver.fix_sys_path()
     import pytest
 
-    #argv = ['-x', 'tests']
     argv = []
     argv.extend(sys.argv[1:])
 
