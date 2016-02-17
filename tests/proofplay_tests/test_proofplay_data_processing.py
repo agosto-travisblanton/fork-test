@@ -12,7 +12,8 @@ from proofplay.data_processing import (calculate_location_count, calculate_seria
                                        generate_date_range_csv_by_date,
                                        format_program_record_data_with_array_of_resources,
                                        transform_resource_data_between_date_range_by_location,
-                                       transform_resource_data_between_date_ranges_by_date)
+                                       transform_resource_data_between_date_ranges_by_date,
+                                       generate_date_range_csv_by_location)
 
 
 def convert_datetime_to_string_of_day_at_midnight(date):
@@ -188,6 +189,62 @@ class TestDataProcessing(BaseTest):
                      ('2016-01-02 00:00:00', {'PlayCount': 4, 'PlayerCount': 2, 'LocationCount': 1})])}
 
         self.assertEqual(expected_output, format_program_record_data_with_array_of_resources(example_input))
+
+    def test_generate_date_range_csv_by_location(self):
+        now = datetime.datetime.now()
+        resources = ["GSAD_4334"]
+        expected_output = """Creation Date,Start Date,End Date,Content\r\n{},2016-02-01 00:00:00,2016-02-02 00:00:00,GSAD_4334\r\nContent,Display,Location,Play Count\r\nGSAD_4334,F5MSCX001001,6034,3\r\nGSAD_4334,F5MSCX001000,6034,4\r\nGSAD_4334,F5MSCX001002,6034,5\r\n""".format(
+                str(now))
+
+        start_time = datetime.datetime.strptime("Feb 1 2016", '%b %d %Y')
+        end_time = datetime.datetime.strptime("Feb 2 2016", '%b %d %Y')
+
+        example_input = [
+            {
+                'F5MSCX001002': {'Location': '6034', 'Play Count': 5, 'Display': 'F5MSCX001002',
+                                 'Content': 'GSAD_4334'},
+                'F5MSCX001000': {'Location': '6034', 'Play Count': 4, 'Display': 'F5MSCX001000',
+                                 'Content': 'GSAD_4334'},
+                'F5MSCX001001': {'Location': '6034', 'Play Count': 3, 'Display': 'F5MSCX001001',
+                                 'Content': 'GSAD_4334'}}
+        ]
+
+        result = generate_date_range_csv_by_location(
+                start_date=start_time,
+                end_date=end_time,
+                resources=resources,
+                array_of_data=example_input,
+                created_time=now
+        ).read()
+
+        self.assertEqual(expected_output, result)
+
+    def test_generate_date_range_csv_by_date(self):
+        now = datetime.datetime.now()
+        resources = ["GSAD_4334"]
+        expected_output = """Creation Date,Start Date,End Date,Start Time,End Time,All Content\r\n{},2016-02-01 00:00:00,2016-02-02 00:00:00,12:00 AM,11:59 PM,GSAD_4334\r\nContent,Date,Location Count,Display Count,Play Count\r\nGSAD_4334,2016-02-01 00:00:00,1,2,6\r\nGSAD_4334,2016-02-02 00:00:00,1,3,6\r\n""".format(
+                str(now))
+
+        start_time = datetime.datetime.strptime("Feb 1 2016", '%b %d %Y')
+        end_time = datetime.datetime.strptime("Feb 2 2016", '%b %d %Y')
+
+        example_input = {
+            'GSAD_4334': OrderedDict(
+                    [
+                        ('2016-02-01 00:00:00', {'PlayCount': 6, 'LocationCount': 1, 'PlayerCount': 2}),
+                        ('2016-02-02 00:00:00', {'PlayCount': 6, 'LocationCount': 1, 'PlayerCount': 3})]
+            )
+        }
+
+        result = generate_date_range_csv_by_date(
+                start_date=start_time,
+                end_date=end_time,
+                resources=resources,
+                dictionary=example_input,
+                now=now
+        ).read()
+
+        self.assertEqual(expected_output, result)
 
 
 if __name__ == '__main__':

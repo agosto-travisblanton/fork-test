@@ -36,6 +36,8 @@ def generate_date_range_csv_by_location(start_date, end_date, resources, array_o
     tmp = StringIO.StringIO()
     writer = csv.writer(tmp)
 
+    print array_of_data
+
     writer.writerow(["Creation Date", "Start Date", "End Date", "Content"])
     writer.writerow([str(created_time), str(start_date), str(end_date), ', '.join(resources)])
     writer.writerow(["Content", "Display", "Location", "Play Count"])
@@ -113,6 +115,5 @@ def reformat_program_record_by_location(dictionary):
             "Play Count": len(value),
         }
 
-    print to_return
 
     return to_return
