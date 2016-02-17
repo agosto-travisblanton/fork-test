@@ -130,17 +130,6 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     $log.error errorObject
     sweet.show('Oops...', 'Unable to save the device notes.', 'error')
 
-  @onClickSaveGeoLocation = () ->
-    ProgressBarService.start()
-    @setPanelInfo()
-    promise = DevicesService.save @currentDevice
-    promise.then @onSuccessDeviceSave, @onFailureGeoLocation
-
-  @onFailureGeoLocation = (errorObject) ->
-    ProgressBarService.complete()
-    $log.error errorObject
-    sweet.show('Oops...', 'Unable to save the geo location.', 'error')
-
   @onClickResetSendButton = () ->
     if @editMode
       ProgressBarService.start()

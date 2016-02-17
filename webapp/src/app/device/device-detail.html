@@ -278,47 +278,6 @@
             <md-card>
               <md-card-title>
                 <md-card-title-text>
-                  <span class="md-headline">Geo location</span>
-                </md-card-title-text>
-              </md-card-title>
-              <md-card-content>
-                <form name="geoLocationForm"
-                      class="form-horizontal"
-                      ng-submit="deviceDetailsCtrl.onClickSaveGeoLocation()"
-                      novalidate>
-                  <div class="form-group">
-                    <div class="col-sm-4">
-                      <label>Latitude</label>
-                      <input type="number"
-                             max="90"
-                             min="-90"
-                             class="form-control"
-                             name="latitude"
-                             ng-model="deviceDetailsCtrl.currentDevice.latitude">
-                    </div>
-                    <div class="col-sm-4">
-                      <label>Longitude</label>
-                      <input type="number"
-                             max="180"
-                             min="-180"
-                             class="form-control"
-                             name="longitude"
-                             ng-model="deviceDetailsCtrl.currentDevice.longitude">
-                    </div>
-                  </div>
-                  <md-card-actions layout="row" layout-align="end center">
-                    <md-button type="submit"
-                               ng-disabled="!geoLocationForm.$dirty || geoLocationForm.$invalid">
-                      <i class="fa fa-fw fa-save"></i>
-                      Save
-                    </md-button>
-                  </md-card-actions>
-                </form>
-              </md-card-content>
-            </md-card>
-            <md-card>
-              <md-card-title>
-                <md-card-title-text>
                   <span class="md-headline">Serial control</span>
                 </md-card-title-text>
               </md-card-title>
