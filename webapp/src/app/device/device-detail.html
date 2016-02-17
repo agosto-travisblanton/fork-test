@@ -406,21 +406,23 @@
                         <th>Memory</th>
                         <th>Storage</th>
                         <th>Program</th>
-                        <th>Created</th>
+                        <th>Event created</th>
+                        <th>Last updated</th>
                         <th></th>
                       </tr>
                       </thead>
                       <tbody>
                       <tr ng-hide="deviceDetailsCtrl.issues.length">
-                        <td class="text-center text-warning" colspan="7">No issues for this device</td>
+                        <td class="text-center text-warning" colspan="8">No issues in this date range</td>
                       </tr>
-                      <tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:['-level','-updated']">
+                      <tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:['-updated']">
                         <td class="issue-{{ item.level_descriptor}}-background"></td>
                         <td>{{ item.category }}</td>
                         <td>{{ item.memory_utilization }}%</td>
                         <td>{{ item.storage_utilization }}%</td>
                         <td>{{ item.program }}</td>
                         <td>{{ item.created }}</td>
+                        <td>{{ item.updated }}</td>
                         <td class="issue-{{ item.level_descriptor}}-text">
                           <i ng-class="item.level==1? 'fa fa-fw fa-warning' :
                           item.level==0? 'fa fa-fw fa-check-circle': 'fa fa-fw fa-ambulance'"></i>
