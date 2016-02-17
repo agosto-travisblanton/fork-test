@@ -7,9 +7,10 @@ appModule.controller "ProofOfPlayCtrl", (ProofPlayService) ->
   @chosen_tenant = null
   @tenants = null
 
-  ProofPlayService.getAllTenants()
-  .then (data) =>
-    @tenants = data.data.tenants
+  @initialize = () ->
+    ProofPlayService.getAllTenants()
+    .then (data) =>
+      @tenants = data.data.tenants
 
 
 

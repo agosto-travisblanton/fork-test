@@ -55,7 +55,8 @@ angular.module('skykitProvisioning')
       for each in resources
         allResources = allResources + "-" + each
 
-      $window.open(@uriBase + '/multi_resource_by_date/' + start_date + '/' + end_date + '/' + allResources + '/' + @chosenTenant + "/" + $cookies.get('currentDistributorKey')
+      $window.open(@uriBase + '/multi_resource_by_date/' + start_date + '/' + end_date + '/' + allResources + '/' +
+          @chosenTenant + "/" + $cookies.get('currentDistributorKey')
 
       , '_blank')
       return true
@@ -67,7 +68,8 @@ angular.module('skykitProvisioning')
       for each in resources
         allResources = allResources + "-" + each
 
-      $window.open(@uriBase + '/multi_resource_by_device/' + start_date + '/' + end_date + '/' + allResources + '/' + @chosenTenant + "/" + $cookies.get('currentDistributorKey')
+      $window.open(@uriBase + '/multi_resource_by_device/' + start_date + '/' + end_date + '/' + allResources + '/' +
+          @chosenTenant + "/" + $cookies.get('currentDistributorKey')
       , '_blank')
       return true
 

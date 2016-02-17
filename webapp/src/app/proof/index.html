@@ -6,11 +6,13 @@
     </md-toolbar>
     <md-content>
         <div class="container">
-            <div ng-if="!vm.chosen_tenant">
+            <div ng-if="!vm.chosen_tenant" ng-init="vm.initialize()">
                 <div ng-hide="vm.tenants">
                     <h3>Loading tenants...</h3>
                 </div>
                 <div ng-show="vm.tenants">
+                    <h3>Please choose a tenant</h3>
+
                     <md-input-container>
                         <label>Tenant</label>
                         <md-select ng-model="vm.which_tenant">

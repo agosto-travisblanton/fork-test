@@ -7,6 +7,7 @@ describe 'ProofPlayService', ->
   $cookies = undefined
   q = undefined
   window = undefined
+  cookie_token = undefined
 
 
   beforeEach module('skykitProvisioning')
@@ -28,37 +29,35 @@ describe 'ProofPlayService', ->
       expect(ProofPlayService.cachedResources).toBeFalsy()
 
   describe 'querying for csvs', ->
+
     beforeEach ->
       spyOn(window, 'open').and.callFake(() ->
         return true
       )
+      cookie_token = 'test'
+      $cookies.put('currentDistributorKey', cookie_token)
 
 
-#    it 'downloads single-resource csv across date range', ->
-#      start_date = 12312
-#      end_date = 234234
-#      resource = "some_resource"
-#      ProofPlayService.downloadCSVForSingleResourceAcrossDateRangeByDate(start_date, end_date, resource)
-#      expect(window.open).toHaveBeenCalled()
-#      expect(window.open).toHaveBeenCalledWith('proofplay/api/v1/one_resource_by_date/' + start_date + '/' + end_date + '/' + resource, '_blank')
+    it 'gets all tenants', ->
+      to_respond = {
+        data: {
+          tenants: ["one", "two"]
+        }
+      }
 
+      $httpBackend.expectGET("proofplay/api/v1/retrieve_my_tenants").respond(to_respond)
 
-#
-#    it 'downloads single-resource csv across date range by location', ->
-#      start_date = 12312
-#      end_date = 234234
-#      resource = "some_resource"
-#      ProofPlayService.downloadCSVForSingleResourceAcrossDateRangeByLocation(start_date, end_date, resource)
-#      expect(window.open).toHaveBeenCalled()
-#      expect(window.open).toHaveBeenCalledWith('proofplay/api/v1/one_resource_by_device/' + start_date + '/' + end_date + '/' + resource, '_blank')
+      ProofPlayService.getAllTenants()
+      .then (data) ->
+        expect(angular.equals(data.data.tenants, to_respond.data.tenants))
+
+      $httpBackend.flush()
 
     it 'sets tenant and downloads multi-resource csv across date range', ->
       start_date = 12312
       end_date = 234234
-      cookie_token = 'test'
       resources = ["some_resource", "another"]
       tenants = ["one_tenant", "two_tenant"]
-      $cookies.put('currentDistributorKey', cookie_token)
       ProofPlayService.setTenant(tenants[0])
       ProofPlayService.downloadCSVForMultipleResourcesByDate(start_date, end_date, resources)
       expect(window.open).toHaveBeenCalled()
@@ -71,15 +70,11 @@ describe 'ProofPlayService', ->
       expect(window.open).toHaveBeenCalledWith('proofplay/api/v1/multi_resource_by_date/' + start_date + '/' + end_date + '/' + allResources + "/" + tenants[0] + "/" + cookie_token, '_blank')
 
 
-
-
     it 'sets tenant and downloads multi-resource csv across device', ->
       start_date = 12312
       end_date = 234234
-      cookie_token = 'test'
       resources = ["some_resource", "another"]
       tenants = ["one_tenant", "two_tenant"]
-      $cookies.put('currentDistributorKey', cookie_token)
       ProofPlayService.setTenant(tenants[0])
       ProofPlayService.downloadCSVForMultipleResourcesByDevice(start_date, end_date, resources)
       expect(window.open).toHaveBeenCalled()
