@@ -14,6 +14,19 @@ class GetTenants(RequestHandler):
         self.response.out.write(json_final)
 
 
+class RetrieveAllDevicesOfTenant(RequestHandler):
+    def get(self, tenant):
+        tenants = get_tenant_names_for_distributor(self.request.headers.get('X-Provisioning-Distributor'))
+        if tenant not in tenants:
+            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+            self.abort(403)
+
+        devices = retrieve_all_devices_of_tenant(tenant)
+        final = json.dumps({"devices": devices})
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(final)
+
+
 class RetrieveAllResourcesOfTenant(RequestHandler):
     def get(self, tenant):
         tenants = get_tenant_names_for_distributor(self.request.headers.get('X-Provisioning-Distributor'))

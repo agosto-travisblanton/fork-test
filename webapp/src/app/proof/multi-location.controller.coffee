@@ -5,7 +5,7 @@ appModule = angular.module 'skykitProvisioning'
 appModule.controller "ProofOfPlayMultiLocationCtrl", (ProofPlayService) ->
   @radioButtonChoices = {
     group1: 'By Device',
-    group2: 'By Summarized',
+    group2: 'Summarized',
     selection: null
   }
 
