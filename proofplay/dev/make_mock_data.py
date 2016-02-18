@@ -51,15 +51,15 @@ def create_data_to_send(started_at, ended_at):
     device_choice = random.choice(gamestop_stores_dict[gamestop_store]["devices"])
 
     return {
-        'resource_name': resource_choice["name"],
-        'resource_id': resource_choice["id"],
-        'device_key': device_choice["device_key"],
-        'serial_number': device_choice["serial_number"],
-        'customer_location_code': gamestop_store,
-        'customer_display_code': device_choice["customer_display_code"],
+        'resource_name': resource_choice["name"],  # string
+        'resource_id': resource_choice["id"],  # string
+        'device_key': device_choice["device_key"],  # string
+        'serial_number': device_choice["serial_number"],  # string
+        'customer_location_code': gamestop_store,  # string
+        'customer_display_code': device_choice["customer_display_code"],  # string
         'started_at': started_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
         'ended_at': ended_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-        'tenant_code': gamestop_stores_dict[gamestop_store]["tenant_code"]
+        'tenant_code': gamestop_stores_dict[gamestop_store]["tenant_code"]  # string
     }
 
 
@@ -71,8 +71,9 @@ def generate_mock_data(to_send):
 
 
 def make_one_days_worth_of_data(amount_a_day, started_at):
-    to_return = {}
-    to_return["data"] = []
+    to_return = {
+        "data": []
+    }
 
     for item in xrange(1, amount_a_day):
         ended_at = started_at + datetime.timedelta(minutes=10)
@@ -85,7 +86,11 @@ def make_one_days_worth_of_data(amount_a_day, started_at):
 def queue_up_mock_data(day_amount, amount_a_day):
     for each in reversed(xrange(1, day_amount)):
         started_at = datetime.datetime.now() - datetime.timedelta(days=each)
-        generate_mock_data(make_one_days_worth_of_data(amount_a_day, started_at))
+
+        if random.randint(1, 7) == 5:
+            pass
+        else:
+            generate_mock_data(make_one_days_worth_of_data(amount_a_day, started_at))
 
 
 def run():

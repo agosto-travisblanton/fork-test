@@ -60,7 +60,7 @@ angular.module('skykitProvisioning')
 
 
     downloadCSVForMultipleResourcesByDate: (start_date, end_date, resources) ->
-      allResources = []
+      allResources = ''
 
       for each in resources
         allResources = allResources + "-" + each
@@ -73,12 +73,25 @@ angular.module('skykitProvisioning')
 
 
     downloadCSVForMultipleResourcesByDevice: (start_date, end_date, resources) ->
-      allResources = []
+      allResources = ''
 
       for each in resources
         allResources = allResources + "-" + each
 
       $window.open(@uriBase + '/multi_resource_by_device/' + start_date + '/' + end_date + '/' + allResources + '/' +
+          @chosenTenant + "/" + $cookies.get('currentDistributorKey')
+      , '_blank')
+      return true
+
+
+
+    downloadCSVForMultipleDevicesSummarized: (start_date, end_date, devices) ->
+      alldevices = ''
+
+      for each in devices
+        alldevices = alldevices + "-" + each
+
+      $window.open(@uriBase + '/multi_device_summarized/' + start_date + '/' + end_date + '/' + alldevices + '/' +
           @chosenTenant + "/" + $cookies.get('currentDistributorKey')
       , '_blank')
       return true

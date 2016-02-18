@@ -66,7 +66,20 @@ def generate_date_range_csv_by_date(start_date, end_date, resources, dictionary,
     return tmp
 
 
-def format_program_record_data_with_array_of_resources(incoming_array):
+def ensure_dictionary_has_keys_through_date_range(start_date, end_date, dictionary):
+    while start_date <= end_date:
+        if str(start_date) not in dictionary:
+            dictionary[str(start_date)] = {
+                "PlayerCount": 0,
+                "LocationCount": 0,
+                "PlayCount": 0
+            }
+        start_date += datetime.timedelta(days=1)
+
+    return OrderedDict(sorted(dictionary.items(), key=lambda t: t))
+
+
+def format_program_record_data_with_array_of_resources(start_date, end_date, incoming_array):
     to_return = {}
 
     for item in incoming_array:
@@ -78,6 +91,12 @@ def format_program_record_data_with_array_of_resources(incoming_array):
             to_return[item["resource"]][key]["LocationCount"] = calculate_location_count(value)
             to_return[item["resource"]][key]["PlayerCount"] = calculate_serial_count(value)
             to_return[item["resource"]][key]["PlayCount"] = len(value)
+
+        to_return[item["resource"]] = ensure_dictionary_has_keys_through_date_range(
+                start_date,
+                end_date,
+                to_return[item["resource"]]
+        )
 
     return to_return
 

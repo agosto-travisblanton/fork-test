@@ -149,7 +149,9 @@ class MultiResourceByDate(RequestHandler):
                 )
             } for resource in all_the_resources_final]
 
-        formatted_data = format_program_record_data_with_array_of_resources(pre_formatted_program_record_by_date)
+        formatted_data = format_program_record_data_with_array_of_resources(midnight_start_day,
+                                                                            just_before_next_day_end_date,
+                                                                            pre_formatted_program_record_by_date)
 
         csv_to_publish = generate_date_range_csv_by_date(
                 midnight_start_day,
@@ -219,11 +221,9 @@ class MultiDeviceSummarized(RequestHandler):
 
 
 def handle_posting_a_new_program_play(incoming_data):
-
     for each_log in incoming_data["data"]:
         logging.info("INCOMING JSON ARRAY")
         logging.info(each_log)
-
         try:
             raw_event_id = insert_raw_program_play_event_data(each_log)
             resource_name = each_log["resource_name"]
@@ -257,12 +257,7 @@ def handle_posting_a_new_program_play(incoming_data):
             )
 
             insert_new_program_record(
-                    location_id,
-                    device_id,
-                    resource_id,
-                    started_at,
-                    ended_at
-            )
+                    location_id, device_id, resource_id, started_at, ended_at)
 
             mark_raw_event_complete(raw_event_id)
 
