@@ -3,7 +3,10 @@
 appModule = angular.module 'skykitProvisioning'
 
 appModule.controller "ProofOfPlayCtrl", (ProofPlayService) ->
-  @resource = {title: "Resource"}
+  @resource = {title: "Resource Report"}
+  @location = {title: "Location Report"}
+  @display = {title: "Display Report"}
+
   @chosen_tenant = null
   @tenants = null
 

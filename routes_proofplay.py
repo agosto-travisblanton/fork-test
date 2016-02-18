@@ -48,6 +48,11 @@ application = WSGIApplication(
                     name="RetrieveAllResources"
             ),
             Route(
+                    r'/proofplay/api/v1/retrieve_all_displays/<tenant>',
+                    handler="proofplay.main.RetrieveAllDevicesOfTenant",
+                    name="RetrieveAllDevicesOfTenant"
+            ),
+            Route(
                     r'/proofplay/api/v1/retrieve_my_tenants',
                     handler="proofplay.main.GetTenants",
                     name="GetTenants"
