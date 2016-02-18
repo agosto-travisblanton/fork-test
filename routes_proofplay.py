@@ -39,6 +39,12 @@ application = WSGIApplication(
                     name="MultiResourceByDevice"
             ),
 
+            Route(
+                    r'/proofplay/api/v1/multi_device_summarized/<start_date>/<end_date>/<devices>/<tenant>/<distributor_key>',
+                    handler="proofplay.main.MultiDeviceSummarized",
+                    name="MultiDeviceSummarized"
+            ),
+
             ################################################################
             # REST DATA FOR UI
             ################################################################

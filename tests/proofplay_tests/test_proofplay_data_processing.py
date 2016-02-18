@@ -11,7 +11,7 @@ from proofplay.data_processing import (calculate_location_count, calculate_seria
                                        reformat_program_record_by_location,
                                        generate_date_range_csv_by_date,
                                        format_program_record_data_with_array_of_resources,
-                                       transform_resource_data_between_date_range_by_location,
+                                       transform_resource_data_between_date_range_by_location_to_dict_by_device,
                                        transform_resource_data_between_date_ranges_by_date,
                                        generate_date_range_csv_by_location)
 
@@ -50,7 +50,7 @@ class TestDataProcessing(BaseTest):
             5: [{"device_id": 5, "some_info": "xyz"}]
         }
 
-        results = transform_resource_data_between_date_range_by_location(example_input)
+        results = transform_resource_data_between_date_range_by_location_to_dict_by_device(example_input)
 
         self.assertEqual(expected_result, results)
 

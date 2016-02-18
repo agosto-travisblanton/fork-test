@@ -12,6 +12,7 @@ class GetTenants(RequestHandler):
         if not distributor:
             self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
             self.abort(403)
+
         tenants = get_tenant_names_for_distributor(distributor)
         json_final = json.dumps({"tenants": tenants})
         self.response.headers['Content-Type'] = 'application/json'
@@ -156,6 +157,60 @@ class MultiResourceByDate(RequestHandler):
                 all_the_resources_final,
                 formatted_data,
                 now
+        )
+
+        self.response.headers['Content-Type'] = 'application/csv'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=multi-resource-by-date.csv'
+        self.response.write(bytes(csv_to_publish.getvalue()))
+
+
+class MultiDeviceSummarized(RequestHandler):
+    def get(self, start_date, end_date, devices, tenant, distributor_key):
+
+        if tenant not in get_tenant_names_for_distributor(distributor_key):
+            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+            self.abort(403)
+
+        ###########################################################
+        # SETUP VARIABLES
+        ###########################################################
+        start_date = datetime.datetime.fromtimestamp(int(start_date))
+        end_date = datetime.datetime.fromtimestamp(int(end_date))
+        if end_date < start_date:
+            self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
+
+        midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
+        midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
+        just_before_next_day_end_date = (midnight_end_day + datetime.timedelta(days=1)) - datetime.timedelta(
+                seconds=1
+        )
+
+        all_the_devices = devices.split('-')
+        all_the_devices_final = all_the_devices[1:]
+        now = datetime.datetime.now()
+
+        ###########################################################
+
+        raw_program_data_for_all_devices = [
+            {
+                "device": device,
+                # program_record is the transformed program record table data
+                "raw_data": get_raw_program_data_by_device(
+                        midnight_start_day,
+                        just_before_next_day_end_date,
+                        device,
+                        tenant
+                )
+            } for device in all_the_devices_final]
+
+        formatted_data = format_raw_program_data_for_all_devices(raw_program_data_for_all_devices)
+
+        csv_to_publish = generate_summarized_csv_by_device(
+                start_date=midnight_start_day,
+                end_date=just_before_next_day_end_date,
+                displays=all_the_devices_final,
+                array_of_data=formatted_data,
+                created_time=now
         )
 
         self.response.headers['Content-Type'] = 'application/csv'

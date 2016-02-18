@@ -1,6 +1,6 @@
 from proofplay_models import Resource, ProgramRecord, Location, Device, ProgramPlayEvent
 from db import Session
-from data_processing import transform_resource_data_between_date_range_by_location, \
+from data_processing import transform_resource_data_between_date_range_by_location_to_dict_by_device, \
     transform_resource_data_between_date_ranges_by_date
 import datetime
 from models import Domain, Tenant, TenantEntityGroup
@@ -140,7 +140,7 @@ def insert_new_device_or_get_existing(location_id, serial_number, device_key, cu
 
 def program_record_for_resource_by_location(start_date, end_date, resource, tenant_code):
     from_db = get_raw_program_record_data(start_date, end_date, resource, tenant_code)
-    all_results = transform_resource_data_between_date_range_by_location(from_db)
+    all_results = transform_resource_data_between_date_range_by_location_to_dict_by_device(from_db)
     return all_results
 
 
@@ -175,6 +175,39 @@ def get_raw_program_record_data(start_date, end_date, resource, tenant_code):
     session.close()
     return from_db
 
+
+####################################################################################
+
+def get_raw_program_data_by_device(start_date, end_date, customer_display_code, tenant_code):
+    session = Session()
+    device_id = session.query(Device).filter_by(customer_display_code=customer_display_code).first().id
+
+    rows = session.query(ProgramRecord) \
+        .filter(
+            ProgramRecord.ended_at.between(start_date, end_date)) \
+        .filter(
+            ProgramRecord.device_id == device_id) \
+        .filter(
+            ProgramRecord.full_device.has(tenant_code=tenant_code)).all()
+
+    from_db = []
+
+    for program_record in rows:
+        d = {
+            "location_id": program_record.full_location.customer_location_code,
+            "device_id": program_record.full_device.serial_number,
+            "resource_id": program_record.full_resource.resource_name,
+            "started_at": program_record.started_at,
+            "ended_at": program_record.ended_at
+        }
+
+        from_db.append(d)
+
+    session.close()
+    return from_db
+
+
+####################################################################################
 
 def get_tenant_list_from_distributor_key(distributor_key):
     distributor = ndb.Key(urlsafe=distributor_key)
