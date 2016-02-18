@@ -40,6 +40,16 @@ angular.module('skykitProvisioning')
       deferred.promise
 
 
+    getAllDisplays: () ->
+      distributorKey = $cookies.get('currentDistributorKey')
+      $http.get(@uriBase + '/retrieve_all_displays/' + @chosenTenant,
+        headers: {
+          'X-Provisioning-Distributor': distributorKey
+        }
+      )
+
+
+
     getAllTenants: () ->
       distributorKey = $cookies.get('currentDistributorKey')
       $http.get(@uriBase + '/retrieve_my_tenants',
