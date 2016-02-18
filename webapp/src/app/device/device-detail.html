@@ -372,7 +372,9 @@
                       </thead>
                       <tbody>
                       <tr ng-hide="deviceDetailsCtrl.issues.length">
-                        <td class="text-center text-warning" colspan="8">No issues in this date range</td>
+                        <td class="text-center text-warning" colspan="8">
+                          No vitals logged in the past {{deviceDetailsCtrl.dayRange}} days.<br>
+                          Please try an earlier 'From date' above.</td>
                       </tr>
                       <tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:['-updated']">
                         <td class="issue-{{ item.level_descriptor}}-background"></td>
