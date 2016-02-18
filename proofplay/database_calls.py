@@ -8,7 +8,14 @@ from google.appengine.ext import ndb
 
 
 def get_tenant_names_for_distributor(distributor_key):
-    return [result.name for result in get_tenant_list_from_distributor_key(distributor_key)]
+    return [result.tenant_code for result in get_tenant_list_from_distributor_key(distributor_key)]
+
+
+def retrieve_all_devices_of_tenant(tenant):
+    session = Session()
+    search = session.query(Device).filter(Device.tenant_code == tenant).all()
+    session.close()
+    return [device.customer_display_code for device in search]
 
 
 def retrieve_all_resources_of_tenant(tenant):
@@ -150,7 +157,7 @@ def get_raw_program_record_data(start_date, end_date, resource, tenant_code):
     rows = session.query(ProgramRecord).filter(
             ProgramRecord.ended_at.between(start_date, end_date)).filter(
             ProgramRecord.resource_id == resource_id).filter(
-        ProgramRecord.full_device.has(tenant_code=tenant_code)).all()
+            ProgramRecord.full_device.has(tenant_code=tenant_code)).all()
 
     from_db = []
 
