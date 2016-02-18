@@ -1,8 +1,8 @@
 import json
 import logging
 import re
-from datetime import datetime
 
+from datetime import datetime
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 from webapp2 import RequestHandler
@@ -366,18 +366,62 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             if sk_player_version:
                 if device.sk_player_version != sk_player_version:
                     device.sk_player_version = sk_player_version
+                    new_log_entry = DeviceIssueLog.create(device_key=device.key,
+                                                          category=config.DEVICE_ISSUE_PLAYER_VERSION_CHANGE,
+                                                          up=True,
+                                                          storage_utilization=storage,
+                                                          memory_utilization=memory,
+                                                          program=program,
+                                                          program_id=program_id,
+                                                          last_error=last_error,
+                                                          resolved=True,
+                                                          resolved_datetime=datetime.utcnow())
+                    new_log_entry.put()
             os = request_json.get('os')
             if os:
                 if device.os != os:
                     device.os = os
+                    new_log_entry = DeviceIssueLog.create(device_key=device.key,
+                                                          category=config.DEVICE_ISSUE_OS_CHANGE,
+                                                          up=True,
+                                                          storage_utilization=storage,
+                                                          memory_utilization=memory,
+                                                          program=program,
+                                                          program_id=program_id,
+                                                          last_error=last_error,
+                                                          resolved=True,
+                                                          resolved_datetime=datetime.utcnow())
+                    new_log_entry.put()
             os_version = request_json.get('osVersion')
             if os_version:
                 if device.os_version != os_version:
                     device.os_version = os_version
+                    new_log_entry = DeviceIssueLog.create(device_key=device.key,
+                                                          category=config.DEVICE_ISSUE_OS_VERSION_CHANGE,
+                                                          up=True,
+                                                          storage_utilization=storage,
+                                                          memory_utilization=memory,
+                                                          program=program,
+                                                          program_id=program_id,
+                                                          last_error=last_error,
+                                                          resolved=True,
+                                                          resolved_datetime=datetime.utcnow())
+                    new_log_entry.put()
             timezone = request_json.get('timezone')
             if timezone:
                 if device.time_zone != timezone:
                     device.time_zone = timezone
+                    new_log_entry = DeviceIssueLog.create(device_key=device.key,
+                                                          category=config.DEVICE_ISSUE_TIMEZONE_CHANGE,
+                                                          up=True,
+                                                          storage_utilization=storage,
+                                                          memory_utilization=memory,
+                                                          program=program,
+                                                          program_id=program_id,
+                                                          last_error=last_error,
+                                                          resolved=True,
+                                                          resolved_datetime=datetime.utcnow())
+                    new_log_entry.put()
             resolved_datetime = datetime.utcnow()
             previously_down = device.up is False
             if previously_down:
@@ -421,7 +465,15 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                       resolved=True,
                                                       resolved_datetime=resolved_datetime)
                 new_log_entry.put()
-
+            if DeviceIssueLog.device_not_reported(device_key=device.key):
+                new_log_entry = DeviceIssueLog.create(device_key=device.key,
+                                                      category=config.DEVICE_ISSUE_FIRST_HEARTBEAT,
+                                                      up=True,
+                                                      storage_utilization=storage,
+                                                      memory_utilization=memory,
+                                                      resolved=True,
+                                                      resolved_datetime=resolved_datetime)
+                new_log_entry.put()
             device.up = True
             device.heartbeat_updated = datetime.utcnow()
             device.put()

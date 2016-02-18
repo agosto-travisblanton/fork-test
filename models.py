@@ -426,6 +426,11 @@ class DeviceIssueLog(ndb.Model):
         return None == issues
 
     @classmethod
+    def device_not_reported(cls, device_key):
+        issues = DeviceIssueLog.query(DeviceIssueLog.device_key == device_key).get(keys_only=True)
+        return None == issues
+
+    @classmethod
     def get_all_by_device_key(cls, device_key):
         return DeviceIssueLog.query(DeviceIssueLog.device_key == device_key).fetch()
 
@@ -456,6 +461,28 @@ class DeviceIssueLog(ndb.Model):
                                       ndb.AND(DeviceIssueLog.resolved == False),
                                       ndb.AND(DeviceIssueLog.resolved_datetime == None)).get(keys_only=True)
         return False if issues is None else True
+
+    @staticmethod
+    def _resolve_device_issue(device_key, category, resolved_datetime):
+        issues = DeviceIssueLog.query(DeviceIssueLog.device_key == device_key,
+                                      ndb.AND(DeviceIssueLog.device_key == device_key),
+                                      ndb.AND(DeviceIssueLog.category == category),
+                                      ndb.AND(DeviceIssueLog.resolved == False),
+                                      ndb.AND(DeviceIssueLog.resolved_datetime == None)).fetch()
+        for issue in issues:
+            issue.up = True
+            issue.resolved = True
+            if category in [config.DEVICE_ISSUE_MEMORY_HIGH, config.DEVICE_ISSUE_STORAGE_LOW]:
+                issue.level = IssueLevel.Warning
+                issue.level_descriptor = IssueLevel.stringify(IssueLevel.Warning)
+            elif category in [config.DEVICE_ISSUE_PLAYER_DOWN]:
+                issue.level = IssueLevel.Danger
+                issue.level_descriptor = IssueLevel.stringify(IssueLevel.Danger)
+            else:
+                issue.level = IssueLevel.Normal
+                issue.level_descriptor = IssueLevel.stringify(IssueLevel.Normal)
+            issue.resolved_datetime = resolved_datetime
+            issue.put()
 
     @staticmethod
     def _resolve_device_issue(device_key, category, resolved_datetime):
