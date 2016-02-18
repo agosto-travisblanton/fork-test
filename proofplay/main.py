@@ -8,7 +8,11 @@ from google.appengine.ext import deferred
 
 class GetTenants(RequestHandler):
     def get(self):
-        tenants = get_tenant_names_for_distributor(self.request.headers.get('X-Provisioning-Distributor'))
+        distributor = self.request.headers.get('X-Provisioning-Distributor')
+        if not distributor:
+            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+            self.abort(403)
+        tenants = get_tenant_names_for_distributor(distributor)
         json_final = json.dumps({"tenants": tenants})
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json_final)
