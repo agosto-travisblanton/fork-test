@@ -17,6 +17,7 @@ application = WSGIApplication(
                     handler='handlers.warmup.StartHandler',
                     name='proof-of-play-start',
             ),
+            
             ################################################################
             # POST NEW CONTENT
             ################################################################
@@ -25,6 +26,7 @@ application = WSGIApplication(
                     handler="proofplay.main.PostNewProgramPlay",
                     name="PostNewProgramPlay"
             ),
+
             ################################################################
             # RUN QUERIES
             ################################################################

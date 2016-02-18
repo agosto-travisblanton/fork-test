@@ -11,15 +11,34 @@ resource_choices = [
     {"name": "GSAD_4334", "id": "1004"}
 ]
 
-first_random_numb = random.randint(0, 3)
 gamestop_stores_dict = {
-    "6034": {
+    "1001": {
         "devices": [
-            {"serial_number": "F5MSCX001000", "device_key": "838383", "customer_display_code": "my-device-1"},
-            {"serial_number": "F5MSCX001001", "device_key": "4848484", "customer_display_code": "my-device-2"},
-            {"serial_number": "F5MSCX001002", "device_key": "3838383", "customer_display_code": "my-device-3"}
+            {"serial_number": "F5MSCX001000", "device_key": "100", "customer_display_code": "my-device-1"},
+            {"serial_number": "F5MSCX001001", "device_key": "101", "customer_display_code": "my-device-2"},
+            {"serial_number": "F5MSCX001002", "device_key": "102", "customer_display_code": "my-device-3"}
         ],
-        "customer_location_code": "my-6034-location",
+        "customer_location_code": "my-1001-location",
+        "tenant_code": "gamestop",
+        "resources": resource_choices
+    },
+    "2001": {
+        "devices": [
+            {"serial_number": "F5MSCX002000", "device_key": "200", "customer_display_code": "my-device-4"},
+            {"serial_number": "F5MSCX002001", "device_key": "201", "customer_display_code": "my-device-5"},
+            {"serial_number": "F5MSCX002003", "device_key": "202", "customer_display_code": "my-device-6"}
+        ],
+        "customer_location_code": "my-2004-location",
+        "tenant_code": "gamestop",
+        "resources": resource_choices
+    },
+    "3001": {
+        "devices": [
+            {"serial_number": "F5MSCX003000", "device_key": "300", "customer_display_code": "my-device-7"},
+            {"serial_number": "F5MSCX003001", "device_key": "301", "customer_display_code": "my-device-8"},
+            {"serial_number": "F5MSCX003003", "device_key": "302", "customer_display_code": "my-device-9"}
+        ],
+        "customer_location_code": "my-3001-location",
         "tenant_code": "gamestop",
         "resources": resource_choices
     }
@@ -30,13 +49,14 @@ def create_data_to_send(started_at, ended_at):
     gamestop_store = random.choice(gamestop_stores_dict.keys())
     resource_choice = random.choice(gamestop_stores_dict[gamestop_store]["resources"])
     device_choice = random.choice(gamestop_stores_dict[gamestop_store]["devices"])
+
     return {
         'resource_name': resource_choice["name"],
         'resource_id': resource_choice["id"],
         'device_key': device_choice["device_key"],
         'serial_number': device_choice["serial_number"],
         'customer_location_code': gamestop_store,
-        'customer_display_code': gamestop_stores_dict[gamestop_store]["customer_location_code"],
+        'customer_display_code': device_choice["customer_display_code"],
         'started_at': started_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
         'ended_at': ended_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
         'tenant_code': gamestop_stores_dict[gamestop_store]["tenant_code"]

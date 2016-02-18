@@ -219,9 +219,11 @@ class MultiDeviceSummarized(RequestHandler):
 
 
 def handle_posting_a_new_program_play(incoming_data):
+
     for each_log in incoming_data["data"]:
         logging.info("INCOMING JSON ARRAY")
         logging.info(each_log)
+
         try:
             raw_event_id = insert_raw_program_play_event_data(each_log)
             resource_name = each_log["resource_name"]
@@ -240,10 +242,28 @@ def handle_posting_a_new_program_play(incoming_data):
             else:
                 location_id = None
 
-            resource_id = insert_new_resource_or_get_existing(resource_name, resource_id, tenant_code)
-            device_id = insert_new_device_or_get_existing(location_id, serial_number, device_key, customer_display_code,
-                                                          tenant_code)
-            insert_new_program_record(location_id, device_id, resource_id, started_at, ended_at)
+            resource_id = insert_new_resource_or_get_existing(
+                    resource_name,
+                    resource_id,
+                    tenant_code
+            )
+
+            device_id = insert_new_device_or_get_existing(
+                    location_id,
+                    serial_number,
+                    device_key,
+                    customer_display_code,
+                    tenant_code
+            )
+
+            insert_new_program_record(
+                    location_id,
+                    device_id,
+                    resource_id,
+                    started_at,
+                    ended_at
+            )
+
             mark_raw_event_complete(raw_event_id)
 
         except KeyError:

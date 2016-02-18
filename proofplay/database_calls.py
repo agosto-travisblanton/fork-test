@@ -13,9 +13,9 @@ def get_tenant_names_for_distributor(distributor_key):
 
 def retrieve_all_devices_of_tenant(tenant):
     session = Session()
-    search = session.query(Device).filter(Device.tenant_code == tenant).all()
+    search = session.query(Device.customer_display_code.distinct().label("customer_display_code"))
     session.close()
-    return [device.customer_display_code for device in search]
+    return [row.customer_display_code for row in search.all()]
 
 
 def retrieve_all_resources_of_tenant(tenant):
