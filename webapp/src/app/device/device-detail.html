@@ -12,7 +12,7 @@
           <a href="/#/tenants/{{deviceDetailsCtrl.tenantKey}}">
             <i class="fa fa-fw fa-backward"></i> Back to tenant</a>
         </md-button>
-        <md-button ngclipboard data-clipboard-target="#copy-ready-device-key">
+        <md-button ngclipboard data-clipboard-target=".copy-ready-device-key">
           <i class="fa fa-fw fa-clipboard"></i> Copy device key</a>
         </md-button>
       </md-card-actions>
@@ -97,12 +97,6 @@
                     <label>Device ID</label>
                     <div>
                       {{deviceDetailsCtrl.currentDevice.deviceId}}
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label>Device key</label>
-                    <div class="crop-long-device-key"
-                         id="copy-ready-device-key">{{deviceDetailsCtrl.currentDevice.key}}
                     </div>
                   </div>
                   <div class="form-group"
@@ -671,5 +665,9 @@
           </md-content>
         </md-tab>
       </md-tabs>
+    </div>
   </md-content>
+  <div class="copy-ready-device-key">
+    {{deviceDetailsCtrl.currentDevice.key}}
+  </div>
 </div>
