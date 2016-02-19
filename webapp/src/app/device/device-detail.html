@@ -162,7 +162,7 @@
                 <div class="form-group"
                      ng-hide="deviceDetailsCtrl.currentDevice.ethernetMacAddress == None ||
                        deviceDetailsCtrl.currentDevice.ethernetMacAddress == ''">
-                  <label>MAC Ethernet</label>
+                  <label>Ethernet MAC</label>
                   <div>
                     {{deviceDetailsCtrl.currentDevice.ethernetMacAddress}}
                   </div>
@@ -278,47 +278,6 @@
             <md-card>
               <md-card-title>
                 <md-card-title-text>
-                  <span class="md-headline">Geo location</span>
-                </md-card-title-text>
-              </md-card-title>
-              <md-card-content>
-                <form name="geoLocationForm"
-                      class="form-horizontal"
-                      ng-submit="deviceDetailsCtrl.onClickSaveGeoLocation()"
-                      novalidate>
-                  <div class="form-group">
-                    <div class="col-sm-4">
-                      <label>Latitude</label>
-                      <input type="number"
-                             max="90"
-                             min="-90"
-                             class="form-control"
-                             name="latitude"
-                             ng-model="deviceDetailsCtrl.currentDevice.latitude">
-                    </div>
-                    <div class="col-sm-4">
-                      <label>Longitude</label>
-                      <input type="number"
-                             max="180"
-                             min="-180"
-                             class="form-control"
-                             name="longitude"
-                             ng-model="deviceDetailsCtrl.currentDevice.longitude">
-                    </div>
-                  </div>
-                  <md-card-actions layout="row" layout-align="end center">
-                    <md-button type="submit"
-                               ng-disabled="!geoLocationForm.$dirty || geoLocationForm.$invalid">
-                      <i class="fa fa-fw fa-save"></i>
-                      Save
-                    </md-button>
-                  </md-card-actions>
-                </form>
-              </md-card-content>
-            </md-card>
-            <md-card>
-              <md-card-title>
-                <md-card-title-text>
                   <span class="md-headline">Serial control</span>
                 </md-card-title-text>
               </md-card-title>
@@ -361,7 +320,7 @@
           </div>
         </md-content>
       </md-tab>
-      <md-tab label="Vitals">
+      <md-tab label="Events">
         <md-content class="md-padding">
           <div flex="100" flex-sm="100" flex-xs="100" layout="column">
             <md-card>
@@ -406,21 +365,25 @@
                         <th>Memory</th>
                         <th>Storage</th>
                         <th>Program</th>
-                        <th>Created</th>
+                        <th>Event created</th>
+                        <th>Last updated</th>
                         <th></th>
                       </tr>
                       </thead>
                       <tbody>
                       <tr ng-hide="deviceDetailsCtrl.issues.length">
-                        <td class="text-center text-warning" colspan="7">No issues for this device</td>
+                        <td class="text-center text-warning" colspan="8">
+                          No vitals logged in the past {{deviceDetailsCtrl.dayRange}} days.<br>
+                          Please try an earlier 'From date' above.</td>
                       </tr>
-                      <tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:['-level','-updated']">
+                      <tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:['-updated']">
                         <td class="issue-{{ item.level_descriptor}}-background"></td>
                         <td>{{ item.category }}</td>
                         <td>{{ item.memory_utilization }}%</td>
                         <td>{{ item.storage_utilization }}%</td>
                         <td>{{ item.program }}</td>
                         <td>{{ item.created }}</td>
+                        <td>{{ item.updated }}</td>
                         <td class="issue-{{ item.level_descriptor}}-text">
                           <i ng-class="item.level==1? 'fa fa-fw fa-warning' :
                           item.level==0? 'fa fa-fw fa-check-circle': 'fa fa-fw fa-ambulance'"></i>
@@ -448,7 +411,7 @@
                       <tr>
                         <th>Serial number</th>
                         <th>WiFi MAC</th>
-                        <th>Ether MAC</th>
+                        <th>Ethernet MAC</th>
                       </tr>
                       </thead>
                       <tbody>
@@ -471,7 +434,7 @@
                     <md-card>
                       <md-card-title>
                         <md-card-title-text>
-                          <span class="md-headline">Content delete</span>
+                          <span class="md-headline">Clear player cache</span>
                         </md-card-title-text>
                       </md-card-title>
                       <md-card-content>
@@ -480,7 +443,7 @@
                               novalidate>
                           <md-card-actions layout="row" layout-align="end center">
                             <md-button type="submit"><i class="fa fa-fw fa-building"></i>
-                              Send to GCM
+                              Send
                             </md-button>
                           </md-card-actions>
                         </form>
@@ -491,7 +454,7 @@
                     <md-card>
                       <md-card-title>
                         <md-card-title-text>
-                          <span class="md-headline">Reset</span>
+                          <span class="md-headline">Reinitialize player</span>
                         </md-card-title-text>
                       </md-card-title>
                       <md-card-content>
@@ -500,7 +463,7 @@
                               novalidate>
                           <md-card-actions layout="row" layout-align="end center">
                             <md-button type="submit"><i class="fa fa-fw fa-building"></i>
-                              Send to GCM
+                              Send
                             </md-button>
                           </md-card-actions>
                         </form>
@@ -511,7 +474,7 @@
                     <md-card>
                       <md-card-title>
                         <md-card-title-text>
-                          <span class="md-headline">Power on</span>
+                          <span class="md-headline">Panel on</span>
                         </md-card-title-text>
                       </md-card-title>
                       <md-card-content>
@@ -520,7 +483,7 @@
                               novalidate>
                           <md-card-actions layout="row" layout-align="end center">
                             <md-button type="submit"><i class="fa fa-fw fa-building"></i>
-                              Send to GCM
+                              Send
                             </md-button>
                           </md-card-actions>
                         </form>
@@ -531,7 +494,7 @@
                     <md-card>
                       <md-card-title>
                         <md-card-title-text>
-                          <span class="md-headline">Power off</span>
+                          <span class="md-headline">Panel off</span>
                         </md-card-title-text>
                       </md-card-title>
                       <md-card-content>
@@ -540,7 +503,7 @@
                               novalidate>
                           <md-card-actions layout="row" layout-align="end center">
                             <md-button type="submit"><i class="fa fa-fw fa-building"></i>
-                              Send to GCM
+                              Send
                             </md-button>
                           </md-card-actions>
                         </form>
@@ -581,7 +544,7 @@
                             <md-button type="submit"
                                        ng-disabled="!volumeForm.$dirty || volumeForm.$invalid">
                               <i class="fa fa-fw fa-building"></i>
-                              Send to GCM
+                              Send
                             </md-button>
                           </md-card-actions>
                         </form>
@@ -616,7 +579,7 @@
                             <md-button type="submit"
                                        ng-disabled="!customForm.$dirty || customForm.$invalid">
                               <i class="fa fa-fw fa-building"></i>
-                              Send to GCM
+                              Send
                             </md-button>
                           </md-card-actions>
                         </form>

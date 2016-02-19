@@ -68,7 +68,7 @@ class TestMain(SQLBaseTest, WebTest):
         })
 
         response = self.app.get(uri, headers=self.headers)
-        self.assertEqual(200, response.status_code)
+        self.assertEqual(200, response.status_int)
 
     def test_multi_resource_by_date_api(self):
         self.load_tenants()
@@ -93,7 +93,7 @@ class TestMain(SQLBaseTest, WebTest):
             'end_date': end_unix
         })
         response = self.app.get(uri, headers=self.headers)
-        self.assertEqual(200, response.status_code)
+        self.assertEqual(200, response.status_int)
 
     def test_get_all_tenants(self):
         self.load_tenants()

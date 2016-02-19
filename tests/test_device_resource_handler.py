@@ -1173,6 +1173,97 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
         self.assertIsNone(self.managed_device.connection_type)
 
+    def test_put_heartbeat_records_first_heartbeat_for_new_device(self):
+        device = ChromeOsDevice.create_managed(
+            tenant_key=self.tenant_key,
+            gcm_registration_id=self.GCM_REGISTRATION_ID,
+            device_id='1231231',
+            mac_address='2313412341230')
+        device_key = device.put()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        'macAddress': '2313412341230'}
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        log_entry = DeviceIssueLog.query(DeviceIssueLog.device_key == device_key,
+                                         ndb.AND(DeviceIssueLog.category == config.DEVICE_ISSUE_FIRST_HEARTBEAT),
+                                         ndb.AND(DeviceIssueLog.storage_utilization == self.STORAGE_UTILIZATION),
+                                         ndb.AND(DeviceIssueLog.memory_utilization == self.MEMORY_UTILIZATION),
+                                         ndb.AND(DeviceIssueLog.up == True),
+                                         ndb.AND(DeviceIssueLog.resolved == True)
+                                         ).get()
+        self.assertIsNotNone(log_entry)
+        self.assertEqual(log_entry.category, config.DEVICE_ISSUE_FIRST_HEARTBEAT)
+
+    def test_put_heartbeat_records_first_timezone_change(self):
+        device = ChromeOsDevice.create_managed(
+            tenant_key=self.tenant_key,
+            gcm_registration_id=self.GCM_REGISTRATION_ID,
+            device_id='1231231',
+            mac_address='2313412341231')
+        device.time_zone = 'US/Chicago'
+        device_key = device.put()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        'macAddress': '2313412341231',
+                        'timezone': 'US/Arizona'}
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        log_entry = DeviceIssueLog.query(DeviceIssueLog.device_key == device_key,
+                                         ndb.AND(DeviceIssueLog.category == config.DEVICE_ISSUE_TIMEZONE_CHANGE)).get()
+        self.assertIsNotNone(log_entry)
+        self.assertEqual(log_entry.category, config.DEVICE_ISSUE_TIMEZONE_CHANGE)
+
+    def test_put_heartbeat_records_os_change(self):
+        device = ChromeOsDevice.create_managed(
+            tenant_key=self.tenant_key,
+            gcm_registration_id=self.GCM_REGISTRATION_ID,
+            device_id='1231231',
+            mac_address='2313412341239')
+        device.os = 'Windows'
+        device_key = device.put()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        'macAddress': '2313412341239',
+                        'os': 'Linux'}
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        log_entry = DeviceIssueLog.query(DeviceIssueLog.device_key == device_key,
+                                         ndb.AND(DeviceIssueLog.category == config.DEVICE_ISSUE_OS_CHANGE)).get()
+        self.assertIsNotNone(log_entry)
+        self.assertEqual(log_entry.category, config.DEVICE_ISSUE_OS_CHANGE)
+
+    def test_put_heartbeat_records_os_version_change(self):
+        device = ChromeOsDevice.create_managed(
+            tenant_key=self.tenant_key,
+            gcm_registration_id=self.GCM_REGISTRATION_ID,
+            device_id='1231231',
+            mac_address='2313412341233')
+        device.os_version = '8.3'
+        device_key = device.put()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        'macAddress': '2313412341233',
+                        'osVersion': '10.0'}
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        log_entry = DeviceIssueLog.query(DeviceIssueLog.device_key == device_key,
+                                         ndb.AND(DeviceIssueLog.category == config.DEVICE_ISSUE_OS_VERSION_CHANGE)).get()
+        self.assertIsNotNone(log_entry)
+        self.assertEqual(log_entry.category, config.DEVICE_ISSUE_OS_VERSION_CHANGE)
+
     ##################################################################################################################
     ## device issues
     ##################################################################################################################

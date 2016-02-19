@@ -61,6 +61,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     proofOfPlayLogging: false
   }
   @commandEvents = []
+  @dayRange = 30
   @editMode = !!$stateParams.deviceKey
   @issues = []
   @pickerOptions = "{icons:{next:'glyphicon glyphicon-arrow-right',
@@ -84,7 +85,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       now = new Date()
       today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
       @endTime = now.toLocaleString().replace(/,/g, "")
-      today.setDate(now.getDate() - 1)
+      today.setDate(now.getDate() - @dayRange)
       @startTime = today.toLocaleString().replace(/,/g, "")
       @epochStart = moment(new Date(@startTime)).unix()
       @epochEnd = moment(new Date(@endTime)).unix()
@@ -129,17 +130,6 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     ProgressBarService.complete()
     $log.error errorObject
     sweet.show('Oops...', 'Unable to save the device notes.', 'error')
-
-  @onClickSaveGeoLocation = () ->
-    ProgressBarService.start()
-    @setPanelInfo()
-    promise = DevicesService.save @currentDevice
-    promise.then @onSuccessDeviceSave, @onFailureGeoLocation
-
-  @onFailureGeoLocation = (errorObject) ->
-    ProgressBarService.complete()
-    $log.error errorObject
-    sweet.show('Oops...', 'Unable to save the geo location.', 'error')
 
   @onClickResetSendButton = () ->
     if @editMode

@@ -151,7 +151,7 @@ describe 'DeviceDetailsCtrl', ->
         now = new Date()
         today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
         @epochEnd = moment(new Date()).unix()
-        today.setDate(today.getDate() - 1)
+        today.setDate(today.getDate() - 30)
         @epochStart = moment(today).unix()
         controller.initialize()
 
@@ -299,40 +299,6 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'displays a sweet alert', ->
         expect(sweet.show).toHaveBeenCalledWith('Oops...', 'Unable to save the serial control information.', 'error')
-
-      it "the 'then' handler routes navigation back to 'devices'", ->
-        expect($state.go).toHaveBeenCalledWith 'devices'
-
-  describe '.onClickSaveGeoLocation', ->
-    beforeEach ->
-      devicesServicePromise = new skykitProvisioning.q.Mock
-      spyOn(DevicesService, 'save').and.returnValue devicesServicePromise
-      spyOn($state, 'go')
-      $stateParams = {}
-      spyOn(progressBarService, 'start')
-      spyOn(progressBarService, 'complete')
-      controller = $controller 'DeviceDetailsCtrl', serviceInjection
-      controller.currentDevice.panelModel = {id: 'Sony-112'}
-      controller.currentDevice.panelInput = {id: 'son01'}
-      controller.onClickSaveGeoLocation()
-      devicesServicePromise.resolve()
-
-    it 'starts the progress bar', ->
-      expect(progressBarService.start).toHaveBeenCalled()
-
-    it 'call DevicesService.save with the current device', ->
-      expect(DevicesService.save).toHaveBeenCalledWith controller.currentDevice
-
-    describe '.onFailureGeoLocation', ->
-      beforeEach ->
-        spyOn(sweet, 'show')
-        controller.onFailureGeoLocation()
-
-      it 'stops the progress bar', ->
-        expect(progressBarService.complete).toHaveBeenCalled()
-
-      it 'displays a sweet alert', ->
-        expect(sweet.show).toHaveBeenCalledWith('Oops...', 'Unable to save the geo location.', 'error')
 
       it "the 'then' handler routes navigation back to 'devices'", ->
         expect($state.go).toHaveBeenCalledWith 'devices'
