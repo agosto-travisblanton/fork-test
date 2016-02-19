@@ -71,6 +71,15 @@ def generate_resource_csv_by_date(start_date, end_date, resources, dictionary, n
     return tmp
 
 
+def ensure_raw_data_dictionary_has_keys_through_date_range(start_date, end_date, dictionary):
+    while start_date <= end_date:
+        if str(start_date) not in dictionary:
+            dictionary[str(start_date)] = None
+        start_date += datetime.timedelta(days=1)
+
+    return OrderedDict(sorted(dictionary.items(), key=lambda t: t))
+
+
 def ensure_dictionary_has_keys_through_date_range(start_date, end_date, dictionary):
     while start_date <= end_date:
         if str(start_date) not in dictionary:
@@ -140,6 +149,90 @@ def reformat_program_record_array_by_location(dictionary):
     return to_return
 
 
+# def prepare_for_csv_transformed_query_by_device_program_data_to_by_date(
+#         start_date,
+#         end_date,
+#         array_of_devices_with_data
+# ):
+#     """
+#     Returns:
+#     {
+#         "device-id": {
+#                 "12-01-1222": {
+#                     "GSAD_1555": {
+#                         "location": "5003",
+#                         "playcount": 25
+#                     }
+#                 }
+#             }
+#         }
+#     """
+#
+#     to_return = {}
+#
+#     for item in array_of_devices_with_data:
+#         to_return[item["device"]] = {}
+#
+#         item["raw_data"] = ensure_dictionary_has_keys_through_date_range(start_date, end_date, item["raw_data"])
+#
+#         # key = date
+#         for key, value in item["raw_data"].iteritems():
+#             to_return[item["device"]][key] = {}
+#
+#             if value is None:
+#                 to_return[item["device"]][key]["None"] = {
+#                     "location": "None",
+#                     "playcount": "None"
+#                 }
+#
+#             else:
+#                 for each_log in value:
+#                     if each_log["resource_id"] not in to_return[item["device"]]:
+#                     to_return[item["device"]][key][value["resource_id"]] = {}
+#
+#             to_return[item["device"]][value["resource_id"]]["location"] = value["location_id"]
+#             to_return[item["device"]][value["resource_id"]]["playcount"] = len(value)
+#
+#     return to_return
+
+
+def prepare_for_csv_transformed_query_by_device_program_data_to_by_date(start_date, end_date, incoming_array):
+
+    """
+    Returns:
+    {
+        "device-id": {
+                "12-01-1222": {
+                    "GSAD_1555": {
+                        "location": "5003",
+                        "playcount": 25
+                    }
+                }
+            }
+        }
+    """
+
+    to_return = OrderedDict()
+
+    for item in incoming_array:
+        to_return[item["device"]] = OrderedDict()
+        ordered_raw_data = OrderedDict(sorted(item["raw_data"].items(), key=lambda t: t))
+
+        # key = "12-01-1818"
+        for key, value in ordered_raw_data.iteritems():
+            to_return[item["device"]][key] = {}
+
+            for each_log in ordered_raw_data[key]:
+                if each_log["resource_id"] not in to_return[item["device"]][key]:
+                    to_return[item["device"]][key][each_log["resource_id"]] = {}
+                    to_return[item["device"]][key][each_log["resource_id"]]["playcount"] = 0
+
+                to_return[item["device"]][key][each_log["resource_id"]]["playcount"] += 1
+                to_return[item["device"]][key][each_log["resource_id"]]["location"] = each_log["location_id"]
+
+    return to_return
+
+
 def count_resource_plays_from_dict_by_device(the_dict):
     """
     sets up temp_dict to contain an amount of times resource played per device:
@@ -202,6 +295,24 @@ def generate_device_csv_summarized(start_date, end_date, displays, array_of_data
 
     for item in array_of_data:
         writer.writerow([item["display"], item["location"], item["content"], item["playcount"]])
+
+    tmp.seek(0)
+    return tmp
+
+
+def generate_device_csv_by_date(created_time, start_date, end_date, displays, dictionary_of_data):
+    tmp = StringIO.StringIO()
+    writer = csv.writer(tmp)
+
+    writer.writerow(["Creation Date", "Start Date", "End Date", "Displays"])
+    writer.writerow([str(created_time), str(start_date), str(end_date), ', '.join(displays)])
+    writer.writerow(["Display", "Location", "Date", "Content", "Play Count"])
+
+    for key, value in dictionary_of_data.iteritems():
+        for another_key, another_value in dictionary_of_data[key].iteritems():
+            for guess_what_another_key, guess_what_another_value in dictionary_of_data[key][another_key].iteritems():
+                writer.writerow([key, guess_what_another_value["location"], another_key, guess_what_another_key,
+                                 guess_what_another_value["playcount"]])
 
     tmp.seek(0)
     return tmp

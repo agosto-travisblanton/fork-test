@@ -6,6 +6,10 @@ import json
 from google.appengine.ext import deferred
 
 
+def date_handler(obj):
+    return obj.isoformat() if hasattr(obj, 'isoformat') else obj
+
+
 ####################################################################################
 # REST CALLS
 ####################################################################################
@@ -255,7 +259,7 @@ class MultiDeviceByDate(RequestHandler):
 
         ###########################################################
 
-        raw_program_data_for_all_devices = [
+        transformed_query_by_device_program_data_to_by_date = [
             {
                 "device": device,
                 # program_record is the transformed program record table data
@@ -267,13 +271,21 @@ class MultiDeviceByDate(RequestHandler):
                 )
             } for device in all_the_devices_final]
 
-        formatted_data = format_transformed_program_data_by_device(raw_program_data_for_all_devices)
+        # print "------------------------------------------------------------"
+        # print json.dumps(transformed_query_by_device_program_data_to_by_date, default=date_handler)
+        # print "------------------------------------------------------------"
 
-        csv_to_publish = generate_device_csv_summarized(
+        formatted_data = prepare_for_csv_transformed_query_by_device_program_data_to_by_date(
+                midnight_start_day,
+                just_before_next_day_end_date,
+                transformed_query_by_device_program_data_to_by_date
+        )
+
+        csv_to_publish = generate_device_csv_by_date(
                 start_date=midnight_start_day,
                 end_date=just_before_next_day_end_date,
                 displays=all_the_devices_final,
-                array_of_data=formatted_data,
+                dictionary_of_data=formatted_data,
                 created_time=now
         )
 

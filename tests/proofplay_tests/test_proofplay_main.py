@@ -10,7 +10,7 @@ import json
 from proofplay.dev.make_mock_data import make_one_days_worth_of_data
 from utils.web_util import build_uri
 import datetime
-from models import Tenant, TENANT_ENTITY_GROUP_NAME, Distributor, Domain, ChromeOsDevice
+from models import Tenant, Distributor, Domain
 from proofplay.database_calls import insert_new_location_or_get_existing, insert_new_device_or_get_existing
 from app_config import config
 import time
@@ -31,15 +31,19 @@ class TestMain(SQLBaseTest, WebTest):
 
     def setUp(self):
         super(TestMain, self).setUp()
-        self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
-                                              active=True)
+
+        self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME, active=True)
+
         self.distributor_key = self.distributor.put()
+
         self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
                                     distributor_key=self.distributor_key,
                                     impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                     active=True)
+
         self.domain_key = self.domain.put()
         self.headers = {
+
             'Authorization': config.API_TOKEN,
             'X-Provisioning-Distributor': self.distributor_key.urlsafe()
         }

@@ -97,6 +97,18 @@ angular.module('skykitProvisioning')
       return true
 
 
+    downloadCSVForMultipleDevicesByDate: (start_date, end_date, devices) ->
+      allDevices = ''
+
+      for each in devices
+        allDevices = allDevices + "," + each
+
+      $window.open(@uriBase + '/multi_device_by_date/' + start_date + '/' + end_date + '/' + allDevices + '/' +
+          @chosenTenant + "/" + $cookies.get('currentDistributorKey')
+      , '_blank')
+      return true
+
+
     querySearch: (resources, searchText) ->
       if searchText
         resources.filter(this.createFilterFor(searchText))
