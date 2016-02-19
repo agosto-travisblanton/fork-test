@@ -271,10 +271,6 @@ class MultiDeviceByDate(RequestHandler):
                 )
             } for device in all_the_devices_final]
 
-        # print "------------------------------------------------------------"
-        # print json.dumps(transformed_query_by_device_program_data_to_by_date, default=date_handler)
-        # print "------------------------------------------------------------"
-
         formatted_data = prepare_for_csv_transformed_query_by_device_program_data_to_by_date(
                 midnight_start_day,
                 just_before_next_day_end_date,

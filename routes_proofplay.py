@@ -75,35 +75,3 @@ application = WSGIApplication([
 ]
 )
 
-a = [
-    {
-        "device": "my-device-3",
-        "raw_data": {
-            "2016-01-03 00:00:00": [
-                {"ended_at": "2016-01-03T15:13:11", "started_at": "2016-01-03T15:03:11", "resource_id": "GSAD_2222",
-                 "location_id": "1001", "device_id": "my-device-3"},
-                {"ended_at": "2016-01-03T15:33:11", "started_at": "2016-01-03T15:23:11", "resource_id": "GSAD_5553",
-                 "location_id": "1001", "device_id": "my-device-3"}],
-            "2016-01-01 00:00:00": [
-                {"ended_at": "2016-01-01T15:13:11", "started_at": "2016-01-01T15:03:11", "resource_id": "GSAD_5447",
-                 "location_id": "1001", "device_id": "my-device-3"}],
-            "2016-01-02 00:00:00": [
-                {"ended_at": "2016-01-02T15:13:11", "started_at": "2016-01-02T15:03:11", "resource_id": "GSAD_5447",
-                 "location_id": "1001", "device_id": "my-device-3"},
-                {"ended_at": "2016-01-02T15:53:11", "started_at": "2016-01-02T15:43:11", "resource_id": "GSAD_4334",
-                 "location_id": "1001", "device_id": "my-device-3"}]
-        }
-    },
-    {
-        "device": "my-device-7",
-        "raw_data": {
-            "2016-01-03 00:00:00": [
-                {"ended_at": "2016-01-03T16:13:11", "started_at": "2016-01-03T16:03:11", "resource_id": "GSAD_4334",
-                 "location_id": "3001", "device_id": "my-device-7"}], "2016-01-02 00:00:00": [
-                {"ended_at": "2016-01-02T15:23:11", "started_at": "2016-01-02T15:13:11", "resource_id": "GSAD_5533",
-                 "location_id": "3001", "device_id": "my-device-7"}]}
-    }
-]
-
-
-
