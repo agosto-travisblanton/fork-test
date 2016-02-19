@@ -197,7 +197,7 @@ class MultiDeviceSummarized(RequestHandler):
             {
                 "device": device,
                 # program_record is the transformed program record table data
-                "raw_data": get_raw_program_data_by_device(
+                "raw_data": program_record_for_device_summarized(
                         midnight_start_day,
                         just_before_next_day_end_date,
                         device,

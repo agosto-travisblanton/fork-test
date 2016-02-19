@@ -9,7 +9,7 @@ def create_merged_dictionary(array_of_dictionaries_to_merge):
     return dict(chain.from_iterable(d.iteritems() for d in array_of_dictionaries_to_merge))
 
 
-def transform_resource_data_between_date_range_by_location_to_dict_by_device(from_db):
+def transform_db_data_to_by_device(from_db):
     to_return = {}
 
     for item in from_db:
@@ -22,7 +22,7 @@ def transform_resource_data_between_date_range_by_location_to_dict_by_device(fro
     return to_return
 
 
-def transform_resource_data_between_date_ranges_by_date(from_db):
+def transform_db_data_to_by_date(from_db):
     to_return = {}
 
     for item in from_db:
@@ -174,10 +174,10 @@ def format_raw_program_data_for_all_devices(array_of_transformed):
 
     array_of_unmerged_dictionaries = map(count_resource_plays_from_dict_by_device, array_of_transformed)
 
-    temp_dict = create_merged_dictionary(array_of_unmerged_dictionaries)
+    merged_dict_of_all_devices = create_merged_dictionary(array_of_unmerged_dictionaries)
 
-    for key, value in temp_dict.iteritems():
-        for another_key, another_value in temp_dict[key].iteritems():
+    for key, value in merged_dict_of_all_devices.iteritems():
+        for another_key, another_value in merged_dict_of_all_devices[key].iteritems():
             dictionary_to_append_to_to_return = {
                 "display": key,
                 "location": value["location"],
