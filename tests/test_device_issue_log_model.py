@@ -254,3 +254,63 @@ class TestDeviceIssueLogModel(BaseTest):
                                                           up=True,
                                                           storage_utilization=self.STORAGE_UTILIZATION,
                                                           memory_utilization=self.MEMORY_UTILIZATION))
+
+    def test_first_heartbeat_has_issue_level_normal(self):
+        issue = DeviceIssueLog.create(device_key=self.device_key,
+                                      category=config.DEVICE_ISSUE_FIRST_HEARTBEAT,
+                                      up=True)
+        issue.put()
+        self.assertEqual(issue.level, IssueLevel.Normal)
+        self.assertEqual(issue.level_descriptor, IssueLevel.stringify(IssueLevel.Normal))
+
+    def test_player_version_change_has_issue_level_normal(self):
+        issue = DeviceIssueLog.create(device_key=self.device_key,
+                                      category=config.DEVICE_ISSUE_PLAYER_VERSION_CHANGE,
+                                      up=True)
+        issue.put()
+        self.assertEqual(issue.level, IssueLevel.Normal)
+        self.assertEqual(issue.level_descriptor, IssueLevel.stringify(IssueLevel.Normal))
+
+    def test_os_change_has_issue_level_normal(self):
+        issue = DeviceIssueLog.create(device_key=self.device_key,
+                                      category=config.DEVICE_ISSUE_OS_CHANGE,
+                                      up=True)
+        issue.put()
+        self.assertEqual(issue.level, IssueLevel.Normal)
+        self.assertEqual(issue.level_descriptor, IssueLevel.stringify(IssueLevel.Normal))
+
+    def test_os_version_change_has_issue_level_normal(self):
+        issue = DeviceIssueLog.create(device_key=self.device_key,
+                                      category=config.DEVICE_ISSUE_OS_VERSION_CHANGE,
+                                      up=True)
+        issue.put()
+        self.assertEqual(issue.level, IssueLevel.Normal)
+        self.assertEqual(issue.level_descriptor, IssueLevel.stringify(IssueLevel.Normal))
+
+    def test_timezone_change_has_issue_level_normal(self):
+        issue = DeviceIssueLog.create(device_key=self.device_key,
+                                      category=config.DEVICE_ISSUE_TIMEZONE_CHANGE,
+                                      up=True)
+        issue.put()
+        self.assertEqual(issue.level, IssueLevel.Normal)
+        self.assertEqual(issue.level_descriptor, IssueLevel.stringify(IssueLevel.Normal))
+
+    def test_device_not_reported_method_when_no_records_retrieved(self):
+        mac_address='i3234i03554350'
+        device = ChromeOsDevice.create_managed(
+            tenant_key=self.tenant_key,
+            gcm_registration_id=self.GCM_REGISTRATION_ID,
+            device_id=self.DEVICE_ID,
+            mac_address=mac_address)
+        device_key = device.put()
+        device_not_reported = DeviceIssueLog.device_not_reported(device_key=device_key)
+        self.assertTrue(device_not_reported)
+
+    def test_device_not_reported_method_when_records_retrieved(self):
+        issue = DeviceIssueLog.create(device_key=self.device_key,
+                                      category=config.DEVICE_ISSUE_TIMEZONE_CHANGE,
+                                      up=True)
+        issue.put()
+        device_not_reported = DeviceIssueLog.device_not_reported(device_key=self.device_key)
+        self.assertFalse(device_not_reported)
+
