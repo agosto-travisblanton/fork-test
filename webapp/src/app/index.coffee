@@ -14,4 +14,5 @@ app = angular.module 'skykitProvisioning', [
   'ngProgress'
   'datetimepicker'
   'ngMaterial'
+  'ngclipboard'
 ]
