@@ -86,12 +86,12 @@ angular.module('skykitProvisioning')
 
 
     downloadCSVForMultipleDevicesSummarized: (start_date, end_date, devices) ->
-      alldevices = ''
+      allDevices = ''
 
       for each in devices
-        alldevices = alldevices + "-" + each
+        allDevices = allDevices + "," + each
 
-      $window.open(@uriBase + '/multi_device_summarized/' + start_date + '/' + end_date + '/' + alldevices + '/' +
+      $window.open(@uriBase + '/multi_device_summarized/' + start_date + '/' + end_date + '/' + allDevices + '/' +
           @chosenTenant + "/" + $cookies.get('currentDistributorKey')
       , '_blank')
       return true

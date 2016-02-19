@@ -187,7 +187,7 @@ class MultiDeviceSummarized(RequestHandler):
                 seconds=1
         )
 
-        all_the_devices = devices.split('-')
+        all_the_devices = devices.split(',')
         all_the_devices_final = all_the_devices[1:]
         now = datetime.datetime.now()
 

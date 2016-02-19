@@ -195,7 +195,7 @@ def get_raw_program_data_by_device(start_date, end_date, customer_display_code, 
     for program_record in rows:
         d = {
             "location_id": program_record.full_location.customer_location_code,
-            "device_id": program_record.full_device.serial_number,
+            "device_id": program_record.full_device.customer_display_code,
             "resource_id": program_record.full_resource.resource_name,
             "started_at": program_record.started_at,
             "ended_at": program_record.ended_at
@@ -204,7 +204,8 @@ def get_raw_program_data_by_device(start_date, end_date, customer_display_code, 
         from_db.append(d)
 
     session.close()
-    return from_db
+    return transform_resource_data_between_date_range_by_location_to_dict_by_device(
+            from_db)
 
 
 ####################################################################################

@@ -97,9 +97,9 @@ appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService) ->
 
   @submit = () =>
     if @final.type is "1"
-      ProofPlayService.downloadCSVForMultipleDisplaysByDevice(@final.start_date_unix, @final.end_date_unix, @final.displays)
+      #ProofPlayService.downloadCSVForMultipleDisplaysByDevice(@final.start_date_unix, @final.end_date_unix, @final.displays)
 
     else
-      ProofPlayService.downloadCSVForMultipleDisplaysByDate(@final.start_date_unix, @final.end_date_unix, @final.displays)
+      ProofPlayService.downloadCSVForMultipleDevicesSummarized(@final.start_date_unix, @final.end_date_unix, @final.displays)
 
   @

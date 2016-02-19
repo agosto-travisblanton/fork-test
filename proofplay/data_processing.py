@@ -2,6 +2,11 @@ import csv
 import StringIO
 import datetime
 from collections import OrderedDict
+from itertools import chain
+
+
+def create_merged_dictionary(array_of_dictionaries_to_merge):
+    return dict(chain.from_iterable(d.iteritems() for d in array_of_dictionaries_to_merge))
 
 
 def transform_resource_data_between_date_range_by_location_to_dict_by_device(from_db):
@@ -136,58 +141,53 @@ def reformat_program_record_by_location(dictionary):
 
 
 def count_resource_plays_from_dict_by_device(the_dict):
-    temp_dict = {}
-
     """
     sets up temp_dict to contain an amount of times resource played per device:
     temp_dict = {
         "my-device": {
             "location": "3443",
             "resource_55442": 54,
-             "resource_3342": 34,
-        },
-        "my-device-2": {
-            "location": "3443",
-            "resource_55442": 54,
-             "resource_3342": 34,
-             "resource_3342": 3,
+            "resource_3342": 34,
         }
     }
     """
-    for key, value in the_dict.iteritems():
+    temp_dict = {}
+
+    for key, value in the_dict["raw_data"].iteritems():
         if key not in temp_dict:
             temp_dict[key] = {
-                "location": value["location_id"]
+                # since one serial will always have the same location
+                "location": the_dict["raw_data"][key][0]["location_id"]
             }
 
-        if value["resource_id"] not in temp_dict[key]:
-            temp_dict[key][value["resource_id"]] = 0
+        for each in the_dict["raw_data"][key]:
+            if each["resource_id"] not in temp_dict[key]:
+                temp_dict[key][each["resource_id"]] = 0
 
-        temp_dict[key][value["resource_id"]] += 1
+            temp_dict[key][each["resource_id"]] += 1
 
     return temp_dict
 
 
-def format_raw_program_data_for_all_devices(array_of_raw_db):
+def format_raw_program_data_for_all_devices(array_of_transformed):
     to_return = []
 
-    transformed_to_by_device = transform_resource_data_between_date_range_by_location_to_dict_by_device(array_of_raw_db)
-    temp_dict = count_resource_plays_from_dict_by_device(transformed_to_by_device)
+    array_of_unmerged_dictionaries = map(count_resource_plays_from_dict_by_device, array_of_transformed)
+
+    temp_dict = create_merged_dictionary(array_of_unmerged_dictionaries)
 
     for key, value in temp_dict.iteritems():
-        dictionary_to_append_to_to_return = {
-            "display": key,
-            "location": value["location"],
-        }
-
         for another_key, another_value in temp_dict[key].iteritems():
+            dictionary_to_append_to_to_return = {
+                "display": key,
+                "location": value["location"],
+            }
             if another_key == "location":
                 pass
             else:
                 dictionary_to_append_to_to_return["content"] = another_key
-                dictionary_to_append_to_to_return["playcount"] = temp_dict[key][another_key]
-
-        to_return.append(dictionary_to_append_to_to_return)
+                dictionary_to_append_to_to_return["playcount"] = another_value
+                to_return.append(dictionary_to_append_to_to_return)
 
     return to_return
 
