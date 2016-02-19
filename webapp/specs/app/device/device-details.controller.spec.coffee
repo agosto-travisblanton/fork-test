@@ -151,7 +151,7 @@ describe 'DeviceDetailsCtrl', ->
         now = new Date()
         today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
         @epochEnd = moment(new Date()).unix()
-        today.setDate(today.getDate() - 1)
+        today.setDate(today.getDate() - 30)
         @epochStart = moment(today).unix()
         controller.initialize()
 

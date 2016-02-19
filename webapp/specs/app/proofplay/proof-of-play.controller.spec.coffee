@@ -18,7 +18,7 @@ describe 'ProofOfPlayCtrl', ->
   describe 'at the start', ->
     it 'tab dict values should equal', ->
       resource = {
-        title: 'Resource',
+        title: 'Resource Report',
 
       }
       expect(angular.equals(resource, controller.resource)).toBeTruthy()
