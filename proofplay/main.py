@@ -4,6 +4,27 @@ from data_processing import *
 import logging
 import json
 from google.appengine.ext import deferred
+from db import SQLALCHEMY_DATABASE_URI
+from alembic import command
+import os
+from routes_proofplay import basedir
+
+
+####################################################################################
+# ALEMBIC MIGRATION
+####################################################################################
+class MakeMigration(RequestHandler):
+    def get(self):
+        try:
+            from alembic.config import Config
+            path = os.path.join(basedir, "alembic.ini")
+            alembic_cfg = Config(path)
+            alembic_cfg.set_main_option('sqlalchemy.url', SQLALCHEMY_DATABASE_URI)
+            command.upgrade(alembic_cfg, "head")
+            self.response.out.write("SUCCESS")
+
+        except:
+            self.response.out.write("FAILURE")
 
 
 ####################################################################################

@@ -2,6 +2,9 @@ from env_setup import setup
 
 setup()
 
+from os import path
+basedir = path.abspath(path.dirname(__file__))
+
 # DO NOT REMOVE
 # Importing deferred is a work around to this bug.
 # https://groups.google.com/forum/?fromgroups=#!topic/webapp2/sHb2RYxGDLc
@@ -71,6 +74,16 @@ application = WSGIApplication([
             BASE_URI + '/retrieve_my_tenants',
             handler="proofplay.main.GetTenants",
             name="GetTenants"
+    ),
+
+    ################################################################
+    # Migrate DB
+    ################################################################
+
+    Route(
+            BASE_URI + '/make_migrations',
+            handler="proofplay.main.MakeMigration",
+            name="MakeMigration"
     ),
 ]
 )

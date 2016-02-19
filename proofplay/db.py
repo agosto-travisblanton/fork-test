@@ -3,7 +3,8 @@ from sqlalchemy import create_engine
 import os
 
 if os.environ.get('SERVER_SOFTWARE', '').startswith('Google'):
-    SQLALCHEMY_DATABASE_URI = "mysql+mysqldb://root@/logging?unix_socket=/cloudsql/skykit-logs-reporter:skykit-logs-reporter"
+    # the second arg after : is the db instance name
+    SQLALCHEMY_DATABASE_URI = "mysql+mysqldb://root@/provisioning?unix_socket=/cloudsql/provisioning-int:provisioning-int"
 else:
     SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://root@localhost/provisioning'
 
