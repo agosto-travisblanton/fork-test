@@ -5,6 +5,10 @@ from collections import OrderedDict
 from itertools import chain
 
 
+def date_handler(obj):
+    return obj.isoformat() if hasattr(obj, 'isoformat') else obj
+
+
 def create_merged_dictionary(array_of_dictionaries_to_merge):
     return dict(chain.from_iterable(d.iteritems() for d in array_of_dictionaries_to_merge))
 
@@ -69,15 +73,6 @@ def generate_resource_csv_by_date(start_date, end_date, resources, dictionary, n
 
     tmp.seek(0)
     return tmp
-
-
-def ensure_raw_data_dictionary_has_keys_through_date_range(start_date, end_date, dictionary):
-    while start_date <= end_date:
-        if str(start_date) not in dictionary:
-            dictionary[str(start_date)] = None
-        start_date += datetime.timedelta(days=1)
-
-    return OrderedDict(sorted(dictionary.items(), key=lambda t: t))
 
 
 def ensure_dictionary_has_keys_through_date_range(start_date, end_date, dictionary):

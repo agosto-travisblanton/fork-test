@@ -6,10 +6,6 @@ import json
 from google.appengine.ext import deferred
 
 
-def date_handler(obj):
-    return obj.isoformat() if hasattr(obj, 'isoformat') else obj
-
-
 ####################################################################################
 # REST CALLS
 ####################################################################################
@@ -54,6 +50,7 @@ class RetrieveAllResourcesOfTenant(RequestHandler):
 
 ####################################################################################
 # MAIN ENTRY FOR POSTING NEW PROGRAM PLAY
+####################################################################################
 class PostNewProgramPlay(RequestHandler):
     def post(self):
         incoming = json.loads(self.request.body)

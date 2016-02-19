@@ -13,7 +13,8 @@ from proofplay.data_processing import (calculate_location_count, calculate_seria
                                        format_program_record_data_with_array_of_resources_by_date,
                                        transform_db_data_to_by_device,
                                        transform_db_data_to_by_date,
-                                       generate_resource_csv_by_device)
+                                       generate_resource_csv_by_device,
+                                       create_merged_dictionary)
 
 
 def convert_datetime_to_string_of_day_at_midnight(date):
@@ -24,6 +25,36 @@ class TestDataProcessing(BaseTest):
     a_date_timestamp = datetime.datetime(2011, 4, 9, 10, 30)
     start_date = a_date_timestamp - datetime.timedelta(days=5)
     end_date = a_date_timestamp + datetime.timedelta(days=1)
+
+    def test_create_merged_dictionary(self):
+        array_of_dicts = [
+            {
+                "one_dict": {
+                    "somestuff": 1,
+                    "some_other_stuff": 2
+                }
+            },
+            {
+                "two_dict": {
+                    "somestuff": 1,
+                    "some_other_stuff": 2
+                }
+            },
+
+        ]
+
+        expected_result = {
+            "one_dict": {
+                "somestuff": 1,
+                "some_other_stuff": 2
+            },
+            "two_dict": {
+                "somestuff": 1,
+                "some_other_stuff": 2
+            }
+        }
+
+        self.assertEqual(create_merged_dictionary(array_of_dicts), expected_result)
 
     def test_calculate_location_count(self):
         example_input = [{"location_id": 5}, {"location_id": 6}, {"location_id": 6}]
