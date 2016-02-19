@@ -37,7 +37,7 @@ def transform_db_data_to_by_date(from_db):
     return to_return
 
 
-def generate_date_range_csv_by_location(start_date, end_date, resources, array_of_data, created_time):
+def generate_resource_csv_by_device(start_date, end_date, resources, array_of_data, created_time):
     tmp = StringIO.StringIO()
     writer = csv.writer(tmp)
 
@@ -53,7 +53,7 @@ def generate_date_range_csv_by_location(start_date, end_date, resources, array_o
     return tmp
 
 
-def generate_date_range_csv_by_date(start_date, end_date, resources, dictionary, now):
+def generate_resource_csv_by_date(start_date, end_date, resources, dictionary, now):
     tmp = StringIO.StringIO()
     writer = csv.writer(tmp)
     all_resources_as_string = ', '.join(resources)
@@ -84,7 +84,7 @@ def ensure_dictionary_has_keys_through_date_range(start_date, end_date, dictiona
     return OrderedDict(sorted(dictionary.items(), key=lambda t: t))
 
 
-def format_program_record_data_with_array_of_resources(start_date, end_date, incoming_array):
+def format_program_record_data_with_array_of_resources_by_date(start_date, end_date, incoming_array):
     to_return = {}
 
     for item in incoming_array:
@@ -123,7 +123,7 @@ def calculate_serial_count(array_of_db_data):
     return len(serials)
 
 
-def reformat_program_record_by_location(dictionary):
+def reformat_program_record_array_by_location(dictionary):
     resource = dictionary["resource"]
     raw_data = dictionary["raw_data"]
 
@@ -143,7 +143,7 @@ def reformat_program_record_by_location(dictionary):
 def count_resource_plays_from_dict_by_device(the_dict):
     """
     sets up temp_dict to contain an amount of times resource played per device:
-    temp_dict = {
+    returns {
         "my-device": {
             "location": "3443",
             "resource_55442": 54,
@@ -151,25 +151,25 @@ def count_resource_plays_from_dict_by_device(the_dict):
         }
     }
     """
-    temp_dict = {}
+    to_return = {}
 
     for key, value in the_dict["raw_data"].iteritems():
-        if key not in temp_dict:
-            temp_dict[key] = {
+        if key not in to_return:
+            to_return[key] = {
                 # since one serial will always have the same location
                 "location": the_dict["raw_data"][key][0]["location_id"]
             }
 
         for each in the_dict["raw_data"][key]:
-            if each["resource_id"] not in temp_dict[key]:
-                temp_dict[key][each["resource_id"]] = 0
+            if each["resource_id"] not in to_return[key]:
+                to_return[key][each["resource_id"]] = 0
 
-            temp_dict[key][each["resource_id"]] += 1
+            to_return[key][each["resource_id"]] += 1
 
-    return temp_dict
+    return to_return
 
 
-def format_raw_program_data_for_all_devices(array_of_transformed):
+def format_transformed_program_data_by_device(array_of_transformed):
     to_return = []
 
     array_of_unmerged_dictionaries = map(count_resource_plays_from_dict_by_device, array_of_transformed)
@@ -192,7 +192,7 @@ def format_raw_program_data_for_all_devices(array_of_transformed):
     return to_return
 
 
-def generate_summarized_csv_by_device(start_date, end_date, displays, array_of_data, created_time):
+def generate_device_csv_summarized(start_date, end_date, displays, array_of_data, created_time):
     tmp = StringIO.StringIO()
     writer = csv.writer(tmp)
 

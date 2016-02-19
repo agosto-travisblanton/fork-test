@@ -8,12 +8,12 @@ from collections import OrderedDict
 import datetime
 
 from proofplay.data_processing import (calculate_location_count, calculate_serial_count,
-                                       reformat_program_record_by_location,
-                                       generate_date_range_csv_by_date,
-                                       format_program_record_data_with_array_of_resources,
+                                       reformat_program_record_array_by_location,
+                                       generate_resource_csv_by_date,
+                                       format_program_record_data_with_array_of_resources_by_date,
                                        transform_db_data_to_by_device,
                                        transform_db_data_to_by_date,
-                                       generate_date_range_csv_by_location)
+                                       generate_resource_csv_by_device)
 
 
 def convert_datetime_to_string_of_day_at_midnight(date):
@@ -109,7 +109,7 @@ class TestDataProcessing(BaseTest):
             'F5MSCX001001': {'Play Count': 2, 'Content': 'GSAD_2222', 'Display': 'F5MSCX001001', 'Location': '6034'},
             'F5MSCX001000': {'Play Count': 2, 'Content': 'GSAD_2222', 'Display': 'F5MSCX001000', 'Location': '6034'}}
 
-        self.assertEqual(expected_output, reformat_program_record_by_location(example_input))
+        self.assertEqual(expected_output, reformat_program_record_array_by_location(example_input))
 
     def test_format_program_record_data_with_array_of_resources(self):
         example_input = [
@@ -188,7 +188,12 @@ class TestDataProcessing(BaseTest):
                     [('2016-01-01 00:00:00', {'PlayCount': 4, 'PlayerCount': 3, 'LocationCount': 1}),
                      ('2016-01-02 00:00:00', {'PlayCount': 4, 'PlayerCount': 2, 'LocationCount': 1})])}
 
-        self.assertEqual(expected_output, format_program_record_data_with_array_of_resources(example_input))
+        start = datetime.datetime(2016, 1, 1, 0, 0, 0)
+
+        end = datetime.datetime(2016, 1, 2, 0, 0, 0)
+
+        self.assertEqual(expected_output,
+                         format_program_record_data_with_array_of_resources_by_date(start, end, example_input))
 
     def test_generate_date_range_csv_by_location(self):
         now = datetime.datetime.now()
@@ -209,7 +214,7 @@ class TestDataProcessing(BaseTest):
                                  'Content': 'GSAD_4334'}}
         ]
 
-        result = generate_date_range_csv_by_location(
+        result = generate_resource_csv_by_device(
                 start_date=start_time,
                 end_date=end_time,
                 resources=resources,
@@ -236,7 +241,7 @@ class TestDataProcessing(BaseTest):
             )
         }
 
-        result = generate_date_range_csv_by_date(
+        result = generate_resource_csv_by_date(
                 start_date=start_time,
                 end_date=end_time,
                 resources=resources,

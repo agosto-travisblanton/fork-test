@@ -6,6 +6,9 @@ import json
 from google.appengine.ext import deferred
 
 
+####################################################################################
+# REST CALLS
+####################################################################################
 class GetTenants(RequestHandler):
     def get(self):
         distributor = self.request.headers.get('X-Provisioning-Distributor')
@@ -45,6 +48,8 @@ class RetrieveAllResourcesOfTenant(RequestHandler):
         self.response.out.write(final)
 
 
+####################################################################################
+# MAIN ENTRY FOR POSTING NEW PROGRAM PLAY
 class PostNewProgramPlay(RequestHandler):
     def post(self):
         incoming = json.loads(self.request.body)
@@ -54,6 +59,9 @@ class PostNewProgramPlay(RequestHandler):
         self.response.out.write(final)
 
 
+####################################################################################
+# CSV QUERY HANDLERS
+####################################################################################
 class MultiResourceByDevice(RequestHandler):
     def get(self, start_date, end_date, resources, tenant, distributor_key):
 
@@ -81,7 +89,7 @@ class MultiResourceByDevice(RequestHandler):
         now = datetime.datetime.now()
         ###########################################################
 
-        list_of_transformed_record_data_by_location = [
+        array_of_transformed_record_data_by_location = [
             {
                 "resource": resource,
                 "raw_data": program_record_for_resource_by_location(
@@ -93,11 +101,11 @@ class MultiResourceByDevice(RequestHandler):
             } for resource in all_the_resources_final]
 
         formatted_record_data_for_each_resource = list(map(
-                reformat_program_record_by_location,
-                list_of_transformed_record_data_by_location
+                reformat_program_record_array_by_location,
+                array_of_transformed_record_data_by_location
         ))
 
-        csv_to_publish = generate_date_range_csv_by_location(
+        csv_to_publish = generate_resource_csv_by_device(
                 midnight_start_day,
                 just_before_next_day_end_date,
                 all_the_resources_final,
@@ -149,11 +157,11 @@ class MultiResourceByDate(RequestHandler):
                 )
             } for resource in all_the_resources_final]
 
-        formatted_data = format_program_record_data_with_array_of_resources(midnight_start_day,
-                                                                            just_before_next_day_end_date,
-                                                                            pre_formatted_program_record_by_date)
+        formatted_data = format_program_record_data_with_array_of_resources_by_date(midnight_start_day,
+                                                                                    just_before_next_day_end_date,
+                                                                                    pre_formatted_program_record_by_date)
 
-        csv_to_publish = generate_date_range_csv_by_date(
+        csv_to_publish = generate_resource_csv_by_date(
                 midnight_start_day,
                 just_before_next_day_end_date,
                 all_the_resources_final,
@@ -193,7 +201,7 @@ class MultiDeviceSummarized(RequestHandler):
 
         ###########################################################
 
-        raw_program_data_for_all_devices = [
+        array_of_transformed_program_data_by_device = [
             {
                 "device": device,
                 # program_record is the transformed program record table data
@@ -205,9 +213,9 @@ class MultiDeviceSummarized(RequestHandler):
                 )
             } for device in all_the_devices_final]
 
-        formatted_data = format_raw_program_data_for_all_devices(raw_program_data_for_all_devices)
+        formatted_data = format_transformed_program_data_by_device(array_of_transformed_program_data_by_device)
 
-        csv_to_publish = generate_summarized_csv_by_device(
+        csv_to_publish = generate_device_csv_summarized(
                 start_date=midnight_start_day,
                 end_date=just_before_next_day_end_date,
                 displays=all_the_devices_final,
@@ -220,6 +228,63 @@ class MultiDeviceSummarized(RequestHandler):
         self.response.write(bytes(csv_to_publish.getvalue()))
 
 
+class MultiDeviceByDate(RequestHandler):
+    def get(self, start_date, end_date, devices, tenant, distributor_key):
+
+        if tenant not in get_tenant_names_for_distributor(distributor_key):
+            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+            self.abort(403)
+
+        ###########################################################
+        # SETUP VARIABLES
+        ###########################################################
+        start_date = datetime.datetime.fromtimestamp(int(start_date))
+        end_date = datetime.datetime.fromtimestamp(int(end_date))
+        if end_date < start_date:
+            self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
+
+        midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
+        midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
+        just_before_next_day_end_date = (midnight_end_day + datetime.timedelta(days=1)) - datetime.timedelta(
+                seconds=1
+        )
+
+        all_the_devices = devices.split(',')
+        all_the_devices_final = all_the_devices[1:]
+        now = datetime.datetime.now()
+
+        ###########################################################
+
+        raw_program_data_for_all_devices = [
+            {
+                "device": device,
+                # program_record is the transformed program record table data
+                "raw_data": program_record_for_device_by_date(
+                        midnight_start_day,
+                        just_before_next_day_end_date,
+                        device,
+                        tenant
+                )
+            } for device in all_the_devices_final]
+
+        formatted_data = format_transformed_program_data_by_device(raw_program_data_for_all_devices)
+
+        csv_to_publish = generate_device_csv_summarized(
+                start_date=midnight_start_day,
+                end_date=just_before_next_day_end_date,
+                displays=all_the_devices_final,
+                array_of_data=formatted_data,
+                created_time=now
+        )
+
+        self.response.headers['Content-Type'] = 'application/csv'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=multi-resource-by-date.csv'
+        self.response.write(bytes(csv_to_publish.getvalue()))
+
+
+####################################################################################
+# FUNCTION THAT GETS CALLED VIA DEFERRED ON NWE PROGRAM PLAY POST
+####################################################################################
 def handle_posting_a_new_program_play(incoming_data):
     for each_log in incoming_data["data"]:
         logging.info("INCOMING JSON ARRAY")
