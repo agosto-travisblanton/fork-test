@@ -1,3 +1,3 @@
-from make_mock_data import run
+from make_mock_data import queue_up_mock_data
 
-run()
+queue_up_mock_data(500, 10)

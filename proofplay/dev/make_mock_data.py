@@ -20,7 +20,6 @@ gamestop_stores_dict = {
         ],
         "customer_location_code": "my-1001-location",
         "tenant_code": "gamestop",
-        "resources": resource_choices
     },
     "2001": {
         "devices": [
@@ -30,7 +29,6 @@ gamestop_stores_dict = {
         ],
         "customer_location_code": "my-2004-location",
         "tenant_code": "gamestop",
-        "resources": resource_choices
     },
     "3001": {
         "devices": [
@@ -40,14 +38,13 @@ gamestop_stores_dict = {
         ],
         "customer_location_code": "my-3001-location",
         "tenant_code": "gamestop",
-        "resources": resource_choices
     }
 }
 
 
 def create_data_to_send(started_at, ended_at):
     gamestop_store = random.choice(gamestop_stores_dict.keys())
-    resource_choice = random.choice(gamestop_stores_dict[gamestop_store]["resources"])
+    resource_choice = random.choice(resource_choices)
     device_choice = random.choice(gamestop_stores_dict[gamestop_store]["devices"])
 
     return {
@@ -61,13 +58,6 @@ def create_data_to_send(started_at, ended_at):
         'ended_at': ended_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
         'tenant_code': gamestop_stores_dict[gamestop_store]["tenant_code"]  # string
     }
-
-
-def generate_mock_data(to_send):
-    url = "http://localhost:8080/proofplay/api/v1/0ac1b95dc3f93d9132b796986ed11cd4/post_new_program_play"
-    headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-    r = requests.post(url, data=json.dumps(to_send), headers=headers)
-    print to_send["data"][-1]["ended_at"]
 
 
 def make_one_days_worth_of_data(amount_a_day, started_at):
@@ -87,15 +77,15 @@ def queue_up_mock_data(day_amount, amount_a_day):
     for each in reversed(xrange(1, day_amount)):
         started_at = datetime.datetime.now() - datetime.timedelta(days=each)
 
+        # to not post some days
         if random.randint(1, 7) == 5:
             pass
         else:
             generate_mock_data(make_one_days_worth_of_data(amount_a_day, started_at))
 
 
-def run():
-    queue_up_mock_data(500, 10)
-
-
-def just_one():
-    queue_up_mock_data(1, 10)
+def generate_mock_data(to_send):
+    url = "http://localhost:8080/proofplay/api/v1/0ac1b95dc3f93d9132b796986ed11cd4/post_new_program_play"
+    headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+    r = requests.post(url, data=json.dumps(to_send), headers=headers)
+    print to_send["data"][-1]["ended_at"]
