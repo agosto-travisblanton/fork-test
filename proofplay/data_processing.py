@@ -144,7 +144,7 @@ def reformat_program_record_array_by_location(dictionary):
     return to_return
 
 
-def prepare_for_csv_transformed_query_by_device_program_data_to_by_date(start_date, end_date, incoming_array):
+def prepare_transformed_query_by_device_to_csv_by_date(start_date, end_date, incoming_array):
     """
     Returns:
     {

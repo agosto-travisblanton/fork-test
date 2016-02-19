@@ -268,7 +268,7 @@ class MultiDeviceByDate(RequestHandler):
                 )
             } for device in all_the_devices_final]
 
-        formatted_data = prepare_for_csv_transformed_query_by_device_program_data_to_by_date(
+        formatted_data = prepare_transformed_query_by_device_to_csv_by_date(
                 midnight_start_day,
                 just_before_next_day_end_date,
                 transformed_query_by_device_program_data_to_by_date
