@@ -149,67 +149,33 @@ def reformat_program_record_array_by_location(dictionary):
     return to_return
 
 
-# def prepare_for_csv_transformed_query_by_device_program_data_to_by_date(
-#         start_date,
-#         end_date,
-#         array_of_devices_with_data
-# ):
-#     """
-#     Returns:
-#     {
-#         "device-id": {
-#                 "12-01-1222": {
-#                     "GSAD_1555": {
-#                         "location": "5003",
-#                         "playcount": 25
-#                     }
-#                 }
-#             }
-#         }
-#     """
-#
-#     to_return = {}
-#
-#     for item in array_of_devices_with_data:
-#         to_return[item["device"]] = {}
-#
-#         item["raw_data"] = ensure_dictionary_has_keys_through_date_range(start_date, end_date, item["raw_data"])
-#
-#         # key = date
-#         for key, value in item["raw_data"].iteritems():
-#             to_return[item["device"]][key] = {}
-#
-#             if value is None:
-#                 to_return[item["device"]][key]["None"] = {
-#                     "location": "None",
-#                     "playcount": "None"
-#                 }
-#
-#             else:
-#                 for each_log in value:
-#                     if each_log["resource_id"] not in to_return[item["device"]]:
-#                     to_return[item["device"]][key][value["resource_id"]] = {}
-#
-#             to_return[item["device"]][value["resource_id"]]["location"] = value["location_id"]
-#             to_return[item["device"]][value["resource_id"]]["playcount"] = len(value)
-#
-#     return to_return
-
-
 def prepare_for_csv_transformed_query_by_device_program_data_to_by_date(start_date, end_date, incoming_array):
-
     """
     Returns:
     {
         "device-id": {
-                "12-01-1222": {
-                    "GSAD_1555": {
-                        "location": "5003",
-                        "playcount": 25
-                    }
+            "12-01-2000": {
+                "GSAD_1555": {
+                    "location": "5003",
+                    "playcount": 25
+                },
+                "GSAD_1111": {
+                    "location": "2342",
+                    "playcount": 22
+                }
+            },
+            "12-02-2000": {
+                "GSAD_1555": {
+                    "location": "5003",
+                    "playcount": 25
+                },
+                "GSAD_1111": {
+                    "location": "2342",
+                    "playcount": 22
                 }
             }
         }
+    }
     """
 
     to_return = OrderedDict()
@@ -218,7 +184,7 @@ def prepare_for_csv_transformed_query_by_device_program_data_to_by_date(start_da
         to_return[item["device"]] = OrderedDict()
         ordered_raw_data = OrderedDict(sorted(item["raw_data"].items(), key=lambda t: t))
 
-        # key = "12-01-1818"
+        # this key is a date object
         for key, value in ordered_raw_data.iteritems():
             to_return[item["device"]][key] = {}
 
@@ -235,8 +201,8 @@ def prepare_for_csv_transformed_query_by_device_program_data_to_by_date(start_da
 
 def count_resource_plays_from_dict_by_device(the_dict):
     """
-    sets up temp_dict to contain an amount of times resource played per device:
-    returns {
+    returns
+    {
         "my-device": {
             "location": "3443",
             "resource_55442": 54,
