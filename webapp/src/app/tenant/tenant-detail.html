@@ -99,7 +99,7 @@
                   <div class="form-group"
                        ng-class="{ 'has-error' : tenantForm.contentManagerBaseUrl.$invalid && !tenantForm.contentManagerBaseUrl.$pristine }">
                     <div class="col-sm-5">
-                      <label> Content manager base URL</label>
+                      <label>Content manager URL</label>
                       <input type="url"
                              required
                              class="form-control"
@@ -114,7 +114,7 @@
                         ng-show="tenantForm.contentManagerBaseUrl.$invalid &&
                         !tenantForm.contentManagerBaseUrl.$pristine"
                         class="help-block">
-                        Content manager base URL must be a secure URL.
+                        Content manager URL must be a secure URL.
                       </p>
                     </div>
                   </div>
@@ -122,7 +122,7 @@
                        ng-class="{ 'has-error' : tenantForm.contentServerUrl.$invalid &&
                        !tenantForm.contentServerUrl.$pristine }">
                     <div class="col-sm-5">
-                      <label>Content server URL</label>
+                      <label>Player content URL</label>
                       <input type="url"
                              required
                              class="form-control"
@@ -135,7 +135,7 @@
                     <div class="col-sm-5 margin-top-15">
                       <p ng-show="tenantForm.contentServerUrl.$invalid && !tenantForm.contentServerUrl.$pristine"
                          class="help-block">
-                        Content server URL must be a secure URL.
+                        Player content URL must be a secure URL.
                       </p>
                     </div>
                   </div>

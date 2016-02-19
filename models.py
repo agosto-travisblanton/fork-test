@@ -44,6 +44,8 @@ class Distributor(ndb.Model):
     name = ndb.StringProperty(required=True, indexed=True)
     # TODO Make admin_email required=True after migration run in prod
     admin_email = ndb.StringProperty(required=False, indexed=True)
+    player_content_url = ndb.StringProperty(required=True, indexed=True)
+    content_manager_url = ndb.StringProperty(required=True, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
@@ -65,10 +67,16 @@ class Distributor(ndb.Model):
             return True
 
     @classmethod
-    def create(cls, name, active):
+    def create(cls,
+               name,
+               active=True,
+               content_manager_url=config.DEFAULT_CONTENT_MANAGER_URL,
+               player_content_url=config.DEFAULT_PLAYER_CONTENT_URL):
         distributor_entity_group = DistributorEntityGroup.singleton()
         return cls(parent=distributor_entity_group.key,
                    name=name,
+                   content_manager_url=content_manager_url,
+                   player_content_url=player_content_url,
                    active=active)
 
     def _pre_put_hook(self):
