@@ -1,3 +1,4 @@
+from app_config import config
 from env_setup import setup_test_paths
 
 setup_test_paths()
@@ -46,6 +47,18 @@ class TestDistributorModel(BaseTest):
         self.assertTrue(distributor_created.active)
         self.assertEqual(self.NAME, distributor_created.name)
         self.assertTrue(distributor_created.active)
+        self.assertEqual(distributor_created.content_manager_url, config.DEFAULT_CONTENT_MANAGER_URL)
+        self.assertEqual(distributor_created.player_content_url, config.DEFAULT_PLAYER_CONTENT_URL)
+
+    def test_create_can_override_default_urls(self):
+        content_manager_url = 'content-manager-foo'
+        player_content_url = 'player-foo'
+        distributor_created = Distributor.create(name=self.NAME,
+                                                 content_manager_url=content_manager_url,
+                                                 player_content_url=player_content_url)
+        distributor_created.put()
+        self.assertEqual(distributor_created.content_manager_url, content_manager_url)
+        self.assertEqual(distributor_created.player_content_url, player_content_url)
 
     def test_is_unique_returns_true_when_name_not_found(self):
         distributor_created = Distributor.find_by_name(self.NAME)

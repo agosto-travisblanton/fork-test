@@ -385,6 +385,38 @@ def _WIFI_CONNECTION():
 
 app_WIFI_CONNECTION = _WIFI_CONNECTION()
 
+
+def _DEFAULT_CONTENT_MANAGER_URL():
+    if on_development_server or not on_server:
+        return 'https://skykit-contentmanager-int.appspot.com'
+    if on_integration_server:
+        return 'https://skykit-contentmanager-int.appspot.com'
+    if on_stage_server:
+        return 'https://skykit-contentmanager-stage.appspot.com'
+    if on_production_server:
+        return 'https://skykit-contentmanager.appspot.com'
+    return None
+
+
+app_DEFAULT_CONTENT_MANAGER_URL = _DEFAULT_CONTENT_MANAGER_URL()
+
+
+def _DEFAULT_PLAYER_CONTENT_URL():
+    if on_development_server or not on_server:
+        return 'https://skykit-contentmanager-int.appspot.com/content'
+    if on_integration_server:
+        return 'https://skykit-contentmanager-int.appspot.com/content'
+    if on_stage_server:
+        return 'https://skykit-contentmanager-stage.appspot.com/content'
+    if on_production_server:
+        return 'https://skykit-contentmanager.appspot.com/content'
+    return None
+
+
+app_DEFAULT_PLAYER_CONTENT_URL = _DEFAULT_PLAYER_CONTENT_URL()
+
+
+
 def _STORMPATH_CLIENT():
     """
     http://docs.stormpath.com/python/quickstart/#create-a-client
