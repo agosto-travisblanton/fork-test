@@ -81,6 +81,7 @@
                       <label>Admin email</label>
                       <input type="email"
                              required
+                             ng-readonly="tenantDetailsCtrl.editMode == true"
                              class="form-control"
                              name="adminEmail"
                              id="adminEmail"
