@@ -113,6 +113,76 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
       parent: 'tenants'
     }
   })
+  $stateProvider.state("tenantDetails", {
+    url: "/tenants2/:tenantKey/details",
+    templateUrl: "app/tenant/tenant.html",
+    controller: "TenantCtrl",
+    controllerAs: 'tenantCtrl',
+    ncyBreadcrumb: {
+      label: '{{ tenantCtrl.currentTenant.name }}',
+      parent: 'tenants'
+    }
+  })
+  $stateProvider.state("tenantManagedDevices", {
+    url: "/tenants2/:tenantKey/managed",
+    templateUrl: "app/tenant/tenant-managed-devices.html",
+    controller: "TenantManagedDevicesCtrl",
+    controllerAs: 'tenantManagedDevicesCtrl',
+    ncyBreadcrumb: {
+      label: '{{ tenantManagedDevicesCtrl.currentTenant.name }}',
+      parent: 'tenants'
+    }
+  })
+  $stateProvider.state("tenantUnmanagedDevices", {
+    url: "/tenants2/:tenantKey/unmanaged",
+    templateUrl: "app/tenant/tenant-unmanaged-devices.html",
+    controller: "TenantUnmanagedDevicesCtrl",
+    controllerAs: 'tenantUnmanagedDevicesCtrl',
+    ncyBreadcrumb: {
+      label: '{{ tenantUnmanagedDevicesCtrl.currentTenant.name }}',
+      parent: 'tenants'
+    }
+  })
+  $stateProvider.state("tenantLocations", {
+    url: "/tenants2/:tenantKey/locations",
+    templateUrl: "app/tenant/tenant-locations.html",
+    controller: "TenantLocationsCtrl",
+    controllerAs: 'tenantLocationsCtrl',
+    ncyBreadcrumb: {
+      label: '{{ tenantLocationsCtrl.currentTenant.name }}',
+      parent: 'tenants'
+    }
+  })
+#  .state('tabs.player', {
+#    url: '/player',
+#    data: {
+#      'selectedTab': 0
+#    },
+#    views: {
+#      'player': {
+#        controller: playerController
+#      }
+#    }
+#  })
+
+#  $stateProvider.state("view1", {
+#    url: "/tenants/:tenantKey/details",
+#    templateUrl: "app/tenant/partials/details.html",
+#  })
+#  $stateProvider.state("view2", {
+#    url: "/tenants/:tenantKey/locations",
+#    templateUrl: "app/tenant/partials/locations.html",
+#  })
+#  $stateProvider.state("view3", {
+#    url: "/tenants/:tenantKey/managed",
+#    templateUrl: "app/tenant/partials/managed.html",
+#  })
+#  $stateProvider.state("view4", {
+#    url: "/tenants/:tenantKey/unmanaged",
+#    templateUrl: "app/tenant/partials/unmanaged.html",
+#  })
+
+
   $stateProvider.state("devices", {
     url: "/devices",
     templateUrl: "app/device/devices-listing.html",
