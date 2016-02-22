@@ -44,6 +44,8 @@ class Distributor(ndb.Model):
     name = ndb.StringProperty(required=True, indexed=True)
     # TODO Make admin_email required=True after migration run in prod
     admin_email = ndb.StringProperty(required=False, indexed=True)
+    player_content_url = ndb.StringProperty(required=True, indexed=True)
+    content_manager_url = ndb.StringProperty(required=True, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
@@ -65,10 +67,16 @@ class Distributor(ndb.Model):
             return True
 
     @classmethod
-    def create(cls, name, active):
+    def create(cls,
+               name,
+               active=True,
+               content_manager_url=config.DEFAULT_CONTENT_MANAGER_URL,
+               player_content_url=config.DEFAULT_PLAYER_CONTENT_URL):
         distributor_entity_group = DistributorEntityGroup.singleton()
         return cls(parent=distributor_entity_group.key,
                    name=name,
+                   content_manager_url=content_manager_url,
+                   player_content_url=player_content_url,
                    active=active)
 
     def _pre_put_hook(self):
@@ -426,6 +434,11 @@ class DeviceIssueLog(ndb.Model):
         return None == issues
 
     @classmethod
+    def device_not_reported(cls, device_key):
+        issues = DeviceIssueLog.query(DeviceIssueLog.device_key == device_key).get(keys_only=True)
+        return None == issues
+
+    @classmethod
     def get_all_by_device_key(cls, device_key):
         return DeviceIssueLog.query(DeviceIssueLog.device_key == device_key).fetch()
 
@@ -456,6 +469,28 @@ class DeviceIssueLog(ndb.Model):
                                       ndb.AND(DeviceIssueLog.resolved == False),
                                       ndb.AND(DeviceIssueLog.resolved_datetime == None)).get(keys_only=True)
         return False if issues is None else True
+
+    @staticmethod
+    def _resolve_device_issue(device_key, category, resolved_datetime):
+        issues = DeviceIssueLog.query(DeviceIssueLog.device_key == device_key,
+                                      ndb.AND(DeviceIssueLog.device_key == device_key),
+                                      ndb.AND(DeviceIssueLog.category == category),
+                                      ndb.AND(DeviceIssueLog.resolved == False),
+                                      ndb.AND(DeviceIssueLog.resolved_datetime == None)).fetch()
+        for issue in issues:
+            issue.up = True
+            issue.resolved = True
+            if category in [config.DEVICE_ISSUE_MEMORY_HIGH, config.DEVICE_ISSUE_STORAGE_LOW]:
+                issue.level = IssueLevel.Warning
+                issue.level_descriptor = IssueLevel.stringify(IssueLevel.Warning)
+            elif category in [config.DEVICE_ISSUE_PLAYER_DOWN]:
+                issue.level = IssueLevel.Danger
+                issue.level_descriptor = IssueLevel.stringify(IssueLevel.Danger)
+            else:
+                issue.level = IssueLevel.Normal
+                issue.level_descriptor = IssueLevel.stringify(IssueLevel.Normal)
+            issue.resolved_datetime = resolved_datetime
+            issue.put()
 
     @staticmethod
     def _resolve_device_issue(device_key, category, resolved_datetime):

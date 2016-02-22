@@ -245,6 +245,42 @@ def _DEVICE_ISSUE_PLAYER_UP():
 app_DEVICE_ISSUE_PLAYER_UP = _DEVICE_ISSUE_PLAYER_UP()
 
 
+def _DEVICE_ISSUE_FIRST_HEARTBEAT():
+    return 'First heartbeat'
+
+
+app_DEVICE_ISSUE_FIRST_HEARTBEAT = _DEVICE_ISSUE_FIRST_HEARTBEAT()
+
+
+def _DEVICE_ISSUE_PLAYER_VERSION_CHANGE():
+    return 'Skykit version change'
+
+
+app_DEVICE_ISSUE_PLAYER_VERSION_CHANGE = _DEVICE_ISSUE_PLAYER_VERSION_CHANGE()
+
+
+def _DEVICE_ISSUE_TIMEZONE_CHANGE():
+    return 'Timezone change'
+
+
+app_DEVICE_ISSUE_TIMEZONE_CHANGE = _DEVICE_ISSUE_TIMEZONE_CHANGE()
+
+
+def _DEVICE_ISSUE_OS_CHANGE():
+    return 'OS change'
+
+
+app_DEVICE_ISSUE_OS_CHANGE = _DEVICE_ISSUE_OS_CHANGE()
+
+
+def _DEVICE_ISSUE_OS_VERSION_CHANGE():
+    return 'OS version change'
+
+
+app_DEVICE_ISSUE_OS_VERSION_CHANGE = _DEVICE_ISSUE_OS_VERSION_CHANGE()
+
+
+
 def _DEVICE_ISSUE_MEMORY_HIGH():
     return 'Memory usage high'
 
@@ -348,6 +384,38 @@ def _WIFI_CONNECTION():
 
 
 app_WIFI_CONNECTION = _WIFI_CONNECTION()
+
+
+def _DEFAULT_CONTENT_MANAGER_URL():
+    if on_development_server or not on_server:
+        return 'https://skykit-contentmanager-int.appspot.com'
+    if on_integration_server:
+        return 'https://skykit-contentmanager-int.appspot.com'
+    if on_stage_server:
+        return 'https://skykit-contentmanager-stage.appspot.com'
+    if on_production_server:
+        return 'https://skykit-contentmanager.appspot.com'
+    return None
+
+
+app_DEFAULT_CONTENT_MANAGER_URL = _DEFAULT_CONTENT_MANAGER_URL()
+
+
+def _DEFAULT_PLAYER_CONTENT_URL():
+    if on_development_server or not on_server:
+        return 'https://skykit-contentmanager-int.appspot.com/content'
+    if on_integration_server:
+        return 'https://skykit-contentmanager-int.appspot.com/content'
+    if on_stage_server:
+        return 'https://skykit-contentmanager-stage.appspot.com/content'
+    if on_production_server:
+        return 'https://skykit-contentmanager.appspot.com/content'
+    return None
+
+
+app_DEFAULT_PLAYER_CONTENT_URL = _DEFAULT_PLAYER_CONTENT_URL()
+
+
 
 def _STORMPATH_CLIENT():
     """
