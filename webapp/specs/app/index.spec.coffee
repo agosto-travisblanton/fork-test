@@ -35,7 +35,7 @@ describe 'skykitProvisioning module and configuration', ->
       expect($state.href('domains', {})).toEqual('#/domains')
 
     it 'should resolve \'addDomain\' state', ->
-      expect($state.href('addDomain', {})).toEqual('#/domains/new')
+      expect($state.href('addDomain', {})).toEqual('#/domains/add')
 
     it 'should resolve \'editDomain\' state', ->
       domainKey = 'deree0re9reuewqerer'
@@ -47,12 +47,12 @@ describe 'skykitProvisioning module and configuration', ->
     it 'should resolve \'tenants\' state', ->
       expect($state.href('tenants', {})).toEqual('#/tenants')
 
-    it 'should resolve \'newTenant\' state', ->
-      expect($state.href('newTenant', {})).toEqual('#/tenants/new')
+    it 'should resolve \'addTenant\' state', ->
+      expect($state.href('addTenant', {})).toEqual('#/tenants/add')
 
-    it 'should resolve \'editTenant\' state', ->
+    it 'should resolve \'tenantDetails\' state', ->
       tenantKey = '3741833e781236b4jwdfhhfds98fyasd6fa7d6'
-      expect($state.href('editTenant', {tenantKey: tenantKey})).toEqual("#/tenants/#{tenantKey}")
+      expect($state.href('tenantDetails', {tenantKey: tenantKey})).toEqual("#/tenants/#{tenantKey}/details")
 
     it 'should resolve \'editDevice\' state', ->
       deviceKey = '3741833e781236b4jwdfhhfds98fyasd6fa7d6'
@@ -84,11 +84,11 @@ describe 'skykitProvisioning module and configuration', ->
       it 'should resolve \'tenants\' state', ->
         expect($state.get('tenants').ncyBreadcrumb.label).toBe 'Tenants'
 
-      it 'should resolve \'newTenant\' state', ->
-        expect($state.get('newTenant').ncyBreadcrumb.label).toBe 'New tenant'
+      it 'should resolve \'addTenant\' state', ->
+        expect($state.get('addTenant').ncyBreadcrumb.label).toBe 'Add tenant'
 
-      it 'should resolve \'editTenant\' state', ->
-        expect($state.get('editTenant').ncyBreadcrumb.label).toBe '{{ tenantDetailsCtrl.currentTenant.name }}'
+      it 'should resolve \'tenantDetails\' state', ->
+        expect($state.get('tenantDetails').ncyBreadcrumb.label).toBe '{{ tenantDetailsCtrl.currentTenant.name }}'
 
       it 'should resolve \'devices\' state', ->
         expect($state.get('devices').ncyBreadcrumb.label).toBe 'Devices'
@@ -100,11 +100,11 @@ describe 'skykitProvisioning module and configuration', ->
         expect($state.get('proof').ncyBreadcrumb.label).toBe 'Proof of Play'
 
     describe 'parents', ->
-      it 'should resolve \'newTenant\' state', ->
-        expect($state.get('newTenant').ncyBreadcrumb.parent).toBe 'tenants'
+      it 'should resolve \'addTenant\' state', ->
+        expect($state.get('addTenant').ncyBreadcrumb.parent).toBe 'tenants'
 
-      it 'should resolve \'editTenant\' state', ->
-        expect($state.get('editTenant').ncyBreadcrumb.parent).toBe 'tenants'
+      it 'should resolve \'tenantDetails\' state', ->
+        expect($state.get('tenantDetails').ncyBreadcrumb.parent).toBe 'tenants'
 
 
   describe 'Restangular configuration', ->

@@ -49,9 +49,9 @@ describe 'TenantsCtrl', ->
     beforeEach ->
       spyOn $state, 'go'
 
-    it "route to the 'editTenant' named route, passing the supplied tenant key", ->
+    it "route to the 'tenantDetails' named route, passing the supplied tenant key", ->
       controller.editItem(tenant)
-      expect($state.go).toHaveBeenCalledWith 'editTenant', {tenantKey: tenant.key}
+      expect($state.go).toHaveBeenCalledWith 'tenantDetails', {tenantKey: tenant.key}
 
   describe '.deleteItem', ->
     tenant = {
