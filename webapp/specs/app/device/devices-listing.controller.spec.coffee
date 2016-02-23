@@ -73,16 +73,3 @@ describe 'DevicesListingCtrl', ->
       controller.editItem(item)
       expect($state.go).toHaveBeenCalledWith('editDevice', {deviceKey: item.key, tenantKey: ''})
 
-  describe '.showDeviceDetails', ->
-    beforeEach ->
-      serviceInjection = {
-        $mdDialog: $mdDialog
-      }
-      item = {apiKey: 'api key'}
-      spyOn($mdDialog, 'show')
-      controller = $controller 'DevicesListingCtrl', serviceInjection
-      controller.showDeviceDetails(item, {})
-
-    it 'calls $mdDialog', ->
-      expect($mdDialog.show).toHaveBeenCalled()
-
