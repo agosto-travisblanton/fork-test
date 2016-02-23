@@ -3,22 +3,25 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantLocationCtrl',
-  ($log, $stateParams, TenantsService, LocationsService, $state, sweet, ProgressBarService) ->
+  ($log, $stateParams, TenantsService, LocationsService, $state, sweet, ProgressBarService, $timeout) ->
     tenantKey = $stateParams.tenantKey
+    @selectedTimezone = undefined
     @editMode = !!$stateParams.locationKey
     if @editMode
       locationPromise = LocationsService.getLocationByKey $stateParams.locationKey
       locationPromise.then (data) =>
         @location = data
-        @fetchTenantName data.tenantKey
+        @selectedTimezone = data.timezone
+        @tenantKey = data.tenantKey
+        @fetchTenantName @tenantKey
     @timezones = []
-    @selectedTimezone = 'America/Chicago'
 
     @initialize = ->
       timezonePromise = LocationsService.getTimezones()
       timezonePromise.then (data) =>
         @timezones = data
       if not @editMode
+        @selectedTimezone = 'America/Chicago'
         @fetchTenantName tenantKey
         @location = {
           tenantKey: tenantKey
@@ -29,11 +32,14 @@ appModule.controller 'TenantLocationCtrl',
       ProgressBarService.start()
       @location.timezone = @selectedTimezone
       promise = LocationsService.save @location
-      promise.then @onSuccessLocationSave, @onFailureLocationSave
+      promise.then @onSuccessLocationSave(@tenantKey), @onFailureLocationSave
 
-    @onSuccessLocationSave = ->
+    @onSuccessLocationSave = (tenantKey)->
       ProgressBarService.complete()
-      $state.go 'tenantLocations', {tenantKey: $stateParams.tenantKey}
+      setTimeout (->
+        $state.go 'tenantLocations', {tenantKey: tenantKey}
+        return
+      ), 1000
 
     @onFailureLocationSave = (errorObject) ->
       ProgressBarService.complete()

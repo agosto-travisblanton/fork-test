@@ -18,7 +18,7 @@ appModule.factory 'LocationsService', (Restangular) ->
       promise
 
     getLocationByKey: (locationKey) ->
-      promise = Restangular.oneUrl('tenants', "api/v1/locations/#{locationKey}").get()
+      promise = Restangular.oneUrl('locations', "api/v1/locations/#{locationKey}").get()
       promise
 
     getTimezones: () ->

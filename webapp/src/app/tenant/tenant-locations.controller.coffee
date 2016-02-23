@@ -4,14 +4,15 @@ appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantLocationsCtrl',
   ($scope, $stateParams, TenantsService, LocationsService, $state) ->
+    tenantKey = $stateParams.tenantKey
     @locations = []
     @currentTenant = undefined
 
     @initialize = ->
-      tenantPromise = TenantsService.getTenantByKey $stateParams.tenantKey
+      tenantPromise = TenantsService.getTenantByKey tenantKey
       tenantPromise.then (data) =>
         @currentTenant = data
-      locationsPromise = LocationsService.getLocationsByTenantKey $stateParams.tenantKey
+      locationsPromise = LocationsService.getLocationsByTenantKey tenantKey
       locationsPromise.then (data) =>
         @locations = data
 
@@ -24,12 +25,12 @@ appModule.controller 'TenantLocationsCtrl',
       if selectedIndex != undefined
         switch selectedIndex
           when 0
-            $state.go 'tenantDetails', {tenantKey: $stateParams.tenantKey}
+            $state.go 'tenantDetails', {tenantKey: tenantKey}
           when 1
-            $state.go 'tenantManagedDevices', {tenantKey: $stateParams.tenantKey}
+            $state.go 'tenantManagedDevices', {tenantKey: tenantKey}
           when 2
-            $state.go 'tenantUnmanagedDevices', {tenantKey: $stateParams.tenantKey}
+            $state.go 'tenantUnmanagedDevices', {tenantKey: tenantKey}
           when 3
-            $state.go 'tenantLocations', {tenantKey: $stateParams.tenantKey}
+            $state.go 'tenantLocations', {tenantKey: tenantKey}
 
     @
