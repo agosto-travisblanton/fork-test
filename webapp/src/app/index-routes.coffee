@@ -151,7 +151,7 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     controller: "TenantLocationCtrl",
     controllerAs: 'tenantLocationCtrl',
     ncyBreadcrumb: {
-      label: '{{ tenantLocationCtrl.tenantName }}  / Location',
+      label: '{{ tenantLocationCtrl.tenantName }}  / {{ tenantLocationCtrl.locationName }}',
       parent: 'tenants'
     }
   })
