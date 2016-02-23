@@ -6,8 +6,8 @@ describe 'TenantDetailsCtrl', ->
   controller = undefined
   $state = undefined
   $stateParams = undefined
-  $log = undefined
-  $mdDialog = undefined
+#  $log = undefined
+#  $mdDialog = undefined
   TenantsService = undefined
   DomainsService = undefined
   DevicesService = undefined
@@ -25,7 +25,7 @@ describe 'TenantDetailsCtrl', ->
   beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _TenantsService_, _DomainsService_, _DevicesService_, _DistributorsService_,
-    _$state_, _sweet_, _$log_, _$mdDialog_) ->
+    _$state_, _sweet_) ->
     $controller = _$controller_
     $state = _$state_
     $stateParams = {}
@@ -38,14 +38,11 @@ describe 'TenantDetailsCtrl', ->
       complete: ->
     }
     sweet = _sweet_
-    $log = _$log_
-    $mdDialog = _$mdDialog_
     scope = {}
     serviceInjection = {
       $scope: scope
       $stateParams: $stateParams
       ProgressBarService: progressBarService
-      $mdDialog: $mdDialog
     }
 
   describe 'initialization', ->
@@ -206,7 +203,6 @@ describe 'TenantDetailsCtrl', ->
     describe '.onFailureTenantSave general error', ->
       beforeEach ->
         spyOn(sweet, 'show')
-        spyOn($log, 'error')
         @errorObject = {status: 400}
         controller.onFailureTenantSave(@errorObject)
 
@@ -219,9 +215,6 @@ describe 'TenantDetailsCtrl', ->
       it "show the error dialog", ->
         expectedError = 'Unable to save the tenant.'
         expect(sweet.show).toHaveBeenCalledWith 'Oops...', expectedError, 'error'
-
-      it "logs the error to the console", ->
-        expect($log.error).toHaveBeenCalledWith @errorObject
 
   describe '.autoGenerateTenantCode', ->
     beforeEach ->
@@ -240,13 +233,3 @@ describe 'TenantDetailsCtrl', ->
       controller.currentTenant.tenant_code = 'barfoo_company'
       controller.autoGenerateTenantCode()
       expect(controller.currentTenant.tenant_code).toBe 'barfoo_company'
-
-  describe '.showDeviceDetails', ->
-    beforeEach ->
-      item = {apiKey: 'api key'}
-      spyOn($mdDialog, 'show')
-      controller = $controller 'TenantDetailsCtrl', serviceInjection
-      controller.showDeviceDetails(item, {})
-
-    it 'calls $mdDialog', ->
-      expect($mdDialog.show).toHaveBeenCalled()

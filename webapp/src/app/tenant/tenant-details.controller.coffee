@@ -3,8 +3,8 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantDetailsCtrl',
-  ($log, $stateParams, TenantsService, DomainsService, DevicesService, DistributorsService, $state, sweet,
-    ProgressBarService, $cookies, $mdDialog, $scope) ->
+  ($stateParams, TenantsService, DomainsService, DistributorsService, $state, sweet, ProgressBarService,
+    $cookies, $scope) ->
     @currentTenant = {
       key: undefined,
       name: undefined,
@@ -54,7 +54,6 @@ appModule.controller 'TenantDetailsCtrl',
         sweet.show('Oops...',
           'Tenant code unavailable. Please modify tenant name to generate a unique tenant code.', 'error')
       else
-        $log.error errorObject
         sweet.show('Oops...', 'Unable to save the tenant.', 'error')
 
     @editItem = (item) ->
@@ -68,15 +67,6 @@ appModule.controller 'TenantDetailsCtrl',
           newTenantCode = newTenantCode.replace(/\s+/g, '_')
           newTenantCode = newTenantCode.replace(/\W+/g, '')
         @currentTenant.tenant_code = newTenantCode
-
-    @showDeviceDetails = (item, event) ->
-      apiKey = item.apiKey
-      $mdDialog.show($mdDialog.alert()
-      .title('Device Details')
-      .textContent("API key: #{apiKey}")
-      .ariaLabel('Device details')
-      .ok('Close')
-      .targetEvent(event))
 
     $scope.tabIndex = 0
 
