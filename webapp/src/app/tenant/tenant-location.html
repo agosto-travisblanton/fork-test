@@ -1,4 +1,4 @@
-<div ng-controller="TenantLocationCtrl" layout="column" ng-cloak>
+<div ng-controller="TenantLocationCtrl" ng-init="tenantLocationCtrl.initialize()" layout="column" ng-cloak>
   <md-toolbar class="md-hue-2">
     <div class="md-toolbar-tools">
       <h2 class="md-flex"><i class="fa fa-fw fa-location-arrow ng-scope"></i> Location</h2>
@@ -54,12 +54,13 @@
                  !locationForm.timezone.$pristine }">
               <div class="col-sm-4">
                 <label>Timezone</label>
-                <input type="text"
-                       class="form-control"
-                       name="timezone"
-                       placeholder="Enter a valid timezone"
-                       ng-model="tenantLocationCtrl.location.timezone" required
-                >
+                <br>
+                <select id="timezone"
+                        ng-model="tenantLocationCtrl.selectedTimezone"
+                        class="form-control"
+                        ng-options="item for item in tenantLocationCtrl.timezones track by item">
+                  <option value=''>Select timezone</option>
+                </select>
               </div>
               <div class="col-sm-5 margin-top-15">
                 <p
