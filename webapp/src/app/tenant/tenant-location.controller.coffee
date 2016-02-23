@@ -3,7 +3,7 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantLocationCtrl',
-  ($log, $stateParams, TenantsService, LocationsService, $state, sweet, ProgressBarService, $timeout) ->
+  ($stateParams, TenantsService, LocationsService, $state, sweet, ProgressBarService) ->
     @tenantKey = $stateParams.tenantKey
     @selectedTimezone = 'America/Chicago'
     @editMode = !!$stateParams.locationKey
@@ -45,11 +45,10 @@ appModule.controller 'TenantLocationCtrl',
       ProgressBarService.complete()
       if errorObject.status is 409
         sweet.show('Oops...',
-          'Location code unavailable. Please modify customer location name to generate a unique location code.', 'error')
+          'Location code unavailable. Please modify customer location name to generate a unique location code.',
+          'error')
       else
-        $log.error errorObject
-        sweet.show('Oops...', 'Unable to save the location.', 'error')
-
+        sweet.show('Oops...', 'Unable to save the tenant.', 'error')
 
     @fetchTenantName = (tenantKey) =>
       tenantPromise = TenantsService.getTenantByKey tenantKey
@@ -64,6 +63,5 @@ appModule.controller 'TenantLocationCtrl',
           newCustomerLocationCode = newCustomerLocationCode.replace(/\s+/g, '_')
           newCustomerLocationCode = newCustomerLocationCode.replace(/\W+/g, '')
         @location.customerLocationCode = newCustomerLocationCode
-
 
     @
