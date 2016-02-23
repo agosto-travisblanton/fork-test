@@ -27,12 +27,13 @@
                        ng-model="tenantLocationCtrl.location.customerLocationName" required>
               </div>
             </div>
-            <div class="form-group" ng-hide="tenantLocationCtrl.editMode"
+            <div class="form-group"
                  ng-class="{ 'has-error' : locationForm.customerLocationCode.$invalid &&
                  !locationForm.customerLocationCode.$pristine }">
               <div class="col-sm-4">
                 <label>Customer Location Code</label>
                 <input type="text"
+                       ng-readonly="tenantLocationCtrl.editMode == true"
                        class="form-control"
                        name="customerLocationCode"
                        placeholder="Auto-generated"

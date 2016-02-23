@@ -64,13 +64,13 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
       label: 'Domains'
     }
   })
-  $stateProvider.state("newDomain", {
-    url: "/domains/new",
+  $stateProvider.state("addDomain", {
+    url: "/domains/add",
     templateUrl: "app/domain/domain-detail.html",
     controller: "DomainDetailsCtrl",
     controllerAs: 'domainDetailsCtrl',
     ncyBreadcrumb: {
-      label: 'New domain',
+      label: 'Add domain',
       parent: 'domains'
     }
   })
@@ -93,26 +93,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
       label: 'Tenants'
     }
   })
-#  $stateProvider.state("newTenant", {
-#    url: "/tenants/new",
-#    templateUrl: "app/tenant/tenant-detail.html",
-#    controller: "TenantDetailsCtrl",
-#    controllerAs: 'tenantDetailsCtrl',
-#    ncyBreadcrumb: {
-#      label: 'New tenant',
-#      parent: 'tenants'
-#    }
-#  })
-#  $stateProvider.state("editTenant", {
-#    url: "/tenants/:tenantKey",
-#    templateUrl: "app/tenant/tenant-detail.html",
-#    controller: "TenantDetailsCtrl",
-#    controllerAs: 'tenantDetailsCtrl',
-#    ncyBreadcrumb: {
-#      label: '{{ tenantDetailsCtrl.currentTenant.name }}',
-#      parent: 'tenants'
-#    }
-#  })
   $stateProvider.state("addTenant", {
     url: "/tenants/add",
     templateUrl: "app/tenant/tenant-add.html",
@@ -123,13 +103,14 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
       parent: 'tenants'
     }
   })
+  #-----------------------------------------------------------#
   $stateProvider.state("tenantDetails", {
     url: "/tenants/:tenantKey/details",
-    templateUrl: "app/tenant/tenant.html",
-    controller: "TenantCtrl",
-    controllerAs: 'tenantCtrl',
+    templateUrl: "app/tenant/tenant-details.html",
+    controller: "TenantDetailsCtrl",
+    controllerAs: 'tenantDetailsCtrl',
     ncyBreadcrumb: {
-      label: '{{ tenantCtrl.currentTenant.name }}',
+      label: '{{ tenantDetailsCtrl.currentTenant.name }}',
       parent: 'tenants'
     }
   })
@@ -163,6 +144,7 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
       parent: 'tenants'
     }
   })
+  #-----------------------------------------------------------#
   $stateProvider.state("editLocation", {
     url: "/locations/:locationKey",
     templateUrl: "app/tenant/tenant-location.html",
@@ -183,7 +165,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
       parent: 'tenants'
     }
   })
-
   $stateProvider.state("devices", {
     url: "/devices",
     templateUrl: "app/device/devices-listing.html",

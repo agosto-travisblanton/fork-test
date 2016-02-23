@@ -34,8 +34,8 @@ describe 'skykitProvisioning module and configuration', ->
     it 'should resolve \'domains\' state', ->
       expect($state.href('domains', {})).toEqual('#/domains')
 
-    it 'should resolve \'newDomain\' state', ->
-      expect($state.href('newDomain', {})).toEqual('#/domains/new')
+    it 'should resolve \'addDomain\' state', ->
+      expect($state.href('addDomain', {})).toEqual('#/domains/new')
 
     it 'should resolve \'editDomain\' state', ->
       domainKey = 'deree0re9reuewqerer'

@@ -2,9 +2,9 @@
 
 appModule = angular.module('skykitProvisioning')
 
-appModule.controller 'TenantCtrl',
+appModule.controller 'TenantDetailsCtrl',
   ($log, $stateParams, TenantsService, DomainsService, DevicesService, DistributorsService, $state, sweet,
-    ProgressBarService, $cookies, $mdDialog, $scope) ->
+    ProgressBarService, $cookies, $mdDialog) ->
     @currentTenant = {
       key: undefined,
       name: undefined,
@@ -18,6 +18,8 @@ appModule.controller 'TenantCtrl',
       active: true
     }
     @selectedDomain = undefined
+    @currentTenantDisplays = []
+    @currentTenantUnmanagedDisplays = []
     @distributorDomains = []
     @editMode = !!$stateParams.tenantKey
 
@@ -26,6 +28,13 @@ appModule.controller 'TenantCtrl',
       tenantPromise.then (tenant) =>
         @currentTenant = tenant
         @onSuccessResolvingTenant tenant
+      devicesPromise = DevicesService.getDevicesByTenant $stateParams.tenantKey
+      devicesPromise.then (data) =>
+        @currentTenantDisplays = data.objects
+
+      unmanagedDevicesPromise = DevicesService.getUnmanagedDevicesByTenant $stateParams.tenantKey
+      unmanagedDevicesPromise.then (data) =>
+        @currentTenantUnmanagedDisplays = data.objects
 
     @initialize = ->
       @currentDistributorKey = $cookies.get('currentDistributorKey')
@@ -72,25 +81,10 @@ appModule.controller 'TenantCtrl',
     @showDeviceDetails = (item, event) ->
       apiKey = item.apiKey
       $mdDialog.show($mdDialog.alert()
-      .title('Device Details')
-      .textContent("API key: #{apiKey}")
-      .ariaLabel('Device details')
-      .ok('Close')
-      .targetEvent(event))
-
-    $scope.tabIndex = 0
-
-    $scope.$watch 'tabIndex', (toTab, fromTab) ->
-
-      if toTab != undefined
-        switch toTab
-          when 0
-            $state.go 'tenantDetails', {tenantKey: $stateParams.tenantKey}
-          when 1
-            $state.go 'tenantManagedDevices', {tenantKey: $stateParams.tenantKey}
-          when 2
-            $state.go 'tenantUnmanagedDevices', {tenantKey: $stateParams.tenantKey}
-          when 3
-            $state.go 'tenantLocations', {tenantKey: $stateParams.tenantKey}
+        .title('Device Details')
+        .textContent("API key: #{apiKey}")
+        .ariaLabel('Device details')
+        .ok('Close')
+        .targetEvent(event))
 
     @
