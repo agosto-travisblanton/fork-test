@@ -1,6 +1,7 @@
 import json
 
 from env_setup import setup_test_paths
+from utils.timezone_util import TimezoneUtil
 
 setup_test_paths()
 
@@ -202,7 +203,7 @@ class TestLocationsHandler(BaseTest, WebTest):
     ##################################################################################################################
     def test_get_location_representation(self):
         request_parameters = {}
-        uri = application.router.build(None, 'location-retrieval', None,
+        uri = application.router.build(None, 'manage-location', None,
                                        {'location_urlsafe_key': self.location_key.urlsafe()})
         response = self.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
@@ -211,6 +212,52 @@ class TestLocationsHandler(BaseTest, WebTest):
         self.assertEqual(response_json.get('timezone'), self.TIMEZONE)
         self.assertEqual(response_json.get('timezoneOffset'), self.TIMEZONE_OFFSET)
         self.assertTrue(response_json.get('active'))
+
+    ##################################################################################################################
+    ## put
+    ##################################################################################################################
+    def test_put_returns_no_content_status(self):
+        uri = application.router.build(None, 'manage-location', None,
+                                       {'location_urlsafe_key': self.location_key.urlsafe()})
+        customer_location_name = 'Acme, Inc.'
+        entity_body = {
+            'customerLocationName': customer_location_name,
+            'timezone': self.TIMEZONE,
+            'active': True
+        }
+        response = self.app.put_json(uri, entity_body, headers=self.headers)
+        self.assertEqual(204, response.status_int)
+
+    def test_put_updates_selected_properties(self):
+        uri = application.router.build(None, 'manage-location', None,
+                                       {'location_urlsafe_key': self.location_key.urlsafe()})
+        customer_location_name = 'Acme, Inc.'
+        entity_body = {
+            'customerLocationName': customer_location_name,
+            'timezone': self.TIMEZONE,
+            'active': False
+        }
+        self.app.put_json(uri, entity_body, headers=self.headers)
+        expected = self.location_key.get()
+        self.assertEqual(expected.customer_location_name, customer_location_name)
+        self.assertEqual(expected.customer_location_code, self.CUSTOMER_LOCATION_CODE)
+        self.assertFalse(expected.active)
+
+    def test_put_updates_timezone_offset(self):
+        location_before = self.location_key.get()
+        self.assertEqual(location_before.timezone_offset, self.TIMEZONE_OFFSET)
+        uri = application.router.build(None, 'manage-location', None,
+                                       {'location_urlsafe_key': self.location_key.urlsafe()})
+        timezone = 'US/Central'
+        entity_body = {
+            'customerLocationName': self.CUSTOMER_LOCATION_NAME,
+            'timezone': timezone,
+            'active': True
+        }
+        expected = self.location_key.get()
+        self.app.put_json(uri, entity_body, headers=self.headers)
+        expected_offset = TimezoneUtil.get_timezone_offset(timezone)
+        self.assertEqual(expected.timezone_offset, expected_offset)
 
     def load_tenant_locations(self, number_of_locations, tenant_key):
         for x in range(number_of_locations):

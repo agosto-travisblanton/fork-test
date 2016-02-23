@@ -10,6 +10,7 @@ from models import Location
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import LOCATION_STRATEGY
+from utils.timezone_util import TimezoneUtil
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -111,3 +112,45 @@ class LocationsHandler(RequestHandler, KeyValidatorMixin):
         else:
             logging.info("Problem creating Location. No request body.")
             self.response.set_status(400, 'Did not receive request body.')
+
+    @requires_api_token
+    def put(self, location_urlsafe_key):
+        key = ndb.Key(urlsafe=location_urlsafe_key)
+        location = key.get()
+        request_json = json.loads(self.request.body)
+        location.customer_location_name = request_json.get('customerLocationName')
+        timezone = request_json.get('timezone')
+        if timezone:
+            location.timezone = timezone
+            location.timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
+        address = request_json.get('address')
+        if address:
+            location.address = address
+        city = request_json.get('city')
+        if city:
+            location.city = city
+        state = request_json.get('state')
+        if state:
+            location.state = state
+        postal_code = request_json.get('postalCode')
+        if postal_code:
+            location.postal_code = postal_code
+        dma = request_json.get('dma')
+        if dma:
+            location.dma = dma
+        latitude = request_json.get('latitude')
+        longitude = request_json.get('longitude')
+        if latitude is None or longitude is None:
+            location.geo_location = None
+        else:
+            if re.match(self.LATITUDE_PATTERN, str(latitude)) is None or re.match(self.LONGITUDE_PATTERN,
+                                                                                  str(longitude)) is None:
+                logging.warning(
+                    'Invalid latitude {0} or longitude {1} detected.'.format(str(latitude), str(longitude)))
+            else:
+                location.geo_location = ndb.GeoPt(latitude, longitude)
+
+        location.active = request_json.get('active')
+        location.put()
+        self.response.headers.pop('Content-Type', None)
+        self.response.set_status(204)
