@@ -81,6 +81,12 @@ describe 'skykitProvisioning module and configuration', ->
       it 'should resolve \'domains\' state', ->
         expect($state.get('domains').ncyBreadcrumb.label).toBe 'Domains'
 
+      it 'should resolve \'addDomain\' state', ->
+        expect($state.get('addDomain').ncyBreadcrumb.label).toBe 'Add domain'
+
+      it 'should resolve \'editDomain\' state', ->
+        expect($state.get('editDomain').ncyBreadcrumb.label).toBe '{{ domainDetailsCtrl.currentDomain.name }}'
+
       it 'should resolve \'tenants\' state', ->
         expect($state.get('tenants').ncyBreadcrumb.label).toBe 'Tenants'
 
@@ -89,6 +95,24 @@ describe 'skykitProvisioning module and configuration', ->
 
       it 'should resolve \'tenantDetails\' state', ->
         expect($state.get('tenantDetails').ncyBreadcrumb.label).toBe '{{ tenantDetailsCtrl.currentTenant.name }}'
+
+      it 'should resolve \'tenantManagedDevices\' state', ->
+        expect($state.get('tenantManagedDevices').ncyBreadcrumb.label).toBe
+        '{{ tenantManagedDevicesCtrl.currentTenant.name }}'
+
+      it 'should resolve \'tenantUnmanagedDevices\' state', ->
+        expect($state.get('tenantUnmanagedDevices').ncyBreadcrumb.label).toBe
+        '{{ tenantUnmanagedDevicesCtrl.currentTenant.name }}'
+
+      it 'should resolve \'tenantLocations\' state', ->
+        expect($state.get('tenantLocations').ncyBreadcrumb.label).toBe '{{ tenantLocationsCtrl.currentTenant.name }}'
+
+      it 'should resolve \'addLocation\' state', ->
+        expect($state.get('addLocation').ncyBreadcrumb.label).toBe '{{ tenantLocationCtrl.tenantName }}  / Location'
+
+      it 'should resolve \'editLocation\' state', ->
+        expect($state.get('editLocation').ncyBreadcrumb.label).toBe
+        '{{ tenantLocationCtrl.tenantName }}  / {{ tenantLocationCtrl.locationName }}'
 
       it 'should resolve \'devices\' state', ->
         expect($state.get('devices').ncyBreadcrumb.label).toBe 'Devices'
@@ -105,6 +129,42 @@ describe 'skykitProvisioning module and configuration', ->
 
       it 'should resolve \'tenantDetails\' state', ->
         expect($state.get('tenantDetails').ncyBreadcrumb.parent).toBe 'tenants'
+
+      it 'should resolve \'tenantManagedDevices\' state', ->
+        expect($state.get('tenantManagedDevices').ncyBreadcrumb.parent).toBe 'tenants'
+
+      it 'should resolve \'tenantUnmanagedDevices\' state', ->
+        expect($state.get('tenantUnmanagedDevices').ncyBreadcrumb.parent).toBe 'tenants'
+
+      it 'should resolve \'tenantLocations\' state', ->
+        expect($state.get('tenantLocations').ncyBreadcrumb.parent).toBe 'tenants'
+
+      it 'should resolve \'editLocation\' state', ->
+        expect($state.get('editLocation').ncyBreadcrumb.parent).toBe 'tenants'
+
+      it 'should resolve \'editDevice\' state', ->
+        expect($state.get('editDevice').ncyBreadcrumb.parent).toBe 'devices'
+
+      it 'should resolve \'deviceReset\' state', ->
+        expect($state.get('deviceReset').ncyBreadcrumb.parent).toBe 'devices'
+
+      it 'should resolve \'deviceVolume\' state', ->
+        expect($state.get('deviceVolume').ncyBreadcrumb.parent).toBe 'devices'
+
+      it 'should resolve \'deviceCustom\' state', ->
+        expect($state.get('deviceCustom').ncyBreadcrumb.parent).toBe 'devices'
+
+      it 'should resolve \'addLocation\' state', ->
+        expect($state.get('addLocation').ncyBreadcrumb.parent).toBe 'tenants'
+
+      it 'should resolve \'addDomain\' state', ->
+        expect($state.get('addDomain').ncyBreadcrumb.parent).toBe 'domains'
+
+      it 'should resolve \'editDomain\' state', ->
+        expect($state.get('editDomain').ncyBreadcrumb.parent).toBe 'domains'
+
+
+
 
 
   describe 'Restangular configuration', ->

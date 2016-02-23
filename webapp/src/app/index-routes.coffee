@@ -103,7 +103,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
       parent: 'tenants'
     }
   })
-  #-----------------------------------------------------------#
   $stateProvider.state("tenantDetails", {
     url: "/tenants/:tenantKey/details",
     templateUrl: "app/tenant/tenant-details.html",
@@ -144,7 +143,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
       parent: 'tenants'
     }
   })
-  #-----------------------------------------------------------#
   $stateProvider.state("editLocation", {
     url: "/locations/:locationKey",
     templateUrl: "app/tenant/tenant-location.html",
