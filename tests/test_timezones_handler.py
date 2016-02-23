@@ -1,4 +1,5 @@
 from env_setup import setup_test_paths
+from webtest import AppError
 
 setup_test_paths()
 
@@ -11,14 +12,8 @@ from app_config import config
 
 class TestTimezonesHandler(BaseTest, WebTest):
     APPLICATION = application
-    ADMIN_EMAIL = "foo{0}@bar.com"
-    API_KEY = "SOME_KEY_{0}"
-    CONTENT_SERVER_URL = 'https://skykit-contentmanager-int.appspot.com/content'
-    CONTENT_MANAGER_BASE_URL = 'https://skykit-contentmanager-int.appspot.com'
-    CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     DISTRIBUTOR_NAME = 'agosto'
-    IMPERSONATION_EMAIL = 'test@test.com'
-    ORIGINAL_NOTIFICATION_EMAILS = ['test@skykit.com', 'admin@skykit.com']
+    FORBIDDEN = '403 Forbidden'
 
     def setUp(self):
         super(TestTimezonesHandler, self).setUp()
@@ -29,6 +24,11 @@ class TestTimezonesHandler(BaseTest, WebTest):
             'Authorization': config.API_TOKEN,
             'X-Provisioning-Distributor': self.distributor_key.urlsafe()
         }
+        self.bad_authorization_header = {
+            'Authorization': 'Forget about it!',
+            'X-Provisioning-Distributor': self.distributor_key.urlsafe()
+        }
+
 
     ##################################################################################################################
     ## get
@@ -50,3 +50,10 @@ class TestTimezonesHandler(BaseTest, WebTest):
         self.assertEqual(response_json[10], 'America/Chicago')
         self.assertEqual(response_json[17], 'America/Denver')
         self.assertEqual(response_json[21], 'America/Los_Angeles')
+
+    def test_get_fails_with_bad_authorization_token(self):
+        request_parameters = {}
+        uri = application.router.build(None, 'timezones-list', None, {})
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.bad_authorization_header)
+        self.assertTrue(self.FORBIDDEN in context.exception.message)
