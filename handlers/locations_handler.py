@@ -86,7 +86,7 @@ class LocationsHandler(RequestHandler, KeyValidatorMixin):
                     geo_location = ndb.GeoPt(latitude, longitude)
             dma = request_json.get('dma')
             if status == 201:
-                if Location.is_customer_location_code_unique(customer_location_code):
+                if Location.is_customer_location_code_unique(customer_location_code, tenant_key):
                     location = Location.create(tenant_key=tenant_key,
                                                customer_location_name=customer_location_name,
                                                customer_location_code=customer_location_code,
@@ -109,7 +109,7 @@ class LocationsHandler(RequestHandler, KeyValidatorMixin):
                     self.response.headers.pop('Content-Type', None)
                     self.response.set_status(201)
                 else:
-                    error_message = "Conflict. Customer location code \"{0}\" is already assigned.".format(
+                    error_message = "Conflict. Customer location code \"{0}\" is already assigned for tenant.".format(
                         customer_location_code)
                     self.response.set_status(409, error_message)
             else:

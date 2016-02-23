@@ -231,8 +231,10 @@ class Location(ndb.Model):
                 return key.get()
 
     @classmethod
-    def is_customer_location_code_unique(cls, customer_location_code):
-        return None is Location.query(Location.customer_location_code == customer_location_code).get(keys_only=True)
+    def is_customer_location_code_unique(cls, customer_location_code, tenant_key):
+        return None is Location.query(
+            ndb.AND(Location.customer_location_code == customer_location_code, Location.tenant_key == tenant_key)).get(
+            keys_only=True)
 
     def _pre_put_hook(self):
         self.class_version = 1

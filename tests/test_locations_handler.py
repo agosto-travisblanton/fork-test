@@ -220,7 +220,7 @@ class TestLocationsHandler(BaseTest, WebTest):
         uri = application.router.build(None, 'location-create', None, {})
         with self.assertRaises(AppError) as context:
             self.app.post_json(uri, params=request_parameters, headers=self.headers)
-        error_message = "Bad response: 409 Conflict. Customer location code \"{0}\" is already assigned.".format(
+        error_message = "Bad response: 409 Conflict. Customer location code \"{0}\" is already assigned for tenant.".format(
             self.CUSTOMER_LOCATION_CODE)
         self.assertTrue(error_message in context.exception.message)
 
