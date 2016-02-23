@@ -256,6 +256,15 @@ application = WSGIApplication(
               ),
 
         ############################################################
+        # Timezones
+        ############################################################
+        Route(r'/api/v1/timezones',
+              handler='handlers.timezones_handler.TimezonesHandler',
+              name='timezones-list',
+              methods=['GET']
+              ),
+
+        ############################################################
         # /dev/ routes secured by admin:required
         ############################################################
         Route(
