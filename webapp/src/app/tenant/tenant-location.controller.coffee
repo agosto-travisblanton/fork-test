@@ -51,4 +51,14 @@ appModule.controller 'TenantLocationCtrl',
       tenantPromise.then (tenant) =>
         @tenantName = tenant.name
 
+    @autoGenerateCustomerLocationCode = ->
+      unless @location.key
+        newCustomerLocationCode = ''
+        if @location.customerLocationName
+          newCustomerLocationCode = @location.customerLocationName.toLowerCase()
+          newCustomerLocationCode = newCustomerLocationCode.replace(/\s+/g, '_')
+          newCustomerLocationCode = newCustomerLocationCode.replace(/\W+/g, '')
+        @location.customerLocationCode = newCustomerLocationCode
+
+
     @
