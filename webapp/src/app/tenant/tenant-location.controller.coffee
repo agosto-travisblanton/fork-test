@@ -43,8 +43,13 @@ appModule.controller 'TenantLocationCtrl',
 
     @onFailureSavingLocation = (errorObject) ->
       ProgressBarService.complete()
-      $log.error errorObject
-      sweet.show('Oops...', 'Unable to save the location.', 'error')
+      if errorObject.status is 409
+        sweet.show('Oops...',
+          'Location code unavailable. Please modify customer location name to generate a unique location code.', 'error')
+      else
+        $log.error errorObject
+        sweet.show('Oops...', 'Unable to save the location.', 'error')
+
 
     @fetchTenantName = (tenantKey) =>
       tenantPromise = TenantsService.getTenantByKey tenantKey

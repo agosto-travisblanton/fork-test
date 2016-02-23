@@ -87,7 +87,7 @@ class TestLocationsHandler(BaseTest, WebTest):
     def test_post_returns_created_status(self):
         request_parameters = {'tenantKey': self.tenant_key.urlsafe(),
                               'customerLocationName': 'Store 4532',
-                              'customerLocationCode': 'store_4532',
+                              'customerLocationCode': 'store_4532B',
                               'timezone': 'America/Phoenix',
                               'active': True,
                               'address': '123 Main St.',
@@ -197,6 +197,32 @@ class TestLocationsHandler(BaseTest, WebTest):
             self.app.post_json(uri, params=request_parameters, headers=self.headers)
         self.assertTrue('Bad response: 400 The active parameter is invalid.'
                         in context.exception.message)
+
+    def test_post_returns_conflict_when_encountering_an_existing_customer_location_code(self):
+        location = Location.create(tenant_key=self.tenant_key,
+                                   customer_location_name=self.CUSTOMER_LOCATION_NAME,
+                                   customer_location_code=self.CUSTOMER_LOCATION_CODE,
+                                   timezone=self.TIMEZONE)
+        location.put()
+        request_parameters = {'tenantKey': self.tenant_key.urlsafe(),
+                              'customerLocationName': 'Store 4532',
+                              'customerLocationCode': self.CUSTOMER_LOCATION_CODE,
+                              'timezone': 'America/Phoenix',
+                              'active': True,
+                              'address': '123 Main St.',
+                              'city': 'Minneapolis',
+                              'state': 'MN',
+                              'postalCode': '55401',
+                              'latitude': 44.986656,
+                              'longitude': -93.258133,
+                              'dma': 'some dma code'
+                              }
+        uri = application.router.build(None, 'location-create', None, {})
+        with self.assertRaises(AppError) as context:
+            self.app.post_json(uri, params=request_parameters, headers=self.headers)
+        error_message = "Bad response: 409 Conflict. Customer location code \"{0}\" is already assigned.".format(
+            self.CUSTOMER_LOCATION_CODE)
+        self.assertTrue(error_message in context.exception.message)
 
     ##################################################################################################################
     ## get

@@ -86,27 +86,32 @@ class LocationsHandler(RequestHandler, KeyValidatorMixin):
                     geo_location = ndb.GeoPt(latitude, longitude)
             dma = request_json.get('dma')
             if status == 201:
-                location = Location.create(tenant_key=tenant_key,
-                                           customer_location_name=customer_location_name,
-                                           customer_location_code=customer_location_code,
-                                           timezone=timezone)
-                if address:
-                    location.address = address
-                if city:
-                    location.city = city
-                if state:
-                    location.state = state
-                if postal_code:
-                    location.postal_code = postal_code
-                if geo_location:
-                    location.geo_location = geo_location
-                if dma:
-                    location.dma = dma
-                if active:
-                    location.active = active
-                location.put()
-                self.response.headers.pop('Content-Type', None)
-                self.response.set_status(201)
+                if Location.is_customer_location_code_unique(customer_location_code):
+                    location = Location.create(tenant_key=tenant_key,
+                                               customer_location_name=customer_location_name,
+                                               customer_location_code=customer_location_code,
+                                               timezone=timezone)
+                    if address:
+                        location.address = address
+                    if city:
+                        location.city = city
+                    if state:
+                        location.state = state
+                    if postal_code:
+                        location.postal_code = postal_code
+                    if geo_location:
+                        location.geo_location = geo_location
+                    if dma:
+                        location.dma = dma
+                    if active:
+                        location.active = active
+                    location.put()
+                    self.response.headers.pop('Content-Type', None)
+                    self.response.set_status(201)
+                else:
+                    error_message = "Conflict. Customer location code \"{0}\" is already assigned.".format(
+                        customer_location_code)
+                    self.response.set_status(409, error_message)
             else:
                 self.response.set_status(status, error_message)
         else:
