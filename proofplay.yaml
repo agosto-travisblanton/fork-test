@@ -24,6 +24,8 @@ libraries:
   version: latest
 - name: pycrypto
   version: latest
+- name: MySQLdb
+  version: "latest"
 
 handlers:
 - url: /_ah/start
