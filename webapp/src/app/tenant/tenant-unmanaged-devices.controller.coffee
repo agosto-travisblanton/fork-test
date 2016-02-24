@@ -3,11 +3,7 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantUnmanagedDevicesCtrl',
-  ($scope, $stateParams, TenantsService, DomainsService, DevicesService, DistributorsService, $state, sweet,
-    ProgressBarService, $cookies, $mdDialog) ->
-
-    @currentTenantUnmanagedDisplays = []
-
+  ($scope, $stateParams, TenantsService, DevicesService, $state) ->
     @currentTenant = {
       key: undefined,
       name: undefined,
@@ -20,15 +16,16 @@ appModule.controller 'TenantUnmanagedDevicesCtrl',
       proof_of_play_logging: false,
       active: true
     }
+    @tenantDevices = []
     @editMode = !!$stateParams.tenantKey
 
     if @editMode
       tenantPromise = TenantsService.getTenantByKey $stateParams.tenantKey
       tenantPromise.then (tenant) =>
         @currentTenant = tenant
-      unmanagedDevicesPromise = DevicesService.getUnmanagedDevicesByTenant $stateParams.tenantKey
-      unmanagedDevicesPromise.then (data) =>
-        @currentTenantUnmanagedDisplays = data.objects
+      devicesPromise = DevicesService.getUnmanagedDevicesByTenant $stateParams.tenantKey
+      devicesPromise.then (data) =>
+        @tenantDevices = data.objects
 
     $scope.tabIndex = 2
 

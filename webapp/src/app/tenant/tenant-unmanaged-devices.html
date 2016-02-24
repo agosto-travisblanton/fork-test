@@ -32,12 +32,12 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-hide="tenantUnmanagedDevicesCtrl.currentTenantUnmanagedDisplays.length">
+            <tr ng-hide="tenantUnmanagedDevicesCtrl.tenantDevices.length">
               <td colspan="4" class="text-center text-danger">
                 {{ tenantUnmanagedDevicesCtrl.currentTenant.name }} has no unmanaged devices.
               </td>
             </tr>
-            <tr ng-repeat="item in tenantUnmanagedDevicesCtrl.currentTenantUnmanagedDisplays | orderBy:'-created' ">
+            <tr ng-repeat="item in tenantUnmanagedDevicesCtrl.tenantDevices | orderBy:'-created' ">
               <td>
                 <a ng-click="tenantUnmanagedDevicesCtrl.editItem(item)"
                    title="Device detail">
