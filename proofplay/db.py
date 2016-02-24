@@ -4,7 +4,7 @@ import os
 
 if os.environ.get('SERVER_SOFTWARE', '').startswith('Google'):
     # the second arg after : is the db instance name
-    SQLALCHEMY_DATABASE_URI = "mysql+mysqldb://root@/provisioning?unix_socket=/cloudsql/provisioning-int:provisioning-int"
+    SQLALCHEMY_DATABASE_URI = "mysql+mysqldb://root@/provisioning?unix_socket=/cloudsql/skykit-display-device-int:provisioning-int"
 else:
     SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://root@localhost/provisioning'
 
