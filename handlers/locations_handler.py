@@ -145,7 +145,7 @@ class LocationsHandler(RequestHandler, KeyValidatorMixin):
             location.dma = dma
         latitude = request_json.get('latitude')
         longitude = request_json.get('longitude')
-        if latitude is not None and longitude is not None:
+        if latitude and longitude:
             if re.match(self.LATITUDE_PATTERN, str(latitude)) is None or re.match(self.LONGITUDE_PATTERN,
                                                                                   str(longitude)) is None:
                 logging.warning(
