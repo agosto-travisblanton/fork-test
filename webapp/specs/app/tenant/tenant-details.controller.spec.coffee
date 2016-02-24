@@ -152,7 +152,7 @@ describe 'TenantDetailsCtrl', ->
 
     beforeEach ->
       tenantsServicePromise = new skykitProvisioning.q.Mock
-      spyOn(TenantsService, 'save').and.returnValue(tenantsServicePromise)
+      spyOn(TenantsService, 'save').and.returnValue tenantsServicePromise
       spyOn($state, 'go')
       $stateParams = {}
       spyOn(progressBarService, 'start')
@@ -170,7 +170,7 @@ describe 'TenantDetailsCtrl', ->
       expect(progressBarService.start).toHaveBeenCalled()
 
     it 'call TenantsService.save, pass the current tenant', ->
-      expect(TenantsService.save).toHaveBeenCalledWith(controller.currentTenant)
+      expect(TenantsService.save).toHaveBeenCalledWith controller.currentTenant
 
     describe '.onSuccessTenantSave', ->
       beforeEach ->
@@ -186,7 +186,7 @@ describe 'TenantDetailsCtrl', ->
       beforeEach ->
         spyOn(sweet, 'show')
         errorObject = {status: 409}
-        controller.onFailureTenantSave(errorObject)
+        controller.onFailureTenantSave errorObject
 
       it 'stops the progress bar animation', ->
         expect(progressBarService.complete).toHaveBeenCalled()
@@ -216,7 +216,6 @@ describe 'TenantDetailsCtrl', ->
 
   describe '.autoGenerateTenantCode', ->
     beforeEach ->
-      $stateParams = {}
       controller = $controller 'TenantDetailsCtrl', serviceInjection
 
     it 'generates a new tenant code when key is undefined', ->
