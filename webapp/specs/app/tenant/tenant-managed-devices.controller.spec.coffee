@@ -100,3 +100,20 @@ describe 'TenantManagedDevicesCtrl', ->
         controller = $controller 'TenantManagedDevicesCtrl', serviceInjection
         expect(DevicesService.getDevicesByTenant).not.toHaveBeenCalled()
 
+    describe 'editItem', ->
+      controller = undefined
+      tenantKey = 'bhjad897d987fa32fg708fg72'
+      item = {key: 'ahjad897d987fadafg708fg71'}
+
+      beforeEach ->
+        spyOn $state, 'go'
+        $stateParams = {tenantKey: tenantKey}
+        serviceInjection = {
+          $scope: scope
+          $stateParams: $stateParams
+        }
+        controller = $controller 'TenantManagedDevicesCtrl', serviceInjection
+
+      it "route to the 'editDevice' named route, passing the supplied device key", ->
+        controller.editItem(item)
+        expect($state.go).toHaveBeenCalledWith('editDevice', {deviceKey: item.key, tenantKey: tenantKey})
