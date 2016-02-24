@@ -81,7 +81,7 @@ application = WSGIApplication([
     ################################################################
 
     Route(
-            BASE_URI + '/make_migrations',
+            BASE_URI + '/0730578567129494/make_migration',
             handler="proofplay.main.MakeMigration",
             name="MakeMigration"
     ),
