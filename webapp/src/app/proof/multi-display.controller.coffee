@@ -18,31 +18,31 @@ appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService) ->
   @formValidity = {
     start_date: false,
     end_date: false,
-    resources: false,
+    displays: false,
   }
 
   @no_cache = true
   @loading = true
   @disabled = true
-  @selected_resources = []
+  @selected_displays = []
 
   @initialize = =>
-    ProofPlayService.getAllResources()
+    ProofPlayService.getAllDisplays()
     .then (data) =>
       @loading = false
-      @resources = data.data.resources
+      @displays = data.data.devices
 
-  @addToSelectedResources = (searchText) =>
-    if @isResourceValid(searchText)
-      @selected_resources.push searchText
-      index = @resources.indexOf searchText
-      @resources.splice index, 1
+  @addToSelectedDisplays = (searchText) =>
+    if @isDisplayValid(searchText)
+      @selected_displays.push searchText
+      index = @displays.indexOf searchText
+      @displays.splice index, 1
       @searchText = ''
-    @areResourcesValid()
+    @areDisplaysValid()
     @isDisabled()
 
-  @querySearch = (resources, searchText) ->
-    ProofPlayService.querySearch(resources, searchText)
+  @querySearch = (displays, searchText) ->
+    ProofPlayService.querySearch(displays, searchText)
 
 
   @isRadioValid = (selection) =>
@@ -50,9 +50,9 @@ appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService) ->
     @isDisabled()
 
 
-  @isResourceValid = (searchText) =>
-    if searchText in @resources
-      if searchText not in @selected_resources
+  @isDisplayValid = (searchText) =>
+    if searchText in @displays
+      if searchText not in @selected_displays
         true
       else
         false
@@ -60,8 +60,8 @@ appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService) ->
       false
 
 
-  @areResourcesValid = () =>
-    @formValidity.resources = (@selected_resources.length > 0)
+  @areDisplaysValid = () =>
+    @formValidity.displays = (@selected_displays.length > 0)
     @isDisabled()
 
   @isStartDateValid = (start_date) =>
@@ -73,21 +73,21 @@ appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService) ->
     @formValidity.end_date = (end_date instanceof Date)
     @isDisabled()
 
-  @removeFromSelectedResource = (item) =>
-    index = @selected_resources.indexOf(item)
-    @selected_resources.splice(index, 1)
-    @resources.push item
-    @areResourcesValid()
+  @removeFromSelectedDisplay = (item) =>
+    index = @selected_displays.indexOf(item)
+    @selected_displays.splice(index, 1)
+    @displays.push item
+    @areDisplaysValid()
     @isDisabled()
 
 
   @isDisabled = () =>
-    if @formValidity.start_date and @formValidity.end_date and @formValidity.resources and @formValidity.type
+    if @formValidity.start_date and @formValidity.end_date and @formValidity.displays and @formValidity.type
       @disabled = false
       @final = {
         start_date_unix: moment(@dateTimeSelection.start).unix(),
         end_date_unix: moment(@dateTimeSelection.end).unix(),
-        resources: @selected_resources,
+        displays: @selected_displays,
         type: @radioButtonChoices.selection
 
       }
@@ -97,9 +97,9 @@ appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService) ->
 
   @submit = () =>
     if @final.type is "1"
-      ProofPlayService.downloadCSVForMultipleResourcesByDevice(@final.start_date_unix, @final.end_date_unix, @final.resources)
+      ProofPlayService.downloadCSVForMultipleDevicesByDate(@final.start_date_unix, @final.end_date_unix, @final.displays)
 
     else
-      ProofPlayService.downloadCSVForMultipleResourcesByDate(@final.start_date_unix, @final.end_date_unix, @final.resources)
+      ProofPlayService.downloadCSVForMultipleDevicesSummarized(@final.start_date_unix, @final.end_date_unix, @final.displays)
 
   @

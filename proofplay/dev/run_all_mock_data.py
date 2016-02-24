@@ -1,3 +1,3 @@
-from make_mock_data import just_one, run
+from make_mock_data import queue_up_mock_data
 
-run()
+queue_up_mock_data(500, 10)
