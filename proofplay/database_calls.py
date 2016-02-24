@@ -12,7 +12,9 @@ from google.appengine.ext import ndb
 ####################################################################################
 def retrieve_all_devices_of_tenant(tenant):
     session = Session()
-    search = session.query(Device.customer_display_code.distinct().label("customer_display_code"))
+    search = session.query(Device.customer_display_code.distinct().label("customer_display_code")).filter(
+        Device.tenant_code == tenant)
+
     session.close()
     return [row.customer_display_code for row in search.all()]
 
