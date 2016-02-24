@@ -1,6 +1,7 @@
 import json
 
 from env_setup import setup_test_paths
+from utils.timezone_util import TimezoneUtil
 
 setup_test_paths()
 
@@ -86,7 +87,7 @@ class TestLocationsHandler(BaseTest, WebTest):
     def test_post_returns_created_status(self):
         request_parameters = {'tenantKey': self.tenant_key.urlsafe(),
                               'customerLocationName': 'Store 4532',
-                              'customerLocationCode': 'store_4532',
+                              'customerLocationCode': 'store_4532B',
                               'timezone': 'America/Phoenix',
                               'active': True,
                               'address': '123 Main St.',
@@ -197,12 +198,38 @@ class TestLocationsHandler(BaseTest, WebTest):
         self.assertTrue('Bad response: 400 The active parameter is invalid.'
                         in context.exception.message)
 
+    def test_post_returns_conflict_when_encountering_an_existing_customer_location_code(self):
+        location = Location.create(tenant_key=self.tenant_key,
+                                   customer_location_name=self.CUSTOMER_LOCATION_NAME,
+                                   customer_location_code=self.CUSTOMER_LOCATION_CODE,
+                                   timezone=self.TIMEZONE)
+        location.put()
+        request_parameters = {'tenantKey': self.tenant_key.urlsafe(),
+                              'customerLocationName': 'Store 4532',
+                              'customerLocationCode': self.CUSTOMER_LOCATION_CODE,
+                              'timezone': 'America/Phoenix',
+                              'active': True,
+                              'address': '123 Main St.',
+                              'city': 'Minneapolis',
+                              'state': 'MN',
+                              'postalCode': '55401',
+                              'latitude': 44.986656,
+                              'longitude': -93.258133,
+                              'dma': 'some dma code'
+                              }
+        uri = application.router.build(None, 'location-create', None, {})
+        with self.assertRaises(AppError) as context:
+            self.app.post_json(uri, params=request_parameters, headers=self.headers)
+        error_message = "Bad response: 409 Conflict. Customer location code \"{0}\" is already assigned for tenant.".format(
+            self.CUSTOMER_LOCATION_CODE)
+        self.assertTrue(error_message in context.exception.message)
+
     ##################################################################################################################
     ## get
     ##################################################################################################################
     def test_get_location_representation(self):
         request_parameters = {}
-        uri = application.router.build(None, 'location-retrieval', None,
+        uri = application.router.build(None, 'manage-location', None,
                                        {'location_urlsafe_key': self.location_key.urlsafe()})
         response = self.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
@@ -211,6 +238,52 @@ class TestLocationsHandler(BaseTest, WebTest):
         self.assertEqual(response_json.get('timezone'), self.TIMEZONE)
         self.assertEqual(response_json.get('timezoneOffset'), self.TIMEZONE_OFFSET)
         self.assertTrue(response_json.get('active'))
+
+    ##################################################################################################################
+    ## put
+    ##################################################################################################################
+    def test_put_returns_no_content_status(self):
+        uri = application.router.build(None, 'manage-location', None,
+                                       {'location_urlsafe_key': self.location_key.urlsafe()})
+        customer_location_name = 'Acme, Inc.'
+        entity_body = {
+            'customerLocationName': customer_location_name,
+            'timezone': self.TIMEZONE,
+            'active': True
+        }
+        response = self.app.put_json(uri, entity_body, headers=self.headers)
+        self.assertEqual(204, response.status_int)
+
+    def test_put_updates_selected_properties(self):
+        uri = application.router.build(None, 'manage-location', None,
+                                       {'location_urlsafe_key': self.location_key.urlsafe()})
+        customer_location_name = 'Acme, Inc.'
+        entity_body = {
+            'customerLocationName': customer_location_name,
+            'timezone': self.TIMEZONE,
+            'active': False
+        }
+        self.app.put_json(uri, entity_body, headers=self.headers)
+        expected = self.location_key.get()
+        self.assertEqual(expected.customer_location_name, customer_location_name)
+        self.assertEqual(expected.customer_location_code, self.CUSTOMER_LOCATION_CODE)
+        self.assertFalse(expected.active)
+
+    def test_put_updates_timezone_offset(self):
+        location_before = self.location_key.get()
+        self.assertEqual(location_before.timezone_offset, self.TIMEZONE_OFFSET)
+        uri = application.router.build(None, 'manage-location', None,
+                                       {'location_urlsafe_key': self.location_key.urlsafe()})
+        timezone = 'US/Central'
+        entity_body = {
+            'customerLocationName': self.CUSTOMER_LOCATION_NAME,
+            'timezone': timezone,
+            'active': True
+        }
+        expected = self.location_key.get()
+        self.app.put_json(uri, entity_body, headers=self.headers)
+        expected_offset = TimezoneUtil.get_timezone_offset(timezone)
+        self.assertEqual(expected.timezone_offset, expected_offset)
 
     def load_tenant_locations(self, number_of_locations, tenant_key):
         for x in range(number_of_locations):

@@ -97,6 +97,7 @@ CHROME_OS_DEVICE_STRATEGY += [
 
 LOCATION_STRATEGY = ModelStrategy(Location)
 LOCATION_STRATEGY += [
+    {'key': lambda o, field_name, context: o.key.urlsafe()},
     {'tenantKey': lambda o, field_name, context: o.tenant_key.urlsafe() if o.tenant_key is not None else None},
     {'tenantName': lambda o, field_name, context: o.tenant_key.get().name if o.tenant_key is not None else None},
     {'customerLocationCode': lambda o, field_name, context: o.key.get().customer_location_code},

@@ -19,13 +19,4 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
   @editItem = (item) ->
     $state.go 'editDevice', {deviceKey: item.key, tenantKey: ''}
 
-  @showDeviceDetails = (item, event) ->
-    apiKey = item.apiKey
-    $mdDialog.show($mdDialog.alert()
-    .title('Device Details')
-    .textContent("API key: #{apiKey}")
-    .ariaLabel('Device details')
-    .ok('Close')
-    .targetEvent(event))
-
   @
