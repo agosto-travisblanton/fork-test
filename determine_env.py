@@ -1,8 +1,4 @@
-"""
-The ``agar.env`` module contains a number of constants to help determine which environment code is running in.
-"""
 import os
-
 from google.appengine.api.app_identity import get_application_id
 from google.appengine.api import apiproxy_stub_map
 
@@ -31,10 +27,13 @@ on_development_server = bool(have_appserver and (not server_software or server_s
 on_server = bool(have_appserver and appid and server_software and not on_development_server)
 
 #: ``True`` if running on a google server and the application ID ends in ``-int``, ``False`` otherwise.
-on_integration_server = on_server and (appid.lower().endswith('-int') or appid.lower().endswith('-demo'))
+on_integration_server = on_server and appid.lower().endswith('-int')
+
+#: ``True`` if running on a google server and the application ID ends in ``-stage``, ``False`` otherwise.
+on_stage_server = on_server and appid.lower().endswith('-stage')
 
 #: ``True`` if running on a google server and the application ID does not end in ``-int``, ``False`` otherwise.
-on_production_server = on_server and not on_integration_server
+on_production_server = on_server and not on_integration_server and not on_stage_server
 
 
 def get_env():
@@ -42,3 +41,7 @@ def get_env():
         return "DEV"
     if on_integration_server:
         return "INT"
+    if on_stage_server:
+        return "STAGE"
+    if on_production_server:
+        return "PROD"

@@ -85,7 +85,9 @@ def queue_up_mock_data(day_amount, amount_a_day):
 
 
 def generate_mock_data(to_send):
-    url = "http://localhost:8080/proofplay/api/v1/0ac1b95dc3f93d9132b796986ed11cd4/post_new_program_play"
+    # first_part = "http://skykit-display-device-int.appspot.com"
+    first_part = "http://localhost:8080"
+    url = first_part + "/proofplay/api/v1/0ac1b95dc3f93d9132b796986ed11cd4/post_new_program_play"
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
     r = requests.post(url, data=json.dumps(to_send), headers=headers)
     print to_send["data"][-1]["ended_at"]
