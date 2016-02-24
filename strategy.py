@@ -82,17 +82,22 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'panelModel': lambda o, field_name, context: o.key.get().panel_model},
     {'panelInput': lambda o, field_name, context: o.key.get().panel_input},
     {'heartbeatInterval': lambda o, field_name, context: o.key.get().heartbeat_interval_minutes},
-    {'timezone': lambda o, field_name, context: o.key.get().time_zone},
     {'connectionType': lambda o, field_name, context: o.key.get().connection_type},
     {'proofOfPlayLogging': lambda o, field_name, context: o.key.get().proof_of_play_logging},
     {'proofOfPlayEditable': lambda o, field_name, context: o.key.get().proof_of_play_editable},
+    # Display Location & Timezone information from Location entity:
+    {'locationKey': lambda o, field_name, context: o.location_key.urlsafe() if o.location_key is not None else None},
+    {'displayCode': lambda o, field_name,
+                           context: o.location_key.get().customer_location_code if o.location_key is not None else None},
+    {'displayDescription': lambda o, field_name,
+                                  context: o.location_key.get().customer_location_name if o.location_key is not None else None},
     {'latitude': lambda o, field_name,
-                        context: o.key.get().geo_location.lat if o.key.get().geo_location is not None else None},
+                        context: o.location_key.get().geo_location.lat if o.location_key is not None else None},
     {'longitude': lambda o, field_name,
-                         context: o.key.get().geo_location.lon if o.key.get().geo_location is not None else None},
-    {'displayCode': lambda o, field_name, context: o.key.get().display_code},
-    {'displayDescription': lambda o, field_name, context: o.key.get().display_description}
-
+                         context: o.location_key.get().geo_location.lon if o.location_key is not None else None},
+    {'timezone': lambda o, field_name, context: o.location_key.get().timezone if o.location_key is not None else None},
+    {'timezoneOffset': lambda o, field_name,
+                              context: o.location_key.get().timezone_offset if o.location_key is not None else None}
 ]
 
 LOCATION_STRATEGY = ModelStrategy(Location)

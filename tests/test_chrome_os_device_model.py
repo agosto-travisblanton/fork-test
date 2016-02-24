@@ -2,6 +2,7 @@ from google.appengine.ext import ndb
 
 from app_config import config
 from env_setup import setup_test_paths
+from utils.timezone_util import TimezoneUtil
 
 setup_test_paths()
 
@@ -10,7 +11,7 @@ from datetime import datetime
 from restler.serializers import to_json
 from strategy import CHROME_OS_DEVICE_STRATEGY
 from agar.test import BaseTest
-from models import ChromeOsDevice, Tenant, Domain, Distributor
+from models import ChromeOsDevice, Tenant, Domain, Distributor, Location
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>. Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -34,6 +35,8 @@ class TestChromeOsDeviceModel(BaseTest):
     DISPLAY_PANEL_MODEL = 'Sharp-PNE521'
     DISPLAY_PANEL_INPUT = 'sha6'
     TIME_ZONE = 'UTC-6'
+    LATITUDE = 37.78
+    LONGITUDE = -122.41
 
     def setUp(self):
         super(TestChromeOsDeviceModel, self).setUp()
@@ -107,7 +110,15 @@ class TestChromeOsDeviceModel(BaseTest):
                                                mac_address=self.MAC_ADDRESS)
         device.panel_model = self.DISPLAY_PANEL_MODEL
         device.panel_input = self.DISPLAY_PANEL_INPUT
-        device.time_zone = self.TIME_ZONE
+        display_description = 'Store 445'
+        display_code = 'store_445'
+        timezone = 'America/Chicago'
+        location = Location.create(tenant_key=self.tenant_key,
+                                   customer_location_name=display_description,
+                                   customer_location_code=display_code,
+                                   timezone=timezone)
+        location.geo_location = ndb.GeoPt(self.LATITUDE, self.LONGITUDE)
+        device.location_key = location.put()
         device.put()
         json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
         self.assertEqual(str(device.device_id), json_representation['deviceId'])
@@ -121,7 +132,52 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertEqual(str(device.mac_address), json_representation['macAddress'])
         self.assertEqual(str(device.panel_input), json_representation['panelInput'])
         self.assertEqual(str(device.panel_model), json_representation['panelModel'])
-        self.assertEqual(str(device.time_zone), json_representation['timezone'])
+        self.assertEqual(str(device.location_key.urlsafe()), json_representation['locationKey'])
+        self.assertEqual(display_description, json_representation['displayDescription'])
+        self.assertEqual(display_code, json_representation['displayCode'])
+        self.assertEqual(self.LATITUDE, json_representation['latitude'])
+        self.assertEqual(self.LONGITUDE, json_representation['longitude'])
+        self.assertEqual(timezone, json_representation['timezone'])
+        self.assertEqual(TimezoneUtil.get_timezone_offset(json_representation['timezone']),
+                         json_representation['timezoneOffset'])
+
+    def test_json_serialization_strategy_with_default_geo_location(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
+        device.panel_model = self.DISPLAY_PANEL_MODEL
+        device.panel_input = self.DISPLAY_PANEL_INPUT
+        display_description = 'Store 445'
+        display_code = 'store_445'
+        timezone = 'America/Chicago'
+        location = Location.create(tenant_key=self.tenant_key,
+                                   customer_location_name=display_description,
+                                   customer_location_code=display_code,
+                                   timezone=timezone)
+        device.location_key = location.put()
+        device.put()
+        json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
+        self.assertEqual(str(device.device_id), json_representation['deviceId'])
+        self.assertEqual(str(device.gcm_registration_id), json_representation['gcmRegistrationId'])
+        self.assertEqual(None, json_representation['serialNumber'])
+        self.assertIsNotNone(json_representation['created'])
+        self.assertIsNotNone(json_representation['updated'])
+        self.assertEqual(str(device.api_key), json_representation['apiKey'])
+        self.assertEqual(str(self.tenant.name), json_representation['tenantName'])
+        self.assertEqual(str(self.tenant.content_server_url), json_representation['contentServerUrl'])
+        self.assertEqual(str(device.mac_address), json_representation['macAddress'])
+        self.assertEqual(str(device.panel_input), json_representation['panelInput'])
+        self.assertEqual(str(device.panel_model), json_representation['panelModel'])
+        self.assertEqual(str(device.location_key.urlsafe()), json_representation['locationKey'])
+        self.assertEqual(display_description, json_representation['displayDescription'])
+        self.assertEqual(display_code, json_representation['displayCode'])
+        geo_location_default = ndb.GeoPt(44.98, -93.27)
+        self.assertEqual(geo_location_default.lat, json_representation['latitude'])
+        self.assertEqual(geo_location_default.lon, json_representation['longitude'])
+        self.assertEqual(timezone, json_representation['timezone'])
+        self.assertEqual(TimezoneUtil.get_timezone_offset(json_representation['timezone']),
+                         json_representation['timezoneOffset'])
 
     def test_json_serialization_strategy_with_optional_serial_number(self):
         device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
@@ -206,32 +262,32 @@ class TestChromeOsDeviceModel(BaseTest):
         device.put()
         self.assertFalse(ChromeOsDevice.is_rogue_unmanaged_device(self.MAC_ADDRESS))
 
-    def test_json_serialization_strategy_of_geo_location_decomposes_into_lat_lon(self):
-        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                               device_id=self.TESTING_DEVICE_ID,
-                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
-                                               mac_address=self.MAC_ADDRESS,
-                                               serial_number=self.SERIAL_NUMBER,
-                                               model=self.MODEL)
-        latitude = 44.983579
-        longitude = -93.277544
-        device.geo_location = ndb.GeoPt(latitude, longitude) # Agosto's geoLocation
-        device.put()
-        json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
-        self.assertEqual(latitude, json_representation['latitude'])
-        self.assertEqual(longitude, json_representation['longitude'])
+    # def test_json_serialization_strategy_of_geo_location_decomposes_into_lat_lon(self):
+    #     device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+    #                                            device_id=self.TESTING_DEVICE_ID,
+    #                                            gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+    #                                            mac_address=self.MAC_ADDRESS,
+    #                                            serial_number=self.SERIAL_NUMBER,
+    #                                            model=self.MODEL)
+    #     latitude = 44.983579
+    #     longitude = -93.277544
+    #     device.geo_location = ndb.GeoPt(latitude, longitude) # Agosto's geoLocation
+    #     device.put()
+    #     json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
+    #     self.assertEqual(latitude, json_representation['latitude'])
+    #     self.assertEqual(longitude, json_representation['longitude'])
 
-    def test_json_serialization_strategy_of_geo_location_when_geo_location_is_none(self):
-        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                               device_id=self.TESTING_DEVICE_ID,
-                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
-                                               mac_address=self.MAC_ADDRESS,
-                                               serial_number=self.SERIAL_NUMBER,
-                                               model=self.MODEL)
-        device.put()
-        json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
-        self.assertIsNone(json_representation['latitude'])
-        self.assertIsNone(json_representation['longitude'])
+    # def test_json_serialization_strategy_of_geo_location_when_geo_location_is_none(self):
+    #     device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+    #                                            device_id=self.TESTING_DEVICE_ID,
+    #                                            gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+    #                                            mac_address=self.MAC_ADDRESS,
+    #                                            serial_number=self.SERIAL_NUMBER,
+    #                                            model=self.MODEL)
+    #     device.put()
+    #     json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
+    #     self.assertIsNone(json_representation['latitude'])
+    #     self.assertIsNone(json_representation['longitude'])
 
     def test_create_sets_proof_of_play_logging_to_false(self):
         device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,

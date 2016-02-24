@@ -828,31 +828,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json['gcmRegistrationId'], self.GCM_REGISTRATION_ID)
         self.assertEqual(response_json['macAddress'], self.MAC_ADDRESS)
 
-    def test_put_lat_or_lon_none_nulls_geo_location(self):
-        request_body = {'latitude': None,
-                        'longitude': -146.549
-                        }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
-        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
-                                json.dumps(request_body),
-                                headers=self.api_token_authorization_header)
-        self.assertIsNone(self.managed_device.geo_location)
-
-    def test_put_valid_lat_or_lon_updates_geo_location(self):
-        latitude = 44.983579
-        longitude = -93.277544
-        request_body = {'latitude': latitude,
-                        'longitude': longitude
-                        }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
-        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
-                                json.dumps(request_body),
-                                headers=self.api_token_authorization_header)
-        self.assertEqual(self.managed_device.geo_location, ndb.GeoPt(latitude, longitude))
-
-
     ##################################################################################################################
     ## delete
     ##################################################################################################################
@@ -1008,24 +983,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
         device = self.managed_device_key.get()
         self.assertGreater(device.heartbeat_updated, original_heartbeat_timestamp)
-
-    def test_put_heartbeat_updates_timezone(self):
-        self.__initialize_heartbeat_info()
-        old_time_zone = 'UTC-5'
-        new_time_zone = 'UTC-6'
-        request_body = {'storage': self.STORAGE_UTILIZATION - 1,
-                        'memory': self.MEMORY_UTILIZATION,
-                        'program': self.PROGRAM,
-                        'programId': self.PROGRAM_ID,
-                        'lastError': self.LAST_ERROR,
-                        'timezone': new_time_zone
-                        }
-        self.managed_device.time_zone = old_time_zone
-        self.managed_device.put()
-        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
-        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
-        updated_heartbeat = self.managed_device_key.get()
-        self.assertNotEqual(updated_heartbeat.time_zone, old_time_zone)
 
     def test_put_heartbeat_invokes_a_device_issue_log_up_toggle_if_device_was_previously_down(self):
         self.__initialize_heartbeat_info(up=False)
@@ -1197,28 +1154,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                          ).get()
         self.assertIsNotNone(log_entry)
         self.assertEqual(log_entry.category, config.DEVICE_ISSUE_FIRST_HEARTBEAT)
-
-    def test_put_heartbeat_records_first_timezone_change(self):
-        device = ChromeOsDevice.create_managed(
-            tenant_key=self.tenant_key,
-            gcm_registration_id=self.GCM_REGISTRATION_ID,
-            device_id='1231231',
-            mac_address='2313412341231')
-        device.time_zone = 'US/Chicago'
-        device_key = device.put()
-        request_body = {'storage': self.STORAGE_UTILIZATION,
-                        'memory': self.MEMORY_UTILIZATION,
-                        'program': self.PROGRAM,
-                        'programId': self.PROGRAM_ID,
-                        'lastError': self.LAST_ERROR,
-                        'macAddress': '2313412341231',
-                        'timezone': 'US/Arizona'}
-        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': device_key.urlsafe()})
-        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
-        log_entry = DeviceIssueLog.query(DeviceIssueLog.device_key == device_key,
-                                         ndb.AND(DeviceIssueLog.category == config.DEVICE_ISSUE_TIMEZONE_CHANGE)).get()
-        self.assertIsNotNone(log_entry)
-        self.assertEqual(log_entry.category, config.DEVICE_ISSUE_TIMEZONE_CHANGE)
 
     def test_put_heartbeat_records_os_change(self):
         device = ChromeOsDevice.create_managed(
