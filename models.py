@@ -206,7 +206,7 @@ class Location(ndb.Model):
     city = ndb.StringProperty(required=False, indexed=True)
     state = ndb.StringProperty(required=False, indexed=True)
     postal_code = ndb.StringProperty(required=False, indexed=True)
-    geo_location = ndb.GeoPtProperty(required=False, indexed=True)
+    geo_location = ndb.GeoPtProperty(required=True, indexed=True)
     dma = ndb.StringProperty(required=False, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
@@ -216,11 +216,12 @@ class Location(ndb.Model):
     @classmethod
     def create(cls, tenant_key, customer_location_name, customer_location_code, timezone):
         timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
-
+        geo_location_default = ndb.GeoPt(44.98, -93.27)  # Home plate Target Field
         return cls(tenant_key=tenant_key,
                    customer_location_name=customer_location_name,
                    customer_location_code=customer_location_code,
                    timezone=timezone,
+                   geo_location=geo_location_default,
                    timezone_offset=timezone_offset)
 
     @classmethod
@@ -284,12 +285,9 @@ class ChromeOsDevice(ndb.Model):
     sk_player_version = ndb.StringProperty(required=False, indexed=True)
     heartbeat_interval_minutes = ndb.IntegerProperty(default=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES, required=True,
                                                      indexed=False)
-    time_zone = ndb.StringProperty(required=False, indexed=True)
-    geo_location = ndb.GeoPtProperty(required=False, indexed=True)
     proof_of_play_logging = ndb.BooleanProperty(default=False, required=True, indexed=True)
     proof_of_play_editable = ndb.BooleanProperty(default=False, required=True)
-    display_code = ndb.StringProperty(required=False, indexed=True)
-    display_description = ndb.StringProperty(required=False, indexed=True)
+    location_key = ndb.KeyProperty(required=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):

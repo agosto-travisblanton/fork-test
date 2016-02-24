@@ -145,16 +145,13 @@ class LocationsHandler(RequestHandler, KeyValidatorMixin):
             location.dma = dma
         latitude = request_json.get('latitude')
         longitude = request_json.get('longitude')
-        if latitude is None or longitude is None:
-            location.geo_location = None
-        else:
+        if latitude and longitude:
             if re.match(self.LATITUDE_PATTERN, str(latitude)) is None or re.match(self.LONGITUDE_PATTERN,
                                                                                   str(longitude)) is None:
                 logging.warning(
                     'Invalid latitude {0} or longitude {1} detected.'.format(str(latitude), str(longitude)))
             else:
                 location.geo_location = ndb.GeoPt(latitude, longitude)
-
         location.active = request_json.get('active')
         location.put()
         self.response.headers.pop('Content-Type', None)

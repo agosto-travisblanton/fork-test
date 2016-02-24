@@ -1,5 +1,7 @@
 import json
 
+from google.appengine.ext import ndb
+
 from env_setup import setup_test_paths
 from utils.timezone_util import TimezoneUtil
 
@@ -249,7 +251,9 @@ class TestLocationsHandler(BaseTest, WebTest):
         entity_body = {
             'customerLocationName': customer_location_name,
             'timezone': self.TIMEZONE,
-            'active': True
+            'active': True,
+            'latitude':44.98,
+            'longitude': -93.27
         }
         response = self.app.put_json(uri, entity_body, headers=self.headers)
         self.assertEqual(204, response.status_int)
@@ -267,6 +271,9 @@ class TestLocationsHandler(BaseTest, WebTest):
         expected = self.location_key.get()
         self.assertEqual(expected.customer_location_name, customer_location_name)
         self.assertEqual(expected.customer_location_code, self.CUSTOMER_LOCATION_CODE)
+        geo_location_default = ndb.GeoPt(44.98, -93.27)  # Home plate Target Field
+        self.assertEqual(expected.geo_location.lat, geo_location_default.lat)
+        self.assertEqual(expected.geo_location.lon, geo_location_default.lon)
         self.assertFalse(expected.active)
 
     def test_put_updates_timezone_offset(self):
