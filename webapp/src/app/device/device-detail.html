@@ -9,8 +9,16 @@
       <div ncy-breadcrumb></div>
       <md-card-actions layout="row">
         <md-button ng-show="deviceDetailsCtrl.tenantKey.length > 0">
-          <a href="/#/tenants/{{deviceDetailsCtrl.tenantKey}}">
-            <i class="fa fa-fw fa-backward"></i> Back to tenant</a>
+          <div ng-switch on="deviceDetailsCtrl.currentDevice.isUnmanagedDevice">
+            <div ng-switch-when="true">
+              <a href="/#/tenants/{{deviceDetailsCtrl.tenantKey}}/unmanaged">
+                <i class="fa fa-fw fa-backward"></i> Back to tenant devices</a>
+            </div>
+            <div ng-switch-default>
+              <a href="/#/tenants/{{deviceDetailsCtrl.tenantKey}}/managed">
+                <i class="fa fa-fw fa-backward"></i> Back to tenant devices</a>
+            </div>
+          </div>
         </md-button>
         <md-button ngclipboard data-clipboard-target=".copy-ready-device-key">
           <i class="fa fa-fw fa-clipboard"></i> Copy device key</a>
