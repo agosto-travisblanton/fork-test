@@ -3,7 +3,7 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantManagedDevicesCtrl',
-  ($scope, $stateParams, TenantsService, DomainsService, DevicesService, DistributorsService, $state) ->
+  ($scope, $stateParams, TenantsService, DevicesService, $state) ->
     @currentTenant = {
       key: undefined,
       name: undefined,
