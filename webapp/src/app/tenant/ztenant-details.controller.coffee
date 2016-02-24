@@ -3,8 +3,8 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantDetailsCtrl',
-  ($stateParams, TenantsService, DomainsService, DistributorsService, $state, sweet, ProgressBarService,
-    $cookies, $scope) ->
+  ($log, $stateParams, TenantsService, DomainsService, DevicesService, DistributorsService, $state, sweet,
+    ProgressBarService, $cookies, $mdDialog) ->
     @currentTenant = {
       key: undefined,
       name: undefined,
@@ -18,6 +18,8 @@ appModule.controller 'TenantDetailsCtrl',
       active: true
     }
     @selectedDomain = undefined
+    @currentTenantDisplays = []
+    @currentTenantUnmanagedDisplays = []
     @distributorDomains = []
     @editMode = !!$stateParams.tenantKey
 
@@ -26,6 +28,13 @@ appModule.controller 'TenantDetailsCtrl',
       tenantPromise.then (tenant) =>
         @currentTenant = tenant
         @onSuccessResolvingTenant tenant
+      devicesPromise = DevicesService.getDevicesByTenant $stateParams.tenantKey
+      devicesPromise.then (data) =>
+        @currentTenantDisplays = data.objects
+
+      unmanagedDevicesPromise = DevicesService.getUnmanagedDevicesByTenant $stateParams.tenantKey
+      unmanagedDevicesPromise.then (data) =>
+        @currentTenantUnmanagedDisplays = data.objects
 
     @initialize = ->
       @currentDistributorKey = $cookies.get('currentDistributorKey')
@@ -54,6 +63,7 @@ appModule.controller 'TenantDetailsCtrl',
         sweet.show('Oops...',
           'Tenant code unavailable. Please modify tenant name to generate a unique tenant code.', 'error')
       else
+        $log.error errorObject
         sweet.show('Oops...', 'Unable to save the tenant.', 'error')
 
     @editItem = (item) ->
@@ -68,19 +78,13 @@ appModule.controller 'TenantDetailsCtrl',
           newTenantCode = newTenantCode.replace(/\W+/g, '')
         @currentTenant.tenant_code = newTenantCode
 
-    $scope.tabIndex = 0
-
-    $scope.$watch 'tabIndex', (toTab, fromTab) ->
-
-      if toTab != undefined
-        switch toTab
-          when 0
-            $state.go 'tenantDetails', {tenantKey: $stateParams.tenantKey}
-          when 1
-            $state.go 'tenantManagedDevices', {tenantKey: $stateParams.tenantKey}
-          when 2
-            $state.go 'tenantUnmanagedDevices', {tenantKey: $stateParams.tenantKey}
-          when 3
-            $state.go 'tenantLocations', {tenantKey: $stateParams.tenantKey}
+    @showDeviceDetails = (item, event) ->
+      apiKey = item.apiKey
+      $mdDialog.show($mdDialog.alert()
+        .title('Device Details')
+        .textContent("API key: #{apiKey}")
+        .ariaLabel('Device details')
+        .ok('Close')
+        .targetEvent(event))
 
     @

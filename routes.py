@@ -61,20 +61,19 @@ application = WSGIApplication(
         ############################################################
         Route(r'/api/v1/locations/<location_urlsafe_key>',
               handler='handlers.locations_handler.LocationsHandler',
-              name='location-retrieval',
-              handler_method='get',
-              methods=['GET']
+              name='manage-location',
+              methods=['GET','PUT', 'DELETE']
+              ),
+        Route(r'/api/v1/locations',
+              handler='handlers.locations_handler.LocationsHandler',
+              name='location-create',
+              methods=['POST']
               ),
         Route(r'/api/v1/tenants/<tenant_urlsafe_key>/locations',
               handler='handlers.locations_handler.LocationsHandler',
               name='locations-list-retrieval',
               handler_method='get_locations_by_tenant',
               methods=['GET']
-              ),
-        Route(r'/api/v1/locations',
-              handler='handlers.locations_handler.LocationsHandler',
-              name='location-create',
-              methods=['POST']
               ),
 
         ############################################################
@@ -253,6 +252,15 @@ application = WSGIApplication(
               handler='handlers.player_command_events_handler.PlayerCommandEventsHandler',
               name='player-command-events',
               handler_method='get_player_command_events',
+              methods=['GET']
+              ),
+
+        ############################################################
+        # Timezones
+        ############################################################
+        Route(r'/api/v1/timezones',
+              handler='handlers.timezones_handler.TimezonesHandler',
+              name='timezones-list',
               methods=['GET']
               ),
 

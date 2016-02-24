@@ -5,631 +5,669 @@
     </div>
   </md-toolbar>
   <md-content flex layout-padding>
-    <div flex="80" flex-xs="100" layout="column">
+    <div flex="100" flex-xs="100" layout="column">
       <div ncy-breadcrumb></div>
-      <div ng-show="deviceDetailsCtrl.tenantKey.length > 0">
-        <a href="/#/tenants/{{deviceDetailsCtrl.tenantKey}}">back to Tenant</a>
-      </div>
-    </div>
-    <md-tabs md-dynamic-height md-border-bottom>
-      <md-tab label="Details">
-        <md-content class="md-padding" layout="row" layout-wrap layout-align="left start" layout-xs="column">
-          <div flex="35" flex-sm="35" flex-xs="35" layout="column">
-            <md-card>
-              <md-card-title>
-                <md-card-title-text>
-                  <span class="md-headline">Properties</span>
-                </md-card-title-text>
-              </md-card-title>
-              <md-card-content>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.serialNumber == None ||
+      <md-card-actions layout="row">
+        <md-button ng-show="deviceDetailsCtrl.tenantKey.length > 0">
+          <a href="/#/tenants/{{deviceDetailsCtrl.tenantKey}}">
+            <i class="fa fa-fw fa-backward"></i> Back to tenant</a>
+        </md-button>
+        <md-button ngclipboard data-clipboard-target=".copy-ready-device-key">
+          <i class="fa fa-fw fa-clipboard"></i> Copy device key</a>
+        </md-button>
+      </md-card-actions>
+      <md-tabs md-dynamic-height md-border-bottom>
+        <md-tab label="Details">
+          <md-content class="md-padding" layout="row" layout-wrap layout-align="left start" layout-xs="column">
+            <div flex="35" flex-sm="35" flex-xs="35" layout="column">
+              <md-card>
+                <md-card-title>
+                  <md-card-title-text>
+                    <span class="md-headline">Properties</span>
+                  </md-card-title-text>
+                </md-card-title>
+                <md-card-content>
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.serialNumber == None ||
                        deviceDetailsCtrl.currentDevice.serialNumber == ''">
-                  <label>Serial number</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.serialNumber}}
+                    <label>Serial number</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.serialNumber}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.annotatedLocation == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.annotatedLocation == None ||
                        deviceDetailsCtrl.currentDevice.annotatedLocation == ''">
-                  <label>Annotated location</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.annotatedLocation}}
+                    <label>Annotated location</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.annotatedLocation}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.annotatedUser == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.annotatedUser == None ||
                        deviceDetailsCtrl.currentDevice.annotatedUser == ''">
-                  <label>Annotated user</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.annotatedUser}}
+                    <label>Annotated user</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.annotatedUser}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.apiKey == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.apiKey == None ||
                        deviceDetailsCtrl.currentDevice.apiKey == ''">
-                  <label>API key</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.apiKey}}
+                    <label>API key</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.apiKey}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.bootMode == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.bootMode == None ||
                        deviceDetailsCtrl.currentDevice.bootMode == ''">
-                  <label>Boot mode</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.bootMode}}
+                    <label>Boot mode</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.bootMode}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.chromeDeviceDomain == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.chromeDeviceDomain == None ||
                        deviceDetailsCtrl.currentDevice.chromeDeviceDomain == ''">
-                  <label>Chrome device domain</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.chromeDeviceDomain}}
+                    <label>Chrome device domain</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.chromeDeviceDomain}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.contentServerUrl == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.contentServerUrl == None ||
                        deviceDetailsCtrl.currentDevice.contentServerUrl == ''">
-                  <label>Content server URL</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.contentServerUrl}}
+                    <label>Content server URL</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.contentServerUrl}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.created == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.created == None ||
                        deviceDetailsCtrl.currentDevice.created == ''">
-                  <label>Created timestamp</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.created}}
+                    <label>Created timestamp</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.created}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.deviceId == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.deviceId == None ||
                        deviceDetailsCtrl.currentDevice.deviceId == ''">
-                  <label>Device ID</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.deviceId}}
+                    <label>Device ID</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.deviceId}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.etag == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.etag == None ||
                        deviceDetailsCtrl.currentDevice.etag == ''">
-                  <label>ETag</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.etag}}
+                    <label>ETag</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.etag}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.firmwareVersion == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.firmwareVersion == None ||
                        deviceDetailsCtrl.currentDevice.firmwareVersion == ''">
-                  <label>Firmware version</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.firmwareVersion}}
+                    <label>Firmware version</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.firmwareVersion}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.gcmRegistrationId == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.gcmRegistrationId == None ||
                        deviceDetailsCtrl.currentDevice.gcmRegistrationId == ''">
-                  <label>GCM registration ID</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.gcmRegistrationId}}
+                    <label>GCM registration ID</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.gcmRegistrationId}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.kind == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.kind == None ||
                        deviceDetailsCtrl.currentDevice.kind == ''">
-                  <label>Kind</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.kind}}
+                    <label>Kind</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.kind}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.lastEnrollmentTime == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.lastEnrollmentTime == None ||
                        deviceDetailsCtrl.currentDevice.lastEnrollmentTime == ''">
-                  <label>Last enrollment</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.lastEnrollmentTime}}
+                    <label>Last enrollment</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.lastEnrollmentTime}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.lastSync == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.lastSync == None ||
                        deviceDetailsCtrl.currentDevice.lastSync == ''">
-                  <label>Last sync</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.lastSync}}
+                    <label>Last sync</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.lastSync}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.logglyLink == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.logglyLink == None ||
                        deviceDetailsCtrl.currentDevice.logglyLink == ''">
-                  <label>Loggly</label>
-                  <div>
-                    <a ng-href="{{deviceDetailsCtrl.currentDevice.logglyLink}}">
-                      {{deviceDetailsCtrl.currentDevice.logglyLink}}</a>
+                    <label>Loggly</label>
+                    <div>
+                      <a ng-href="{{deviceDetailsCtrl.currentDevice.logglyLink}}">
+                        {{deviceDetailsCtrl.currentDevice.logglyLink}}</a>
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.macAddress == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.macAddress == None ||
                        deviceDetailsCtrl.currentDevice.macAddress == ''">
-                  <label>MAC WiFi</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.macAddress}}
+                    <label>MAC WiFi</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.macAddress}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.ethernetMacAddress == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.ethernetMacAddress == None ||
                        deviceDetailsCtrl.currentDevice.ethernetMacAddress == ''">
-                  <label>Ethernet MAC</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.ethernetMacAddress}}
+                    <label>Ethernet MAC</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.ethernetMacAddress}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.model == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.model == None ||
                        deviceDetailsCtrl.currentDevice.model == ''">
-                  <label>Model</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.model}}
+                    <label>Model</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.model}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.osVersion == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.osVersion == None ||
                        deviceDetailsCtrl.currentDevice.osVersion == ''">
-                  <label>OS version</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.osVersion}}
+                    <label>OS version</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.osVersion}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.orgUnitPath == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.orgUnitPath == None ||
                        deviceDetailsCtrl.currentDevice.orgUnitPath == ''">
-                  <label>OU path</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.orgUnitPath}}
+                    <label>OU path</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.orgUnitPath}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.platformVersion == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.platformVersion == None ||
                        deviceDetailsCtrl.currentDevice.platformVersion == ''">
-                  <label>Platform version</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.platformVersion}}
+                    <label>Platform version</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.platformVersion}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.status == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.status == None ||
                        deviceDetailsCtrl.currentDevice.status == ''">
-                  <label>Status</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.status}}
+                    <label>Status</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.status}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.tenantCode == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.tenantCode == None ||
                        deviceDetailsCtrl.currentDevice.tenantCode == ''">
-                  <label>Tenant code</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.tenantCode}}
+                    <label>Tenant code</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.tenantCode}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.timezone == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.timezone == None ||
                        deviceDetailsCtrl.currentDevice.timezone == ''">
-                  <label>Timezone</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.timezone}}
+                    <label>Timezone</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.timezone}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.isUnmanagedDevice == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.isUnmanagedDevice == None ||
                        deviceDetailsCtrl.currentDevice.isUnmanagedDevice == ''">
-                  <label>Unmanaged</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.isUnmanagedDevice}}
+                    <label>Unmanaged</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.isUnmanagedDevice}}
+                    </div>
                   </div>
-                </div>
-                <div class="form-group"
-                     ng-hide="deviceDetailsCtrl.currentDevice.updated == None ||
+                  <div class="form-group"
+                       ng-hide="deviceDetailsCtrl.currentDevice.updated == None ||
                        deviceDetailsCtrl.currentDevice.updated == ''">
-                  <label>Updated timestamp</label>
-                  <div>
-                    {{deviceDetailsCtrl.currentDevice.updated}}
+                    <label>Updated timestamp</label>
+                    <div>
+                      {{deviceDetailsCtrl.currentDevice.updated}}
+                    </div>
                   </div>
-                </div>
-                <form name="deviceUpdateForm"
-                      class="form-horizontal"
-                      ng-submit="deviceDetailsCtrl.onClickSaveDevice()"
-                      novalidate>
-                  <div class="form-group" ng-hide="!deviceDetailsCtrl.currentDevice.proofOfPlayEditable"  >
-                    <div  class="col-sm-12">
-                      <label>Proof of play logging</label>
-                      <div>
-                        <input type="checkbox"
-                               ng-model="deviceDetailsCtrl.currentDevice.proofOfPlayLogging"> <span>Enable</span>
+                  <form name="deviceUpdateForm"
+                        class="form-horizontal"
+                        ng-submit="deviceDetailsCtrl.onClickSaveDevice()"
+                        novalidate>
+                    <div class="form-group" ng-hide="!deviceDetailsCtrl.currentDevice.proofOfPlayEditable">
+                      <div class="col-sm-12">
+                        <label>Proof of play logging</label>
+                        <div>
+                          <input type="checkbox"
+                                 ng-model="deviceDetailsCtrl.currentDevice.proofOfPlayLogging"> <span>Enable</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div class="form-group">
-                    <div  class="col-sm-12">
-                      <label>Notes</label>
-                      <div>
-                        <input type="text"
-                               class="form-control"
-                               name="notes"
-                               ng-model="deviceDetailsCtrl.currentDevice.notes">
+                    <div class="form-group">
+                      <div class="col-sm-12">
+                        <label>Notes</label>
+                        <div>
+                          <input type="text"
+                                 class="form-control"
+                                 name="notes"
+                                 ng-model="deviceDetailsCtrl.currentDevice.notes">
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <md-card-actions layout="row" layout-align="end center">
-                    <md-button type="submit"
-                               ng-disabled="!deviceUpdateForm.$dirty || deviceUpdateForm.$invalid">
-                      <i class="fa fa-fw fa-save"></i>
-                      Save
-                    </md-button>
-                  </md-card-actions>
-                </form>
-              </md-card-content>
-            </md-card>
-          </div>
-          <div flex="35" flex-sm="35" flex-xs="35" layout="column">
-            <md-card>
-              <md-card-title>
-                <md-card-title-text>
-                  <span class="md-headline">Serial control</span>
-                </md-card-title-text>
-              </md-card-title>
-              <md-card-content>
-                <form name="serialControlForm"
-                      class="form-horizontal"
-                      ng-submit="deviceDetailsCtrl.onClickSavePanels()"
-                      novalidate>
-                  <div class="form-group">
-                    <div class="col-sm-5">
-                      <label>Panel model</label>
-                      <select
-                        id="panelModel"
-                        class="form-control"
-                        ng-model="deviceDetailsCtrl.currentDevice.panelModel"
-                        ng-options="p.displayName for p in deviceDetailsCtrl.panelModels track by p.id">
-                      </select>
-                    </div>
-                    <div class="col-sm-5">
-                      <label>Panel input</label>
-                      <select
-                        id="panelInput"
-                        class="form-control"
-                        ng-required="deviceDetailsCtrl.currentDevice.panelModel !== None"
-                        ng-model="deviceDetailsCtrl.currentDevice.panelInput"
-                        ng-options="c.displayName for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">
-                      </select>
-                    </div>
-                  </div>
-                  <md-card-actions layout="row" layout-align="end center">
-                    <md-button type="submit"
-                               ng-disabled="!serialControlForm.$dirty || serialControlForm.$invalid">
-                      <i class="fa fa-fw fa-save"></i>
-                      Save
-                    </md-button>
-                  </md-card-actions>
-                </form>
-              </md-card-content>
-            </md-card>
-          </div>
-        </md-content>
-      </md-tab>
-      <md-tab label="Events">
-        <md-content class="md-padding">
-          <div flex="100" flex-sm="100" flex-xs="100" layout="column">
-            <md-card>
-              <md-card-content>
-                <form name="tenantForm" class="form-horizontal" ng-submit="deviceDetailsCtrl.onClickRefreshButton()"
-                      novalidate>
-                  <div class="row">
-                    <div class="col-sm-offset-6 col-sm-2">
-                      <label for="startTime" class="control-label">From</label>
-                      <input type="text" class="form-control input-sm"
-                             datetimepicker
-                             datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
-                             placeholder="{{deviceDetailsCtrl.startTime}}"
-                             name="startTime"
-                             id="startTime"
-                             ng-model="deviceDetailsCtrl.startTime">
-                    </div>
-                    <div class="col-sm-2">
-                      <label for="endTime" class="control-label">To</label>
-                      <input type="text" class="form-control input-sm"
-                             datetimepicker
-                             datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
-                             placeholder="{{deviceDetailsCtrl.endTime}}"
-                             name="endTime"
-                             id="endTime"
-                             ng-model="deviceDetailsCtrl.endTime">
-                    </div>
-                    <div class="col-sm-2 margin-top-15">
-                      <md-button type="submit">
-                        <i class="fa fa-fw fa-refresh"></i> Refresh
+                    <md-card-actions layout="row" layout-align="end center">
+                      <md-button type="submit"
+                                 ng-disabled="!deviceUpdateForm.$dirty || deviceUpdateForm.$invalid">
+                        <i class="fa fa-fw fa-save"></i>
+                        Save
                       </md-button>
+                    </md-card-actions>
+                  </form>
+                </md-card-content>
+              </md-card>
+            </div>
+            <div flex="35" flex-sm="35" flex-xs="35" layout="column">
+              <md-card>
+                <md-card-title>
+                  <md-card-title-text>
+                    <span class="md-headline">Serial control</span>
+                  </md-card-title-text>
+                </md-card-title>
+                <md-card-content>
+                  <form name="serialControlForm"
+                        class="form-horizontal"
+                        ng-submit="deviceDetailsCtrl.onClickSavePanels()"
+                        novalidate>
+                    <div class="form-group">
+                      <div class="col-sm-5">
+                        <label>Panel model</label>
+                        <select
+                          id="panelModel"
+                          class="form-control"
+                          ng-model="deviceDetailsCtrl.currentDevice.panelModel"
+                          ng-options="p.displayName for p in deviceDetailsCtrl.panelModels track by p.id">
+                        </select>
+                      </div>
+                      <div class="col-sm-5">
+                        <label>Panel input</label>
+                        <select
+                          id="panelInput"
+                          class="form-control"
+                          ng-required="deviceDetailsCtrl.currentDevice.panelModel !== None"
+                          ng-model="deviceDetailsCtrl.currentDevice.panelInput"
+                          ng-options="c.displayName for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">
+                        </select>
+                      </div>
+                    </div>
+                    <md-card-actions layout="row" layout-align="end center">
+                      <md-button type="submit"
+                                 ng-disabled="!serialControlForm.$dirty || serialControlForm.$invalid">
+                        <i class="fa fa-fw fa-save"></i>
+                        Save
+                      </md-button>
+                    </md-card-actions>
+                  </form>
+                </md-card-content>
+              </md-card>
+            </div>
+          </md-content>
+        </md-tab>
+        <md-tab label="Events">
+          <md-content class="md-padding">
+            <div flex="100" flex-sm="100" flex-xs="100" layout="column">
+              <md-card>
+                <md-card-content>
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <table class="table table-responsive table-striped">
+                        <thead>
+                        <tr>
+                          <th>Serial number</th>
+                          <th>WiFi MAC</th>
+                          <th>Ethernet MAC</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                          <td class="reset-device-serial-number">
+                            {{deviceDetailsCtrl.currentDevice.serialNumber}}
+                          </td>
+                          <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
+                          </td>
+                          <td class="reset-device-ethernet-mac-address">{{
+                            deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
+                          </td>
+                        </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
-                </form>
-                <div class="row margin-top-15">
-                  <div class="col-lg-12">
-                    <table class="table table-responsive table-striped">
-                      <thead>
-                      <tr>
-                        <th width="3px"></th>
-                        <th>Category</th>
-                        <th>Memory</th>
-                        <th>Storage</th>
-                        <th>Program</th>
-                        <th>Event created</th>
-                        <th>Last updated</th>
-                        <th></th>
-                      </tr>
-                      </thead>
-                      <tbody>
-                      <tr ng-hide="deviceDetailsCtrl.issues.length">
-                        <td class="text-center text-warning" colspan="8">
-                          No vitals logged in the past {{deviceDetailsCtrl.dayRange}} days.<br>
-                          Please try an earlier 'From date' above.</td>
-                      </tr>
-                      <tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:['-updated']">
-                        <td class="issue-{{ item.level_descriptor}}-background"></td>
-                        <td>{{ item.category }}</td>
-                        <td>{{ item.memory_utilization }}%</td>
-                        <td>{{ item.storage_utilization }}%</td>
-                        <td>{{ item.program }}</td>
-                        <td>{{ item.created }}</td>
-                        <td>{{ item.updated }}</td>
-                        <td class="issue-{{ item.level_descriptor}}-text">
-                          <i ng-class="item.level==1? 'fa fa-fw fa-warning' :
+
+                  <form name="tenantForm" class="form-horizontal" ng-submit="deviceDetailsCtrl.onClickRefreshButton()"
+                        novalidate>
+                    <div class="row">
+                      <div class="col-sm-offset-6 col-sm-2">
+                        <label for="startTime" class="control-label">From</label>
+                        <input type="text" class="form-control input-sm"
+                               datetimepicker
+                               datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
+                               placeholder="{{deviceDetailsCtrl.startTime}}"
+                               name="startTime"
+                               id="startTime"
+                               ng-model="deviceDetailsCtrl.startTime">
+                      </div>
+                      <div class="col-sm-2">
+                        <label for="endTime" class="control-label">To</label>
+                        <input type="text" class="form-control input-sm"
+                               datetimepicker
+                               datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
+                               placeholder="{{deviceDetailsCtrl.endTime}}"
+                               name="endTime"
+                               id="endTime"
+                               ng-model="deviceDetailsCtrl.endTime">
+                      </div>
+                      <div class="col-sm-2 margin-top-15">
+                        <md-button type="submit">
+                          <i class="fa fa-fw fa-refresh"></i> Refresh
+                        </md-button>
+                      </div>
+                    </div>
+                  </form>
+                  <div class="row margin-top-15">
+                    <div class="col-lg-12">
+                      <table class="table table-responsive table-striped">
+                        <thead>
+                        <tr>
+                          <th width="3px"></th>
+                          <th>Category</th>
+                          <th>Memory</th>
+                          <th>Storage</th>
+                          <th>Program</th>
+                          <th>Event created</th>
+                          <th>Last updated</th>
+                          <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-hide="deviceDetailsCtrl.issues.length">
+                          <td class="text-center text-warning" colspan="8">
+                            No vitals logged in the past {{deviceDetailsCtrl.dayRange}} days.<br>
+                            Please try an earlier 'From date' above.
+                          </td>
+                        </tr>
+                        <tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:['-updated']">
+                          <td class="issue-{{ item.level_descriptor}}-background"></td>
+                          <td>{{ item.category }}</td>
+                          <td>{{ item.memory_utilization }}%</td>
+                          <td>{{ item.storage_utilization }}%</td>
+                          <td>{{ item.program }}</td>
+                          <td>{{ item.created }}</td>
+                          <td>{{ item.updated }}</td>
+                          <td class="issue-{{ item.level_descriptor}}-text">
+                            <i ng-class="item.level==1? 'fa fa-fw fa-warning' :
                           item.level==0? 'fa fa-fw fa-check-circle': 'fa fa-fw fa-ambulance'"></i>
-                          {{ item.elapsed_time }}
-                        </td>
-                      </tr>
-                      </tbody>
-                    </table>
+                            {{ item.elapsed_time }}
+                          </td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
-              </md-card-content>
-            </md-card>
-          </div>
-        </md-content>
-      </md-tab>
-      <md-tab label="Commands">
-        <md-content class="md-padding" layout="row" layout-wrap layout-align="center start" layout-xs="column">
-          <div flex="100" flex-sm="100" flex-xs="100" layout="column">
-            <md-card>
-              <md-card-content>
-                <div class="row">
-                  <div class="col-sm-12">
-                    <table class="table table-responsive table-striped">
-                      <thead>
-                      <tr>
-                        <th>Serial number</th>
-                        <th>WiFi MAC</th>
-                        <th>Ethernet MAC</th>
-                      </tr>
-                      </thead>
-                      <tbody>
-                      <tr>
-                        <td class="reset-device-serial-number">
-                          {{deviceDetailsCtrl.currentDevice.serialNumber}}
-                        </td>
-                        <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
-                        </td>
-                        <td class="reset-device-ethernet-mac-address">{{
-                          deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                        </td>
-                      </tr>
-                      </tbody>
-                    </table>
+                </md-card-content>
+              </md-card>
+            </div>
+          </md-content>
+        </md-tab>
+        <md-tab label="Commands">
+          <md-content class="md-padding" layout="row" layout-wrap layout-align="center start" layout-xs="column">
+            <div flex="100" flex-sm="100" flex-xs="100" layout="column">
+              <md-card>
+                <md-card-content>
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <table class="table table-responsive table-striped">
+                        <thead>
+                        <tr>
+                          <th>Serial number</th>
+                          <th>WiFi MAC</th>
+                          <th>Ethernet MAC</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                          <td class="reset-device-serial-number">
+                            {{deviceDetailsCtrl.currentDevice.serialNumber}}
+                          </td>
+                          <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
+                          </td>
+                          <td class="reset-device-ethernet-mac-address">{{
+                            deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
+                          </td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
-                <md-content class="md-padding" layout="row" layout-wrap layout-xs="column">
-                  <div flex="25" flex-sm="25" flex-xs="25" layout="column">
-                    <md-card>
-                      <md-card-title>
-                        <md-card-title-text>
-                          <span class="md-headline">Clear player cache</span>
-                        </md-card-title-text>
-                      </md-card-title>
-                      <md-card-content>
-                        <form name="resetForm" class="form-horizontal"
-                              ng-submit="deviceDetailsCtrl.onClickContentDeleteSendButton()"
-                              novalidate>
-                          <md-card-actions layout="row" layout-align="end center">
-                            <md-button type="submit"><i class="fa fa-fw fa-building"></i>
-                              Send
-                            </md-button>
-                          </md-card-actions>
-                        </form>
-                      </md-card-content>
-                    </md-card>
-                  </div>
-                  <div flex="25" flex-sm="25" flex-xs="25" layout="column">
-                    <md-card>
-                      <md-card-title>
-                        <md-card-title-text>
-                          <span class="md-headline">Reinitialize player</span>
-                        </md-card-title-text>
-                      </md-card-title>
-                      <md-card-content>
-                        <form name="resetForm" class="form-horizontal"
-                              ng-submit="deviceDetailsCtrl.onClickResetSendButton()"
-                              novalidate>
-                          <md-card-actions layout="row" layout-align="end center">
-                            <md-button type="submit"><i class="fa fa-fw fa-building"></i>
-                              Send
-                            </md-button>
-                          </md-card-actions>
-                        </form>
-                      </md-card-content>
-                    </md-card>
-                  </div>
-                  <div flex="25" flex-sm="25" flex-xs="25" layout="column">
-                    <md-card>
-                      <md-card-title>
-                        <md-card-title-text>
-                          <span class="md-headline">Panel on</span>
-                        </md-card-title-text>
-                      </md-card-title>
-                      <md-card-content>
-                        <form name="powerOnForm" class="form-horizontal"
-                              ng-submit="deviceDetailsCtrl.onClickPowerOnSendButton()"
-                              novalidate>
-                          <md-card-actions layout="row" layout-align="end center">
-                            <md-button type="submit"><i class="fa fa-fw fa-building"></i>
-                              Send
-                            </md-button>
-                          </md-card-actions>
-                        </form>
-                      </md-card-content>
-                    </md-card>
-                  </div>
-                  <div flex="25" flex-sm="25" flex-xs="25" layout="column">
-                    <md-card>
-                      <md-card-title>
-                        <md-card-title-text>
-                          <span class="md-headline">Panel off</span>
-                        </md-card-title-text>
-                      </md-card-title>
-                      <md-card-content>
-                        <form name="powerOffForm" class="form-horizontal"
-                              ng-submit="deviceDetailsCtrl.onClickPowerOffSendButton()"
-                              novalidate>
-                          <md-card-actions layout="row" layout-align="end center">
-                            <md-button type="submit"><i class="fa fa-fw fa-building"></i>
-                              Send
-                            </md-button>
-                          </md-card-actions>
-                        </form>
-                      </md-card-content>
-                    </md-card>
-                  </div>
-                </md-content>
-                <md-content class="md-padding" layout="row" layout-wrap layout-xs="column">
-                  <div flex="25" flex-sm="25" flex-xs="25" layout="column">
-                    <md-card>
-                      <md-card-title>
-                        <md-card-title-text>
-                          <span class="md-headline">Volume</span>
-                        </md-card-title-text>
-                      </md-card-title>
-                      <md-card-content>
-                        <form name="volumeForm" class="form-horizontal" ng-submit="deviceDetailsCtrl.onClickVolumeSendButton()"
-                              novalidate>
-                          <div class="row">
-                            <div class="col-sm-12">
-                              <div class="row">
-                                <div class="col-sm-5 pull-right">
-                                  <input type="number"
-                                         class="form-control"
-                                         name="volume"
-                                         id="volume"
-                                         ng-model="deviceDetailsCtrl.currentDevice.volume"
-                                         min="1"
-                                         max="100"
-                                         ngMinlength="1"
-                                         ngMaxlength="3"
-                                         ng-required="true">
+                  <md-content class="md-padding" layout="row" layout-wrap layout-xs="column">
+                    <div flex="25" flex-sm="25" flex-xs="25" layout="column">
+                      <md-card>
+                        <md-card-title>
+                          <md-card-title-text>
+                            <span class="md-headline">Reset content</span>
+                          </md-card-title-text>
+                        </md-card-title>
+                        <md-card-content>
+                          <form name="resetForm" class="form-horizontal"
+                                ng-submit="deviceDetailsCtrl.onClickContentDeleteSendButton()"
+                                novalidate>
+                            <md-card-actions layout="row" layout-align="end center">
+                              <md-button type="submit"><i class="fa fa-fw fa-building"></i>
+                                Send
+                              </md-button>
+                            </md-card-actions>
+                          </form>
+                        </md-card-content>
+                      </md-card>
+                    </div>
+                    <div flex="25" flex-sm="25" flex-xs="25" layout="column">
+                      <md-card>
+                        <md-card-title>
+                          <md-card-title-text>
+                            <span class="md-headline">Reset player</span>
+                          </md-card-title-text>
+                        </md-card-title>
+                        <md-card-content>
+                          <form name="resetForm" class="form-horizontal"
+                                ng-submit="deviceDetailsCtrl.onClickResetSendButton()"
+                                novalidate>
+                            <md-card-actions layout="row" layout-align="end center">
+                              <md-button type="submit"><i class="fa fa-fw fa-building"></i>
+                                Send
+                              </md-button>
+                            </md-card-actions>
+                          </form>
+                        </md-card-content>
+                      </md-card>
+                    </div>
+                    <div flex="25" flex-sm="25" flex-xs="25" layout="column">
+                      <md-card>
+                        <md-card-title>
+                          <md-card-title-text>
+                            <span class="md-headline">Panel on</span>
+                          </md-card-title-text>
+                        </md-card-title>
+                        <md-card-content>
+                          <form name="powerOnForm" class="form-horizontal"
+                                ng-submit="deviceDetailsCtrl.onClickPowerOnSendButton()"
+                                novalidate>
+                            <md-card-actions layout="row" layout-align="end center">
+                              <md-button type="submit"><i class="fa fa-fw fa-building"></i>
+                                Send
+                              </md-button>
+                            </md-card-actions>
+                          </form>
+                        </md-card-content>
+                      </md-card>
+                    </div>
+                    <div flex="25" flex-sm="25" flex-xs="25" layout="column">
+                      <md-card>
+                        <md-card-title>
+                          <md-card-title-text>
+                            <span class="md-headline">Panel off</span>
+                          </md-card-title-text>
+                        </md-card-title>
+                        <md-card-content>
+                          <form name="powerOffForm" class="form-horizontal"
+                                ng-submit="deviceDetailsCtrl.onClickPowerOffSendButton()"
+                                novalidate>
+                            <md-card-actions layout="row" layout-align="end center">
+                              <md-button type="submit"><i class="fa fa-fw fa-building"></i>
+                                Send
+                              </md-button>
+                            </md-card-actions>
+                          </form>
+                        </md-card-content>
+                      </md-card>
+                    </div>
+                  </md-content>
+                  <md-content class="md-padding" layout="row" layout-wrap layout-xs="column">
+                    <div flex="25" flex-sm="25" flex-xs="25" layout="column">
+                      <md-card>
+                        <md-card-title>
+                          <md-card-title-text>
+                            <span class="md-headline">Volume</span>
+                          </md-card-title-text>
+                        </md-card-title>
+                        <md-card-content>
+                          <form name="volumeForm" class="form-horizontal"
+                                ng-submit="deviceDetailsCtrl.onClickVolumeSendButton()"
+                                novalidate>
+                            <div class="row">
+                              <div class="col-sm-12">
+                                <div class="row">
+                                  <div class="col-sm-5 pull-right">
+                                    <input type="number"
+                                           class="form-control"
+                                           name="volume"
+                                           id="volume"
+                                           ng-model="deviceDetailsCtrl.currentDevice.volume"
+                                           min="1"
+                                           max="100"
+                                           ngMinlength="1"
+                                           ngMaxlength="3"
+                                           ng-required="true">
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                          <md-card-actions layout="row" layout-align="end center">
-                            <md-button type="submit"
-                                       ng-disabled="!volumeForm.$dirty || volumeForm.$invalid">
-                              <i class="fa fa-fw fa-building"></i>
-                              Send
-                            </md-button>
-                          </md-card-actions>
-                        </form>
-                      </md-card-content>
-                    </md-card>
-                  </div>
-                  <div flex="33" flex-sm="33" flex-xs="33" layout="column">
-                    <md-card>
-                      <md-card-title>
-                        <md-card-title-text>
-                          <span class="md-headline">Custom</span>
-                        </md-card-title-text>
-                      </md-card-title>
-                      <md-card-content>
-                        <form name="customForm" class="form-horizontal" ng-submit="deviceDetailsCtrl.onClickCommandSendButton()"
-                              novalidate>
-                          <div class="row">
-                            <div class="col-sm-12">
-                              <div class="row">
-                                <div class="col-sm-9 pull-right">
-                                  <input type="text"
-                                         class="form-control"
-                                         name="custom"
-                                         id="custom"
-                                         ng-model="deviceDetailsCtrl.currentDevice.custom"
-                                         ng-required="true">
+                            <md-card-actions layout="row" layout-align="end center">
+                              <md-button type="submit"
+                                         ng-disabled="!volumeForm.$dirty || volumeForm.$invalid">
+                                <i class="fa fa-fw fa-building"></i>
+                                Send
+                              </md-button>
+                            </md-card-actions>
+                          </form>
+                        </md-card-content>
+                      </md-card>
+                    </div>
+                    <div flex="33" flex-sm="33" flex-xs="33" layout="column">
+                      <md-card>
+                        <md-card-title>
+                          <md-card-title-text>
+                            <span class="md-headline">Custom</span>
+                          </md-card-title-text>
+                        </md-card-title>
+                        <md-card-content>
+                          <form name="customForm" class="form-horizontal"
+                                ng-submit="deviceDetailsCtrl.onClickCommandSendButton()"
+                                novalidate>
+                            <div class="row">
+                              <div class="col-sm-12">
+                                <div class="row">
+                                  <div class="col-sm-9 pull-right">
+                                    <input type="text"
+                                           class="form-control"
+                                           name="custom"
+                                           id="custom"
+                                           ng-model="deviceDetailsCtrl.currentDevice.custom"
+                                           ng-required="true">
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                          <md-card-actions layout="row" layout-align="end center">
-                            <md-button type="submit"
-                                       ng-disabled="!customForm.$dirty || customForm.$invalid">
-                              <i class="fa fa-fw fa-building"></i>
-                              Send
-                            </md-button>
-                          </md-card-actions>
-                        </form>
-                      </md-card-content>
-                    </md-card>
+                            <md-card-actions layout="row" layout-align="end center">
+                              <md-button type="submit"
+                                         ng-disabled="!customForm.$dirty || customForm.$invalid">
+                                <i class="fa fa-fw fa-building"></i>
+                                Send
+                              </md-button>
+                            </md-card-actions>
+                          </form>
+                        </md-card-content>
+                      </md-card>
+                    </div>
+                  </md-content>
+                </md-card-content>
+              </md-card>
+            </div>
+          </md-content>
+          <md-content class="md-padding" layout="row" layout-wrap layout-xs="column">
+            <div flex="66" flex-sm="66" flex-xs="66" layout="column">
+              <md-card>
+                <md-card-title>
+                  <md-card-title-text>
+                    <span class="md-headline">Command history</span>
+                  </md-card-title-text>
+                </md-card-title>
+                <md-card-content>
+                  <div class="row margin-top-15">
+                    <div class="col-lg-12">
+                      <table class="table table-responsive table-striped">
+                        <thead>
+                        <tr>
+                          <th>Command</th>
+                          <th>Posted (US/Central)</th>
+                          <th>Confirmed (US/Central)</th>
+                          <th style="width:1px"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-hide="deviceDetailsCtrl.commandEvents.length">
+                          <td class="text-center text-warning" colspan="4">No commands posted to this player</td>
+                        </tr>
+                        <tr ng-repeat="item in deviceDetailsCtrl.commandEvents | orderBy:['-postedTime']">
+                          <td>{{ item.payload }}</td>
+                          <td>{{ item.postedTime }}</td>
+                          <td>{{ item.confirmedTime }}</td>
+                          <td class="up-{{ item.confirmed}}-background"></td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </md-content>
-              </md-card-content>
-            </md-card>
-          </div>
-        </md-content>
-        <md-content class="md-padding" layout="row" layout-wrap layout-xs="column">
-          <div flex="66" flex-sm="66" flex-xs="66" layout="column">
-            <md-card>
-              <md-card-title>
-                <md-card-title-text>
-                  <span class="md-headline">History</span>
-                </md-card-title-text>
-              </md-card-title>
-              <md-card-content>
-                <div class="row margin-top-15">
-                  <div class="col-lg-12">
-                    <table class="table table-responsive table-striped">
-                      <thead>
-                      <tr>
-                        <th>Command</th>
-                        <th>Posted (US/Central)</th>
-                        <th>Confirmed (US/Central)</th>
-                        <th style="width:1px"></th>
-                      </tr>
-                      </thead>
-                      <tbody>
-                      <tr ng-hide="deviceDetailsCtrl.commandEvents.length">
-                        <td class="text-center text-warning" colspan="4">No commands posted for this device</td>
-                      </tr>
-                      <tr ng-repeat="item in deviceDetailsCtrl.commandEvents | orderBy:['-postedTime']">
-                        <td>{{ item.payload }}</td>
-                        <td>{{ item.postedTime }}</td>
-                        <td>{{ item.confirmedTime }}</td>
-                        <td class="up-{{ item.confirmed}}-background"></td>
-                      </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </md-card-content>
-            </md-card>
-          </div>
-        </md-content>
-      </md-tab>
-    </md-tabs>
+                </md-card-content>
+              </md-card>
+            </div>
+          </md-content>
+        </md-tab>
+      </md-tabs>
+    </div>
   </md-content>
+  <div class="copy-ready-device-key">
+    {{deviceDetailsCtrl.currentDevice.key}}
+  </div>
 </div>

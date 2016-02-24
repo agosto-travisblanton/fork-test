@@ -67,6 +67,8 @@ class AppConfig(Config):
 
     EMAIL_SUPPORT = False
 
+    DEFAULT_CONTENT_MANAGER_URL = False
+    DEFAULT_PLAYER_CONTENT_URL = False
 
 
 config = AppConfig.get_config()

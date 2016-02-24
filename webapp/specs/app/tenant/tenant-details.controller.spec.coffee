@@ -6,8 +6,6 @@ describe 'TenantDetailsCtrl', ->
   controller = undefined
   $state = undefined
   $stateParams = undefined
-  $log = undefined
-  $mdDialog = undefined
   TenantsService = undefined
   DomainsService = undefined
   DevicesService = undefined
@@ -25,7 +23,7 @@ describe 'TenantDetailsCtrl', ->
   beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _TenantsService_, _DomainsService_, _DevicesService_, _DistributorsService_,
-    _$state_, _sweet_, _$log_, _$mdDialog_) ->
+    _$state_, _sweet_) ->
     $controller = _$controller_
     $state = _$state_
     $stateParams = {}
@@ -38,14 +36,11 @@ describe 'TenantDetailsCtrl', ->
       complete: ->
     }
     sweet = _sweet_
-    $log = _$log_
-    $mdDialog = _$mdDialog_
     scope = {}
     serviceInjection = {
       $scope: scope
       $stateParams: $stateParams
       ProgressBarService: progressBarService
-      $mdDialog: $mdDialog
     }
 
   describe 'initialization', ->
@@ -157,7 +152,7 @@ describe 'TenantDetailsCtrl', ->
 
     beforeEach ->
       tenantsServicePromise = new skykitProvisioning.q.Mock
-      spyOn(TenantsService, 'save').and.returnValue(tenantsServicePromise)
+      spyOn(TenantsService, 'save').and.returnValue tenantsServicePromise
       spyOn($state, 'go')
       $stateParams = {}
       spyOn(progressBarService, 'start')
@@ -175,7 +170,7 @@ describe 'TenantDetailsCtrl', ->
       expect(progressBarService.start).toHaveBeenCalled()
 
     it 'call TenantsService.save, pass the current tenant', ->
-      expect(TenantsService.save).toHaveBeenCalledWith(controller.currentTenant)
+      expect(TenantsService.save).toHaveBeenCalledWith controller.currentTenant
 
     describe '.onSuccessTenantSave', ->
       beforeEach ->
@@ -191,7 +186,7 @@ describe 'TenantDetailsCtrl', ->
       beforeEach ->
         spyOn(sweet, 'show')
         errorObject = {status: 409}
-        controller.onFailureTenantSave(errorObject)
+        controller.onFailureTenantSave errorObject
 
       it 'stops the progress bar animation', ->
         expect(progressBarService.complete).toHaveBeenCalled()
@@ -206,7 +201,6 @@ describe 'TenantDetailsCtrl', ->
     describe '.onFailureTenantSave general error', ->
       beforeEach ->
         spyOn(sweet, 'show')
-        spyOn($log, 'error')
         @errorObject = {status: 400}
         controller.onFailureTenantSave(@errorObject)
 
@@ -220,12 +214,8 @@ describe 'TenantDetailsCtrl', ->
         expectedError = 'Unable to save the tenant.'
         expect(sweet.show).toHaveBeenCalledWith 'Oops...', expectedError, 'error'
 
-      it "logs the error to the console", ->
-        expect($log.error).toHaveBeenCalledWith @errorObject
-
   describe '.autoGenerateTenantCode', ->
     beforeEach ->
-      $stateParams = {}
       controller = $controller 'TenantDetailsCtrl', serviceInjection
 
     it 'generates a new tenant code when key is undefined', ->
@@ -240,13 +230,3 @@ describe 'TenantDetailsCtrl', ->
       controller.currentTenant.tenant_code = 'barfoo_company'
       controller.autoGenerateTenantCode()
       expect(controller.currentTenant.tenant_code).toBe 'barfoo_company'
-
-  describe '.showDeviceDetails', ->
-    beforeEach ->
-      item = {apiKey: 'api key'}
-      spyOn($mdDialog, 'show')
-      controller = $controller 'TenantDetailsCtrl', serviceInjection
-      controller.showDeviceDetails(item, {})
-
-    it 'calls $mdDialog', ->
-      expect($mdDialog.show).toHaveBeenCalled()

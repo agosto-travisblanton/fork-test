@@ -64,13 +64,13 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
       label: 'Domains'
     }
   })
-  $stateProvider.state("newDomain", {
-    url: "/domains/new",
+  $stateProvider.state("addDomain", {
+    url: "/domains/add",
     templateUrl: "app/domain/domain-detail.html",
     controller: "DomainDetailsCtrl",
     controllerAs: 'domainDetailsCtrl',
     ncyBreadcrumb: {
-      label: 'New domain',
+      label: 'Add domain',
       parent: 'domains'
     }
   })
@@ -93,23 +93,73 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
       label: 'Tenants'
     }
   })
-  $stateProvider.state("newTenant", {
-    url: "/tenants/new",
-    templateUrl: "app/tenant/tenant-detail.html",
-    controller: "TenantDetailsCtrl",
-    controllerAs: 'tenantDetailsCtrl',
+  $stateProvider.state("addTenant", {
+    url: "/tenants/add",
+    templateUrl: "app/tenant/tenant-add.html",
+    controller: "TenantAddCtrl",
+    controllerAs: 'tenantAddCtrl',
     ncyBreadcrumb: {
-      label: 'New tenant',
+      label: 'Add tenant',
       parent: 'tenants'
     }
   })
-  $stateProvider.state("editTenant", {
-    url: "/tenants/:tenantKey",
-    templateUrl: "app/tenant/tenant-detail.html",
+  $stateProvider.state("tenantDetails", {
+    url: "/tenants/:tenantKey/details",
+    templateUrl: "app/tenant/tenant-details.html",
     controller: "TenantDetailsCtrl",
     controllerAs: 'tenantDetailsCtrl',
     ncyBreadcrumb: {
       label: '{{ tenantDetailsCtrl.currentTenant.name }}',
+      parent: 'tenants'
+    }
+  })
+  $stateProvider.state("tenantManagedDevices", {
+    url: "/tenants/:tenantKey/managed",
+    templateUrl: "app/tenant/tenant-managed-devices.html",
+    controller: "TenantManagedDevicesCtrl",
+    controllerAs: 'tenantManagedDevicesCtrl',
+    ncyBreadcrumb: {
+      label: '{{ tenantManagedDevicesCtrl.currentTenant.name }}',
+      parent: 'tenants'
+    }
+  })
+  $stateProvider.state("tenantUnmanagedDevices", {
+    url: "/tenants/:tenantKey/unmanaged",
+    templateUrl: "app/tenant/tenant-unmanaged-devices.html",
+    controller: "TenantUnmanagedDevicesCtrl",
+    controllerAs: 'tenantUnmanagedDevicesCtrl',
+    ncyBreadcrumb: {
+      label: '{{ tenantUnmanagedDevicesCtrl.currentTenant.name }}',
+      parent: 'tenants'
+    }
+  })
+  $stateProvider.state("tenantLocations", {
+    url: "/tenants/:tenantKey/locations",
+    templateUrl: "app/tenant/tenant-locations.html",
+    controller: "TenantLocationsCtrl",
+    controllerAs: 'tenantLocationsCtrl',
+    ncyBreadcrumb: {
+      label: '{{ tenantLocationsCtrl.currentTenant.name }}',
+      parent: 'tenants'
+    }
+  })
+  $stateProvider.state("editLocation", {
+    url: "/locations/:locationKey",
+    templateUrl: "app/tenant/tenant-location.html",
+    controller: "TenantLocationCtrl",
+    controllerAs: 'tenantLocationCtrl',
+    ncyBreadcrumb: {
+      label: '{{ tenantLocationCtrl.tenantName }}  / {{ tenantLocationCtrl.locationName }}',
+      parent: 'tenants'
+    }
+  })
+  $stateProvider.state("addLocation", {
+    url: "/tenants/:tenantKey/location",
+    templateUrl: "app/tenant/tenant-location.html",
+    controller: "TenantLocationCtrl",
+    controllerAs: 'tenantLocationCtrl',
+    ncyBreadcrumb: {
+      label: '{{ tenantLocationCtrl.tenantName }}  / Location',
       parent: 'tenants'
     }
   })

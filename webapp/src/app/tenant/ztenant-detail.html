@@ -81,6 +81,7 @@
                       <label>Admin email</label>
                       <input type="email"
                              required
+                             ng-readonly="tenantDetailsCtrl.editMode == true"
                              class="form-control"
                              name="adminEmail"
                              id="adminEmail"
@@ -98,7 +99,7 @@
                   <div class="form-group"
                        ng-class="{ 'has-error' : tenantForm.contentManagerBaseUrl.$invalid && !tenantForm.contentManagerBaseUrl.$pristine }">
                     <div class="col-sm-5">
-                      <label> Content manager base URL</label>
+                      <label>Content manager URL</label>
                       <input type="url"
                              required
                              class="form-control"
@@ -113,7 +114,7 @@
                         ng-show="tenantForm.contentManagerBaseUrl.$invalid &&
                         !tenantForm.contentManagerBaseUrl.$pristine"
                         class="help-block">
-                        Content manager base URL must be a secure URL.
+                        Content manager URL must be a secure URL.
                       </p>
                     </div>
                   </div>
@@ -121,7 +122,7 @@
                        ng-class="{ 'has-error' : tenantForm.contentServerUrl.$invalid &&
                        !tenantForm.contentServerUrl.$pristine }">
                     <div class="col-sm-5">
-                      <label>Content server URL</label>
+                      <label>Player content URL</label>
                       <input type="url"
                              required
                              class="form-control"
@@ -134,7 +135,7 @@
                     <div class="col-sm-5 margin-top-15">
                       <p ng-show="tenantForm.contentServerUrl.$invalid && !tenantForm.contentServerUrl.$pristine"
                          class="help-block">
-                        Content server URL must be a secure URL.
+                        Player content URL must be a secure URL.
                       </p>
                     </div>
                   </div>
@@ -270,6 +271,33 @@
                     <td class="up-{{ item.up}}-background"></td>
                   </tr>
                   </tbody>
+                </table>
+
+              </md-card-content>
+            </md-card>
+          </div>
+        </md-content>
+      </md-tab>
+      <md-tab label="Locations">
+        <md-content class="md-padding">
+          <div flex="100" flex-sm="100" flex-xs="100" layout="column">
+            <md-card>
+              <md-card-title>
+                <md-card-title-text>
+                  <span class="md-headline">{{ tenantDetailsCtrl.currentTenant.name }}</span>
+                </md-card-title-text>
+              </md-card-title>
+              <md-card-content>
+                <table class="table table-responsive table-striped">
+                  <thead>
+                  <tr>
+                    <th></th>
+                    <th>Location Name</th>
+                    <th>Location Code</th>
+                    <th><i class="fa fa-fw fa-clock-o"></i> Timezone</th>
+                  </tr>
+                  </thead>
+                  <tbody>
                 </table>
 
               </md-card-content>
