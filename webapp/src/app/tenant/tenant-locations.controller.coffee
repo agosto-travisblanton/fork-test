@@ -7,18 +7,6 @@ appModule.controller 'TenantLocationsCtrl',
     tenantKey = $stateParams.tenantKey
     @locations = []
     @currentTenant = undefined
-
-    @initialize = ->
-      tenantPromise = TenantsService.getTenantByKey tenantKey
-      tenantPromise.then (data) =>
-        @currentTenant = data
-      locationsPromise = LocationsService.getLocationsByTenantKey tenantKey
-      locationsPromise.then (data) =>
-        @locations = data
-
-    @editItem = (item) ->
-      $state.go 'editLocation', {locationKey: item.key}
-
     $scope.tabIndex = 3
 
     $scope.$watch 'tabIndex', (selectedIndex) ->
@@ -32,5 +20,17 @@ appModule.controller 'TenantLocationsCtrl',
             $state.go 'tenantUnmanagedDevices', {tenantKey: tenantKey}
           when 3
             $state.go 'tenantLocations', {tenantKey: tenantKey}
+
+    @initialize = ->
+      tenantPromise = TenantsService.getTenantByKey tenantKey
+      tenantPromise.then (data) =>
+        @currentTenant = data
+      locationsPromise = LocationsService.getLocationsByTenantKey tenantKey
+      locationsPromise.then (data) =>
+        @locations = data
+
+    @editItem = (item) ->
+      $state.go 'editLocation', {locationKey: item.key}
+
 
     @

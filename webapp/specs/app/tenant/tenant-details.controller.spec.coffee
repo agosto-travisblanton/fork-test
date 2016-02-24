@@ -6,8 +6,6 @@ describe 'TenantDetailsCtrl', ->
   controller = undefined
   $state = undefined
   $stateParams = undefined
-#  $log = undefined
-#  $mdDialog = undefined
   TenantsService = undefined
   DomainsService = undefined
   DevicesService = undefined
