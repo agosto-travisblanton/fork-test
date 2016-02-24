@@ -1,0 +1,181 @@
+<div ng-controller="TenantDetailsCtrl" ng-init="tenantDetailsCtrl.initialize()" layout="column" ng-cloak>
+  <md-toolbar class="md-hue-2">
+    <div class="md-toolbar-tools">
+      <h2 class="md-flex"><i class="fa fa-fw fa-group ng-scope"></i> Tenants</h2>
+    </div>
+  </md-toolbar>
+  <md-content class="md-padding">
+    <div flex="80" flex-xs="100" layout="column">
+      <div ncy-breadcrumb></div>
+    </div>
+    <md-tabs md-stretch-tabs md-selected="tabIndex">
+      <md-tab label="General"></md-tab>
+      <md-tab label="Managed Devices"></md-tab>
+      <md-tab label="Unmanaged Devices"></md-tab>
+      <md-tab label="Locations"></md-tab>
+    </md-tabs>
+    <div flex="75" flex-sm="50" flex-xs="30" layout="column">
+      <md-card>
+        <md-card-title>
+          <md-card-title-text>
+            <span class="md-headline">{{ tenantDetailsCtrl.currentTenant.name }}</span>
+          </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+          <form name="tenantForm" class="form-horizontal" ng-submit="tenantDetailsCtrl.onClickSaveButton()"
+                novalidate>
+            <!--<div class="form-group" ng-hide="!tenantDetailsCtrl.editMode">-->
+              <!--<div class="col-sm-12">-->
+                <!--<label>Key</label>-->
+                <!--<div>-->
+                  <!--{{tenantDetailsCtrl.currentTenant.key}}-->
+                <!--</div>-->
+              <!--</div>-->
+            <!--</div>-->
+            <div class="form-group"
+                 ng-class="{ 'has-error' : tenantForm.name.$invalid && !tenantForm.name.$pristine }">
+              <div class="col-sm-4">
+                <label>Name</label>
+                <input type="text"
+                       class="form-control"
+                       autofocus
+                       name="name"
+                       placeholder="Enter a name"
+                       ng-change="!tenantDetailsCtrl.editMode && tenantDetailsCtrl.autoGenerateTenantCode()"
+                       ng-model="tenantDetailsCtrl.currentTenant.name" required>
+              </div>
+            </div>
+            <div class="form-group"
+                 ng-class="{ 'has-error' : tenantForm.tenantCode.$invalid && !tenantForm.tenantCode.$pristine }">
+              <div class="col-sm-4">
+                <label>Code</label>
+                <input type="text"
+                       ng-readonly="tenantDetailsCtrl.editMode == true"
+                       class="form-control"
+                       name="tenantCode"
+                       placeholder="Code matching Google Device Management"
+                       ng-model="tenantDetailsCtrl.currentTenant.tenant_code" required
+                       ng-pattern="/^[a-z0-9_]*$/">
+              </div>
+              <div class="col-sm-5 margin-top-15">
+                <p
+                  ng-show="tenantForm.tenantCode.$invalid && !tenantForm.tenantCode.$pristine"
+                  class="help-block">
+                  Alphanumeric and underscore are allowed.
+                </p>
+              </div>
+
+            </div>
+            <div class="form-group"
+                 ng-class="{ 'has-error' : tenantForm.chromeDeviceDomain.$invalid && !tenantForm.chromeDeviceDomain.$pristine }">
+              <div class="col-sm-4">
+                <label>Domain</label>
+                <select id="chromeDeviceDomain"
+                        ng-model="tenantDetailsCtrl.selectedDomain"
+                        class="form-control"
+                        ng-options="i.name for i in tenantDetailsCtrl.distributorDomains track by i.key">
+                  <option value=''>Select domain</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group"
+                 ng-class="{ 'has-error' : tenantForm.adminEmail.$invalid && !tenantForm.adminEmail.$pristine }">
+              <div class="col-sm-4">
+                <label>Admin email</label>
+                <input type="email"
+                       required
+                       ng-readonly="tenantDetailsCtrl.editMode == true"
+                       class="form-control"
+                       name="adminEmail"
+                       id="adminEmail"
+                       placeholder="Enter a valid admin email"
+                       ng-model="tenantDetailsCtrl.currentTenant.admin_email">
+              </div>
+              <div class="col-sm-5 margin-top-15">
+                <p
+                  ng-show="tenantForm.adminEmail.$invalid && !tenantForm.adminEmail.$pristine"
+                  class="help-block">
+                  A valid admin email is required.
+                </p>
+              </div>
+            </div>
+            <div class="form-group"
+                 ng-class="{ 'has-error' : tenantForm.contentManagerBaseUrl.$invalid && !tenantForm.contentManagerBaseUrl.$pristine }">
+              <div class="col-sm-5">
+                <label>Content manager URL</label>
+                <input type="url"
+                       required
+                       class="form-control"
+                       name="contentManagerBaseUrl"
+                       id="contentManagerBaseUrl"
+                       placeholder="Enter content manager base URL"
+                       ng-model="tenantDetailsCtrl.currentTenant.content_manager_base_url"
+                       ng-pattern="/^https:\/\/\S+$/">
+              </div>
+              <div class="col-sm-5 margin-top-15">
+                <p
+                  ng-show="tenantForm.contentManagerBaseUrl.$invalid &&
+                        !tenantForm.contentManagerBaseUrl.$pristine"
+                  class="help-block">
+                  Content manager URL must be a secure URL.
+                </p>
+              </div>
+            </div>
+            <div class="form-group"
+                 ng-class="{ 'has-error' : tenantForm.contentServerUrl.$invalid &&
+                       !tenantForm.contentServerUrl.$pristine }">
+              <div class="col-sm-5">
+                <label>Player content URL</label>
+                <input type="url"
+                       required
+                       class="form-control"
+                       name="contentServerUrl"
+                       id="contentServerUrl"
+                       placeholder="Enter content server URL"
+                       ng-model="tenantDetailsCtrl.currentTenant.content_server_url"
+                       ng-pattern="/^https:\/\/\S+$/">
+              </div>
+              <div class="col-sm-5 margin-top-15">
+                <p ng-show="tenantForm.contentServerUrl.$invalid && !tenantForm.contentServerUrl.$pristine"
+                   class="help-block">
+                  Player content URL must be a secure URL.
+                </p>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-5">
+                <label>Notification emails</label>
+                <input type="text"
+                       class="form-control"
+                       name="notificationEmails"
+                       id="notificationEmails"
+                       placeholder="Enter comma-delimited emails"
+                       ng-model="tenantDetailsCtrl.currentTenant.notification_emails">
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-9">
+                <input type="checkbox"
+                       ng-model="tenantDetailsCtrl.currentTenant.proof_of_play_logging"> <label>
+                Proof of play logging</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-9">
+                <input type="checkbox"
+                       id="active"
+                       ng-model="tenantDetailsCtrl.currentTenant.active"> <label
+                for="active">Active</label>
+              </div>
+            </div>
+            <md-card-actions layout="row" layout-align="center">
+              <md-button type="submit" ng-disabled="tenantForm.$invalid">
+                <i class="fa fa-fw fa-save"></i> Save
+              </md-button>
+            </md-card-actions>
+          </form>
+        </md-card-content>
+      </md-card>
+    </div>
+  </md-content>
+</div>

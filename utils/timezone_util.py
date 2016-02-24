@@ -1,7 +1,8 @@
-import pytz.tzfile
-import pytz.reference
-import pytz.tzinfo
 import datetime
+
+import pytz.reference
+import pytz.tzfile
+import pytz.tzinfo
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -15,3 +16,7 @@ class TimezoneUtil(object):
         timezone_offset = int(zone.utcoffset(now).total_seconds()/3600)
         return timezone_offset
 
+    @staticmethod
+    def get_us_timezones():
+        timezones = pytz.country_timezones['us']
+        return timezones

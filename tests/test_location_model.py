@@ -1,3 +1,5 @@
+import uuid
+
 from env_setup import setup_test_paths
 
 setup_test_paths()
@@ -60,6 +62,22 @@ class TestLocationModel(BaseTest):
         location.put()
         actual = Location.find_by_customer_location_code(self.CUSTOMER_LOCATION_CODE)
         self.assertEqual(actual.timezone_offset, self.TIMEZONE_OFFSET)
+
+    def test_is_customer_location_code_unique_returns_false_when_code_found(self):
+        location = Location.create(tenant_key=self.tenant_key,
+                                   customer_location_name=self.CUSTOMER_LOCATION_NAME,
+                                   customer_location_code=self.CUSTOMER_LOCATION_CODE,
+                                   timezone=self.TIMEZONE)
+        location.put()
+        uniqueness_check = Location.is_customer_location_code_unique(customer_location_code=self.CUSTOMER_LOCATION_CODE,
+                                                                     tenant_key=self.tenant_key)
+        self.assertFalse(uniqueness_check)
+
+    def test_is_customer_location_code_unique_returns_true_when_code_not_found(self):
+        location_code = str(uuid.uuid4().hex)
+        uniqueness_check = Location.is_customer_location_code_unique(customer_location_code=location_code,
+                                                                     tenant_key=self.tenant_key)
+        self.assertTrue(uniqueness_check)
 
     def test_class_version_is_only_set_by_pre_put_hook_method(self):
         location = Location.create(tenant_key=self.tenant_key,

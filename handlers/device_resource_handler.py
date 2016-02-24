@@ -261,17 +261,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             notes = request_json.get('notes')
             if notes:
                 device.notes = notes
-            latitude = request_json.get('latitude')
-            longitude = request_json.get('longitude')
-            if latitude is None or longitude is None:
-                device.geo_location = None
-            else:
-                if re.match(self.LATITUDE_PATTERN, str(latitude)) is None or re.match(self.LONGITUDE_PATTERN,
-                                                                                      str(longitude)) is None:
-                    logging.warning(
-                            'Invalid latitude {0} or longitude {1} detected.'.format(str(latitude), str(longitude)))
-                else:
-                    device.geo_location = ndb.GeoPt(latitude, longitude)
             gcm_registration_id = request_json.get('gcmRegistrationId')
             if gcm_registration_id:
                 logging.info('  PUT updating the gcmRegistrationId.')
@@ -398,21 +387,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     device.os_version = os_version
                     new_log_entry = DeviceIssueLog.create(device_key=device.key,
                                                           category=config.DEVICE_ISSUE_OS_VERSION_CHANGE,
-                                                          up=True,
-                                                          storage_utilization=storage,
-                                                          memory_utilization=memory,
-                                                          program=program,
-                                                          program_id=program_id,
-                                                          last_error=last_error,
-                                                          resolved=True,
-                                                          resolved_datetime=datetime.utcnow())
-                    new_log_entry.put()
-            timezone = request_json.get('timezone')
-            if timezone:
-                if device.time_zone != timezone:
-                    device.time_zone = timezone
-                    new_log_entry = DeviceIssueLog.create(device_key=device.key,
-                                                          category=config.DEVICE_ISSUE_TIMEZONE_CHANGE,
                                                           up=True,
                                                           storage_utilization=storage,
                                                           memory_utilization=memory,

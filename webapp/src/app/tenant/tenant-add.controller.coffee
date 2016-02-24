@@ -2,9 +2,9 @@
 
 appModule = angular.module('skykitProvisioning')
 
-appModule.controller 'TenantDetailsCtrl',
-  ($stateParams, TenantsService, DomainsService, DistributorsService, $state, sweet, ProgressBarService,
-    $cookies, $scope) ->
+appModule.controller 'TenantAddCtrl',
+  ($log, $stateParams, TenantsService, DomainsService, DevicesService, DistributorsService, $state, sweet,
+    ProgressBarService, $cookies, $mdDialog, $scope) ->
     @currentTenant = {
       key: undefined,
       name: undefined,
@@ -19,24 +19,12 @@ appModule.controller 'TenantDetailsCtrl',
     }
     @selectedDomain = undefined
     @distributorDomains = []
-    @editMode = !!$stateParams.tenantKey
-
-    if @editMode
-      tenantPromise = TenantsService.getTenantByKey $stateParams.tenantKey
-      tenantPromise.then (tenant) =>
-        @currentTenant = tenant
-        @onSuccessResolvingTenant tenant
 
     @initialize = ->
       @currentDistributorKey = $cookies.get('currentDistributorKey')
       distributorDomainPromise = DistributorsService.getDomainsByKey @currentDistributorKey
       distributorDomainPromise.then (domains) =>
         @distributorDomains = domains
-
-    @onSuccessResolvingTenant = (tenant) =>
-      domainPromise = DomainsService.getDomainByKey tenant.domain_key
-      domainPromise.then (data) =>
-        @selectedDomain = data
 
     @onClickSaveButton = ->
       ProgressBarService.start()
@@ -54,10 +42,8 @@ appModule.controller 'TenantDetailsCtrl',
         sweet.show('Oops...',
           'Tenant code unavailable. Please modify tenant name to generate a unique tenant code.', 'error')
       else
+        $log.error errorObject
         sweet.show('Oops...', 'Unable to save the tenant.', 'error')
-
-    @editItem = (item) ->
-      $state.go 'editDevice', {deviceKey: item.key, tenantKey: $stateParams.tenantKey}
 
     @autoGenerateTenantCode = ->
       unless @currentTenant.key
@@ -67,20 +53,5 @@ appModule.controller 'TenantDetailsCtrl',
           newTenantCode = newTenantCode.replace(/\s+/g, '_')
           newTenantCode = newTenantCode.replace(/\W+/g, '')
         @currentTenant.tenant_code = newTenantCode
-
-    $scope.tabIndex = 0
-
-    $scope.$watch 'tabIndex', (toTab, fromTab) ->
-
-      if toTab != undefined
-        switch toTab
-          when 0
-            $state.go 'tenantDetails', {tenantKey: $stateParams.tenantKey}
-          when 1
-            $state.go 'tenantManagedDevices', {tenantKey: $stateParams.tenantKey}
-          when 2
-            $state.go 'tenantUnmanagedDevices', {tenantKey: $stateParams.tenantKey}
-          when 3
-            $state.go 'tenantLocations', {tenantKey: $stateParams.tenantKey}
 
     @

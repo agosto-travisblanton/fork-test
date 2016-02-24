@@ -11,7 +11,7 @@ appModule.controller "TenantsCtrl", ($state, $log, TenantsService, sweet) ->
       @tenants = data
 
   @editItem = (item) ->
-    $state.go 'editTenant', {tenantKey: item.key}
+    $state.go 'tenantDetails', {tenantKey: item.key}
 
   @deleteItem = (item) =>
     callback = () =>
