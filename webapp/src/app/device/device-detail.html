@@ -297,7 +297,7 @@
                 <md-card-content>
                   <form name="locationForm"
                         class="form-horizontal"
-                        ng-submit="deviceDetailsCtrl.onClickSavePanels()"
+                        ng-submit="deviceDetailsCtrl.onClickSaveLocation()"
                         novalidate>
                     <div class="form-group">
                       <div class="col-sm-5">
@@ -305,8 +305,8 @@
                         <select
                           id="customerLocationName"
                           class="form-control"
-                          ng-model="deviceDetailsCtrl.currentDevice.customerLocationName"
-                          ng-options="p.customerLocationName for p in deviceDetailsCtrl.locations track by p.id">
+                          ng-model="deviceDetailsCtrl.currentDevice.location"
+                          ng-options="i.customerLocationName for i in deviceDetailsCtrl.locations track by i.key">
                         </select>
                       </div>
                     </div>
