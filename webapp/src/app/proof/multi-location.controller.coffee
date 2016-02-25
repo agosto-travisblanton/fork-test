@@ -100,6 +100,7 @@ appModule.controller "ProofOfPlayMultiLocationCtrl", (ProofPlayService) ->
       ProofPlayService.downloadCSVForMultipleLocationsByDevice(@final.start_date_unix, @final.end_date_unix, @final.locations)
 
     else
+      console.log("here")
       ProofPlayService.downloadCSVForMultipleLocationsSummarized(@final.start_date_unix, @final.end_date_unix, @final.locations)
 
   @

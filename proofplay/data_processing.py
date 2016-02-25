@@ -31,9 +31,9 @@ def transform_db_data_to_by_location_then_resource(from_db):
             to_return[customer_location_code] = {}
 
         if resource_name not in to_return[customer_location_code]:
-            to_return[customer_location_code] = []
+            to_return[customer_location_code][resource_name] = []
 
-        to_return[customer_location_code].append(item)
+        to_return[customer_location_code][resource_name].append(item)
 
     return to_return
 
@@ -69,6 +69,58 @@ def transform_db_data_to_by_date(from_db):
 ######################################################################################
 # FORMATTING
 ######################################################################################
+def format_multi_location_summarized(transformed_db_data):
+    """
+    Args:
+        transformed_db_data: {
+            "location-1": {
+                "resource-one": [{
+                    "location_id": "my-customer-location-code",
+                    "device_id": "my-customer-display-code",
+                    "resource_id": my-resource-name",
+                    "started_at": datetime
+                    "ended_at": datetime
+                }]
+            }
+        }
+
+    Returns:
+        "location-1": {
+                "resource-one": 15
+            }
+    """
+
+    {
+        'location': '2001',
+        'raw_data': {
+            '2001': [
+                {
+                    'device_id': 'my-device-5', 'location_id': '2001',
+                    'ended_at': datetime.datetime(2016, 2, 1, 16, 3, 12),
+                    'started_at': datetime.datetime(2016, 2, 1, 15, 53, 12), 'resource_id': 'GSAD_5533'}]
+        }
+    }
+
+    to_return = {}
+
+    print "-------------------------------"
+    print transformed_db_data
+
+    transformed_db_data = transformed_db_data["raw_data"]
+
+    # for each location
+    for key, value in transformed_db_data.iteritems():
+        if key not in to_return:
+            to_return[key] = {}
+
+        # for each resource in location
+        for another_key, another_value in transformed_db_data[key].iteritems():
+            if another_key not in to_return[key]:
+                to_return[key][another_key] = len(transformed_db_data[key][another_key])
+
+    return to_return
+
+
 def ensure_dictionary_has_keys_through_date_range(start_date, end_date, dictionary):
     while start_date <= end_date:
         if str(start_date) not in dictionary:
@@ -308,6 +360,46 @@ def generate_device_csv_by_date(created_time, start_date, end_date, displays, di
             for guess_what_another_key, guess_what_another_value in dictionary_of_data[key][another_key].iteritems():
                 writer.writerow([key, guess_what_another_value["location"], another_key, guess_what_another_key,
                                  guess_what_another_value["playcount"]])
+
+    tmp.seek(0)
+    return tmp
+
+
+def generate_location_csv_summarized(created_time, start_date, end_date, locations, dictionary_of_data):
+    """
+    Args:
+        created_time: datetime
+        start_date: datetime
+        end_date: datetime
+        locations: array
+        dictionary_of_data: {
+            "location-1": {
+                    "resource-one": 15,
+                    "resource-two": 42
+
+                },
+            "location-2": {
+                    "resource-two": 42,
+                    "resource-three": 34
+            }
+        }
+
+    Returns:
+        StringIO object
+
+    """
+
+    tmp = StringIO.StringIO()
+    writer = csv.writer(tmp)
+    writer.writerow(["Creation Date", "Start Date", "End Date", "Locations"])
+    writer.writerow([str(created_time), str(start_date), str(end_date), ', '.join(locations)])
+    writer.writerow(["Location", "Content", "Play Count"])
+
+    for location, resources in dictionary_of_data.iteritems():
+        for resource, playcount in dictionary_of_data[location].iteritems():
+            writer.writerow(
+                    [location, resource, playcount]
+            )
 
     tmp.seek(0)
     return tmp

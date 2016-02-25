@@ -362,9 +362,9 @@ class MultiLocationSummarized(RequestHandler):
 
         array_of_transformed_program_data_by_device = [
             {
-                "device": location,
+                "location": location,
                 # program_record is the transformed program record table data
-                "raw_data": program_record_for_device_summarized(
+                "raw_data": program_record_for_location_summarized(
                         midnight_start_day,
                         just_before_next_day_end_date,
                         location,
@@ -372,13 +372,18 @@ class MultiLocationSummarized(RequestHandler):
                 )
             } for location in all_the_locations_final]
 
-        formatted_data = format_transformed_program_data_by_device(array_of_transformed_program_data_by_device)
+        formatted_data = map(
+            format_multi_location_summarized,
+            array_of_transformed_program_data_by_device
+        )
 
-        csv_to_publish = generate_device_csv_summarized(
+        merged_formatted_data = create_merged_dictionary(formatted_data)
+
+        csv_to_publish = generate_location_csv_summarized(
                 start_date=midnight_start_day,
                 end_date=just_before_next_day_end_date,
-                displays=all_the_locations_final,
-                array_of_data=formatted_data,
+                locations=all_the_locations_final,
+                dictionary_of_data=merged_formatted_data,
                 created_time=now
         )
 
