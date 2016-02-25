@@ -155,7 +155,7 @@ class MultiResourceByDevice(RequestHandler):
         )
 
         self.response.headers['Content-Type'] = 'application/csv'
-        self.response.headers['Content-Disposition'] = 'attachment; filename=one-resource-by-device.csv'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=MultiResourceByDevice.csv'
         self.response.write(bytes(csv_to_publish.getvalue()))
 
 
@@ -211,7 +211,7 @@ class MultiResourceByDate(RequestHandler):
         )
 
         self.response.headers['Content-Type'] = 'application/csv'
-        self.response.headers['Content-Disposition'] = 'attachment; filename=multi-resource-by-date.csv'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=MultiResourceByDate.csv'
         self.response.write(bytes(csv_to_publish.getvalue()))
 
 
@@ -268,7 +268,7 @@ class MultiDeviceSummarized(RequestHandler):
         )
 
         self.response.headers['Content-Type'] = 'application/csv'
-        self.response.headers['Content-Disposition'] = 'attachment; filename=multi-resource-by-date.csv'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=MultiDeviceSummarized.csv'
         self.response.write(bytes(csv_to_publish.getvalue()))
 
 
@@ -326,7 +326,7 @@ class MultiDeviceByDate(RequestHandler):
         )
 
         self.response.headers['Content-Type'] = 'application/csv'
-        self.response.headers['Content-Disposition'] = 'attachment; filename=multi-resource-by-date.csv'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=MultiDeviceByDate.csv'
         self.response.write(bytes(csv_to_publish.getvalue()))
 
 
@@ -388,7 +388,7 @@ class MultiLocationSummarized(RequestHandler):
         )
 
         self.response.headers['Content-Type'] = 'application/csv'
-        self.response.headers['Content-Disposition'] = 'attachment; filename=multi-resource-by-date.csv'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=MultiLocationSummarized.csv'
         self.response.write(bytes(csv_to_publish.getvalue()))
 
 
@@ -447,7 +447,7 @@ class MultiLocationByDevice(RequestHandler):
         )
 
         self.response.headers['Content-Type'] = 'application/csv'
-        self.response.headers['Content-Disposition'] = 'attachment; filename=multi-resource-by-date.csv'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=MultiLocationByDevice.csv'
         self.response.write(bytes(csv_to_publish.getvalue()))
 
 
