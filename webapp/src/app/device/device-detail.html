@@ -309,20 +309,10 @@
                           ng-options="p.customerLocationName for p in deviceDetailsCtrl.locations track by p.id">
                         </select>
                       </div>
-                      <!--<div class="col-sm-5">-->
-                        <!--<label>Panel input</label>-->
-                        <!--<select-->
-                          <!--id="panelInput"-->
-                          <!--class="form-control"-->
-                          <!--ng-required="deviceDetailsCtrl.currentDevice.panelModel !== None"-->
-                          <!--ng-model="deviceDetailsCtrl.currentDevice.panelInput"-->
-                          <!--ng-options="c.displayName for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">-->
-                        <!--</select>-->
-                      <!--</div>-->
                     </div>
                     <md-card-actions layout="row" layout-align="end center">
                       <md-button type="submit"
-                                 ng-disabled="!serialControlForm.$dirty || serialControlForm.$invalid">
+                                 ng-disabled="!locationForm.$dirty || locationForm.$invalid">
                         <i class="fa fa-fw fa-save"></i>
                         Save
                       </md-button>
