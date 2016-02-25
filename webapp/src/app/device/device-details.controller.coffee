@@ -6,25 +6,11 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     $stateParams,
     $state,
     DevicesService,
-    TenantsService,
+    LocationsService,
     CommandsService,
     sweet,
     ProgressBarService) ->
   @tenantKey = $stateParams.tenantKey
-
-  @currentTenant = {
-    key: undefined,
-    name: undefined,
-    tenant_code: undefined,
-    admin_email: undefined,
-    content_server_url: undefined,
-    content_manager_base_url: undefined,
-    domain_key: undefined,
-    notification_emails: undefined,
-    proof_of_play_logging: false,
-    active: true
-  }
-
   @currentDevice = {
     key: undefined
     gcmRegistrationId: undefined
@@ -67,16 +53,12 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @initialize = () ->
     @panelModels = DevicesService.getPanelModels()
     @panelInputs = DevicesService.getPanelInputs()
-    tenantsPromise = TenantsService.fetchAllTenants()
-    tenantsPromise.then (data) =>
-      @tenants = data
-
     if @editMode
-      devicePromise = DevicesService.getDeviceByKey($stateParams.deviceKey)
+      devicePromise = DevicesService.getDeviceByKey $stateParams.deviceKey
       devicePromise.then (data) =>
         @currentDevice = data
         @setSelectedOptions()
-      commandEventsPromise = DevicesService.getCommandEventsByKey($stateParams.deviceKey)
+      commandEventsPromise = DevicesService.getCommandEventsByKey $stateParams.deviceKey
       commandEventsPromise.then (data) =>
         @commandEvents = data
       now = new Date()
@@ -89,6 +71,9 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       issuesPromise = DevicesService.getIssuesByKey($stateParams.deviceKey, @epochStart, @epochEnd)
       issuesPromise.then (data) =>
         @issues = data
+      locationsPromise = LocationsService.getLocationsByTenantKey @tenantKey
+      locationsPromise.then (data) =>
+        @locations = data
 
   @setSelectedOptions = () ->
     if @currentDevice.panelModel == null
@@ -102,11 +87,20 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
         if panelInput.id is @currentDevice.panelInput
           @currentDevice.panelInput = panelInput
 
+  @setLocationInfo = () ->
+    #TODO wire this up
+
   @onClickSavePanels = () ->
     ProgressBarService.start()
     @setPanelInfo()
     promise = DevicesService.save @currentDevice
     promise.then @onSuccessDeviceSave, @onFailureDeviceSavePanels
+
+  @onClickSaveLocation = () ->
+    ProgressBarService.start()
+    @setLocationInfo()
+    promise = DevicesService.save @currentDevice
+    promise.then @onSuccessDeviceSave, @onFailureDeviceSaveLocation
 
   @onSuccessDeviceSave = ->
     ProgressBarService.complete()
@@ -116,6 +110,11 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     ProgressBarService.complete()
     $log.error errorObject
     sweet.show('Oops...', 'Unable to save the serial control information.', 'error')
+
+  @onFailureDeviceSaveLocation = (errorObject) ->
+    ProgressBarService.complete()
+    $log.error errorObject
+    sweet.show('Oops...', 'Unable to save the location information.', 'error')
 
   @onClickSaveDevice = () ->
     ProgressBarService.start()
