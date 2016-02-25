@@ -48,10 +48,9 @@ angular.module('skykitProvisioning')
         }
       )
 
-    # I'm just here until the backend is ready
     getAllLocations: () ->
       distributorKey = $cookies.get('currentDistributorKey')
-      $http.get(@uriBase + '/retrieve_my_tenants',
+      $http.get(@uriBase + '/retrieve_all_locations/' + @chosenTenant,
         headers: {
           'X-Provisioning-Distributor': distributorKey
         }

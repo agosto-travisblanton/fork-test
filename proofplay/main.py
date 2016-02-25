@@ -21,10 +21,13 @@ class MakeMigration(RequestHandler):
             alembic_cfg = Config(path)
             alembic_cfg.set_main_option('sqlalchemy.url', SQLALCHEMY_DATABASE_URI)
             command.upgrade(alembic_cfg, "head")
-            self.response.out.write("SUCCESS")
+            self.response.out.write(
+                    "SUCCESS. Migrations Applied Successfully (or no change to model schema neccesasary.")
 
-        except:
-            self.response.out.write("FAILURE")
+        except Exception as e:
+            print e
+            self.response.out.write(
+                    "FAILURE. Exception caught during alembic migrations. Check the developer console logs.")
 
 
 ####################################################################################
@@ -65,6 +68,19 @@ class RetrieveAllResourcesOfTenant(RequestHandler):
 
         resources = retrieve_all_resources_of_tenant(tenant)
         final = json.dumps({"resources": resources})
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(final)
+
+
+class RetrieveAllLocationsOfTenant(RequestHandler):
+    def get(self, tenant):
+        tenants = get_tenant_names_for_distributor(self.request.headers.get('X-Provisioning-Distributor'))
+        if tenant not in tenants:
+            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+            self.abort(403)
+
+        locations = retrieve_all_locations_of_tenant(tenant)
+        final = json.dumps({"locations": locations})
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(final)
 
@@ -309,7 +325,7 @@ class MultiDeviceByDate(RequestHandler):
 
 
 ####################################################################################
-# FUNCTION THAT GETS CALLED VIA DEFERRED ON NWE PROGRAM PLAY POST
+# FUNCTION THAT GETS CALLED VIA DEFERRED ON NEW PROGRAM PLAY POST
 ####################################################################################
 def handle_posting_a_new_program_play(incoming_data):
     for each_log in incoming_data["data"]:
@@ -353,4 +369,4 @@ def handle_posting_a_new_program_play(incoming_data):
             mark_raw_event_complete(raw_event_id)
 
         except KeyError:
-            logging.warn("ERROR: KEYERROR IN POSTING A NEW PROGRAM PLAY")
+            logging.warn("ERROR: KEYERROR IN POSTING A NEW PROGRAM PLAY. THE RECORD WILL NOT BE STORED. ")

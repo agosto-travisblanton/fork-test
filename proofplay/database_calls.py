@@ -13,10 +13,26 @@ from google.appengine.ext import ndb
 def retrieve_all_devices_of_tenant(tenant):
     session = Session()
     search = session.query(Device.customer_display_code.distinct().label("customer_display_code")).filter(
-        Device.tenant_code == tenant)
+            Device.tenant_code == tenant)
 
     session.close()
     return [row.customer_display_code for row in search.all()]
+
+
+def retrieve_all_locations_of_tenant(tenant):
+    session = Session()
+    search = session.query(Device.location_id.distinct().label("location_id")).filter(
+            Device.tenant_code == tenant)
+    session.close()
+    location_ids = [row.location_id for row in search.all()]
+    return map(retrieve_customer_location_code_from_location_id, location_ids)
+
+
+def retrieve_customer_location_code_from_location_id(location_id):
+    session = Session()
+    search = session.query(Location).filter_by(id=location_id).first().customer_location_code
+    session.close()
+    return search
 
 
 def retrieve_all_resources_of_tenant(tenant):

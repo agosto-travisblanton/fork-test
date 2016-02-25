@@ -3,6 +3,7 @@ from env_setup import setup
 setup()
 
 from os import path
+
 basedir = path.abspath(path.dirname(__file__))
 
 # DO NOT REMOVE
@@ -75,6 +76,11 @@ application = WSGIApplication([
             handler="proofplay.main.GetTenants",
             name="GetTenants"
     ),
+    Route(
+            BASE_URI + '/retrieve_all_locations/<tenant>',
+            handler="proofplay.main.RetrieveAllLocationsOfTenant",
+            name="RetrieveAllLocationsOfTenant"
+    ),
 
     ################################################################
     # Migrate DB
@@ -87,4 +93,3 @@ application = WSGIApplication([
     ),
 ]
 )
-
