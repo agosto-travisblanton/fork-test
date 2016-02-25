@@ -18,31 +18,31 @@ appModule.controller "ProofOfPlayMultiLocationCtrl", (ProofPlayService) ->
   @formValidity = {
     start_date: false,
     end_date: false,
-    resources: false,
+    locations: false,
   }
 
   @no_cache = true
   @loading = true
   @disabled = true
-  @selected_resources = []
+  @selected_locations = []
 
   @initialize = =>
-    ProofPlayService.getAllResources()
+    ProofPlayService.getAllLocations()
     .then (data) =>
       @loading = false
-      @resources = data.data.resources
+      @locations = data.data.locations
 
-  @addToSelectedResources = (searchText) =>
-    if @isResourceValid(searchText)
-      @selected_resources.push searchText
-      index = @resources.indexOf searchText
-      @resources.splice index, 1
+  @addToSelectedLocations = (searchText) =>
+    if @isLocationValid(searchText)
+      @selected_locations.push searchText
+      index = @locations.indexOf searchText
+      @locations.splice index, 1
       @searchText = ''
-    @areResourcesValid()
+    @areLocationsValid()
     @isDisabled()
 
-  @querySearch = (resources, searchText) ->
-    ProofPlayService.querySearch(resources, searchText)
+  @querySearch = (locations, searchText) ->
+    ProofPlayService.querySearch(locations, searchText)
 
 
   @isRadioValid = (selection) =>
@@ -50,9 +50,9 @@ appModule.controller "ProofOfPlayMultiLocationCtrl", (ProofPlayService) ->
     @isDisabled()
 
 
-  @isResourceValid = (searchText) =>
-    if searchText in @resources
-      if searchText not in @selected_resources
+  @isLocationValid = (searchText) =>
+    if searchText in @locations
+      if searchText not in @selected_locations
         true
       else
         false
@@ -60,8 +60,8 @@ appModule.controller "ProofOfPlayMultiLocationCtrl", (ProofPlayService) ->
       false
 
 
-  @areResourcesValid = () =>
-    @formValidity.resources = (@selected_resources.length > 0)
+  @areLocationsValid = () =>
+    @formValidity.locations = (@selected_locations.length > 0)
     @isDisabled()
 
   @isStartDateValid = (start_date) =>
@@ -73,21 +73,21 @@ appModule.controller "ProofOfPlayMultiLocationCtrl", (ProofPlayService) ->
     @formValidity.end_date = (end_date instanceof Date)
     @isDisabled()
 
-  @removeFromSelectedResource = (item) =>
-    index = @selected_resources.indexOf(item)
-    @selected_resources.splice(index, 1)
-    @resources.push item
-    @areResourcesValid()
+  @removeFromSelectedLocation = (item) =>
+    index = @selected_locations.indexOf(item)
+    @selected_locations.splice(index, 1)
+    @locations.push item
+    @areLocationsValid()
     @isDisabled()
 
 
   @isDisabled = () =>
-    if @formValidity.start_date and @formValidity.end_date and @formValidity.resources and @formValidity.type
+    if @formValidity.start_date and @formValidity.end_date and @formValidity.locations and @formValidity.type
       @disabled = false
       @final = {
         start_date_unix: moment(@dateTimeSelection.start).unix(),
         end_date_unix: moment(@dateTimeSelection.end).unix(),
-        resources: @selected_resources,
+        locations: @selected_locations,
         type: @radioButtonChoices.selection
 
       }
@@ -97,9 +97,9 @@ appModule.controller "ProofOfPlayMultiLocationCtrl", (ProofPlayService) ->
 
   @submit = () =>
     if @final.type is "1"
-      ProofPlayService.downloadCSVForMultipleResourcesByDevice(@final.start_date_unix, @final.end_date_unix, @final.resources)
+      ProofPlayService.downloadCSVForMultipleLocationsByDevice(@final.start_date_unix, @final.end_date_unix, @final.locations)
 
     else
-      ProofPlayService.downloadCSVForMultipleResourcesByDate(@final.start_date_unix, @final.end_date_unix, @final.resources)
+      ProofPlayService.downloadCSVForMultipleLocationsSummarized(@final.start_date_unix, @final.end_date_unix, @final.locations)
 
   @

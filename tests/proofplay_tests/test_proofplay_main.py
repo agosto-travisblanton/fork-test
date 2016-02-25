@@ -48,6 +48,59 @@ class TestMain(SQLBaseTest, WebTest):
             'X-Provisioning-Distributor': self.distributor_key.urlsafe()
         }
 
+    def test_multi_device_by_date_api(self):
+        self.load_tenants()
+        self.load_resources()
+        self.load_one_device()
+
+        start_date = datetime.datetime.now()
+        end_date = start_date - datetime.timedelta(days=5)
+        start_unix = int(time.mktime(start_date.timetuple()))
+        end_unix = int(time.mktime(end_date.timetuple()))
+        devices = [self.one_device_customer_display_code]
+
+        all_devices = ''
+        for item in devices:
+            all_devices = "," + item
+
+        uri = build_uri('MultiDeviceByDate', module='proofplay', params_dict={
+            'tenant': self.tenant_code,
+            'distributor_key': self.distributor_key.urlsafe(),
+            'devices': all_devices,
+            'start_date': start_unix,
+            'end_date': end_unix
+        })
+
+        response = self.app.get(uri, headers=self.headers)
+        self.assertEqual(200, response.status_int)
+
+    def test_multi_device_summarized_api(self):
+        self.load_tenants()
+        self.load_resources()
+        self.load_one_device()
+
+        start_date = datetime.datetime.now()
+        end_date = start_date - datetime.timedelta(days=5)
+        start_unix = int(time.mktime(start_date.timetuple()))
+        end_unix = int(time.mktime(end_date.timetuple()))
+        devices = [self.one_device_customer_display_code]
+
+        all_devices = ''
+        for item in devices:
+            all_devices = "," + item
+
+        uri = build_uri('MultiDeviceSummarized', module='proofplay', params_dict={
+            'tenant': self.tenant_code,
+            'distributor_key': self.distributor_key.urlsafe(),
+            'devices': all_devices,
+            'start_date': start_unix,
+            'end_date': end_unix
+        })
+
+        response = self.app.get(uri, headers=self.headers)
+        self.assertEqual(200, response.status_int)
+
+
     def test_multi_resource_by_device_api(self):
         self.load_tenants()
         self.load_resources()
