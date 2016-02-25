@@ -87,6 +87,9 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
         if panelInput.id is @currentDevice.panelInput
           @currentDevice.panelInput = panelInput
 
+  @setLocationInfo = () ->
+    #TODO wire this up
+
   @onClickSavePanels = () ->
     ProgressBarService.start()
     @setPanelInfo()
