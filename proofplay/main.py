@@ -198,9 +198,11 @@ class MultiResourceByDate(RequestHandler):
                 )
             } for resource in all_the_resources_final]
 
-        formatted_data = format_program_record_data_with_array_of_resources_by_date(midnight_start_day,
-                                                                                    just_before_next_day_end_date,
-                                                                                    pre_formatted_program_record_by_date)
+        formatted_data = format_program_record_data_with_array_of_resources_by_date(
+                midnight_start_day,
+                just_before_next_day_end_date,
+                pre_formatted_program_record_by_date
+        )
 
         csv_to_publish = generate_resource_csv_by_date(
                 midnight_start_day,
@@ -373,8 +375,8 @@ class MultiLocationSummarized(RequestHandler):
             } for location in all_the_locations_final]
 
         formatted_data = map(
-            format_multi_location_summarized,
-            array_of_transformed_program_data_by_device
+                format_multi_location_summarized,
+                array_of_transformed_program_data_by_device
         )
 
         merged_formatted_data = create_merged_dictionary(formatted_data)
@@ -432,8 +434,8 @@ class MultiLocationByDevice(RequestHandler):
             } for location in all_the_locations_final]
 
         formatted_data = map(
-            format_multi_location_by_device,
-            array_of_transformed_program_data_by_device
+                format_multi_location_by_device,
+                array_of_transformed_program_data_by_device
         )
 
         merged_formatted_data = create_merged_dictionary(formatted_data)

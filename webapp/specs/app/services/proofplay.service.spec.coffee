@@ -87,6 +87,46 @@ describe 'ProofPlayService', ->
       expect(window.open).toHaveBeenCalledWith('proofplay/api/v1/multi_resource_by_device/' + start_date + '/' + end_date + '/' + allResources + "/" + tenants[0] + "/" + cookie_token, '_blank')
 
 
+
+    it 'gets all displays of a tenant', ->
+      to_respond = {
+        data: {
+          displays: ["one", "two"]
+        }
+      }
+
+      chosen_tenant = "some-tenant"
+
+      ProofPlayService.setTenant(chosen_tenant)
+
+      $httpBackend.expectGET("proofplay/api/v1/retrieve_all_displays/" + chosen_tenant).respond(to_respond)
+
+      ProofPlayService.getAllDisplays()
+      .then (data) ->
+        expect(angular.equals(data.data.displays, to_respond.data.displays))
+
+      $httpBackend.flush()
+
+    it 'gets all locations of a tenant', ->
+      to_respond = {
+        data: {
+          locations: ["one", "two"]
+        }
+      }
+
+      chosen_tenant = "some-tenant"
+
+      ProofPlayService.setTenant(chosen_tenant)
+
+      $httpBackend.expectGET("proofplay/api/v1/retrieve_all_locations/" + chosen_tenant).respond(to_respond)
+
+      ProofPlayService.getAllLocations()
+      .then (data) ->
+        expect(angular.equals(data.data.locations, to_respond.data.locations))
+
+      $httpBackend.flush()
+
+
   describe 'querySearch filters array by text', ->
 
     it 'filters properly', ->

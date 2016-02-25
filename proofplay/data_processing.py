@@ -111,6 +111,7 @@ def format_multi_location_by_device(transformed_db_data):
     """
     Args:
         transformed_db_data: {
+        "raw_data": {
             "location-1": {
                 "resource-one": [{
                     "location_id": "my-customer-location-code",
@@ -121,7 +122,7 @@ def format_multi_location_by_device(transformed_db_data):
                 }]
             }
         }
-
+    }
     Returns:
         "location-1": {
                 "resource-one": {
