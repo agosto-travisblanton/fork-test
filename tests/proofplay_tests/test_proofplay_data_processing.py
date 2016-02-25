@@ -18,7 +18,9 @@ from proofplay.data_processing import (
     create_merged_dictionary,
     count_resource_plays_from_dict_by_device,
     format_transformed_program_data_by_device,
-    prepare_transformed_query_by_device_to_csv_by_date
+    prepare_transformed_query_by_device_to_csv_by_date,
+    generate_device_csv_summarized,
+    generate_device_csv_by_date
 )
 
 
@@ -94,6 +96,7 @@ class TestDataProcessing(BaseTest):
         started_at_plus_one = self.start_date + datetime.timedelta(days=1)
         started_at_plus_two = self.start_date + datetime.timedelta(days=2)
         started_at_plus_three = self.start_date + datetime.timedelta(days=3)
+
         example_input = [
             {"device_id": 1, "started_at": started_at_plus_one},
             {"device_id": 1, "someinfo": "something", "started_at": started_at_plus_one},
@@ -469,6 +472,77 @@ class TestDataProcessing(BaseTest):
         result = prepare_transformed_query_by_device_to_csv_by_date(self.start_date, self.end_date, example_input)
 
         self.assertEqual(result, expected_result)
+
+    def test_generate_device_csv_summarized(self):
+        example_input = [
+            {'content': 'GSAD_4334', 'display': 'my-device-3', 'location': '1001', 'playcount': 1},
+            {'content': 'GSAD_2222', 'display': 'my-device-7', 'location': '3001', 'playcount': 3},
+            {'content': 'GSAD_4334', 'display': 'my-device-7', 'location': '3001', 'playcount': 3},
+            {'content': 'GSAD_5447', 'display': 'my-device-7', 'location': '3001', 'playcount': 2}
+        ]
+        now = str(datetime.datetime.now())
+
+        expected_output = """Creation Date,Start Date,End Date,Displays\r\n{},2016-02-01 00:00:00,2016-02-03 00:00:00,"my-device-3, my-device-7"\r\nDisplay,Location,Content,Play Count\r\nmy-device-3,1001,GSAD_4334,1\r\nmy-device-7,3001,GSAD_2222,3\r\nmy-device-7,3001,GSAD_4334,3\r\nmy-device-7,3001,GSAD_5447,2\r\n""".format(
+                now)
+
+        start_time = datetime.datetime.strptime("Feb 1 2016", '%b %d %Y')
+        end_time = datetime.datetime.strptime("Feb 3 2016", '%b %d %Y')
+
+        displays = ["my-device-3", "my-device-7"]
+        self.assertEqual(generate_device_csv_summarized(start_time, end_time, displays, example_input, now).read(),
+                         expected_output)
+
+    def test_generate_device_csv_by_date(self):
+        example_input = OrderedDict(
+                [
+                    ('my-device-3',
+                     OrderedDict(
+                             [('2016-02-02 00:00:00', {'GSAD_4334': {'location': '1001', 'playcount': 1}})])),
+                    ('my-device-7',
+                     OrderedDict(
+                             [(
+                                 '2016-02-01 00:00:00',
+                                 {
+                                     'GSAD_5447': {
+                                         'location': '3001',
+                                         'playcount': 1},
+                                     'GSAD_4334': {
+                                         'location': '3001',
+                                         'playcount': 2},
+                                     'GSAD_2222': {
+                                         'location': '3001',
+                                         'playcount': 1}}),
+                                 (
+                                     '2016-02-02 00:00:00',
+                                     {
+                                         'GSAD_2222': {
+                                             'location': '3001',
+                                             'playcount': 1}}),
+                                 (
+                                     '2016-02-03 00:00:00',
+                                     {
+                                         'GSAD_5447': {
+                                             'location': '3001',
+                                             'playcount': 1},
+                                         'GSAD_4334': {
+                                             'location': '3001',
+                                             'playcount': 1},
+                                         'GSAD_2222': {
+                                             'location': '3001',
+                                             'playcount': 1}})]))]
+        )
+
+        now = str(datetime.datetime.now())
+        devices = ["my-device-3", "my-device-7"]
+
+        expected_result = 'Creation Date,Start Date,End Date,Displays\r\n{},2016-02-01 00:00:00,2016-02-03 00:00:00,"my-device-3, my-device-7"\r\nDisplay,Location,Date,Content,Play Count\r\nmy-device-3,1001,2016-02-02 00:00:00,GSAD_4334,1\r\nmy-device-7,3001,2016-02-01 00:00:00,GSAD_5447,1\r\nmy-device-7,3001,2016-02-01 00:00:00,GSAD_2222,1\r\nmy-device-7,3001,2016-02-01 00:00:00,GSAD_4334,2\r\nmy-device-7,3001,2016-02-02 00:00:00,GSAD_2222,1\r\nmy-device-7,3001,2016-02-03 00:00:00,GSAD_5447,1\r\nmy-device-7,3001,2016-02-03 00:00:00,GSAD_2222,1\r\nmy-device-7,3001,2016-02-03 00:00:00,GSAD_4334,1\r\n'.format(
+            now)
+
+        start_time = datetime.datetime.strptime("Feb 1 2016", '%b %d %Y')
+        end_time = datetime.datetime.strptime("Feb 3 2016", '%b %d %Y')
+
+        self.assertEqual(generate_device_csv_by_date(now, start_time, end_time, devices, example_input).read(),
+                         expected_result)
 
 
 if __name__ == '__main__':

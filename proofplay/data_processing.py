@@ -265,6 +265,9 @@ def generate_device_csv_by_date(created_time, start_date, end_date, displays, di
     tmp = StringIO.StringIO()
     writer = csv.writer(tmp)
 
+    print "-----------"
+    print dictionary_of_data
+
     writer.writerow(["Creation Date", "Start Date", "End Date", "Displays"])
     writer.writerow([str(created_time), str(start_date), str(end_date), ', '.join(displays)])
     writer.writerow(["Display", "Location", "Date", "Content", "Play Count"])
@@ -275,5 +278,7 @@ def generate_device_csv_by_date(created_time, start_date, end_date, displays, di
                 writer.writerow([key, guess_what_another_value["location"], another_key, guess_what_another_key,
                                  guess_what_another_value["playcount"]])
 
+    print "---------"
+    print tmp.getvalue()
     tmp.seek(0)
     return tmp
