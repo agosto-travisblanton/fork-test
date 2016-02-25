@@ -115,15 +115,15 @@ angular.module('skykitProvisioning')
       , '_blank')
       return true
 
-    downloadCSVForMultipleLocationsByDevice: (start_date, end_date, devices) ->
-#      allDevices = ''
-#
-#      for each in devices
-#        allDevices = allDevices + "," + each
-#
-#      $window.open(@uriBase + '/multi_device_by_date/' + start_date + '/' + end_date + '/' + allDevices + '/' +
-#          @chosenTenant + "/" + $cookies.get('currentDistributorKey')
-#      , '_blank')
+    downloadCSVForMultipleLocationsByDevice: (start_date, end_date, locations) ->
+      allLocations = ''
+
+      for each in locations
+        allLocations = allLocations + "," + each
+
+      $window.open(@uriBase + '/multi_location_by_device/' + start_date + '/' + end_date + '/' + allLocations + '/' +
+          @chosenTenant + "/" + $cookies.get('currentDistributorKey')
+      , '_blank')
       return true
 
     downloadCSVForMultipleLocationsSummarized: (start_date, end_date, locations) ->

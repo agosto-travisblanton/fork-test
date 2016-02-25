@@ -419,11 +419,11 @@ class MultiLocationByDevice(RequestHandler):
 
         ###########################################################
 
-        transformed_query_by_device_program_data_to_by_date = [
+        array_of_transformed_program_data_by_device = [
             {
                 "location": location,
                 # program_record is the transformed program record table data
-                "raw_data": program_record_for_device_by_date(
+                "raw_data": program_record_for_location_summarized(
                         midnight_start_day,
                         just_before_next_day_end_date,
                         location,
@@ -431,17 +431,18 @@ class MultiLocationByDevice(RequestHandler):
                 )
             } for location in all_the_locations_final]
 
-        formatted_data = prepare_transformed_query_by_device_to_csv_by_date(
-                midnight_start_day,
-                just_before_next_day_end_date,
-                transformed_query_by_device_program_data_to_by_date
+        formatted_data = map(
+            format_multi_location_by_device,
+            array_of_transformed_program_data_by_device
         )
 
-        csv_to_publish = generate_device_csv_by_date(
+        merged_formatted_data = create_merged_dictionary(formatted_data)
+
+        csv_to_publish = generate_location_csv_by_device(
                 start_date=midnight_start_day,
                 end_date=just_before_next_day_end_date,
-                displays=all_the_locations_final,
-                dictionary_of_data=formatted_data,
+                locations=all_the_locations_final,
+                dictionary_of_data=merged_formatted_data,
                 created_time=now
         )
 

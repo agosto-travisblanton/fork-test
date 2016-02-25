@@ -28,7 +28,7 @@ def transform_db_data_to_by_location_then_resource(from_db):
         resource_name = item["resource_id"]
 
         if customer_location_code not in to_return:
-            to_return[customer_location_code] = {}
+            to_return[customer_location_code] = OrderedDict()
 
         if resource_name not in to_return[customer_location_code]:
             to_return[customer_location_code][resource_name] = []
@@ -97,12 +97,59 @@ def format_multi_location_summarized(transformed_db_data):
     # for each location
     for key, value in transformed_db_data.iteritems():
         if key not in to_return:
-            to_return[key] = {}
+            to_return[key] = OrderedDict()
 
         # for each resource in location
         for another_key, another_value in transformed_db_data[key].iteritems():
             if another_key not in to_return[key]:
                 to_return[key][another_key] = len(transformed_db_data[key][another_key])
+
+    return to_return
+
+
+def format_multi_location_by_device(transformed_db_data):
+    """
+    Args:
+        transformed_db_data: {
+            "location-1": {
+                "resource-one": [{
+                    "location_id": "my-customer-location-code",
+                    "device_id": "my-customer-display-code",
+                    "resource_id": my-resource-name",
+                    "started_at": datetime
+                    "ended_at": datetime
+                }]
+            }
+        }
+
+    Returns:
+        "location-1": {
+                "resource-one": {
+                    "some_device": 3
+                    }
+            }
+    """
+
+    to_return = {}
+
+    transformed_db_data = transformed_db_data["raw_data"]
+
+    # for each location
+    for key, value in transformed_db_data.iteritems():
+        if key not in to_return:
+            to_return[key] = OrderedDict()
+
+        # for each resource in location
+        for another_key, another_value in transformed_db_data[key].iteritems():
+            if another_key not in to_return[key]:
+                to_return[key][another_key] = OrderedDict()
+
+            for each_log in transformed_db_data[key][another_key]:
+
+                if each_log["device_id"] not in to_return[key][another_key]:
+                    to_return[key][another_key][each_log["device_id"]] = 0
+
+                to_return[key][another_key][each_log["device_id"]] += 1
 
     return to_return
 
@@ -386,6 +433,42 @@ def generate_location_csv_summarized(created_time, start_date, end_date, locatio
             writer.writerow(
                     [location, resource, playcount]
             )
+
+    tmp.seek(0)
+    return tmp
+
+
+def generate_location_csv_by_device(created_time, start_date, end_date, locations, dictionary_of_data):
+    """
+
+    Args:
+        created_time:
+        start_date:
+        end_date:
+        locations:
+        dictionary_of_data: {
+            "location-1": {
+                    "resource-one": {
+                        "some_device": 3
+                        }
+                }
+            }
+
+    Returns:
+        StringIO object
+    """
+    tmp = StringIO.StringIO()
+    writer = csv.writer(tmp)
+    writer.writerow(["Creation Date", "Start Date", "End Date", "Locations"])
+    writer.writerow([str(created_time), str(start_date), str(end_date), ', '.join(locations)])
+    writer.writerow(["Location", "Device", "Content", "Play Count"])
+
+    for location, resources in dictionary_of_data.iteritems():
+        for resource, devices in dictionary_of_data[location].iteritems():
+            for device, playcount in dictionary_of_data[location][resource].iteritems():
+                writer.writerow(
+                        [location, device, resource, playcount]
+                )
 
     tmp.seek(0)
     return tmp
