@@ -90,21 +90,7 @@ def format_multi_location_summarized(transformed_db_data):
             }
     """
 
-    {
-        'location': '2001',
-        'raw_data': {
-            '2001': [
-                {
-                    'device_id': 'my-device-5', 'location_id': '2001',
-                    'ended_at': datetime.datetime(2016, 2, 1, 16, 3, 12),
-                    'started_at': datetime.datetime(2016, 2, 1, 15, 53, 12), 'resource_id': 'GSAD_5533'}]
-        }
-    }
-
     to_return = {}
-
-    print "-------------------------------"
-    print transformed_db_data
 
     transformed_db_data = transformed_db_data["raw_data"]
 

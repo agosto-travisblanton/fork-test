@@ -127,7 +127,6 @@ angular.module('skykitProvisioning')
       return true
 
     downloadCSVForMultipleLocationsSummarized: (start_date, end_date, locations) ->
-      console.log "test"
       allLocations = ''
 
       for each in locations
