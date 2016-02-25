@@ -13,6 +13,25 @@ def create_merged_dictionary(array_of_dictionaries_to_merge):
     return dict(chain.from_iterable(d.iteritems() for d in array_of_dictionaries_to_merge))
 
 
+def transform_db_data_to_by_location_then_resource(from_db):
+    to_return = {}
+
+    for item in from_db:
+
+        customer_location_code = item["location_id"]
+        resource_name = item["resource_id"]
+
+        if customer_location_code not in to_return:
+            to_return[customer_location_code] = {}
+
+        if resource_name not in to_return[customer_location_code]:
+            to_return[customer_location_code] = []
+
+        to_return[customer_location_code].append(item)
+
+    return to_return
+
+
 def transform_db_data_to_by_device(from_db):
     to_return = {}
 
@@ -146,7 +165,7 @@ def reformat_program_record_array_by_location(dictionary):
 
 def prepare_transformed_query_by_device_to_csv_by_date(start_date, end_date, incoming_array):
     """
-    Returns:
+    Return:
     {
         "device-id": {
             "12-01-2000": {
@@ -196,12 +215,12 @@ def prepare_transformed_query_by_device_to_csv_by_date(start_date, end_date, inc
 
 def count_resource_plays_from_dict_by_device(the_dict):
     """
-    returns
+    Return:
     {
         "my-device": {
             "location": "3443",
             "resource_55442": 54,
-            "resource_3342": 34,
+            "resource_3342": 34
         }
     }
     """

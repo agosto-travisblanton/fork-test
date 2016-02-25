@@ -1,7 +1,10 @@
 from proofplay_models import Resource, ProgramRecord, Location, Device, ProgramPlayEvent
 from db import Session
-from data_processing import transform_db_data_to_by_device, \
-    transform_db_data_to_by_date
+from data_processing import (
+    transform_db_data_to_by_device,
+    transform_db_data_to_by_date,
+    transform_db_data_to_by_location_then_resource
+)
 import datetime
 from models import Domain, Tenant, TenantEntityGroup
 from google.appengine.ext import ndb
@@ -218,6 +221,40 @@ def get_raw_program_record_data_by_device(start_date, end_date, customer_display
             ProgramRecord.ended_at.between(start_date, end_date)) \
         .filter(
             ProgramRecord.device_id == device_id) \
+        .filter(
+            ProgramRecord.full_device.has(tenant_code=tenant_code)).all()
+
+    from_db = []
+
+    for program_record in rows:
+        d = {
+            "location_id": program_record.full_location.customer_location_code,
+            "device_id": program_record.full_device.customer_display_code,
+            "resource_id": program_record.full_resource.resource_name,
+            "started_at": program_record.started_at,
+            "ended_at": program_record.ended_at
+        }
+
+        from_db.append(d)
+
+    session.close()
+    return from_db
+
+
+def program_record_for_location_summarized(start_date, end_date, customer_location_code, tenant_code):
+    from_db = get_raw_program_record_data_by_location(start_date, end_date, customer_location_code, tenant_code)
+    return transform_db_data_to_by_location_then_resource(from_db)
+
+
+def get_raw_program_record_data_by_location(start_date, end_date, customer_location_code, tenant_code):
+    session = Session()
+    location_id = session.query(Location).filter_by(customer_location_code=customer_location_code).first().id
+
+    rows = session.query(ProgramRecord) \
+        .filter(
+            ProgramRecord.ended_at.between(start_date, end_date)) \
+        .filter(
+            ProgramRecord.location_id == location_id) \
         .filter(
             ProgramRecord.full_device.has(tenant_code=tenant_code)).all()
 

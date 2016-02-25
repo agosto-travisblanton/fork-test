@@ -100,6 +100,9 @@ class PostNewProgramPlay(RequestHandler):
 ####################################################################################
 # CSV QUERY HANDLERS
 ####################################################################################
+####################################################################################
+# RESOURCES
+####################################################################################
 class MultiResourceByDevice(RequestHandler):
     def get(self, start_date, end_date, resources, tenant, distributor_key):
 
@@ -212,6 +215,9 @@ class MultiResourceByDate(RequestHandler):
         self.response.write(bytes(csv_to_publish.getvalue()))
 
 
+####################################################################################
+# DEVICES
+####################################################################################
 class MultiDeviceSummarized(RequestHandler):
     def get(self, start_date, end_date, devices, tenant, distributor_key):
 
@@ -315,6 +321,121 @@ class MultiDeviceByDate(RequestHandler):
                 start_date=midnight_start_day,
                 end_date=just_before_next_day_end_date,
                 displays=all_the_devices_final,
+                dictionary_of_data=formatted_data,
+                created_time=now
+        )
+
+        self.response.headers['Content-Type'] = 'application/csv'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=multi-resource-by-date.csv'
+        self.response.write(bytes(csv_to_publish.getvalue()))
+
+
+####################################################################################
+# LOCATIONS
+####################################################################################
+class MultiLocationSummarized(RequestHandler):
+    def get(self, start_date, end_date, locations, tenant, distributor_key):
+
+        if tenant not in get_tenant_names_for_distributor(distributor_key):
+            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+            self.abort(403)
+
+        ###########################################################
+        # SETUP VARIABLES
+        ###########################################################
+        start_date = datetime.datetime.fromtimestamp(int(start_date))
+        end_date = datetime.datetime.fromtimestamp(int(end_date))
+        if end_date < start_date:
+            self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
+
+        midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
+        midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
+        just_before_next_day_end_date = (midnight_end_day + datetime.timedelta(days=1)) - datetime.timedelta(
+                seconds=1
+        )
+
+        all_the_devices = devices.split(',')
+        all_the_devices_final = all_the_devices[1:]
+        now = datetime.datetime.now()
+
+        ###########################################################
+
+        array_of_transformed_program_data_by_device = [
+            {
+                "device": device,
+                # program_record is the transformed program record table data
+                "raw_data": program_record_for_device_summarized(
+                        midnight_start_day,
+                        just_before_next_day_end_date,
+                        device,
+                        tenant
+                )
+            } for device in all_the_devices_final]
+
+        formatted_data = format_transformed_program_data_by_device(array_of_transformed_program_data_by_device)
+
+        csv_to_publish = generate_device_csv_summarized(
+                start_date=midnight_start_day,
+                end_date=just_before_next_day_end_date,
+                displays=all_the_devices_final,
+                array_of_data=formatted_data,
+                created_time=now
+        )
+
+        self.response.headers['Content-Type'] = 'application/csv'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=multi-resource-by-date.csv'
+        self.response.write(bytes(csv_to_publish.getvalue()))
+
+
+class MultiLocationByDevice(RequestHandler):
+    def get(self, start_date, end_date, locations, tenant, distributor_key):
+
+        if tenant not in get_tenant_names_for_distributor(distributor_key):
+            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+            self.abort(403)
+
+        ###########################################################
+        # SETUP VARIABLES
+        ###########################################################
+        start_date = datetime.datetime.fromtimestamp(int(start_date))
+        end_date = datetime.datetime.fromtimestamp(int(end_date))
+        if end_date < start_date:
+            self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
+
+        midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
+        midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
+        just_before_next_day_end_date = (midnight_end_day + datetime.timedelta(days=1)) - datetime.timedelta(
+                seconds=1
+        )
+
+        all_the_locations = locations.split(',')
+        all_the_locations_final = all_the_locations[1:]
+        now = datetime.datetime.now()
+
+        ###########################################################
+
+        transformed_query_by_device_program_data_to_by_date = [
+            {
+                "location": location,
+                # program_record is the transformed program record table data
+                "raw_data": program_record_for_device_by_date(
+                        midnight_start_day,
+                        just_before_next_day_end_date,
+                        location,
+                        tenant
+                )
+            } for location in all_the_locations_final]
+
+        formatted_data = prepare_transformed_query_by_device_to_csv_by_date(
+                midnight_start_day,
+                just_before_next_day_end_date,
+                transformed_query_by_device_program_data_to_by_date
+        )
+
+        csv_to_publish = generate_device_csv_by_date(
+                start_date=midnight_start_day,
+                end_date=just_before_next_day_end_date,
+                displays=all_the_locations_final,
                 dictionary_of_data=formatted_data,
                 created_time=now
         )
