@@ -291,6 +291,48 @@
               <md-card>
                 <md-card-title>
                   <md-card-title-text>
+                    <span class="md-headline">Location</span>
+                  </md-card-title-text>
+                </md-card-title>
+                <md-card-content>
+                  <form name="locationForm"
+                        class="form-horizontal"
+                        ng-submit="deviceDetailsCtrl.onClickSavePanels()"
+                        novalidate>
+                    <div class="form-group">
+                      <div class="col-sm-5">
+                        <label>Panel location</label>
+                        <select
+                          id="customerLocationName"
+                          class="form-control"
+                          ng-model="deviceDetailsCtrl.currentDevice.customerLocationName"
+                          ng-options="p.customerLocationName for p in deviceDetailsCtrl.locations track by p.id">
+                        </select>
+                      </div>
+                      <!--<div class="col-sm-5">-->
+                        <!--<label>Panel input</label>-->
+                        <!--<select-->
+                          <!--id="panelInput"-->
+                          <!--class="form-control"-->
+                          <!--ng-required="deviceDetailsCtrl.currentDevice.panelModel !== None"-->
+                          <!--ng-model="deviceDetailsCtrl.currentDevice.panelInput"-->
+                          <!--ng-options="c.displayName for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">-->
+                        <!--</select>-->
+                      <!--</div>-->
+                    </div>
+                    <md-card-actions layout="row" layout-align="end center">
+                      <md-button type="submit"
+                                 ng-disabled="!serialControlForm.$dirty || serialControlForm.$invalid">
+                        <i class="fa fa-fw fa-save"></i>
+                        Save
+                      </md-button>
+                    </md-card-actions>
+                  </form>
+                </md-card-content>
+              </md-card>
+              <md-card>
+                <md-card-title>
+                  <md-card-title-text>
                     <span class="md-headline">Serial control</span>
                   </md-card-title-text>
                 </md-card-title>

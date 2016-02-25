@@ -10,8 +10,8 @@ describe 'DeviceDetailsCtrl', ->
   getDevicePromise = undefined
   getDeviceIssuesPromise = undefined
   getPlayerCommandEventsPromise = undefined
-  TenantsService = undefined
-  tenantsServicePromise = undefined
+  LocationsService = undefined
+  locationsServicePromise = undefined
   CommandsService = undefined
   commandsServicePromise = undefined
   sweet = undefined
@@ -64,13 +64,13 @@ describe 'DeviceDetailsCtrl', ->
 
   beforeEach module('skykitProvisioning')
 
-  beforeEach inject (_$controller_, _DevicesService_, _TenantsService_, _CommandsService_, _sweet_, _$state_) ->
+  beforeEach inject (_$controller_, _DevicesService_, _LocationsService_, _CommandsService_, _sweet_, _$state_) ->
     $controller = _$controller_
     $stateParams = {}
     $state = {}
     $state = _$state_
     DevicesService = _DevicesService_
-    TenantsService = _TenantsService_
+    LocationsService = _LocationsService_
     CommandsService = _CommandsService_
     progressBarService = {
       start: ->
@@ -86,8 +86,8 @@ describe 'DeviceDetailsCtrl', ->
 
   describe 'initialize', ->
     beforeEach ->
-      tenantsServicePromise = new skykitProvisioning.q.Mock
-      spyOn(TenantsService, 'fetchAllTenants').and.returnValue tenantsServicePromise
+      locationsServicePromise = new skykitProvisioning.q.Mock
+      spyOn(LocationsService, 'getLocationsByTenantKey').and.returnValue locationsServicePromise
       getDevicePromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getDeviceByKey').and.returnValue getDevicePromise
       getPlayerCommandEventsPromise = new skykitProvisioning.q.Mock
@@ -119,7 +119,7 @@ describe 'DeviceDetailsCtrl', ->
           $stateParams: $stateParams
           $state: $state
           DevicesService: DevicesService
-          TenantsService: TenantsService
+          LocationsService: LocationsService
         }
         controller.initialize()
 
@@ -132,21 +132,17 @@ describe 'DeviceDetailsCtrl', ->
       it 'issues array should be defined', ->
         expect(controller.issues).toBeDefined()
 
-      it 'call TenantsService.fetchAllTenants to retrieve all tenants', ->
-        expect(TenantsService.fetchAllTenants).toHaveBeenCalled()
-
-      it "the 'then' handler caches the retrieved tenants in the controller", ->
-        tenantsServicePromise.resolve tenants
-        expect(controller.tenants).toBe tenants
-
     describe 'edit mode', ->
       beforeEach ->
-        $stateParams.deviceKey = 'fkasdhfjfa9s8udyva7dygoudyg'
+        $stateParams = {
+          deviceKey: 'fkasdhfjfa9s8udyva7dygoudyg'
+          tenantKey: 'tkasdhfjfa9s2udyva5digopdy0'
+        }
         controller = $controller 'DeviceDetailsCtrl', {
           $stateParams: $stateParams
           $state: $state
           DevicesService: DevicesService
-          TenantsService: TenantsService
+          LocationsService: LocationsService
         }
         now = new Date()
         today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
@@ -163,13 +159,6 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'calls DevicesService.getPanelInputs to retrieve all panel inputs', ->
         expect(DevicesService.getPanelInputs).toHaveBeenCalled()
-
-      it 'calls TenantsService.fetchAllTenants to retrieve all tenants', ->
-        expect(TenantsService.fetchAllTenants).toHaveBeenCalled()
-
-      it "the 'then' handler caches the retrieved tenants in the controller", ->
-        tenantsServicePromise.resolve tenants
-        expect(controller.tenants).toBe tenants
 
       it 'calls DevicesService.getByKey to retrieve the selected device', ->
         expect(DevicesService.getDeviceByKey).toHaveBeenCalledWith $stateParams.deviceKey
@@ -191,6 +180,9 @@ describe 'DeviceDetailsCtrl', ->
       it "the 'then' handler caches the retrieved command events in the controller", ->
         getPlayerCommandEventsPromise.resolve commandEvents
         expect(controller.commandEvents).toBe commandEvents
+
+      it 'calls LocationsService.getLocationsByTenantKey to locations for a given tenant', ->
+        expect(LocationsService.getLocationsByTenantKey).toHaveBeenCalledWith $stateParams.tenantKey
 
   describe '.onClickSaveDevice', ->
     beforeEach ->
