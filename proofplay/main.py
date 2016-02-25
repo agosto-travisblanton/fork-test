@@ -354,30 +354,30 @@ class MultiLocationSummarized(RequestHandler):
                 seconds=1
         )
 
-        all_the_devices = devices.split(',')
-        all_the_devices_final = all_the_devices[1:]
+        all_the_locations = locations.split(',')
+        all_the_locations_final = all_the_locations[1:]
         now = datetime.datetime.now()
 
         ###########################################################
 
         array_of_transformed_program_data_by_device = [
             {
-                "device": device,
+                "device": location,
                 # program_record is the transformed program record table data
                 "raw_data": program_record_for_device_summarized(
                         midnight_start_day,
                         just_before_next_day_end_date,
-                        device,
+                        location,
                         tenant
                 )
-            } for device in all_the_devices_final]
+            } for location in all_the_locations_final]
 
         formatted_data = format_transformed_program_data_by_device(array_of_transformed_program_data_by_device)
 
         csv_to_publish = generate_device_csv_summarized(
                 start_date=midnight_start_day,
                 end_date=just_before_next_day_end_date,
-                displays=all_the_devices_final,
+                displays=all_the_locations_final,
                 array_of_data=formatted_data,
                 created_time=now
         )

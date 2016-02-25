@@ -5,6 +5,9 @@ from collections import OrderedDict
 from itertools import chain
 
 
+######################################################################################
+# MISC
+######################################################################################
 def date_handler(obj):
     return obj.isoformat() if hasattr(obj, 'isoformat') else obj
 
@@ -13,6 +16,9 @@ def create_merged_dictionary(array_of_dictionaries_to_merge):
     return dict(chain.from_iterable(d.iteritems() for d in array_of_dictionaries_to_merge))
 
 
+######################################################################################
+# TRANSFORM RAW DB DATA
+######################################################################################
 def transform_db_data_to_by_location_then_resource(from_db):
     to_return = {}
 
@@ -60,40 +66,9 @@ def transform_db_data_to_by_date(from_db):
     return to_return
 
 
-def generate_resource_csv_by_device(start_date, end_date, resources, array_of_data, created_time):
-    tmp = StringIO.StringIO()
-    writer = csv.writer(tmp)
-
-    writer.writerow(["Creation Date", "Start Date", "End Date", "Content"])
-    writer.writerow([str(created_time), str(start_date), str(end_date), ', '.join(resources)])
-    writer.writerow(["Content", "Display", "Location", "Play Count"])
-
-    for item in array_of_data:
-        for key, value in item.iteritems():
-            writer.writerow([value["Content"], value["Display"], value["Location"], value["Play Count"]])
-
-    tmp.seek(0)
-    return tmp
-
-
-def generate_resource_csv_by_date(start_date, end_date, resources, dictionary, now):
-    tmp = StringIO.StringIO()
-    writer = csv.writer(tmp)
-    all_resources_as_string = ', '.join(resources)
-    writer.writerow(["Creation Date", "Start Date", "End Date", "Start Time", "End Time", "All Content"])
-    writer.writerow([str(now), str(start_date), str(end_date), "12:00 AM", "11:59 PM",
-                     all_resources_as_string])
-    writer.writerow(["Content", "Date", "Location Count", "Display Count", "Play Count"])
-
-    for key, value in dictionary.iteritems():
-        for sub_key, sub_value in dictionary[key].iteritems():
-            writer.writerow([key, str(sub_key), sub_value["LocationCount"],
-                             sub_value["PlayerCount"], sub_value["PlayCount"]])
-
-    tmp.seek(0)
-    return tmp
-
-
+######################################################################################
+# FORMATTING
+######################################################################################
 def ensure_dictionary_has_keys_through_date_range(start_date, end_date, dictionary):
     while start_date <= end_date:
         if str(start_date) not in dictionary:
@@ -127,23 +102,6 @@ def format_program_record_data_with_array_of_resources_by_date(start_date, end_d
         )
 
     return to_return
-
-
-def calculate_location_count(value):
-    locations = []
-    for item in value:
-        if item["location_id"] not in locations:
-            locations.append(item["location_id"])
-
-    return len(locations)
-
-
-def calculate_serial_count(array_of_db_data):
-    serials = []
-    for item in array_of_db_data:
-        if item["device_id"] not in serials:
-            serials.append(item["device_id"])
-    return len(serials)
 
 
 def reformat_program_record_array_by_location(dictionary):
@@ -263,6 +221,63 @@ def format_transformed_program_data_by_device(array_of_transformed):
                 to_return.append(dictionary_to_append_to_to_return)
 
     return to_return
+
+
+######################################################################################
+# Calculations
+######################################################################################
+def calculate_location_count(value):
+    locations = []
+    for item in value:
+        if item["location_id"] not in locations:
+            locations.append(item["location_id"])
+
+    return len(locations)
+
+
+def calculate_serial_count(array_of_db_data):
+    serials = []
+    for item in array_of_db_data:
+        if item["device_id"] not in serials:
+            serials.append(item["device_id"])
+    return len(serials)
+
+
+######################################################################################
+# GENERATE CSVs
+######################################################################################
+def generate_resource_csv_by_device(start_date, end_date, resources, array_of_data, created_time):
+    tmp = StringIO.StringIO()
+    writer = csv.writer(tmp)
+
+    writer.writerow(["Creation Date", "Start Date", "End Date", "Content"])
+    writer.writerow([str(created_time), str(start_date), str(end_date), ', '.join(resources)])
+    writer.writerow(["Content", "Display", "Location", "Play Count"])
+
+    for item in array_of_data:
+        for key, value in item.iteritems():
+            writer.writerow([value["Content"], value["Display"], value["Location"], value["Play Count"]])
+
+    tmp.seek(0)
+    return tmp
+
+
+def generate_resource_csv_by_date(start_date, end_date, resources, dictionary, now):
+    tmp = StringIO.StringIO()
+    writer = csv.writer(tmp)
+    all_resources_as_string = ', '.join(resources)
+    writer.writerow(["Creation Date", "Start Date", "End Date", "Start Time", "End Time", "All Content"])
+    writer.writerow([str(now), str(start_date), str(end_date), "12:00 AM", "11:59 PM",
+                     all_resources_as_string])
+    writer.writerow(["Content", "Date", "Location Count", "Display Count", "Play Count"])
+
+    for key, value in dictionary.iteritems():
+        for sub_key, sub_value in dictionary[key].iteritems():
+            writer.writerow([key, str(sub_key), sub_value["LocationCount"],
+                             sub_value["PlayerCount"], sub_value["PlayCount"]])
+
+    tmp.seek(0)
+    return tmp
 
 
 def generate_device_csv_summarized(start_date, end_date, displays, array_of_data, created_time):

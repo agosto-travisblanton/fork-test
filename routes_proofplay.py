@@ -35,6 +35,9 @@ application = WSGIApplication([
     ################################################################
     # RUN QUERIES
     ################################################################
+    ################################################################
+    # BY RESOURCE
+    ################################################################
     Route(
             BASE_URI + '/multi_resource_by_date/<start_date>/<end_date>/<resources>/<tenant>/<distributor_key>',
             handler="proofplay.main.MultiResourceByDate",
@@ -45,7 +48,9 @@ application = WSGIApplication([
             handler="proofplay.main.MultiResourceByDevice",
             name="MultiResourceByDevice"
     ),
-
+    ################################################################
+    # BY DEVICE
+    ################################################################
     Route(
             BASE_URI + '/multi_device_summarized/<start_date>/<end_date>/<devices>/<tenant>/<distributor_key>',
             handler="proofplay.main.MultiDeviceSummarized",
@@ -56,6 +61,20 @@ application = WSGIApplication([
             BASE_URI + '/multi_device_by_date/<start_date>/<end_date>/<devices>/<tenant>/<distributor_key>',
             handler="proofplay.main.MultiDeviceByDate",
             name="MultiDeviceByDate"
+    ),
+    ################################################################
+    # BY LOCATION
+    ################################################################
+    Route(
+            BASE_URI + '/multi_location_summarized/<start_date>/<end_date>/<locations>/<tenant>/<distributor_key>',
+            handler="proofplay.main.MultiLocationSummarized",
+            name="MultiLocationSummarized"
+    ),
+
+    Route(
+            BASE_URI + '/multi_location_by_device/<start_date>/<end_date>/<locations>/<tenant>/<distributor_key>',
+            handler="proofplay.main.MultiLocationByDevice",
+            name="MultiLocationByDevice"
     ),
 
     ################################################################

@@ -164,6 +164,9 @@ def insert_new_device_or_get_existing(location_id, serial_number, device_key, cu
 ####################################################################################
 # CSV Queries
 ####################################################################################
+####################################################################################
+# BY RESOURCE
+####################################################################################
 def program_record_for_resource_by_location(start_date, end_date, resource, tenant_code):
     from_db = get_raw_program_record_data_by_resource(start_date, end_date, resource, tenant_code)
     all_results = transform_db_data_to_by_device(from_db)
@@ -202,6 +205,9 @@ def get_raw_program_record_data_by_resource(start_date, end_date, resource, tena
     return from_db
 
 
+####################################################################################
+# BY DEVICE
+####################################################################################
 def program_record_for_device_by_date(start_date, end_date, customer_display_code, tenant_code):
     from_db = get_raw_program_record_data_by_device(start_date, end_date, customer_display_code, tenant_code)
     return transform_db_data_to_by_date(from_db)
@@ -241,6 +247,9 @@ def get_raw_program_record_data_by_device(start_date, end_date, customer_display
     return from_db
 
 
+####################################################################################
+# BY LOCATION
+####################################################################################
 def program_record_for_location_summarized(start_date, end_date, customer_location_code, tenant_code):
     from_db = get_raw_program_record_data_by_location(start_date, end_date, customer_location_code, tenant_code)
     return transform_db_data_to_by_location_then_resource(from_db)
