@@ -17,7 +17,7 @@ describe 'ProofOfPlayMultiLocationCtrl', ->
   describe 'initialization', ->
     it 'radioButtonChoices should equal', ->
       radioButtonChoices = {
-        group1: 'By Date',
+        group1: 'By Device',
         group2: 'Summarized',
         selection: null
       }
