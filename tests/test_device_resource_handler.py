@@ -15,7 +15,7 @@ from chrome_os_devices_api import (refresh_device_by_mac_address, refresh_device
 from agar.test import BaseTest, WebTest
 from mockito import when, any as any_matcher
 from routes import application
-from models import ChromeOsDevice, Tenant, Distributor, Domain, DeviceIssueLog
+from models import ChromeOsDevice, Tenant, Distributor, Domain, DeviceIssueLog, Location
 from app_config import config
 
 
@@ -827,6 +827,21 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json['contentServerUrl'], self.CONTENT_SERVER_URL)
         self.assertEqual(response_json['gcmRegistrationId'], self.GCM_REGISTRATION_ID)
         self.assertEqual(response_json['macAddress'], self.MAC_ADDRESS)
+
+    def test_device_resource_put_no_updates_location(self):
+        location = Location.create(tenant_key=self.tenant_key,
+                                   customer_location_name='Store 1234',
+                                   customer_location_code='store_1234',
+                                   timezone='America/Chicago')
+        location_key = location.put()
+        request_body = {'locationKey': location_key.urlsafe()}
+        when(deferred).defer(any_matcher(update_chrome_os_device),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
+                     json.dumps(request_body),
+                     headers=self.api_token_authorization_header)
+        updated_device = self.managed_device_key.get()
+        self.assertEqual(updated_device.location_key, location_key)
 
     ##################################################################################################################
     ## delete
