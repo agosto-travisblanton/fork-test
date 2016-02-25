@@ -25,7 +25,6 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     active: true
   }
 
-
   @currentDevice = {
     key: undefined
     gcmRegistrationId: undefined
@@ -56,8 +55,6 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     updated: undefined #"2015-07-07 19:22:57"
     volume: undefined
     custom: undefined
-    latitude: undefined
-    longitude: undefined
     proofOfPlayLogging: false
   }
   @commandEvents = []
