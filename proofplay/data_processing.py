@@ -436,6 +436,7 @@ def generate_location_csv_summarized(created_time, start_date, end_date, locatio
             )
 
     tmp.seek(0)
+
     return tmp
 
 

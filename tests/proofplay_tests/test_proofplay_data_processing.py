@@ -23,7 +23,9 @@ from proofplay.data_processing import (
     generate_device_csv_by_date,
     transform_db_data_to_by_location_then_resource,
     format_multi_location_by_device,
-    format_multi_location_summarized
+    format_multi_location_summarized,
+    generate_location_csv_summarized,
+    generate_location_csv_by_device
 )
 
 
@@ -639,8 +641,50 @@ class TestDataProcessing(BaseTest):
 
         expected_result = {'location-1': OrderedDict([('resource-one', 1)])}
 
-
         self.assertEqual(format_multi_location_summarized(example_input), expected_result)
+
+    def test_generate_location_csv_summarized(self):
+        example_input = {
+            '3001': OrderedDict(
+                    [('GSAD_2222', 3), ('GSAD_5533', 3), ('GSAD_4334', 3)]),
+            '1001': OrderedDict(
+                    [('GSAD_5447', 3), ('GSAD_2222', 4), ('GSAD_5533', 1), ('GSAD_5553', 2), ('GSAD_4334', 1)])}
+
+        now = str(datetime.datetime.now())
+
+        start_time = datetime.datetime.strptime("Feb 1 2016", '%b %d %Y')
+        end_time = datetime.datetime.strptime("Feb 3 2016", '%b %d %Y')
+        locations = ["1001", "3001"]
+
+        expected_result = 'Creation Date,Start Date,End Date,Locations\r\n{},2016-02-01 00:00:00,2016-02-03 00:00:00,"1001, 3001"\r\nLocation,Content,Play Count\r\n3001,GSAD_2222,3\r\n3001,GSAD_5533,3\r\n3001,GSAD_4334,3\r\n1001,GSAD_5447,3\r\n1001,GSAD_2222,4\r\n1001,GSAD_5533,1\r\n1001,GSAD_5553,2\r\n1001,GSAD_4334,1\r\n'.format(
+                now)
+
+        self.assertEqual(generate_location_csv_summarized(now, start_time, end_time, locations, example_input).read(),
+                         expected_result)
+
+    def test_generate_location_csv_by_device(self):
+        example_input = {
+            '3001': OrderedDict([('GSAD_2222', OrderedDict([('my-device-9', 2), ('my-device-8', 1)])),
+                                 ('GSAD_5533', OrderedDict([('my-device-7', 1), ('my-device-8', 2)])), (
+                                     'GSAD_4334', OrderedDict(
+                                             [('my-device-8', 1), ('my-device-7', 1), ('my-device-9', 1)]))]),
+            '1001': OrderedDict([('GSAD_5447', OrderedDict([('my-device-1', 1), ('my-device-3', 2)])), (
+                'GSAD_2222', OrderedDict([('my-device-1', 2), ('my-device-2', 1), ('my-device-3', 1)])),
+                                 ('GSAD_5533', OrderedDict([('my-device-2', 1)])),
+                                 ('GSAD_5553', OrderedDict([('my-device-2', 1), ('my-device-3', 1)])),
+                                 ('GSAD_4334', OrderedDict([('my-device-3', 1)]))])}
+
+        now = str(datetime.datetime.now())
+
+        start_time = datetime.datetime.strptime("Feb 1 2016", '%b %d %Y')
+        end_time = datetime.datetime.strptime("Feb 3 2016", '%b %d %Y')
+        locations = ["1001", "3001"]
+
+        expected_result = 'Creation Date,Start Date,End Date,Locations\r\n{},2016-02-01 00:00:00,2016-02-03 00:00:00,"1001, 3001"\r\nLocation,Device,Content,Play Count\r\n3001,my-device-9,GSAD_2222,2\r\n3001,my-device-8,GSAD_2222,1\r\n3001,my-device-7,GSAD_5533,1\r\n3001,my-device-8,GSAD_5533,2\r\n3001,my-device-8,GSAD_4334,1\r\n3001,my-device-7,GSAD_4334,1\r\n3001,my-device-9,GSAD_4334,1\r\n1001,my-device-1,GSAD_5447,1\r\n1001,my-device-3,GSAD_5447,2\r\n1001,my-device-1,GSAD_2222,2\r\n1001,my-device-2,GSAD_2222,1\r\n1001,my-device-3,GSAD_2222,1\r\n1001,my-device-2,GSAD_5533,1\r\n1001,my-device-2,GSAD_5553,1\r\n1001,my-device-3,GSAD_5553,1\r\n1001,my-device-3,GSAD_4334,1\r\n'.format(
+                now)
+
+        self.assertEqual(generate_location_csv_by_device(now, start_time, end_time, locations, example_input).read(),
+                         expected_result)
 
 
 if __name__ == '__main__':
