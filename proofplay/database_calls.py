@@ -101,9 +101,9 @@ def insert_new_program_record(location_id, device_id, resource_id, started_at, e
 def insert_new_resource_or_get_existing(resource_name, resource_identifier, tenant_code):
     session = Session()
 
-    resource_exits = session.query(Resource).filter_by(resource_name=resource_name).first()
+    resource_exists = session.query(Resource).filter_by(resource_identifier=resource_identifier).first()
 
-    if not resource_exits:
+    if not resource_exists:
         new_resource = Resource(
                 resource_name=resource_name,
                 resource_identifier=resource_identifier,
@@ -115,8 +115,13 @@ def insert_new_resource_or_get_existing(resource_name, resource_identifier, tena
         return new_resource.id
 
     else:
+        if resource_exists.resource_name != resource_name:
+            resource_exists.resource_name = resource_name
+            session.add(resource_exists)
+            session.commit()
+
         session.close()
-        return resource_exits.id
+        return resource_exists.id
 
 
 def insert_new_location_or_get_existing(customer_location_code):

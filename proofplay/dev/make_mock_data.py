@@ -2,14 +2,15 @@ import requests
 import json
 import datetime
 import random
-import copy
 
 resource_choices = [
     {"name": "GSAD_5553", "id": "1000"},
     {"name": "GSAD_5447", "id": "1001"},
     {"name": "GSAD_2222", "id": "1002"},
     {"name": "GSAD_5533", "id": "1003"},
-    {"name": "GSAD_4334", "id": "1004"}
+    {"name": "GSAD_4334", "id": "1004"},
+    {"name": "GSAD_4334-V2", "id": "1004"}  # name changed here but identifier the same, this can happen
+
 ]
 
 gamestop_stores_dict = {
