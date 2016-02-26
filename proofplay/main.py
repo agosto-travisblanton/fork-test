@@ -21,10 +21,13 @@ class MakeMigration(RequestHandler):
             alembic_cfg = Config(path)
             alembic_cfg.set_main_option('sqlalchemy.url', SQLALCHEMY_DATABASE_URI)
             command.upgrade(alembic_cfg, "head")
-            self.response.out.write("SUCCESS")
+            self.response.out.write(
+                    "SUCCESS. Migrations Applied Successfully (or no change to model schema neccesasary.")
 
-        except:
-            self.response.out.write("FAILURE")
+        except Exception as e:
+            print e
+            self.response.out.write(
+                    "FAILURE. Exception caught during alembic migrations. Check the developer console logs.")
 
 
 ####################################################################################
@@ -69,6 +72,19 @@ class RetrieveAllResourcesOfTenant(RequestHandler):
         self.response.out.write(final)
 
 
+class RetrieveAllLocationsOfTenant(RequestHandler):
+    def get(self, tenant):
+        tenants = get_tenant_names_for_distributor(self.request.headers.get('X-Provisioning-Distributor'))
+        if tenant not in tenants:
+            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+            self.abort(403)
+
+        locations = retrieve_all_locations_of_tenant(tenant)
+        final = json.dumps({"locations": locations})
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(final)
+
+
 ####################################################################################
 # MAIN ENTRY FOR POSTING NEW PROGRAM PLAY
 ####################################################################################
@@ -83,6 +99,9 @@ class PostNewProgramPlay(RequestHandler):
 
 ####################################################################################
 # CSV QUERY HANDLERS
+####################################################################################
+####################################################################################
+# RESOURCES
 ####################################################################################
 class MultiResourceByDevice(RequestHandler):
     def get(self, start_date, end_date, resources, tenant, distributor_key):
@@ -136,7 +155,7 @@ class MultiResourceByDevice(RequestHandler):
         )
 
         self.response.headers['Content-Type'] = 'application/csv'
-        self.response.headers['Content-Disposition'] = 'attachment; filename=one-resource-by-device.csv'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=MultiResourceByDevice.csv'
         self.response.write(bytes(csv_to_publish.getvalue()))
 
 
@@ -179,9 +198,11 @@ class MultiResourceByDate(RequestHandler):
                 )
             } for resource in all_the_resources_final]
 
-        formatted_data = format_program_record_data_with_array_of_resources_by_date(midnight_start_day,
-                                                                                    just_before_next_day_end_date,
-                                                                                    pre_formatted_program_record_by_date)
+        formatted_data = format_program_record_data_with_array_of_resources_by_date(
+                midnight_start_day,
+                just_before_next_day_end_date,
+                pre_formatted_program_record_by_date
+        )
 
         csv_to_publish = generate_resource_csv_by_date(
                 midnight_start_day,
@@ -192,10 +213,13 @@ class MultiResourceByDate(RequestHandler):
         )
 
         self.response.headers['Content-Type'] = 'application/csv'
-        self.response.headers['Content-Disposition'] = 'attachment; filename=multi-resource-by-date.csv'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=MultiResourceByDate.csv'
         self.response.write(bytes(csv_to_publish.getvalue()))
 
 
+####################################################################################
+# DEVICES
+####################################################################################
 class MultiDeviceSummarized(RequestHandler):
     def get(self, start_date, end_date, devices, tenant, distributor_key):
 
@@ -246,7 +270,7 @@ class MultiDeviceSummarized(RequestHandler):
         )
 
         self.response.headers['Content-Type'] = 'application/csv'
-        self.response.headers['Content-Disposition'] = 'attachment; filename=multi-resource-by-date.csv'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=MultiDeviceSummarized.csv'
         self.response.write(bytes(csv_to_publish.getvalue()))
 
 
@@ -304,12 +328,133 @@ class MultiDeviceByDate(RequestHandler):
         )
 
         self.response.headers['Content-Type'] = 'application/csv'
-        self.response.headers['Content-Disposition'] = 'attachment; filename=multi-resource-by-date.csv'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=MultiDeviceByDate.csv'
         self.response.write(bytes(csv_to_publish.getvalue()))
 
 
 ####################################################################################
-# FUNCTION THAT GETS CALLED VIA DEFERRED ON NWE PROGRAM PLAY POST
+# LOCATIONS
+####################################################################################
+class MultiLocationSummarized(RequestHandler):
+    def get(self, start_date, end_date, locations, tenant, distributor_key):
+
+        if tenant not in get_tenant_names_for_distributor(distributor_key):
+            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+            self.abort(403)
+
+        ###########################################################
+        # SETUP VARIABLES
+        ###########################################################
+        start_date = datetime.datetime.fromtimestamp(int(start_date))
+        end_date = datetime.datetime.fromtimestamp(int(end_date))
+        if end_date < start_date:
+            self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
+
+        midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
+        midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
+        just_before_next_day_end_date = (midnight_end_day + datetime.timedelta(days=1)) - datetime.timedelta(
+                seconds=1
+        )
+
+        all_the_locations = locations.split(',')
+        all_the_locations_final = all_the_locations[1:]
+        now = datetime.datetime.now()
+
+        ###########################################################
+
+        array_of_transformed_program_data_by_device = [
+            {
+                "location": location,
+                # program_record is the transformed program record table data
+                "raw_data": program_record_for_location_summarized(
+                        midnight_start_day,
+                        just_before_next_day_end_date,
+                        location,
+                        tenant
+                )
+            } for location in all_the_locations_final]
+
+        formatted_data = map(
+                format_multi_location_summarized,
+                array_of_transformed_program_data_by_device
+        )
+
+        merged_formatted_data = create_merged_dictionary(formatted_data)
+
+        csv_to_publish = generate_location_csv_summarized(
+                start_date=midnight_start_day,
+                end_date=just_before_next_day_end_date,
+                locations=all_the_locations_final,
+                dictionary_of_data=merged_formatted_data,
+                created_time=now
+        )
+
+        self.response.headers['Content-Type'] = 'application/csv'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=MultiLocationSummarized.csv'
+        self.response.write(bytes(csv_to_publish.getvalue()))
+
+
+class MultiLocationByDevice(RequestHandler):
+    def get(self, start_date, end_date, locations, tenant, distributor_key):
+
+        if tenant not in get_tenant_names_for_distributor(distributor_key):
+            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+            self.abort(403)
+
+        ###########################################################
+        # SETUP VARIABLES
+        ###########################################################
+        start_date = datetime.datetime.fromtimestamp(int(start_date))
+        end_date = datetime.datetime.fromtimestamp(int(end_date))
+        if end_date < start_date:
+            self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
+
+        midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
+        midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
+        just_before_next_day_end_date = (midnight_end_day + datetime.timedelta(days=1)) - datetime.timedelta(
+                seconds=1
+        )
+
+        all_the_locations = locations.split(',')
+        all_the_locations_final = all_the_locations[1:]
+        now = datetime.datetime.now()
+
+        ###########################################################
+
+        array_of_transformed_program_data_by_device = [
+            {
+                "location": location,
+                # program_record is the transformed program record table data
+                "raw_data": program_record_for_location_summarized(
+                        midnight_start_day,
+                        just_before_next_day_end_date,
+                        location,
+                        tenant
+                )
+            } for location in all_the_locations_final]
+
+        formatted_data = map(
+                format_multi_location_by_device,
+                array_of_transformed_program_data_by_device
+        )
+
+        merged_formatted_data = create_merged_dictionary(formatted_data)
+
+        csv_to_publish = generate_location_csv_by_device(
+                start_date=midnight_start_day,
+                end_date=just_before_next_day_end_date,
+                locations=all_the_locations_final,
+                dictionary_of_data=merged_formatted_data,
+                created_time=now
+        )
+
+        self.response.headers['Content-Type'] = 'application/csv'
+        self.response.headers['Content-Disposition'] = 'attachment; filename=MultiLocationByDevice.csv'
+        self.response.write(bytes(csv_to_publish.getvalue()))
+
+
+####################################################################################
+# FUNCTION THAT GETS CALLED VIA DEFERRED ON NEW PROGRAM PLAY POST
 ####################################################################################
 def handle_posting_a_new_program_play(incoming_data):
     for each_log in incoming_data["data"]:
@@ -353,4 +498,4 @@ def handle_posting_a_new_program_play(incoming_data):
             mark_raw_event_complete(raw_event_id)
 
         except KeyError:
-            logging.warn("ERROR: KEYERROR IN POSTING A NEW PROGRAM PLAY")
+            logging.warn("ERROR: KEYERROR IN POSTING A NEW PROGRAM PLAY. THE RECORD WILL NOT BE STORED. ")

@@ -70,7 +70,8 @@ describe 'ProofPlayService', ->
       expect(window.open).toHaveBeenCalledWith('proofplay/api/v1/multi_resource_by_date/' + start_date + '/' + end_date + '/' + allResources + "/" + tenants[0] + "/" + cookie_token, '_blank')
 
 
-    it 'sets tenant and downloads multi-resource csv across device', ->
+
+    it 'sets tenant and downloadCSVForMultipleResourcesByDevice', ->
       start_date = 12312
       end_date = 234234
       resources = ["some_resource", "another"]
@@ -79,12 +80,122 @@ describe 'ProofPlayService', ->
       ProofPlayService.downloadCSVForMultipleResourcesByDevice(start_date, end_date, resources)
       expect(window.open).toHaveBeenCalled()
 
-      allResources = []
+      allResources = ''
 
       for each in resources
         allResources = allResources + "-" + each
 
+
       expect(window.open).toHaveBeenCalledWith('proofplay/api/v1/multi_resource_by_device/' + start_date + '/' + end_date + '/' + allResources + "/" + tenants[0] + "/" + cookie_token, '_blank')
+
+
+    it 'sets tenant and downloads multi-devices summarized csv', ->
+      start_date = 12312
+      end_date = 234234
+      devices = ["some_devices", "another_device"]
+      tenants = ["one_tenant", "two_tenant"]
+      ProofPlayService.setTenant(tenants[0])
+      ProofPlayService.downloadCSVForMultipleDevicesSummarized(start_date, end_date, devices)
+      expect(window.open).toHaveBeenCalled()
+
+      allDevices = ''
+
+      for each in devices
+        allDevices = allDevices + "," + each
+
+
+      expect(window.open).toHaveBeenCalledWith('proofplay/api/v1/multi_device_summarized/' + start_date + '/' + end_date + '/' + allDevices + "/" + tenants[0] + "/" + cookie_token, '_blank')
+
+    it 'sets tenant and downloadCSVForMultipleDevicesByDate', ->
+      start_date = 12312
+      end_date = 234234
+      devices = ["some_devices", "another_device"]
+      tenants = ["one_tenant", "two_tenant"]
+      ProofPlayService.setTenant(tenants[0])
+      ProofPlayService.downloadCSVForMultipleDevicesByDate(start_date, end_date, devices)
+      expect(window.open).toHaveBeenCalled()
+
+      allDevices = ''
+
+      for each in devices
+        allDevices = allDevices + "," + each
+
+
+      expect(window.open).toHaveBeenCalledWith('proofplay/api/v1/multi_device_by_date/' + start_date + '/' + end_date + '/' + allDevices + "/" + tenants[0] + "/" + cookie_token, '_blank')
+
+    it 'sets tenant and downloadCSVForMultipleLocationsByDevice', ->
+      start_date = 12312
+      end_date = 234234
+      locations = ["some_location", "another_location"]
+      tenants = ["one_tenant", "two_tenant"]
+      ProofPlayService.setTenant(tenants[0])
+      ProofPlayService.downloadCSVForMultipleLocationsByDevice(start_date, end_date, locations)
+      expect(window.open).toHaveBeenCalled()
+
+      allLocations = ''
+
+      for each in locations
+        allLocations = allLocations + "," + each
+
+
+      expect(window.open).toHaveBeenCalledWith('proofplay/api/v1/multi_location_by_device/' + start_date + '/' + end_date + '/' + allLocations + "/" + tenants[0] + "/" + cookie_token, '_blank')
+
+
+    it 'sets tenant and downloadCSVForMultipleLocationsSummarized', ->
+      start_date = 12312
+      end_date = 234234
+      locations = ["some_location", "another_location"]
+      tenants = ["one_tenant", "two_tenant"]
+      ProofPlayService.setTenant(tenants[0])
+      ProofPlayService.downloadCSVForMultipleLocationsSummarized(start_date, end_date, locations)
+      expect(window.open).toHaveBeenCalled()
+
+      allLocations = ''
+
+      for each in locations
+        allLocations = allLocations + "," + each
+
+
+      expect(window.open).toHaveBeenCalledWith('proofplay/api/v1/multi_location_summarized/' + start_date + '/' + end_date + '/' + allLocations + "/" + tenants[0] + "/" + cookie_token, '_blank')
+
+
+    it 'gets all displays of a tenant', ->
+      to_respond = {
+        data: {
+          displays: ["one", "two"]
+        }
+      }
+
+      chosen_tenant = "some-tenant"
+
+      ProofPlayService.setTenant(chosen_tenant)
+
+      $httpBackend.expectGET("proofplay/api/v1/retrieve_all_displays/" + chosen_tenant).respond(to_respond)
+
+      ProofPlayService.getAllDisplays()
+      .then (data) ->
+        expect(angular.equals(data.data.displays, to_respond.data.displays))
+
+      $httpBackend.flush()
+
+    it 'gets all locations of a tenant', ->
+      to_respond = {
+        data: {
+          locations: ["one", "two"]
+        }
+      }
+
+      chosen_tenant = "some-tenant"
+
+      ProofPlayService.setTenant(chosen_tenant)
+
+      $httpBackend.expectGET("proofplay/api/v1/retrieve_all_locations/" + chosen_tenant).respond(to_respond)
+
+      ProofPlayService.getAllLocations()
+      .then (data) ->
+        expect(angular.equals(data.data.locations, to_respond.data.locations))
+
+      $httpBackend.flush()
 
 
   describe 'querySearch filters array by text', ->

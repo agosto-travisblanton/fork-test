@@ -28,6 +28,7 @@ class TestMain(SQLBaseTest, WebTest):
     ORIGINAL_NOTIFICATION_EMAILS = ['test@skykit.com', 'admin@skykit.com']
     tenant_code = "gamestop"
     one_device_customer_display_code = "my-device"
+    location_code = "6025"
 
     def setUp(self):
         super(TestMain, self).setUp()
@@ -74,6 +75,58 @@ class TestMain(SQLBaseTest, WebTest):
         response = self.app.get(uri, headers=self.headers)
         self.assertEqual(200, response.status_int)
 
+    def test_multi_location_summarized(self):
+        self.load_tenants()
+        self.load_resources()
+        self.load_one_device()
+
+        start_date = datetime.datetime.now()
+        end_date = start_date - datetime.timedelta(days=5)
+        start_unix = int(time.mktime(start_date.timetuple()))
+        end_unix = int(time.mktime(end_date.timetuple()))
+        locations = [self.location_code]
+
+        all_locations = ''
+        for item in locations:
+            all_locations = "," + item
+
+        uri = build_uri('MultiLocationSummarized', module='proofplay', params_dict={
+            'tenant': self.tenant_code,
+            'distributor_key': self.distributor_key.urlsafe(),
+            'locations': all_locations,
+            'start_date': start_unix,
+            'end_date': end_unix
+        })
+
+        response = self.app.get(uri, headers=self.headers)
+        self.assertEqual(200, response.status_int)
+
+    def test_multi_location_by_device(self):
+        self.load_tenants()
+        self.load_resources()
+        self.load_one_device()
+
+        start_date = datetime.datetime.now()
+        end_date = start_date - datetime.timedelta(days=5)
+        start_unix = int(time.mktime(start_date.timetuple()))
+        end_unix = int(time.mktime(end_date.timetuple()))
+        locations = [self.location_code]
+
+        all_locations = ''
+        for item in locations:
+            all_locations = "," + item
+
+        uri = build_uri('MultiLocationByDevice', module='proofplay', params_dict={
+            'tenant': self.tenant_code,
+            'distributor_key': self.distributor_key.urlsafe(),
+            'locations': all_locations,
+            'start_date': start_unix,
+            'end_date': end_unix
+        })
+
+        response = self.app.get(uri, headers=self.headers)
+        self.assertEqual(200, response.status_int)
+
     def test_multi_device_summarized_api(self):
         self.load_tenants()
         self.load_resources()
@@ -99,7 +152,6 @@ class TestMain(SQLBaseTest, WebTest):
 
         response = self.app.get(uri, headers=self.headers)
         self.assertEqual(200, response.status_int)
-
 
     def test_multi_resource_by_device_api(self):
         self.load_tenants()
@@ -160,6 +212,16 @@ class TestMain(SQLBaseTest, WebTest):
         response = self.app.get(uri, headers=self.headers)
         self.assertEqual(json.loads(response.body), {u'tenants': [u'gamestop']})
 
+    def test_get_all_locations_of_tenant(self):
+        self.load_tenants()
+        self.load_one_device()
+
+        uri = build_uri('RetrieveAllLocationsOfTenant', module='proofplay', params_dict={'tenant': self.tenant_code})
+        response = self.app.get(uri, headers=self.headers)
+
+        self.assertEqual(json.loads(response.body), {u'locations': [unicode(self.location_code)]})
+
+
     def test_get_all_resources(self):
         self.load_tenants()
         self.load_resources()
@@ -186,7 +248,7 @@ class TestMain(SQLBaseTest, WebTest):
     def load_one_device(self):
         device_serial = "1234"
         device_key = "5443"
-        location_id = insert_new_location_or_get_existing("6025")
+        location_id = insert_new_location_or_get_existing(self.location_code)
         insert_new_device_or_get_existing(location_id, device_serial, device_key, self.one_device_customer_display_code,
                                           self.tenant_code)
 

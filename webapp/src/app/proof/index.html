@@ -57,7 +57,7 @@
                                               md-highlight-flags="^i">{{item}}</span>
                                                         </md-item-template>
                                                         <md-not-found>
-                                                            No states matching "{{vm.searchText}}" were found.
+                                                            No matching item for search "{{vm.searchText}}" was found.
                                                         </md-not-found>
                                                     </md-autocomplete>
                                                     <br/>
@@ -165,7 +165,7 @@
                     </div>
                 </md-tab>
 
-                <!---
+
                 <md-tab label="{{vm.location.title}}" layout-align="center center">
                     <div ng-controller="ProofOfPlayMultiLocationCtrl as vm" layout="column" ng-cloak>
                         <div class="row" ng-init="vm.initialize()">
@@ -182,24 +182,24 @@
                                                     <md-autocomplete
                                                             md-selected-item="vm.selectedItem"
                                                             md-search-text="vm.searchText"
-                                                            md-items="item in vm.querySearch(vm.resources, vm.searchText)"
+                                                            md-items="item in vm.querySearch(vm.locations, vm.searchText)"
                                                             md-item-text="item"
                                                             md-min-length="0"
-                                                            md-search-text-change="vm.isResourceValid(vm.searchText)"
-                                                            md-selected-item-change="vm.isResourceValid(vm.searchText)"
+                                                            md-search-text-change="vm.isLocationValid(vm.searchText)"
+                                                            md-selected-item-change="vm.isLocationValid(vm.searchText)"
                                                             placeholder="Select a resource">
                                                         <md-item-template>
                                         <span md-highlight-text="vm.searchText"
                                               md-highlight-flags="^i">{{item}}</span>
                                                         </md-item-template>
                                                         <md-not-found>
-                                                            No states matching "{{vm.searchText}}" were found.
+                                                            No matching item for search "{{vm.searchText}}" was found.
                                                         </md-not-found>
                                                     </md-autocomplete>
                                                     <br/>
 
                                                     <md-button class="md-raised"
-                                                               ng-click="vm.addToSelectedResources(vm.searchText)"
+                                                               ng-click="vm.addToSelectedLocations(vm.searchText)"
                                                                style="float: right">Add
                                                     </md-button>
                                                     <br/>
@@ -215,7 +215,7 @@
                                             <div ng-show="vm.loading">
 
                                                 <md-content class="md-padding">
-                                                    <h3>Loading resources...</h3>
+                                                    <h3>Loading Locations...</h3>
                                                 </md-content>
                                                 <hr/>
 
@@ -275,13 +275,13 @@
                                         <md-content class="md-padding">
                                             <h3>Selected Locations</h3>
                                             <hr/>
-                                            <div ng-show="vm.selected_resources.length > 0">
+                                            <div ng-show="vm.selected_locations.length > 0">
                                                 <md-list>
                                                     <ol>
-                                                        <li ng-repeat="item in vm.selected_resources">
+                                                        <li ng-repeat="item in vm.selected_locations">
                                                             {{ item }}
                                                             <md-button md-no-ink class="md-primary"
-                                                                       ng-click="vm.removeFromSelectedResource(item)">X
+                                                                       ng-click="vm.removeFromSelectedLocation(item)">X
                                                             </md-button>
                                                             </button>
 
@@ -289,8 +289,8 @@
                                                     </ol>
                                                 </md-list>
                                             </div>
-                                            <div ng-hide="vm.selected_resources.length > 0">
-                                                <h5>You have no selected resources</h5>
+                                            <div ng-hide="vm.selected_locations.length > 0">
+                                                <h5>You have no selected locations</h5>
                                             </div>
                                         </md-content>
 
@@ -299,7 +299,7 @@
                             </div>
                         </div>
                     </div>
-                </md-tab> ---->
+                </md-tab>
                 <md-tab label="{{vm.display.title}}" layout-align="center center">
                     <div ng-controller="ProofOfPlayMultiDisplayCtrl as vm" layout="column" ng-cloak>
                         <div class="row" ng-init="vm.initialize()">
@@ -327,7 +327,7 @@
                                               md-highlight-flags="^i">{{item}}</span>
                                                         </md-item-template>
                                                         <md-not-found>
-                                                            No states matching "{{vm.searchText}}" were found.
+                                                            No matching item for search "{{vm.searchText}}" was found.
                                                         </md-not-found>
                                                     </md-autocomplete>
                                                     <br/>
