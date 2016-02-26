@@ -535,19 +535,38 @@ class User(ndb.Model):
     def _pre_put_hook(self):
         self.class_version = 1
         if self.key is None or self.key.id() is None:
-            self.key = ndb.Key(User, self.email)
+            self.key = ndb.Key(User, self.email.lower())
+
+    @classmethod
+    def _build_key(cls, email):
+        key = ndb.Key(User, email.lower())
+        return key
+
+    @classmethod
+    def get_or_insert_by_email(cls, email, stormpath_account_href=None):
+        user = cls.get_by_email(email)
+        if user is None:
+            key = cls._build_key(email)
+            user = User(key=key, email=email, stormpath_account_href=stormpath_account_href)
+            user.put()
+        else:
+            if user.stormpath_account_href != stormpath_account_href and stormpath_account_href is not None:
+                user.stormpath_account_href = stormpath_account_href
+                user.put()
+        return user
 
     @classmethod
     def get_by_email(cls, email):
-        return ndb.Key(User, email).get()
+        key = cls._build_key(email)
+        return key.get()
 
     @classmethod
     def update_or_create_with_api_account(cls, account):
         user = None
-        if account.href:
+        if account and account.href:
             user = cls.query(cls.stormpath_account_href == account.href).get()
             if user is None:
-                user = User.get_or_insert(account.email, email=account.email, stormpath_account_href=account.href)
+                user = cls.get_or_insert_by_email(account.email, stormpath_account_href=account.href)
         return user
 
     @property
