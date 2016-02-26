@@ -35,6 +35,7 @@ def transform_db_data_to_by_location_then_resource(from_db):
 
         to_return[customer_location_code][resource_name].append(item)
 
+    print to_return
     return to_return
 
 
