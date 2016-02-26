@@ -570,6 +570,11 @@ class User(ndb.Model):
                 user = cls.get_or_insert_by_email(account.email, stormpath_account_href=account.href)
         return user
 
+    @classmethod
+    def test_create(cls, email, stormpath_account_href='https://api.stormpath.com/v1/accounts/'):
+        return cls(email=email,
+                   stormpath_account_href=stormpath_account_href)
+
     @property
     def distributor_keys(self):
         dist_user_keys = DistributorUser.query(DistributorUser.user_key == self.key).fetch(keys_only=True)
