@@ -22,7 +22,7 @@ class MakeMigration(RequestHandler):
             alembic_cfg.set_main_option('sqlalchemy.url', SQLALCHEMY_DATABASE_URI)
             command.upgrade(alembic_cfg, "head")
             self.response.out.write(
-                    "SUCCESS. Migrations Applied Successfully (or no change to model schema neccesasary.")
+                    "SUCCESS. Migrations Applied Successfully (or no change to model schema necessary).")
 
         except Exception as e:
             print e
@@ -461,41 +461,46 @@ def handle_posting_a_new_program_play(incoming_data):
         logging.info("INCOMING JSON ARRAY")
         logging.info(each_log)
         try:
-            raw_event_id = insert_raw_program_play_event_data(each_log)
-            resource_name = each_log["resource_name"]
-            resource_id = each_log["resource_id"]
-            serial_number = each_log["serial_number"]
-            device_key = each_log["device_key"]
-            tenant_code = each_log["tenant_code"]
-            customer_display_code = each_log["customer_display_code"]
-            started_at = datetime.datetime.strptime(each_log["started_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
-            ended_at = datetime.datetime.strptime(each_log["ended_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
+            if not each_log['customer_location_code'] and not each_log['customer_display_code']:
+                pass
+            else:
+                raw_event_id = insert_raw_program_play_event_data(each_log)
+                resource_name = each_log["resource_name"]
+                resource_id = each_log["resource_id"]
+                serial_number = each_log["serial_number"]
+                device_key = each_log["device_key"]
+                tenant_code = each_log["tenant_code"]
+                started_at = datetime.datetime.strptime(each_log["started_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
+                ended_at = datetime.datetime.strptime(each_log["ended_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
+                customer_location_code = each_log["customer_location_code"]
+                customer_display_code = each_log["customer_display_code"]
 
-            if 'customer_location_code' in each_log:
-                customer_location_code = each_log["customer_location_code"]  # e.g. 6023 or "Store_6023"
+                if not customer_location_code:
+                    customer_location_code = "None"
+
                 location_id = insert_new_location_or_get_existing(customer_location_code)
 
-            else:
-                location_id = None
+                if not customer_display_code:
+                    customer_display_code = "None"
 
-            resource_id = insert_new_resource_or_get_existing(
-                    resource_name,
-                    resource_id,
-                    tenant_code
-            )
+                resource_id = insert_new_resource_or_get_existing(
+                        resource_name,
+                        resource_id,
+                        tenant_code
+                )
 
-            device_id = insert_new_device_or_get_existing(
-                    location_id,
-                    serial_number,
-                    device_key,
-                    customer_display_code,
-                    tenant_code
-            )
+                device_id = insert_new_device_or_get_existing(
+                        location_id,
+                        serial_number,
+                        device_key,
+                        customer_display_code,
+                        tenant_code
+                )
 
-            insert_new_program_record(
-                    location_id, device_id, resource_id, started_at, ended_at)
+                insert_new_program_record(
+                        location_id, device_id, resource_id, started_at, ended_at)
 
-            mark_raw_event_complete(raw_event_id)
+                mark_raw_event_complete(raw_event_id)
 
         except KeyError:
             logging.warn("ERROR: KEYERROR IN POSTING A NEW PROGRAM PLAY. THE RECORD WILL NOT BE STORED. ")

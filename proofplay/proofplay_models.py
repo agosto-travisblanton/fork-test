@@ -49,7 +49,7 @@ class Location(Base):
     __tablename__ = "location"
 
     id = Column(Integer, primary_key=True)
-    customer_location_code = Column(String(255), unique=True, nullable=False)
+    customer_location_code = Column(String(255), unique=True, nullable=True)
     dma_code = Column(String(255), nullable=True)
     state = Column(String(255), nullable=True)
     city = Column(String(255), nullable=True)
@@ -69,7 +69,7 @@ class Device(Base):
     full_location = relationship("Location", backref="Device")
     serial_number = Column(String(255), nullable=False)
     device_key = Column(String(255), nullable=False)
-    customer_display_code = Column(String(255), nullable=False)
+    customer_display_code = Column(String(255))
     tenant_code = Column(String(255), nullable=False)
 
     def __init__(self, serial_number, tenant_code, device_key, customer_display_code, location_id=None):

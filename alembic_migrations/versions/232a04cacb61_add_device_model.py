@@ -1,13 +1,13 @@
-"""change field names to match provisioning
+"""Add Device model
 
-Revision ID: 46ed78aba06
+Revision ID: 232a04cacb61
 Revises: None
-Create Date: 2016-02-15 16:05:12.629655
+Create Date: 2016-02-26 15:12:41.548399
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '46ed78aba06'
+revision = '232a04cacb61'
 down_revision = None
 
 from alembic import op
@@ -51,7 +51,7 @@ def upgrade():
     sa.Column('location_id', sa.Integer(), nullable=True),
     sa.Column('serial_number', sa.String(length=255), nullable=False),
     sa.Column('device_key', sa.String(length=255), nullable=False),
-    sa.Column('customer_display_code', sa.String(length=255), nullable=False),
+    sa.Column('customer_display_code', sa.String(length=255), nullable=True),
     sa.Column('tenant_code', sa.String(length=255), nullable=False),
     sa.ForeignKeyConstraint(['location_id'], ['location.id'], ),
     sa.PrimaryKeyConstraint('id')
