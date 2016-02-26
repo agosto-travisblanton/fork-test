@@ -44,8 +44,8 @@ class Distributor(ndb.Model):
     name = ndb.StringProperty(required=True, indexed=True)
     # TODO Make admin_email required=True after migration run in prod
     admin_email = ndb.StringProperty(required=False, indexed=True)
-    player_content_url = ndb.StringProperty(required=True, indexed=True)
-    content_manager_url = ndb.StringProperty(required=True, indexed=True)
+    player_content_url = ndb.StringProperty(required=False, indexed=True)
+    content_manager_url = ndb.StringProperty(required=False, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
@@ -569,6 +569,11 @@ class User(ndb.Model):
             if user is None:
                 user = cls.get_or_insert_by_email(account.email, stormpath_account_href=account.href)
         return user
+
+    @classmethod
+    def test_create(cls, email, stormpath_account_href='https://api.stormpath.com/v1/accounts/'):
+        return cls(email=email,
+                   stormpath_account_href=stormpath_account_href)
 
     @property
     def distributor_keys(self):
