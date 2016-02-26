@@ -18,7 +18,14 @@ from proofplay.data_processing import (
     create_merged_dictionary,
     count_resource_plays_from_dict_by_device,
     format_transformed_program_data_by_device,
-    prepare_transformed_query_by_device_to_csv_by_date
+    prepare_transformed_query_by_device_to_csv_by_date,
+    generate_device_csv_summarized,
+    generate_device_csv_by_date,
+    transform_db_data_to_by_location_then_resource,
+    format_multi_location_by_device,
+    format_multi_location_summarized,
+    generate_location_csv_summarized,
+    generate_location_csv_by_device
 )
 
 
@@ -94,6 +101,7 @@ class TestDataProcessing(BaseTest):
         started_at_plus_one = self.start_date + datetime.timedelta(days=1)
         started_at_plus_two = self.start_date + datetime.timedelta(days=2)
         started_at_plus_three = self.start_date + datetime.timedelta(days=3)
+
         example_input = [
             {"device_id": 1, "started_at": started_at_plus_one},
             {"device_id": 1, "someinfo": "something", "started_at": started_at_plus_one},
@@ -469,6 +477,214 @@ class TestDataProcessing(BaseTest):
         result = prepare_transformed_query_by_device_to_csv_by_date(self.start_date, self.end_date, example_input)
 
         self.assertEqual(result, expected_result)
+
+    def test_generate_device_csv_summarized(self):
+        example_input = [
+            {'content': 'GSAD_4334', 'display': 'my-device-3', 'location': '1001', 'playcount': 1},
+            {'content': 'GSAD_2222', 'display': 'my-device-7', 'location': '3001', 'playcount': 3},
+            {'content': 'GSAD_4334', 'display': 'my-device-7', 'location': '3001', 'playcount': 3},
+            {'content': 'GSAD_5447', 'display': 'my-device-7', 'location': '3001', 'playcount': 2}
+        ]
+        now = str(datetime.datetime.now())
+
+        expected_output = """Creation Date,Start Date,End Date,Displays\r\n{},2016-02-01 00:00:00,2016-02-03 00:00:00,"my-device-3, my-device-7"\r\nDisplay,Location,Content,Play Count\r\nmy-device-3,1001,GSAD_4334,1\r\nmy-device-7,3001,GSAD_2222,3\r\nmy-device-7,3001,GSAD_4334,3\r\nmy-device-7,3001,GSAD_5447,2\r\n""".format(
+                now)
+
+        start_time = datetime.datetime.strptime("Feb 1 2016", '%b %d %Y')
+        end_time = datetime.datetime.strptime("Feb 3 2016", '%b %d %Y')
+
+        displays = ["my-device-3", "my-device-7"]
+        self.assertEqual(generate_device_csv_summarized(start_time, end_time, displays, example_input, now).read(),
+                         expected_output)
+
+    def test_generate_device_csv_by_date(self):
+        example_input = OrderedDict(
+                [
+                    ('my-device-3',
+                     OrderedDict(
+                             [('2016-02-02 00:00:00', {'GSAD_4334': {'location': '1001', 'playcount': 1}})])),
+                    ('my-device-7',
+                     OrderedDict(
+                             [(
+                                 '2016-02-01 00:00:00',
+                                 {
+                                     'GSAD_5447': {
+                                         'location': '3001',
+                                         'playcount': 1},
+                                     'GSAD_4334': {
+                                         'location': '3001',
+                                         'playcount': 2},
+                                     'GSAD_2222': {
+                                         'location': '3001',
+                                         'playcount': 1}}),
+                                 (
+                                     '2016-02-02 00:00:00',
+                                     {
+                                         'GSAD_2222': {
+                                             'location': '3001',
+                                             'playcount': 1}}),
+                                 (
+                                     '2016-02-03 00:00:00',
+                                     {
+                                         'GSAD_5447': {
+                                             'location': '3001',
+                                             'playcount': 1},
+                                         'GSAD_4334': {
+                                             'location': '3001',
+                                             'playcount': 1},
+                                         'GSAD_2222': {
+                                             'location': '3001',
+                                             'playcount': 1}})]))]
+        )
+
+        now = str(datetime.datetime.now())
+        devices = ["my-device-3", "my-device-7"]
+
+        expected_result = 'Creation Date,Start Date,End Date,Displays\r\n{},2016-02-01 00:00:00,2016-02-03 00:00:00,"my-device-3, my-device-7"\r\nDisplay,Location,Date,Content,Play Count\r\nmy-device-3,1001,2016-02-02 00:00:00,GSAD_4334,1\r\nmy-device-7,3001,2016-02-01 00:00:00,GSAD_5447,1\r\nmy-device-7,3001,2016-02-01 00:00:00,GSAD_2222,1\r\nmy-device-7,3001,2016-02-01 00:00:00,GSAD_4334,2\r\nmy-device-7,3001,2016-02-02 00:00:00,GSAD_2222,1\r\nmy-device-7,3001,2016-02-03 00:00:00,GSAD_5447,1\r\nmy-device-7,3001,2016-02-03 00:00:00,GSAD_2222,1\r\nmy-device-7,3001,2016-02-03 00:00:00,GSAD_4334,1\r\n'.format(
+                now)
+
+        start_time = datetime.datetime.strptime("Feb 1 2016", '%b %d %Y')
+        end_time = datetime.datetime.strptime("Feb 3 2016", '%b %d %Y')
+
+        self.assertEqual(generate_device_csv_by_date(now, start_time, end_time, devices, example_input).read(),
+                         expected_result)
+
+    def test_transform_db_data_to_by_location_then_resource(self):
+        example_input = [
+            {'resource_id': 'GSAD_2222', 'started_at': datetime.datetime(2016, 1, 1, 15, 53, 11), 'location_id': '3001',
+             'device_id': 'my-device-9', 'ended_at': datetime.datetime(2016, 1, 1, 16, 3, 11)},
+            {'resource_id': 'GSAD_2222', 'started_at': datetime.datetime(2016, 1, 2, 14, 53, 11), 'location_id': '3001',
+             'device_id': 'my-device-8', 'ended_at': datetime.datetime(2016, 1, 2, 15, 3, 11)},
+            {'resource_id': 'GSAD_5533', 'started_at': datetime.datetime(2016, 1, 2, 15, 13, 11), 'location_id': '3001',
+             'device_id': 'my-device-7', 'ended_at': datetime.datetime(2016, 1, 2, 15, 23, 11)},
+            {'resource_id': 'GSAD_2222', 'started_at': datetime.datetime(2016, 1, 2, 16, 3, 11), 'location_id': '3001',
+             'device_id': 'my-device-9', 'ended_at': datetime.datetime(2016, 1, 2, 16, 13, 11)},
+            {'resource_id': 'GSAD_5533', 'started_at': datetime.datetime(2016, 1, 3, 14, 53, 11), 'location_id': '3001',
+             'device_id': 'my-device-8', 'ended_at': datetime.datetime(2016, 1, 3, 15, 3, 11)},
+            {'resource_id': 'GSAD_5533', 'started_at': datetime.datetime(2016, 1, 3, 15, 33, 11), 'location_id': '3001',
+             'device_id': 'my-device-8', 'ended_at': datetime.datetime(2016, 1, 3, 15, 43, 11)},
+            {'resource_id': 'GSAD_4334', 'started_at': datetime.datetime(2016, 1, 3, 15, 43, 11), 'location_id': '3001',
+             'device_id': 'my-device-8', 'ended_at': datetime.datetime(2016, 1, 3, 15, 53, 11)},
+            {'resource_id': 'GSAD_4334', 'started_at': datetime.datetime(2016, 1, 3, 16, 3, 11), 'location_id': '3001',
+             'device_id': 'my-device-7', 'ended_at': datetime.datetime(2016, 1, 3, 16, 13, 11)},
+            {'resource_id': 'GSAD_4334', 'started_at': datetime.datetime(2016, 1, 3, 16, 13, 11), 'location_id': '3001',
+             'device_id': 'my-device-9', 'ended_at': datetime.datetime(2016, 1, 3, 16, 23, 11)}
+        ]
+
+        expected_output = {'3001': OrderedDict([('GSAD_2222', [{'resource_id': 'GSAD_2222', 'device_id': 'my-device-9',
+                                                                'ended_at': datetime.datetime(2016, 1, 1, 16, 3, 11),
+                                                                'started_at': datetime.datetime(2016, 1, 1, 15, 53, 11),
+                                                                'location_id': '3001'},
+                                                               {'resource_id': 'GSAD_2222', 'device_id': 'my-device-8',
+                                                                'ended_at': datetime.datetime(2016, 1, 2, 15, 3, 11),
+                                                                'started_at': datetime.datetime(2016, 1, 2, 14, 53, 11),
+                                                                'location_id': '3001'},
+                                                               {'resource_id': 'GSAD_2222', 'device_id': 'my-device-9',
+                                                                'ended_at': datetime.datetime(2016, 1, 2, 16, 13, 11),
+                                                                'started_at': datetime.datetime(2016, 1, 2, 16, 3, 11),
+                                                                'location_id': '3001'}]), ('GSAD_5533', [
+            {'resource_id': 'GSAD_5533', 'device_id': 'my-device-7',
+             'ended_at': datetime.datetime(2016, 1, 2, 15, 23, 11),
+             'started_at': datetime.datetime(2016, 1, 2, 15, 13, 11), 'location_id': '3001'},
+            {'resource_id': 'GSAD_5533', 'device_id': 'my-device-8',
+             'ended_at': datetime.datetime(2016, 1, 3, 15, 3, 11),
+             'started_at': datetime.datetime(2016, 1, 3, 14, 53, 11), 'location_id': '3001'},
+            {'resource_id': 'GSAD_5533', 'device_id': 'my-device-8',
+             'ended_at': datetime.datetime(2016, 1, 3, 15, 43, 11),
+             'started_at': datetime.datetime(2016, 1, 3, 15, 33, 11), 'location_id': '3001'}]), ('GSAD_4334', [
+            {'resource_id': 'GSAD_4334', 'device_id': 'my-device-8',
+             'ended_at': datetime.datetime(2016, 1, 3, 15, 53, 11),
+             'started_at': datetime.datetime(2016, 1, 3, 15, 43, 11), 'location_id': '3001'},
+            {'resource_id': 'GSAD_4334', 'device_id': 'my-device-7',
+             'ended_at': datetime.datetime(2016, 1, 3, 16, 13, 11),
+             'started_at': datetime.datetime(2016, 1, 3, 16, 3, 11), 'location_id': '3001'},
+            {'resource_id': 'GSAD_4334', 'device_id': 'my-device-9',
+             'ended_at': datetime.datetime(2016, 1, 3, 16, 23, 11),
+             'started_at': datetime.datetime(2016, 1, 3, 16, 13, 11), 'location_id': '3001'}])])}
+
+        self.assertEqual(transform_db_data_to_by_location_then_resource(example_input), expected_output)
+
+    def test_format_multi_location_by_device(self):
+        example_input = {
+            "raw_data": {
+                "location-1": {
+                    "resource-one": [{
+                        "location_id": "my-customer-location-code",
+                        "device_id": "my-customer-display-code",
+                        "resource_id": "my-resource-name",
+                        "started_at": datetime.datetime(2016, 1, 3, 16, 3, 11),
+                        "ended_at": datetime.datetime(2016, 1, 3, 15, 53, 11)
+                    }]
+                }
+            }
+        }
+
+        expected_output = {
+            'location-1': OrderedDict([('resource-one', OrderedDict([('my-customer-display-code', 1)]))])}
+
+        self.assertEqual(format_multi_location_by_device(example_input), expected_output)
+
+    def test_format_multi_location_summarized(self):
+        example_input = {
+            "raw_data": {
+                "location-1": {
+                    "resource-one": [{
+                        "location_id": "my-customer-location-code",
+                        "device_id": "my-customer-display-code",
+                        "resource_id": "my-resource-name",
+                        "started_at": datetime.datetime(2016, 1, 3, 16, 3, 11),
+                        "ended_at": datetime.datetime(2016, 1, 3, 15, 53, 11)
+                    }]
+                }
+            }
+        }
+
+        expected_result = {'location-1': OrderedDict([('resource-one', 1)])}
+
+        self.assertEqual(format_multi_location_summarized(example_input), expected_result)
+
+    def test_generate_location_csv_summarized(self):
+        example_input = {
+            '3001': OrderedDict(
+                    [('GSAD_2222', 3), ('GSAD_5533', 3), ('GSAD_4334', 3)]),
+            '1001': OrderedDict(
+                    [('GSAD_5447', 3), ('GSAD_2222', 4), ('GSAD_5533', 1), ('GSAD_5553', 2), ('GSAD_4334', 1)])}
+
+        now = str(datetime.datetime.now())
+
+        start_time = datetime.datetime.strptime("Feb 1 2016", '%b %d %Y')
+        end_time = datetime.datetime.strptime("Feb 3 2016", '%b %d %Y')
+        locations = ["1001", "3001"]
+
+        expected_result = 'Creation Date,Start Date,End Date,Locations\r\n{},2016-02-01 00:00:00,2016-02-03 00:00:00,"1001, 3001"\r\nLocation,Content,Play Count\r\n3001,GSAD_2222,3\r\n3001,GSAD_5533,3\r\n3001,GSAD_4334,3\r\n1001,GSAD_5447,3\r\n1001,GSAD_2222,4\r\n1001,GSAD_5533,1\r\n1001,GSAD_5553,2\r\n1001,GSAD_4334,1\r\n'.format(
+                now)
+
+        self.assertEqual(generate_location_csv_summarized(now, start_time, end_time, locations, example_input).read(),
+                         expected_result)
+
+    def test_generate_location_csv_by_device(self):
+        example_input = {
+            '3001': OrderedDict([('GSAD_2222', OrderedDict([('my-device-9', 2), ('my-device-8', 1)])),
+                                 ('GSAD_5533', OrderedDict([('my-device-7', 1), ('my-device-8', 2)])), (
+                                     'GSAD_4334', OrderedDict(
+                                             [('my-device-8', 1), ('my-device-7', 1), ('my-device-9', 1)]))]),
+            '1001': OrderedDict([('GSAD_5447', OrderedDict([('my-device-1', 1), ('my-device-3', 2)])), (
+                'GSAD_2222', OrderedDict([('my-device-1', 2), ('my-device-2', 1), ('my-device-3', 1)])),
+                                 ('GSAD_5533', OrderedDict([('my-device-2', 1)])),
+                                 ('GSAD_5553', OrderedDict([('my-device-2', 1), ('my-device-3', 1)])),
+                                 ('GSAD_4334', OrderedDict([('my-device-3', 1)]))])}
+
+        now = str(datetime.datetime.now())
+
+        start_time = datetime.datetime.strptime("Feb 1 2016", '%b %d %Y')
+        end_time = datetime.datetime.strptime("Feb 3 2016", '%b %d %Y')
+        locations = ["1001", "3001"]
+
+        expected_result = 'Creation Date,Start Date,End Date,Locations\r\n{},2016-02-01 00:00:00,2016-02-03 00:00:00,"1001, 3001"\r\nLocation,Device,Content,Play Count\r\n3001,my-device-9,GSAD_2222,2\r\n3001,my-device-8,GSAD_2222,1\r\n3001,my-device-7,GSAD_5533,1\r\n3001,my-device-8,GSAD_5533,2\r\n3001,my-device-8,GSAD_4334,1\r\n3001,my-device-7,GSAD_4334,1\r\n3001,my-device-9,GSAD_4334,1\r\n1001,my-device-1,GSAD_5447,1\r\n1001,my-device-3,GSAD_5447,2\r\n1001,my-device-1,GSAD_2222,2\r\n1001,my-device-2,GSAD_2222,1\r\n1001,my-device-3,GSAD_2222,1\r\n1001,my-device-2,GSAD_5533,1\r\n1001,my-device-2,GSAD_5553,1\r\n1001,my-device-3,GSAD_5553,1\r\n1001,my-device-3,GSAD_4334,1\r\n'.format(
+                now)
+
+        self.assertEqual(generate_location_csv_by_device(now, start_time, end_time, locations, example_input).read(),
+                         expected_result)
 
 
 if __name__ == '__main__':

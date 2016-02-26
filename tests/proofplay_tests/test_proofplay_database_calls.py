@@ -5,7 +5,7 @@ setup_test_paths()
 from base_sql_test_config import SQLBaseTest
 import datetime
 from proofplay.proofplay_models import Resource, ProgramRecord, Device, Location
-
+from collections import OrderedDict
 from proofplay.database_calls import (
     insert_new_resource_or_get_existing,
     insert_new_program_record,
@@ -17,7 +17,10 @@ from proofplay.database_calls import (
     retrieve_all_resources,
     get_raw_program_record_data_by_device,
     program_record_for_device_by_date,
-    program_record_for_device_summarized
+    program_record_for_device_summarized,
+    retrieve_all_locations_of_tenant,
+    get_raw_program_record_data_by_location,
+    program_record_for_location_summarized
 )
 
 
@@ -184,6 +187,48 @@ class TestDatabase(SQLBaseTest):
                 self.tenant_code
         ), expected_output)
 
+    def test_get_raw_program_record_data_by_location(self):
+        self.test_insert_new_program_record()
+
+        start_search = self.started_at - datetime.timedelta(days=1)
+        end_search = self.started_at + datetime.timedelta(days=1)
+
+        result = get_raw_program_record_data_by_location(start_search,
+                                                         end_search,
+                                                         self.customer_location_code,
+                                                         self.tenant_code)
+
+        expected_output = [
+            {
+                "location_id": self.customer_location_code,
+                "device_id": self.customer_display_code,
+                "resource_id": self.resource_name,
+                "started_at": self.started_at,
+                "ended_at": self.ended_at
+            }
+        ]
+
+        self.assertEqual(result, expected_output)
+
+    def test_program_record_for_location_summarized(self):
+        self.test_insert_new_program_record()
+
+        start_search = self.started_at - datetime.timedelta(days=1)
+        end_search = self.started_at + datetime.timedelta(days=1)
+
+        result = program_record_for_location_summarized(start_search,
+                                                        end_search,
+                                                        self.customer_location_code,
+                                                        self.tenant_code)
+        self.maxDiff = None
+
+        expected_output = {u'6025': OrderedDict([(u'some_resource', [
+            {'started_at': datetime.datetime(2016, 2, 2, 15, 31, 43, 683139),
+             'ended_at': datetime.datetime(2016, 2, 2, 16, 31, 43, 683139), 'resource_id': u'some_resource',
+             'location_id': u'6025', 'device_id': u'some_display_code'}])])}
+
+        self.assertEqual(result, expected_output)
+
     def test_get_raw_program_record_data_for_resource_between_date_ranges_by_date(self):
         self.test_insert_new_program_record()
         expected_output = {
@@ -203,3 +248,7 @@ class TestDatabase(SQLBaseTest):
                 self.tenant_code
 
         ), expected_output)
+
+    def test_retrieve_all_locations_of_tenant(self):
+        self.test_insert_new_device()
+        self.assertEqual([self.customer_location_code], retrieve_all_locations_of_tenant(self.tenant_code))
