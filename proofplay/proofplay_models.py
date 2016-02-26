@@ -35,7 +35,7 @@ class Resource(Base):
     __tablename__ = "resource"
 
     id = Column(Integer, primary_key=True)
-    resource_name = Column(String(255), unique=True, nullable=False)
+    resource_name = Column(String(255), unique=False, nullable=False)
     resource_identifier = Column(String(255), unique=True, nullable=False)
     tenant_code = Column(String(255), nullable=False)
 

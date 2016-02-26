@@ -171,7 +171,7 @@ class TestMain(SQLBaseTest, WebTest):
         uri = build_uri('MultiResourceByDevice', module='proofplay', params_dict={
             'tenant': self.tenant_code,
             'distributor_key': self.distributor_key.urlsafe(),
-            'resources': all_resources,
+            'resource_identifiers': all_resources,
             'start_date': start_unix,
             'end_date': end_unix
         })
@@ -197,7 +197,7 @@ class TestMain(SQLBaseTest, WebTest):
         uri = build_uri('MultiResourceByDate', module='proofplay', params_dict={
             'tenant': self.tenant_code,
             'distributor_key': self.distributor_key.urlsafe(),
-            'resources': all_resources,
+            'resource_identifiers': all_resources,
             'start_date': start_unix,
             'end_date': end_unix
         })
@@ -220,7 +220,6 @@ class TestMain(SQLBaseTest, WebTest):
         response = self.app.get(uri, headers=self.headers)
 
         self.assertEqual(json.loads(response.body), {u'locations': [unicode(self.location_code)]})
-
 
     def test_get_all_resources(self):
         self.load_tenants()

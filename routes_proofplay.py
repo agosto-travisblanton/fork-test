@@ -39,12 +39,12 @@ application = WSGIApplication([
     # BY RESOURCE
     ################################################################
     Route(
-            BASE_URI + '/multi_resource_by_date/<start_date>/<end_date>/<resources>/<tenant>/<distributor_key>',
+            BASE_URI + '/multi_resource_by_date/<start_date>/<end_date>/<resource_identifiers>/<tenant>/<distributor_key>',
             handler="proofplay.main.MultiResourceByDate",
             name="MultiResourceByDate"
     ),
     Route(
-            BASE_URI + '/multi_resource_by_device/<start_date>/<end_date>/<resources>/<tenant>/<distributor_key>',
+            BASE_URI + '/multi_resource_by_device/<start_date>/<end_date>/<resource_identifiers>/<tenant>/<distributor_key>',
             handler="proofplay.main.MultiResourceByDevice",
             name="MultiResourceByDevice"
     ),

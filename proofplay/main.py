@@ -104,7 +104,7 @@ class PostNewProgramPlay(RequestHandler):
 # RESOURCES
 ####################################################################################
 class MultiResourceByDevice(RequestHandler):
-    def get(self, start_date, end_date, resources, tenant, distributor_key):
+    def get(self, start_date, end_date, resource_identifiers, tenant, distributor_key):
 
         if tenant not in get_tenant_names_for_distributor(distributor_key):
             self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
@@ -125,14 +125,14 @@ class MultiResourceByDevice(RequestHandler):
                 seconds=1
         )
 
-        all_the_resources = resources.split('-')
+        all_the_resources = resource_identifiers.split('-')
         all_the_resources_final = all_the_resources[1:]
         now = datetime.datetime.now()
         ###########################################################
 
         array_of_transformed_record_data_by_location = [
             {
-                "resource": resource,
+                "resource": retrieve_resource_name_from_resource_id(resource),
                 "raw_data": program_record_for_resource_by_location(
                         midnight_start_day,
                         just_before_next_day_end_date,
@@ -146,10 +146,12 @@ class MultiResourceByDevice(RequestHandler):
                 array_of_transformed_record_data_by_location
         ))
 
+        resource_identifiers_to_resource_names = map(retrieve_resource_name_from_resource_id, all_the_resources_final)
+
         csv_to_publish = generate_resource_csv_by_device(
                 midnight_start_day,
                 just_before_next_day_end_date,
-                all_the_resources_final,
+                resource_identifiers_to_resource_names,
                 formatted_record_data_for_each_resource,
                 now
         )
@@ -160,7 +162,7 @@ class MultiResourceByDevice(RequestHandler):
 
 
 class MultiResourceByDate(RequestHandler):
-    def get(self, start_date, end_date, resources, tenant, distributor_key):
+    def get(self, start_date, end_date, resource_identifiers, tenant, distributor_key):
 
         if tenant not in get_tenant_names_for_distributor(distributor_key):
             self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
@@ -180,7 +182,7 @@ class MultiResourceByDate(RequestHandler):
                 seconds=1
         )
 
-        all_the_resources = resources.split('-')
+        all_the_resources = resource_identifiers.split('-')
         all_the_resources_final = all_the_resources[1:]
         now = datetime.datetime.now()
 
@@ -188,7 +190,7 @@ class MultiResourceByDate(RequestHandler):
 
         pre_formatted_program_record_by_date = [
             {
-                "resource": resource,
+                "resource": retrieve_resource_name_from_resource_id(resource),
                 # program_record is the transformed program record table data
                 "raw_data": program_record_for_resource_by_date(
                         midnight_start_day,
@@ -204,10 +206,12 @@ class MultiResourceByDate(RequestHandler):
                 pre_formatted_program_record_by_date
         )
 
+        resource_identifiers_to_resource_names = map(retrieve_resource_name_from_resource_id, all_the_resources_final)
+
         csv_to_publish = generate_resource_csv_by_date(
                 midnight_start_day,
                 just_before_next_day_end_date,
-                all_the_resources_final,
+                resource_identifiers_to_resource_names,
                 formatted_data,
                 now
         )

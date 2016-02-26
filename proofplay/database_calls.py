@@ -42,7 +42,18 @@ def retrieve_all_resources_of_tenant(tenant):
     session = Session()
     search = session.query(Resource).filter(Resource.tenant_code == tenant).all()
     session.close()
-    return [resource.resource_name for resource in search]
+    return [
+        {
+            "resource_name": resource.resource_name,
+            "resource_identifier": resource.resource_identifier
+        } for resource in search]
+
+
+def retrieve_resource_name_from_resource_id(resource_identifier):
+    session = Session()
+    resource_name = session.query(Resource).filter_by(resource_identifier=resource_identifier).first().resource_name
+    session.close()
+    return resource_name
 
 
 def retrieve_all_resources():
@@ -184,9 +195,9 @@ def program_record_for_resource_by_date(start_date, end_date, resource, tenant_c
     return all_results
 
 
-def get_raw_program_record_data_by_resource(start_date, end_date, resource, tenant_code):
+def get_raw_program_record_data_by_resource(start_date, end_date, resource_identifier, tenant_code):
     session = Session()
-    resource_id = session.query(Resource).filter_by(resource_name=resource).first().id
+    resource_id = session.query(Resource).filter_by(resource_identifier=resource_identifier).first().id
 
     rows = session.query(ProgramRecord).filter(
             ProgramRecord.ended_at.between(start_date, end_date)).filter(
@@ -198,7 +209,7 @@ def get_raw_program_record_data_by_resource(start_date, end_date, resource, tena
     for program_record in rows:
         d = {
             "location_id": program_record.full_location.customer_location_code,
-            "device_id": program_record.full_device.serial_number,
+            "device_id": program_record.full_device.customer_display_code,
             "resource_id": program_record.full_resource.resource_name,
             "started_at": program_record.started_at,
             "ended_at": program_record.ended_at
