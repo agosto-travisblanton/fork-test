@@ -531,6 +531,7 @@ class User(ndb.Model):
     is_administrator = ndb.BooleanProperty(default=False)
     stormpath_account_href = ndb.StringProperty()
     last_login = ndb.DateTimeProperty()
+    enabled = ndb.BooleanProperty(default=True)
 
     def _pre_put_hook(self):
         self.class_version = 1
