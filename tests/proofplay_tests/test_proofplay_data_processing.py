@@ -20,7 +20,10 @@ from proofplay.data_processing import (
     format_transformed_program_data_by_device,
     prepare_transformed_query_by_device_to_csv_by_date,
     generate_device_csv_summarized,
-    generate_device_csv_by_date
+    generate_device_csv_by_date,
+    transform_db_data_to_by_location_then_resource,
+    format_multi_location_by_device,
+    format_multi_location_summarized
 )
 
 
@@ -536,13 +539,108 @@ class TestDataProcessing(BaseTest):
         devices = ["my-device-3", "my-device-7"]
 
         expected_result = 'Creation Date,Start Date,End Date,Displays\r\n{},2016-02-01 00:00:00,2016-02-03 00:00:00,"my-device-3, my-device-7"\r\nDisplay,Location,Date,Content,Play Count\r\nmy-device-3,1001,2016-02-02 00:00:00,GSAD_4334,1\r\nmy-device-7,3001,2016-02-01 00:00:00,GSAD_5447,1\r\nmy-device-7,3001,2016-02-01 00:00:00,GSAD_2222,1\r\nmy-device-7,3001,2016-02-01 00:00:00,GSAD_4334,2\r\nmy-device-7,3001,2016-02-02 00:00:00,GSAD_2222,1\r\nmy-device-7,3001,2016-02-03 00:00:00,GSAD_5447,1\r\nmy-device-7,3001,2016-02-03 00:00:00,GSAD_2222,1\r\nmy-device-7,3001,2016-02-03 00:00:00,GSAD_4334,1\r\n'.format(
-            now)
+                now)
 
         start_time = datetime.datetime.strptime("Feb 1 2016", '%b %d %Y')
         end_time = datetime.datetime.strptime("Feb 3 2016", '%b %d %Y')
 
         self.assertEqual(generate_device_csv_by_date(now, start_time, end_time, devices, example_input).read(),
                          expected_result)
+
+    def test_transform_db_data_to_by_location_then_resource(self):
+        example_input = [
+            {'resource_id': 'GSAD_2222', 'started_at': datetime.datetime(2016, 1, 1, 15, 53, 11), 'location_id': '3001',
+             'device_id': 'my-device-9', 'ended_at': datetime.datetime(2016, 1, 1, 16, 3, 11)},
+            {'resource_id': 'GSAD_2222', 'started_at': datetime.datetime(2016, 1, 2, 14, 53, 11), 'location_id': '3001',
+             'device_id': 'my-device-8', 'ended_at': datetime.datetime(2016, 1, 2, 15, 3, 11)},
+            {'resource_id': 'GSAD_5533', 'started_at': datetime.datetime(2016, 1, 2, 15, 13, 11), 'location_id': '3001',
+             'device_id': 'my-device-7', 'ended_at': datetime.datetime(2016, 1, 2, 15, 23, 11)},
+            {'resource_id': 'GSAD_2222', 'started_at': datetime.datetime(2016, 1, 2, 16, 3, 11), 'location_id': '3001',
+             'device_id': 'my-device-9', 'ended_at': datetime.datetime(2016, 1, 2, 16, 13, 11)},
+            {'resource_id': 'GSAD_5533', 'started_at': datetime.datetime(2016, 1, 3, 14, 53, 11), 'location_id': '3001',
+             'device_id': 'my-device-8', 'ended_at': datetime.datetime(2016, 1, 3, 15, 3, 11)},
+            {'resource_id': 'GSAD_5533', 'started_at': datetime.datetime(2016, 1, 3, 15, 33, 11), 'location_id': '3001',
+             'device_id': 'my-device-8', 'ended_at': datetime.datetime(2016, 1, 3, 15, 43, 11)},
+            {'resource_id': 'GSAD_4334', 'started_at': datetime.datetime(2016, 1, 3, 15, 43, 11), 'location_id': '3001',
+             'device_id': 'my-device-8', 'ended_at': datetime.datetime(2016, 1, 3, 15, 53, 11)},
+            {'resource_id': 'GSAD_4334', 'started_at': datetime.datetime(2016, 1, 3, 16, 3, 11), 'location_id': '3001',
+             'device_id': 'my-device-7', 'ended_at': datetime.datetime(2016, 1, 3, 16, 13, 11)},
+            {'resource_id': 'GSAD_4334', 'started_at': datetime.datetime(2016, 1, 3, 16, 13, 11), 'location_id': '3001',
+             'device_id': 'my-device-9', 'ended_at': datetime.datetime(2016, 1, 3, 16, 23, 11)}
+        ]
+
+        expected_output = {'3001': OrderedDict([('GSAD_2222', [{'resource_id': 'GSAD_2222', 'device_id': 'my-device-9',
+                                                                'ended_at': datetime.datetime(2016, 1, 1, 16, 3, 11),
+                                                                'started_at': datetime.datetime(2016, 1, 1, 15, 53, 11),
+                                                                'location_id': '3001'},
+                                                               {'resource_id': 'GSAD_2222', 'device_id': 'my-device-8',
+                                                                'ended_at': datetime.datetime(2016, 1, 2, 15, 3, 11),
+                                                                'started_at': datetime.datetime(2016, 1, 2, 14, 53, 11),
+                                                                'location_id': '3001'},
+                                                               {'resource_id': 'GSAD_2222', 'device_id': 'my-device-9',
+                                                                'ended_at': datetime.datetime(2016, 1, 2, 16, 13, 11),
+                                                                'started_at': datetime.datetime(2016, 1, 2, 16, 3, 11),
+                                                                'location_id': '3001'}]), ('GSAD_5533', [
+            {'resource_id': 'GSAD_5533', 'device_id': 'my-device-7',
+             'ended_at': datetime.datetime(2016, 1, 2, 15, 23, 11),
+             'started_at': datetime.datetime(2016, 1, 2, 15, 13, 11), 'location_id': '3001'},
+            {'resource_id': 'GSAD_5533', 'device_id': 'my-device-8',
+             'ended_at': datetime.datetime(2016, 1, 3, 15, 3, 11),
+             'started_at': datetime.datetime(2016, 1, 3, 14, 53, 11), 'location_id': '3001'},
+            {'resource_id': 'GSAD_5533', 'device_id': 'my-device-8',
+             'ended_at': datetime.datetime(2016, 1, 3, 15, 43, 11),
+             'started_at': datetime.datetime(2016, 1, 3, 15, 33, 11), 'location_id': '3001'}]), ('GSAD_4334', [
+            {'resource_id': 'GSAD_4334', 'device_id': 'my-device-8',
+             'ended_at': datetime.datetime(2016, 1, 3, 15, 53, 11),
+             'started_at': datetime.datetime(2016, 1, 3, 15, 43, 11), 'location_id': '3001'},
+            {'resource_id': 'GSAD_4334', 'device_id': 'my-device-7',
+             'ended_at': datetime.datetime(2016, 1, 3, 16, 13, 11),
+             'started_at': datetime.datetime(2016, 1, 3, 16, 3, 11), 'location_id': '3001'},
+            {'resource_id': 'GSAD_4334', 'device_id': 'my-device-9',
+             'ended_at': datetime.datetime(2016, 1, 3, 16, 23, 11),
+             'started_at': datetime.datetime(2016, 1, 3, 16, 13, 11), 'location_id': '3001'}])])}
+
+        self.assertEqual(transform_db_data_to_by_location_then_resource(example_input), expected_output)
+
+    def test_format_multi_location_by_device(self):
+        example_input = {
+            "raw_data": {
+                "location-1": {
+                    "resource-one": [{
+                        "location_id": "my-customer-location-code",
+                        "device_id": "my-customer-display-code",
+                        "resource_id": "my-resource-name",
+                        "started_at": datetime.datetime(2016, 1, 3, 16, 3, 11),
+                        "ended_at": datetime.datetime(2016, 1, 3, 15, 53, 11)
+                    }]
+                }
+            }
+        }
+
+        expected_output = {
+            'location-1': OrderedDict([('resource-one', OrderedDict([('my-customer-display-code', 1)]))])}
+
+        self.assertEqual(format_multi_location_by_device(example_input), expected_output)
+
+    def test_format_multi_location_summarized(self):
+        example_input = {
+            "raw_data": {
+                "location-1": {
+                    "resource-one": [{
+                        "location_id": "my-customer-location-code",
+                        "device_id": "my-customer-display-code",
+                        "resource_id": "my-resource-name",
+                        "started_at": datetime.datetime(2016, 1, 3, 16, 3, 11),
+                        "ended_at": datetime.datetime(2016, 1, 3, 15, 53, 11)
+                    }]
+                }
+            }
+        }
+
+        expected_result = {'location-1': OrderedDict([('resource-one', 1)])}
+
+
+        self.assertEqual(format_multi_location_summarized(example_input), expected_result)
 
 
 if __name__ == '__main__':
