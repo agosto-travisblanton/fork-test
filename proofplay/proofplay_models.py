@@ -31,18 +31,29 @@ class ProgramPlayEvent(Base):
         self.completed = completed
 
 
+class TenantCode(Base):
+    __tablename__ = "tenant_code"
+
+    id = Column(Integer, primary_key=True)
+    tenant_code = Column(String(255), unique=True, nullable=False)
+
+    def __init__(self, tenant_code):
+        self.tenant_code = tenant_code
+
+
 class Resource(Base):
     __tablename__ = "resource"
 
     id = Column(Integer, primary_key=True)
     resource_name = Column(String(255), unique=False, nullable=False)
     resource_identifier = Column(String(255), unique=True, nullable=False)
-    tenant_code = Column(String(255), nullable=False)
+    tenant_id = Column(Integer, ForeignKey('tenant_code.id'), nullable=True)
+    tenant = relationship("TenantCode", backref="Resource")
 
-    def __init__(self, resource_name, resource_identifier, tenant_code):
+    def __init__(self, resource_name, resource_identifier, tenant_id):
         self.resource_name = resource_name
         self.resource_identifier = resource_identifier
-        self.tenant_code = tenant_code
+        self.tenant_id = tenant_id
 
 
 class Location(Base):
@@ -70,12 +81,13 @@ class Device(Base):
     serial_number = Column(String(255), nullable=False)
     device_key = Column(String(255), nullable=False)
     customer_display_code = Column(String(255))
-    tenant_code = Column(String(255), nullable=False)
+    tenant_id = Column(Integer, ForeignKey('tenant_code.id'), nullable=True)
+    tenant = relationship("TenantCode", backref="Device")
 
-    def __init__(self, serial_number, tenant_code, device_key, customer_display_code, location_id=None):
+    def __init__(self, serial_number, tenant_id, device_key, customer_display_code, location_id=None):
         self.location_id = location_id
         self.serial_number = serial_number
-        self.tenant_code = tenant_code
+        self.tenant_id = tenant_id
         self.customer_display_code = customer_display_code
         self.device_key = device_key
 

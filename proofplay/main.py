@@ -92,7 +92,6 @@ class PostNewProgramPlay(RequestHandler):
 class MultiResourceByDevice(RequestHandler):
     @has_tenant_in_distributor_param
     def get(self, start_date, end_date, resource_identifiers, tenant, distributor_key):
-
         ###########################################################
         # SETUP VARIABLES
         ###########################################################
@@ -147,7 +146,6 @@ class MultiResourceByDevice(RequestHandler):
 class MultiResourceByDate(RequestHandler):
     @has_tenant_in_distributor_param
     def get(self, start_date, end_date, resource_identifiers, tenant, distributor_key):
-
         ###########################################################
         # SETUP VARIABLES
         ###########################################################
@@ -207,7 +205,6 @@ class MultiResourceByDate(RequestHandler):
 class MultiDeviceSummarized(RequestHandler):
     @has_tenant_in_distributor_param
     def get(self, start_date, end_date, devices, tenant, distributor_key):
-
         ###########################################################
         # SETUP VARIABLES
         ###########################################################
@@ -258,7 +255,6 @@ class MultiDeviceSummarized(RequestHandler):
 class MultiDeviceByDate(RequestHandler):
     @has_tenant_in_distributor_param
     def get(self, start_date, end_date, devices, tenant, distributor_key):
-
         ###########################################################
         # SETUP VARIABLES
         ###########################################################
@@ -316,7 +312,6 @@ class MultiDeviceByDate(RequestHandler):
 class MultiLocationSummarized(RequestHandler):
     @has_tenant_in_distributor_param
     def get(self, start_date, end_date, locations, tenant, distributor_key):
-
         ###########################################################
         # SETUP VARIABLES
         ###########################################################
@@ -370,10 +365,8 @@ class MultiLocationSummarized(RequestHandler):
 
 
 class MultiLocationByDevice(RequestHandler):
-
     @has_tenant_in_distributor_param
     def get(self, start_date, end_date, locations, tenant, distributor_key):
-
         ###########################################################
         # SETUP VARIABLES
         ###########################################################
@@ -455,6 +448,10 @@ def handle_posting_a_new_program_play(incoming_data):
 
                 if not customer_display_code:
                     customer_display_code = "None"
+
+                insert_new_tenant_code_or_get_existing(
+                        tenant_code
+                )
 
                 resource_id = insert_new_resource_or_get_existing(
                         resource_name,

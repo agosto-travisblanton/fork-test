@@ -4,7 +4,7 @@ setup_test_paths()
 
 from agar.test import WebTest
 from base_sql_test_config import SQLBaseTest
-from proofplay.proofplay_models import Resource, ProgramRecord
+from proofplay.proofplay_models import Resource, ProgramRecord, TenantCode
 from routes_proofplay import application
 import json
 from proofplay.dev.make_mock_data import make_one_days_worth_of_data
@@ -48,6 +48,8 @@ class TestMain(SQLBaseTest, WebTest):
             'Authorization': config.API_TOKEN,
             'X-Provisioning-Distributor': self.distributor_key.urlsafe()
         }
+
+        self.load_tenant()
 
     def test_multi_device_by_date_api(self):
         self.load_tenants()
@@ -254,17 +256,26 @@ class TestMain(SQLBaseTest, WebTest):
         insert_new_device_or_get_existing(location_id, device_serial, device_key, self.one_device_customer_display_code,
                                           self.tenant_code)
 
+    def load_tenant(self):
+        new_tenant = TenantCode(
+                tenant_code=self.tenant_code
+        )
+
+        self.db_session.add(new_tenant)
+        self.db_session.commit()
+        self.tenant_id = new_tenant.id
+
     def load_resources(self):
         new_resource = Resource(
                 resource_name="test",
                 resource_identifier="1234",
-                tenant_code=self.tenant_code
+                tenant_id=self.tenant_id
         )
         self.db_session.add(new_resource)
         another_new_resource = Resource(
                 resource_name="test2",
                 resource_identifier="5678",
-                tenant_code=self.tenant_code
+                tenant_id=self.tenant_id
 
         )
         self.db_session.add(another_new_resource)

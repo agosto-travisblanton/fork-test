@@ -1,9 +1,10 @@
 from env_setup import setup_test_paths
+
 setup_test_paths()
 
 from base_sql_test_config import SQLBaseTest
 import datetime
-from proofplay.proofplay_models import Resource, ProgramRecord, Device, Location
+from proofplay.proofplay_models import Resource, ProgramRecord, Device, Location, TenantCode
 from collections import OrderedDict
 
 from proofplay.database_calls import (
@@ -20,7 +21,8 @@ from proofplay.database_calls import (
     program_record_for_device_summarized,
     retrieve_all_locations_of_tenant,
     get_raw_program_record_data_by_location,
-    program_record_for_location_summarized
+    program_record_for_location_summarized,
+    insert_new_tenant_code_or_get_existing
 )
 
 
@@ -35,7 +37,21 @@ class TestDatabase(SQLBaseTest):
     started_at = datetime.datetime(2016, 2, 2, 15, 31, 43, 683139)
     ended_at = datetime.datetime(2016, 2, 2, 16, 31, 43, 683139)
 
+    def setUp(self):
+        super(TestDatabase, self).setUp()
+        self.load_one_tenant()
+
+
+    def load_one_tenant(self):
+        self.tenant_id = insert_new_tenant_code_or_get_existing(self.tenant_code)
+
+    def test_insert_new_tenant(self):
+        insert_new_tenant_code_or_get_existing(self.tenant_code)
+        tenant_code = self.db_session.query(TenantCode).filter_by(tenant_code=self.tenant_code).first()
+        self.assertEqual(self.tenant_code, tenant_code.tenant_code)
+
     def test_insert_new_resource(self):
+        self.test_insert_new_tenant()
         insert_new_resource_or_get_existing(self.resource_name, self.resource_id, self.tenant_code)
         resource = self.db_session.query(Resource).filter_by(resource_name=self.resource_name).first()
         self.assertEqual(resource.resource_name, self.resource_name)
@@ -53,6 +69,7 @@ class TestDatabase(SQLBaseTest):
         self.assertEqual(resources, [self.resource_name, "new_resource"])
 
     def test_insert_new_location(self):
+        self.test_insert_new_tenant()
         insert_new_location_or_get_existing(self.customer_location_code)
         resource = self.db_session.query(Location).filter_by(customer_location_code=self.customer_location_code).first()
         self.assertEqual(resource.customer_location_code, self.customer_location_code)
@@ -70,7 +87,7 @@ class TestDatabase(SQLBaseTest):
         device = self.db_session.query(Device).filter_by(serial_number=self.device_serial).first()
         self.assertEqual(device.serial_number, self.device_serial)
         self.assertEqual(device.device_key, self.device_key)
-        self.assertEqual(device.tenant_code, self.tenant_code)
+        self.assertEqual(device.tenant_id, self.tenant_id)
         self.assertEqual(device.full_location.customer_location_code, self.customer_location_code)
 
     def test_insert_new_program_record(self):
