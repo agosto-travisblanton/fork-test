@@ -108,7 +108,7 @@ class MultiResourceByDevice(RequestHandler):
                 seconds=1
         )
 
-        all_the_resources = resource_identifiers.split('-')
+        all_the_resources = resource_identifiers.split("|")
         all_the_resources_final = all_the_resources[1:]
         now = datetime.datetime.now()
         ###########################################################
@@ -162,7 +162,7 @@ class MultiResourceByDate(RequestHandler):
                 seconds=1
         )
 
-        all_the_resources = resource_identifiers.split('-')
+        all_the_resources = resource_identifiers.split("|")
         all_the_resources_final = all_the_resources[1:]
         now = datetime.datetime.now()
 
@@ -222,7 +222,7 @@ class MultiDeviceSummarized(RequestHandler):
                 seconds=1
         )
 
-        all_the_devices = devices.split(',')
+        all_the_devices = devices.split("|")
         all_the_devices_final = all_the_devices[1:]
         now = datetime.datetime.now()
 
@@ -273,7 +273,7 @@ class MultiDeviceByDate(RequestHandler):
                 seconds=1
         )
 
-        all_the_devices = devices.split(',')
+        all_the_devices = devices.split("|")
         all_the_devices_final = all_the_devices[1:]
         now = datetime.datetime.now()
 
@@ -331,7 +331,7 @@ class MultiLocationSummarized(RequestHandler):
                 seconds=1
         )
 
-        all_the_locations = locations.split(',')
+        all_the_locations = locations.split("|")
         all_the_locations_final = all_the_locations[1:]
         now = datetime.datetime.now()
 
@@ -388,7 +388,7 @@ class MultiLocationByDevice(RequestHandler):
                 seconds=1
         )
 
-        all_the_locations = locations.split(',')
+        all_the_locations = locations.split("|")
         all_the_locations_final = all_the_locations[1:]
         now = datetime.datetime.now()
 

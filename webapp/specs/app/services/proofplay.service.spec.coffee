@@ -65,7 +65,7 @@ describe 'ProofPlayService', ->
       allResources = []
 
       for each in resources
-        allResources = allResources + "-" + each
+        allResources = allResources + "|" + each
 
       expect(window.open).toHaveBeenCalledWith('proofplay/api/v1/multi_resource_by_date/' + start_date + '/' + end_date + '/' + allResources + "/" + tenants[0] + "/" + cookie_token, '_blank')
 
@@ -83,7 +83,7 @@ describe 'ProofPlayService', ->
       allResources = ''
 
       for each in resources
-        allResources = allResources + "-" + each
+        allResources = allResources + "|" + each
 
 
       expect(window.open).toHaveBeenCalledWith('proofplay/api/v1/multi_resource_by_device/' + start_date + '/' + end_date + '/' + allResources + "/" + tenants[0] + "/" + cookie_token, '_blank')
@@ -101,7 +101,7 @@ describe 'ProofPlayService', ->
       allDevices = ''
 
       for each in devices
-        allDevices = allDevices + "," + each
+        allDevices = allDevices + "|" + each
 
 
       expect(window.open).toHaveBeenCalledWith('proofplay/api/v1/multi_device_summarized/' + start_date + '/' + end_date + '/' + allDevices + "/" + tenants[0] + "/" + cookie_token, '_blank')
@@ -118,7 +118,7 @@ describe 'ProofPlayService', ->
       allDevices = ''
 
       for each in devices
-        allDevices = allDevices + "," + each
+        allDevices = allDevices + "|" + each
 
 
       expect(window.open).toHaveBeenCalledWith('proofplay/api/v1/multi_device_by_date/' + start_date + '/' + end_date + '/' + allDevices + "/" + tenants[0] + "/" + cookie_token, '_blank')
@@ -135,7 +135,7 @@ describe 'ProofPlayService', ->
       allLocations = ''
 
       for each in locations
-        allLocations = allLocations + "," + each
+        allLocations = allLocations + "|" + each
 
 
       expect(window.open).toHaveBeenCalledWith('proofplay/api/v1/multi_location_by_device/' + start_date + '/' + end_date + '/' + allLocations + "/" + tenants[0] + "/" + cookie_token, '_blank')
@@ -153,7 +153,7 @@ describe 'ProofPlayService', ->
       allLocations = ''
 
       for each in locations
-        allLocations = allLocations + "," + each
+        allLocations = allLocations + "|" + each
 
 
       expect(window.open).toHaveBeenCalledWith('proofplay/api/v1/multi_location_summarized/' + start_date + '/' + end_date + '/' + allLocations + "/" + tenants[0] + "/" + cookie_token, '_blank')

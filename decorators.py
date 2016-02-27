@@ -132,7 +132,6 @@ def has_tenant_in_distributor_header(handler_method):
 
 def has_tenant_in_distributor_param(handler_method):
     def authorize(self, *args, **kwargs):
-        print self
         distributor_key = kwargs['distributor_key']
         tenants = get_tenant_names_for_distributor(distributor_key)
         tenant = kwargs['tenant']

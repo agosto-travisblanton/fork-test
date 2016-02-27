@@ -1,11 +1,11 @@
 from env_setup import setup_test_paths
-
 setup_test_paths()
 
 from base_sql_test_config import SQLBaseTest
 import datetime
 from proofplay.proofplay_models import Resource, ProgramRecord, Device, Location
 from collections import OrderedDict
+
 from proofplay.database_calls import (
     insert_new_resource_or_get_existing,
     insert_new_program_record,
