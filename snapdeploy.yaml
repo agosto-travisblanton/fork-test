@@ -1,6 +1,6 @@
-hash: 108f37cfe5
+hash: 8637471da0
 module_yaml_files:
 - app.yaml
 - migration.yaml
 - proofplay.yaml
-version: 39
+version: 40
