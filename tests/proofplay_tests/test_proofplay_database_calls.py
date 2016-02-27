@@ -43,7 +43,8 @@ class TestDatabase(SQLBaseTest):
     def test_retrieve_all_resources_of_tenant(self):
         self.test_insert_new_resource()
         resources = retrieve_all_resources_of_tenant(self.tenant_code)
-        self.assertEqual(resources, [self.resource_name])
+        self.assertEqual(resources, [
+            {'resource_identifier': unicode(self.resource_id), 'resource_name': unicode(self.resource_name)}])
 
     def test_retrieve_all_resources(self):
         self.test_insert_new_resource()
@@ -73,7 +74,7 @@ class TestDatabase(SQLBaseTest):
         self.assertEqual(device.full_location.customer_location_code, self.customer_location_code)
 
     def test_insert_new_program_record(self):
-        resource_id = insert_new_resource_or_get_existing(self.resource_name, self.resource_id, "gamestop")
+        resource_id = insert_new_resource_or_get_existing(self.resource_name, self.resource_id, self.tenant_code)
         location_id = insert_new_location_or_get_existing(self.customer_location_code)
 
         device_id = insert_new_device_or_get_existing(
@@ -107,7 +108,7 @@ class TestDatabase(SQLBaseTest):
                     'started_at': datetime.datetime(2016, 2, 2, 15, 31, 43, 683139),
                     'ended_at': datetime.datetime(2016, 2, 2, 16, 31, 43, 683139),
                     'resource_id': u'some_resource', 'location_id': u'6025',
-                    'device_id': u'some_display_code'}
+                    'device_id': unicode(self.customer_display_code)}
             ]
         }
 
@@ -130,7 +131,7 @@ class TestDatabase(SQLBaseTest):
                     'ended_at': datetime.datetime(2016, 2, 2, 16, 31, 43, 683139),
                     'resource_id': u'some_resource',
                     'location_id': u'6025',
-                    'device_id': u'some_display_code'
+                    'device_id': unicode(self.customer_display_code)
                 }
             ]
         }
@@ -171,11 +172,12 @@ class TestDatabase(SQLBaseTest):
     def test_get_raw_program_record_data_for_resource_between_date_ranges_by_location(self):
         self.test_insert_new_program_record()
         expected_output = {
-            u'62525': [
+            unicode(self.customer_display_code): [
                 {
                     'started_at': datetime.datetime(2016, 2, 2, 15, 31, 43, 683139),
                     'ended_at': datetime.datetime(2016, 2, 2, 16, 31, 43, 683139),
-                    'resource_id': u'some_resource', 'location_id': u'6025', 'device_id': u'62525'
+                    'resource_id': u'some_resource', 'location_id': u'6025',
+                    'device_id': unicode(self.customer_display_code)
                 }
             ]
         }
@@ -183,7 +185,7 @@ class TestDatabase(SQLBaseTest):
         self.assertEqual(program_record_for_resource_by_location(
                 self.started_at,
                 self.ended_at,
-                self.resource_name,
+                self.resource_id,
                 self.tenant_code
         ), expected_output)
 
@@ -235,8 +237,9 @@ class TestDatabase(SQLBaseTest):
             '2016-02-02 00:00:00': [
                 {
                     'started_at': datetime.datetime(2016, 2, 2, 15, 31, 43, 683139),
-                    'ended_at': datetime.datetime(2016, 2, 2, 16, 31, 43, 683139), 'resource_id': u'some_resource',
-                    'location_id': u'6025', 'device_id': u'62525'
+                    'ended_at': datetime.datetime(2016, 2, 2, 16, 31, 43, 683139),
+                    'resource_id': u'some_resource',
+                    'location_id': u'6025', 'device_id': unicode(self.customer_display_code)
                 }
             ]
         }
@@ -244,7 +247,7 @@ class TestDatabase(SQLBaseTest):
         self.assertEqual(program_record_for_resource_by_date(
                 self.started_at,
                 self.ended_at,
-                self.resource_name,
+                self.resource_id,
                 self.tenant_code
 
         ), expected_output)

@@ -162,10 +162,10 @@ class TestMain(SQLBaseTest, WebTest):
         end_date = start_date - datetime.timedelta(days=5)
         start_unix = int(time.mktime(start_date.timetuple()))
         end_unix = int(time.mktime(end_date.timetuple()))
-        resources = ["test", "test2"]
+        resource_identifiers = ["1234", "5678"]
 
         all_resources = ''
-        for item in resources:
+        for item in resource_identifiers:
             all_resources = "-" + item
 
         uri = build_uri('MultiResourceByDevice', module='proofplay', params_dict={
@@ -188,7 +188,7 @@ class TestMain(SQLBaseTest, WebTest):
         end_date = start_date - datetime.timedelta(days=5)
         start_unix = int(time.mktime(start_date.timetuple()))
         end_unix = int(time.mktime(end_date.timetuple()))
-        resources = ["test", "test2"]
+        resources = ["1234", "5678"]
 
         all_resources = ''
         for item in resources:
@@ -228,7 +228,10 @@ class TestMain(SQLBaseTest, WebTest):
         uri = build_uri('RetrieveAllResources', module='proofplay', params_dict={'tenant': self.tenant_code})
         response = self.app.get(uri, headers=self.headers)
 
-        self.assertEqual(json.loads(response.body), {u'resources': [u'test', u'test2']})
+        self.assertEqual(json.loads(response.body),
+                         {u'resources': [{u'resource_identifier': u'1234', u'resource_name': u'test'},
+                                         {u'resource_identifier': u'5678', u'resource_name': u'test2'}]
+                          })
 
     def test_get_all_devices(self):
         self.load_tenants()
@@ -274,7 +277,7 @@ class TestMain(SQLBaseTest, WebTest):
                                impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                active=True)
         domain_key = domain.put()
-        tenant = Tenant.create(tenant_code='gamestop',
+        tenant = Tenant.create(tenant_code=self.tenant_code,
                                name=self.tenant_code,
                                admin_email=self.ADMIN_EMAIL,
                                content_server_url=self.CONTENT_SERVER_URL,

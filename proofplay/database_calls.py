@@ -313,4 +313,4 @@ def get_tenant_list_from_distributor_key(distributor_key):
 
 
 def get_tenant_names_for_distributor(distributor_key):
-    return [result.tenant_code for result in get_tenant_list_from_distributor_key(distributor_key)]
+    return [result.tenant_code.encode('ascii', 'ignore') for result in get_tenant_list_from_distributor_key(distributor_key)]

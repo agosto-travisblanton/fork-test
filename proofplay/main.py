@@ -8,6 +8,7 @@ from db import SQLALCHEMY_DATABASE_URI
 from alembic import command
 import os
 from routes_proofplay import basedir
+from decorators import has_tenant_in_distributor_header, has_distributor_key, has_tenant_in_distributor_param
 
 
 ####################################################################################
@@ -34,12 +35,9 @@ class MakeMigration(RequestHandler):
 # REST CALLS
 ####################################################################################
 class GetTenants(RequestHandler):
+    @has_distributor_key
     def get(self):
         distributor = self.request.headers.get('X-Provisioning-Distributor')
-        if not distributor:
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
-
         tenants = get_tenant_names_for_distributor(distributor)
         json_final = json.dumps({"tenants": tenants})
         self.response.headers['Content-Type'] = 'application/json'
@@ -47,12 +45,8 @@ class GetTenants(RequestHandler):
 
 
 class RetrieveAllDevicesOfTenant(RequestHandler):
+    @has_tenant_in_distributor_header
     def get(self, tenant):
-        tenants = get_tenant_names_for_distributor(self.request.headers.get('X-Provisioning-Distributor'))
-        if tenant not in tenants:
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
-
         devices = retrieve_all_devices_of_tenant(tenant)
         final = json.dumps({"devices": devices})
         self.response.headers['Content-Type'] = 'application/json'
@@ -60,12 +54,8 @@ class RetrieveAllDevicesOfTenant(RequestHandler):
 
 
 class RetrieveAllResourcesOfTenant(RequestHandler):
+    @has_tenant_in_distributor_header
     def get(self, tenant):
-        tenants = get_tenant_names_for_distributor(self.request.headers.get('X-Provisioning-Distributor'))
-        if tenant not in tenants:
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
-
         resources = retrieve_all_resources_of_tenant(tenant)
         final = json.dumps({"resources": resources})
         self.response.headers['Content-Type'] = 'application/json'
@@ -73,12 +63,8 @@ class RetrieveAllResourcesOfTenant(RequestHandler):
 
 
 class RetrieveAllLocationsOfTenant(RequestHandler):
+    @has_tenant_in_distributor_header
     def get(self, tenant):
-        tenants = get_tenant_names_for_distributor(self.request.headers.get('X-Provisioning-Distributor'))
-        if tenant not in tenants:
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
-
         locations = retrieve_all_locations_of_tenant(tenant)
         final = json.dumps({"locations": locations})
         self.response.headers['Content-Type'] = 'application/json'
@@ -104,11 +90,8 @@ class PostNewProgramPlay(RequestHandler):
 # RESOURCES
 ####################################################################################
 class MultiResourceByDevice(RequestHandler):
+    @has_tenant_in_distributor_param
     def get(self, start_date, end_date, resource_identifiers, tenant, distributor_key):
-
-        if tenant not in get_tenant_names_for_distributor(distributor_key):
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
 
         ###########################################################
         # SETUP VARIABLES
@@ -162,11 +145,8 @@ class MultiResourceByDevice(RequestHandler):
 
 
 class MultiResourceByDate(RequestHandler):
+    @has_tenant_in_distributor_param
     def get(self, start_date, end_date, resource_identifiers, tenant, distributor_key):
-
-        if tenant not in get_tenant_names_for_distributor(distributor_key):
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
 
         ###########################################################
         # SETUP VARIABLES
@@ -225,11 +205,8 @@ class MultiResourceByDate(RequestHandler):
 # DEVICES
 ####################################################################################
 class MultiDeviceSummarized(RequestHandler):
+    @has_tenant_in_distributor_param
     def get(self, start_date, end_date, devices, tenant, distributor_key):
-
-        if tenant not in get_tenant_names_for_distributor(distributor_key):
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
 
         ###########################################################
         # SETUP VARIABLES
@@ -279,11 +256,8 @@ class MultiDeviceSummarized(RequestHandler):
 
 
 class MultiDeviceByDate(RequestHandler):
+    @has_tenant_in_distributor_param
     def get(self, start_date, end_date, devices, tenant, distributor_key):
-
-        if tenant not in get_tenant_names_for_distributor(distributor_key):
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
 
         ###########################################################
         # SETUP VARIABLES
@@ -340,11 +314,8 @@ class MultiDeviceByDate(RequestHandler):
 # LOCATIONS
 ####################################################################################
 class MultiLocationSummarized(RequestHandler):
+    @has_tenant_in_distributor_param
     def get(self, start_date, end_date, locations, tenant, distributor_key):
-
-        if tenant not in get_tenant_names_for_distributor(distributor_key):
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
 
         ###########################################################
         # SETUP VARIABLES
@@ -399,11 +370,9 @@ class MultiLocationSummarized(RequestHandler):
 
 
 class MultiLocationByDevice(RequestHandler):
-    def get(self, start_date, end_date, locations, tenant, distributor_key):
 
-        if tenant not in get_tenant_names_for_distributor(distributor_key):
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
+    @has_tenant_in_distributor_param
+    def get(self, start_date, end_date, locations, tenant, distributor_key):
 
         ###########################################################
         # SETUP VARIABLES
