@@ -44,8 +44,8 @@ class Distributor(ndb.Model):
     name = ndb.StringProperty(required=True, indexed=True)
     # TODO Make admin_email required=True after migration run in prod
     admin_email = ndb.StringProperty(required=False, indexed=True)
-    player_content_url = ndb.StringProperty(required=True, indexed=True)
-    content_manager_url = ndb.StringProperty(required=True, indexed=True)
+    player_content_url = ndb.StringProperty(required=False, indexed=True)
+    content_manager_url = ndb.StringProperty(required=False, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
@@ -531,24 +531,49 @@ class User(ndb.Model):
     is_administrator = ndb.BooleanProperty(default=False)
     stormpath_account_href = ndb.StringProperty()
     last_login = ndb.DateTimeProperty()
+    enabled = ndb.BooleanProperty(default=True)
 
     def _pre_put_hook(self):
         self.class_version = 1
         if self.key is None or self.key.id() is None:
-            self.key = ndb.Key(User, self.email)
+            self.key = ndb.Key(User, self.email.lower())
+
+    @classmethod
+    def _build_key(cls, email):
+        key = ndb.Key(User, email.lower())
+        return key
+
+    @classmethod
+    def get_or_insert_by_email(cls, email, stormpath_account_href=None):
+        user = cls.get_by_email(email)
+        if user is None:
+            key = cls._build_key(email)
+            user = User(key=key, email=email, stormpath_account_href=stormpath_account_href)
+            user.put()
+        else:
+            if user.stormpath_account_href != stormpath_account_href and stormpath_account_href is not None:
+                user.stormpath_account_href = stormpath_account_href
+                user.put()
+        return user
 
     @classmethod
     def get_by_email(cls, email):
-        return ndb.Key(User, email).get()
+        key = cls._build_key(email)
+        return key.get()
 
     @classmethod
     def update_or_create_with_api_account(cls, account):
         user = None
-        if account.href:
+        if account and account.href:
             user = cls.query(cls.stormpath_account_href == account.href).get()
             if user is None:
-                user = User.get_or_insert(account.email, email=account.email, stormpath_account_href=account.href)
+                user = cls.get_or_insert_by_email(account.email, stormpath_account_href=account.href)
         return user
+
+    @classmethod
+    def test_create(cls, email, stormpath_account_href='https://api.stormpath.com/v1/accounts/'):
+        return cls(email=email,
+                   stormpath_account_href=stormpath_account_href)
 
     @property
     def distributor_keys(self):
