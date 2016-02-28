@@ -4,7 +4,7 @@ setup_test_paths()
 
 from agar.test import WebTest
 from base_sql_test_config import SQLBaseTest
-from proofplay.proofplay_models import Resource, ProgramRecord
+from proofplay.proofplay_models import Resource, ProgramRecord, TenantCode
 from routes_proofplay import application
 import json
 from proofplay.dev.make_mock_data import make_one_days_worth_of_data
@@ -28,6 +28,7 @@ class TestMain(SQLBaseTest, WebTest):
     ORIGINAL_NOTIFICATION_EMAILS = ['test@skykit.com', 'admin@skykit.com']
     tenant_code = "gamestop"
     one_device_customer_display_code = "my-device"
+    location_code = "6025"
 
     def setUp(self):
         super(TestMain, self).setUp()
@@ -48,6 +49,8 @@ class TestMain(SQLBaseTest, WebTest):
             'X-Provisioning-Distributor': self.distributor_key.urlsafe()
         }
 
+        self.load_tenant()
+
     def test_multi_device_by_date_api(self):
         self.load_tenants()
         self.load_resources()
@@ -67,6 +70,58 @@ class TestMain(SQLBaseTest, WebTest):
             'tenant': self.tenant_code,
             'distributor_key': self.distributor_key.urlsafe(),
             'devices': all_devices,
+            'start_date': start_unix,
+            'end_date': end_unix
+        })
+
+        response = self.app.get(uri, headers=self.headers)
+        self.assertEqual(200, response.status_int)
+
+    def test_multi_location_summarized(self):
+        self.load_tenants()
+        self.load_resources()
+        self.load_one_device()
+
+        start_date = datetime.datetime.now()
+        end_date = start_date - datetime.timedelta(days=5)
+        start_unix = int(time.mktime(start_date.timetuple()))
+        end_unix = int(time.mktime(end_date.timetuple()))
+        locations = [self.location_code]
+
+        all_locations = ''
+        for item in locations:
+            all_locations = "," + item
+
+        uri = build_uri('MultiLocationSummarized', module='proofplay', params_dict={
+            'tenant': self.tenant_code,
+            'distributor_key': self.distributor_key.urlsafe(),
+            'locations': all_locations,
+            'start_date': start_unix,
+            'end_date': end_unix
+        })
+
+        response = self.app.get(uri, headers=self.headers)
+        self.assertEqual(200, response.status_int)
+
+    def test_multi_location_by_device(self):
+        self.load_tenants()
+        self.load_resources()
+        self.load_one_device()
+
+        start_date = datetime.datetime.now()
+        end_date = start_date - datetime.timedelta(days=5)
+        start_unix = int(time.mktime(start_date.timetuple()))
+        end_unix = int(time.mktime(end_date.timetuple()))
+        locations = [self.location_code]
+
+        all_locations = ''
+        for item in locations:
+            all_locations = "," + item
+
+        uri = build_uri('MultiLocationByDevice', module='proofplay', params_dict={
+            'tenant': self.tenant_code,
+            'distributor_key': self.distributor_key.urlsafe(),
+            'locations': all_locations,
             'start_date': start_unix,
             'end_date': end_unix
         })
@@ -100,7 +155,6 @@ class TestMain(SQLBaseTest, WebTest):
         response = self.app.get(uri, headers=self.headers)
         self.assertEqual(200, response.status_int)
 
-
     def test_multi_resource_by_device_api(self):
         self.load_tenants()
         self.load_resources()
@@ -110,16 +164,16 @@ class TestMain(SQLBaseTest, WebTest):
         end_date = start_date - datetime.timedelta(days=5)
         start_unix = int(time.mktime(start_date.timetuple()))
         end_unix = int(time.mktime(end_date.timetuple()))
-        resources = ["test", "test2"]
+        resource_identifiers = ["1234", "5678"]
 
         all_resources = ''
-        for item in resources:
+        for item in resource_identifiers:
             all_resources = "-" + item
 
         uri = build_uri('MultiResourceByDevice', module='proofplay', params_dict={
             'tenant': self.tenant_code,
             'distributor_key': self.distributor_key.urlsafe(),
-            'resources': all_resources,
+            'resource_identifiers': all_resources,
             'start_date': start_unix,
             'end_date': end_unix
         })
@@ -136,7 +190,7 @@ class TestMain(SQLBaseTest, WebTest):
         end_date = start_date - datetime.timedelta(days=5)
         start_unix = int(time.mktime(start_date.timetuple()))
         end_unix = int(time.mktime(end_date.timetuple()))
-        resources = ["test", "test2"]
+        resources = ["1234", "5678"]
 
         all_resources = ''
         for item in resources:
@@ -145,7 +199,7 @@ class TestMain(SQLBaseTest, WebTest):
         uri = build_uri('MultiResourceByDate', module='proofplay', params_dict={
             'tenant': self.tenant_code,
             'distributor_key': self.distributor_key.urlsafe(),
-            'resources': all_resources,
+            'resource_identifiers': all_resources,
             'start_date': start_unix,
             'end_date': end_unix
         })
@@ -160,6 +214,15 @@ class TestMain(SQLBaseTest, WebTest):
         response = self.app.get(uri, headers=self.headers)
         self.assertEqual(json.loads(response.body), {u'tenants': [u'gamestop']})
 
+    def test_get_all_locations_of_tenant(self):
+        self.load_tenants()
+        self.load_one_device()
+
+        uri = build_uri('RetrieveAllLocationsOfTenant', module='proofplay', params_dict={'tenant': self.tenant_code})
+        response = self.app.get(uri, headers=self.headers)
+
+        self.assertEqual(json.loads(response.body), {u'locations': [unicode(self.location_code)]})
+
     def test_get_all_resources(self):
         self.load_tenants()
         self.load_resources()
@@ -167,7 +230,10 @@ class TestMain(SQLBaseTest, WebTest):
         uri = build_uri('RetrieveAllResources', module='proofplay', params_dict={'tenant': self.tenant_code})
         response = self.app.get(uri, headers=self.headers)
 
-        self.assertEqual(json.loads(response.body), {u'resources': [u'test', u'test2']})
+        self.assertEqual(json.loads(response.body),
+                         {u'resources': [{u'resource_identifier': u'1234', u'resource_name': u'test'},
+                                         {u'resource_identifier': u'5678', u'resource_name': u'test2'}]
+                          })
 
     def test_get_all_devices(self):
         self.load_tenants()
@@ -186,21 +252,30 @@ class TestMain(SQLBaseTest, WebTest):
     def load_one_device(self):
         device_serial = "1234"
         device_key = "5443"
-        location_id = insert_new_location_or_get_existing("6025")
+        location_id = insert_new_location_or_get_existing(self.location_code)
         insert_new_device_or_get_existing(location_id, device_serial, device_key, self.one_device_customer_display_code,
                                           self.tenant_code)
+
+    def load_tenant(self):
+        new_tenant = TenantCode(
+                tenant_code=self.tenant_code
+        )
+
+        self.db_session.add(new_tenant)
+        self.db_session.commit()
+        self.tenant_id = new_tenant.id
 
     def load_resources(self):
         new_resource = Resource(
                 resource_name="test",
                 resource_identifier="1234",
-                tenant_code=self.tenant_code
+                tenant_id=self.tenant_id
         )
         self.db_session.add(new_resource)
         another_new_resource = Resource(
                 resource_name="test2",
                 resource_identifier="5678",
-                tenant_code=self.tenant_code
+                tenant_id=self.tenant_id
 
         )
         self.db_session.add(another_new_resource)
@@ -213,7 +288,7 @@ class TestMain(SQLBaseTest, WebTest):
                                impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                active=True)
         domain_key = domain.put()
-        tenant = Tenant.create(tenant_code='gamestop',
+        tenant = Tenant.create(tenant_code=self.tenant_code,
                                name=self.tenant_code,
                                admin_email=self.ADMIN_EMAIL,
                                content_server_url=self.CONTENT_SERVER_URL,
