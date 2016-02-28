@@ -30,7 +30,8 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService) ->
     ProofPlayService.getAllResources()
     .then (data) =>
       @loading = false
-      @resources = data.data.resources
+      @full_resource_map = data.data.resources
+      @resources = (resource.resource_name for resource in data.data.resources)
 
   @addToSelectedResources = (searchText) =>
     if @isResourceValid(searchText)
@@ -96,10 +97,16 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService) ->
       @disabled = true
 
   @submit = () =>
+    resources_as_ids = []
+    for item in @final.resources
+      for each in @full_resource_map
+        if each["resource_name"] == item
+          resources_as_ids.push each["resource_identifier"]
+
     if @final.type is "1"
-      ProofPlayService.downloadCSVForMultipleResourcesByDevice(@final.start_date_unix, @final.end_date_unix, @final.resources)
+      ProofPlayService.downloadCSVForMultipleResourcesByDevice(@final.start_date_unix, @final.end_date_unix, resources_as_ids)
 
     else
-      ProofPlayService.downloadCSVForMultipleResourcesByDate(@final.start_date_unix, @final.end_date_unix, @final.resources)
+      ProofPlayService.downloadCSVForMultipleResourcesByDate(@final.start_date_unix, @final.end_date_unix, resources_as_ids)
 
   @

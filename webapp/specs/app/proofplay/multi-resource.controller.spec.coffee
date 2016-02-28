@@ -49,7 +49,7 @@ describe 'ProofOfPlayMultiResourceCtrl', ->
   describe '.initialize', ->
     resourcesData = {
       data: {
-        resources: ["one resource", "two resource", "three resource", "four"]
+        resources: [{"resource_name": "one resource"}]
       }
     }
 
@@ -79,7 +79,7 @@ describe 'ProofOfPlayMultiResourceCtrl', ->
     it "the 'then' handler caches the retrieved resources data in the controller and loading to be done", ->
       controller.initialize()
       promise.resolve resourcesData
-      expect(controller.resources).toBe resourcesData.data.resources
+      expect(controller.full_resource_map).toBe resourcesData.data.resources
       expect(controller.loading).toBeFalsy()
 
 
@@ -98,11 +98,11 @@ describe 'ProofOfPlayMultiResourceCtrl', ->
       controller.initialize()
       promise.resolve resourcesData
 
-      controller.selected_resources = [resourcesData.data.resources[0]]
-      resourceValidity = controller.isResourceValid(resourcesData.data.resources[0])
+      controller.selected_resources = [resourcesData.data.resources[0]["resource_name"]]
+      resourceValidity = controller.isResourceValid(resourcesData.data.resources[0]["resource_name"])
       expect(resourceValidity).toBeFalsy()
       controller.selected_resources = []
-      newResourceValidity = controller.isResourceValid(resourcesData.data.resources[0])
+      newResourceValidity = controller.isResourceValid(resourcesData.data.resources[0]["resource_name"])
       expect(newResourceValidity).toBeTruthy()
       newResourceValidity = controller.isResourceValid("something not in resources")
       expect(newResourceValidity).toBeFalsy()
@@ -125,8 +125,8 @@ describe 'ProofOfPlayMultiResourceCtrl', ->
     it 'adds to selected resource if resource is valid', ->
       controller.initialize()
       promise.resolve resourcesData
-      controller.addToSelectedResources(resourcesData.data.resources[0])
-      expect(angular.equals(controller.resources, ["two resource", "three resource", "four"])).toBeTruthy()
+      controller.addToSelectedResources(resourcesData.data.resources[0]["resource_name"])
+      expect(angular.equals(controller.resources, [])).toBeTruthy()
       expect(angular.equals(controller.selected_resources, ['one resource'])).toBeTruthy()
 
 
@@ -142,9 +142,11 @@ describe 'ProofOfPlayMultiResourceCtrl', ->
       controller.final = {
         start_date_unix: moment(new Date()).unix(),
         end_date_unix: moment(new Date()).unix(),
-        resources: ["some", "resources"],
+        resources: ["one resource"],
         type: "1"
       }
+      controller.full_resource_map = resourcesData.data.resources
+
       controller.submit()
       expect(ProofPlayService.downloadCSVForMultipleResourcesByDevice).toHaveBeenCalled()
 

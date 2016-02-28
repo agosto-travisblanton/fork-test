@@ -8,6 +8,7 @@ from db import SQLALCHEMY_DATABASE_URI
 from alembic import command
 import os
 from routes_proofplay import basedir
+from decorators import has_tenant_in_distributor_header, has_distributor_key, has_tenant_in_distributor_param
 
 
 ####################################################################################
@@ -22,7 +23,7 @@ class MakeMigration(RequestHandler):
             alembic_cfg.set_main_option('sqlalchemy.url', SQLALCHEMY_DATABASE_URI)
             command.upgrade(alembic_cfg, "head")
             self.response.out.write(
-                    "SUCCESS. Migrations Applied Successfully (or no change to model schema neccesasary.")
+                    "SUCCESS. Migrations Applied Successfully (or no change to model schema necessary).")
 
         except Exception as e:
             print e
@@ -34,12 +35,9 @@ class MakeMigration(RequestHandler):
 # REST CALLS
 ####################################################################################
 class GetTenants(RequestHandler):
+    @has_distributor_key
     def get(self):
         distributor = self.request.headers.get('X-Provisioning-Distributor')
-        if not distributor:
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
-
         tenants = get_tenant_names_for_distributor(distributor)
         json_final = json.dumps({"tenants": tenants})
         self.response.headers['Content-Type'] = 'application/json'
@@ -47,12 +45,8 @@ class GetTenants(RequestHandler):
 
 
 class RetrieveAllDevicesOfTenant(RequestHandler):
+    @has_tenant_in_distributor_header
     def get(self, tenant):
-        tenants = get_tenant_names_for_distributor(self.request.headers.get('X-Provisioning-Distributor'))
-        if tenant not in tenants:
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
-
         devices = retrieve_all_devices_of_tenant(tenant)
         final = json.dumps({"devices": devices})
         self.response.headers['Content-Type'] = 'application/json'
@@ -60,12 +54,8 @@ class RetrieveAllDevicesOfTenant(RequestHandler):
 
 
 class RetrieveAllResourcesOfTenant(RequestHandler):
+    @has_tenant_in_distributor_header
     def get(self, tenant):
-        tenants = get_tenant_names_for_distributor(self.request.headers.get('X-Provisioning-Distributor'))
-        if tenant not in tenants:
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
-
         resources = retrieve_all_resources_of_tenant(tenant)
         final = json.dumps({"resources": resources})
         self.response.headers['Content-Type'] = 'application/json'
@@ -73,12 +63,8 @@ class RetrieveAllResourcesOfTenant(RequestHandler):
 
 
 class RetrieveAllLocationsOfTenant(RequestHandler):
+    @has_tenant_in_distributor_header
     def get(self, tenant):
-        tenants = get_tenant_names_for_distributor(self.request.headers.get('X-Provisioning-Distributor'))
-        if tenant not in tenants:
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
-
         locations = retrieve_all_locations_of_tenant(tenant)
         final = json.dumps({"locations": locations})
         self.response.headers['Content-Type'] = 'application/json'
@@ -104,12 +90,8 @@ class PostNewProgramPlay(RequestHandler):
 # RESOURCES
 ####################################################################################
 class MultiResourceByDevice(RequestHandler):
-    def get(self, start_date, end_date, resources, tenant, distributor_key):
-
-        if tenant not in get_tenant_names_for_distributor(distributor_key):
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
-
+    @has_tenant_in_distributor_param
+    def get(self, start_date, end_date, resource_identifiers, tenant, distributor_key):
         ###########################################################
         # SETUP VARIABLES
         ###########################################################
@@ -125,14 +107,14 @@ class MultiResourceByDevice(RequestHandler):
                 seconds=1
         )
 
-        all_the_resources = resources.split('-')
+        all_the_resources = resource_identifiers.split("|")
         all_the_resources_final = all_the_resources[1:]
         now = datetime.datetime.now()
         ###########################################################
 
         array_of_transformed_record_data_by_location = [
             {
-                "resource": resource,
+                "resource": retrieve_resource_name_from_resource_id(resource),
                 "raw_data": program_record_for_resource_by_location(
                         midnight_start_day,
                         just_before_next_day_end_date,
@@ -146,10 +128,12 @@ class MultiResourceByDevice(RequestHandler):
                 array_of_transformed_record_data_by_location
         ))
 
+        resource_identifiers_to_resource_names = map(retrieve_resource_name_from_resource_id, all_the_resources_final)
+
         csv_to_publish = generate_resource_csv_by_device(
                 midnight_start_day,
                 just_before_next_day_end_date,
-                all_the_resources_final,
+                resource_identifiers_to_resource_names,
                 formatted_record_data_for_each_resource,
                 now
         )
@@ -160,12 +144,8 @@ class MultiResourceByDevice(RequestHandler):
 
 
 class MultiResourceByDate(RequestHandler):
-    def get(self, start_date, end_date, resources, tenant, distributor_key):
-
-        if tenant not in get_tenant_names_for_distributor(distributor_key):
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
-
+    @has_tenant_in_distributor_param
+    def get(self, start_date, end_date, resource_identifiers, tenant, distributor_key):
         ###########################################################
         # SETUP VARIABLES
         ###########################################################
@@ -180,7 +160,7 @@ class MultiResourceByDate(RequestHandler):
                 seconds=1
         )
 
-        all_the_resources = resources.split('-')
+        all_the_resources = resource_identifiers.split("|")
         all_the_resources_final = all_the_resources[1:]
         now = datetime.datetime.now()
 
@@ -188,7 +168,7 @@ class MultiResourceByDate(RequestHandler):
 
         pre_formatted_program_record_by_date = [
             {
-                "resource": resource,
+                "resource": retrieve_resource_name_from_resource_id(resource),
                 # program_record is the transformed program record table data
                 "raw_data": program_record_for_resource_by_date(
                         midnight_start_day,
@@ -204,10 +184,12 @@ class MultiResourceByDate(RequestHandler):
                 pre_formatted_program_record_by_date
         )
 
+        resource_identifiers_to_resource_names = map(retrieve_resource_name_from_resource_id, all_the_resources_final)
+
         csv_to_publish = generate_resource_csv_by_date(
                 midnight_start_day,
                 just_before_next_day_end_date,
-                all_the_resources_final,
+                resource_identifiers_to_resource_names,
                 formatted_data,
                 now
         )
@@ -221,12 +203,8 @@ class MultiResourceByDate(RequestHandler):
 # DEVICES
 ####################################################################################
 class MultiDeviceSummarized(RequestHandler):
+    @has_tenant_in_distributor_param
     def get(self, start_date, end_date, devices, tenant, distributor_key):
-
-        if tenant not in get_tenant_names_for_distributor(distributor_key):
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
-
         ###########################################################
         # SETUP VARIABLES
         ###########################################################
@@ -241,7 +219,7 @@ class MultiDeviceSummarized(RequestHandler):
                 seconds=1
         )
 
-        all_the_devices = devices.split(',')
+        all_the_devices = devices.split("|")
         all_the_devices_final = all_the_devices[1:]
         now = datetime.datetime.now()
 
@@ -275,12 +253,8 @@ class MultiDeviceSummarized(RequestHandler):
 
 
 class MultiDeviceByDate(RequestHandler):
+    @has_tenant_in_distributor_param
     def get(self, start_date, end_date, devices, tenant, distributor_key):
-
-        if tenant not in get_tenant_names_for_distributor(distributor_key):
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
-
         ###########################################################
         # SETUP VARIABLES
         ###########################################################
@@ -295,7 +269,7 @@ class MultiDeviceByDate(RequestHandler):
                 seconds=1
         )
 
-        all_the_devices = devices.split(',')
+        all_the_devices = devices.split("|")
         all_the_devices_final = all_the_devices[1:]
         now = datetime.datetime.now()
 
@@ -336,12 +310,8 @@ class MultiDeviceByDate(RequestHandler):
 # LOCATIONS
 ####################################################################################
 class MultiLocationSummarized(RequestHandler):
+    @has_tenant_in_distributor_param
     def get(self, start_date, end_date, locations, tenant, distributor_key):
-
-        if tenant not in get_tenant_names_for_distributor(distributor_key):
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
-
         ###########################################################
         # SETUP VARIABLES
         ###########################################################
@@ -356,7 +326,7 @@ class MultiLocationSummarized(RequestHandler):
                 seconds=1
         )
 
-        all_the_locations = locations.split(',')
+        all_the_locations = locations.split("|")
         all_the_locations_final = all_the_locations[1:]
         now = datetime.datetime.now()
 
@@ -395,12 +365,8 @@ class MultiLocationSummarized(RequestHandler):
 
 
 class MultiLocationByDevice(RequestHandler):
+    @has_tenant_in_distributor_param
     def get(self, start_date, end_date, locations, tenant, distributor_key):
-
-        if tenant not in get_tenant_names_for_distributor(distributor_key):
-            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
-
         ###########################################################
         # SETUP VARIABLES
         ###########################################################
@@ -415,7 +381,7 @@ class MultiLocationByDevice(RequestHandler):
                 seconds=1
         )
 
-        all_the_locations = locations.split(',')
+        all_the_locations = locations.split("|")
         all_the_locations_final = all_the_locations[1:]
         now = datetime.datetime.now()
 
@@ -461,41 +427,50 @@ def handle_posting_a_new_program_play(incoming_data):
         logging.info("INCOMING JSON ARRAY")
         logging.info(each_log)
         try:
-            raw_event_id = insert_raw_program_play_event_data(each_log)
-            resource_name = each_log["resource_name"]
-            resource_id = each_log["resource_id"]
-            serial_number = each_log["serial_number"]
-            device_key = each_log["device_key"]
-            tenant_code = each_log["tenant_code"]
-            customer_display_code = each_log["customer_display_code"]
-            started_at = datetime.datetime.strptime(each_log["started_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
-            ended_at = datetime.datetime.strptime(each_log["ended_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
+            if not each_log['customer_location_code'] and not each_log['customer_display_code']:
+                pass
+            else:
+                raw_event_id = insert_raw_program_play_event_data(each_log)
+                resource_name = each_log["resource_name"]
+                resource_id = each_log["resource_id"]
+                serial_number = each_log["serial_number"]
+                device_key = each_log["device_key"]
+                tenant_code = each_log["tenant_code"]
+                started_at = datetime.datetime.strptime(each_log["started_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
+                ended_at = datetime.datetime.strptime(each_log["ended_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
+                customer_location_code = each_log["customer_location_code"]
+                customer_display_code = each_log["customer_display_code"]
 
-            if 'customer_location_code' in each_log:
-                customer_location_code = each_log["customer_location_code"]  # e.g. 6023 or "Store_6023"
+                if not customer_location_code:
+                    customer_location_code = "None"
+
                 location_id = insert_new_location_or_get_existing(customer_location_code)
 
-            else:
-                location_id = None
+                if not customer_display_code:
+                    customer_display_code = "None"
 
-            resource_id = insert_new_resource_or_get_existing(
-                    resource_name,
-                    resource_id,
-                    tenant_code
-            )
+                insert_new_tenant_code_or_get_existing(
+                        tenant_code
+                )
 
-            device_id = insert_new_device_or_get_existing(
-                    location_id,
-                    serial_number,
-                    device_key,
-                    customer_display_code,
-                    tenant_code
-            )
+                resource_id = insert_new_resource_or_get_existing(
+                        resource_name,
+                        resource_id,
+                        tenant_code
+                )
 
-            insert_new_program_record(
-                    location_id, device_id, resource_id, started_at, ended_at)
+                device_id = insert_new_device_or_get_existing(
+                        location_id,
+                        serial_number,
+                        device_key,
+                        customer_display_code,
+                        tenant_code
+                )
 
-            mark_raw_event_complete(raw_event_id)
+                insert_new_program_record(
+                        location_id, device_id, resource_id, started_at, ended_at)
+
+                mark_raw_event_complete(raw_event_id)
 
         except KeyError:
             logging.warn("ERROR: KEYERROR IN POSTING A NEW PROGRAM PLAY. THE RECORD WILL NOT BE STORED. ")
