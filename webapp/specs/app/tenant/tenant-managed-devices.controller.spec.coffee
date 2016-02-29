@@ -116,4 +116,8 @@ describe 'TenantManagedDevicesCtrl', ->
 
       it "route to the 'editDevice' named route, passing the supplied device key", ->
         controller.editItem(item)
-        expect($state.go).toHaveBeenCalledWith('editDevice', {deviceKey: item.key, tenantKey: tenantKey})
+        expect($state.go).toHaveBeenCalledWith('editDevice', {
+          deviceKey: item.key,
+          tenantKey: tenantKey,
+          fromDevices: false
+        })

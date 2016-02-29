@@ -42,6 +42,6 @@ appModule.controller 'TenantUnmanagedDevicesCtrl',
             $state.go 'tenantLocations', {tenantKey: $stateParams.tenantKey}
 
     @editItem = (item) ->
-      $state.go 'editDevice', {deviceKey: item.key, tenantKey: $stateParams.tenantKey}
+      $state.go 'editDevice', {deviceKey: item.key, tenantKey: $stateParams.tenantKey, fromDevices: false}
 
     @

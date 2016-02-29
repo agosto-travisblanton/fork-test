@@ -173,7 +173,7 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     }
   })
   $stateProvider.state("editDevice", {
-    url: "/devices/:deviceKey?tenantKey",
+    url: "/devices/:deviceKey?tenantKey?fromDevices",
     templateUrl: "app/device/device-detail.html",
     ncyBreadcrumb: {
       label: '{{ deviceDetailsCtrl.currentDevice.key }}'
