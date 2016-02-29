@@ -88,73 +88,59 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($http, $log, Res
     getPanelInputs: () ->
       [
         {
-          'id': '0'
-          'displayName': 'None'
+          'id': 'None'
           'parentId': 'None'
         }
         {
-          'id': 'son1'
-          'displayName': 'HDMI1'
+          'id': 'HDMI1'
           'parentId': 'Sony-FXD40LX2F'
         }
         {
-          'id': 'son2'
-          'displayName': 'HDMI2'
+          'id': 'HDMI2'
           'parentId': 'Sony-FXD40LX2F'
         }
         {
-          'id': 'phi1'
-          'displayName': 'HDMI1'
+          'id': 'HDMI1'
           'parentId': 'Phillips-BDL5560EL'
         }
         {
-          'id': 'phi2'
-          'displayName': 'HDMI2'
+          'id': 'HDMI2'
           'parentId': 'Phillips-BDL5560EL'
         }
         {
-          'id': 'phi3'
-          'displayName': 'DVI'
+          'id': 'DVI'
           'parentId': 'Phillips-BDL5560EL'
         }
         {
-          'id': 'pan1'
-          'displayName': 'HDMI1'
+          'id': 'HDMI1'
           'parentId': 'Panasonic-TH55LF6U'
         }
         {
-          'id': 'pan2'
-          'displayName': 'HDMI2'
+          'id': 'HDMI2'
           'parentId': 'Panasonic-TH55LF6U'
         }
         {
-          'id': 'pan3'
-          'displayName': 'DVI'
+          'id': 'DVI'
           'parentId': 'Panasonic-TH55LF6U'
         }
         {
-          'id': 'sha1'
-          'displayName': 'HDMI1'
+          'id': 'HDMI1'
           'parentId': 'Sharp-PNE521'
         }
         {
-          'id': 'sha2'
-          'displayName': 'HDMI2'
+          'id': 'HDMI2'
           'parentId': 'Sharp-PNE521'
         }
         {
-          'id': 'sha3'
-          'displayName': 'DVI'
+          'id': 'DVI'
           'parentId': 'Sharp-PNE521'
         }
         {
-          'id': 'nec1'
-          'displayName': 'VGA'
+          'id': 'VGA'
           'parentId': 'NEC-LCD4215'
         }
         {
-          'id': 'nec2'
-          'displayName': 'DVI1'
+          'id': 'DVI1'
           'parentId': 'NEC-LCD4215'
         }
       ]
