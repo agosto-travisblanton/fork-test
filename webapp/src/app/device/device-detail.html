@@ -7,25 +7,47 @@
   <md-content flex layout-padding>
     <div flex="100" flex-xs="100" layout="column">
       <div ncy-breadcrumb></div>
-      <md-card-actions layout="row">
-        <md-button>
-          <a href="{{deviceDetailsCtrl.backUrl}}">
-            <i class="fa fa-fw fa-backward"></i> {{deviceDetailsCtrl.backUrlText}}</a>
-        </md-button>
-        <md-button ngclipboard data-clipboard-target=".copy-ready-device-key">
-          <i class="fa fa-fw fa-clipboard"></i> Copy device key</a>
-        </md-button>
-      </md-card-actions>
+      <div class="row margin-top-05">
+        <div class="col-sm-6">
+          <table class="table table-responsive table-striped">
+            <thead>
+            <tr>
+              <th><i class="fa fa-fw fa-wifi"></i> MAC</th>
+              <th><i class="fa fa-fw fa-plug"></i> MAC</th>
+              <th>Serial number</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
+              </td>
+              <td class="reset-device-ethernet-mac-address">{{
+                deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
+              </td>
+              <td class="reset-device-serial-number">
+                {{deviceDetailsCtrl.currentDevice.serialNumber}}
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-sm-2 margin-top-20">
+          <md-button ngclipboard data-clipboard-target="#hidden-device-key">
+            <i class="fa fa-fw fa-clipboard"></i> Copy device key</a>
+          </md-button>
+        </div>
+        <div class="col-sm-2 margin-top-20">
+          <md-button>
+            <a href="{{deviceDetailsCtrl.backUrl}}">
+              <i class="fa fa-fw fa-backward"></i> {{deviceDetailsCtrl.backUrlText}}</a>
+          </md-button>
+        </div>
+      </div>
       <md-tabs md-dynamic-height md-border-bottom>
-        <md-tab label="Details">
+        <md-tab label="Properties">
           <md-content class="md-padding" layout="row" layout-wrap layout-align="left start" layout-xs="column">
             <div flex="35" flex-sm="35" flex-xs="35" layout="column">
               <md-card>
-                <md-card-title>
-                  <md-card-title-text>
-                    <span class="md-headline">Properties</span>
-                  </md-card-title-text>
-                </md-card-title>
                 <md-card-content>
                   <div class="form-group"
                        ng-hide="deviceDetailsCtrl.currentDevice.serialNumber == None ||
@@ -362,32 +384,6 @@
             <div flex="100" flex-sm="100" flex-xs="100" layout="column">
               <md-card>
                 <md-card-content>
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <table class="table table-responsive table-striped">
-                        <thead>
-                        <tr>
-                          <th>Serial number</th>
-                          <th>WiFi MAC</th>
-                          <th>Ethernet MAC</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                          <td class="reset-device-serial-number">
-                            {{deviceDetailsCtrl.currentDevice.serialNumber}}
-                          </td>
-                          <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
-                          </td>
-                          <td class="reset-device-ethernet-mac-address">{{
-                            deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                          </td>
-                        </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-
                   <form name="tenantForm" class="form-horizontal" ng-submit="deviceDetailsCtrl.onClickRefreshButton()"
                         novalidate>
                     <div class="row">
@@ -400,6 +396,7 @@
                                name="startTime"
                                id="startTime"
                                ng-model="deviceDetailsCtrl.startTime">
+                        </span>
                       </div>
                       <div class="col-sm-2">
                         <label for="endTime" class="control-label">To</label>
@@ -413,7 +410,7 @@
                       </div>
                       <div class="col-sm-2 margin-top-15">
                         <md-button type="submit">
-                          <i class="fa fa-fw fa-refresh"></i> Refresh
+                          <i class="fa fa-fw fa-filter"></i> Filter
                         </md-button>
                       </div>
                     </div>
@@ -436,7 +433,7 @@
                         <tbody>
                         <tr ng-hide="deviceDetailsCtrl.issues.length">
                           <td class="text-center text-warning" colspan="8">
-                            No vitals logged in the past {{deviceDetailsCtrl.dayRange}} days.<br>
+                            No events logged in the past {{deviceDetailsCtrl.dayRange}} days.<br>
                             Please try an earlier 'From date' above.
                           </td>
                         </tr>
@@ -458,6 +455,8 @@
                       </table>
                     </div>
                   </div>
+                  <div class="row margin-top-50">
+                  </div>
                 </md-card-content>
               </md-card>
             </div>
@@ -468,31 +467,6 @@
             <div flex="100" flex-sm="100" flex-xs="100" layout="column">
               <md-card>
                 <md-card-content>
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <table class="table table-responsive table-striped">
-                        <thead>
-                        <tr>
-                          <th>Serial number</th>
-                          <th>WiFi MAC</th>
-                          <th>Ethernet MAC</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                          <td class="reset-device-serial-number">
-                            {{deviceDetailsCtrl.currentDevice.serialNumber}}
-                          </td>
-                          <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
-                          </td>
-                          <td class="reset-device-ethernet-mac-address">{{
-                            deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                          </td>
-                        </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
                   <md-content class="md-padding" layout="row" layout-wrap layout-xs="column">
                     <div flex="25" flex-sm="25" flex-xs="25" layout="column">
                       <md-card>
@@ -699,7 +673,7 @@
       </md-tabs>
     </div>
   </md-content>
-  <div class="copy-ready-device-key">
+  <div id="hidden-device-key" class="copy-ready-device-key">
     {{deviceDetailsCtrl.currentDevice.key}}
   </div>
 </div>
