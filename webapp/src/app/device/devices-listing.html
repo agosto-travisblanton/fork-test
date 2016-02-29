@@ -74,12 +74,11 @@
                         <th><i class="fa fa-fw fa-plug"></i> MAC</th>
                         <th>Provisioned</th>
                         <th></th>
-                        <th></th>
                       </tr>
                       </thead>
                       <tbody>
                       <tr ng-hide="devicesListingCtrl.unmanagedDevices.length">
-                        <td class="no-devices text-center text-danger" colspan="7">No devices</td>
+                        <td class="no-devices text-center text-danger" colspan="6">No devices</td>
                       </tr>
                       <tr ng-repeat="item in devicesListingCtrl.unmanagedDevices | orderBy:'-created'">
                         <td>
@@ -98,11 +97,6 @@
                         <td>{{ item.macAddress }}</td>
                         <td>{{ item.ethernetMacAddress }}</td>
                         <td>{{ item.created }}</td>
-                        <td>
-                          <md-button class="md-secondary"
-                                     ng-click="devicesListingCtrl.showDeviceDetails(item, $event)">More Info
-                          </md-button>
-                        </td>
                         <td class="up-{{ item.up}}-background"></td>
                       </tr>
                       </tbody>

@@ -471,7 +471,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertLength(10, response_json['objects'])
+        self.assertLength(21, response_json)
 
     def test_get_filter_unmanaged_devices_by_tenant_entity_body_json(self):
         self.__build_list_devices(tenant_key=self.tenant_key, managed_number_to_build=20,
@@ -481,7 +481,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertLength(0, response_json['objects'])
+        self.assertLength(0, response_json)
 
     #################################################################################################################
     # get_devices_by_distributor

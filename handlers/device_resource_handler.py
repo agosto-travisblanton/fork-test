@@ -94,9 +94,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
                         ChromeOsDevice.is_unmanaged_device == unmanaged)
         )
-        query_forward = query.order(ChromeOsDevice.key)
-        query_reverse = query.order(-ChromeOsDevice.key)
-        result_data = self.fetch_page(query_forward, query_reverse)
+        # query_forward = query.order(ChromeOsDevice.key)
+        # query_reverse = query.order(-ChromeOsDevice.key)
+        # result_data = self.fetch_page(query_forward, query_reverse)
+        result_data = query.fetch(1000)
         json_response(self.response, result_data, strategy=CHROME_OS_DEVICE_STRATEGY)
 
     @requires_api_token
