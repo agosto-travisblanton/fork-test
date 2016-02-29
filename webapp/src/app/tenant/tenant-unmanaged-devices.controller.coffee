@@ -25,7 +25,7 @@ appModule.controller 'TenantUnmanagedDevicesCtrl',
         @currentTenant = tenant
       devicesPromise = DevicesService.getUnmanagedDevicesByTenant $stateParams.tenantKey
       devicesPromise.then (data) =>
-        @tenantDevices = data.objects
+        @tenantDevices = data
 
     $scope.tabIndex = 2
 
@@ -42,6 +42,6 @@ appModule.controller 'TenantUnmanagedDevicesCtrl',
             $state.go 'tenantLocations', {tenantKey: $stateParams.tenantKey}
 
     @editItem = (item) ->
-      $state.go 'editDevice', {deviceKey: item.key, tenantKey: $stateParams.tenantKey}
+      $state.go 'editDevice', {deviceKey: item.key, tenantKey: $stateParams.tenantKey, fromDevices: false}
 
     @

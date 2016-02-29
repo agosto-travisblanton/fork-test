@@ -79,10 +79,10 @@ describe 'TenantUnmanagedDevicesCtrl', ->
       it 'retrieve tenant\'s devices by tenant key from DevicesService', ->
         controller = $controller 'TenantUnmanagedDevicesCtrl', serviceInjection
         devices = [{key: 'f8sa76d78fa978d6fa7dg7ds55'}, {key: 'f8sa76d78fa978d6fa7dg7ds56'}]
-        data = {objects: devices}
+        data = {devices}
         devicesServicePromise.resolve(data)
         expect(DevicesService.getUnmanagedDevicesByTenant).toHaveBeenCalledWith($stateParams.tenantKey)
-        expect(controller.tenantDevices).toBe(devices)
+        expect(controller.tenantDevices).toBe(data)
 
     describe 'creating a new tenant', ->
       it 'editMode should be set to false', ->
@@ -116,5 +116,9 @@ describe 'TenantUnmanagedDevicesCtrl', ->
 
       it "route to the 'editDevice' named route, passing the supplied device key", ->
         controller.editItem(item)
-        expect($state.go).toHaveBeenCalledWith('editDevice', {deviceKey: item.key, tenantKey: tenantKey})
+        expect($state.go).toHaveBeenCalledWith('editDevice', {
+          deviceKey: item.key,
+          tenantKey: tenantKey,
+          fromDevices: false
+        })
 

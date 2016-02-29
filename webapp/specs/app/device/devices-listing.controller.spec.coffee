@@ -63,7 +63,7 @@ describe 'DevicesListingCtrl', ->
       expect(controller.unmanagedDevices).toBe unmanagedDevices
 
   describe '.editItem', ->
-    item = {key: 'ahjad897d987fadafg708fg71'}
+    item = {key: 'ahjad897d987fadafg708fg71', tenantKey: 'ahjad897d987fadafg708fg71', fromDevices: true}
 
     beforeEach ->
       spyOn $state, 'go'
@@ -71,5 +71,9 @@ describe 'DevicesListingCtrl', ->
 
     it "route to the 'editDevice' named route, passing the supplied device key", ->
       controller.editItem(item)
-      expect($state.go).toHaveBeenCalledWith('editDevice', {deviceKey: item.key, tenantKey: ''})
+      expect($state.go).toHaveBeenCalledWith('editDevice', {
+        deviceKey: item.key,
+        tenantKey: item.tenantKey,
+        fromDevices: true
+      })
 
