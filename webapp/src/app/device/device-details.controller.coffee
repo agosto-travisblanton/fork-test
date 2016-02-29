@@ -98,7 +98,8 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
         if panelModel.id is @currentDevice.panelModel
           @currentDevice.panelModel = panelModel
       for panelInput in @panelInputs
-        if panelInput.id is @currentDevice.panelInput
+        isParent = panelInput.parentId is @currentDevice.panelModel.id
+        if isParent and panelInput.id.toLowerCase() is @currentDevice.panelInput
           @currentDevice.panelInput = panelInput
     if @currentDevice.locationKey != null
       for location in @locations
@@ -250,6 +251,6 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     if @currentDevice.panelModel != null
       @currentDevice.panelModel = if @currentDevice.panelModel.id == 'None' then null else @currentDevice.panelModel.id
     if @currentDevice.panelInput != null
-      @currentDevice.panelInput = if @currentDevice.panelInput.id == '0' then null else @currentDevice.panelInput.id
+      @currentDevice.panelInput = if @currentDevice.panelInput.id == 'None' then null else @currentDevice.panelInput.id.toLowerCase()
 
   @

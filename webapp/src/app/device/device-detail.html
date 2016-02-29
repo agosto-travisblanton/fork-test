@@ -348,7 +348,7 @@
                           class="form-control"
                           ng-required="deviceDetailsCtrl.currentDevice.panelModel !== None"
                           ng-model="deviceDetailsCtrl.currentDevice.panelInput"
-                          ng-options="c.displayName for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">
+                          ng-options="c.id for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">
                         </select>
                       </div>
                     </div>
