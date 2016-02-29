@@ -175,9 +175,6 @@ describe 'DeviceDetailsCtrl', ->
         getPlayerCommandEventsPromise.resolve commandEvents
         expect(controller.commandEvents).toBe commandEvents
 
-      it 'calls LocationsService.getLocationsByTenantKey to locations for a given tenant', ->
-        expect(LocationsService.getLocationsByTenantKey).toHaveBeenCalledWith $stateParams.tenantKey
-
   describe '.onClickSaveDevice', ->
     beforeEach ->
       devicesServicePromise = new skykitProvisioning.q.Mock
