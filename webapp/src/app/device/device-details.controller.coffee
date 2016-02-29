@@ -50,8 +50,11 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @dayRange = 30
   @editMode = !!$stateParams.deviceKey
   @issues = []
-  @pickerOptions = "{icons:{next:'glyphicon glyphicon-arrow-right',
-      previous:'glyphicon glyphicon-arrow-left',up:'glyphicon glyphicon-arrow-up',down:'glyphicon glyphicon-arrow-down'}}"
+  @pickerOptions = "{widgetPositioning: {vertical:'bottom'}, showTodayButton: true, sideBySide: true, icons:{
+      next:'glyphicon glyphicon-arrow-right',
+      previous:'glyphicon glyphicon-arrow-left',
+      up:'glyphicon glyphicon-arrow-up',
+      down:'glyphicon glyphicon-arrow-down'}}"
 
   @initialize = () ->
     @panelModels = DevicesService.getPanelModels()
@@ -131,8 +134,6 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onSuccessDeviceSave = ->
     ProgressBarService.complete()
-#    if @tenantKey is undefined
-#      @tenantKey = @currentDevice.tenantKey
     $state.go 'devices'
 
   @onFailureDeviceSavePanels = (errorObject) ->
