@@ -256,6 +256,14 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
         else:
             request_json = json.loads(self.request.body)
+            location_urlsafe_key = request_json.get('locationKey')
+            if location_urlsafe_key:
+                try:
+                    location = ndb.Key(urlsafe=location_urlsafe_key).get()
+                except Exception, e:
+                    logging.exception(e)
+                if location:
+                    device.location_key = location.key
             notes = request_json.get('notes')
             if notes:
                 device.notes = notes

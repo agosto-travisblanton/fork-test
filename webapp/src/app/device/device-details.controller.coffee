@@ -42,6 +42,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     volume: undefined
     custom: undefined
     proofOfPlayLogging: false
+    location: undefined
   }
   @commandEvents = []
   @dayRange = 30
@@ -55,9 +56,12 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     @panelInputs = DevicesService.getPanelInputs()
     if @editMode
       devicePromise = DevicesService.getDeviceByKey $stateParams.deviceKey
-      devicePromise.then (data) =>
-        @currentDevice = data
-        @setSelectedOptions()
+      devicePromise.then ((response) =>
+        @onGetDeviceSuccess(response)
+        return
+      ), (response) =>
+        @onGetDeviceFailure(response)
+        return
       commandEventsPromise = DevicesService.getCommandEventsByKey $stateParams.deviceKey
       commandEventsPromise.then (data) =>
         @commandEvents = data
@@ -71,9 +75,19 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       issuesPromise = DevicesService.getIssuesByKey($stateParams.deviceKey, @epochStart, @epochEnd)
       issuesPromise.then (data) =>
         @issues = data
-      locationsPromise = LocationsService.getLocationsByTenantKey @tenantKey
-      locationsPromise.then (data) =>
-        @locations = data
+
+  @onGetDeviceSuccess = (response) ->
+    @currentDevice = response
+    if @tenantKey is undefined
+      @tenantKey = @currentDevice.tenantKey
+    locationsPromise = LocationsService.getLocationsByTenantKey @tenantKey
+    locationsPromise.then (data) =>
+      @locations = data
+      @setSelectedOptions()
+
+  @onGetDeviceFailure = (response) ->
+    errorMessage = "No detail for key ##{$stateParams.deviceKey}.\nError: #{response.status} #{response.statusText}"
+    sweet.show('Oops...', errorMessage, 'error')
 
   @setSelectedOptions = () ->
     if @currentDevice.panelModel == null
@@ -86,24 +100,27 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       for panelInput in @panelInputs
         if panelInput.id is @currentDevice.panelInput
           @currentDevice.panelInput = panelInput
-
-  @setLocationInfo = () ->
-    #TODO wire this up
+    if @currentDevice.locationKey != null
+      for location in @locations
+        if location.key is @currentDevice.locationKey
+          @currentDevice.location = location
 
   @onClickSavePanels = () ->
     ProgressBarService.start()
-    @setPanelInfo()
     promise = DevicesService.save @currentDevice
     promise.then @onSuccessDeviceSave, @onFailureDeviceSavePanels
 
   @onClickSaveLocation = () ->
     ProgressBarService.start()
-    @setLocationInfo()
+    @currentDevice.locationKey = @currentDevice.location.key
+    @setPanelInfo()
     promise = DevicesService.save @currentDevice
     promise.then @onSuccessDeviceSave, @onFailureDeviceSaveLocation
 
   @onSuccessDeviceSave = ->
     ProgressBarService.complete()
+#    if @tenantKey is undefined
+#      @tenantKey = @currentDevice.tenantKey
     $state.go 'devices'
 
   @onFailureDeviceSavePanels = (errorObject) ->
