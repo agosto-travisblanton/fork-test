@@ -265,6 +265,12 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     logging.exception(e)
                 if location:
                     device.location_key = location.key
+            customer_display_name = request_json.get('customerDisplayName')
+            if customer_display_name:
+                device.customer_display_name = customer_display_name
+            customer_display_code = request_json.get('customerDisplayCode')
+            if customer_display_code:
+                device.customer_display_code = customer_display_code
             notes = request_json.get('notes')
             if notes:
                 device.notes = notes
