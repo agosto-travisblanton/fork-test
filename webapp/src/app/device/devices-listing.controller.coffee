@@ -2,8 +2,7 @@
 
 appModule = angular.module('skykitProvisioning')
 
-appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, $state, $cookies, ProgressBarService,
-  sweet) ->
+appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, $state, $cookies, ProgressBarService, sweet) ->
   @devices = []
   @unmanagedDevices = []
   @distributorKey = undefined
