@@ -584,3 +584,12 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'displays a sweet alert with error information', ->
         expect(sweet.show).toHaveBeenCalledWith('Oops...', "Refresh error: #{error_text}", 'error')
+
+  describe '.autoGenerateCustomerDisplayCode', ->
+    beforeEach ->
+      controller = $controller 'DeviceDetailsCtrl', {}
+
+    it 'generates a new customer display code', ->
+      controller.currentDevice.customerDisplayName = 'Panel in Reception'
+      controller.autoGenerateCustomerDisplayCode()
+      expect(controller.currentDevice.customerDisplayCode).toBe 'panel_in_reception'
