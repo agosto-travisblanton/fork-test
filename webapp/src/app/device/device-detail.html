@@ -290,6 +290,26 @@
                         </div>
                       </div>
                     </div>
+                    <div class="form-group">
+                      <div class="col-sm-6">
+                        <label>Customer display name</label>
+                        <div>
+                          <input type="text"
+                                 class="form-control"
+                                 name="customerDisplayName"
+                                 ng-model="deviceDetailsCtrl.currentDevice.customerDisplayName">
+                        </div>
+                      </div>
+                      <div class="col-sm-6">
+                        <label>Customer display code</label>
+                        <div>
+                          <input type="text"
+                                 class="form-control"
+                                 name="customerDisplayCode"
+                                 ng-model="deviceDetailsCtrl.currentDevice.customerDisplayCode">
+                        </div>
+                      </div>
+                    </div>
                     <md-card-actions layout="row" layout-align="end center">
                       <md-button type="submit"
                                  ng-disabled="!deviceUpdateForm.$dirty || deviceUpdateForm.$invalid">
