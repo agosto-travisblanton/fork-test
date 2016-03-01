@@ -67,15 +67,17 @@ if None == unmanaged_device:
     print 'Unmanaged device created with MAC ' + UNMANAGED_MAC_ADDRESS
 else:
     print 'Unmanaged device with MAC ' + unmanaged_device.mac_address + ' already exists, so did not create'
-managed_device = ChromeOsDevice.get_by_device_id(DEVICE_ID)
-if None == managed_device:
-    managed_device = ChromeOsDevice.create_managed(
-            tenant_key=tenant.key,
-            gcm_registration_id=GCM_REGISTRATION_ID,
-            device_id=DEVICE_ID,
-            mac_address=MAC_ADDRESS)
-    managed_device.serial_number=SERIAL_NUMBER
-    managed_device.put()
-    print 'Managed device created with MAC ' + MAC_ADDRESS
-else:
-    print 'Managed device with Device ID ' + managed_device.device_id + ' already exists, so did not create'
+
+for i in range(0, 12):
+    managed_device = ChromeOsDevice.get_by_device_id(DEVICE_ID + str(i))
+    if None == managed_device:
+        managed_device = ChromeOsDevice.create_managed(
+                tenant_key=tenant.key,
+                gcm_registration_id=GCM_REGISTRATION_ID + str(i),
+                device_id=DEVICE_ID+ str(i),
+                mac_address=str(i) + MAC_ADDRESS)
+        managed_device.serial_number=SERIAL_NUMBER+ str(i)
+        managed_device.put()
+        print 'Managed device created with MAC ' + str(i) + MAC_ADDRESS
+    else:
+        print 'Managed device with Device ID ' + managed_device.device_id + ' already exists, so did not create'
