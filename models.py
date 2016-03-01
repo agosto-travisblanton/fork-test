@@ -287,6 +287,8 @@ class ChromeOsDevice(ndb.Model):
                                                      indexed=False)
     proof_of_play_logging = ndb.BooleanProperty(default=False, required=True, indexed=True)
     proof_of_play_editable = ndb.BooleanProperty(default=False, required=True)
+    customer_display_name = ndb.StringProperty(required=False, indexed=False)
+    customer_display_code = ndb.StringProperty(required=False, indexed=False)
     location_key = ndb.KeyProperty(required=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
