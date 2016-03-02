@@ -828,7 +828,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json['gcmRegistrationId'], self.GCM_REGISTRATION_ID)
         self.assertEqual(response_json['macAddress'], self.MAC_ADDRESS)
 
-    def test_device_resource_put_no_updates_location(self):
+    def test_device_resource_put_updates_location(self):
         location = Location.create(tenant_key=self.tenant_key,
                                    customer_location_name='Store 1234',
                                    customer_location_code='store_1234',
@@ -842,6 +842,25 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                      headers=self.api_token_authorization_header)
         updated_device = self.managed_device_key.get()
         self.assertEqual(updated_device.location_key, location_key)
+
+    def test_device_resource_put_updates_customer_display_info(self):
+        customer_display_name = 'Panel in Reception'
+        customer_display_code = 'panel_in_reception'
+        request_body = {
+            'customerDisplayName': customer_display_name,
+            'customerDisplayCode': customer_display_code
+        }
+        self.assertIsNone(self.managed_device.customer_display_name)
+        self.assertIsNone(self.managed_device.customer_display_code)
+        when(deferred).defer(any_matcher(update_chrome_os_device),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
+                     json.dumps(request_body),
+                     headers=self.api_token_authorization_header)
+        updated_device = self.managed_device_key.get()
+        self.assertEqual(customer_display_name, updated_device.customer_display_name)
+        self.assertEqual(customer_display_code, updated_device.customer_display_code)
+
 
     ##################################################################################################################
     ## delete

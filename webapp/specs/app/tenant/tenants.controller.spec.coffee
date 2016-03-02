@@ -5,18 +5,20 @@ describe 'TenantsCtrl', ->
   controller = undefined
   $state = undefined
   TenantsService = undefined
-  sweet = undefined
   promise = undefined
+  ProgressBarService = undefined
+  sweet = undefined
 
 
   beforeEach module('skykitProvisioning')
 
-  beforeEach inject (_$controller_, _TenantsService_, _$state_, _sweet_) ->
+  beforeEach inject (_$controller_, _TenantsService_, _$state_, _ProgressBarService_, _sweet_) ->
     $controller = _$controller_
     $state = _$state_
     TenantsService = _TenantsService_
+    ProgressBarService = _ProgressBarService_
     sweet = _sweet_
-    controller = $controller 'TenantsCtrl', {$state: $state, TenantsService: TenantsService, sweet: sweet}
+    controller = $controller 'TenantsCtrl', {$state: $state, TenantsService: TenantsService, ProgressBarService: ProgressBarService, sweet: sweet, }
 
   describe 'initialization', ->
     it 'tenants should be an empty array', ->
@@ -32,6 +34,8 @@ describe 'TenantsCtrl', ->
     beforeEach ->
       promise = new skykitProvisioning.q.Mock
       spyOn(TenantsService, 'fetchAllTenants').and.returnValue promise
+      spyOn(ProgressBarService, 'start')
+      spyOn(ProgressBarService, 'complete')
 
     it 'call TenantsService.fetchAllTenants to retrieve all tenants', ->
       controller.initialize()
@@ -42,6 +46,29 @@ describe 'TenantsCtrl', ->
       controller.initialize()
       promise.resolve tenants
       expect(controller.tenants).toBe tenants
+
+  describe '.getFetchSuccess', ->
+    beforeEach ->
+      spyOn(ProgressBarService, 'complete')
+
+    it 'stops the progress bar', ->
+      controller.getFetchSuccess()
+      expect(ProgressBarService.complete).toHaveBeenCalled()
+
+  describe '.getFetchFailure', ->
+    response = {status: 400, statusText: 'Bad request'}
+    beforeEach ->
+      spyOn(ProgressBarService, 'complete')
+      spyOn(sweet, 'show')
+
+    it 'stops the progress bar', ->
+      controller.getFetchFailure response
+      expect(ProgressBarService.complete).toHaveBeenCalled()
+
+    it 'calls seet alert with error', ->
+      controller.getFetchFailure response
+      expect(sweet.show).toHaveBeenCalledWith('Oops...', 'Unable to fetch tenants. Error: 400 Bad request.', 'error')
+
 
   describe '.editItem', ->
     tenant = {key: 'dhjad897d987fadafg708hb55'}

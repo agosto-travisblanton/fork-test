@@ -290,6 +290,37 @@
                         </div>
                       </div>
                     </div>
+                    <div class="form-group">
+                      <div class="col-sm-6">
+                        <label>Customer display name</label>
+                        <div>
+                          <input type="text"
+                                 class="form-control"
+                                 autofocus
+                                 name="customerDisplayName"
+                                 placeholder="e.g., Panel in Front Reception"
+                                 ng-change="deviceDetailsCtrl.autoGenerateCustomerDisplayCode()"
+                                 ng-model="deviceDetailsCtrl.currentDevice.customerDisplayName">
+                        </div>
+                      </div>
+                      <div class="col-sm-6" ng-class="{ 'has-error' : deviceUpdateForm.customerDisplayCode.$invalid && !deviceUpdateForm.customerDisplayCode.$pristine }">
+                        <label>Customer display code</label>
+                        <div>
+                          <input type="text"
+                                 class="form-control"
+                                 name="customerDisplayCode"
+                                 placeholder="auto-generated"
+                                 ng-model="deviceDetailsCtrl.currentDevice.customerDisplayCode"
+                                 ng-pattern="/^[a-z0-9_]*$/">
+                          <p
+                            ng-show="deviceUpdateForm.customerDisplayCode.$invalid && !deviceUpdateForm.customerDisplayCode.$invalid.$pristine"
+                            class="help-block">
+                            Alphanumeric and underscore allowed.
+                          </p>
+
+                        </div>
+                      </div>
+                    </div>
                     <md-card-actions layout="row" layout-align="end center">
                       <md-button type="submit"
                                  ng-disabled="!deviceUpdateForm.$dirty || deviceUpdateForm.$invalid">

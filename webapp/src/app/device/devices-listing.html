@@ -27,7 +27,7 @@
                       </thead>
                       <tbody>
                       <tr ng-hide="devicesListingCtrl.devices.length">
-                        <td class="no-devices text-center text-danger" colspan="7">No devices</td>
+                        <td class="no-devices text-center text-danger" colspan="7">No managed devices retrieved</td>
                       </tr>
                       <tr ng-repeat="item in devicesListingCtrl.devices | orderBy:'-created'">
                         <td>
@@ -78,7 +78,7 @@
                       </thead>
                       <tbody>
                       <tr ng-hide="devicesListingCtrl.unmanagedDevices.length">
-                        <td class="no-devices text-center text-danger" colspan="6">No devices</td>
+                        <td class="no-devices text-center text-danger" colspan="6">No unmanaged devices retrieved</td>
                       </tr>
                       <tr ng-repeat="item in devicesListingCtrl.unmanagedDevices | orderBy:'-created'">
                         <td>
