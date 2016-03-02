@@ -70,5 +70,9 @@ class AppConfig(Config):
     DEFAULT_CONTENT_MANAGER_URL = False
     DEFAULT_PLAYER_CONTENT_URL = False
 
+    SPRINT_NUMBER = None
+    DEPLOYMENT_COUNTER = None
+    PRODUCTION_HOTFIX_COUNTER = None
+
 
 config = AppConfig.get_config()

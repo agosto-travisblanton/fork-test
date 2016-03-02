@@ -100,18 +100,6 @@ def _OAUTH_CLIENT_ID():
 app_OAUTH_CLIENT_ID = _OAUTH_CLIENT_ID()
 
 
-# def _CLIENT_SECRET():
-#     if on_development_server or not on_server:
-#         return '5uw_Cj78Iygf3rfnJKZ_SVVO'
-#     if on_integration_server:
-#         return 'h-PGaqnkAfRhjVTtbxcgSLD5'
-#     if on_stage_server:
-#         return 'SkT2kDa3nViHTJXLuUYbSbzE'
-#     if on_production_server:
-#         return 'NWCFk0IyE8QPqD2CDwloKvjH'
-#     return None
-# app_CLIENT_SECRET = _CLIENT_SECRET()
-
 def _PUBLIC_API_SERVER_KEY():
     if on_development_server or not on_server:
         return 'AIzaSyAzS-hwl5dV-Wn4g5opG_34gGYplgJT1Fc'
@@ -494,3 +482,27 @@ def _EMAIL_SUPPORT():
 
 
 app_EMAIL_SUPPORT = _EMAIL_SUPPORT()
+
+
+##############################################################################
+# VERSION  sprint_number.deployment_increment.hotfix_increment e.g., 30.1.0
+##############################################################################
+def _SPRINT_NUMBER():
+    return 30
+
+
+app_SPRINT_NUMBER = _SPRINT_NUMBER()
+
+
+def _DEPLOYMENT_COUNTER():
+    return 1
+
+
+app_DEPLOYMENT_COUNTER = _DEPLOYMENT_COUNTER()
+
+
+def _PRODUCTION_HOTFIX_COUNTER():
+    return 0
+
+
+app_PRODUCTION_HOTFIX_COUNTER = _PRODUCTION_HOTFIX_COUNTER()

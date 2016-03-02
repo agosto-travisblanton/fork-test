@@ -1,3 +1,4 @@
+from app_config import config
 from env_setup import setup_test_paths
 
 setup_test_paths()
@@ -17,6 +18,14 @@ class TestVersionsHandler(BaseTest, WebTest):
         uri = application.router.build(None, 'version-retrieval', None, {})
         response = self.get(uri)
         self.assertOK(response)
+
+    def test_get_returns_web_version_number_json(self):
+        version_number = '{0}.{1}.{2}'.format(config.SPRINT_NUMBER, config.DEPLOYMENT_COUNTER,
+                                              config.PRODUCTION_HOTFIX_COUNTER)
+        uri = application.router.build(None, 'version-retrieval', None, {})
+        response = self.get(uri)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['number'], version_number)
 
     def test_get_returns_web_version_name_json(self):
         uri = application.router.build(None, 'version-retrieval', None, {})

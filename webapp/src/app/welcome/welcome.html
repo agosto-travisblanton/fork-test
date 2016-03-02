@@ -11,20 +11,22 @@
           <table class="table">
             <tbody>
             <tr>
-              <td class="text-right col-md-3">Hostname:</td>
-              <td class="col-md-3">{{welcomeCtrl.version_data.hostname}}</td>
+              <td class="text-right col-md-3">Number:</td>
+              <td class="col-md-3">{{welcomeCtrl.version_data.number}}</td>
             </tr>
             <tr>
-              <td class="text-right col-md-3">Web module:</td>
+              <td class="text-right col-md-3">Module:</td>
               <td class="col-md-3">{{welcomeCtrl.version_data.web_module_name}}</td>
             </tr>
             <tr>
-              <td class="text-right col-md-3">Web version:</td>
+              <td class="text-right col-md-3">Tag:</td>
               <td class="col-md-3">{{welcomeCtrl.version_data.web_version_name}}</td>
             </tr>
             <tr>
-              <td class="text-right col-md-3">Instance id:</td>
-              <td class="col-md-3">{{welcomeCtrl.version_data.current_instance_id}}</td>
+              <td class="text-right col-md-3">Hostname:</td>
+              <td class="col-md-3 hostname-word-break">
+                {{welcomeCtrl.version_data.hostname}}
+              </td>
             </tr>
             </tbody>
           </table>
