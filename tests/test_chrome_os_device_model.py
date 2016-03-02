@@ -92,6 +92,13 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertEqual(device.program_id, '****initial****')
         self.assertTrue(device.heartbeat_interval_minutes is config.PLAYER_HEARTBEAT_INTERVAL_MINUTES)
 
+    def test_create_managed_has_expected_default_check_for_content_interval(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
+        self.assertTrue(device.check_for_content_interval_minutes is config.CHECK_FOR_CONTENT_INTERVAL_MINUTES)
+
     def test_create_unmanaged_auto_sets_heartbeat_info(self):
         device = ChromeOsDevice.create_unmanaged(self.TEST_GCM_REGISTRATION_ID, self.MAC_ADDRESS)
         self.assertTrue(device.is_unmanaged_device)
