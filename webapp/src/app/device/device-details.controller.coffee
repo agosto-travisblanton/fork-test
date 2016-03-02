@@ -265,4 +265,12 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     if @currentDevice.panelInput != null
       @currentDevice.panelInput = if @currentDevice.panelInput.id == 'None' then null else @currentDevice.panelInput.id.toLowerCase()
 
+  @autoGenerateCustomerDisplayCode = ->
+    newDisplayCode = ''
+    if @currentDevice.customerDisplayName
+      newDisplayCode = @currentDevice.customerDisplayName.toLowerCase()
+      newDisplayCode = newDisplayCode.replace(/\s+/g, '_')
+      newDisplayCode = newDisplayCode.replace(/\W+/g, '')
+    @currentDevice.customerDisplayCode = newDisplayCode
+
   @

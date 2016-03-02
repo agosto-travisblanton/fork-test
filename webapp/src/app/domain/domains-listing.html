@@ -18,6 +18,7 @@
               <table class="table table-responsive table-striped">
                 <thead>
                 <tr>
+                  <th></th>
                   <th>Name</th>
                   <th>Impersonation Admin Email</th>
                   <th>Created</th>
@@ -28,6 +29,17 @@
                   <td class="no-devices text-center text-danger" colspan="4">No domains</td>
                 </tr>
                 <tr ng-repeat="item in domainsCtrl.domains | orderBy:'-created'">
+                  <td>
+                    <a ng-click="domainsCtrl.editItem(item)" title="Domain detail">
+                      <ng-md-icon icon="mode_edit" size="48">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                          <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"></path>
+                          <path
+                            d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+                        </svg>
+                      </ng-md-icon>
+                    </a>
+                  </td>
                   <td class="domain-key"><a name="edit-domain" class="btn"
                                             ng-click="domainsCtrl.editItem(item)"
                                             title="Edit domain">{{item.name}}</a></td>
