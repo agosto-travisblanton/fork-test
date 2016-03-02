@@ -298,8 +298,6 @@ describe 'DeviceDetailsCtrl', ->
       spyOn(progressBarService, 'start')
       spyOn(progressBarService, 'complete')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
-      controller.currentDevice.heartbeatInterval = 5
-      controller.currentDevice.checkContentInterval = 3
       controller.currentDevice.panelModel = {id: 'Sony-112'}
       controller.currentDevice.panelInput = {id: 'HDMI1', parentId: 'Sony-112'}
 
