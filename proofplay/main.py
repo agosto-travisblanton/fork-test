@@ -4,9 +4,10 @@ from data_processing import *
 import logging
 import json
 from google.appengine.ext import deferred
-from db import SQLALCHEMY_DATABASE_URI
 from alembic import command
 import os
+
+from proofplay_config import config
 from routes_proofplay import basedir
 from decorators import has_tenant_in_distributor_header, has_distributor_key, has_tenant_in_distributor_param
 
@@ -20,7 +21,7 @@ class MakeMigration(RequestHandler):
             from alembic.config import Config
             path = os.path.join(basedir, "alembic.ini")
             alembic_cfg = Config(path)
-            alembic_cfg.set_main_option('sqlalchemy.url', SQLALCHEMY_DATABASE_URI)
+            alembic_cfg.set_main_option('sqlalchemy.url', config.SQLALCHEMY_DATABASE_URI)
             command.upgrade(alembic_cfg, "head")
             self.response.out.write(
                     "SUCCESS. Migrations Applied Successfully (or no change to model schema necessary).")

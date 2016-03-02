@@ -3,12 +3,18 @@ The configuration file used by :py:mod:`agar.config` implementations and other l
 `google.appengine.api.lib_config`_ configuration library. Configuration overrides go in this file.
 """
 from env_setup import setup
-
 setup()
-import os
-from agar.env import on_development_server, on_server, on_production_server, on_integration_server, appid
 
-on_stage_server = on_server and appid.lower().endswith('-stage')
+import os
+from provisioning_env import (
+    on_production_server,
+    on_stage_server,
+    on_development_server,
+    on_integration_server,
+    on_server,
+    on_test_harness,
+    on_continuous_integration_server)
+from agar.env import appid
 
 
 ##############################################################################
@@ -57,6 +63,7 @@ def _SERVICE_ACCOUNT_EMAIL():
         return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0@developer.gserviceaccount.com'
     return None
 
+
 app_SERVICE_ACCOUNT_EMAIL = _SERVICE_ACCOUNT_EMAIL()
 
 
@@ -82,6 +89,7 @@ def _CLIENT_ID():
         return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0.apps.googleusercontent.com'
     return None
 
+
 app_CLIENT_ID = _CLIENT_ID()
 
 
@@ -96,6 +104,7 @@ def _OAUTH_CLIENT_ID():
     if on_production_server:
         return '613606096818-tfkv6eedbrbc4hltamdjgc7nk25k37mk.apps.googleusercontent.com'
     return None
+
 
 app_OAUTH_CLIENT_ID = _OAUTH_CLIENT_ID()
 
@@ -175,7 +184,6 @@ def _CONTENT_MANAGER_API_SERVER_KEY():
 app_CONTENT_MANAGER_API_SERVER_KEY = _CONTENT_MANAGER_API_SERVER_KEY()
 
 
-
 def _DEFAULT_AGOSTO_DEVICE_DOMAIN():
     if on_development_server or not on_server:
         return 'local.agosto.com'
@@ -189,6 +197,7 @@ def _DEFAULT_AGOSTO_DEVICE_DOMAIN():
 
 
 app_DEFAULT_AGOSTO_DEVICE_DOMAIN = _DEFAULT_AGOSTO_DEVICE_DOMAIN()
+
 
 def _GOOGLE_CUSTOMER_ID():
     if on_development_server or not on_server:
@@ -266,7 +275,6 @@ def _DEVICE_ISSUE_OS_VERSION_CHANGE():
 
 
 app_DEVICE_ISSUE_OS_VERSION_CHANGE = _DEVICE_ISSUE_OS_VERSION_CHANGE()
-
 
 
 def _DEVICE_ISSUE_MEMORY_HIGH():
@@ -390,31 +398,24 @@ app_DEFAULT_CONTENT_MANAGER_URL = _DEFAULT_CONTENT_MANAGER_URL()
 
 
 def _DEFAULT_PLAYER_CONTENT_URL():
-    if on_development_server or not on_server:
-        return 'https://skykit-contentmanager-int.appspot.com/content'
-    if on_integration_server:
-        return 'https://skykit-contentmanager-int.appspot.com/content'
-    if on_stage_server:
-        return 'https://skykit-contentmanager-stage.appspot.com/content'
-    if on_production_server:
-        return 'https://skykit-contentmanager.appspot.com/content'
-    return None
+    return '{}/content'.format(app_DEFAULT_CONTENT_MANAGER_URL)
 
 
 app_DEFAULT_PLAYER_CONTENT_URL = _DEFAULT_PLAYER_CONTENT_URL()
-
 
 
 def _STORMPATH_CLIENT():
     """
     http://docs.stormpath.com/python/quickstart/#create-a-client
     """
-    if on_production_server:
+    if on_test_harness or on_development_server or on_integration_server or on_stage_server:
+        id = '6VYRY6TL26YRBJOAOO533W6DO'
+        secret = 'oc4u1Nm0M5p3vJSOENhPZzAhNfzifAxMQS0v3J/kG/U'
+    elif on_production_server:
         id = 'IY5YOGP105D4HGY07GK2IT62X'
         secret = '8jPFs33PKDFuAz++gDeokLO7zAyfi1LSciL9xL0tEJk'
     else:
-        id = '6VYRY6TL26YRBJOAOO533W6DO'
-        secret = 'oc4u1Nm0M5p3vJSOENhPZzAhNfzifAxMQS0v3J/kG/U'
+        raise EnvironmentError("Unknown environment for Stormpath: {}".format(appid))
 
     api_key = {
         'id': id,
@@ -436,6 +437,7 @@ def _STORMPATH_AUTH_APP():
 app_STORMPATH_AUTH_APP = _STORMPATH_AUTH_APP()
 
 webapp2_extras_sessions_secret_key = '94eda847-0ea9-4f49-b96c-1434ec318563'
+
 
 ##############################################################################
 # MAIL SETTINGS
@@ -482,6 +484,32 @@ def _EMAIL_SUPPORT():
 
 
 app_EMAIL_SUPPORT = _EMAIL_SUPPORT()
+
+
+def _SQLALCHEMY_DATABASE_URI():
+    # the second arg after : is the db instance name
+    if on_test_harness:
+        db_uri = 'sqlite:///:memory:'
+    elif on_development_server:
+        db_uri = 'mysql+mysqldb://root@localhost/provisioning'
+    else:
+        if on_integration_server:
+            instance_name = 'provisioning-int'
+        elif on_stage_server:
+            instance_name = 'provisioning-stage'
+        elif on_production_server:
+            instance_name = 'provisioning-prod'
+        else:
+            instance_name = None
+
+        assert instance_name is not None, "Unknown environment"
+
+        # "provisioning" is the database name
+        db_uri = "mysql+mysqldb://root@/provisioning?unix_socket=/cloudsql/{}:{}".format(appid, instance_name)
+    return db_uri
+
+
+proofplay_SQLALCHEMY_DATABASE_URI = _SQLALCHEMY_DATABASE_URI()
 
 
 ##############################################################################
