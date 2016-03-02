@@ -303,7 +303,8 @@
                                  ng-model="deviceDetailsCtrl.currentDevice.customerDisplayName">
                         </div>
                       </div>
-                      <div class="col-sm-6" ng-class="{ 'has-error' : deviceUpdateForm.customerDisplayCode.$invalid && !deviceUpdateForm.customerDisplayCode.$pristine }">
+                      <div class="col-sm-6"
+                           ng-class="{ 'has-error' : deviceUpdateForm.customerDisplayCode.$invalid && !deviceUpdateForm.customerDisplayCode.$pristine }">
                         <label>Customer display code</label>
                         <div>
                           <input type="text"
@@ -400,6 +401,49 @@
                     <md-card-actions layout="row" layout-align="end center">
                       <md-button type="submit"
                                  ng-disabled="!serialControlForm.$dirty || serialControlForm.$invalid">
+                        <i class="fa fa-fw fa-save"></i>
+                        Save
+                      </md-button>
+                    </md-card-actions>
+                  </form>
+                </md-card-content>
+              </md-card>
+              <md-card>
+                <md-card-title>
+                  <md-card-title-text>
+                    <span class="md-headline">Polling Intervals</span>
+                  </md-card-title-text>
+                </md-card-title>
+                <md-card-content>
+                  <form name="intervalsControlForm"
+                        class="form-horizontal"
+                        ng-submit="deviceDetailsCtrl.onClickSaveIntervals()"
+                        novalidate>
+                    <div class="form-group">
+                      <div class="col-sm-4">
+                        <label>Heartbeat</label>
+                        <input type="number"
+                               class="form-control"
+                               name="heartbeatInterval"
+                               id="heartbeatInterval"
+                               ng-model="deviceDetailsCtrl.currentDevice.heartbeatInterval"
+                               min="1"
+                               ng-required="true">minutes
+                      </div>
+                      <div class="col-sm-4">
+                        <label>Check content</label>
+                        <input type="number"
+                               class="form-control"
+                               name="checkContentInterval"
+                               id="checkContentInterval"
+                               ng-model="deviceDetailsCtrl.currentDevice.checkContentInterval"
+                               min="1"
+                               ng-required="true">minutes
+                      </div>
+                    </div>
+                    <md-card-actions layout="row" layout-align="end center">
+                      <md-button type="submit"
+                                 ng-disabled="!intervalsControlForm.$dirty || intervalsControlForm.$invalid">
                         <i class="fa fa-fw fa-save"></i>
                         Save
                       </md-button>

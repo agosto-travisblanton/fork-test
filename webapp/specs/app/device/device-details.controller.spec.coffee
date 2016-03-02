@@ -289,6 +289,41 @@ describe 'DeviceDetailsCtrl', ->
       it "the 'then' handler routes navigation back to 'devices'", ->
         expect($state.go).toHaveBeenCalledWith 'devices'
 
+  describe '.onClickSaveIntervals', ->
+    beforeEach ->
+      devicesServicePromise = new skykitProvisioning.q.Mock
+      spyOn(DevicesService, 'save').and.returnValue devicesServicePromise
+      spyOn($state, 'go')
+      $stateParams = {}
+      spyOn(progressBarService, 'start')
+      spyOn(progressBarService, 'complete')
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+      controller.currentDevice.panelModel = {id: 'Sony-112'}
+      controller.currentDevice.panelInput = {id: 'HDMI1', parentId: 'Sony-112'}
+
+      controller.onClickSaveIntervals()
+      devicesServicePromise.resolve()
+
+    it 'starts the progress bar', ->
+      expect(progressBarService.start).toHaveBeenCalled()
+
+    it 'call DevicesService.save with the current device', ->
+      expect(DevicesService.save).toHaveBeenCalledWith controller.currentDevice
+
+    describe '.onFailureDeviceSaveIntervals', ->
+      beforeEach ->
+        spyOn(sweet, 'show')
+        controller.onFailureDeviceSaveIntervals()
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a sweet alert', ->
+        expect(sweet.show).toHaveBeenCalledWith('Oops...', 'Unable to save intervals information.', 'error')
+
+      it "the 'then' handler routes navigation back to 'devices'", ->
+        expect($state.go).toHaveBeenCalledWith 'devices'
+
   describe '.onClickResetSendButton', ->
     beforeEach ->
       commandsServicePromise = new skykitProvisioning.q.Mock

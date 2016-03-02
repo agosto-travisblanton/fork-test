@@ -597,6 +597,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json['tenantKey'], tenant.key.urlsafe())
         self.assertEqual(response_json['chromeDeviceDomain'], self.CHROME_DEVICE_DOMAIN)
         self.assertEqual(response_json['logglyLink'], None)
+        self.assertEqual(response_json['heartbeatInterval'], config.PLAYER_HEARTBEAT_INTERVAL_MINUTES)
+        self.assertEqual(response_json['checkContentInterval'], config.CHECK_FOR_CONTENT_INTERVAL_MINUTES)
 
     def test_get_device_by_key_entity_body_json_logglyLink_when_serial_number_is_specified(self):
         self.managed_device.serial_number = "SN5552324"

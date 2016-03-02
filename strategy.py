@@ -82,6 +82,7 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'panelModel': lambda o, field_name, context: o.key.get().panel_model},
     {'panelInput': lambda o, field_name, context: o.key.get().panel_input},
     {'heartbeatInterval': lambda o, field_name, context: o.key.get().heartbeat_interval_minutes},
+    {'checkContentInterval': lambda o, field_name, context: o.key.get().check_for_content_interval_minutes},
     {'connectionType': lambda o, field_name, context: o.key.get().connection_type},
     {'proofOfPlayLogging': lambda o, field_name, context: o.key.get().proof_of_play_logging},
     {'proofOfPlayEditable': lambda o, field_name, context: o.key.get().proof_of_play_editable},
