@@ -34,7 +34,7 @@
             <tbody>
             <tr ng-hide="tenantUnmanagedDevicesCtrl.tenantDevices.length">
               <td colspan="4" class="text-center text-danger">
-                {{ tenantUnmanagedDevicesCtrl.currentTenant.name }} has no unmanaged devices.
+                No unmanaged devices retrieved for {{ tenantUnmanagedDevicesCtrl.currentTenant.name }}.
               </td>
             </tr>
             <tr ng-repeat="item in tenantUnmanagedDevicesCtrl.tenantDevices | orderBy:'-created' ">
