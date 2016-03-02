@@ -111,7 +111,8 @@
                                                 <md-radio-group
                                                         ng-model="vm.radioButtonChoices.selection"
                                                         ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
-                                                    <md-radio-button style="margin-left: 20px" value="1">{{vm.radioButtonChoices.group1}}
+                                                    <md-radio-button style="margin-left: 20px" value="1">
+                                                        {{vm.radioButtonChoices.group1}}
                                                     </md-radio-button>
                                                     <md-radio-button style="margin-left: 20px" value="2">
                                                         {{vm.radioButtonChoices.group2}}
@@ -145,6 +146,7 @@
                                                         <li ng-repeat="item in vm.selected_resources">
                                                             {{ item }}
                                                             <md-button md-no-ink class="md-primary"
+                                                                       id="proofplay-selected-items"
                                                                        ng-click="vm.removeFromSelectedResource(item)">X
                                                             </md-button>
                                                             </button>
@@ -247,7 +249,8 @@
                                                 <md-radio-group
                                                         ng-model="vm.radioButtonChoices.selection"
                                                         ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
-                                                    <md-radio-button style="margin-left: 20px" value="1">{{vm.radioButtonChoices.group1}}
+                                                    <md-radio-button style="margin-left: 20px" value="1">
+                                                        {{vm.radioButtonChoices.group1}}
                                                     </md-radio-button>
                                                     <md-radio-button style="margin-left: 20px" value="2">
                                                         {{vm.radioButtonChoices.group2}}
@@ -281,6 +284,7 @@
                                                         <li ng-repeat="item in vm.selected_locations">
                                                             {{ item }}
                                                             <md-button md-no-ink class="md-primary"
+                                                                       id="proofplay-selected-items"
                                                                        ng-click="vm.removeFromSelectedLocation(item)">X
                                                             </md-button>
                                                             </button>
@@ -381,7 +385,8 @@
                                                 <md-radio-group
                                                         ng-model="vm.radioButtonChoices.selection"
                                                         ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
-                                                    <md-radio-button style="margin-left: 20px" value="1">{{vm.radioButtonChoices.group1}}
+                                                    <md-radio-button style="margin-left: 20px" value="1">
+                                                        {{vm.radioButtonChoices.group1}}
                                                     </md-radio-button>
                                                     <md-radio-button style="margin-left: 20px" value="2">
                                                         {{vm.radioButtonChoices.group2}}
@@ -415,6 +420,8 @@
                                                         <li ng-repeat="item in vm.selected_displays">
                                                             {{ item }}
                                                             <md-button md-no-ink class="md-primary"
+                                                                       id="proofplay-selected-items"
+
                                                                        ng-click="vm.removeFromSelectedDisplay(item)">X
                                                             </md-button>
                                                             </button>
