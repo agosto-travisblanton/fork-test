@@ -3,13 +3,13 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'DeviceDetailsCtrl', ($log,
-    $stateParams,
-    $state,
-    DevicesService,
-    LocationsService,
-    CommandsService,
-    sweet,
-    ProgressBarService) ->
+  $stateParams,
+  $state,
+  DevicesService,
+  LocationsService,
+  CommandsService,
+  sweet,
+  ProgressBarService) ->
   @tenantKey = $stateParams.tenantKey
   @deviceKey = $stateParams.deviceKey
   @fromDevices = $stateParams.fromDevices is "true"
@@ -45,6 +45,8 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     custom: undefined
     proofOfPlayLogging: false
     location: undefined
+    heartbeatInterval: undefined
+    checkContentInterval: undefined
   }
   @commandEvents = []
   @dayRange = 30
@@ -125,6 +127,12 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     promise = DevicesService.save @currentDevice
     promise.then @onSuccessDeviceSave, @onFailureDeviceSavePanels
 
+  @onClickSaveIntervals = () ->
+    ProgressBarService.start()
+    @setPanelInfo()
+    promise = DevicesService.save @currentDevice
+    promise.then @onSuccessDeviceSave, @onFailureDeviceSaveIntervals
+
   @onClickSaveLocation = () ->
     ProgressBarService.start()
     @currentDevice.locationKey = @currentDevice.location.key
@@ -140,6 +148,11 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     ProgressBarService.complete()
     $log.error errorObject
     sweet.show('Oops...', 'Unable to save the serial control information.', 'error')
+
+  @onFailureDeviceSaveIntervals = (errorObject) ->
+    ProgressBarService.complete()
+    $log.error errorObject
+    sweet.show('Oops...', 'Unable to save intervals information.', 'error')
 
   @onFailureDeviceSaveLocation = (errorObject) ->
     ProgressBarService.complete()
