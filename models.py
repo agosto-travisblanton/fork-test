@@ -285,6 +285,8 @@ class ChromeOsDevice(ndb.Model):
     sk_player_version = ndb.StringProperty(required=False, indexed=True)
     heartbeat_interval_minutes = ndb.IntegerProperty(default=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES, required=True,
                                                      indexed=False)
+    check_for_content_interval_minutes = ndb.IntegerProperty(default=config.CHECK_FOR_CONTENT_INTERVAL_MINUTES,
+                                                             required=True, indexed=True)
     proof_of_play_logging = ndb.BooleanProperty(default=False, required=True, indexed=True)
     proof_of_play_editable = ndb.BooleanProperty(default=False, required=True)
     customer_display_name = ndb.StringProperty(required=False, indexed=True)
