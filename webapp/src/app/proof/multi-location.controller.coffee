@@ -31,6 +31,8 @@ appModule.controller "ProofOfPlayMultiLocationCtrl", (ProofPlayService) ->
     .then (data) =>
       @loading = false
       @locations = data.data.locations
+      if @locations.length > 0
+        @had_some_items = true
 
   @addToSelectedLocations = (searchText) =>
     if @isLocationValid(searchText)
