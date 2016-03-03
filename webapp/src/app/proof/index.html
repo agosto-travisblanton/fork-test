@@ -47,7 +47,7 @@
                                                 <hr/>
 
                                             </div>
-                                            <div ng-if="vm.resources.length > 0 && !vm.loading">
+                                            <div ng-if="vm.had_some_items && !vm.loading">
 
 
                                                 <div ng-hide="vm.loading">
@@ -132,8 +132,9 @@
                                                     Submit
                                                 </md-button>
                                             </div>
-                                            <div ng-if="vm.resources.length === 0 && !vm.loading">
-                                                <h3>This tenant has no resources logged. Make sure your devices have proof of play activated.</h3>
+                                            <div ng-if="!vm.had_some_items && !vm.loading">
+                                                <h3>This tenant has no resources logged. Make sure your devices have
+                                                    proof of play activated.</h3>
                                             </div>
                                         </md-content>
 
@@ -192,7 +193,7 @@
                                                 <hr/>
 
                                             </div>
-                                            <div ng-if="vm.locations.length > 0 && !vm.loading">
+                                            <div ng-if="vm.had_some_items && !vm.loading">
 
                                                 <div ng-hide="vm.loading">
                                                     <h4 class="proof-of-play-label">Location Selection</h4>
@@ -276,8 +277,9 @@
                                                     Submit
                                                 </md-button>
                                             </div>
-                                            <div ng-if="vm.locations.length === 0 && !vm.loading">
-                                                <h3>This tenant has no locations logged. Make sure your devices have proof of play activated.</h3>
+                                            <div ng-if="!vm.had_some_items && !vm.loading">
+                                                <h3>This tenant has no locations logged. Make sure your devices have
+                                                    proof of play activated.</h3>
                                             </div>
                                         </md-content>
 
@@ -333,7 +335,7 @@
                                                 <hr/>
 
                                             </div>
-                                            <div ng-if="vm.displays.length > 0 && !vm.loading">
+                                            <div ng-if="vm.had_some_items && !vm.loading">
 
 
                                                 <div ng-hide="vm.loading">
@@ -418,8 +420,9 @@
                                                     Submit
                                                 </md-button>
                                             </div>
-                                            <div ng-if="vm.displays.length === 0 && !vm.loading">
-                                                <h3>This tenant has no displays logged. Make sure your devices have proof of play activated.</h3>
+                                            <div ng-if="!vm.had_some_items && !vm.loading">
+                                                <h3>This tenant has no displays logged. Make sure your devices have
+                                                    proof of play activated.</h3>
                                             </div>
                                         </md-content>
 
