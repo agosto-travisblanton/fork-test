@@ -152,8 +152,8 @@ class Tenant(ndb.Model):
     def find_devices(cls, tenant_key, unmanaged):
         if tenant_key:
             return ChromeOsDevice.query(
-                    ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
-                            ChromeOsDevice.is_unmanaged_device == unmanaged)
+                ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
+                        ChromeOsDevice.is_unmanaged_device == unmanaged)
             ).fetch(1000)
 
     @classmethod
@@ -269,7 +269,7 @@ class ChromeOsDevice(ndb.Model):
     etag = ndb.StringProperty(required=False, indexed=False)
     name = ndb.ComputedProperty(lambda self: '{0} {1}'.format(self.serial_number, self.model))
     loggly_link = ndb.ComputedProperty(lambda self: 'https://skykit.loggly.com/search?&terms=tag%3A"{0}"'.format(
-            self.serial_number))
+        self.serial_number))
     is_unmanaged_device = ndb.BooleanProperty(default=False, required=True, indexed=True)
     pairing_code = ndb.StringProperty(required=False, indexed=True)
     panel_model = ndb.StringProperty(required=False, indexed=True)
@@ -285,8 +285,12 @@ class ChromeOsDevice(ndb.Model):
     sk_player_version = ndb.StringProperty(required=False, indexed=True)
     heartbeat_interval_minutes = ndb.IntegerProperty(default=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES, required=True,
                                                      indexed=False)
+    check_for_content_interval_minutes = ndb.IntegerProperty(default=config.CHECK_FOR_CONTENT_INTERVAL_MINUTES,
+                                                             required=True, indexed=True)
     proof_of_play_logging = ndb.BooleanProperty(default=False, required=True, indexed=True)
     proof_of_play_editable = ndb.BooleanProperty(default=False, required=True)
+    customer_display_name = ndb.StringProperty(required=False, indexed=True)
+    customer_display_code = ndb.StringProperty(required=False, indexed=True)
     location_key = ndb.KeyProperty(required=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
@@ -304,39 +308,39 @@ class ChromeOsDevice(ndb.Model):
     def create_managed(cls, tenant_key, gcm_registration_id, mac_address, device_id=None, serial_number=None,
                        model=None):
         device = cls(
-                device_id=device_id,
-                tenant_key=tenant_key,
-                gcm_registration_id=gcm_registration_id,
-                mac_address=mac_address,
-                api_key=str(uuid.uuid4().hex),
-                serial_number=serial_number,
-                model=model,
-                is_unmanaged_device=False,
-                up=True,
-                storage_utilization=0,
-                memory_utilization=0,
-                heartbeat_updated=datetime.utcnow(),
-                program='****initial****',
-                program_id='****initial****',
-                heartbeat_interval_minutes=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES)
+            device_id=device_id,
+            tenant_key=tenant_key,
+            gcm_registration_id=gcm_registration_id,
+            mac_address=mac_address,
+            api_key=str(uuid.uuid4().hex),
+            serial_number=serial_number,
+            model=model,
+            is_unmanaged_device=False,
+            up=True,
+            storage_utilization=0,
+            memory_utilization=0,
+            heartbeat_updated=datetime.utcnow(),
+            program='****initial****',
+            program_id='****initial****',
+            heartbeat_interval_minutes=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES)
         return device
 
     @classmethod
     def create_unmanaged(cls, gcm_registration_id, mac_address):
         device = cls(
-                gcm_registration_id=gcm_registration_id,
-                mac_address=mac_address,
-                api_key=str(uuid.uuid4().hex),
-                pairing_code='{0}-{1}-{2}-{3}'.format(str(uuid.uuid4().hex)[:4], str(uuid.uuid4().hex)[:4],
-                                                      str(uuid.uuid4().hex)[:4], str(uuid.uuid4().hex)[:4]),
-                is_unmanaged_device=True,
-                up=True,
-                storage_utilization=0,
-                memory_utilization=0,
-                heartbeat_updated=datetime.utcnow(),
-                program='****initial****',
-                program_id='****initial****',
-                heartbeat_interval_minutes=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES)
+            gcm_registration_id=gcm_registration_id,
+            mac_address=mac_address,
+            api_key=str(uuid.uuid4().hex),
+            pairing_code='{0}-{1}-{2}-{3}'.format(str(uuid.uuid4().hex)[:4], str(uuid.uuid4().hex)[:4],
+                                                  str(uuid.uuid4().hex)[:4], str(uuid.uuid4().hex)[:4]),
+            is_unmanaged_device=True,
+            up=True,
+            storage_utilization=0,
+            memory_utilization=0,
+            heartbeat_updated=datetime.utcnow(),
+            program='****initial****',
+            program_id='****initial****',
+            heartbeat_interval_minutes=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES)
         return device
 
     @classmethod
@@ -366,8 +370,8 @@ class ChromeOsDevice(ndb.Model):
     @classmethod
     def mac_address_already_assigned(cls, device_mac_address):
         mac_address_assigned_to_device = ChromeOsDevice.query(
-                ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
-                       ChromeOsDevice.ethernet_mac_address == device_mac_address)).count() > 0
+            ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
+                   ChromeOsDevice.ethernet_mac_address == device_mac_address)).count() > 0
         return mac_address_assigned_to_device
 
     @classmethod
@@ -604,8 +608,8 @@ class DistributorUser(ndb.Model):
     @classmethod
     def create(cls, distributor_key, user_key):
         distributor_user = cls(
-                user_key=user_key,
-                distributor_key=distributor_key)
+            user_key=user_key,
+            distributor_key=distributor_key)
         return distributor_user
 
     def _pre_put_hook(self):
@@ -636,7 +640,7 @@ class PlayerCommandEvent(ndb.Model):
     @classmethod
     def get_events_by_device_key(self, device_urlsafe_key, last_number=100):
         query = PlayerCommandEvent.query(PlayerCommandEvent.device_urlsafe_key == device_urlsafe_key).order(
-                -PlayerCommandEvent.posted)
+            -PlayerCommandEvent.posted)
         return query.fetch(last_number)
 
     def _pre_put_hook(self):

@@ -4,6 +4,7 @@ from google.appengine.ext import ndb
 
 from app_config import config
 from restler.serializers import json_response
+from proofplay.database_calls import get_tenant_names_for_distributor
 
 
 def identity_required(handler_method):
@@ -110,6 +111,50 @@ def requires_api_token(handler_method):
             json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=403)
             return
         handler_method(self, *args, **kwargs)
+
+    return authorize
+
+
+def has_tenant_in_distributor_header(handler_method):
+    def authorize(self, *args, **kwargs):
+        distributor_key = self.request.headers.get('X-Provisioning-Distributor')
+        tenants = get_tenant_names_for_distributor(distributor_key)
+        tenant = kwargs['tenant']
+        if tenant not in tenants:
+            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+            self.abort(403)
+            return
+
+        handler_method(self, *args, **kwargs)
+
+    return authorize
+
+
+def has_tenant_in_distributor_param(handler_method):
+    def authorize(self, *args, **kwargs):
+        distributor_key = kwargs['distributor_key']
+        tenants = get_tenant_names_for_distributor(distributor_key)
+        tenant = kwargs['tenant']
+        if tenant not in tenants:
+            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+            self.abort(403)
+            return
+
+        handler_method(self, *args, **kwargs)
+
+    return authorize
+
+
+def has_distributor_key(handler_method):
+    def authorize(self, *args, **kwargs):
+        distributor_key = self.request.headers.get('X-Provisioning-Distributor')
+        if not distributor_key:
+            self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
+            self.abort(403)
+            return
+
+        handler_method(self, *args, **kwargs)
+
     return authorize
 
 
@@ -125,6 +170,7 @@ def requires_registration_token(handler_method):
             json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=403)
             return
         handler_method(self, *args, **kwargs)
+
     return authorize
 
 
@@ -139,6 +185,7 @@ def requires_unmanaged_registration_token(handler_method):
             json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=403)
             return
         handler_method(self, *args, **kwargs)
+
     return authorize
 
 

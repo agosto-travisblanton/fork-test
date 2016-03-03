@@ -11,6 +11,8 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     sweet,
     ProgressBarService) ->
   @tenantKey = $stateParams.tenantKey
+  @deviceKey = $stateParams.deviceKey
+  @fromDevices = $stateParams.fromDevices is "true"
   @currentDevice = {
     key: undefined
     gcmRegistrationId: undefined
@@ -42,23 +44,32 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     volume: undefined
     custom: undefined
     proofOfPlayLogging: false
+    location: undefined
+    heartbeatInterval: undefined
+    checkContentInterval: undefined
   }
   @commandEvents = []
   @dayRange = 30
   @editMode = !!$stateParams.deviceKey
   @issues = []
-  @pickerOptions = "{icons:{next:'glyphicon glyphicon-arrow-right',
-      previous:'glyphicon glyphicon-arrow-left',up:'glyphicon glyphicon-arrow-up',down:'glyphicon glyphicon-arrow-down'}}"
+  @pickerOptions = "{widgetPositioning: {vertical:'bottom'}, showTodayButton: true, sideBySide: true, icons:{
+      next:'glyphicon glyphicon-arrow-right',
+      previous:'glyphicon glyphicon-arrow-left',
+      up:'glyphicon glyphicon-arrow-up',
+      down:'glyphicon glyphicon-arrow-down'}}"
 
   @initialize = () ->
     @panelModels = DevicesService.getPanelModels()
     @panelInputs = DevicesService.getPanelInputs()
     if @editMode
-      devicePromise = DevicesService.getDeviceByKey $stateParams.deviceKey
-      devicePromise.then (data) =>
-        @currentDevice = data
-        @setSelectedOptions()
-      commandEventsPromise = DevicesService.getCommandEventsByKey $stateParams.deviceKey
+      devicePromise = DevicesService.getDeviceByKey @deviceKey
+      devicePromise.then ((response) =>
+        @onGetDeviceSuccess(response)
+        return
+      ), (response) =>
+        @onGetDeviceFailure(response)
+        return
+      commandEventsPromise = DevicesService.getCommandEventsByKey @deviceKey
       commandEventsPromise.then (data) =>
         @commandEvents = data
       now = new Date()
@@ -68,12 +79,31 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       @startTime = today.toLocaleString().replace(/,/g, "")
       @epochStart = moment(new Date(@startTime)).unix()
       @epochEnd = moment(new Date(@endTime)).unix()
-      issuesPromise = DevicesService.getIssuesByKey($stateParams.deviceKey, @epochStart, @epochEnd)
+      issuesPromise = DevicesService.getIssuesByKey(@deviceKey, @epochStart, @epochEnd)
       issuesPromise.then (data) =>
         @issues = data
-      locationsPromise = LocationsService.getLocationsByTenantKey @tenantKey
-      locationsPromise.then (data) =>
-        @locations = data
+
+  @onGetDeviceSuccess = (response) ->
+    @currentDevice = response
+    @tenantKey = @currentDevice.tenantKey if @tenantKey is undefined
+    if $stateParams.fromDevices is "true"
+      @backUrl = '/#/devices'
+      @backUrlText = 'Back to devices'
+    else
+      if @currentDevice.isUnmanagedDevice is true
+        @backUrl = "/#/tenants/#{@tenantKey}/unmanaged"
+        @backUrlText = 'Back to tenant unmanaged devices'
+      else
+        @backUrl = "/#/tenants/#{@tenantKey}/managed"
+        @backUrlText = 'Back to tenant managed devices'
+    locationsPromise = LocationsService.getLocationsByTenantKey @tenantKey
+    locationsPromise.then (data) =>
+      @locations = data
+      @setSelectedOptions()
+
+  @onGetDeviceFailure = (response) ->
+    errorMessage = "No detail for key ##{@deviceKey}.\nError: #{response.status} #{response.statusText}"
+    sweet.show('Oops...', errorMessage, 'error')
 
   @setSelectedOptions = () ->
     if @currentDevice.panelModel == null
@@ -84,21 +114,29 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
         if panelModel.id is @currentDevice.panelModel
           @currentDevice.panelModel = panelModel
       for panelInput in @panelInputs
-        if panelInput.id is @currentDevice.panelInput
+        isParent = panelInput.parentId is @currentDevice.panelModel.id
+        if isParent and panelInput.id.toLowerCase() is @currentDevice.panelInput
           @currentDevice.panelInput = panelInput
-
-  @setLocationInfo = () ->
-    #TODO wire this up
+    if @currentDevice.locationKey != null
+      for location in @locations
+        if location.key is @currentDevice.locationKey
+          @currentDevice.location = location
 
   @onClickSavePanels = () ->
     ProgressBarService.start()
-    @setPanelInfo()
     promise = DevicesService.save @currentDevice
     promise.then @onSuccessDeviceSave, @onFailureDeviceSavePanels
 
+  @onClickSaveIntervals = () ->
+    ProgressBarService.start()
+    @setPanelInfo()
+    promise = DevicesService.save @currentDevice
+    promise.then @onSuccessDeviceSave, @onFailureDeviceSaveIntervals
+
   @onClickSaveLocation = () ->
     ProgressBarService.start()
-    @setLocationInfo()
+    @currentDevice.locationKey = @currentDevice.location.key
+    @setPanelInfo()
     promise = DevicesService.save @currentDevice
     promise.then @onSuccessDeviceSave, @onFailureDeviceSaveLocation
 
@@ -110,6 +148,11 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     ProgressBarService.complete()
     $log.error errorObject
     sweet.show('Oops...', 'Unable to save the serial control information.', 'error')
+
+  @onFailureDeviceSaveIntervals = (errorObject) ->
+    ProgressBarService.complete()
+    $log.error errorObject
+    sweet.show('Oops...', 'Unable to save intervals information.', 'error')
 
   @onFailureDeviceSaveLocation = (errorObject) ->
     ProgressBarService.complete()
@@ -130,7 +173,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @onClickResetSendButton = () ->
     if @editMode
       ProgressBarService.start()
-      promise = CommandsService.reset $stateParams.deviceKey
+      promise = CommandsService.reset @deviceKey
       promise.then @onResetSuccess, @onResetFailure
 
   @onResetSuccess = () ->
@@ -144,7 +187,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @onClickContentDeleteSendButton = () ->
     if @editMode
       ProgressBarService.start()
-      promise = CommandsService.contentDelete $stateParams.deviceKey
+      promise = CommandsService.contentDelete @deviceKey
       promise.then @onContentDeleteSuccess, @onContentDeleteFailure
 
   @onContentDeleteSuccess = () ->
@@ -158,7 +201,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @onClickVolumeSendButton = () ->
     if @editMode
       ProgressBarService.start()
-      promise = CommandsService.volume $stateParams.deviceKey, @currentDevice.volume
+      promise = CommandsService.volume @deviceKey, @currentDevice.volume
       promise.then @onVolumeSuccess(@currentDevice.volume), @onVolumeFailure
 
   @onVolumeSuccess = (level) ->
@@ -172,7 +215,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @onClickCommandSendButton = () ->
     if @editMode
       ProgressBarService.start()
-      promise = CommandsService.custom $stateParams.deviceKey, @currentDevice.custom
+      promise = CommandsService.custom @deviceKey, @currentDevice.custom
       promise.then @onCommandSuccess(@currentDevice.custom), @onCommandFailure
 
   @onCommandSuccess = (command) ->
@@ -187,7 +230,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     ProgressBarService.start()
     @epochStart = moment(new Date(@startTime)).unix()
     @epochEnd = moment(new Date(@endTime)).unix()
-    issuesPromise = DevicesService.getIssuesByKey($stateParams.deviceKey, @epochStart, @epochEnd)
+    issuesPromise = DevicesService.getIssuesByKey(@deviceKey, @epochStart, @epochEnd)
     issuesPromise.then ((data) =>
       @onRefreshIssuesSuccess(data)
     ), (error) =>
@@ -204,7 +247,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @onClickPowerOnSendButton = () ->
     if @editMode
       ProgressBarService.start()
-      promise = CommandsService.powerOn $stateParams.deviceKey
+      promise = CommandsService.powerOn @deviceKey
       promise.then @onPowerOnSuccess, @onPowerOnFailure
 
   @onPowerOnSuccess = () ->
@@ -218,7 +261,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @onClickPowerOffSendButton = () ->
     if @editMode
       ProgressBarService.start()
-      promise = CommandsService.powerOff $stateParams.deviceKey
+      promise = CommandsService.powerOff @deviceKey
       promise.then @onPowerOffSuccess, @onPowerOffFailure
 
   @onPowerOffSuccess = () ->
@@ -233,6 +276,14 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     if @currentDevice.panelModel != null
       @currentDevice.panelModel = if @currentDevice.panelModel.id == 'None' then null else @currentDevice.panelModel.id
     if @currentDevice.panelInput != null
-      @currentDevice.panelInput = if @currentDevice.panelInput.id == '0' then null else @currentDevice.panelInput.id
+      @currentDevice.panelInput = if @currentDevice.panelInput.id == 'None' then null else @currentDevice.panelInput.id.toLowerCase()
+
+  @autoGenerateCustomerDisplayCode = ->
+    newDisplayCode = ''
+    if @currentDevice.customerDisplayName
+      newDisplayCode = @currentDevice.customerDisplayName.toLowerCase()
+      newDisplayCode = newDisplayCode.replace(/\s+/g, '_')
+      newDisplayCode = newDisplayCode.replace(/\W+/g, '')
+    @currentDevice.customerDisplayCode = newDisplayCode
 
   @

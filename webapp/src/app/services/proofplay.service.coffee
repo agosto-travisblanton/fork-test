@@ -70,7 +70,7 @@ angular.module('skykitProvisioning')
       allResources = ''
 
       for each in resources
-        allResources = allResources + "-" + each
+        allResources = allResources + "|" + each
 
       $window.open(@uriBase + '/multi_resource_by_date/' + start_date + '/' + end_date + '/' + allResources + '/' +
           @chosenTenant + "/" + $cookies.get('currentDistributorKey')
@@ -83,7 +83,7 @@ angular.module('skykitProvisioning')
       allResources = ''
 
       for each in resources
-        allResources = allResources + "-" + each
+        allResources = allResources + "|" + each
 
       $window.open(@uriBase + '/multi_resource_by_device/' + start_date + '/' + end_date + '/' + allResources + '/' +
           @chosenTenant + "/" + $cookies.get('currentDistributorKey')
@@ -96,7 +96,7 @@ angular.module('skykitProvisioning')
       allDevices = ''
 
       for each in devices
-        allDevices = allDevices + "," + each
+        allDevices = allDevices + "|" + each
 
       $window.open(@uriBase + '/multi_device_summarized/' + start_date + '/' + end_date + '/' + allDevices + '/' +
           @chosenTenant + "/" + $cookies.get('currentDistributorKey')
@@ -108,7 +108,7 @@ angular.module('skykitProvisioning')
       allDevices = ''
 
       for each in devices
-        allDevices = allDevices + "," + each
+        allDevices = allDevices + "|" + each
 
       $window.open(@uriBase + '/multi_device_by_date/' + start_date + '/' + end_date + '/' + allDevices + '/' +
           @chosenTenant + "/" + $cookies.get('currentDistributorKey')
@@ -119,7 +119,7 @@ angular.module('skykitProvisioning')
       allLocations = ''
 
       for each in locations
-        allLocations = allLocations + "," + each
+        allLocations = allLocations + "|" + each
 
       $window.open(@uriBase + '/multi_location_by_device/' + start_date + '/' + end_date + '/' + allLocations + '/' +
           @chosenTenant + "/" + $cookies.get('currentDistributorKey')
@@ -130,7 +130,7 @@ angular.module('skykitProvisioning')
       allLocations = ''
 
       for each in locations
-        allLocations = allLocations + "," + each
+        allLocations = allLocations + "|" + each
 
       $window.open(@uriBase + '/multi_location_summarized/' + start_date + '/' + end_date + '/' + allLocations + '/' +
           @chosenTenant + "/" + $cookies.get('currentDistributorKey')

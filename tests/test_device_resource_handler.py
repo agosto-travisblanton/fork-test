@@ -15,7 +15,7 @@ from chrome_os_devices_api import (refresh_device_by_mac_address, refresh_device
 from agar.test import BaseTest, WebTest
 from mockito import when, any as any_matcher
 from routes import application
-from models import ChromeOsDevice, Tenant, Distributor, Domain, DeviceIssueLog
+from models import ChromeOsDevice, Tenant, Distributor, Domain, DeviceIssueLog, Location
 from app_config import config
 
 
@@ -471,7 +471,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertLength(10, response_json['objects'])
+        self.assertLength(21, response_json)
 
     def test_get_filter_unmanaged_devices_by_tenant_entity_body_json(self):
         self.__build_list_devices(tenant_key=self.tenant_key, managed_number_to_build=20,
@@ -481,7 +481,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertLength(0, response_json['objects'])
+        self.assertLength(0, response_json)
 
     #################################################################################################################
     # get_devices_by_distributor
@@ -597,6 +597,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json['tenantKey'], tenant.key.urlsafe())
         self.assertEqual(response_json['chromeDeviceDomain'], self.CHROME_DEVICE_DOMAIN)
         self.assertEqual(response_json['logglyLink'], None)
+        self.assertEqual(response_json['heartbeatInterval'], config.PLAYER_HEARTBEAT_INTERVAL_MINUTES)
+        self.assertEqual(response_json['checkContentInterval'], config.CHECK_FOR_CONTENT_INTERVAL_MINUTES)
 
     def test_get_device_by_key_entity_body_json_logglyLink_when_serial_number_is_specified(self):
         self.managed_device.serial_number = "SN5552324"
@@ -827,6 +829,40 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json['contentServerUrl'], self.CONTENT_SERVER_URL)
         self.assertEqual(response_json['gcmRegistrationId'], self.GCM_REGISTRATION_ID)
         self.assertEqual(response_json['macAddress'], self.MAC_ADDRESS)
+
+    def test_device_resource_put_updates_location(self):
+        location = Location.create(tenant_key=self.tenant_key,
+                                   customer_location_name='Store 1234',
+                                   customer_location_code='store_1234',
+                                   timezone='America/Chicago')
+        location_key = location.put()
+        request_body = {'locationKey': location_key.urlsafe()}
+        when(deferred).defer(any_matcher(update_chrome_os_device),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
+                     json.dumps(request_body),
+                     headers=self.api_token_authorization_header)
+        updated_device = self.managed_device_key.get()
+        self.assertEqual(updated_device.location_key, location_key)
+
+    def test_device_resource_put_updates_customer_display_info(self):
+        customer_display_name = 'Panel in Reception'
+        customer_display_code = 'panel_in_reception'
+        request_body = {
+            'customerDisplayName': customer_display_name,
+            'customerDisplayCode': customer_display_code
+        }
+        self.assertIsNone(self.managed_device.customer_display_name)
+        self.assertIsNone(self.managed_device.customer_display_code)
+        when(deferred).defer(any_matcher(update_chrome_os_device),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
+                     json.dumps(request_body),
+                     headers=self.api_token_authorization_header)
+        updated_device = self.managed_device_key.get()
+        self.assertEqual(customer_display_name, updated_device.customer_display_name)
+        self.assertEqual(customer_display_code, updated_device.customer_display_code)
+
 
     ##################################################################################################################
     ## delete

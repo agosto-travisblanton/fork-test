@@ -38,35 +38,57 @@ body {
 }
 
 .margin-top-05 {
-  margin-top: 0.5em; }
+  margin-top: 0.5em;
+}
 
 .margin-top-15 {
-  margin-top: 1.5em; }
+  margin-top: 1.5em;
+}
+
+.margin-top-20 {
+  margin-top: 2.0em;
+}
+
+.margin-top-25 {
+  margin-top: 2.5em;
+}
+
+.margin-top-50 {
+  margin-top: 5.0em;
+}
 
 .issue-warning-background {
   background-color: orange;
 }
+
 .issue-warning-text {
   color: orange;
 }
+
 .issue-danger-background {
   background-color: red;
 }
+
 .issue-danger-text {
   color: red;
 }
+
 .issue-normal-background {
   background-color: green;
 }
+
 .issue-normal-text {
   color: green;
 }
+
 .up-true-background {
   background-color: green;
 }
+
 .up-false-background {
   background-color: red;
 }
+
 .navbar-default {
   background-color: $top-navbar-background-color;
   border-color: darken($top-navbar-background-color, 10%);
@@ -347,12 +369,24 @@ ul.alert-dropdown {
   padding-top: 10px;
 }
 
-.copy-ready-device-key{
+.copy-ready-device-key {
   color: transparent;
-}​
+}
 
+​
 .no-devices {
   text-align: center;
+}
+
+.gcm-registration-id-word-break {
+  width: 390px;
+  word-wrap: break-word;
+  display: inline-block;
+}
+.hostname-word-break {
+  width: 200px;
+  word-wrap: break-word;
+  display: inline-block;
 }
 
 [ng-click],

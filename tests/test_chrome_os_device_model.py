@@ -92,6 +92,13 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertEqual(device.program_id, '****initial****')
         self.assertTrue(device.heartbeat_interval_minutes is config.PLAYER_HEARTBEAT_INTERVAL_MINUTES)
 
+    def test_create_managed_has_expected_default_check_for_content_interval(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
+        self.assertTrue(device.check_for_content_interval_minutes is config.CHECK_FOR_CONTENT_INTERVAL_MINUTES)
+
     def test_create_unmanaged_auto_sets_heartbeat_info(self):
         device = ChromeOsDevice.create_unmanaged(self.TEST_GCM_REGISTRATION_ID, self.MAC_ADDRESS)
         self.assertTrue(device.is_unmanaged_device)
@@ -110,12 +117,16 @@ class TestChromeOsDeviceModel(BaseTest):
                                                mac_address=self.MAC_ADDRESS)
         device.panel_model = self.DISPLAY_PANEL_MODEL
         device.panel_input = self.DISPLAY_PANEL_INPUT
-        display_description = 'Store 445'
-        display_code = 'store_445'
+        customer_location_name = 'Store 445'
+        customer_location_code = 'store_445'
+        customer_display_name = 'Panel in Reception'
+        customer_display_code = 'panel_in_reception'
+        device.customer_display_name = customer_display_name
+        device.customer_display_code = customer_display_code
         timezone = 'America/Chicago'
         location = Location.create(tenant_key=self.tenant_key,
-                                   customer_location_name=display_description,
-                                   customer_location_code=display_code,
+                                   customer_location_name=customer_location_name,
+                                   customer_location_code=customer_location_code,
                                    timezone=timezone)
         location.geo_location = ndb.GeoPt(self.LATITUDE, self.LONGITUDE)
         device.location_key = location.put()
@@ -133,8 +144,10 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertEqual(str(device.panel_input), json_representation['panelInput'])
         self.assertEqual(str(device.panel_model), json_representation['panelModel'])
         self.assertEqual(str(device.location_key.urlsafe()), json_representation['locationKey'])
-        self.assertEqual(display_description, json_representation['displayDescription'])
-        self.assertEqual(display_code, json_representation['displayCode'])
+        self.assertEqual(customer_location_name, json_representation['customerLocationName'])
+        self.assertEqual(customer_location_code, json_representation['customerLocationCode'])
+        self.assertEqual(customer_display_name, json_representation['customerDisplayName'])
+        self.assertEqual(customer_display_code, json_representation['customerDisplayCode'])
         self.assertEqual(self.LATITUDE, json_representation['latitude'])
         self.assertEqual(self.LONGITUDE, json_representation['longitude'])
         self.assertEqual(timezone, json_representation['timezone'])
@@ -148,12 +161,12 @@ class TestChromeOsDeviceModel(BaseTest):
                                                mac_address=self.MAC_ADDRESS)
         device.panel_model = self.DISPLAY_PANEL_MODEL
         device.panel_input = self.DISPLAY_PANEL_INPUT
-        display_description = 'Store 445'
-        display_code = 'store_445'
+        customer_location_name = 'Store 445'
+        customer_location_code = 'store_445'
         timezone = 'America/Chicago'
         location = Location.create(tenant_key=self.tenant_key,
-                                   customer_location_name=display_description,
-                                   customer_location_code=display_code,
+                                   customer_location_name=customer_location_name,
+                                   customer_location_code=customer_location_code,
                                    timezone=timezone)
         device.location_key = location.put()
         device.put()
@@ -170,8 +183,8 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertEqual(str(device.panel_input), json_representation['panelInput'])
         self.assertEqual(str(device.panel_model), json_representation['panelModel'])
         self.assertEqual(str(device.location_key.urlsafe()), json_representation['locationKey'])
-        self.assertEqual(display_description, json_representation['displayDescription'])
-        self.assertEqual(display_code, json_representation['displayCode'])
+        self.assertEqual(customer_location_name, json_representation['customerLocationName'])
+        self.assertEqual(customer_location_code, json_representation['customerLocationCode'])
         geo_location_default = ndb.GeoPt(44.98, -93.27)
         self.assertEqual(geo_location_default.lat, json_representation['latitude'])
         self.assertEqual(geo_location_default.lon, json_representation['longitude'])

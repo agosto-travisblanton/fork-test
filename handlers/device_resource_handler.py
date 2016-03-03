@@ -94,9 +94,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
                         ChromeOsDevice.is_unmanaged_device == unmanaged)
         )
-        query_forward = query.order(ChromeOsDevice.key)
-        query_reverse = query.order(-ChromeOsDevice.key)
-        result_data = self.fetch_page(query_forward, query_reverse)
+        # query_forward = query.order(ChromeOsDevice.key)
+        # query_reverse = query.order(-ChromeOsDevice.key)
+        # result_data = self.fetch_page(query_forward, query_reverse)
+        result_data = query.fetch(1000)
         json_response(self.response, result_data, strategy=CHROME_OS_DEVICE_STRATEGY)
 
     @requires_api_token
@@ -256,6 +257,26 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
         else:
             request_json = json.loads(self.request.body)
+            location_urlsafe_key = request_json.get('locationKey')
+            if location_urlsafe_key:
+                try:
+                    location = ndb.Key(urlsafe=location_urlsafe_key).get()
+                except Exception, e:
+                    logging.exception(e)
+                if location:
+                    device.location_key = location.key
+            heartbeat_interval_minutes = request_json.get('heartbeatInterval')
+            if heartbeat_interval_minutes:
+                device.heartbeat_interval_minutes = heartbeat_interval_minutes
+            check_for_content_interval_minutes = request_json.get('checkContentInterval')
+            if check_for_content_interval_minutes:
+                device.check_for_content_interval_minutes = check_for_content_interval_minutes
+            customer_display_name = request_json.get('customerDisplayName')
+            if customer_display_name:
+                device.customer_display_name = customer_display_name
+            customer_display_code = request_json.get('customerDisplayCode')
+            if customer_display_code:
+                device.customer_display_code = customer_display_code
             notes = request_json.get('notes')
             if notes:
                 device.notes = notes

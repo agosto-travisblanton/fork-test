@@ -2,13 +2,27 @@
 
 appModule = angular.module 'skykitProvisioning'
 
-appModule.controller "TenantsCtrl", ($state, $log, TenantsService, sweet) ->
+appModule.controller "TenantsCtrl", ($state, $log, TenantsService, ProgressBarService, sweet) ->
   @tenants = []
 
   @initialize = ->
+    ProgressBarService.start()
     promise = TenantsService.fetchAllTenants()
-    promise.then (data) =>
-      @tenants = data
+    promise.then ((response) =>
+      @getFetchSuccess(response)
+      return
+    ), (response) =>
+      @getFetchFailure(response)
+      return
+
+  @getFetchSuccess = (response) ->
+    @tenants = response
+    ProgressBarService.complete()
+
+  @getFetchFailure = (response) ->
+    ProgressBarService.complete()
+    errorMessage = "Unable to fetch tenants. Error: #{response.status} #{response.statusText}."
+    sweet.show('Oops...', errorMessage, 'error')
 
   @editItem = (item) ->
     $state.go 'tenantDetails', {tenantKey: item.key}

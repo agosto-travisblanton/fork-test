@@ -36,7 +36,7 @@
             <tbody>
             <tr ng-hide="tenantManagedDevicesCtrl.tenantDevices.length">
               <td colspan="6" class="text-center text-danger">
-                {{ tenantManagedDevicesCtrl.currentTenant.name }} has no managed devices.
+                No managed devices retrieved for {{ tenantManagedDevicesCtrl.currentTenant.name }}.
               </td>
             </tr>
             <tr ng-repeat="item in tenantManagedDevicesCtrl.tenantDevices | orderBy:'-created' ">
@@ -49,7 +49,7 @@
               <td>{{ item.macAddress }}</td>
               <td>{{ item.ethernetMacAddress }}</td>
               <td>
-                <a name="edit-device" class="btn" ng-click="tenantDevices.editItem(item)"
+                <a name="edit-device" class="btn" ng-click="tenantManagedDevicesCtrl.editItem(item)"
                    title="Device detail">{{item.serialNumber}}</a>
               </td>
               <td>{{ item.created }}</td>

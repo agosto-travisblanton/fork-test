@@ -7,33 +7,47 @@
   <md-content flex layout-padding>
     <div flex="100" flex-xs="100" layout="column">
       <div ncy-breadcrumb></div>
-      <md-card-actions layout="row">
-        <md-button ng-show="deviceDetailsCtrl.tenantKey.length > 0">
-          <div ng-switch on="deviceDetailsCtrl.currentDevice.isUnmanagedDevice">
-            <div ng-switch-when="true">
-              <a href="/#/tenants/{{deviceDetailsCtrl.tenantKey}}/unmanaged">
-                <i class="fa fa-fw fa-backward"></i> Back to tenant devices</a>
-            </div>
-            <div ng-switch-default>
-              <a href="/#/tenants/{{deviceDetailsCtrl.tenantKey}}/managed">
-                <i class="fa fa-fw fa-backward"></i> Back to tenant devices</a>
-            </div>
-          </div>
-        </md-button>
-        <md-button ngclipboard data-clipboard-target=".copy-ready-device-key">
-          <i class="fa fa-fw fa-clipboard"></i> Copy device key</a>
-        </md-button>
-      </md-card-actions>
+      <div class="row margin-top-05">
+        <div class="col-sm-6">
+          <table class="table table-responsive table-striped">
+            <thead>
+            <tr>
+              <th><i class="fa fa-fw fa-wifi"></i> MAC</th>
+              <th><i class="fa fa-fw fa-plug"></i> MAC</th>
+              <th>Serial number</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
+              </td>
+              <td class="reset-device-ethernet-mac-address">{{
+                deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
+              </td>
+              <td class="reset-device-serial-number">
+                {{deviceDetailsCtrl.currentDevice.serialNumber}}
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-sm-2 margin-top-20">
+          <md-button ngclipboard data-clipboard-target="#hidden-device-key">
+            <i class="fa fa-fw fa-clipboard"></i> Copy device key</a>
+          </md-button>
+        </div>
+        <div class="col-sm-2 margin-top-20">
+          <md-button>
+            <a href="{{deviceDetailsCtrl.backUrl}}">
+              <i class="fa fa-fw fa-backward"></i> {{deviceDetailsCtrl.backUrlText}}</a>
+          </md-button>
+        </div>
+      </div>
       <md-tabs md-dynamic-height md-border-bottom>
-        <md-tab label="Details">
+        <md-tab label="Properties">
           <md-content class="md-padding" layout="row" layout-wrap layout-align="left start" layout-xs="column">
             <div flex="35" flex-sm="35" flex-xs="35" layout="column">
               <md-card>
-                <md-card-title>
-                  <md-card-title-text>
-                    <span class="md-headline">Properties</span>
-                  </md-card-title-text>
-                </md-card-title>
                 <md-card-content>
                   <div class="form-group"
                        ng-hide="deviceDetailsCtrl.currentDevice.serialNumber == None ||
@@ -127,7 +141,7 @@
                        ng-hide="deviceDetailsCtrl.currentDevice.gcmRegistrationId == None ||
                        deviceDetailsCtrl.currentDevice.gcmRegistrationId == ''">
                     <label>GCM registration ID</label>
-                    <div>
+                    <div class="gcm-registration-id-word-break">
                       {{deviceDetailsCtrl.currentDevice.gcmRegistrationId}}
                     </div>
                   </div>
@@ -276,6 +290,38 @@
                         </div>
                       </div>
                     </div>
+                    <div class="form-group">
+                      <div class="col-sm-6">
+                        <label>Customer display name</label>
+                        <div>
+                          <input type="text"
+                                 class="form-control"
+                                 autofocus
+                                 name="customerDisplayName"
+                                 placeholder="e.g., Panel in Front Reception"
+                                 ng-change="deviceDetailsCtrl.autoGenerateCustomerDisplayCode()"
+                                 ng-model="deviceDetailsCtrl.currentDevice.customerDisplayName">
+                        </div>
+                      </div>
+                      <div class="col-sm-6"
+                           ng-class="{ 'has-error' : deviceUpdateForm.customerDisplayCode.$invalid && !deviceUpdateForm.customerDisplayCode.$pristine }">
+                        <label>Customer display code</label>
+                        <div>
+                          <input type="text"
+                                 class="form-control"
+                                 name="customerDisplayCode"
+                                 placeholder="auto-generated"
+                                 ng-model="deviceDetailsCtrl.currentDevice.customerDisplayCode"
+                                 ng-pattern="/^[a-z0-9_]*$/">
+                          <p
+                            ng-show="deviceUpdateForm.customerDisplayCode.$invalid && !deviceUpdateForm.customerDisplayCode.$invalid.$pristine"
+                            class="help-block">
+                            Alphanumeric and underscore allowed.
+                          </p>
+
+                        </div>
+                      </div>
+                    </div>
                     <md-card-actions layout="row" layout-align="end center">
                       <md-button type="submit"
                                  ng-disabled="!deviceUpdateForm.$dirty || deviceUpdateForm.$invalid">
@@ -297,7 +343,7 @@
                 <md-card-content>
                   <form name="locationForm"
                         class="form-horizontal"
-                        ng-submit="deviceDetailsCtrl.onClickSavePanels()"
+                        ng-submit="deviceDetailsCtrl.onClickSaveLocation()"
                         novalidate>
                     <div class="form-group">
                       <div class="col-sm-5">
@@ -305,8 +351,8 @@
                         <select
                           id="customerLocationName"
                           class="form-control"
-                          ng-model="deviceDetailsCtrl.currentDevice.customerLocationName"
-                          ng-options="p.customerLocationName for p in deviceDetailsCtrl.locations track by p.id">
+                          ng-model="deviceDetailsCtrl.currentDevice.location"
+                          ng-options="i.customerLocationName for i in deviceDetailsCtrl.locations track by i.key">
                         </select>
                       </div>
                     </div>
@@ -348,13 +394,56 @@
                           class="form-control"
                           ng-required="deviceDetailsCtrl.currentDevice.panelModel !== None"
                           ng-model="deviceDetailsCtrl.currentDevice.panelInput"
-                          ng-options="c.displayName for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">
+                          ng-options="c.id for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">
                         </select>
                       </div>
                     </div>
                     <md-card-actions layout="row" layout-align="end center">
                       <md-button type="submit"
                                  ng-disabled="!serialControlForm.$dirty || serialControlForm.$invalid">
+                        <i class="fa fa-fw fa-save"></i>
+                        Save
+                      </md-button>
+                    </md-card-actions>
+                  </form>
+                </md-card-content>
+              </md-card>
+              <md-card>
+                <md-card-title>
+                  <md-card-title-text>
+                    <span class="md-headline">Polling Intervals</span>
+                  </md-card-title-text>
+                </md-card-title>
+                <md-card-content>
+                  <form name="intervalsControlForm"
+                        class="form-horizontal"
+                        ng-submit="deviceDetailsCtrl.onClickSaveIntervals()"
+                        novalidate>
+                    <div class="form-group">
+                      <div class="col-sm-4">
+                        <label>Heartbeat</label>
+                        <input type="number"
+                               class="form-control"
+                               name="heartbeatInterval"
+                               id="heartbeatInterval"
+                               ng-model="deviceDetailsCtrl.currentDevice.heartbeatInterval"
+                               min="1"
+                               ng-required="true">minutes
+                      </div>
+                      <div class="col-sm-4">
+                        <label>Check content</label>
+                        <input type="number"
+                               class="form-control"
+                               name="checkContentInterval"
+                               id="checkContentInterval"
+                               ng-model="deviceDetailsCtrl.currentDevice.checkContentInterval"
+                               min="1"
+                               ng-required="true">minutes
+                      </div>
+                    </div>
+                    <md-card-actions layout="row" layout-align="end center">
+                      <md-button type="submit"
+                                 ng-disabled="!intervalsControlForm.$dirty || intervalsControlForm.$invalid">
                         <i class="fa fa-fw fa-save"></i>
                         Save
                       </md-button>
@@ -370,32 +459,6 @@
             <div flex="100" flex-sm="100" flex-xs="100" layout="column">
               <md-card>
                 <md-card-content>
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <table class="table table-responsive table-striped">
-                        <thead>
-                        <tr>
-                          <th>Serial number</th>
-                          <th>WiFi MAC</th>
-                          <th>Ethernet MAC</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                          <td class="reset-device-serial-number">
-                            {{deviceDetailsCtrl.currentDevice.serialNumber}}
-                          </td>
-                          <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
-                          </td>
-                          <td class="reset-device-ethernet-mac-address">{{
-                            deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                          </td>
-                        </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-
                   <form name="tenantForm" class="form-horizontal" ng-submit="deviceDetailsCtrl.onClickRefreshButton()"
                         novalidate>
                     <div class="row">
@@ -408,6 +471,7 @@
                                name="startTime"
                                id="startTime"
                                ng-model="deviceDetailsCtrl.startTime">
+                        </span>
                       </div>
                       <div class="col-sm-2">
                         <label for="endTime" class="control-label">To</label>
@@ -421,7 +485,7 @@
                       </div>
                       <div class="col-sm-2 margin-top-15">
                         <md-button type="submit">
-                          <i class="fa fa-fw fa-refresh"></i> Refresh
+                          <i class="fa fa-fw fa-filter"></i> Filter
                         </md-button>
                       </div>
                     </div>
@@ -444,7 +508,7 @@
                         <tbody>
                         <tr ng-hide="deviceDetailsCtrl.issues.length">
                           <td class="text-center text-warning" colspan="8">
-                            No vitals logged in the past {{deviceDetailsCtrl.dayRange}} days.<br>
+                            No events logged in the past {{deviceDetailsCtrl.dayRange}} days.<br>
                             Please try an earlier 'From date' above.
                           </td>
                         </tr>
@@ -466,6 +530,8 @@
                       </table>
                     </div>
                   </div>
+                  <div class="row margin-top-50">
+                  </div>
                 </md-card-content>
               </md-card>
             </div>
@@ -476,31 +542,6 @@
             <div flex="100" flex-sm="100" flex-xs="100" layout="column">
               <md-card>
                 <md-card-content>
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <table class="table table-responsive table-striped">
-                        <thead>
-                        <tr>
-                          <th>Serial number</th>
-                          <th>WiFi MAC</th>
-                          <th>Ethernet MAC</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                          <td class="reset-device-serial-number">
-                            {{deviceDetailsCtrl.currentDevice.serialNumber}}
-                          </td>
-                          <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
-                          </td>
-                          <td class="reset-device-ethernet-mac-address">{{
-                            deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                          </td>
-                        </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
                   <md-content class="md-padding" layout="row" layout-wrap layout-xs="column">
                     <div flex="25" flex-sm="25" flex-xs="25" layout="column">
                       <md-card>
@@ -707,7 +748,7 @@
       </md-tabs>
     </div>
   </md-content>
-  <div class="copy-ready-device-key">
+  <div id="hidden-device-key" class="copy-ready-device-key">
     {{deviceDetailsCtrl.currentDevice.key}}
   </div>
 </div>
