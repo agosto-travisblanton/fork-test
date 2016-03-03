@@ -1,6 +1,6 @@
+from app_config import config
 from migration_base import MigrationBase
 from models import Tenant
-from agar.env import on_production_server
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
@@ -14,9 +14,6 @@ class SetContentManagerBaseUrlOnTenant(MigrationBase):
     def run(self):
         tenants = Tenant.query().fetch(500)
         for tenant in tenants:
-            content_manager_base_url = 'https://skykit-contentmanager-int.appspot.com'
-            if on_production_server:
-                content_manager_base_url = 'https://skykit-contentmanager.appspot.com'
-            tenant.content_manager_base_url = content_manager_base_url
+            tenant.content_manager_base_url = config.DEFAULT_CONTENT_MANAGER_URL
             tenant.put()
 

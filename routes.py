@@ -15,7 +15,7 @@ if os.environ.get('CURRENT_VERSION_ID'):
 # from google.appengine.ext import deferred
 
 from webapp2 import Route, WSGIApplication
-from agar.env import on_production_server
+from provisioning_env import on_production_server
 
 application = WSGIApplication(
     [
