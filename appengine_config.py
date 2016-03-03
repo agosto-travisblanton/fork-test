@@ -522,14 +522,14 @@ proofplay_SQLALCHEMY_DATABASE_URI = _SQLALCHEMY_DATABASE_URI()
 # VERSION  sprint_number.deployment_increment.hotfix_increment e.g., 30.1.0
 ##############################################################################
 def _SPRINT_NUMBER():
-    return 30
+    return 31
 
 
 app_SPRINT_NUMBER = _SPRINT_NUMBER()
 
 
 def _DEPLOYMENT_COUNTER():
-    return 3
+    return 0
 
 
 app_DEPLOYMENT_COUNTER = _DEPLOYMENT_COUNTER()
