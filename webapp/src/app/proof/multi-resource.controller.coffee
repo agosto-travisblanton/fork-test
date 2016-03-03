@@ -32,6 +32,8 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService) ->
       @loading = false
       @full_resource_map = data.data.resources
       @resources = (resource.resource_name for resource in data.data.resources)
+      if @resources.length > 0
+        @had_some_items = true
 
   @addToSelectedResources = (searchText) =>
     if @isResourceValid(searchText)

@@ -31,6 +31,8 @@ appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService) ->
     .then (data) =>
       @loading = false
       @displays = data.data.devices
+      if @displays.length > 0
+        @had_some_items = true
 
   @addToSelectedDisplays = (searchText) =>
     if @isDisplayValid(searchText)
