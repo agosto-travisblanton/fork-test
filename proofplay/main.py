@@ -78,6 +78,8 @@ class RetrieveAllLocationsOfTenant(RequestHandler):
 class PostNewProgramPlay(RequestHandler):
     def post(self):
         incoming = json.loads(self.request.body)
+        logging.info("NEW BATCH OF LOGS:")
+        logging.info(incoming)
         deferred.defer(handle_posting_a_new_program_play, incoming)
         final = json.dumps({"success": True, "message": "NEW PROGRAM WILL BE PROCESSED IN THE TASK QUEUE"})
         self.response.headers['Content-Type'] = 'application/json'

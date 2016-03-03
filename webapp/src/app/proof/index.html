@@ -39,43 +39,6 @@
                                     <md-card-content>
                                         <md-content class="md-padding">
 
-                                            <div ng-hide="vm.loading">
-                                                <h4 class="proof-of-play-label">Resource Selection</h4>
-
-                                                <form ng-submit="$event.preventDefault()">
-                                                    <md-autocomplete
-                                                            md-selected-item="vm.selectedItem"
-                                                            md-search-text="vm.searchText"
-                                                            md-items="item in vm.querySearch(vm.resources, vm.searchText)"
-                                                            md-item-text="item"
-                                                            md-min-length="0"
-                                                            md-search-text-change="vm.isResourceValid(vm.searchText)"
-                                                            md-selected-item-change="vm.isResourceValid(vm.searchText)"
-                                                            placeholder="Select a resource">
-                                                        <md-item-template>
-                                        <span md-highlight-text="vm.searchText"
-                                              md-highlight-flags="^i">{{item}}</span>
-                                                        </md-item-template>
-                                                        <md-not-found>
-                                                            No matching item for search "{{vm.searchText}}" was found.
-                                                        </md-not-found>
-                                                    </md-autocomplete>
-                                                    <br/>
-
-                                                    <md-button class="md-raised"
-                                                               ng-click="vm.addToSelectedResources(vm.searchText)"
-                                                               style="float: right">Add
-                                                    </md-button>
-                                                    <br/>
-                                                    <br/>
-                                                    <br/>
-
-                                                    <hr/>
-
-
-                                                </form>
-                                            </div>
-
                                             <div ng-show="vm.loading">
 
                                                 <md-content class="md-padding">
@@ -84,50 +47,94 @@
                                                 <hr/>
 
                                             </div>
+                                            <div ng-if="vm.resources.length > 0 && !vm.loading">
 
 
-                                            <div class="row">
+                                                <div ng-hide="vm.loading">
+                                                    <h4 class="proof-of-play-label">Resource Selection</h4>
 
-                                                <div class="col-sm-3">
-                                                    <h4 class="proof-of-play-label">Start Date</h4>
-                                                    <md-datepicker ng-model="vm.dateTimeSelection.start"
-                                                                   ng-change="vm.isStartDateValid(vm.dateTimeSelection.start)"
-                                                                   required
-                                                                   md-placeholder="Enter date"></md-datepicker>
+                                                    <form ng-submit="$event.preventDefault()">
+                                                        <md-autocomplete
+                                                                md-selected-item="vm.selectedItem"
+                                                                md-search-text="vm.searchText"
+                                                                md-items="item in vm.querySearch(vm.resources, vm.searchText)"
+                                                                md-item-text="item"
+                                                                md-min-length="0"
+                                                                md-search-text-change="vm.isResourceValid(vm.searchText)"
+                                                                md-selected-item-change="vm.isResourceValid(vm.searchText)"
+                                                                placeholder="Select a resource">
+                                                            <md-item-template>
+                                        <span md-highlight-text="vm.searchText"
+                                              md-highlight-flags="^i">{{item}}</span>
+                                                            </md-item-template>
+                                                            <md-not-found>
+                                                                No matching item for search "{{vm.searchText}}" was
+                                                                found.
+                                                            </md-not-found>
+                                                        </md-autocomplete>
+                                                        <br/>
+
+                                                        <md-button class="md-raised"
+                                                                   ng-click="vm.addToSelectedResources(vm.searchText)"
+                                                                   style="float: right">Add
+                                                        </md-button>
+                                                        <br/>
+                                                        <br/>
+                                                        <br/>
+
+                                                        <hr/>
+
+
+                                                    </form>
                                                 </div>
-                                                <div class="col-sm-3 col-sm-offset-4">
 
-                                                    <h4 class="proof-of-play-label">End Date</h4>
-                                                    <md-datepicker ng-model="vm.dateTimeSelection.end"
-                                                                   ng-change="vm.isEndDateValid(vm.dateTimeSelection.end)"
-                                                                   required
-                                                                   md-placeholder="Enter date"></md-datepicker>
+
+                                                <div class="row">
+
+                                                    <div class="col-sm-3">
+                                                        <h4 class="proof-of-play-label">Start Date</h4>
+                                                        <md-datepicker ng-model="vm.dateTimeSelection.start"
+                                                                       ng-change="vm.isStartDateValid(vm.dateTimeSelection.start)"
+                                                                       required
+                                                                       md-placeholder="Enter date"></md-datepicker>
+                                                    </div>
+                                                    <div class="col-sm-3 col-sm-offset-4">
+
+                                                        <h4 class="proof-of-play-label">End Date</h4>
+                                                        <md-datepicker ng-model="vm.dateTimeSelection.end"
+                                                                       ng-change="vm.isEndDateValid(vm.dateTimeSelection.end)"
+                                                                       required
+                                                                       md-placeholder="Enter date"></md-datepicker>
+                                                    </div>
                                                 </div>
+                                                <hr/>
+
+                                                <md-input-container class="md-block">
+                                                    <h4 class="proof-of-play-label">Report Type</h4>
+                                                    <md-radio-group
+                                                            ng-model="vm.radioButtonChoices.selection"
+                                                            ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
+                                                        <md-radio-button style="margin-left: 20px" value="1">
+                                                            {{vm.radioButtonChoices.group1}}
+                                                        </md-radio-button>
+                                                        <md-radio-button style="margin-left: 20px" value="2">
+                                                            {{vm.radioButtonChoices.group2}}
+                                                        </md-radio-button>
+                                                    </md-radio-group>
+
+                                                </md-input-container>
+
+                                                <hr/>
+
+                                                <md-button class="md-raised" ng-click="vm.submit()"
+                                                           ng-disabled="vm.disabled"
+                                                           style="margin-top: 25px; float: right; margin-bottom: 50px">
+                                                    Submit
+                                                </md-button>
                                             </div>
-                                            <hr/>
-
-                                            <md-input-container class="md-block">
-                                                <h4 class="proof-of-play-label">Report Type</h4>
-                                                <md-radio-group
-                                                        ng-model="vm.radioButtonChoices.selection"
-                                                        ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
-                                                    <md-radio-button style="margin-left: 20px" value="1">
-                                                        {{vm.radioButtonChoices.group1}}
-                                                    </md-radio-button>
-                                                    <md-radio-button style="margin-left: 20px" value="2">
-                                                        {{vm.radioButtonChoices.group2}}
-                                                    </md-radio-button>
-                                                </md-radio-group>
-
-                                            </md-input-container>
-
-                                            <hr/>
-
-                                            <md-button class="md-raised" ng-click="vm.submit()"
-                                                       ng-disabled="vm.disabled"
-                                                       style="margin-top: 25px; float: right; margin-bottom: 50px">
-                                                Submit
-                                            </md-button>
+                                            <div ng-if="vm.resources.length === 0 && !vm.loading">
+                                                <h3>This tenant has no resources logged. Make sure your devices have proof of play activated.</h3>
+                                            </div>
                                         </md-content>
 
                                     </md-card-content>
@@ -177,43 +184,6 @@
                                     <md-card-content>
                                         <md-content class="md-padding">
 
-                                            <div ng-hide="vm.loading">
-                                                <h4 class="proof-of-play-label">Location Selection</h4>
-
-                                                <form ng-submit="$event.preventDefault()">
-                                                    <md-autocomplete
-                                                            md-selected-item="vm.selectedItem"
-                                                            md-search-text="vm.searchText"
-                                                            md-items="item in vm.querySearch(vm.locations, vm.searchText)"
-                                                            md-item-text="item"
-                                                            md-min-length="0"
-                                                            md-search-text-change="vm.isLocationValid(vm.searchText)"
-                                                            md-selected-item-change="vm.isLocationValid(vm.searchText)"
-                                                            placeholder="Select a resource">
-                                                        <md-item-template>
-                                        <span md-highlight-text="vm.searchText"
-                                              md-highlight-flags="^i">{{item}}</span>
-                                                        </md-item-template>
-                                                        <md-not-found>
-                                                            No matching item for search "{{vm.searchText}}" was found.
-                                                        </md-not-found>
-                                                    </md-autocomplete>
-                                                    <br/>
-
-                                                    <md-button class="md-raised"
-                                                               ng-click="vm.addToSelectedLocations(vm.searchText)"
-                                                               style="float: right">Add
-                                                    </md-button>
-                                                    <br/>
-                                                    <br/>
-                                                    <br/>
-
-                                                    <hr/>
-
-
-                                                </form>
-                                            </div>
-
                                             <div ng-show="vm.loading">
 
                                                 <md-content class="md-padding">
@@ -222,50 +192,93 @@
                                                 <hr/>
 
                                             </div>
+                                            <div ng-if="vm.locations.length > 0 && !vm.loading">
+
+                                                <div ng-hide="vm.loading">
+                                                    <h4 class="proof-of-play-label">Location Selection</h4>
+
+                                                    <form ng-submit="$event.preventDefault()">
+                                                        <md-autocomplete
+                                                                md-selected-item="vm.selectedItem"
+                                                                md-search-text="vm.searchText"
+                                                                md-items="item in vm.querySearch(vm.locations, vm.searchText)"
+                                                                md-item-text="item"
+                                                                md-min-length="0"
+                                                                md-search-text-change="vm.isLocationValid(vm.searchText)"
+                                                                md-selected-item-change="vm.isLocationValid(vm.searchText)"
+                                                                placeholder="Select a resource">
+                                                            <md-item-template>
+                                        <span md-highlight-text="vm.searchText"
+                                              md-highlight-flags="^i">{{item}}</span>
+                                                            </md-item-template>
+                                                            <md-not-found>
+                                                                No matching item for search "{{vm.searchText}}" was
+                                                                found.
+                                                            </md-not-found>
+                                                        </md-autocomplete>
+                                                        <br/>
+
+                                                        <md-button class="md-raised"
+                                                                   ng-click="vm.addToSelectedLocations(vm.searchText)"
+                                                                   style="float: right">Add
+                                                        </md-button>
+                                                        <br/>
+                                                        <br/>
+                                                        <br/>
+
+                                                        <hr/>
 
 
-                                            <div class="row">
-
-                                                <div class="col-sm-3">
-                                                    <h4 class="proof-of-play-label">Start Date</h4>
-                                                    <md-datepicker ng-model="vm.dateTimeSelection.start"
-                                                                   ng-change="vm.isStartDateValid(vm.dateTimeSelection.start)"
-                                                                   required
-                                                                   md-placeholder="Enter date"></md-datepicker>
+                                                    </form>
                                                 </div>
-                                                <div class="col-sm-3 col-sm-offset-4">
 
-                                                    <h4 class="proof-of-play-label">End Date</h4>
-                                                    <md-datepicker ng-model="vm.dateTimeSelection.end"
-                                                                   ng-change="vm.isEndDateValid(vm.dateTimeSelection.end)"
-                                                                   required
-                                                                   md-placeholder="Enter date"></md-datepicker>
+
+                                                <div class="row">
+
+                                                    <div class="col-sm-3">
+                                                        <h4 class="proof-of-play-label">Start Date</h4>
+                                                        <md-datepicker ng-model="vm.dateTimeSelection.start"
+                                                                       ng-change="vm.isStartDateValid(vm.dateTimeSelection.start)"
+                                                                       required
+                                                                       md-placeholder="Enter date"></md-datepicker>
+                                                    </div>
+                                                    <div class="col-sm-3 col-sm-offset-4">
+
+                                                        <h4 class="proof-of-play-label">End Date</h4>
+                                                        <md-datepicker ng-model="vm.dateTimeSelection.end"
+                                                                       ng-change="vm.isEndDateValid(vm.dateTimeSelection.end)"
+                                                                       required
+                                                                       md-placeholder="Enter date"></md-datepicker>
+                                                    </div>
                                                 </div>
+                                                <hr/>
+
+                                                <md-input-container class="md-block">
+                                                    <h4 class="proof-of-play-label">Report Type</h4>
+                                                    <md-radio-group
+                                                            ng-model="vm.radioButtonChoices.selection"
+                                                            ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
+                                                        <md-radio-button style="margin-left: 20px" value="1">
+                                                            {{vm.radioButtonChoices.group1}}
+                                                        </md-radio-button>
+                                                        <md-radio-button style="margin-left: 20px" value="2">
+                                                            {{vm.radioButtonChoices.group2}}
+                                                        </md-radio-button>
+                                                    </md-radio-group>
+
+                                                </md-input-container>
+
+                                                <hr/>
+
+                                                <md-button class="md-raised" ng-click="vm.submit()"
+                                                           ng-disabled="vm.disabled"
+                                                           style="margin-top: 25px; float: right; margin-bottom: 50px">
+                                                    Submit
+                                                </md-button>
                                             </div>
-                                            <hr/>
-
-                                            <md-input-container class="md-block">
-                                                <h4 class="proof-of-play-label">Report Type</h4>
-                                                <md-radio-group
-                                                        ng-model="vm.radioButtonChoices.selection"
-                                                        ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
-                                                    <md-radio-button style="margin-left: 20px" value="1">
-                                                        {{vm.radioButtonChoices.group1}}
-                                                    </md-radio-button>
-                                                    <md-radio-button style="margin-left: 20px" value="2">
-                                                        {{vm.radioButtonChoices.group2}}
-                                                    </md-radio-button>
-                                                </md-radio-group>
-
-                                            </md-input-container>
-
-                                            <hr/>
-
-                                            <md-button class="md-raised" ng-click="vm.submit()"
-                                                       ng-disabled="vm.disabled"
-                                                       style="margin-top: 25px; float: right; margin-bottom: 50px">
-                                                Submit
-                                            </md-button>
+                                            <div ng-if="vm.locations.length === 0 && !vm.loading">
+                                                <h3>This tenant has no locations logged. Make sure your devices have proof of play activated.</h3>
+                                            </div>
                                         </md-content>
 
                                     </md-card-content>
@@ -312,44 +325,6 @@
                                 <md-card>
                                     <md-card-content>
                                         <md-content class="md-padding">
-
-                                            <div ng-hide="vm.loading">
-                                                <h4 class="proof-of-play-label">Display Selection</h4>
-
-                                                <form ng-submit="$event.preventDefault()">
-                                                    <md-autocomplete
-                                                            md-selected-item="vm.selectedItem"
-                                                            md-search-text="vm.searchText"
-                                                            md-items="item in vm.querySearch(vm.displays, vm.searchText)"
-                                                            md-item-text="item"
-                                                            md-min-length="0"
-                                                            md-search-text-change="vm.isDisplayValid(vm.searchText)"
-                                                            md-selected-item-change="vm.isDisplayValid(vm.searchText)"
-                                                            placeholder="Select a display">
-                                                        <md-item-template>
-                                        <span md-highlight-text="vm.searchText"
-                                              md-highlight-flags="^i">{{item}}</span>
-                                                        </md-item-template>
-                                                        <md-not-found>
-                                                            No matching item for search "{{vm.searchText}}" was found.
-                                                        </md-not-found>
-                                                    </md-autocomplete>
-                                                    <br/>
-
-                                                    <md-button class="md-raised"
-                                                               ng-click="vm.addToSelectedDisplays(vm.searchText)"
-                                                               style="float: right">Add
-                                                    </md-button>
-                                                    <br/>
-                                                    <br/>
-                                                    <br/>
-
-                                                    <hr/>
-
-
-                                                </form>
-                                            </div>
-
                                             <div ng-show="vm.loading">
 
                                                 <md-content class="md-padding">
@@ -358,50 +333,94 @@
                                                 <hr/>
 
                                             </div>
+                                            <div ng-if="vm.displays.length > 0 && !vm.loading">
 
 
-                                            <div class="row">
+                                                <div ng-hide="vm.loading">
+                                                    <h4 class="proof-of-play-label">Display Selection</h4>
 
-                                                <div class="col-sm-3">
-                                                    <h4 class="proof-of-play-label">Start Date</h4>
-                                                    <md-datepicker ng-model="vm.dateTimeSelection.start"
-                                                                   ng-change="vm.isStartDateValid(vm.dateTimeSelection.start)"
-                                                                   required
-                                                                   md-placeholder="Enter date"></md-datepicker>
+                                                    <form ng-submit="$event.preventDefault()">
+                                                        <md-autocomplete
+                                                                md-selected-item="vm.selectedItem"
+                                                                md-search-text="vm.searchText"
+                                                                md-items="item in vm.querySearch(vm.displays, vm.searchText)"
+                                                                md-item-text="item"
+                                                                md-min-length="0"
+                                                                md-search-text-change="vm.isDisplayValid(vm.searchText)"
+                                                                md-selected-item-change="vm.isDisplayValid(vm.searchText)"
+                                                                placeholder="Select a display">
+                                                            <md-item-template>
+                                                                <span md-highlight-text="vm.searchText"
+                                                                      md-highlight-flags="^i">{{item}}</span>
+                                                            </md-item-template>
+                                                            <md-not-found>
+                                                                No matching item for search "{{vm.searchText}}" was
+                                                                found.
+                                                            </md-not-found>
+                                                        </md-autocomplete>
+                                                        <br/>
+
+                                                        <md-button class="md-raised"
+                                                                   ng-click="vm.addToSelectedDisplays(vm.searchText)"
+                                                                   style="float: right">Add
+                                                        </md-button>
+                                                        <br/>
+                                                        <br/>
+                                                        <br/>
+
+                                                        <hr/>
+
+
+                                                    </form>
                                                 </div>
-                                                <div class="col-sm-3 col-sm-offset-4">
 
-                                                    <h4 class="proof-of-play-label">End Date</h4>
-                                                    <md-datepicker ng-model="vm.dateTimeSelection.end"
-                                                                   ng-change="vm.isEndDateValid(vm.dateTimeSelection.end)"
-                                                                   required
-                                                                   md-placeholder="Enter date"></md-datepicker>
+
+                                                <div class="row">
+
+                                                    <div class="col-sm-3">
+                                                        <h4 class="proof-of-play-label">Start Date</h4>
+                                                        <md-datepicker ng-model="vm.dateTimeSelection.start"
+                                                                       ng-change="vm.isStartDateValid(vm.dateTimeSelection.start)"
+                                                                       required
+                                                                       md-placeholder="Enter date"></md-datepicker>
+                                                    </div>
+                                                    <div class="col-sm-3 col-sm-offset-4">
+
+                                                        <h4 class="proof-of-play-label">End Date</h4>
+                                                        <md-datepicker ng-model="vm.dateTimeSelection.end"
+                                                                       ng-change="vm.isEndDateValid(vm.dateTimeSelection.end)"
+                                                                       required
+                                                                       md-placeholder="Enter date"></md-datepicker>
+                                                    </div>
                                                 </div>
+                                                <hr/>
+
+                                                <md-input-container class="md-block">
+                                                    <h4 class="proof-of-play-label">Report Type</h4>
+                                                    <md-radio-group
+                                                            ng-model="vm.radioButtonChoices.selection"
+                                                            ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
+                                                        <md-radio-button style="margin-left: 20px" value="1">
+                                                            {{vm.radioButtonChoices.group1}}
+                                                        </md-radio-button>
+                                                        <md-radio-button style="margin-left: 20px" value="2">
+                                                            {{vm.radioButtonChoices.group2}}
+                                                        </md-radio-button>
+                                                    </md-radio-group>
+
+                                                </md-input-container>
+
+                                                <hr/>
+
+                                                <md-button class="md-raised" ng-click="vm.submit()"
+                                                           ng-disabled="vm.disabled"
+                                                           style="margin-top: 25px; float: right; margin-bottom: 50px">
+                                                    Submit
+                                                </md-button>
                                             </div>
-                                            <hr/>
-
-                                            <md-input-container class="md-block">
-                                                <h4 class="proof-of-play-label">Report Type</h4>
-                                                <md-radio-group
-                                                        ng-model="vm.radioButtonChoices.selection"
-                                                        ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
-                                                    <md-radio-button style="margin-left: 20px" value="1">
-                                                        {{vm.radioButtonChoices.group1}}
-                                                    </md-radio-button>
-                                                    <md-radio-button style="margin-left: 20px" value="2">
-                                                        {{vm.radioButtonChoices.group2}}
-                                                    </md-radio-button>
-                                                </md-radio-group>
-
-                                            </md-input-container>
-
-                                            <hr/>
-
-                                            <md-button class="md-raised" ng-click="vm.submit()"
-                                                       ng-disabled="vm.disabled"
-                                                       style="margin-top: 25px; float: right; margin-bottom: 50px">
-                                                Submit
-                                            </md-button>
+                                            <div ng-if="vm.displays.length === 0 && !vm.loading">
+                                                <h3>This tenant has no displays logged. Make sure your devices have proof of play activated.</h3>
+                                            </div>
                                         </md-content>
 
                                     </md-card-content>

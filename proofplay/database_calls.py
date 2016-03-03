@@ -15,24 +15,37 @@ from google.appengine.ext import ndb
 ####################################################################################
 def retrieve_all_devices_of_tenant(tenant):
     session = Session()
-    tenant_id = session.query(TenantCode).filter_by(tenant_code=tenant).first().id
+    tenant = session.query(TenantCode).filter_by(tenant_code=tenant).first()
+    if tenant:
+        tenant_id = tenant.id
 
-    search = session.query(Device.customer_display_code.distinct().label("customer_display_code")).filter(
-            Device.tenant_id == tenant_id)
+        search = session.query(Device.customer_display_code.distinct().label("customer_display_code")).filter(
+                Device.tenant_id == tenant_id)
 
-    session.close()
-    return [row.customer_display_code for row in search.all()]
+        session.close()
+        return [row.customer_display_code for row in search.all()]
+    else:
+        session.close()
+        return []
 
 
 def retrieve_all_locations_of_tenant(tenant):
     session = Session()
-    tenant_id = session.query(TenantCode).filter_by(tenant_code=tenant).first().id
 
-    search = session.query(Device.location_id.distinct().label("location_id")).filter(
-            Device.tenant_id == tenant_id)
-    session.close()
-    location_ids = [row.location_id for row in search.all()]
-    return map(retrieve_customer_location_code_from_location_id, location_ids)
+    tenant = session.query(TenantCode).filter_by(tenant_code=tenant).first()
+
+    if tenant:
+        tenant_id = tenant.id
+
+        search = session.query(Device.location_id.distinct().label("location_id")).filter(
+                Device.tenant_id == tenant_id)
+        session.close()
+        location_ids = [row.location_id for row in search.all()]
+        return map(retrieve_customer_location_code_from_location_id, location_ids)
+
+    else:
+        session.close()
+        return []
 
 
 def retrieve_customer_location_code_from_location_id(location_id):
@@ -44,15 +57,19 @@ def retrieve_customer_location_code_from_location_id(location_id):
 
 def retrieve_all_resources_of_tenant(tenant):
     session = Session()
-    tenant_id = session.query(TenantCode).filter_by(tenant_code=tenant).first().id
-
-    search = session.query(Resource).filter(Resource.tenant_id == tenant_id).all()
-    session.close()
-    return [
-        {
-            "resource_name": resource.resource_name,
-            "resource_identifier": resource.resource_identifier
-        } for resource in search]
+    tenant = session.query(TenantCode).filter_by(tenant_code=tenant).first()
+    if tenant:
+        tenant_id = tenant.id
+        search = session.query(Resource).filter(Resource.tenant_id == tenant_id).all()
+        session.close()
+        return [
+            {
+                "resource_name": resource.resource_name,
+                "resource_identifier": resource.resource_identifier
+            } for resource in search]
+    else:
+        session.close()
+        return []
 
 
 def retrieve_resource_name_from_resource_id(resource_identifier):
