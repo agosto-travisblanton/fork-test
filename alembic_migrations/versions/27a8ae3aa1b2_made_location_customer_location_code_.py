@@ -1,13 +1,13 @@
-"""Add tenant code table
+"""made location customer_location_code not unique
 
-Revision ID: 28e9d1d4f30e
+Revision ID: 27a8ae3aa1b2
 Revises: None
-Create Date: 2016-02-26 21:51:55.913309
+Create Date: 2016-03-04 16:58:11.630937
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '28e9d1d4f30e'
+revision = '27a8ae3aa1b2'
 down_revision = None
 
 from alembic import op
@@ -40,8 +40,9 @@ def upgrade():
     sa.Column('dma_code', sa.String(length=255), nullable=True),
     sa.Column('state', sa.String(length=255), nullable=True),
     sa.Column('city', sa.String(length=255), nullable=True),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('customer_location_code')
+    sa.Column('tenant_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['tenant_id'], ['tenant_code.id'], ),
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('resource',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -55,7 +56,7 @@ def upgrade():
     op.create_table('device',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('location_id', sa.Integer(), nullable=True),
-    sa.Column('serial_number', sa.String(length=255), nullable=False),
+    sa.Column('serial_number', sa.String(length=255), nullable=True),
     sa.Column('device_key', sa.String(length=255), nullable=False),
     sa.Column('customer_display_code', sa.String(length=255), nullable=True),
     sa.Column('tenant_id', sa.Integer(), nullable=True),

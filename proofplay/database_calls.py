@@ -20,10 +20,12 @@ def retrieve_all_devices_of_tenant(tenant):
         tenant_id = tenant.id
 
         search = session.query(Device.customer_display_code.distinct().label("customer_display_code")).filter(
-                Device.tenant_id == tenant_id)
+            Device.tenant_id == tenant_id)
 
         session.close()
+
         return [row.customer_display_code for row in search.all()]
+
     else:
         session.close()
         return []
@@ -38,7 +40,7 @@ def retrieve_all_locations_of_tenant(tenant):
         tenant_id = tenant.id
 
         search = session.query(Device.location_id.distinct().label("location_id")).filter(
-                Device.tenant_id == tenant_id)
+            Device.tenant_id == tenant_id)
         session.close()
         location_ids = [row.location_id for row in search.all()]
         return map(retrieve_customer_location_code_from_location_id, location_ids)
@@ -92,13 +94,13 @@ def retrieve_all_resources():
 def insert_raw_program_play_event_data(each_log):
     session = Session()
     new_raw_event = ProgramPlayEvent(
-            resource_name=each_log["resource_name"],
-            resource_id=each_log["resource_id"],
-            serial_number=each_log["serial_number"],
-            device_key=each_log["device_key"],
-            tenant_code=each_log["tenant_code"],
-            started_at=datetime.datetime.strptime(each_log["started_at"], '%Y-%m-%dT%H:%M:%S.%fZ'),
-            ended_at=datetime.datetime.strptime(each_log["ended_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
+        resource_name=each_log["resource_name"],
+        resource_id=each_log["resource_id"],
+        serial_number=each_log["serial_number"],
+        device_key=each_log["device_key"],
+        tenant_code=each_log["tenant_code"],
+        started_at=datetime.datetime.strptime(each_log["started_at"], '%Y-%m-%dT%H:%M:%S.%fZ'),
+        ended_at=datetime.datetime.strptime(each_log["ended_at"], '%Y-%m-%dT%H:%M:%S.%fZ')
     )
     session.add(new_raw_event)
     session.commit()
@@ -120,11 +122,11 @@ def insert_new_program_record(location_id, device_id, resource_id, started_at, e
     session = Session()
 
     new_program_record = ProgramRecord(
-            location_id=location_id,
-            resource_id=resource_id,
-            device_id=device_id,
-            started_at=started_at,
-            ended_at=ended_at
+        location_id=location_id,
+        resource_id=resource_id,
+        device_id=device_id,
+        started_at=started_at,
+        ended_at=ended_at
     )
 
     session.add(new_program_record)
@@ -141,9 +143,9 @@ def insert_new_resource_or_get_existing(resource_name, resource_identifier, tena
         tenant_id = session.query(TenantCode).filter_by(tenant_code=tenant_code).first().id
 
         new_resource = Resource(
-                resource_name=resource_name,
-                resource_identifier=resource_identifier,
-                tenant_id=tenant_id
+            resource_name=resource_name,
+            resource_identifier=resource_identifier,
+            tenant_id=tenant_id
         )
         session.add(new_resource)
         session.commit()
@@ -167,7 +169,7 @@ def insert_new_tenant_code_or_get_existing(tenant_code):
 
     if not tenant_exists:
         new_tenant = TenantCode(
-                tenant_code=tenant_code,
+            tenant_code=tenant_code,
 
         )
         session.add(new_tenant)
@@ -179,14 +181,16 @@ def insert_new_tenant_code_or_get_existing(tenant_code):
         return tenant_exists.id
 
 
-def insert_new_location_or_get_existing(customer_location_code):
+def insert_new_location_or_get_existing(customer_location_code, tenant_id):
     session = Session()
 
-    location_exists = session.query(Location).filter_by(customer_location_code=customer_location_code).first()
+    location_exists = session.query(Location).filter_by(customer_location_code=customer_location_code).filter_by(
+        tenant_id=tenant_id).first()
 
     if not location_exists:
         new_location = Location(
-                customer_location_code=customer_location_code
+            customer_location_code=customer_location_code,
+            tenant_id=tenant_id
         )
         session.add(new_location)
         session.commit()
@@ -200,17 +204,18 @@ def insert_new_location_or_get_existing(customer_location_code):
 def insert_new_device_or_get_existing(location_id, serial_number, device_key, customer_display_code, tenant_code):
     session = Session()
 
-    device_exists = session.query(Device).filter_by(serial_number=serial_number).first()
+    device_exists = session.query(Device).filter_by(device_key=device_key).filter_by(
+        customer_display_code=customer_display_code).first()
 
     if not device_exists:
         tenant_id = session.query(TenantCode).filter_by(tenant_code=tenant_code).first().id
 
         new_device = Device(
-                location_id=location_id,
-                serial_number=serial_number,
-                device_key=device_key,
-                customer_display_code=customer_display_code,
-                tenant_id=tenant_id
+            location_id=location_id,
+            serial_number=serial_number,
+            device_key=device_key,
+            customer_display_code=customer_display_code,
+            tenant_id=tenant_id
 
         )
 
@@ -247,9 +252,9 @@ def get_raw_program_record_data_by_resource(start_date, end_date, resource_ident
     tenant_id = session.query(TenantCode).filter_by(tenant_code=tenant_code).first().id
 
     rows = session.query(ProgramRecord).filter(
-            ProgramRecord.ended_at.between(start_date, end_date)).filter(
-            ProgramRecord.resource_id == resource_id).filter(
-            ProgramRecord.full_device.has(tenant_id=tenant_id)).all()
+        ProgramRecord.ended_at.between(start_date, end_date)).filter(
+        ProgramRecord.resource_id == resource_id).filter(
+        ProgramRecord.full_device.has(tenant_id=tenant_id)).all()
 
     from_db = []
 
@@ -288,11 +293,11 @@ def get_raw_program_record_data_by_device(start_date, end_date, customer_display
 
     rows = session.query(ProgramRecord) \
         .filter(
-            ProgramRecord.ended_at.between(start_date, end_date)) \
+        ProgramRecord.ended_at.between(start_date, end_date)) \
         .filter(
-            ProgramRecord.device_id == device_id) \
+        ProgramRecord.device_id == device_id) \
         .filter(
-            ProgramRecord.full_device.has(tenant_id=tenant_id)).all()
+        ProgramRecord.full_device.has(tenant_id=tenant_id)).all()
 
     from_db = []
 
@@ -326,11 +331,11 @@ def get_raw_program_record_data_by_location(start_date, end_date, customer_locat
 
     rows = session.query(ProgramRecord) \
         .filter(
-            ProgramRecord.ended_at.between(start_date, end_date)) \
+        ProgramRecord.ended_at.between(start_date, end_date)) \
         .filter(
-            ProgramRecord.location_id == location_id) \
+        ProgramRecord.location_id == location_id) \
         .filter(
-            ProgramRecord.full_device.has(tenant_id=tenant_id)).all()
+        ProgramRecord.full_device.has(tenant_id=tenant_id)).all()
 
     from_db = []
 
@@ -362,5 +367,6 @@ def get_tenant_list_from_distributor_key(distributor_key):
 
 
 def get_tenant_names_for_distributor(distributor_key):
-    return [result.tenant_code.encode('ascii', 'ignore') for result in
+    return [result.tenant_code.encode('ascii', 'ignore')
+            for result in
             get_tenant_list_from_distributor_key(distributor_key)]

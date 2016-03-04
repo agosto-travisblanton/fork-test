@@ -24,12 +24,12 @@ class MakeMigration(RequestHandler):
             alembic_cfg.set_main_option('sqlalchemy.url', config.SQLALCHEMY_DATABASE_URI)
             command.upgrade(alembic_cfg, "head")
             self.response.out.write(
-                    "SUCCESS. Migrations Applied Successfully (or no change to model schema necessary).")
+                "SUCCESS. Migrations Applied Successfully (or no change to model schema necessary).")
 
         except Exception as e:
             print e
             self.response.out.write(
-                    "FAILURE. Exception caught during alembic migrations. Check the developer console logs.")
+                "FAILURE. Exception caught during alembic migrations. Check the developer console logs.")
 
 
 ####################################################################################
@@ -107,7 +107,7 @@ class MultiResourceByDevice(RequestHandler):
         midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
         midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
         just_before_next_day_end_date = (midnight_end_day + datetime.timedelta(days=1)) - datetime.timedelta(
-                seconds=1
+            seconds=1
         )
 
         all_the_resources = resource_identifiers.split("|")
@@ -119,26 +119,26 @@ class MultiResourceByDevice(RequestHandler):
             {
                 "resource": retrieve_resource_name_from_resource_id(resource),
                 "raw_data": program_record_for_resource_by_location(
-                        midnight_start_day,
-                        just_before_next_day_end_date,
-                        resource,
-                        tenant
+                    midnight_start_day,
+                    just_before_next_day_end_date,
+                    resource,
+                    tenant
                 )
             } for resource in all_the_resources_final]
 
         formatted_record_data_for_each_resource = list(map(
-                reformat_program_record_array_by_location,
-                array_of_transformed_record_data_by_location
+            reformat_program_record_array_by_location,
+            array_of_transformed_record_data_by_location
         ))
 
         resource_identifiers_to_resource_names = map(retrieve_resource_name_from_resource_id, all_the_resources_final)
 
         csv_to_publish = generate_resource_csv_by_device(
-                midnight_start_day,
-                just_before_next_day_end_date,
-                resource_identifiers_to_resource_names,
-                formatted_record_data_for_each_resource,
-                now
+            midnight_start_day,
+            just_before_next_day_end_date,
+            resource_identifiers_to_resource_names,
+            formatted_record_data_for_each_resource,
+            now
         )
 
         self.response.headers['Content-Type'] = 'application/csv'
@@ -160,7 +160,7 @@ class MultiResourceByDate(RequestHandler):
         midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
         midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
         just_before_next_day_end_date = (midnight_end_day + datetime.timedelta(days=1)) - datetime.timedelta(
-                seconds=1
+            seconds=1
         )
 
         all_the_resources = resource_identifiers.split("|")
@@ -174,27 +174,27 @@ class MultiResourceByDate(RequestHandler):
                 "resource": retrieve_resource_name_from_resource_id(resource),
                 # program_record is the transformed program record table data
                 "raw_data": program_record_for_resource_by_date(
-                        midnight_start_day,
-                        just_before_next_day_end_date,
-                        resource,
-                        tenant
+                    midnight_start_day,
+                    just_before_next_day_end_date,
+                    resource,
+                    tenant
                 )
             } for resource in all_the_resources_final]
 
         formatted_data = format_program_record_data_with_array_of_resources_by_date(
-                midnight_start_day,
-                just_before_next_day_end_date,
-                pre_formatted_program_record_by_date
+            midnight_start_day,
+            just_before_next_day_end_date,
+            pre_formatted_program_record_by_date
         )
 
         resource_identifiers_to_resource_names = map(retrieve_resource_name_from_resource_id, all_the_resources_final)
 
         csv_to_publish = generate_resource_csv_by_date(
-                midnight_start_day,
-                just_before_next_day_end_date,
-                resource_identifiers_to_resource_names,
-                formatted_data,
-                now
+            midnight_start_day,
+            just_before_next_day_end_date,
+            resource_identifiers_to_resource_names,
+            formatted_data,
+            now
         )
 
         self.response.headers['Content-Type'] = 'application/csv'
@@ -219,7 +219,7 @@ class MultiDeviceSummarized(RequestHandler):
         midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
         midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
         just_before_next_day_end_date = (midnight_end_day + datetime.timedelta(days=1)) - datetime.timedelta(
-                seconds=1
+            seconds=1
         )
 
         all_the_devices = devices.split("|")
@@ -233,21 +233,21 @@ class MultiDeviceSummarized(RequestHandler):
                 "device": device,
                 # program_record is the transformed program record table data
                 "raw_data": program_record_for_device_summarized(
-                        midnight_start_day,
-                        just_before_next_day_end_date,
-                        device,
-                        tenant
+                    midnight_start_day,
+                    just_before_next_day_end_date,
+                    device,
+                    tenant
                 )
             } for device in all_the_devices_final]
 
         formatted_data = format_transformed_program_data_by_device(array_of_transformed_program_data_by_device)
 
         csv_to_publish = generate_device_csv_summarized(
-                start_date=midnight_start_day,
-                end_date=just_before_next_day_end_date,
-                displays=all_the_devices_final,
-                array_of_data=formatted_data,
-                created_time=now
+            start_date=midnight_start_day,
+            end_date=just_before_next_day_end_date,
+            displays=all_the_devices_final,
+            array_of_data=formatted_data,
+            created_time=now
         )
 
         self.response.headers['Content-Type'] = 'application/csv'
@@ -269,7 +269,7 @@ class MultiDeviceByDate(RequestHandler):
         midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
         midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
         just_before_next_day_end_date = (midnight_end_day + datetime.timedelta(days=1)) - datetime.timedelta(
-                seconds=1
+            seconds=1
         )
 
         all_the_devices = devices.split("|")
@@ -283,25 +283,25 @@ class MultiDeviceByDate(RequestHandler):
                 "device": device,
                 # program_record is the transformed program record table data
                 "raw_data": program_record_for_device_by_date(
-                        midnight_start_day,
-                        just_before_next_day_end_date,
-                        device,
-                        tenant
+                    midnight_start_day,
+                    just_before_next_day_end_date,
+                    device,
+                    tenant
                 )
             } for device in all_the_devices_final]
 
         formatted_data = prepare_transformed_query_by_device_to_csv_by_date(
-                midnight_start_day,
-                just_before_next_day_end_date,
-                transformed_query_by_device_program_data_to_by_date
+            midnight_start_day,
+            just_before_next_day_end_date,
+            transformed_query_by_device_program_data_to_by_date
         )
 
         csv_to_publish = generate_device_csv_by_date(
-                start_date=midnight_start_day,
-                end_date=just_before_next_day_end_date,
-                displays=all_the_devices_final,
-                dictionary_of_data=formatted_data,
-                created_time=now
+            start_date=midnight_start_day,
+            end_date=just_before_next_day_end_date,
+            displays=all_the_devices_final,
+            dictionary_of_data=formatted_data,
+            created_time=now
         )
 
         self.response.headers['Content-Type'] = 'application/csv'
@@ -326,7 +326,7 @@ class MultiLocationSummarized(RequestHandler):
         midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
         midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
         just_before_next_day_end_date = (midnight_end_day + datetime.timedelta(days=1)) - datetime.timedelta(
-                seconds=1
+            seconds=1
         )
 
         all_the_locations = locations.split("|")
@@ -340,26 +340,26 @@ class MultiLocationSummarized(RequestHandler):
                 "location": location,
                 # program_record is the transformed program record table data
                 "raw_data": program_record_for_location_summarized(
-                        midnight_start_day,
-                        just_before_next_day_end_date,
-                        location,
-                        tenant
+                    midnight_start_day,
+                    just_before_next_day_end_date,
+                    location,
+                    tenant
                 )
             } for location in all_the_locations_final]
 
         formatted_data = map(
-                format_multi_location_summarized,
-                array_of_transformed_program_data_by_device
+            format_multi_location_summarized,
+            array_of_transformed_program_data_by_device
         )
 
         merged_formatted_data = create_merged_dictionary(formatted_data)
 
         csv_to_publish = generate_location_csv_summarized(
-                start_date=midnight_start_day,
-                end_date=just_before_next_day_end_date,
-                locations=all_the_locations_final,
-                dictionary_of_data=merged_formatted_data,
-                created_time=now
+            start_date=midnight_start_day,
+            end_date=just_before_next_day_end_date,
+            locations=all_the_locations_final,
+            dictionary_of_data=merged_formatted_data,
+            created_time=now
         )
 
         self.response.headers['Content-Type'] = 'application/csv'
@@ -381,7 +381,7 @@ class MultiLocationByDevice(RequestHandler):
         midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
         midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
         just_before_next_day_end_date = (midnight_end_day + datetime.timedelta(days=1)) - datetime.timedelta(
-                seconds=1
+            seconds=1
         )
 
         all_the_locations = locations.split("|")
@@ -395,26 +395,26 @@ class MultiLocationByDevice(RequestHandler):
                 "location": location,
                 # program_record is the transformed program record table data
                 "raw_data": program_record_for_location_summarized(
-                        midnight_start_day,
-                        just_before_next_day_end_date,
-                        location,
-                        tenant
+                    midnight_start_day,
+                    just_before_next_day_end_date,
+                    location,
+                    tenant
                 )
             } for location in all_the_locations_final]
 
         formatted_data = map(
-                format_multi_location_by_device,
-                array_of_transformed_program_data_by_device
+            format_multi_location_by_device,
+            array_of_transformed_program_data_by_device
         )
 
         merged_formatted_data = create_merged_dictionary(formatted_data)
 
         csv_to_publish = generate_location_csv_by_device(
-                start_date=midnight_start_day,
-                end_date=just_before_next_day_end_date,
-                locations=all_the_locations_final,
-                dictionary_of_data=merged_formatted_data,
-                created_time=now
+            start_date=midnight_start_day,
+            end_date=just_before_next_day_end_date,
+            locations=all_the_locations_final,
+            dictionary_of_data=merged_formatted_data,
+            created_time=now
         )
 
         self.response.headers['Content-Type'] = 'application/csv'
@@ -447,31 +447,31 @@ def handle_posting_a_new_program_play(incoming_data):
                 if not customer_location_code:
                     customer_location_code = "None"
 
-                location_id = insert_new_location_or_get_existing(customer_location_code)
-
                 if not customer_display_code:
                     customer_display_code = "None"
 
-                insert_new_tenant_code_or_get_existing(
-                        tenant_code
+                tenant_id = insert_new_tenant_code_or_get_existing(
+                    tenant_code
                 )
 
+                location_id = insert_new_location_or_get_existing(customer_location_code, tenant_id)
+
                 resource_id = insert_new_resource_or_get_existing(
-                        resource_name,
-                        resource_id,
-                        tenant_code
+                    resource_name,
+                    resource_id,
+                    tenant_code
                 )
 
                 device_id = insert_new_device_or_get_existing(
-                        location_id,
-                        serial_number,
-                        device_key,
-                        customer_display_code,
-                        tenant_code
+                    location_id,
+                    serial_number,
+                    device_key,
+                    customer_display_code,
+                    tenant_code
                 )
 
                 insert_new_program_record(
-                        location_id, device_id, resource_id, started_at, ended_at)
+                    location_id, device_id, resource_id, started_at, ended_at)
 
                 mark_raw_event_complete(raw_event_id)
 

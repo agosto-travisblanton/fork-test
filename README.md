@@ -40,9 +40,9 @@ $ python manage.py serve dispatch.yaml
 ```
 
 ### Test Back-End
-
+After following the directions found <a href="https://sites.google.com/a/dev.agosto.com/skykit/tenant-provisioning/testing">here</a>
 ```sh
-$ python manage.py test
+$ ./manage.py pytest --cov-report=term --cov-report=html --cov=. tests/
 ```
 ### Run Front-End
 
