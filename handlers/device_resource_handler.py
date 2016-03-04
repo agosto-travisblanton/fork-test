@@ -266,10 +266,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 if location:
                     device.location_key = location.key
             heartbeat_interval_minutes = request_json.get('heartbeatInterval')
-            if heartbeat_interval_minutes:
+            if heartbeat_interval_minutes is not None and heartbeat_interval_minutes > 0:
                 device.heartbeat_interval_minutes = heartbeat_interval_minutes
             check_for_content_interval_minutes = request_json.get('checkContentInterval')
-            if check_for_content_interval_minutes:
+            if check_for_content_interval_minutes is not None and check_for_content_interval_minutes > -1:
                 device.check_for_content_interval_minutes = check_for_content_interval_minutes
             customer_display_name = request_json.get('customerDisplayName')
             if customer_display_name:
@@ -349,12 +349,12 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                                                                  device_urlsafe_key)
                         logging.info(info_message)
             storage = request_json.get('storage')
-            if storage:
+            if storage is not None:
                 storage = int(storage)
                 if device.storage_utilization != storage:
                     device.storage_utilization = storage
             memory = request_json.get('memory')
-            if memory:
+            if memory is not None:
                 memory = int(memory)
                 if device.memory_utilization != memory:
                     device.memory_utilization = memory
