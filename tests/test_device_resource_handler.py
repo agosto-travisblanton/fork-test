@@ -863,6 +863,72 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(customer_display_name, updated_device.customer_display_name)
         self.assertEqual(customer_display_code, updated_device.customer_display_code)
 
+    def test_put_updates_valid_heartbeat_interval(self):
+        interval = 3
+        request_body = {
+            'heartbeatInterval': interval
+        }
+        when(deferred).defer(any_matcher(update_chrome_os_device),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
+                     json.dumps(request_body),
+                     headers=self.api_token_authorization_header)
+        updated_display = self.managed_device_key.get()
+        self.assertNotEqual(config.PLAYER_HEARTBEAT_INTERVAL_MINUTES, updated_display.heartbeat_interval_minutes)
+
+    def test_put_does_not_update_invalid_heartbeat_interval(self):
+        interval = 0
+        request_body = {
+            'heartbeatInterval': interval
+        }
+        when(deferred).defer(any_matcher(update_chrome_os_device),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
+                     json.dumps(request_body),
+                     headers=self.api_token_authorization_header)
+        updated_display = self.managed_device_key.get()
+        self.assertEqual(config.PLAYER_HEARTBEAT_INTERVAL_MINUTES, updated_display.heartbeat_interval_minutes)
+
+    def test_put_updates_valid_check_content_interval(self):
+        interval = 3
+        request_body = {
+            'checkContentInterval': interval
+        }
+        when(deferred).defer(any_matcher(update_chrome_os_device),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
+                     json.dumps(request_body),
+                     headers=self.api_token_authorization_header)
+        updated_display = self.managed_device_key.get()
+        self.assertNotEqual(config.CHECK_FOR_CONTENT_INTERVAL_MINUTES,
+                            updated_display.check_for_content_interval_minutes)
+
+    def test_put_updates_check_content_interval_zero(self):
+        interval = 0
+        request_body = {
+            'checkContentInterval': interval
+        }
+        when(deferred).defer(any_matcher(update_chrome_os_device),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
+                     json.dumps(request_body),
+                     headers=self.api_token_authorization_header)
+        updated_display = self.managed_device_key.get()
+        self.assertNotEqual(config.CHECK_FOR_CONTENT_INTERVAL_MINUTES,
+                            updated_display.check_for_content_interval_minutes)
+
+    def test_put_does_not_update_invalid_check_content_interval(self):
+        interval = -1
+        request_body = {
+            'checkContentInterval': interval
+        }
+        when(deferred).defer(any_matcher(update_chrome_os_device),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
+                     json.dumps(request_body),
+                     headers=self.api_token_authorization_header)
+        updated_display = self.managed_device_key.get()
+        self.assertEqual(config.CHECK_FOR_CONTENT_INTERVAL_MINUTES, updated_display.check_for_content_interval_minutes)
 
     ##################################################################################################################
     ## delete
