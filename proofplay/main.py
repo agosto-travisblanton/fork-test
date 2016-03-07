@@ -78,7 +78,7 @@ class RetrieveAllLocationsOfTenant(RequestHandler):
 class PostNewProgramPlay(RequestHandler):
     def post(self):
         incoming = json.loads(self.request.body)
-        logging.info("NEW BATCH OF LOGS:")
+        logging.info("NEW BATCH OF LOGS: ")
         logging.info(incoming)
         deferred.defer(handle_posting_a_new_program_play, incoming)
         final = json.dumps({"success": True, "message": "NEW PROGRAM WILL BE PROCESSED IN THE TASK QUEUE"})
@@ -427,8 +427,6 @@ class MultiLocationByDevice(RequestHandler):
 ####################################################################################
 def handle_posting_a_new_program_play(incoming_data):
     for each_log in incoming_data["data"]:
-        logging.info("INCOMING JSON ARRAY")
-        logging.info(each_log)
         try:
             if not each_log['customer_location_code'] and not each_log['customer_display_code']:
                 pass
