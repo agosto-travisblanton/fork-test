@@ -11,6 +11,7 @@ from provisioning_env import (
     on_stage_server,
     on_development_server,
     on_integration_server,
+    on_gamestop_server,
     on_server,
     on_test_harness,
     on_continuous_integration_server)
@@ -59,6 +60,8 @@ def _SERVICE_ACCOUNT_EMAIL():
         return '390010375778-87capuus77kispm64q27iah4kl0rorv4@developer.gserviceaccount.com'
     if on_stage_server:
         return 'service-247@skykit-provisioning-stage.iam.gserviceaccount.com'
+    if on_gamestop_server:
+        return '?????????????????'
     if on_production_server:
         return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0@developer.gserviceaccount.com'
     return None
@@ -87,6 +90,8 @@ def _CLIENT_ID():
         return '106935685560101973796'
     if on_production_server:
         return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0.apps.googleusercontent.com'
+    if on_gamestop_server:
+        return '281350297105-9pc7cpa4chi8je9j0vp6ko4au99931rj.apps.googleusercontent.com'
     return None
 
 
@@ -108,6 +113,20 @@ def _OAUTH_CLIENT_ID():
 
 app_OAUTH_CLIENT_ID = _OAUTH_CLIENT_ID()
 
+
+# def _CLIENT_SECRET():
+#     if on_development_server or not on_server:
+#         return '5uw_Cj78Iygf3rfnJKZ_SVVO'
+#     if on_integration_server:
+#         return 'h-PGaqnkAfRhjVTtbxcgSLD5'
+#     if on_stage_server:
+#         return 'SkT2kDa3nViHTJXLuUYbSbzE'
+#     if on_gamestop_server:
+#         return 'H-RgqzSYZps7auL9tB9RFXZG'
+#     if on_production_server:
+#         return 'NWCFk0IyE8QPqD2CDwloKvjH'
+#     return None
+# app_CLIENT_SECRET = _CLIENT_SECRET()
 
 def _PUBLIC_API_SERVER_KEY():
     if on_development_server or not on_server:
@@ -133,6 +152,8 @@ def _API_TOKEN():
         return '6C346588BD4C6D722A1165B43C51C'
     if on_production_server:
         return '6C346588BD4C6D722A1165B43C51C'
+    if on_gamestop_server:
+        return '5XZHBF3mOwqJlYAlG1NeeWX0Cb72g'
     return None
 
 
@@ -205,6 +226,8 @@ def _GOOGLE_CUSTOMER_ID():
     if on_integration_server:
         return 'my_customer'
     if on_stage_server:
+        return 'my_customer'
+    if on_gamestop_server:
         return 'my_customer'
     if on_production_server:
         return 'my_customer'
@@ -414,7 +437,7 @@ def _STORMPATH_CLIENT():
     """
     http://docs.stormpath.com/python/quickstart/#create-a-client
     """
-    if on_test_harness or on_development_server or on_integration_server or on_stage_server:
+    if on_test_harness or on_development_server or on_integration_server or on_stage_server or on_gamestop_server:
         id = '6VYRY6TL26YRBJOAOO533W6DO'
         secret = 'oc4u1Nm0M5p3vJSOENhPZzAhNfzifAxMQS0v3J/kG/U'
     elif on_production_server:
