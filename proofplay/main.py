@@ -102,7 +102,7 @@ class MultiResourceByDevice(RequestHandler):
         end_date = datetime.datetime.fromtimestamp(int(end_date))
 
         if end_date < start_date:
-            self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
+            return self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
 
         midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
         midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
@@ -155,7 +155,7 @@ class MultiResourceByDate(RequestHandler):
         start_date = datetime.datetime.fromtimestamp(int(start_date))
         end_date = datetime.datetime.fromtimestamp(int(end_date))
         if end_date < start_date:
-            self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
+            return self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
 
         midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
         midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
@@ -214,7 +214,7 @@ class MultiDeviceSummarized(RequestHandler):
         start_date = datetime.datetime.fromtimestamp(int(start_date))
         end_date = datetime.datetime.fromtimestamp(int(end_date))
         if end_date < start_date:
-            self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
+            return self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
 
         midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
         midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
@@ -264,7 +264,7 @@ class MultiDeviceByDate(RequestHandler):
         start_date = datetime.datetime.fromtimestamp(int(start_date))
         end_date = datetime.datetime.fromtimestamp(int(end_date))
         if end_date < start_date:
-            self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
+            return self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
 
         midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
         midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
@@ -321,7 +321,7 @@ class MultiLocationSummarized(RequestHandler):
         start_date = datetime.datetime.fromtimestamp(int(start_date))
         end_date = datetime.datetime.fromtimestamp(int(end_date))
         if end_date < start_date:
-            self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
+            return self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
 
         midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
         midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
@@ -376,7 +376,7 @@ class MultiLocationByDevice(RequestHandler):
         start_date = datetime.datetime.fromtimestamp(int(start_date))
         end_date = datetime.datetime.fromtimestamp(int(end_date))
         if end_date < start_date:
-            self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
+            return self.response.out.write("ERROR: YOUR START DAY IS AFTER YOUR END DAY")
 
         midnight_start_day = datetime.datetime.combine(start_date.date(), datetime.time())
         midnight_end_day = datetime.datetime.combine(end_date.date(), datetime.time())
