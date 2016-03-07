@@ -70,7 +70,7 @@ class TestDatabase(SQLBaseTest):
 
     def test_insert_new_location(self):
         self.test_insert_new_tenant()
-        insert_new_location_or_get_existing(self.customer_location_code)
+        insert_new_location_or_get_existing(self.customer_location_code, self.tenant_code)
         resource = self.db_session.query(Location).filter_by(customer_location_code=self.customer_location_code).first()
         self.assertEqual(resource.customer_location_code, self.customer_location_code)
 
@@ -92,7 +92,7 @@ class TestDatabase(SQLBaseTest):
 
     def test_insert_new_program_record(self):
         resource_id = insert_new_resource_or_get_existing(self.resource_name, self.resource_id, self.tenant_code)
-        location_id = insert_new_location_or_get_existing(self.customer_location_code)
+        location_id = insert_new_location_or_get_existing(self.customer_location_code, self.tenant_code)
 
         device_id = insert_new_device_or_get_existing(
                 1,

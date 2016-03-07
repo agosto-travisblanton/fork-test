@@ -444,6 +444,10 @@ def handle_posting_a_new_program_play(incoming_data):
                 customer_location_code = each_log["customer_location_code"]
                 customer_display_code = each_log["customer_display_code"]
 
+                # an unmanaged device will have these potential attributes
+                if not serial_number or serial_number == "null" or serial_number == "undefined" or serial_number == "":
+                    serial_number = "None"
+
                 if not customer_location_code:
                     customer_location_code = "None"
 
