@@ -61,7 +61,7 @@ def _SERVICE_ACCOUNT_EMAIL():
     if on_stage_server:
         return 'service-247@skykit-provisioning-stage.iam.gserviceaccount.com'
     if on_gamestop_server:
-        return '?????????????????'
+        return 'service-247@skykit-provisioning-gamestop.iam.gserviceaccount.com'
     if on_production_server:
         return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0@developer.gserviceaccount.com'
     return None
@@ -88,10 +88,10 @@ def _CLIENT_ID():
         return '390010375778-87capuus77kispm64q27iah4kl0rorv4.apps.googleusercontent.com'
     if on_stage_server:
         return '106935685560101973796'
-    if on_production_server:
-        return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0.apps.googleusercontent.com'
     if on_gamestop_server:
         return '281350297105-9pc7cpa4chi8je9j0vp6ko4au99931rj.apps.googleusercontent.com'
+    if on_production_server:
+        return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0.apps.googleusercontent.com'
     return None
 
 
@@ -418,6 +418,8 @@ def _DEFAULT_CONTENT_MANAGER_URL():
         return 'https://skykit-contentmanager-int.appspot.com'
     if on_stage_server:
         return 'https://skykit-contentmanager-stage.appspot.com'
+    if on_gamestop_server:
+        return 'https://skykit-contentmanager-gamestop.appspot.com'
     if on_production_server:
         return 'https://skykit-contentmanager.appspot.com'
     return None
