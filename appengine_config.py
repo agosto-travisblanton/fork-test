@@ -11,9 +11,9 @@ from provisioning_env import (
     on_stage_server,
     on_development_server,
     on_integration_server,
+    on_gamestop_server,
     on_server,
-    on_test_harness,
-    on_continuous_integration_server)
+    on_test_harness)
 from agar.env import appid
 
 
@@ -57,10 +57,14 @@ app_PRIVATE_KEY = _PRIVATE_KEY()
 def _SERVICE_ACCOUNT_EMAIL():
     if on_development_server or on_integration_server or not on_server:
         return '390010375778-87capuus77kispm64q27iah4kl0rorv4@developer.gserviceaccount.com'
-    if on_stage_server:
+    elif on_stage_server:
         return 'service-247@skykit-provisioning-stage.iam.gserviceaccount.com'
-    if on_production_server:
+    elif on_gamestop_server:
+        return 'service@skykit-provisioning-gamestop.iam.gserviceaccount.com'
+    elif on_production_server:
         return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0@developer.gserviceaccount.com'
+    else:
+        raise EnvironmentError('Unknown environment for SERVICE_ACCOUNT_EMAIL in appengine_config.py')
     return None
 
 
@@ -81,12 +85,16 @@ app_GCM_TEST_MODE = _GCM_TEST_MODE()
 def _CLIENT_ID():
     if on_development_server or not on_server:
         return '390010375778-87capuus77kispm64q27iah4kl0rorv4.apps.googleusercontent.com'
-    if on_integration_server:
+    elif on_integration_server:
         return '390010375778-87capuus77kispm64q27iah4kl0rorv4.apps.googleusercontent.com'
-    if on_stage_server:
+    elif on_stage_server:
         return '106935685560101973796'
-    if on_production_server:
+    elif on_gamestop_server:
+        return '281350297105-9pc7cpa4chi8je9j0vp6ko4au99931rj.apps.googleusercontent.com'
+    elif on_production_server:
         return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0.apps.googleusercontent.com'
+    else:
+        raise EnvironmentError('Unknown environment for CLIENT_ID in appengine_config.py')
     return None
 
 
@@ -97,27 +105,49 @@ app_CLIENT_ID = _CLIENT_ID()
 def _OAUTH_CLIENT_ID():
     if on_development_server or not on_server:
         return '390010375778-gidaqujfhgkqrc5lat9t890mhc0nhutt.apps.googleusercontent.com'
-    if on_integration_server:
+    elif on_integration_server:
         return '390010375778-gidaqujfhgkqrc5lat9t890mhc0nhutt.apps.googleusercontent.com'
-    if on_stage_server:
+    elif on_stage_server:
         return '1087929808190-q8s9bhpu79ju7fkqblnl3nn2th0efv57.apps.googleusercontent.com'
-    if on_production_server:
+    elif on_gamestop_server:
+        return '281350297105-9pc7cpa4chi8je9j0vp6ko4au99931rj.apps.googleusercontent.com'
+    elif on_production_server:
         return '613606096818-tfkv6eedbrbc4hltamdjgc7nk25k37mk.apps.googleusercontent.com'
+    else:
+        raise EnvironmentError('Unknown environment for OAUTH_CLIENT_ID in appengine_config.py')
     return None
 
 
 app_OAUTH_CLIENT_ID = _OAUTH_CLIENT_ID()
 
 
+# def _CLIENT_SECRET():
+#     if on_development_server or not on_server:
+#         return '5uw_Cj78Iygf3rfnJKZ_SVVO'
+#     if on_integration_server:
+#         return 'h-PGaqnkAfRhjVTtbxcgSLD5'
+#     if on_stage_server:
+#         return 'SkT2kDa3nViHTJXLuUYbSbzE'
+#     if on_gamestop_server:
+#         return 'H-RgqzSYZps7auL9tB9RFXZG'
+#     if on_production_server:
+#         return 'NWCFk0IyE8QPqD2CDwloKvjH'
+#     return None
+# app_CLIENT_SECRET = _CLIENT_SECRET()
+
 def _PUBLIC_API_SERVER_KEY():
     if on_development_server or not on_server:
         return 'AIzaSyAzS-hwl5dV-Wn4g5opG_34gGYplgJT1Fc'
-    if on_integration_server:
+    elif on_integration_server:
         return 'AIzaSyAzS-hwl5dV-Wn4g5opG_34gGYplgJT1Fc'
-    if on_stage_server:
+    elif on_stage_server:
         return 'AIzaSyB0mE3DWNt8iFFvZ60TQyTgl3NpKK6-BQA'
-    if on_production_server:
+    elif on_gamestop_server:
+        return 'AIzaSyDvysZi67-oEJnlbJv-EWqme-mNdSI1qD0'
+    elif on_production_server:
         return 'AIzaSyBcZQf7qcJibJmBKHDaqgdRwf2XQ3MZFiY'
+    else:
+        raise EnvironmentError('Unknown environment for PUBLIC_API_SERVER_KEY in appengine_config.py')
     return None
 
 
@@ -127,12 +157,16 @@ app_PUBLIC_API_SERVER_KEY = _PUBLIC_API_SERVER_KEY()
 def _API_TOKEN():
     if on_development_server or not on_server:
         return '6C346588BD4C6D722A1165B43C51C'
-    if on_integration_server:
+    elif on_integration_server:
         return '6C346588BD4C6D722A1165B43C51C'
-    if on_stage_server:
+    elif on_stage_server:
         return '6C346588BD4C6D722A1165B43C51C'
-    if on_production_server:
+    elif on_gamestop_server:
+        return '5XZHBF3mOwqJlYAlG1NeeWX0Cb72g'
+    elif on_production_server:
         return '6C346588BD4C6D722A1165B43C51C'
+    else:
+        raise EnvironmentError('Unknown environment for API_TOKEN in appengine_config.py')
     return None
 
 
@@ -142,12 +176,16 @@ app_API_TOKEN = _API_TOKEN()
 def _UNMANAGED_API_TOKEN():
     if on_development_server or not on_server:
         return 'A1365B43C51C46588BD4C6D5016C0'
-    if on_integration_server:
+    elif on_integration_server:
         return 'A1365B43C51C46588BD4C6D5016C0'
-    if on_stage_server:
+    elif on_stage_server:
         return 'A1365B43C51C46588BD4C6D5016C0'
-    if on_production_server:
+    elif on_gamestop_server:
         return 'A1365B43C51C46588BD4C6D5016C0'
+    elif on_production_server:
+        return 'A1365B43C51C46588BD4C6D5016C0'
+    else:
+        raise EnvironmentError('Unknown environment for UNMANAGED_API_TOKEN in appengine_config.py')
     return None
 
 
@@ -157,12 +195,16 @@ app_UNMANAGED_API_TOKEN = _UNMANAGED_API_TOKEN()
 def _UNMANAGED_REGISTRATION_TOKEN():
     if on_development_server or not on_server:
         return '43C51C8BD4C6D723A1365B6C34658'
-    if on_integration_server:
+    elif on_integration_server:
         return '43C51C8BD4C6D723A1365B6C34658'
-    if on_stage_server:
+    elif on_stage_server:
         return '43C51C8BD4C6D723A1365B6C34658'
-    if on_production_server:
+    elif on_gamestop_server:
         return '43C51C8BD4C6D723A1365B6C34658'
+    elif on_production_server:
+        return '43C51C8BD4C6D723A1365B6C34658'
+    else:
+        raise EnvironmentError('Unknown environment for UNMANAGED_REGISTRATION_TOKEN in appengine_config.py')
     return None
 
 
@@ -172,12 +214,16 @@ app_UNMANAGED_REGISTRATION_TOKEN = _UNMANAGED_REGISTRATION_TOKEN()
 def _CONTENT_MANAGER_API_SERVER_KEY():
     if on_development_server or not on_server:
         return 'EqwbumxWrJzybkDerDbm9yLBteJqZi7X'
-    if on_integration_server:
+    elif on_integration_server:
         return 'EqwbumxWrJzybkDerDbm9yLBteJqZi7X'
-    if on_stage_server:
+    elif on_stage_server:
         return 'OTJkMGNjMmYzMmZlNjI4MDVmNGVlMjEx'
-    if on_production_server:
+    elif on_gamestop_server:
+        return '???'
+    elif on_production_server:
         return 'uXyQWMr3mAUvLFhvYuzYnfehkKop7ZCe'
+    else:
+        raise EnvironmentError('Unknown environment for CONTENT_MANAGER_API_SERVER_KEY in appengine_config.py')
     return None
 
 
@@ -187,12 +233,16 @@ app_CONTENT_MANAGER_API_SERVER_KEY = _CONTENT_MANAGER_API_SERVER_KEY()
 def _DEFAULT_AGOSTO_DEVICE_DOMAIN():
     if on_development_server or not on_server:
         return 'local.agosto.com'
-    if on_integration_server:
+    elif on_integration_server:
         return 'dev.agosto.com'
-    if on_stage_server:
+    elif on_stage_server:
         return 'devstaging.skykit.com'
-    if on_production_server:
+    elif on_gamestop_server:
+        return '???'
+    elif on_production_server:
         return 'skykit.agosto.com'
+    else:
+        raise EnvironmentError('Unknown environment for DEFAULT_AGOSTO_DEVICE_DOMAIN in appengine_config.py')
     return None
 
 
@@ -202,12 +252,16 @@ app_DEFAULT_AGOSTO_DEVICE_DOMAIN = _DEFAULT_AGOSTO_DEVICE_DOMAIN()
 def _GOOGLE_CUSTOMER_ID():
     if on_development_server or not on_server:
         return 'my_customer'
-    if on_integration_server:
+    elif on_integration_server:
         return 'my_customer'
-    if on_stage_server:
+    elif on_stage_server:
         return 'my_customer'
-    if on_production_server:
+    elif on_gamestop_server:
         return 'my_customer'
+    elif on_production_server:
+        return 'my_customer'
+    else:
+        raise EnvironmentError('Unknown environment for GOOGLE_CUSTOMER_ID in appengine_config.py')
     return None
 
 
@@ -391,12 +445,16 @@ app_WIFI_CONNECTION = _WIFI_CONNECTION()
 def _DEFAULT_CONTENT_MANAGER_URL():
     if on_development_server or not on_server:
         return 'https://skykit-contentmanager-int.appspot.com'
-    if on_integration_server:
+    elif on_integration_server:
         return 'https://skykit-contentmanager-int.appspot.com'
-    if on_stage_server:
+    elif on_stage_server:
         return 'https://skykit-contentmanager-stage.appspot.com'
-    if on_production_server:
+    elif on_gamestop_server:
+        return 'https://skykit-contentmanager-gamestop.appspot.com'
+    elif on_production_server:
         return 'https://skykit-contentmanager.appspot.com'
+    else:
+        raise EnvironmentError('Unknown environment for DEFAULT_CONTENT_MANAGER_URL in appengine_config.py')
     return None
 
 
@@ -417,11 +475,11 @@ def _STORMPATH_CLIENT():
     if on_test_harness or on_development_server or on_integration_server or on_stage_server:
         id = '6VYRY6TL26YRBJOAOO533W6DO'
         secret = 'oc4u1Nm0M5p3vJSOENhPZzAhNfzifAxMQS0v3J/kG/U'
-    elif on_production_server:
+    elif on_production_server or on_gamestop_server:
         id = 'IY5YOGP105D4HGY07GK2IT62X'
         secret = '8jPFs33PKDFuAz++gDeokLO7zAyfi1LSciL9xL0tEJk'
     else:
-        raise EnvironmentError("Unknown environment for Stormpath: {}".format(appid))
+        raise EnvironmentError("Unknown environment for Stormpath: {} in appengine_config.py".format(appid))
 
     api_key = {
         'id': id,
@@ -480,13 +538,17 @@ app_MAIL_FROM = _MAIL_FROM()
 def _EMAIL_SUPPORT():
     if on_development_server or not on_server:
         return True
-    if on_integration_server:
+    elif on_integration_server:
         return True
-    if on_stage_server:
+    elif on_stage_server:
         return True
-    if on_production_server:
+    elif on_gamestop_server:
         return True
-    return False
+    elif on_production_server:
+        return True
+    else:
+        raise EnvironmentError('Unknown environment for EMAIL_SUPPORT in appengine_config.py')
+    return None
 
 
 app_EMAIL_SUPPORT = _EMAIL_SUPPORT()
@@ -503,6 +565,8 @@ def _SQLALCHEMY_DATABASE_URI():
             instance_name = 'provisioning-int'
         elif on_stage_server:
             instance_name = 'provisioning-stage'
+        elif on_gamestop_server:
+            instance_name = 'provisioning-gamestop'
         elif on_production_server:
             instance_name = 'provisioning-prod'
         else:
@@ -529,7 +593,7 @@ app_SPRINT_NUMBER = _SPRINT_NUMBER()
 
 
 def _DEPLOYMENT_COUNTER():
-    return 2
+    return 5
 
 
 app_DEPLOYMENT_COUNTER = _DEPLOYMENT_COUNTER()
