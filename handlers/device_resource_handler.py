@@ -1,6 +1,5 @@
 import json
 import logging
-import re
 
 from datetime import datetime
 from google.appengine.ext import ndb
@@ -276,7 +275,15 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 device.customer_display_name = customer_display_name
             customer_display_code = request_json.get('customerDisplayCode')
             if customer_display_code:
-                device.customer_display_code = customer_display_code
+                if device.customer_display_code != customer_display_code:
+                    if ChromeOsDevice.is_customer_display_code_unique(
+                            customer_display_code=customer_display_code,
+                            tenant_key=device.tenant_key):
+                        device.customer_display_code = customer_display_code
+                    else:
+                        status = 409
+                        message = "Conflict. Customer display code \"{0}\" is already assigned for tenant.".format(
+                            customer_display_code)
             notes = request_json.get('notes')
             if notes:
                 device.notes = notes

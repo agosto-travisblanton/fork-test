@@ -845,23 +845,54 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         updated_device = self.managed_device_key.get()
         self.assertEqual(updated_device.location_key, location_key)
 
-    def test_device_resource_put_updates_customer_display_info(self):
+    def test_device_resource_put_does_not_update_non_unique_customer_display_code(self):
         customer_display_name = 'Panel in Reception'
         customer_display_code = 'panel_in_reception'
+        device = self.managed_device_key.get()
+        device.customer_display_name = customer_display_name
+        device.customer_display_code = customer_display_code
+        device.put()
+        new_device = ChromeOsDevice.create_managed(
+            tenant_key=self.tenant_key,
+            gcm_registration_id=self.GCM_REGISTRATION_ID,
+            device_id='4444-55555',
+            mac_address='555555555')
+        new_device_key = new_device.put()
         request_body = {
             'customerDisplayName': customer_display_name,
             'customerDisplayCode': customer_display_code
         }
-        self.assertIsNone(self.managed_device.customer_display_name)
-        self.assertIsNone(self.managed_device.customer_display_code)
         when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
-        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
+                             any_matcher(new_device_key.urlsafe())).thenReturn(None)
+
+        with self.assertRaises(AppError) as context:
+            self.app.put('/api/v1/devices/{0}'.format(new_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
-        updated_device = self.managed_device_key.get()
-        self.assertEqual(customer_display_name, updated_device.customer_display_name)
-        self.assertEqual(customer_display_code, updated_device.customer_display_code)
+        message = 'Bad response: 409 Conflict. Customer display code "{0}" is already assigned for tenant.'.format(
+            customer_display_code)
+        self.assertTrue(message in context.exception.message)
+
+    def test_device_resource_put_does_not_update_non_same_customer_display_code(self):
+        customer_display_name = 'Panel in Reception'
+        customer_display_code = 'panel_in_reception'
+        device = self.managed_device_key.get()
+        device.customer_display_name = customer_display_name
+        device.customer_display_code = customer_display_code
+        device.put()
+        new_display_name = 'Storage Room'
+        request_body = {
+            'customerDisplayName': new_display_name,
+            'customerDisplayCode': customer_display_code
+        }
+        when(deferred).defer(any_matcher(update_chrome_os_device),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        response = self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
+                     json.dumps(request_body),
+                     headers=self.api_token_authorization_header)
+        self.assertEqual('204 No Content', response.status)
+        self.assertEqual(device.customer_display_code, customer_display_code)
+        self.assertEqual(device.customer_display_name, new_display_name)
 
     def test_put_updates_valid_heartbeat_interval(self):
         interval = 3
