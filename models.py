@@ -6,6 +6,7 @@ from google.appengine.ext import ndb
 from app_config import config
 from restler.decorators import ae_ndb_serializer
 from utils.timezone_util import TimezoneUtil
+from google.appengine.datastore.datastore_query import Cursor
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>. Bob MacNeal <bob.macneal@agosto.com>'
 

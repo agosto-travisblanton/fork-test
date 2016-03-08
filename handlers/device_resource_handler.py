@@ -91,8 +91,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         else:
             unmanaged = True
         query = ChromeOsDevice.query(
-                ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
-                        ChromeOsDevice.is_unmanaged_device == unmanaged)
+            ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
+                    ChromeOsDevice.is_unmanaged_device == unmanaged)
         )
         # query_forward = query.order(ChromeOsDevice.key)
         # query_reverse = query.order(-ChromeOsDevice.key)
@@ -100,23 +100,28 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         result_data = query.fetch(1000)
         json_response(self.response, result_data, strategy=CHROME_OS_DEVICE_STRATEGY)
 
-    @requires_api_token
-    def get_devices_by_distributor(self, distributor_urlsafe_key):
-        device_list = []
-        unmanaged_filter = self.request.get('unmanaged')
-        if unmanaged_filter == '' or str(unmanaged_filter) == 'false':
-            unmanaged = False
-        else:
-            unmanaged = True
+    @staticmethod
+    def get_domain_tenant_list_from_distributor(distributor_urlsafe_key):
         distributor = ndb.Key(urlsafe=distributor_urlsafe_key)
         domain_keys = Domain.query(Domain.distributor_key == distributor).fetch(100, keys_only=True)
         tenant_list = Tenant.query(ancestor=TenantEntityGroup.singleton().key)
         tenant_list = filter(lambda x: x.active is True, tenant_list)
         domain_tenant_list = filter(lambda x: x.domain_key in domain_keys, tenant_list)
+        return domain_tenant_list
+
+    @requires_api_token
+    def get_devices_by_distributor(self, distributor_urlsafe_key):
+        print "am here"
+        device_list = []
+        unmanaged_filter = self.request.get('unmanaged')
+        unmanaged = not bool(unmanaged_filter == '' or str(unmanaged_filter) == 'false')
+        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
+
         for tenant in domain_tenant_list:
             tenant_devices = Tenant.find_devices(tenant.key, unmanaged)
             for tenant_device in tenant_devices:
                 device_list.append(tenant_device)
+
         json_response(self.response, device_list, strategy=CHROME_OS_DEVICE_STRATEGY)
 
     @requires_api_token
@@ -500,10 +505,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
         else:
             change_intent(
-                    gcm_registration_id=device.gcm_registration_id,
-                    payload=config.PLAYER_RESET_COMMAND,
-                    device_urlsafe_key=device_urlsafe_key,
-                    host=self.request.host_url)
+                gcm_registration_id=device.gcm_registration_id,
+                payload=config.PLAYER_RESET_COMMAND,
+                device_urlsafe_key=device_urlsafe_key,
+                host=self.request.host_url)
             device.key.delete()
             self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
