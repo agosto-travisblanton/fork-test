@@ -472,10 +472,10 @@ def _STORMPATH_CLIENT():
     """
     http://docs.stormpath.com/python/quickstart/#create-a-client
     """
-    if on_test_harness or on_development_server or on_integration_server or on_stage_server or on_gamestop_server:
+    if on_test_harness or on_development_server or on_integration_server or on_stage_server:
         id = '6VYRY6TL26YRBJOAOO533W6DO'
         secret = 'oc4u1Nm0M5p3vJSOENhPZzAhNfzifAxMQS0v3J/kG/U'
-    elif on_production_server:
+    elif on_production_server or on_gamestop_server:
         id = 'IY5YOGP105D4HGY07GK2IT62X'
         secret = '8jPFs33PKDFuAz++gDeokLO7zAyfi1LSciL9xL0tEJk'
     else:
@@ -593,7 +593,7 @@ app_SPRINT_NUMBER = _SPRINT_NUMBER()
 
 
 def _DEPLOYMENT_COUNTER():
-    return 4
+    return 5
 
 
 app_DEPLOYMENT_COUNTER = _DEPLOYMENT_COUNTER()
