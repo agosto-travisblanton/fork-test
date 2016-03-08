@@ -2,7 +2,7 @@
 
 app = angular.module 'skykitProvisioning'
 
-app.run ($cookies, Restangular) ->
+app.run ($cookies, Restangular, $location) ->
   Restangular.addRequestInterceptor (elem, operation) ->
     authToken = '6C346588BD4C6D722A1165B43C51C'
     if $location.host().indexOf('-gamestop') > -1
