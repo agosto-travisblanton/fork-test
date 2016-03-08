@@ -382,6 +382,13 @@ class ChromeOsDevice(ndb.Model):
         else:
             return False
 
+    @classmethod
+    def is_customer_display_code_unique(cls, customer_display_code, tenant_key):
+        return None is ChromeOsDevice.query(
+            ndb.AND(ChromeOsDevice.customer_display_code == customer_display_code,
+                    ChromeOsDevice.tenant_key == tenant_key)).get(
+            keys_only=True)
+
     def _pre_put_hook(self):
         self.class_version = 3
 
