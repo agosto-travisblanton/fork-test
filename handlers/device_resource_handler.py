@@ -17,6 +17,7 @@ from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY, DEVICE_ISSUE_LOG_STRATEGY
 from utils.mail_util import MailUtil
+import ndb_json
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -122,7 +123,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             for tenant_device in tenant_devices:
                 device_list.append(tenant_device)
 
-        json_response(self.response, device_list, strategy=CHROME_OS_DEVICE_STRATEGY)
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(ndb_json.dumps(device_list))
+
+        # json_response(self.response, device_list, strategy=CHROME_OS_DEVICE_STRATEGY)
 
     @requires_api_token
     def get(self, device_urlsafe_key):

@@ -158,6 +158,46 @@ class Tenant(ndb.Model):
             ).fetch(1000)
 
     @classmethod
+    def find_devices_paginated(cls, tenant_key, unmanaged, prev_cursor_str, next_cursor_str):
+        fetch_size = 10
+        if not prev_cursor_str and not next_cursor_str:
+            objects, next_cursor, more = ChromeOsDevice.query(
+                ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
+                        ChromeOsDevice.is_unmanaged_device == unmanaged)).fetch_page(fetch_size)
+            prev_cursor_str = ''
+            next_cursor_str = next_cursor.urlsafe()
+            next_ = True if more else False
+            prev = False
+        elif next_cursor_str:
+            cursor = Cursor(urlsafe=next_cursor_str)
+            objects, next_cursor, more = ChromeOsDevice.query(
+                ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
+                        ChromeOsDevice.is_unmanaged_device == unmanaged)).fetch_page(fetch_size, start_cursor=cursor)
+
+            prev_cursor_str = next_cursor_str
+            next_cursor_str = next_cursor.urlsafe()
+            prev = True
+            next_ = True if more else False
+        elif prev_cursor_str:
+            cursor = Cursor(urlsafe=prev_cursor_str)
+            objects, next_cursor, more = ChromeOsDevice.query(
+                ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
+                        ChromeOsDevice.is_unmanaged_device == unmanaged)).fetch_page(fetch_size, start_cursor=cursor)
+            objects.reverse()
+            next_cursor_str = prev_cursor_str
+            prev_cursor_str = next_cursor.urlsafe()
+            prev = True if more else False
+            next_ = True
+
+        return {
+            'objects': objects,
+            'next_cursor': next_cursor_str,
+            'prev_cursor': prev_cursor_str,
+            'prev': prev,
+            'next': next_
+        }
+
+    @classmethod
     def get_impersonation_email(cls, urlsafe_tenant_key):
         if urlsafe_tenant_key:
             tenant = ndb.Key(urlsafe=urlsafe_tenant_key).get()
