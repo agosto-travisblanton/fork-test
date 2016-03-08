@@ -252,7 +252,7 @@ class TestMain(SQLBaseTest, WebTest):
     def load_one_device(self):
         device_serial = "1234"
         device_key = "5443"
-        location_id = insert_new_location_or_get_existing(self.location_code)
+        location_id = insert_new_location_or_get_existing(self.location_code, self.tenant_code)
         insert_new_device_or_get_existing(location_id, device_serial, device_key, self.one_device_customer_display_code,
                                           self.tenant_code)
 
