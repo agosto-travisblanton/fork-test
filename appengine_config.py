@@ -90,7 +90,7 @@ def _CLIENT_ID():
     elif on_stage_server:
         return '106935685560101973796'
     elif on_gamestop_server:
-        return '110047437051045908976'
+        return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0.apps.googleusercontent.com'
     elif on_production_server:
         return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0.apps.googleusercontent.com'
     else:
@@ -219,7 +219,7 @@ def _CONTENT_MANAGER_API_SERVER_KEY():
     elif on_stage_server:
         return 'OTJkMGNjMmYzMmZlNjI4MDVmNGVlMjEx'
     elif on_gamestop_server:
-        return '???'
+        return '' # Calls into CM-Sim
     elif on_production_server:
         return 'uXyQWMr3mAUvLFhvYuzYnfehkKop7ZCe'
     else:
