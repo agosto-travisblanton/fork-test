@@ -54,8 +54,8 @@
                       </tbody>
                     </table>
                   </md-data-table-container>
-                  <button ng-disabled="!devicesListingCtrl.devicesPrev" ng-click="devicesListingCtrl.paginateCall(false, true)">Prev</button>
-                  <button ng-disabled="!devicesListingCtrl.devicesNext" ng-click="devicesListingCtrl.paginateCall(true, true)">Next</button>
+                  <md-button class="md-raised" ng-disabled="!devicesListingCtrl.devicesPrev" ng-click="devicesListingCtrl.paginateCall(false, true)">Prev</md-button>
+                  <md-button class="md-raised" ng-disabled="!devicesListingCtrl.devicesNext" ng-click="devicesListingCtrl.paginateCall(true, true)">Next</md-button>
                 </md-card-content>
               </md-card>
             </div>
@@ -104,6 +104,9 @@
                       </tbody>
                     </table>
                   </md-data-table-container>
+                  <md-button class="md-raised" ng-disabled="!devicesListingCtrl.unmanagedDevicesPrev" ng-click="devicesListingCtrl.paginateCall(false, false)">Prev</md-button>
+                  <md-button class="md-raised" ng-disabled="!devicesListingCtrl.unmanagedDevicesNext" ng-click="devicesListingCtrl.paginateCall(true, false)">Next</md-button>
+
                 </md-card-content>
               </md-card>
             </div>
