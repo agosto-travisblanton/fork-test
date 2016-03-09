@@ -160,7 +160,7 @@ application = WSGIApplication(
               handler_method='get_devices_by_tenant',
               methods=['GET']
               ),
-        Route(r'/api/v1/distributors/<distributor_urlsafe_key>/devices',
+        Route(r'/api/v1/distributors/<cur_prev_cursor>/<cur_next_cursor>/<distributor_urlsafe_key>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='devices-by-distributor',
               handler_method='get_devices_by_distributor',

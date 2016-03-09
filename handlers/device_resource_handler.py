@@ -111,28 +111,50 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         return domain_tenant_list
 
     @requires_api_token
-    def get_devices_by_distributor(self, distributor_urlsafe_key):
-        print "am here"
+    def get_devices_by_distributor(self, distributor_urlsafe_key, cur_prev_cursor, cur_next_cursor):
+        if cur_next_cursor == "null":
+            cur_next_cursor = None
+
+        if cur_prev_cursor == "null":
+            cur_prev_cursor = None
+
         device_list = []
+        prev_cursor = None
+        next_cursor = None
+
         unmanaged_filter = self.request.get('unmanaged')
         unmanaged = not bool(unmanaged_filter == '' or str(unmanaged_filter) == 'false')
         domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
 
         for tenant in domain_tenant_list:
-            tenant_devices = Tenant.find_devices(tenant.key, unmanaged)
-            for tenant_device in tenant_devices:
+            tenant_devices = Tenant.find_devices_paginated(
+                tenant.key,
+                unmanaged,
+                prev_cursor_str=cur_prev_cursor,
+                next_cursor_str=cur_next_cursor
+            )
+            prev_cursor = tenant_devices["prev_cursor"]
+            next_cursor = tenant_devices["next_cursor"]
+
+            for tenant_device in tenant_devices["objects"]:
                 device_list.append(tenant_device)
 
-        self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(ndb_json.dumps(device_list))
+        json_response(
+            self.response,
+            {
+                "devices": device_list,
+                "next_cursor": next_cursor,
+                "prev_cursor": prev_cursor,
 
-        # json_response(self.response, device_list, strategy=CHROME_OS_DEVICE_STRATEGY)
+            },
+            strategy=CHROME_OS_DEVICE_STRATEGY
+        )
 
     @requires_api_token
     def get(self, device_urlsafe_key):
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
         if self.is_unmanaged_device is False:
-            if None == device.device_id:
+            if not device.device_id:
                 deferred.defer(refresh_device_by_mac_address,
                                device_urlsafe_key=device_urlsafe_key,
                                device_mac_address=device.mac_address,

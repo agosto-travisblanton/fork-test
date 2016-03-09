@@ -42,18 +42,20 @@
                             </ng-md-icon>
                           </a>
                         </td>
-                        <td>{{ item.tenant_key.tenant_code}}</td>
-                        <td>{{ item.mac_address }}</td>
-                        <td>{{ item.ethernet_mac_address || "None"}}</td>
+                        <td>{{ item.tenantCode }}</td>
+                        <td>{{ item.macAddress || "None" }}</td>
+                        <td>{{ item.ethernetMacAddress || "None"  }}</td>
                         <td>
                           <a name="edit-device" class="btn" ng-click="devicesListingCtrl.editItem(item)"
-                             title="Device detail">{{item.serial_number}}</a></td>
+                             title="Device detail">{{item.serialNumber}}</a></td>
                         <td>{{ item.created }}</td>
                         <td class="up-{{ item.up}}-background"></td>
                       </tr>
                       </tbody>
                     </table>
                   </md-data-table-container>
+                  <button ng-disabled="!devicesListingCtrl.devicesPrev" ng-click="devicesListingCtrl.paginateCall(false, true)">Prev</button>
+                  <button ng-disabled="!devicesListingCtrl.devicesNext" ng-click="devicesListingCtrl.paginateCall(true, true)">Next</button>
                 </md-card-content>
               </md-card>
             </div>
@@ -93,9 +95,9 @@
                             </ng-md-icon>
                           </a>
                         </td>
-                        <td>{{ item.tenant_key.tenant_code}}</td>
-                        <td>{{ item.mac_address || "None" }}</td>
-                        <td>{{ item.ethernet_mac_address || "None" }}</td>
+                        <td>{{ item.tenantCode }}</td>
+                        <td>{{ item.macAddress || "None" }}</td>
+                        <td>{{ item.ethernetMacAddress || "None" }}</td>
                         <td>{{ item.created }}</td>
                         <td class="up-{{ item.up}}-background"></td>
                       </tr>

@@ -34,15 +34,15 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($http, $log, Res
         promise = Restangular.oneUrl(SERVICE_NAME, url).get()
         promise
 
-    getDevicesByDistributor: (distributorKey) ->
+    getDevicesByDistributor: (distributorKey, prev, next) ->
       unless distributorKey == undefined
-        url = "api/v1/distributors/#{distributorKey}/devices?unmanaged=false"
+        url = "api/v1/distributors/#{prev}/#{next}/#{distributorKey}/devices?unmanaged=false"
         promise = Restangular.oneUrl(SERVICE_NAME, url).get()
         promise
 
-    getUnmanagedDevicesByDistributor: (distributorKey) ->
+    getUnmanagedDevicesByDistributor: (distributorKey, prev, next) ->
       unless distributorKey == undefined
-        url = "api/v1/distributors/#{distributorKey}/devices?unmanaged=true"
+        url = "api/v1/distributors/#{prev}/#{next}/#{distributorKey}/devices?unmanaged=true"
         promise = Restangular.oneUrl(SERVICE_NAME, url).get()
         promise
 

@@ -158,43 +158,44 @@ class Tenant(ndb.Model):
             ).fetch(1000)
 
     @classmethod
-    def find_devices_paginated(cls, tenant_key, unmanaged, prev_cursor_str, next_cursor_str):
+    def find_devices_paginated(cls, tenant_key, unmanaged, prev_cursor_str=None, next_cursor_str=None):
         fetch_size = 10
+        objects = None
+        next_cursor = None
+        prev_cursor = None
+
         if not prev_cursor_str and not next_cursor_str:
             objects, next_cursor, more = ChromeOsDevice.query(
                 ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
                         ChromeOsDevice.is_unmanaged_device == unmanaged)).fetch_page(fetch_size)
-            prev_cursor_str = ''
-            next_cursor_str = next_cursor.urlsafe()
-            next_ = True if more else False
-            prev = False
+            prev_cursor = None
+            next_cursor = next_cursor.urlsafe() if more else None
+
         elif next_cursor_str:
             cursor = Cursor(urlsafe=next_cursor_str)
             objects, next_cursor, more = ChromeOsDevice.query(
                 ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
                         ChromeOsDevice.is_unmanaged_device == unmanaged)).fetch_page(fetch_size, start_cursor=cursor)
 
-            prev_cursor_str = next_cursor_str
-            next_cursor_str = next_cursor.urlsafe()
-            prev = True
-            next_ = True if more else False
+            prev_cursor = next_cursor_str
+            next_cursor = next_cursor.urlsafe() if more else None
+
         elif prev_cursor_str:
             cursor = Cursor(urlsafe=prev_cursor_str)
-            objects, next_cursor, more = ChromeOsDevice.query(
+            objects, prev, more = ChromeOsDevice.query(
                 ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
-                        ChromeOsDevice.is_unmanaged_device == unmanaged)).fetch_page(fetch_size, start_cursor=cursor)
-            objects.reverse()
-            next_cursor_str = prev_cursor_str
-            prev_cursor_str = next_cursor.urlsafe()
-            prev = True if more else False
-            next_ = True
+                        ChromeOsDevice.is_unmanaged_device == unmanaged)).order(-ChromeOsDevice.key).fetch_page(
+                fetch_size,
+                start_cursor=cursor.reversed()
+            )
+            next_cursor = prev_cursor_str
+            prev_cursor = prev.urlsafe() if more else None
 
         return {
-            'objects': objects,
-            'next_cursor': next_cursor_str,
-            'prev_cursor': prev_cursor_str,
-            'prev': prev,
-            'next': next_
+            'objects': objects or [],
+            'next_cursor': next_cursor,
+            'prev_cursor': prev_cursor,
+
         }
 
     @classmethod
