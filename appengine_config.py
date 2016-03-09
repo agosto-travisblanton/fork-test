@@ -90,7 +90,7 @@ def _CLIENT_ID():
     elif on_stage_server:
         return '106935685560101973796'
     elif on_gamestop_server:
-        return '281350297105-9pc7cpa4chi8je9j0vp6ko4au99931rj.apps.googleusercontent.com'
+        return '110047437051045908976'
     elif on_production_server:
         return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0.apps.googleusercontent.com'
     else:
