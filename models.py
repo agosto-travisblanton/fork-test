@@ -167,7 +167,8 @@ class Tenant(ndb.Model):
         if not prev_cursor_str and not next_cursor_str:
             objects, next_cursor, more = ChromeOsDevice.query(
                 ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
-                        ChromeOsDevice.is_unmanaged_device == unmanaged)).fetch_page(fetch_size)
+                        ChromeOsDevice.is_unmanaged_device == unmanaged)).fetch_page(page_size=fetch_size)
+
             prev_cursor = None
             next_cursor = next_cursor.urlsafe() if more else None
 
@@ -175,7 +176,7 @@ class Tenant(ndb.Model):
             cursor = Cursor(urlsafe=next_cursor_str)
             objects, next_cursor, more = ChromeOsDevice.query(
                 ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
-                        ChromeOsDevice.is_unmanaged_device == unmanaged)).fetch_page(fetch_size, start_cursor=cursor)
+                        ChromeOsDevice.is_unmanaged_device == unmanaged)).fetch_page(page_size=fetch_size, start_cursor=cursor)
 
             prev_cursor = next_cursor_str
             next_cursor = next_cursor.urlsafe() if more else None
@@ -185,18 +186,20 @@ class Tenant(ndb.Model):
             objects, prev, more = ChromeOsDevice.query(
                 ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
                         ChromeOsDevice.is_unmanaged_device == unmanaged)).order(-ChromeOsDevice.key).fetch_page(
-                fetch_size,
+                page_size=fetch_size,
                 start_cursor=cursor.reversed()
             )
             next_cursor = prev_cursor_str
             prev_cursor = prev.urlsafe() if more else None
 
-        return {
+        to_return = {
             'objects': objects or [],
             'next_cursor': next_cursor,
             'prev_cursor': prev_cursor,
 
         }
+
+        return to_return
 
     @classmethod
     def get_impersonation_email(cls, urlsafe_tenant_key):

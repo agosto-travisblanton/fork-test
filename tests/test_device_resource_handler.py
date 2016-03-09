@@ -74,10 +74,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.unmanaged_device = ChromeOsDevice.create_unmanaged(self.GCM_REGISTRATION_ID, self.MAC_ADDRESS)
         self.unmanaged_device_key = self.unmanaged_device.put()
         self.managed_device = ChromeOsDevice.create_managed(
-                                tenant_key=self.tenant_key,
-                                gcm_registration_id=self.GCM_REGISTRATION_ID,
-                                device_id=self.DEVICE_ID,
-                                mac_address=self.MAC_ADDRESS)
+            tenant_key=self.tenant_key,
+            gcm_registration_id=self.GCM_REGISTRATION_ID,
+            device_id=self.DEVICE_ID,
+            mac_address=self.MAC_ADDRESS)
         self.managed_device_key = self.managed_device.put()
         self.unmanaged_registration_token_authorization_header = {
             'Authorization': config.UNMANAGED_REGISTRATION_TOKEN
@@ -90,7 +90,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         }
 
         self.empty_header = {}
-
 
     ##################################################################################################################
     # post ChromeOsDevice
@@ -433,7 +432,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertTrue('Bad response: 404 Rogue unmanaged device with MAC address: {0} no longer exists.'.format(
-                mac_address) in context.exception.message)
+            mac_address) in context.exception.message)
         self.assertIsNone(unmanaged_device_key.get())
 
     def test_get_list_by_mac_address_on_rogue_unmanged_device_with_tenant_key_does_not_delete_device(self):
@@ -466,7 +465,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_get_devices_by_tenant_entity_body_json(self):
         self.__build_list_devices(tenant_key=self.tenant_key, managed_number_to_build=20,
                                   unmanaged_number_to_build=0)
-        request_parameters = {'unmanaged':'false'}
+        request_parameters = {'unmanaged': 'false'}
         uri = application.router.build(None, 'devices-by-tenant', None,
                                        {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
@@ -476,7 +475,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_get_filter_unmanaged_devices_by_tenant_entity_body_json(self):
         self.__build_list_devices(tenant_key=self.tenant_key, managed_number_to_build=20,
                                   unmanaged_number_to_build=0)
-        request_parameters = {'unmanaged':'true'}
+        request_parameters = {'unmanaged': 'true'}
         uri = application.router.build(None, 'devices-by-tenant', None,
                                        {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
@@ -494,9 +493,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.__setup_distributor_with_two_tenants_with_n_devices(distributor_key,
                                                                  tenant_1_device_count=1,
                                                                  tenant_2_device_count=1)
-        request_parameters = {}
+        request_parameters = {'unmanaged': 'false'}
         uri = application.router.build(None, 'devices-by-distributor', None,
-                                       {'distributor_urlsafe_key': distributor_key.urlsafe()})
+                                       {'distributor_urlsafe_key': distributor_key.urlsafe(), 'cur_prev_cursor': 'null',
+                                        'cur_next_cursor': 'null'})
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertOK(response)
 
@@ -507,12 +507,23 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.__setup_distributor_with_two_tenants_with_n_devices(distributor_key,
                                                                  tenant_1_device_count=13,
                                                                  tenant_2_device_count=6)
-        request_parameters = {}
-        uri = application.router.build(None, 'devices-by-distributor', None,
-                                       {'distributor_urlsafe_key': distributor_key.urlsafe()})
+        request_parameters = {'unmanaged': 'false'}
+        uri = application.router.build(
+            None,
+            'devices-by-distributor',
+            None,
+            {
+                'distributor_urlsafe_key': distributor_key.urlsafe(),
+                'cur_prev_cursor': 'null',
+                'cur_next_cursor': 'null'
+            }
+        )
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+
         response_json = json.loads(response.body)
-        self.assertLength(19, response_json)
+
+        self.assertTrue(len(response_json["devices"]) < 11)
+        self.assertFalse(response_json["prev_cursor"])
 
     #################################################################################################################
     # get managed device
@@ -1297,7 +1308,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': device_key.urlsafe()})
         self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
         log_entry = DeviceIssueLog.query(DeviceIssueLog.device_key == device_key,
-                                         ndb.AND(DeviceIssueLog.category == config.DEVICE_ISSUE_OS_VERSION_CHANGE)).get()
+                                         ndb.AND(
+                                             DeviceIssueLog.category == config.DEVICE_ISSUE_OS_VERSION_CHANGE)).get()
         self.assertIsNotNone(log_entry)
         self.assertEqual(log_entry.category, config.DEVICE_ISSUE_OS_VERSION_CHANGE)
 

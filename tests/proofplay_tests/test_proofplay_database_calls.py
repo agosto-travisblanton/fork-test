@@ -41,7 +41,6 @@ class TestDatabase(SQLBaseTest):
         super(TestDatabase, self).setUp()
         self.load_one_tenant()
 
-
     def load_one_tenant(self):
         self.tenant_id = insert_new_tenant_code_or_get_existing(self.tenant_code)
 
@@ -77,11 +76,11 @@ class TestDatabase(SQLBaseTest):
     def test_insert_new_device(self):
         self.test_insert_new_location()
         insert_new_device_or_get_existing(
-                1,
-                self.device_serial,
-                self.device_key,
-                self.customer_display_code,
-                self.tenant_code
+            1,
+            self.device_serial,
+            self.device_key,
+            self.customer_display_code,
+            self.tenant_code
         )
 
         device = self.db_session.query(Device).filter_by(serial_number=self.device_serial).first()
@@ -95,19 +94,19 @@ class TestDatabase(SQLBaseTest):
         location_id = insert_new_location_or_get_existing(self.customer_location_code, self.tenant_code)
 
         device_id = insert_new_device_or_get_existing(
-                1,
-                self.device_serial,
-                self.device_key,
-                self.customer_display_code,
-                self.tenant_code
+            1,
+            self.device_serial,
+            self.device_key,
+            self.customer_display_code,
+            self.tenant_code
         )
 
         insert_new_program_record(
-                location_id,
-                device_id,
-                resource_id,
-                self.started_at,
-                self.ended_at
+            location_id,
+            device_id,
+            resource_id,
+            self.started_at,
+            self.ended_at
         )
 
         program_record = self.db_session.query(ProgramRecord).filter_by(started_at=self.started_at).first()
@@ -200,10 +199,10 @@ class TestDatabase(SQLBaseTest):
         }
 
         self.assertEqual(program_record_for_resource_by_location(
-                self.started_at,
-                self.ended_at,
-                self.resource_id,
-                self.tenant_code
+            self.started_at,
+            self.ended_at,
+            self.resource_id,
+            self.tenant_code
         ), expected_output)
 
     def test_get_raw_program_record_data_by_location(self):
@@ -262,10 +261,10 @@ class TestDatabase(SQLBaseTest):
         }
 
         self.assertEqual(program_record_for_resource_by_date(
-                self.started_at,
-                self.ended_at,
-                self.resource_id,
-                self.tenant_code
+            self.started_at,
+            self.ended_at,
+            self.resource_id,
+            self.tenant_code
 
         ), expected_output)
 
