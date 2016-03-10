@@ -104,7 +104,7 @@ information_to_post = {
 }
 
 
-def send_mock_data(to_send, integration=False):
+def send_mock_data(to_send, integration=True):
     if integration:
         first_part = "http://skykit-display-device-int.appspot.com"
     else:

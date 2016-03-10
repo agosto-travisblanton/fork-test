@@ -118,31 +118,25 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         if cur_prev_cursor == "null":
             cur_prev_cursor = None
 
-        device_list = []
-        prev_cursor = None
-        next_cursor = None
-
         unmanaged_filter = self.request.get('unmanaged')
         unmanaged = not bool(unmanaged_filter == '' or str(unmanaged_filter) == 'false')
         domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
+        tenant_keys = [tenant.key for tenant in domain_tenant_list]
 
-        for tenant in domain_tenant_list:
-            tenant_devices = Tenant.find_devices_paginated(
-                tenant.key,
-                unmanaged,
-                prev_cursor_str=cur_prev_cursor,
-                next_cursor_str=cur_next_cursor
-            )
-            prev_cursor = tenant_devices["prev_cursor"]
-            next_cursor = tenant_devices["next_cursor"]
-
-            for tenant_device in tenant_devices["objects"]:
-                device_list.append(tenant_device)
+        tenant_devices = Tenant.find_devices_paginated(
+            tenant_keys=tenant_keys,
+            unmanaged=unmanaged,
+            prev_cursor_str=cur_prev_cursor,
+            next_cursor_str=cur_next_cursor
+        )
+        prev_cursor = tenant_devices["prev_cursor"]
+        next_cursor = tenant_devices["next_cursor"]
+        devices = tenant_devices["objects"]
 
         json_response(
             self.response,
             {
-                "devices": device_list,
+                "devices": devices,
                 "next_cursor": next_cursor,
                 "prev_cursor": prev_cursor,
 
