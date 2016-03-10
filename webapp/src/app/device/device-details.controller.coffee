@@ -124,6 +124,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onClickSavePanels = () ->
     ProgressBarService.start()
+    @setPanelInfo()
     promise = DevicesService.save @currentDevice
     promise.then @onSuccessDeviceSave, @onFailureDeviceSavePanels
 
