@@ -158,16 +158,16 @@ class Tenant(ndb.Model):
             ).fetch(1000)
 
     @classmethod
-    def find_devices_paginated(cls, tenant_key, unmanaged, prev_cursor_str=None, next_cursor_str=None):
-        fetch_size = 10
+    def find_devices_paginated(cls, tenant_keys, fetch_size=10, unmanaged=False, prev_cursor_str=None,
+                               next_cursor_str=None):
         objects = None
         next_cursor = None
         prev_cursor = None
 
         if not prev_cursor_str and not next_cursor_str:
             objects, next_cursor, more = ChromeOsDevice.query(
-                ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
-                        ChromeOsDevice.is_unmanaged_device == unmanaged)).fetch_page(page_size=fetch_size)
+                ndb.AND(ChromeOsDevice.tenant_key.IN(tenant_keys),
+                        ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(page_size=fetch_size)
 
             prev_cursor = None
             next_cursor = next_cursor.urlsafe() if more else None
@@ -175,8 +175,9 @@ class Tenant(ndb.Model):
         elif next_cursor_str:
             cursor = Cursor(urlsafe=next_cursor_str)
             objects, next_cursor, more = ChromeOsDevice.query(
-                ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
-                        ChromeOsDevice.is_unmanaged_device == unmanaged)).fetch_page(page_size=fetch_size, start_cursor=cursor)
+                ndb.AND(ChromeOsDevice.tenant_key.IN(tenant_keys),
+                        ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(page_size=fetch_size,
+                                                                                     start_cursor=cursor)
 
             prev_cursor = next_cursor_str
             next_cursor = next_cursor.urlsafe() if more else None
@@ -184,7 +185,7 @@ class Tenant(ndb.Model):
         elif prev_cursor_str:
             cursor = Cursor(urlsafe=prev_cursor_str)
             objects, prev, more = ChromeOsDevice.query(
-                ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
+                ndb.AND(ChromeOsDevice.tenant_key.IN(tenant_keys),
                         ChromeOsDevice.is_unmanaged_device == unmanaged)).order(-ChromeOsDevice.key).fetch_page(
                 page_size=fetch_size,
                 start_cursor=cursor.reversed()
