@@ -80,7 +80,9 @@ class PostNewProgramPlay(RequestHandler):
         incoming = json.loads(self.request.body)
         logging.info("NEW BATCH OF LOGS: ")
         logging.info(incoming)
-        deferred.defer(handle_posting_a_new_program_play, incoming)
+        deferred.defer(handle_posting_a_new_program_play,
+                       incoming,
+                       _queue="proof-of-play")
         final = json.dumps({"success": True, "message": "NEW PROGRAM WILL BE PROCESSED IN THE TASK QUEUE"})
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(final)

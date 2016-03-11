@@ -56,7 +56,7 @@ class Distributor(ndb.Model):
     def find_by_name(cls, name):
         if name:
             key = Distributor.query(Distributor.name == name).get(keys_only=True)
-            if None is not key:
+            if key:
                 return key.get()
 
     @classmethod
@@ -98,7 +98,7 @@ class Domain(ndb.Model):
     def find_by_name(cls, name):
         if name:
             key = Domain.query(Domain.name == name).get(keys_only=True)
-            if None is not key:
+            if key:
                 return key.get()
 
     @classmethod
@@ -135,14 +135,14 @@ class Tenant(ndb.Model):
     def find_by_name(cls, name):
         if name:
             key = Tenant.query(Tenant.name == name).get(keys_only=True)
-            if None is not key:
+            if key:
                 return key.get()
 
     @classmethod
     def find_by_tenant_code(cls, tenant_code):
         if tenant_code:
             key = Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
-            if None is not key:
+            if key:
                 return key.get()
 
     @classmethod
@@ -167,7 +167,8 @@ class Tenant(ndb.Model):
         if not prev_cursor_str and not next_cursor_str:
             objects, next_cursor, more = ChromeOsDevice.query(
                 ndb.AND(ChromeOsDevice.tenant_key.IN(tenant_keys),
-                        ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(page_size=fetch_size)
+                        ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(
+                page_size=fetch_size)
 
             prev_cursor = None
             next_cursor = next_cursor.urlsafe() if more else None
@@ -176,8 +177,9 @@ class Tenant(ndb.Model):
             cursor = Cursor(urlsafe=next_cursor_str)
             objects, next_cursor, more = ChromeOsDevice.query(
                 ndb.AND(ChromeOsDevice.tenant_key.IN(tenant_keys),
-                        ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(page_size=fetch_size,
-                                                                                     start_cursor=cursor)
+                        ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(
+                page_size=fetch_size,
+                start_cursor=cursor)
 
             prev_cursor = next_cursor_str
             next_cursor = next_cursor.urlsafe() if more else None
@@ -274,7 +276,7 @@ class Location(ndb.Model):
     def find_by_customer_location_code(cls, customer_location_code):
         if customer_location_code:
             key = Location.query(Location.customer_location_code == customer_location_code).get(keys_only=True)
-            if None is not key:
+            if key:
                 return key.get()
 
     @classmethod
@@ -347,7 +349,7 @@ class ChromeOsDevice(ndb.Model):
     def get_by_device_id(cls, device_id):
         if device_id:
             chrome_os_device_key = ChromeOsDevice.query(ChromeOsDevice.device_id == device_id).get(keys_only=True)
-            if None is not chrome_os_device_key:
+            if chrome_os_device_key:
                 return chrome_os_device_key.get()
 
     @classmethod
@@ -394,7 +396,7 @@ class ChromeOsDevice(ndb.Model):
         if mac_address:
             device_key = ChromeOsDevice.query(ndb.AND(ChromeOsDevice.mac_address == mac_address,
                                                       ChromeOsDevice.is_unmanaged_device == True)).get(keys_only=True)
-            if None is device_key:
+            if not device_key:
                 return None
             else:
                 return device_key.get()
@@ -406,7 +408,7 @@ class ChromeOsDevice(ndb.Model):
         if gcm_registration_id:
             device_key = ChromeOsDevice.query(ndb.AND(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
                                                       ChromeOsDevice.is_unmanaged_device == True)).get(keys_only=True)
-            if None is device_key:
+            if not device_key:
                 return None
             else:
                 return device_key.get()
