@@ -77,9 +77,6 @@ class RetrieveAllLocationsOfTenant(RequestHandler):
 ####################################################################################
 class PostNewProgramPlay(RequestHandler):
     def post(self):
-        # incoming = json.loads(self.request.body)
-        # deferred.defer(handle_posting_a_new_program_play, incoming)
-        # final = json.dumps({"success": True, "message": "NEW PROGRAM WILL BE PROCESSED IN THE TASK QUEUE"})
         final = json.dumps(
             {"success": True, "message": "Proof of Play is not supported in this version of Provisioning."})
         self.response.headers['Content-Type'] = 'application/json'
