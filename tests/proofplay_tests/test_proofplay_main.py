@@ -245,9 +245,11 @@ class TestMain(SQLBaseTest, WebTest):
 
     def test_post_new_program_play(self):
         uri = build_uri('PostNewProgramPlay', module='proofplay')
-        self.app.post(uri, params=json.dumps(make_one_days_worth_of_data(10, datetime.datetime.now())))
-        self.assertRunAndClearTasksInQueue(1, queue_names="default")
-        self.assertTrue(self.db_session.query(ProgramRecord).first())
+        response = self.app.post(uri, params=json.dumps(make_one_days_worth_of_data(10, datetime.datetime.now())))
+        self.assertOK(response)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['message'], 'Proof of Play is not supported in this version of Provisioning.')
+        self.assertTrue(response_json['success'])
 
     def load_one_device(self):
         device_serial = "1234"

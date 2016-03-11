@@ -1,15 +1,15 @@
-from webapp2 import RequestHandler
-from database_calls import *
-from data_processing import *
-import logging
 import json
-from google.appengine.ext import deferred
-from alembic import command
+import logging
 import os
 
+from webapp2 import RequestHandler
+
+from alembic import command
+from data_processing import *
+from database_calls import *
+from decorators import has_tenant_in_distributor_header, has_distributor_key, has_tenant_in_distributor_param
 from proofplay_config import config
 from routes_proofplay import basedir
-from decorators import has_tenant_in_distributor_header, has_distributor_key, has_tenant_in_distributor_param
 
 
 ####################################################################################
@@ -77,9 +77,8 @@ class RetrieveAllLocationsOfTenant(RequestHandler):
 ####################################################################################
 class PostNewProgramPlay(RequestHandler):
     def post(self):
-        incoming = json.loads(self.request.body)
-        deferred.defer(handle_posting_a_new_program_play, incoming)
-        final = json.dumps({"success": True, "message": "NEW PROGRAM WILL BE PROCESSED IN THE TASK QUEUE"})
+        final = json.dumps(
+            {"success": True, "message": "Proof of Play is not supported in this version of Provisioning."})
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(final)
 
