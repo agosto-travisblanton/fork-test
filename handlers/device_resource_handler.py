@@ -228,8 +228,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     self.response.headers['Location'] = device_uri
                     self.response.headers.pop('Content-Type', None)
                     self.response.set_status(status)
+
                     tenant_notification_emails = Tenant.find_by_tenant_code(tenant_code).notification_emails
-                    if tenant_notification_emails is not None:
+                    if tenant_notification_emails is not None and len(tenant_notification_emails) > 0:
                         response = MailUtil.send_message(
                             recipients=tenant_notification_emails,
                             subject='Device Added',
