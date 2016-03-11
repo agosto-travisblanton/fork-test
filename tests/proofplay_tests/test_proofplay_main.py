@@ -246,7 +246,7 @@ class TestMain(SQLBaseTest, WebTest):
     def test_post_new_program_play(self):
         uri = build_uri('PostNewProgramPlay', module='proofplay')
         self.app.post(uri, params=json.dumps(make_one_days_worth_of_data(10, datetime.datetime.now())))
-        self.assertRunAndClearTasksInQueue(1, queue_names="default")
+        self.assertRunAndClearTasksInQueue(1, queue_names="proof-of-play")
         self.assertTrue(self.db_session.query(ProgramRecord).first())
 
     def load_one_device(self):
