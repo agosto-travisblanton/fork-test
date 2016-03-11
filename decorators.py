@@ -102,6 +102,7 @@ def log_memory(function):
 def requires_api_token(handler_method):
     def authorize(self, *args, **kwargs):
         self.is_unmanaged_device = False
+        print self.request.headers
         api_token = self.request.headers.get('Authorization')
         self.is_unmanaged_device = api_token == config.UNMANAGED_API_TOKEN
         if _token_missing(api_token):

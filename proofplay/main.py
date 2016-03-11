@@ -9,7 +9,12 @@ import os
 
 from proofplay_config import config
 from routes_proofplay import basedir
-from decorators import has_tenant_in_distributor_header, has_distributor_key, has_tenant_in_distributor_param
+from decorators import (
+    has_tenant_in_distributor_header,
+    has_distributor_key,
+    has_tenant_in_distributor_param,
+    requires_api_token
+)
 
 
 ####################################################################################
@@ -76,6 +81,7 @@ class RetrieveAllLocationsOfTenant(RequestHandler):
 # MAIN ENTRY FOR POSTING NEW PROGRAM PLAY
 ####################################################################################
 class PostNewProgramPlay(RequestHandler):
+    @requires_api_token
     def post(self):
         incoming = json.loads(self.request.body)
         logging.info("NEW BATCH OF LOGS: ")

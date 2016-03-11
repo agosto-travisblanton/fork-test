@@ -3,6 +3,7 @@ import json
 import datetime
 import random
 import uuid
+from app_config import config
 
 analytics = {}
 
@@ -239,9 +240,15 @@ def send_mock_data(to_send, integration=False):
         first_part = "http://skykit-display-device-int.appspot.com"
     else:
         first_part = "http://localhost:8080"
-    url = first_part + "/proofplay/api/v1/0ac1b95dc3f93d9132b796986ed11cd4/post_new_program_play"
-    headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-    r = requests.post(url, data=json.dumps(to_send), headers=headers)
+
+    url = first_part + "/proofplay/api/v1/post_new_program_play"
+
+    headers = {
+        'Content-type': 'application/json',
+        'Accept': 'text/plain',
+        "Authorization": config.API_TOKEN
+    }
+    requests.post(url, data=json.dumps(to_send), headers=headers)
 
 
 generate_mock_data(500, 10)

@@ -18,7 +18,7 @@ class TenantsHandler(RequestHandler):
 
     @requires_api_token
     def get(self, tenant_key=None):
-        if None == tenant_key:
+        if not tenant_key:
             distributor_key = self.request.headers.get('X-Provisioning-Distributor')
             distributor = ndb.Key(urlsafe=distributor_key)
             domain_keys = Domain.query(Domain.distributor_key == distributor).fetch(100, keys_only=True)
