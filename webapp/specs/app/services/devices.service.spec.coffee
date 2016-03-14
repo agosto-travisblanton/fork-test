@@ -38,9 +38,9 @@ describe 'DevicesService', ->
       spyOn(Restangular, 'oneUrl').and.returnValue restangularServiceStub
       spyOn(restangularServiceStub, 'get').and.returnValue promise
       distributorKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFud'
-      actual = DevicesService.getDevicesByDistributor distributorKey
+      actual = DevicesService.getDevicesByDistributor distributorKey, null, null
       expect(Restangular.oneUrl).toHaveBeenCalledWith('devices',
-        "api/v1/distributors/#{distributorKey}/devices?unmanaged=false")
+        "api/v1/distributors/null/null/#{distributorKey}/devices?unmanaged=false")
       expect(actual).toBe promise
 
   describe '.getUnmanagedDevicesByDistributor', ->
@@ -49,9 +49,9 @@ describe 'DevicesService', ->
       spyOn(Restangular, 'oneUrl').and.returnValue restangularServiceStub
       spyOn(restangularServiceStub, 'get').and.returnValue promise
       distributorKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFud'
-      actual = DevicesService.getUnmanagedDevicesByDistributor distributorKey
+      actual = DevicesService.getUnmanagedDevicesByDistributor distributorKey, null, null
       expect(Restangular.oneUrl).toHaveBeenCalledWith('devices',
-        "api/v1/distributors/#{distributorKey}/devices?unmanaged=true")
+        "api/v1/distributors/null/null/#{distributorKey}/devices?unmanaged=true")
       expect(actual).toBe promise
 
   describe '.getDeviceByKey', ->

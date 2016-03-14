@@ -43,8 +43,8 @@
                           </a>
                         </td>
                         <td>{{ item.tenantCode }}</td>
-                        <td>{{ item.macAddress }}</td>
-                        <td>{{ item.ethernetMacAddress }}</td>
+                        <td>{{ item.macAddress || "None" }}</td>
+                        <td>{{ item.ethernetMacAddress || "None"  }}</td>
                         <td>
                           <a name="edit-device" class="btn" ng-click="devicesListingCtrl.editItem(item)"
                              title="Device detail">{{item.serialNumber}}</a></td>
@@ -54,6 +54,8 @@
                       </tbody>
                     </table>
                   </md-data-table-container>
+                  <md-button class="md-raised" ng-disabled="!devicesListingCtrl.devicesPrev" ng-click="devicesListingCtrl.paginateCall(false, true)">Prev</md-button>
+                  <md-button class="md-raised" ng-disabled="!devicesListingCtrl.devicesNext" ng-click="devicesListingCtrl.paginateCall(true, true)">Next</md-button>
                 </md-card-content>
               </md-card>
             </div>
@@ -94,14 +96,17 @@
                           </a>
                         </td>
                         <td>{{ item.tenantCode }}</td>
-                        <td>{{ item.macAddress }}</td>
-                        <td>{{ item.ethernetMacAddress }}</td>
+                        <td>{{ item.macAddress || "None" }}</td>
+                        <td>{{ item.ethernetMacAddress || "None" }}</td>
                         <td>{{ item.created }}</td>
                         <td class="up-{{ item.up}}-background"></td>
                       </tr>
                       </tbody>
                     </table>
                   </md-data-table-container>
+                  <md-button class="md-raised" ng-disabled="!devicesListingCtrl.unmanagedDevicesPrev" ng-click="devicesListingCtrl.paginateCall(false, false)">Prev</md-button>
+                  <md-button class="md-raised" ng-disabled="!devicesListingCtrl.unmanagedDevicesNext" ng-click="devicesListingCtrl.paginateCall(true, false)">Next</md-button>
+
                 </md-card-content>
               </md-card>
             </div>

@@ -10,16 +10,20 @@ describe 'DevicesListingCtrl', ->
   unmanagedPromise = undefined
   ProgressBarService = undefined
   sweet = undefined
-  devices = [
-    {key: 'dhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
-    {key: 'dhjad897d987fadafg708y67d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
-    {key: 'dhjad897d987fadafg708hb55', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
-  ]
-  unmanagedDevices = [
-    {key: 'uhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
-    {key: 'uhjad897d987fadafg708y67d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
-    {key: 'uhjad897d987fadafg708hb55', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
-  ]
+  to_respond_with_devices = {
+    devices: [
+      {key: 'dhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
+      {key: 'dhjad897d987fadafg708y67d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
+      {key: 'dhjad897d987fadafg708hb55', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
+    ]
+  }
+  to_respond_with_unmanagedDevices = {
+    unmanagedDevices: [
+      {key: 'uhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
+      {key: 'uhjad897d987fadafg708y67d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
+      {key: 'uhjad897d987fadafg708hb55', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
+    ]
+  }
 
   beforeEach module('skykitProvisioning')
 
@@ -50,7 +54,7 @@ describe 'DevicesListingCtrl', ->
 
     it 'calls DevicesService.getDevicesByDistributor to retrieve all distributor devices', ->
       controller.initialize()
-      expect(DevicesService.getDevicesByDistributor).toHaveBeenCalledWith controller.distributorKey
+      expect(DevicesService.getDevicesByDistributor).toHaveBeenCalledWith controller.distributorKey, controller.devicesPrev, controller.devicesNext
 
     it 'starts the progress bar', ->
       controller.initialize()
@@ -58,17 +62,14 @@ describe 'DevicesListingCtrl', ->
 
     it 'calls DevicesService.getUnmanagedDevicesByDistributor to retrieve all distributor unmanaged devices', ->
       controller.initialize()
-      expect(DevicesService.getUnmanagedDevicesByDistributor).toHaveBeenCalledWith controller.distributorKey
+      expect(DevicesService.getUnmanagedDevicesByDistributor).toHaveBeenCalledWith controller.distributorKey, controller.unmanagedDevicesPrev, controller.unmanagedDevicesNext
 
-    it "the 'then' handler caches the retrieved devices in the controller", ->
-      controller.initialize()
-      promise.resolve devices
-      expect(controller.devices).toBe devices
-
-    it "the 'then' handler caches the retrieved unmanaged devices in the controller", ->
-      controller.initialize()
-      unmanagedPromise.resolve unmanagedDevices
-      expect(controller.unmanagedDevices).toBe unmanagedDevices
+    it "the 'then' handler caches the retrieved devices and unmanaged devices in the controller", ->
+      controller.getManagedAndUnmanagedDevices()
+      promise.resolve to_respond_with_devices
+      unmanagedPromise.resolve to_respond_with_unmanagedDevices
+      expect(controller.devices).toBe to_respond_with_devices.devices
+      expect(controller.unmanagedDevices).toBe to_respond_with_unmanagedDevices.devices
 
   describe '.getFetchSuccess', ->
     beforeEach ->
@@ -109,3 +110,36 @@ describe 'DevicesListingCtrl', ->
         fromDevices: true
       })
 
+  describe '.paginateCall', ->
+
+    beforeEach ->
+      spyOn $state, 'go'
+      promise = new skykitProvisioning.q.Mock
+      unmanagedPromise = new skykitProvisioning.q.Mock
+      spyOn(DevicesService, 'getDevicesByDistributor').and.returnValue promise
+      spyOn(DevicesService, 'getUnmanagedDevicesByDistributor').and.returnValue unmanagedPromise
+      spyOn(ProgressBarService, 'start')
+      spyOn(ProgressBarService, 'complete')
+      controller = $controller 'DevicesListingCtrl', {}
+      controller.devicesPrev = '1'
+      controller.devicesNext = '2'
+      controller.unmanagedDevicesPrev = '3'
+      controller.unmanagedDevicesNext = '4'
+      controller.distributorKey = 'some-key'
+
+    it "paginated forward with unmanaged", ->
+      controller.paginateCall(true, false)
+      expect(DevicesService.getUnmanagedDevicesByDistributor).toHaveBeenCalledWith controller.distributorKey, null, controller.unmanagedDevicesNext
+
+    it 'paginates forward with managed', ->
+      controller.paginateCall(true, true)
+      expect(DevicesService.getDevicesByDistributor).toHaveBeenCalledWith controller.distributorKey, null, controller.devicesNext
+
+
+    it "paginated backward with unmanaged", ->
+      controller.paginateCall(false, false)
+      expect(DevicesService.getUnmanagedDevicesByDistributor).toHaveBeenCalledWith controller.distributorKey, controller.unmanagedDevicesPrev, null
+
+    it 'paginates backward with managed', ->
+      controller.paginateCall(false, true)
+      expect(DevicesService.getDevicesByDistributor).toHaveBeenCalledWith controller.distributorKey, controller.devicesPrev, null

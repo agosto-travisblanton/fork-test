@@ -6,6 +6,7 @@ from google.appengine.ext import ndb
 from app_config import config
 from restler.decorators import ae_ndb_serializer
 from utils.timezone_util import TimezoneUtil
+from google.appengine.datastore.datastore_query import Cursor
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>. Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -155,6 +156,51 @@ class Tenant(ndb.Model):
                 ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
                         ChromeOsDevice.is_unmanaged_device == unmanaged)
             ).fetch(1000)
+
+    @classmethod
+    def find_devices_paginated(cls, tenant_keys, fetch_size=10, unmanaged=False, prev_cursor_str=None,
+                               next_cursor_str=None):
+        objects = None
+        next_cursor = None
+        prev_cursor = None
+
+        if not prev_cursor_str and not next_cursor_str:
+            objects, next_cursor, more = ChromeOsDevice.query(
+                ndb.AND(ChromeOsDevice.tenant_key.IN(tenant_keys),
+                        ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(page_size=fetch_size)
+
+            prev_cursor = None
+            next_cursor = next_cursor.urlsafe() if more else None
+
+        elif next_cursor_str:
+            cursor = Cursor(urlsafe=next_cursor_str)
+            objects, next_cursor, more = ChromeOsDevice.query(
+                ndb.AND(ChromeOsDevice.tenant_key.IN(tenant_keys),
+                        ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(page_size=fetch_size,
+                                                                                     start_cursor=cursor)
+
+            prev_cursor = next_cursor_str
+            next_cursor = next_cursor.urlsafe() if more else None
+
+        elif prev_cursor_str:
+            cursor = Cursor(urlsafe=prev_cursor_str)
+            objects, prev, more = ChromeOsDevice.query(
+                ndb.AND(ChromeOsDevice.tenant_key.IN(tenant_keys),
+                        ChromeOsDevice.is_unmanaged_device == unmanaged)).order(-ChromeOsDevice.key).fetch_page(
+                page_size=fetch_size,
+                start_cursor=cursor.reversed()
+            )
+            next_cursor = prev_cursor_str
+            prev_cursor = prev.urlsafe() if more else None
+
+        to_return = {
+            'objects': objects or [],
+            'next_cursor': next_cursor,
+            'prev_cursor': prev_cursor,
+
+        }
+
+        return to_return
 
     @classmethod
     def get_impersonation_email(cls, urlsafe_tenant_key):

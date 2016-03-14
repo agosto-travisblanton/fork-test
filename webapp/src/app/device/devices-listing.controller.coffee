@@ -6,23 +6,44 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
   @devices = []
   @unmanagedDevices = []
   @distributorKey = undefined
+  @devicesPrev = null
+  @devicesNext = null
+  @unmanagedDevicesPrev = null
+  @unmanagedDevicesNext = null
 
-  @initialize = () ->
-    @distributorKey = $cookies.get('currentDistributorKey')
-    unmanagedDevicesPromise = DevicesService.getUnmanagedDevicesByDistributor @distributorKey
-    unmanagedDevicesPromise.then (response) =>
-      @unmanagedDevices = response
+  @getManagedDevices = (key, prev, next) ->
+    devicesPromise = DevicesService.getDevicesByDistributor key, prev, next
     ProgressBarService.start()
-    devicesPromise = DevicesService.getDevicesByDistributor @distributorKey
     devicesPromise.then ((response) =>
-      @getFetchSuccess(response)
-      return
+      @devices = response.devices
+      @devicesNext = response.next_cursor
+      @devicesPrev = response.prev_cursor
+      @getFetchSuccess()
     ), (response) =>
       @getFetchFailure(response)
-      return
 
-  @getFetchSuccess = (response) ->
-    @devices = response
+
+  @getUnmanagedDevices = (key, prev, next) ->
+    unmanagedDevicesPromise = DevicesService.getUnmanagedDevicesByDistributor key, prev, next
+    ProgressBarService.start()
+    unmanagedDevicesPromise.then ((response) =>
+      @unmanagedDevices = response.devices
+      @unmanagedDevicesPrev = response.prev_cursor
+      @unmanagedDevicesNext = response.next_cursor
+      @getFetchSuccess()
+    ), (response) =>
+      @getFetchFailure(response)
+
+  @getManagedAndUnmanagedDevices = () ->
+    @distributorKey = $cookies.get('currentDistributorKey')
+    @getManagedDevices(@distributorKey, @devicesPrev, @devicesNext)
+    @getUnmanagedDevices(@distributorKey, @unmanagedDevicesPrev, @unmanagedDevicesNext)
+
+
+  @initialize = () ->
+    @getManagedAndUnmanagedDevices()
+
+  @getFetchSuccess = () ->
     ProgressBarService.complete()
 
   @getFetchFailure = (response) ->
@@ -37,4 +58,18 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
       fromDevices: true
     }
 
+  @paginateCall = (forward, managed) ->
+    if forward
+      if managed
+        @getManagedDevices @distributorKey, null, @devicesNext
+
+      if not managed
+        @getUnmanagedDevices @distributorKey, null, @unmanagedDevicesNext
+
+    if not forward
+      if managed
+        @getManagedDevices @distributorKey, @devicesPrev, null
+
+      if not managed
+        @getUnmanagedDevices @distributorKey, @unmanagedDevicesPrev, null
   @
