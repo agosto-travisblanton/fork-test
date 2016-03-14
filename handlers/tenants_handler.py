@@ -31,6 +31,19 @@ class TenantsHandler(RequestHandler):
         json_response(self.response, result, strategy=TENANT_STRATEGY)
 
     @requires_api_token
+    def get_tenant_defaults_on_distributor(self, tenant_key):
+        tenant = ndb.Key(urlsafe=tenant_key).get()
+        domain = tenant.get_domain()
+        distributor = domain.get_distributor()
+        json_response(
+            self.response,
+            {
+                "content_manager_url": distributor.content_manager_url,
+                "player_content_url": distributor.player_content_url
+            }
+        )
+
+    @requires_api_token
     def post(self):
         if self.request.body is not str('') and self.request.body is not None:
             status = 201

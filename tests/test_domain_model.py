@@ -1,3 +1,4 @@
+from app_config import config
 from env_setup import setup_test_paths
 
 setup_test_paths()
@@ -47,6 +48,15 @@ class TestDomainModel(BaseTest):
         domain_created = Domain.find_by_name(name)
         self.assertEqual(domain_created.name, name)
         self.assertFalse(domain_created.active)
+
+    def test_get_distributor_returns_distributor_representation(self):
+        distributor = self.domain.get_distributor()
+        self.assertEqual(distributor.name, self.DISTRIBUTOR_NAME)
+
+    def test_get_distributor_returns_distributor_default_properties(self):
+        distributor = self.domain.get_distributor()
+        self.assertEqual(distributor.content_manager_url, config.DEFAULT_CONTENT_MANAGER_URL)
+        self.assertEqual(distributor.player_content_url, config.DEFAULT_PLAYER_CONTENT_URL)
 
     def test_class_version_is_only_set_by_pre_put_hook_method(self):
         self.domain.class_version = 47
