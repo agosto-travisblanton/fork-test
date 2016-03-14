@@ -75,6 +75,8 @@ class TestDistributorsHandler(BaseTest, WebTest):
         self.assertEqual(response_json.get('key'), expected.key.urlsafe())
         self.assertEqual(response_json.get('name'), self.AGOSTO)
         self.assertEqual(response_json.get('active'), expected.active)
+        self.assertEqual(response_json.get('content_manager_url'), config.DEFAULT_CONTENT_MANAGER_URL)
+        self.assertEqual(response_json.get('player_content_url'), config.DEFAULT_PLAYER_CONTENT_URL)
         self.assertEqual(response_json.get('created'), expected.created.strftime('%Y-%m-%d %H:%M:%S'))
         self.assertEqual(response_json.get('updated'), expected.updated.strftime('%Y-%m-%d %H:%M:%S'))
 

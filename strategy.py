@@ -26,6 +26,8 @@ TENANT_STRATEGY += [
 DISTRIBUTOR_FIELDS = [
     'name',
     'active',
+    'content_manager_url',
+    'player_content_url',
     'created',
     'updated'
 ]

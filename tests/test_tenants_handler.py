@@ -447,40 +447,6 @@ class TestTenantsHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertEqual(response_json.get('active'), False)
 
-    ##################################################################################################################
-    ## get_tenant_defaults
-    ##################################################################################################################
-
-    def test_get_tenant_defaults_returns_ok_status(self):
-        tenant_keys = self.load_tenants()
-        request_parameters = {}
-        uri = application.router.build(None, 'tenant-defaults', None, {'tenant_key': tenant_keys[0].urlsafe()})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
-        self.assertOK(response)
-
-    def test_get_tenant_defaults_returns_default_of_none(self):
-        tenant_keys = self.load_tenants()
-        request_parameters = {}
-        uri = application.router.build(None, 'tenant-defaults', None, {'tenant_key': tenant_keys[0].urlsafe()})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
-        response_json = json.loads(response.body)
-        self.assertIsNone(response_json.get('content_manager_url'))
-        self.assertIsNone(response_json.get('player_content_url'))
-
-    def test_get_tenant_defaults_returns_defaults(self):
-        default_content_manager_url = 'foo'
-        default_player_content_url = 'goo'
-        self.distributor.content_manager_url = default_content_manager_url
-        self.distributor.player_content_url = default_player_content_url
-        self.distributor.put()
-        tenant_keys = self.load_tenants()
-        request_parameters = {}
-        uri = application.router.build(None, 'tenant-defaults', None, {'tenant_key': tenant_keys[0].urlsafe()})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
-        response_json = json.loads(response.body)
-        self.assertEqual(response_json.get('content_manager_url'), default_content_manager_url)
-        self.assertEqual(response_json.get('player_content_url'), default_player_content_url)
-
     def load_tenants(self):
         tenant_keys = []
         domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
