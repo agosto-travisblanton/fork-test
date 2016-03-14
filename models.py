@@ -94,6 +94,9 @@ class Domain(ndb.Model):
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
     class_version = ndb.IntegerProperty()
 
+    def get_distributor(self):
+        return self.distributor_key.get()
+
     @classmethod
     def find_by_name(cls, name):
         if name:
