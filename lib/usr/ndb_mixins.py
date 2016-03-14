@@ -19,6 +19,7 @@ class KeyValidatorMixin(object):
     """
     Validates urlsafe representation of an ndb.Key
     """
+
     def valid_key(self, urlsafe_key, kind_cls):
         '''
         Validates that urlsafe_key is an ndb.Key of type kind_cls
@@ -39,7 +40,6 @@ class KeyValidatorMixin(object):
             self.abort(400, INVALID_KEY)
 
         return False, None
-
 
     def validate_and_get(self, urlsafe_key, kind_cls, abort_on_not_found=False):
         '''
@@ -62,7 +62,6 @@ class KeyValidatorMixin(object):
 
 
 class PagingListHandlerMixin(object):
-
     @property
     def page_size(self):
         """

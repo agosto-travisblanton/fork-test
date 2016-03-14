@@ -428,9 +428,7 @@ class MultiLocationByDevice(RequestHandler):
 def handle_posting_a_new_program_play(incoming_data):
     for each_log in incoming_data["data"]:
         try:
-            if not each_log['customer_location_code'] and not each_log['customer_display_code']:
-                pass
-            else:
+            if each_log['customer_location_code'] and each_log['customer_display_code']:
                 raw_event_id = insert_raw_program_play_event_data(each_log)
                 resource_name = each_log["resource_name"]
                 resource_id = each_log["resource_id"]

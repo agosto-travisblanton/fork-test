@@ -497,7 +497,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         uri = application.router.build(None, 'devices-by-distributor', None,
                                        {'distributor_urlsafe_key': distributor_key.urlsafe(), 'cur_prev_cursor': 'null',
                                         'cur_next_cursor': 'null'})
+
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+
         self.assertOK(response)
 
     def test_get_devices_by_distributor_returns_expected_device_count(self):

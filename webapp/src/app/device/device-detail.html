@@ -172,10 +172,12 @@
                   <div class="form-group"
                        ng-hide="deviceDetailsCtrl.currentDevice.logglyLink == None ||
                        deviceDetailsCtrl.currentDevice.logglyLink == ''">
-                    <label>Loggly</label>
-                    <div>
-                      <a ng-href="{{deviceDetailsCtrl.currentDevice.logglyLink}}">
-                        {{deviceDetailsCtrl.currentDevice.logglyLink}}</a>
+                    <div ng-show="deviceDetailsCtrl.logglyForUser()">
+                        <label>Loggly</label>
+                        <div>
+                          <a ng-href="{{deviceDetailsCtrl.currentDevice.logglyLink}}">
+                            {{deviceDetailsCtrl.currentDevice.logglyLink}}</a>
+                        </div>
                     </div>
                   </div>
                   <div class="form-group"

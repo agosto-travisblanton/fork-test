@@ -3,13 +3,15 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'DeviceDetailsCtrl', ($log,
-    $stateParams,
-    $state,
-    DevicesService,
-    LocationsService,
-    CommandsService,
-    sweet,
-    ProgressBarService) ->
+  $stateParams,
+  $state,
+  DevicesService,
+  LocationsService,
+  CommandsService,
+  sweet,
+  $cookies,
+  ProgressBarService
+) ->
   @tenantKey = $stateParams.tenantKey
   @deviceKey = $stateParams.deviceKey
   @fromDevices = $stateParams.fromDevices is "true"
@@ -48,6 +50,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     heartbeatInterval: undefined
     checkContentInterval: undefined
   }
+
   @commandEvents = []
   @dayRange = 30
   @editMode = !!$stateParams.deviceKey
@@ -287,4 +290,8 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       newDisplayCode = newDisplayCode.replace(/\W+/g, '')
     @currentDevice.customerDisplayCode = newDisplayCode
 
+
+  @logglyForUser = () ->
+    userDomain = $cookies.get('userEmail').split("@")[1]
+    return  userDomain == "demo.agosto.com" || userDomain == "agosto.com"
   @

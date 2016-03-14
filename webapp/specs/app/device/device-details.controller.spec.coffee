@@ -17,6 +17,7 @@ describe 'DeviceDetailsCtrl', ->
   sweet = undefined
   progressBarService = undefined
   serviceInjection = undefined
+  cookieMock = undefined
   device = {key: 'dhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
   issues = [
     {
@@ -628,3 +629,31 @@ describe 'DeviceDetailsCtrl', ->
       controller.currentDevice.customerDisplayName = 'Panel in Reception'
       controller.autoGenerateCustomerDisplayCode()
       expect(controller.currentDevice.customerDisplayCode).toBe 'panel_in_reception'
+
+
+  describe 'isAgostoDomain', ->
+    beforeEach ->
+
+      cookieMock = {
+        storage: {},
+        put: (key, value) ->
+          this.storage[key] = value
+        get: (key) ->
+          return this.storage[key]
+      }
+      controller = $controller 'DeviceDetailsCtrl', {$cookies: cookieMock}
+
+
+
+    it 'is a valid domain if @demo.agosto.com', ->
+      cookieMock.put("userEmail", "some.user@demo.agosto.com")
+      expect(controller.logglyForUser()).toBeTruthy()
+
+    it 'is a valid domain if @agosto.com', ->
+      cookieMock.put("userEmail", "some.user@agosto.com")
+      expect(controller.logglyForUser()).toBeTruthy()
+
+
+    it 'is not if anything else', ->
+      cookieMock.put("userEmail", "some.user@123.com")
+      expect(controller.logglyForUser()).toBeFalsy()
