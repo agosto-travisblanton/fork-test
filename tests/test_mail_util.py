@@ -20,16 +20,16 @@ class TestMailUtil(BaseTest):
     def test_send_message_returns_response_message(self):
         response = MailUtil.send_message(
             recipients=self.RECIPIENTS,
-            subject='my subject',
-            text='my message')
+            subject='Mailgun Test',
+            text='test message')
         response_json = json.loads(response)
         self.assertEqual(self.QUEUED_MESSAGE, response_json['message'])
 
     def test_send_message_returns_response_message_id_with_expected_domain(self):
         response = MailUtil.send_message(
             recipients=self.RECIPIENTS,
-            subject='my subject',
-            text='my message')
+            subject='Mailgun Test',
+            text='test message')
         response_json = json.loads(response)
         id_returned = response_json['id']
         expected_mail_domain = id_returned.split('@')[1]

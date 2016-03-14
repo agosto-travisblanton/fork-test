@@ -1,6 +1,5 @@
 import json
 import logging
-import re
 
 from datetime import datetime
 from google.appengine.ext import ndb
@@ -17,7 +16,6 @@ from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY, DEVICE_ISSUE_LOG_STRATEGY
 from utils.mail_util import MailUtil
-import ndb_json
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -254,7 +252,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     self.response.headers.pop('Content-Type', None)
                     self.response.set_status(status)
                     tenant_notification_emails = Tenant.find_by_tenant_code(tenant_code).notification_emails
-                    if tenant_notification_emails is not None:
+                    if tenant_notification_emails is not None and len(tenant_notification_emails) > 0:
                         response = MailUtil.send_message(
                             recipients=tenant_notification_emails,
                             subject='Device Added',
@@ -301,7 +299,15 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 device.customer_display_name = customer_display_name
             customer_display_code = request_json.get('customerDisplayCode')
             if customer_display_code:
-                device.customer_display_code = customer_display_code
+                if device.customer_display_code != customer_display_code:
+                    if ChromeOsDevice.is_customer_display_code_unique(
+                            customer_display_code=customer_display_code,
+                            tenant_key=device.tenant_key):
+                        device.customer_display_code = customer_display_code
+                    else:
+                        status = 409
+                        message = "Conflict. Customer display code \"{0}\" is already assigned for tenant.".format(
+                            customer_display_code)
             notes = request_json.get('notes')
             if notes:
                 device.notes = notes
