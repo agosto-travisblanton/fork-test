@@ -1,4 +1,5 @@
 from env_setup import setup_test_paths
+from app_config import config
 
 setup_test_paths()
 
@@ -245,8 +246,10 @@ class TestMain(SQLBaseTest, WebTest):
 
     def test_post_new_program_play(self):
         uri = build_uri('PostNewProgramPlay', module='proofplay')
-        self.app.post(uri, params=json.dumps(make_one_days_worth_of_data(10, datetime.datetime.now())))
-        self.assertRunAndClearTasksInQueue(1, queue_names="default")
+        self.app.post(uri, params=json.dumps(make_one_days_worth_of_data(10, datetime.datetime.now())),
+                      headers={"Authorization": config.API_TOKEN})
+
+        self.assertRunAndClearTasksInQueue(1, queue_names="proof-of-play")
         self.assertTrue(self.db_session.query(ProgramRecord).first())
 
     def load_one_device(self):
@@ -258,7 +261,7 @@ class TestMain(SQLBaseTest, WebTest):
 
     def load_tenant(self):
         new_tenant = TenantCode(
-                tenant_code=self.tenant_code
+            tenant_code=self.tenant_code
         )
 
         self.db_session.add(new_tenant)
@@ -267,15 +270,15 @@ class TestMain(SQLBaseTest, WebTest):
 
     def load_resources(self):
         new_resource = Resource(
-                resource_name="test",
-                resource_identifier="1234",
-                tenant_id=self.tenant_id
+            resource_name="test",
+            resource_identifier="1234",
+            tenant_id=self.tenant_id
         )
         self.db_session.add(new_resource)
         another_new_resource = Resource(
-                resource_name="test2",
-                resource_identifier="5678",
-                tenant_id=self.tenant_id
+            resource_name="test2",
+            resource_identifier="5678",
+            tenant_id=self.tenant_id
 
         )
         self.db_session.add(another_new_resource)

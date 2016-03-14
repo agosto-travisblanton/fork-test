@@ -357,6 +357,13 @@ def get_raw_program_record_data_by_location(start_date, end_date, customer_locat
 ####################################################################################
 # DataStore Related
 ####################################################################################
+def tenant_code_from_urlsafe_key(urlsafe_key):
+    tenant_key = ndb.Key(urlsafe=urlsafe_key)
+    if tenant_key:
+        return tenant_key.get().tenant_code
+    return None
+
+
 def get_tenant_list_from_distributor_key(distributor_key):
     distributor = ndb.Key(urlsafe=distributor_key)
     domain_keys = Domain.query(Domain.distributor_key == distributor).fetch(100, keys_only=True)

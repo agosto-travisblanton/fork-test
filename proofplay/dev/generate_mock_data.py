@@ -3,11 +3,12 @@ import json
 import datetime
 import random
 import uuid
+from app_config import config
 
 analytics = {}
 
 information_to_post = {
-    "myacmeservices": {
+    "acme_inc": {
         "resource_choices": [
             {"name": "ACME_5553", "id": uuid.uuid1().hex},
             {"name": "ACME_5447", "id": uuid.uuid1().hex},
@@ -102,16 +103,6 @@ information_to_post = {
 
     }
 }
-
-
-def send_mock_data(to_send, integration=True):
-    if integration:
-        first_part = "http://skykit-display-device-int.appspot.com"
-    else:
-        first_part = "http://localhost:8080"
-    url = first_part + "/proofplay/api/v1/0ac1b95dc3f93d9132b796986ed11cd4/post_new_program_play"
-    headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-    r = requests.post(url, data=json.dumps(to_send), headers=headers)
 
 
 def create_one_log(
@@ -244,6 +235,20 @@ def generate_mock_data(days_of_logs, amount_a_day):
     print analytics
 
 
+def send_mock_data(to_send, integration=False):
+    if integration:
+        first_part = "http://skykit-display-device-int.appspot.com"
+    else:
+        first_part = "http://localhost:8080"
+
+    url = first_part + "/proofplay/api/v1/post_new_program_play"
+
+    headers = {
+        'Content-type': 'application/json',
+        'Accept': 'text/plain',
+        "Authorization": config.API_TOKEN
+    }
+    requests.post(url, data=json.dumps(to_send), headers=headers)
+
+
 generate_mock_data(500, 10)
-
-
