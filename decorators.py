@@ -213,6 +213,6 @@ def _token_invalid(api_token, for_unmanaged_registration_token=False, for_regist
         valid_api_token = api_token == config.API_TOKEN
         unmanaged_api_token = api_token == config.UNMANAGED_API_TOKEN
         if not valid_api_token and not unmanaged_api_token:
-            logging.error('HTTP request API token is invalid.')
+            logging.error('HTTP request API token {0} is invalid. Expected token = {1}'.format(api_token, config.API_TOKEN))
             return True
     return False

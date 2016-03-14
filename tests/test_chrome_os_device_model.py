@@ -1,3 +1,5 @@
+import uuid
+
 from google.appengine.ext import ndb
 
 from app_config import config
@@ -37,6 +39,7 @@ class TestChromeOsDeviceModel(BaseTest):
     TIME_ZONE = 'UTC-6'
     LATITUDE = 37.78
     LONGITUDE = -122.41
+    CUSTOMER_DISPLAY_CODE = 'front_reception'
 
     def setUp(self):
         super(TestChromeOsDeviceModel, self).setUp()
@@ -275,33 +278,6 @@ class TestChromeOsDeviceModel(BaseTest):
         device.put()
         self.assertFalse(ChromeOsDevice.is_rogue_unmanaged_device(self.MAC_ADDRESS))
 
-    # def test_json_serialization_strategy_of_geo_location_decomposes_into_lat_lon(self):
-    #     device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-    #                                            device_id=self.TESTING_DEVICE_ID,
-    #                                            gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
-    #                                            mac_address=self.MAC_ADDRESS,
-    #                                            serial_number=self.SERIAL_NUMBER,
-    #                                            model=self.MODEL)
-    #     latitude = 44.983579
-    #     longitude = -93.277544
-    #     device.geo_location = ndb.GeoPt(latitude, longitude) # Agosto's geoLocation
-    #     device.put()
-    #     json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
-    #     self.assertEqual(latitude, json_representation['latitude'])
-    #     self.assertEqual(longitude, json_representation['longitude'])
-
-    # def test_json_serialization_strategy_of_geo_location_when_geo_location_is_none(self):
-    #     device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-    #                                            device_id=self.TESTING_DEVICE_ID,
-    #                                            gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
-    #                                            mac_address=self.MAC_ADDRESS,
-    #                                            serial_number=self.SERIAL_NUMBER,
-    #                                            model=self.MODEL)
-    #     device.put()
-    #     json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
-    #     self.assertIsNone(json_representation['latitude'])
-    #     self.assertIsNone(json_representation['longitude'])
-
     def test_create_sets_proof_of_play_logging_to_false(self):
         device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
                                                device_id=self.TESTING_DEVICE_ID,
@@ -333,3 +309,23 @@ class TestChromeOsDeviceModel(BaseTest):
         device.put()
         json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
         self.assertTrue(json_representation['proofOfPlayLogging'])
+
+    def test_is_customer_display_code_unique_returns_false_when_code_found(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS,
+                                               serial_number=self.SERIAL_NUMBER,
+                                               model=self.MODEL)
+        device.customer_display_code = self.CUSTOMER_DISPLAY_CODE
+        device.put()
+        uniqueness_check = ChromeOsDevice.is_customer_display_code_unique(
+            customer_display_code=self.CUSTOMER_DISPLAY_CODE,
+            tenant_key=self.tenant_key)
+        self.assertFalse(uniqueness_check)
+
+    def test_is_customer_display_code_unique_returns_true_when_code_not_found(self):
+        display_code = str(uuid.uuid4().hex)
+        uniqueness_check = ChromeOsDevice.is_customer_display_code_unique(customer_display_code=display_code,
+                                                                          tenant_key=self.tenant_key)
+        self.assertTrue(uniqueness_check)
