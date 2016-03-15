@@ -3,8 +3,7 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantAddCtrl',
-  ($log, $stateParams, TenantsService, DomainsService, DevicesService, DistributorsService, $state, sweet,
-    ProgressBarService, $cookies, $mdDialog, $scope) ->
+  ($log, TenantsService, DistributorsService, $state, sweet, ProgressBarService, $cookies) ->
     @currentTenant = {
       key: undefined,
       name: undefined,
@@ -22,6 +21,10 @@ appModule.controller 'TenantAddCtrl',
 
     @initialize = ->
       @currentDistributorKey = $cookies.get('currentDistributorKey')
+      distributorPromise = DistributorsService.getByKey @currentDistributorKey
+      distributorPromise.then (data) =>
+        @currentTenant.content_server_url = data.player_content_url
+        @currentTenant.content_manager_base_url = data.content_manager_url
       distributorDomainPromise = DistributorsService.getDomainsByKey @currentDistributorKey
       distributorDomainPromise.then (domains) =>
         @distributorDomains = domains
