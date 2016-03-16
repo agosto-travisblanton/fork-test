@@ -161,6 +161,12 @@ class Tenant(ndb.Model):
             ).fetch(1000)
 
     @classmethod
+    def find_devices_with_partial_serial(cls, tenant_keys, unmanaged, partial_serial):
+        return ChromeOsDevice.query().filter(ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
+            ChromeOsDevice.is_unmanaged_device == unmanaged).filter(ChromeOsDevice.serial_number >= partial_serial) \
+            .filter(ChromeOsDevice.serial_number <= partial_serial + u'\ufffd').fetch(1000)
+
+    @classmethod
     def find_devices_paginated(cls, tenant_keys, fetch_size=10, unmanaged=False, prev_cursor_str=None,
                                next_cursor_str=None):
         objects = None

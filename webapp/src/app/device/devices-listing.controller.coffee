@@ -11,6 +11,11 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
   @unmanagedDevicesPrev = null
   @unmanagedDevicesNext = null
 
+  @searchDevices = (distributor, partial_serial, unmanaged) ->
+    DevicesService.searchDevicesByPartialSerial(distributor, partial_serial, unmanaged)
+    .then (res) ->
+      console.log(res)
+
   @getManagedDevices = (key, prev, next) ->
     devicesPromise = DevicesService.getDevicesByDistributor key, prev, next
     ProgressBarService.start()
@@ -36,6 +41,7 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
 
   @getManagedAndUnmanagedDevices = () ->
     @distributorKey = $cookies.get('currentDistributorKey')
+    @searchDevices(@distributorKey, "E6MS", false)
     @getManagedDevices(@distributorKey, @devicesPrev, @devicesNext)
     @getUnmanagedDevices(@distributorKey, @unmanagedDevicesPrev, @unmanagedDevicesNext)
 

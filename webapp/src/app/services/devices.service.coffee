@@ -34,6 +34,12 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($http, $log, Res
         promise = Restangular.oneUrl(SERVICE_NAME, url).get()
         promise
 
+    searchDevicesByPartialSerial: (distributorKey, partial_serial, unmanaged) ->
+      unless distributorKey == undefined
+        url = "api/v1/distributors/search/#{distributorKey}/#{partial_serial}/#{unmanaged}/devices"
+        promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        promise
+
     getDevicesByDistributor: (distributorKey, prev, next) ->
       unless distributorKey == undefined
         url = "api/v1/distributors/#{prev}/#{next}/#{distributorKey}/devices?unmanaged=false"

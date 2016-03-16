@@ -166,6 +166,12 @@ application = WSGIApplication(
               handler_method='get_devices_by_distributor',
               methods=['GET']
               ),
+        Route(r'/api/v1/distributors/search/<distributor_urlsafe_key>/<partial_serial>/<unmanaged>/devices',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='search_for_device_by_serial',
+              handler_method='search_for_device_by_serial',
+              methods=['GET']
+              ),
         ############################################################
         # Tenants
         ############################################################

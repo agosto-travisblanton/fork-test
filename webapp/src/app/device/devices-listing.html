@@ -10,7 +10,8 @@
         <md-tab label="Managed">
           <md-content class="md-padding">
             <div flex="100" flex-sm="100" flex-xs="100" layout="column">
-              <md-card>
+                <md-card>
+
                 <md-card-content>
                   <md-data-table-container layout="column">
                     <table class="table table-responsive table-striped">
@@ -54,9 +55,37 @@
                       </tbody>
                     </table>
                   </md-data-table-container>
+                    <div class="col-md-12">
+                        <div class="col-sm-3">
                   <md-button class="md-raised" ng-disabled="!devicesListingCtrl.devicesPrev" ng-click="devicesListingCtrl.paginateCall(false, true)">Prev</md-button>
-                  <md-button class="md-raised" ng-disabled="!devicesListingCtrl.devicesNext" ng-click="devicesListingCtrl.paginateCall(true, true)">Next</md-button>
+
+                            <md-button class="md-raised" ng-disabled="!devicesListingCtrl.devicesNext" ng-click="devicesListingCtrl.paginateCall(true, true)">Next</md-button>
+                                      </div>
+
+                                                <div class="col-md-3 col-md-offset-6">
+                        <md-autocomplete
+                            md-selected-item="vm.selectedItem"
+                            style="margin-left: -25px;"
+                            md-search-text="vm.searchText"
+                            md-items="item in vm.querySearch(vm.resources, vm.searchText)"
+                            md-item-text="item"
+                            md-min-length="0"
+                            md-search-text-change="vm.isResourceValid(vm.searchText)"
+                            md-selected-item-change="vm.isResourceValid(vm.searchText)"
+                            placeholder="Select a resource">
+                        <md-item-template>
+                    <span md-highlight-text="vm.searchText"
+                          md-highlight-flags="^i">{{item}}</span>
+                        </md-item-template>
+                        <md-not-found>
+                            No matching item for search "{{vm.searchText}}" was
+                            found.
+                        </md-not-found>
+                    </md-autocomplete>
+                        </div>
+                        </div>
                 </md-card-content>
+
               </md-card>
             </div>
           </md-content>

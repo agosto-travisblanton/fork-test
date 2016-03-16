@@ -24,6 +24,21 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     MAILGUN_QUEUED_MESSAGE = 'Queued. Thank you.'
 
     @requires_api_token
+    def search_for_device_by_serial(self, distributor_urlsafe_key, partial_serial, unmanaged):
+        unmanaged = True if unmanaged == "true" else False
+        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
+        tenant_keys = [tenant.key for tenant in domain_tenant_list]
+        resulting_devices = Tenant.find_devices_with_partial_serial(
+            tenant_keys=tenant_keys,
+            unmanaged=unmanaged,
+            partial_serial=partial_serial
+        )
+        json_response(
+            self.response,
+            {"serial_number_matches": [device.serial_number for device in resulting_devices]},
+        )
+
+    @requires_api_token
     def get_list(self):
         pairing_code = self.request.get('pairingCode')
         device_mac_address = self.request.get('macAddress')
