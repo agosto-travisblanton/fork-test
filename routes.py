@@ -180,13 +180,6 @@ application = WSGIApplication(
             name='manage-tenant',
             methods=['GET', 'PUT', 'DELETE']
         ),
-        Route(
-            r'/api/v1/tenants/<tenant_key>/defaults',
-            handler='handlers.tenants_handler.TenantsHandler',
-            name='tenant-defaults',
-            handler_method='get_tenant_defaults_on_distributor',
-            methods=['GET']
-        ),
 
         ############################################################
         # Distributors
