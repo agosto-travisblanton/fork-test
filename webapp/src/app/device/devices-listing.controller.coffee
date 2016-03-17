@@ -11,13 +11,37 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
   @unmanagedDevicesPrev = null
   @unmanagedDevicesNext = null
   @selectedButton = "Serial Number"
+  @validSerials = []
+  @curDevices = {}
+  @disabled = true
 
-  @searchDevices = (partial_serial) ->
+  @changeRadio = () ->
+    @searchText = ''
+    @disabled = true
+    @curDevices = {}
+
+  @convertArrayToDictionary = (theArray) ->
+    curDevices = {}
+    for item in theArray
+      curDevices[item.serial] = item
+    return curDevices
+
+  @prepareForEditView = (serial_number) ->
+     @editItem @curDevices[serial_number]
+
+  @isResourceValid = (resource) ->
+    if resource in @validSerials
+      @disabled = false
+    else
+      @disabled = true
+
+  @searchDevices = (partial_serial) =>
     if partial_serial
       DevicesService.searchDevicesByPartialSerial(@distributorKey, partial_serial, false)
-      .then (res) ->
-        res["serial_number_matches"] or []
-
+      .then (res) =>
+        result = res["serial_number_matches"]
+        @curDevices = @convertArrayToDictionary(result)
+        @validSerials = [each.serial for each in result][0]
 
   @getManagedDevices = (key, prev, next) ->
     devicesPromise = DevicesService.getDevicesByDistributor key, prev, next

@@ -29,11 +29,14 @@
 
                                         <div class="col-md-2 col-md-offset-3"
                                              style="margin-right: -40px !important">
-                                            <md-radio-group ng-model="devicesListingCtrl.selectedButton">
+                                            <md-radio-group ng-model="devicesListingCtrl.selectedButton" ng-change="devicesListingCtrl.changeRadio()">
                                                 <md-radio-button value="Serial Number" class="md-primary">
                                                     Serial Number
                                                 </md-radio-button>
-                                                <md-radio-button value="MAC" class="md-primary">
+                                                <md-radio-button
+                                                        value="MAC"
+                                                        class="md-primary"
+                                                ng-disabled="true">
                                                     MAC
                                                 </md-radio-button>
                                             </md-radio-group>
@@ -46,9 +49,10 @@
                                                     md-items="item in devicesListingCtrl.searchDevices(devicesListingCtrl.searchText)"
                                                     md-item-text="item"
                                                     md-min-length="0"
+                                                    md-search-text-change="devicesListingCtrl.isResourceValid(devicesListingCtrl.searchText)"
+                                                    md-selected-item-change="devicesListingCtrl.isResourceValid(devicesListingCtrl.searchText)"
                                                     placeholder="Make A Search">
-                                                 <!---- md-search-text-change="devicesListingCtrl.isResourceValid(devicesListingCtrl.searchText)"
-                                                    md-selected-item-change="devicesListingCtrl.isResourceValid(devicesListingCtrl.searchText)" --->
+
                                                 <md-item-template>
                                                         <span md-highlight-text="devicesListingCtrl.searchText"
                                                               md-highlight-flags="^i">{{item}}</span>
@@ -61,7 +65,10 @@
                                         </div>
                                         <div class="col-md-1"
                                              style="margin-left: -20px !important; margin-top: -4px !important">
-                                            <md-button class="md-raised md-primary">
+                                            <md-button class="md-raised md-primary"
+                                                       ng-disabled="devicesListingCtrl.disabled"
+                                                       ng-click="devicesListingCtrl.prepareForEditView(devicesListingCtrl.searchText)"
+                                            >
 
                                                 OPEN
                                             </md-button>

@@ -35,7 +35,14 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         )
         json_response(
             self.response,
-            {"serial_number_matches": [device.serial_number for device in resulting_devices]},
+            {
+                "serial_number_matches": [
+                    {
+                        "serial": device.serial_number,
+                        "key": device.key.urlsafe(),
+                        "tenantKey": device.tenant_key.urlsafe()
+                    } for device in resulting_devices]
+            },
         )
 
     @requires_api_token
