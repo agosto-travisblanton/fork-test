@@ -10,11 +10,14 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
   @devicesNext = null
   @unmanagedDevicesPrev = null
   @unmanagedDevicesNext = null
+  @selectedButton = "Serial Number"
 
-  @searchDevices = (distributor, partial_serial, unmanaged) ->
-    DevicesService.searchDevicesByPartialSerial(distributor, partial_serial, unmanaged)
-    .then (res) ->
-      console.log(res)
+  @searchDevices = (partial_serial) ->
+    if partial_serial
+      DevicesService.searchDevicesByPartialSerial(@distributorKey, partial_serial, false)
+      .then (res) ->
+        res["serial_number_matches"] or []
+
 
   @getManagedDevices = (key, prev, next) ->
     devicesPromise = DevicesService.getDevicesByDistributor key, prev, next
@@ -40,13 +43,12 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
       @getFetchFailure(response)
 
   @getManagedAndUnmanagedDevices = () ->
-    @distributorKey = $cookies.get('currentDistributorKey')
-    @searchDevices(@distributorKey, "E6MS", false)
     @getManagedDevices(@distributorKey, @devicesPrev, @devicesNext)
     @getUnmanagedDevices(@distributorKey, @unmanagedDevicesPrev, @unmanagedDevicesNext)
 
 
   @initialize = () ->
+    @distributorKey = $cookies.get('currentDistributorKey')
     @getManagedAndUnmanagedDevices()
 
   @getFetchSuccess = () ->
