@@ -563,7 +563,7 @@ def _SQLALCHEMY_DATABASE_URI():
         db_uri = 'mysql+mysqldb://root@localhost/provisioning'
     else:
         if on_integration_server:
-            instance_name = 'provisioning-int'
+            instance_name = 'provisioning-int-v2'
         elif on_stage_server:
             instance_name = 'provisioning-stage'
         elif on_gamestop_server:
