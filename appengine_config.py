@@ -469,7 +469,7 @@ def _DEFAULT_PLAYER_CONTENT_URL():
 app_DEFAULT_PLAYER_CONTENT_URL = _DEFAULT_PLAYER_CONTENT_URL()
 
 
-def _PROOF_OF_PLAY_URL():
+def _DEFAULT_PROOF_OF_PLAY_URL():
     if on_development_server or not on_server:
         return 'https://skykit-display-device-int.appspot.com/proofplay/api/v1/post_new_program_play'
     elif on_integration_server:
@@ -485,7 +485,7 @@ def _PROOF_OF_PLAY_URL():
     return None
 
 
-app_PROOF_OF_PLAY_URL = _PROOF_OF_PLAY_URL()
+app_DEFAULT_PROOF_OF_PLAY_URL = _DEFAULT_PROOF_OF_PLAY_URL()
 
 def _STORMPATH_CLIENT():
     """

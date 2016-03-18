@@ -72,7 +72,7 @@ class AppConfig(Config):
     DEFAULT_CONTENT_MANAGER_URL = False
     DEFAULT_PLAYER_CONTENT_URL = False
 
-    PROOF_OF_PLAY_URL = False
+    DEFAULT_PROOF_OF_PLAY_URL = None
 
     SPRINT_NUMBER = None
     DEPLOYMENT_COUNTER = None

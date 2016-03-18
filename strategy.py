@@ -12,6 +12,7 @@ TENANT_FIELDS = [
     'content_server_url',
     'content_manager_base_url',
     'proof_of_play_logging',
+    'proof_of_play_url',
     'active',
     'created',
     'updated'
@@ -88,6 +89,7 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'connectionType': lambda o, field_name, context: o.key.get().connection_type},
     {'proofOfPlayLogging': lambda o, field_name, context: o.key.get().proof_of_play_logging},
     {'proofOfPlayEditable': lambda o, field_name, context: o.key.get().proof_of_play_editable},
+    {'proofOfPlayUrl': lambda o, field_name, context: o.tenant_key.get().proof_of_play_url if o.tenant_key is not None else None},
     # Display Location & Timezone information from Location entity:
     {'locationKey': lambda o, field_name, context: o.location_key.urlsafe() if o.location_key is not None else None},
     {'customerLocationCode': lambda o, field_name,

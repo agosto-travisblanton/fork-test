@@ -4,6 +4,7 @@ import logging
 from google.appengine.ext import ndb
 from webapp2 import RequestHandler
 
+from app_config import config
 from content_manager_api import ContentManagerApi
 from decorators import requires_api_token
 from models import Tenant, TenantEntityGroup, Domain
@@ -27,7 +28,11 @@ class TenantsHandler(RequestHandler):
             result = filter(lambda x: x.domain_key in domain_keys, tenant_list)
         else:
             tenant_key = ndb.Key(urlsafe=tenant_key)
-            result = tenant_key.get()
+            tenant = tenant_key.get()
+            if tenant.proof_of_play_url is None:
+                tenant.proof_of_play_url= config.DEFAULT_PROOF_OF_PLAY_URL
+                tenant.put()
+            result = tenant
         json_response(self.response, result, strategy=TENANT_STRATEGY)
 
     @requires_api_token
@@ -82,6 +87,9 @@ class TenantsHandler(RequestHandler):
                 error_message = 'The proof_of_play_logging parameter is invalid.'
             else:
                 proof_of_play_logging = bool(proof_of_play_logging)
+            proof_of_play_url = request_json.get('proof_of_play_url')
+            if proof_of_play_url is None or proof_of_play_url == '':
+                proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
             if status == 201:
                 if Tenant.is_tenant_code_unique(tenant_code):
                     tenant = Tenant.create(name=name,
@@ -92,7 +100,8 @@ class TenantsHandler(RequestHandler):
                                            domain_key=domain_key,
                                            active=active,
                                            notification_emails = notification_emails,
-                                           proof_of_play_logging=proof_of_play_logging)
+                                           proof_of_play_logging=proof_of_play_logging,
+                                           proof_of_play_url=proof_of_play_url)
                     tenant_key = tenant.put()
                     content_manager_api = ContentManagerApi()
                     notify_content_manager = content_manager_api.create_tenant(tenant)

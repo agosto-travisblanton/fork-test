@@ -64,6 +64,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         self.assertEqual(response_json.get('notification_emails'), ', '.join(expected.notification_emails).strip(', '))
         self.assertEqual(response_json.get('created'), expected.created.strftime('%Y-%m-%d %H:%M:%S'))
         self.assertEqual(response_json.get('updated'), expected.updated.strftime('%Y-%m-%d %H:%M:%S'))
+        self.assertEqual(response_json.get('proof_of_play_url'), config.DEFAULT_PROOF_OF_PLAY_URL)
 
     def test_get_returns_ok_status(self):
         self.load_tenants()
