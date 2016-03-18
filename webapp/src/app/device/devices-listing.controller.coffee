@@ -117,14 +117,12 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
           DevicesService.searchDevicesByPartialSerial(@distributorKey, partial, unmanaged)
           .then (res) =>
             result = res["serial_number_matches"]
-
             @unmanagedSerialDevices = @convertArrayToDictionary(result, false)
             @unmanagedValidSerials = [each.serial for each in result][0]
         else
           DevicesService.searchDevicesByPartialMac(@distributorKey, partial, unmanaged)
           .then (res) =>
             result = res["mac_matches"]
-
             @unmanagedMacDevices = @convertArrayToDictionary(result, true)
             @unmanagedValidMacs = [each.mac for each in result][0]
 
@@ -134,7 +132,6 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
           DevicesService.searchDevicesByPartialSerial(@distributorKey, partial, unmanaged)
           .then (res) =>
             result = res["serial_number_matches"]
-
             @serialDevices = @convertArrayToDictionary(result, false)
             @validSerials = [each.serial for each in result][0]
 
@@ -142,7 +139,6 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
           DevicesService.searchDevicesByPartialMac(@distributorKey, partial, unmanaged)
           .then (res) =>
             result = res["mac_matches"]
-
             @macDevices = @convertArrayToDictionary(result, true)
             @validMacs = [each.mac for each in result][0]
 
