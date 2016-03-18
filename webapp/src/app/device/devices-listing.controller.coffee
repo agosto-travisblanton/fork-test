@@ -3,45 +3,147 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, $state, $cookies, ProgressBarService, sweet) ->
-  @devices = []
-  @unmanagedDevices = []
   @distributorKey = undefined
+
+  # Managed
+  @devices = []
   @devicesPrev = null
   @devicesNext = null
-  @unmanagedDevicesPrev = null
-  @unmanagedDevicesNext = null
   @selectedButton = "Serial Number"
   @validSerials = []
-  @curDevices = {}
+  @serialDevices = {}
   @disabled = true
+  @macDevices = {}
+  @validMacs = []
 
-  @changeRadio = () ->
-    @searchText = ''
-    @disabled = true
-    @curDevices = {}
+  # Unmanaged
+  @unmanagedSelectedButton = "MAC"
+  @unmanagedValidSerials = []
+  @unmanagedSerialDevices = {}
+  @unmanagedDisabled = true
+  @unmanagedDevicesPrev = null
+  @unmanagedDevicesNext = null
+  @unmanagedDevices = []
+  @unmanagedMacDevices = {}
+  @unmanagedValidMacs = []
 
-  @convertArrayToDictionary = (theArray) ->
-    curDevices = {}
-    for item in theArray
-      curDevices[item.serial] = item
-    return curDevices
+  @changeRadio = (unmanaged) ->
+    if unmanaged
+      @unmanagedSearchText = ''
+      @unmanagedDisabled = true
 
-  @prepareForEditView = (serial_number) ->
-     @editItem @curDevices[serial_number]
+      @unmanagedValidSerials = []
+      @unmanagedSerialDevices = {}
 
-  @isResourceValid = (resource) ->
-    if resource in @validSerials
-      @disabled = false
+      @unmanagedMacDevices = {}
+      @unmanagedValidMacs = []
+
     else
+      @searchText = ''
       @disabled = true
 
-  @searchDevices = (partial_serial) =>
-    if partial_serial
-      DevicesService.searchDevicesByPartialSerial(@distributorKey, partial_serial, false)
-      .then (res) =>
-        result = res["serial_number_matches"]
-        @curDevices = @convertArrayToDictionary(result)
-        @validSerials = [each.serial for each in result][0]
+      @serialDevices = {}
+      @validSerials = []
+
+      @macDevices = {}
+      @validMacs = []
+
+  @convertArrayToDictionary = (theArray, mac) ->
+    Devices = {}
+    for item in theArray
+      if mac
+        Devices[item.mac] = item
+      else
+        Devices[item.serial] = item
+
+    return Devices
+
+  @prepareForEditView = (unmanaged, searchText) ->
+    if unmanaged
+      mac = @unmanagedSelectedButton == "MAC"
+      if mac
+        @editItem @unmanagedMacDevices[searchText]
+      else
+        @editItem @unmanagedSerialDevices[searchText]
+
+    else
+      mac = @selectedButton == "MAC"
+      if mac
+        @editItem @macDevices[searchText]
+      else
+        @editItem @serialDevices[searchText]
+
+  @isResourceValid = (unmanaged, resource) ->
+    if unmanaged
+      mac = @unmanagedSelectedButton == "MAC"
+
+    else
+      mac = @selectedButton == "MAC"
+
+
+    if not unmanaged and not mac
+      the_type = @validSerials
+
+    if unmanaged and not mac
+      the_type = @unmanagedValidSerials
+
+    if not unmanaged and mac
+      the_type = @validMacs
+
+    if unmanaged and mac
+      the_type = @unmanagedValidMacs
+
+    if not unmanaged
+      if resource in the_type
+        @disabled = false
+
+      else
+        @disabled = true
+
+    else
+      if resource in the_type
+        @unmanagedDisabled = false
+
+      else
+        @unmanagedDisabled = true
+
+
+  @searchDevices = (unmanaged, partial) =>
+    if unmanaged
+      if partial
+        if @unmanagedSelectedButton == "Serial Number"
+          DevicesService.searchDevicesByPartialSerial(@distributorKey, partial, unmanaged)
+          .then (res) =>
+            result = res["serial_number_matches"]
+
+            @unmanagedSerialDevices = @convertArrayToDictionary(result, false)
+            @unmanagedValidSerials = [each.serial for each in result][0]
+        else
+          DevicesService.searchDevicesByPartialMac(@distributorKey, partial, unmanaged)
+          .then (res) =>
+            result = res["mac_matches"]
+
+            @unmanagedMacDevices = @convertArrayToDictionary(result, true)
+            @unmanagedValidMacs = [each.mac for each in result][0]
+
+    else
+      if partial
+        if @selectedButton == "Serial Number"
+          DevicesService.searchDevicesByPartialSerial(@distributorKey, partial, unmanaged)
+          .then (res) =>
+            result = res["serial_number_matches"]
+
+            @serialDevices = @convertArrayToDictionary(result, false)
+            @validSerials = [each.serial for each in result][0]
+
+        else
+          DevicesService.searchDevicesByPartialMac(@distributorKey, partial, unmanaged)
+          .then (res) =>
+            result = res["mac_matches"]
+
+            @macDevices = @convertArrayToDictionary(result, true)
+            @validMacs = [each.mac for each in result][0]
+
 
   @getManagedDevices = (key, prev, next) ->
     devicesPromise = DevicesService.getDevicesByDistributor key, prev, next
