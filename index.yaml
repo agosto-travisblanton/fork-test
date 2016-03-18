@@ -41,3 +41,15 @@ indexes:
   - name: tenant_key
   - name: __key__
     direction: desc
+
+- kind: ChromeOsDevice
+  properties:
+  - name: is_unmanaged_device
+  - name: tenant_key
+  - name: mac_address
+
+- kind: ChromeOsDevice
+  properties:
+  - name: is_unmanaged_device
+  - name: tenant_key
+  - name: serial_number

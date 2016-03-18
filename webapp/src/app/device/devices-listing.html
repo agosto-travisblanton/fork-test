@@ -1,118 +1,264 @@
 <div ng-controller="DevicesListingCtrl" ng-init="devicesListingCtrl.initialize()" layout="column" ng-cloak>
-  <md-toolbar class="md-hue-2">
-    <div class="md-toolbar-tools">
-      <h2 class="md-flex"><i class="fa fa-fw fa-desktop ng-scope"></i> Devices</h2>
-    </div>
-  </md-toolbar>
-  <md-content>
-    <div flex="100" flex-sm="100" flex-xs="100" layout="column">
-      <md-tabs md-dynamic-height md-border-bottom>
-        <md-tab label="Managed">
-          <md-content class="md-padding">
-            <div flex="100" flex-sm="100" flex-xs="100" layout="column">
-              <md-card>
-                <md-card-content>
-                  <md-data-table-container layout="column">
-                    <table class="table table-responsive table-striped">
-                      <thead>
-                      <tr>
-                        <th></th>
-                        <th>Tenant code</th>
-                        <th><i class="fa fa-fw fa-wifi"></i> MAC</th>
-                        <th><i class="fa fa-fw fa-plug"></i> MAC</th>
-                        <th>Serial number</th>
-                        <th>Provisioned</th>
-                        <th></th>
-                      </tr>
-                      </thead>
-                      <tbody>
-                      <tr ng-hide="devicesListingCtrl.devices.length">
-                        <td class="no-devices text-center text-danger" colspan="7">No managed devices retrieved</td>
-                      </tr>
-                      <tr ng-repeat="item in devicesListingCtrl.devices | orderBy:'-created'">
-                        <td>
-                          <a ng-click="devicesListingCtrl.editItem(item)"
-                             title="Device detail">
-                            <ng-md-icon icon="mode_edit" size="48">
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"></path>
-                                <path
-                                  d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
-                              </svg>
-                            </ng-md-icon>
-                          </a>
-                        </td>
-                        <td>{{ item.tenantCode }}</td>
-                        <td>{{ item.macAddress || "None" }}</td>
-                        <td>{{ item.ethernetMacAddress || "None"  }}</td>
-                        <td>
-                          <a name="edit-device" class="btn" ng-click="devicesListingCtrl.editItem(item)"
-                             title="Device detail">{{item.serialNumber}}</a></td>
-                        <td>{{ item.created }}</td>
-                        <td class="up-{{ item.up}}-background"></td>
-                      </tr>
-                      </tbody>
-                    </table>
-                  </md-data-table-container>
-                  <md-button class="md-raised" ng-disabled="!devicesListingCtrl.devicesPrev" ng-click="devicesListingCtrl.paginateCall(false, true)">Prev</md-button>
-                  <md-button class="md-raised" ng-disabled="!devicesListingCtrl.devicesNext" ng-click="devicesListingCtrl.paginateCall(true, true)">Next</md-button>
-                </md-card-content>
-              </md-card>
-            </div>
-          </md-content>
-        </md-tab>
-        <md-tab label="Unmanaged">
-          <md-content class="md-padding">
-            <div flex="100" flex-sm="100" flex-xs="100" layout="column">
-              <md-card>
-                <md-card-content>
-                  <md-data-table-container layout="column">
-                    <table class="table table-responsive table-striped">
-                      <thead>
-                      <tr>
-                        <th></th>
-                        <th>Tenant code</th>
-                        <th><i class="fa fa-fw fa-wifi"></i> MAC</th>
-                        <th><i class="fa fa-fw fa-plug"></i> MAC</th>
-                        <th>Provisioned</th>
-                        <th></th>
-                      </tr>
-                      </thead>
-                      <tbody>
-                      <tr ng-hide="devicesListingCtrl.unmanagedDevices.length">
-                        <td class="no-devices text-center text-danger" colspan="6">No unmanaged devices retrieved</td>
-                      </tr>
-                      <tr ng-repeat="item in devicesListingCtrl.unmanagedDevices | orderBy:'-created'">
-                        <td>
-                          <a ng-click="devicesListingCtrl.editItem(item)"
-                             title="Device detail">
-                            <ng-md-icon icon="mode_edit" size="48">
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"></path>
-                                <path
-                                  d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
-                              </svg>
-                            </ng-md-icon>
-                          </a>
-                        </td>
-                        <td>{{ item.tenantCode }}</td>
-                        <td>{{ item.macAddress || "None" }}</td>
-                        <td>{{ item.ethernetMacAddress || "None" }}</td>
-                        <td>{{ item.created }}</td>
-                        <td class="up-{{ item.up}}-background"></td>
-                      </tr>
-                      </tbody>
-                    </table>
-                  </md-data-table-container>
-                  <md-button class="md-raised" ng-disabled="!devicesListingCtrl.unmanagedDevicesPrev" ng-click="devicesListingCtrl.paginateCall(false, false)">Prev</md-button>
-                  <md-button class="md-raised" ng-disabled="!devicesListingCtrl.unmanagedDevicesNext" ng-click="devicesListingCtrl.paginateCall(true, false)">Next</md-button>
+    <md-toolbar class="md-hue-2">
+        <div class="md-toolbar-tools">
+            <h2 class="md-flex"><i class="fa fa-fw fa-desktop ng-scope"></i> Devices</h2>
+        </div>
+    </md-toolbar>
+    <md-content>
+        <div flex="100" flex-sm="100" flex-xs="100" layout="column">
+            <md-tabs md-dynamic-height md-border-bottom>
+                <md-tab label="Managed">
+                    <md-content class="md-padding">
+                        <div flex="100" flex-sm="100" flex-xs="100" layout="column">
+                            <md-card>
+                                <md-card-content>
+                                    <div class="col-md-12">
+                                        <div class="col-sm-3">
+                                            <md-button class="md-raised"
+                                                       ng-disabled="!devicesListingCtrl.devicesPrev"
+                                                       ng-click="devicesListingCtrl.paginateCall(false, true)">
+                                                Prev
+                                            </md-button>
+                                            <md-button class="md-raised"
+                                                       ng-disabled="!devicesListingCtrl.devicesNext"
+                                                       ng-click="devicesListingCtrl.paginateCall(true, true)">
+                                                Next
+                                            </md-button>
+                                        </div>
+                                        <div class="col-md-3 col-md-offset-2">
+                                            <md-radio-group ng-model="devicesListingCtrl.selectedButton"
+                                                            ng-change="devicesListingCtrl.changeRadio(false)"
+                                                            class="radio-horizontal">
 
-                </md-card-content>
-              </md-card>
-            </div>
-          </md-content>
-        </md-tab>
-      </md-tabs>
-    </div>
-  </md-content>
+                                                <div class="col-md-4">
+                                                    <md-radio-button value="Serial Number"
+                                                                     class="md-primary">
+                                                        Serial Number
+                                                    </md-radio-button>
+                                                </div>
+
+                                                <div class="col-md-2 col-md-offset-2">
+
+                                                    <md-radio-button
+                                                            value="MAC"
+                                                            class="md-primary radio-button">
+                                                        MAC
+                                                    </md-radio-button>
+                                                </div>
+                                            </md-radio-group>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <md-autocomplete
+                                                    md-no-cache="true"
+                                                    md-selected-item="devicesListingCtrl.selectedItem"
+                                                    md-search-text="devicesListingCtrl.searchText"
+                                                    md-items="item in devicesListingCtrl.searchDevices(false, devicesListingCtrl.searchText)"
+                                                    md-item-text="item"
+                                                    md-min-length="0"
+                                                    md-search-text-change="devicesListingCtrl.isResourceValid(false, devicesListingCtrl.searchText)"
+                                                    md-selected-item-change="devicesListingCtrl.isResourceValid(false, devicesListingCtrl.searchText)"
+                                                    placeholder="Make A Search">
+
+                                                <md-item-template>
+                                                        <span md-highlight-text="devicesListingCtrl.searchText"
+                                                              md-highlight-flags="^i">{{item}}</span>
+                                                </md-item-template>
+                                                <md-not-found>
+                                                    <div ng-if="devicesListingCtrl.searchText !== ''">
+                                                        No results for "{{devicesListingCtrl.searchText}}" were
+                                                        found.
+                                                    </div>
+                                                </md-not-found>
+                                            </md-autocomplete>
+                                        </div>
+                                        <div class="col-md-1"
+                                             style="margin-left: -20px !important; margin-top: -4px !important">
+                                            <md-button class="md-raised md-primary"
+                                                       ng-disabled="devicesListingCtrl.disabled"
+                                                       ng-click="devicesListingCtrl.prepareForEditView(false, devicesListingCtrl.searchText)">
+                                                OPEN
+                                            </md-button>
+                                        </div>
+                                    </div>
+                                </md-card-content>
+                            </md-card>
+                            <md-card>
+                                <md-card-content>
+                                    <md-data-table-container layout="column">
+                                        <table class="table table-responsive table-striped">
+
+                                            <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>Tenant code</th>
+                                                <th><i class="fa fa-fw fa-wifi"></i> MAC</th>
+                                                <th><i class="fa fa-fw fa-plug"></i> MAC</th>
+                                                <th>Serial number</th>
+                                                <th>Provisioned</th>
+                                                <th></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr ng-hide="devicesListingCtrl.devices.length">
+                                                <td class="no-devices text-center text-danger" colspan="7">No managed
+                                                    devices retrieved
+                                                </td>
+                                            </tr>
+                                            <tr ng-repeat="item in devicesListingCtrl.devices | orderBy:'-created'">
+                                                <td>
+                                                    <a ng-click="devicesListingCtrl.editItem(item)"
+                                                       title="Device detail">
+                                                        <ng-md-icon icon="mode_edit" size="48">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                                 width="24" height="24">
+                                                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"></path>
+                                                                <path
+                                                                        d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+                                                            </svg>
+                                                        </ng-md-icon>
+                                                    </a>
+                                                </td>
+                                                <td>{{ item.tenantCode }}</td>
+                                                <td>{{ item.macAddress || "None" }}</td>
+                                                <td>{{ item.ethernetMacAddress || "None" }}</td>
+                                                <td>
+                                                    <a name="edit-device" class="btn"
+                                                       ng-click="devicesListingCtrl.editItem(item)"
+                                                       title="Device detail">{{item.serialNumber}}</a></td>
+                                                <td>{{ item.created }}</td>
+                                                <td class="up-{{ item.up}}-background"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </md-data-table-container>
+                                </md-card-content>
+                            </md-card>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <md-tab label="Unmanaged">
+                    <md-content class="md-padding">
+                        <div flex="100" flex-sm="100" flex-xs="100" layout="column">
+                            <md-card>
+                                <md-card-content>
+                                    <div class="col-md-12">
+                                        <div class="col-sm-3">
+                                            <md-button class="md-raised"
+                                                       ng-disabled="!devicesListingCtrl.unmanagedDevicesPrev"
+                                                       ng-click="devicesListingCtrl.paginateCall(false, false)">Prev
+                                            </md-button>
+                                            <md-button class="md-raised"
+                                                       ng-disabled="!devicesListingCtrl.unmanagedDevicesNext"
+                                                       ng-click="devicesListingCtrl.paginateCall(true, false)">Next
+                                            </md-button>
+                                        </div>
+                                        <div class="col-md-3 col-md-offset-2">
+                                            <md-radio-group ng-model="devicesListingCtrl.unmanagedSelectedButton"
+                                                            ng-change="devicesListingCtrl.changeRadio(false)"
+                                                            class="radio-horizontal">
+
+                                                <div class="col-md-4">
+                                                    <md-radio-button value="Serial Number"
+                                                                     class="md-primary" ng-disabled="true">
+                                                        Serial Number
+                                                    </md-radio-button>
+                                                </div>
+
+                                                <div class="col-md-2 col-md-offset-2">
+
+                                                    <md-radio-button
+                                                            value="MAC"
+                                                            class="md-primary radio-button">
+                                                        MAC
+                                                    </md-radio-button>
+                                                </div>
+                                            </md-radio-group>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <md-autocomplete
+                                                    md-no-cache="true"
+                                                    md-selected-item="devicesListingCtrl.unmanagedSelectedItem"
+                                                    md-search-text="devicesListingCtrl.unmanagedSearchText"
+                                                    md-items="item in devicesListingCtrl.searchDevices(true, devicesListingCtrl.unmanagedSearchText)"
+                                                    md-item-text="item"
+                                                    md-min-length="0"
+                                                    md-search-text-change="devicesListingCtrl.isResourceValid(true, devicesListingCtrl.unmanagedSearchText)"
+                                                    md-selected-item-change="devicesListingCtrl.isResourceValid(true, devicesListingCtrl.unmanagedSearchText)"
+                                                    placeholder="Make A Search">
+
+                                                <md-item-template>
+                                                        <span md-highlight-text="devicesListingCtrl.unmanagedSearchText"
+                                                              md-highlight-flags="^i">{{item}}</span>
+                                                </md-item-template>
+                                                <md-not-found>
+                                                    <div ng-if="devicesListingCtrl.unmanagedSearchText !== ''">
+                                                        No results for "{{devicesListingCtrl.unmanagedSearchText}}" were
+                                                        found.
+                                                    </div>
+                                                </md-not-found>
+                                            </md-autocomplete>
+                                        </div>
+                                        <div class="col-md-1"
+                                             style="margin-left: -20px !important; margin-top: -4px !important">
+                                            <md-button class="md-raised md-primary"
+                                                       ng-disabled="devicesListingCtrl.unmanagedDisabled"
+                                                       ng-click="devicesListingCtrl.prepareForEditView(true, devicesListingCtrl.unmanagedSearchText)">
+                                                OPEN
+                                            </md-button>
+                                        </div>
+
+                                    </div>
+                                </md-card-content>
+                            </md-card>
+                            <md-card>
+                                <md-card-content>
+                                    <md-data-table-container layout="column">
+                                        <table class="table table-responsive table-striped">
+                                            <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>Tenant code</th>
+                                                <th><i class="fa fa-fw fa-wifi"></i> MAC</th>
+                                                <th><i class="fa fa-fw fa-plug"></i> MAC</th>
+                                                <th>Provisioned</th>
+                                                <th></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr ng-hide="devicesListingCtrl.unmanagedDevices.length">
+                                                <td class="no-devices text-center text-danger" colspan="6">No unmanaged
+                                                    devices retrieved
+                                                </td>
+                                            </tr>
+                                            <tr ng-repeat="item in devicesListingCtrl.unmanagedDevices | orderBy:'-created'">
+                                                <td>
+                                                    <a ng-click="devicesListingCtrl.editItem(item)"
+                                                       title="Device detail">
+                                                        <ng-md-icon icon="mode_edit" size="48">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                                 width="24" height="24">
+                                                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"></path>
+                                                                <path
+                                                                        d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+                                                            </svg>
+                                                        </ng-md-icon>
+                                                    </a>
+                                                </td>
+                                                <td>{{ item.tenantCode }}</td>
+                                                <td>{{ item.macAddress || "None" }}</td>
+                                                <td>{{ item.ethernetMacAddress || "None" }}</td>
+                                                <td>{{ item.created }}</td>
+                                                <td class="up-{{ item.up}}-background"></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </md-data-table-container>
+                                </md-card-content>
+                            </md-card>
+                        </div>
+                    </md-content>
+                </md-tab>
+            </md-tabs>
+        </div>
+    </md-content>
 </div>

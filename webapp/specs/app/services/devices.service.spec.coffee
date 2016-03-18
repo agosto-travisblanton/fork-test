@@ -103,3 +103,30 @@ describe 'DevicesService', ->
       expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices',"/api/v1/player-command-events/#{deviceKey}"
       expect(deviceRestangularService.get).toHaveBeenCalled()
       expect(actual).toBe promise
+
+
+  describe '.searchDevicesByPartialMac', ->
+    it 'search devices with a partial mac address returns an http promise', ->
+      distributorKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw'
+      partialMac = "1234"
+      unmanaged = false
+      deviceRestangularService = {get: ->}
+      spyOn(Restangular, 'oneUrl').and.returnValue deviceRestangularService
+      spyOn(deviceRestangularService, 'get').and.returnValue promise
+      actual = DevicesService.searchDevicesByPartialMac(distributorKey, partialMac, unmanaged)
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices',"api/v1/distributors/search/mac/#{distributorKey}/#{partialMac}/#{unmanaged}/devices"
+      expect(deviceRestangularService.get).toHaveBeenCalled()
+      expect(actual).toBe promise
+
+  describe '.searchDevicesByPartialSerial', ->
+    it 'search devices with a partial mac address returns an http promise', ->
+      distributorKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw'
+      partialMac = "1234"
+      unmanaged = false
+      deviceRestangularService = {get: ->}
+      spyOn(Restangular, 'oneUrl').and.returnValue deviceRestangularService
+      spyOn(deviceRestangularService, 'get').and.returnValue promise
+      actual = DevicesService.searchDevicesByPartialSerial(distributorKey, partialMac, unmanaged)
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices',"api/v1/distributors/search/serial/#{distributorKey}/#{partialMac}/#{unmanaged}/devices"
+      expect(deviceRestangularService.get).toHaveBeenCalled()
+      expect(actual).toBe promise
