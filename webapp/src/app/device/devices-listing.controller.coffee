@@ -140,7 +140,7 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
           .then (res) =>
             result = res["mac_matches"]
             @macDevices = @convertArrayToDictionary(result, true)
-            @validMacs = [each.mac for each in result][0]
+            @validMacs = ([each.mac for each in result][0])
 
 
   @getManagedDevices = (key, prev, next) ->
