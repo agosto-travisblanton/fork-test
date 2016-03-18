@@ -30,6 +30,7 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
   @changeRadio = (unmanaged) ->
     if unmanaged
       @unmanagedSearchText = ''
+
       @unmanagedDisabled = true
 
       @unmanagedValidSerials = []
@@ -40,6 +41,7 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
 
     else
       @searchText = ''
+
       @disabled = true
 
       @serialDevices = {}

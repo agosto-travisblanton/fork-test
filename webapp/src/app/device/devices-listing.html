@@ -29,7 +29,8 @@
 
                                         <div class="col-md-2 col-md-offset-3"
                                              style="margin-right: -40px !important">
-                                            <md-radio-group ng-model="devicesListingCtrl.selectedButton" ng-change="devicesListingCtrl.changeRadio(false)">
+                                            <md-radio-group ng-model="devicesListingCtrl.selectedButton"
+                                                            ng-change="devicesListingCtrl.changeRadio(false)">
                                                 <md-radio-button value="Serial Number" class="md-primary">
                                                     Serial Number
                                                 </md-radio-button>
@@ -43,7 +44,7 @@
                                         </div>
                                         <div class="col-md-3">
                                             <md-autocomplete
-                                                    md-no-cache="true"
+                                                    md-no-cache="false"
                                                     md-selected-item="devicesListingCtrl.selectedItem"
                                                     md-search-text="devicesListingCtrl.searchText"
                                                     md-items="item in devicesListingCtrl.searchDevices(false, devicesListingCtrl.searchText)"
@@ -58,8 +59,11 @@
                                                               md-highlight-flags="^i">{{item}}</span>
                                                 </md-item-template>
                                                 <md-not-found>
-                                                    No matching item for search "{{devicesListingCtrl.searchText}}" was
-                                                    found.
+                                                    <div ng-if="devicesListingCtrl.searchText !== ''">
+                                                        No results for "{{devicesListingCtrl.searchText}}" were
+                                                        found.
+                                                    </div>
+
                                                 </md-not-found>
                                             </md-autocomplete>
                                         </div>
@@ -137,36 +141,40 @@
                 <md-tab label="Unmanaged">
                     <md-content class="md-padding">
                         <div flex="100" flex-sm="100" flex-xs="100" layout="column">
-                             <md-card>
+                            <md-card>
                                 <md-card-content>
                                     <div class="col-md-12">
                                         <div class="col-sm-3">
-                                            <md-button class="md-raised" ng-disabled="!devicesListingCtrl.unmanagedDevicesPrev"
-                                               ng-click="devicesListingCtrl.paginateCall(false, false)">Prev
-                                    </md-button>
-                                    <md-button class="md-raised" ng-disabled="!devicesListingCtrl.unmanagedDevicesNext"
-                                               ng-click="devicesListingCtrl.paginateCall(true, false)">Next
-                                    </md-button>
+                                            <md-button class="md-raised"
+                                                       ng-disabled="!devicesListingCtrl.unmanagedDevicesPrev"
+                                                       ng-click="devicesListingCtrl.paginateCall(false, false)">Prev
+                                            </md-button>
+                                            <md-button class="md-raised"
+                                                       ng-disabled="!devicesListingCtrl.unmanagedDevicesNext"
+                                                       ng-click="devicesListingCtrl.paginateCall(true, false)">Next
+                                            </md-button>
 
                                         </div>
 
                                         <div class="col-md-2 col-md-offset-3"
                                              style="margin-right: -40px !important">
-                                            <md-radio-group ng-model="devicesListingCtrl.unmanagedSelectedButton" ng-change="devicesListingCtrl.changeRadio()">
-                                                <md-radio-button value="Serial Number" class="md-primary"  ng-disabled="true">
+                                            <md-radio-group ng-model="devicesListingCtrl.unmanagedSelectedButton"
+                                                            ng-change="devicesListingCtrl.changeRadio()">
+                                                <md-radio-button value="Serial Number" class="md-primary"
+                                                                 ng-disabled="true">
                                                     Serial Number
                                                 </md-radio-button>
                                                 <md-radio-button
                                                         value="MAC"
                                                         class="md-primary"
-                                               >
+                                                >
                                                     MAC
                                                 </md-radio-button>
                                             </md-radio-group>
                                         </div>
                                         <div class="col-md-3">
                                             <md-autocomplete
-                                                    md-no-cache="true"
+                                                    md-no-cache="false"
                                                     md-selected-item="devicesListingCtrl.unmanagedSelectedItem"
                                                     md-search-text="devicesListingCtrl.unmanagedSearchText"
                                                     md-items="item in devicesListingCtrl.searchDevices(true, devicesListingCtrl.unmanagedSearchText)"
@@ -181,8 +189,10 @@
                                                               md-highlight-flags="^i">{{item}}</span>
                                                 </md-item-template>
                                                 <md-not-found>
-                                                    No matching item for search "{{devicesListingCtrl.unmanagedSearchText}}" was
-                                                    found.
+                                                    <div ng-if="devicesListingCtrl.unmanagedSearchText !== ''">
+                                                        No results for "{{devicesListingCtrl.unmanagedSearchText}}" were
+                                                        found.
+                                                    </div>
                                                 </md-not-found>
                                             </md-autocomplete>
                                         </div>
