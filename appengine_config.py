@@ -469,6 +469,24 @@ def _DEFAULT_PLAYER_CONTENT_URL():
 app_DEFAULT_PLAYER_CONTENT_URL = _DEFAULT_PLAYER_CONTENT_URL()
 
 
+def _PROOF_OF_PLAY_URL():
+    if on_development_server or not on_server:
+        return 'https://skykit-display-device-int.appspot.com/proofplay/api/v1/post_new_program_play'
+    elif on_integration_server:
+        return 'https://skykit-display-device-int.appspot.com/proofplay/api/v1/post_new_program_play'
+    elif on_stage_server:
+        return 'https://skykit-provisioning-stage.appspot.com/proofplay/api/v1/post_new_program_play'
+    elif on_gamestop_server:
+        return 'https://skykit-provisioning-gamestop.appspot.com/proofplay/api/v1/post_new_program_play'
+    elif on_production_server:
+        return 'https://skykit-provisioning.appspot.com/proofplay/api/v1/post_new_program_play'
+    else:
+        raise EnvironmentError('Unknown environment for PROOF_OF_PLAY_URL in appengine_config.py')
+    return None
+
+
+app_PROOF_OF_PLAY_URL = _PROOF_OF_PLAY_URL()
+
 def _STORMPATH_CLIENT():
     """
     http://docs.stormpath.com/python/quickstart/#create-a-client
