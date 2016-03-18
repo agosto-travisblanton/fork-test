@@ -19,27 +19,32 @@
                                                        ng-click="devicesListingCtrl.paginateCall(false, true)">
                                                 Prev
                                             </md-button>
-
                                             <md-button class="md-raised"
                                                        ng-disabled="!devicesListingCtrl.devicesNext"
                                                        ng-click="devicesListingCtrl.paginateCall(true, true)">
                                                 Next
                                             </md-button>
                                         </div>
-
-                                        <div class="col-md-2 col-md-offset-3"
-                                             style="margin-right: -40px !important">
+                                        <div class="col-md-3 col-md-offset-2">
                                             <md-radio-group ng-model="devicesListingCtrl.selectedButton"
-                                                            ng-change="devicesListingCtrl.changeRadio(false)">
-                                                <md-radio-button value="Serial Number" class="md-primary">
-                                                    Serial Number
-                                                </md-radio-button>
-                                                <md-radio-button
-                                                        value="MAC"
-                                                        class="md-primary"
-                                                >
-                                                    MAC
-                                                </md-radio-button>
+                                                            ng-change="devicesListingCtrl.changeRadio(false)"
+                                                            class="radio-horizontal">
+
+                                                <div class="col-md-4">
+                                                    <md-radio-button value="Serial Number"
+                                                                     class="md-primary">
+                                                        Serial Number
+                                                    </md-radio-button>
+                                                </div>
+
+                                                <div class="col-md-2 col-md-offset-2">
+
+                                                    <md-radio-button
+                                                            value="MAC"
+                                                            class="md-primary radio-button">
+                                                        MAC
+                                                    </md-radio-button>
+                                                </div>
                                             </md-radio-group>
                                         </div>
                                         <div class="col-md-3">
@@ -63,7 +68,6 @@
                                                         No results for "{{devicesListingCtrl.searchText}}" were
                                                         found.
                                                     </div>
-
                                                 </md-not-found>
                                             </md-autocomplete>
                                         </div>
@@ -71,17 +75,13 @@
                                              style="margin-left: -20px !important; margin-top: -4px !important">
                                             <md-button class="md-raised md-primary"
                                                        ng-disabled="devicesListingCtrl.disabled"
-                                                       ng-click="devicesListingCtrl.prepareForEditView(false, devicesListingCtrl.searchText)"
-                                            >
-
+                                                       ng-click="devicesListingCtrl.prepareForEditView(false, devicesListingCtrl.searchText)">
                                                 OPEN
                                             </md-button>
                                         </div>
-
                                     </div>
                                 </md-card-content>
                             </md-card>
-
                             <md-card>
                                 <md-card-content>
                                     <md-data-table-container layout="column">
@@ -131,9 +131,7 @@
                                             </tbody>
                                         </table>
                                     </md-data-table-container>
-
                                 </md-card-content>
-
                             </md-card>
                         </div>
                     </md-content>
@@ -153,23 +151,27 @@
                                                        ng-disabled="!devicesListingCtrl.unmanagedDevicesNext"
                                                        ng-click="devicesListingCtrl.paginateCall(true, false)">Next
                                             </md-button>
-
                                         </div>
-
-                                        <div class="col-md-2 col-md-offset-3"
-                                             style="margin-right: -40px !important">
+                                        <div class="col-md-3 col-md-offset-2">
                                             <md-radio-group ng-model="devicesListingCtrl.unmanagedSelectedButton"
-                                                            ng-change="devicesListingCtrl.changeRadio()">
-                                                <md-radio-button value="Serial Number" class="md-primary"
-                                                                 ng-disabled="true">
-                                                    Serial Number
-                                                </md-radio-button>
-                                                <md-radio-button
-                                                        value="MAC"
-                                                        class="md-primary"
-                                                >
-                                                    MAC
-                                                </md-radio-button>
+                                                            ng-change="devicesListingCtrl.changeRadio(false)"
+                                                            class="radio-horizontal">
+
+                                                <div class="col-md-4">
+                                                    <md-radio-button value="Serial Number"
+                                                                     class="md-primary" ng-disabled="true">
+                                                        Serial Number
+                                                    </md-radio-button>
+                                                </div>
+
+                                                <div class="col-md-2 col-md-offset-2">
+
+                                                    <md-radio-button
+                                                            value="MAC"
+                                                            class="md-primary radio-button">
+                                                        MAC
+                                                    </md-radio-button>
+                                                </div>
                                             </md-radio-group>
                                         </div>
                                         <div class="col-md-3">
@@ -200,9 +202,7 @@
                                              style="margin-left: -20px !important; margin-top: -4px !important">
                                             <md-button class="md-raised md-primary"
                                                        ng-disabled="devicesListingCtrl.unmanagedDisabled"
-                                                       ng-click="devicesListingCtrl.prepareForEditView(true, devicesListingCtrl.unmanagedSearchText)"
-                                            >
-
+                                                       ng-click="devicesListingCtrl.prepareForEditView(true, devicesListingCtrl.unmanagedSearchText)">
                                                 OPEN
                                             </md-button>
                                         </div>
@@ -210,7 +210,6 @@
                                     </div>
                                 </md-card-content>
                             </md-card>
-
                             <md-card>
                                 <md-card-content>
                                     <md-data-table-container layout="column">
@@ -254,7 +253,6 @@
                                             </tbody>
                                         </table>
                                     </md-data-table-container>
-
                                 </md-card-content>
                             </md-card>
                         </div>

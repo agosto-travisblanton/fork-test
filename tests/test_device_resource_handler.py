@@ -534,8 +534,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         tenant_one_amount = 13
         tenant_two_amount = 6
         self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(distributor_key,
-                                                                 tenant_1_device_count=tenant_one_amount,
-                                                                 tenant_2_device_count=tenant_two_amount)
+                                                                              tenant_1_device_count=tenant_one_amount,
+                                                                              tenant_2_device_count=tenant_two_amount)
         uri = application.router.build(
             None,
             'search_for_device_by_serial',
@@ -552,7 +552,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertTrue(len(response_json["serial_number_matches"]) == tenant_one_amount + tenant_two_amount)
 
-
     def test_search_for_device_by_mac(self):
         distributor = Distributor.create(name='Acme Brothers',
                                          active=True)
@@ -560,8 +559,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         tenant_one_amount = 13
         tenant_two_amount = 6
         self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(distributor_key,
-                                                                 tenant_1_device_count=tenant_one_amount,
-                                                                 tenant_2_device_count=tenant_two_amount)
+                                                                              tenant_1_device_count=tenant_one_amount,
+                                                                              tenant_2_device_count=tenant_two_amount)
         uri = application.router.build(
             None,
             'search_for_device_by_mac',
@@ -577,8 +576,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
         response_json = json.loads(response.body)
         self.assertTrue(len(response_json["mac_matches"]) == tenant_one_amount + tenant_two_amount)
-
-
 
     #################################################################################################################
     # get managed device
