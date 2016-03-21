@@ -383,6 +383,7 @@ ul.alert-dropdown {
   word-wrap: break-word;
   display: inline-block;
 }
+
 .hostname-word-break {
   width: 200px;
   word-wrap: break-word;
@@ -395,9 +396,21 @@ ul.alert-dropdown {
   cursor: pointer;
 }
 
-
 #proofplay-selected-items {
   min-width: 0px !important;
+}
+
+.radio-button {
+  padding: 3px
+}
+
+.radio-horizontal {
+  display: flex;
+  align-self: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+
 }
 
 //.distributor-selection {

@@ -111,7 +111,6 @@ describe 'DevicesListingCtrl', ->
       })
 
   describe '.paginateCall', ->
-
     beforeEach ->
       spyOn $state, 'go'
       promise = new skykitProvisioning.q.Mock
@@ -143,3 +142,159 @@ describe 'DevicesListingCtrl', ->
     it 'paginates backward with managed', ->
       controller.paginateCall(false, true)
       expect(DevicesService.getDevicesByDistributor).toHaveBeenCalledWith controller.distributorKey, controller.devicesPrev, null
+
+  describe '.search bar related functions', ->
+    beforeEach ->
+      controller = $controller 'DevicesListingCtrl', {}
+
+    it 'resets variables whenever function is called with unmanaged', ->
+      unmanaged = true
+      controller.changeRadio(unmanaged)
+
+      expect(controller.unmanagedSearchText).toEqual ''
+      expect(controller.unmanagedDisabled).toEqual true
+      expect(controller.unmanagedValidSerials).toEqual []
+      expect(controller.unmanagedSerialDevices).toEqual {}
+      expect(controller.unmanagedMacDevices).toEqual {}
+      expect(controller.unmanagedValidMacs).toEqual []
+
+    it 'resets variables whenever function is called with managed', ->
+      unmanaged = false
+      controller.changeRadio(unmanaged)
+
+      expect(controller.searchText).toEqual ''
+      expect(controller.disabled).toEqual true
+      expect(controller.serialDevices).toEqual {}
+      expect(controller.validSerials).toEqual []
+      expect(controller.macDevices).toEqual {}
+      expect(controller.validMacs).toEqual []
+
+
+    it 'converts array to dictionary with serial as key', ->
+      theArray = [{"serial": "test", "a": "b"}]
+      isMac = false
+      result = controller.convertArrayToDictionary(theArray, isMac)
+      expect(result).toEqual {"test": {"a": "b", "serial": "test"}}
+
+
+    it 'converts array to dictionary with mac key', ->
+      theArray = [{"mac": "test", "a": "b"}]
+      isMac = true
+      result = controller.convertArrayToDictionary(theArray, isMac)
+      expect(result).toEqual {"test": {"a": "b", "mac": "test"}}
+
+
+  describe '.prepareForEditItem', ->
+    resourceSearch = "test"
+
+    beforeEach ->
+      spyOn $state, 'go'
+      controller = $controller 'DevicesListingCtrl', {}
+      controller.unmanagedMacDevices = {"test": {"key": "1234", "tenantKey": "5678"}}
+      controller.unmanagedSerialDevices = {"test": {"key": "1234", "tenantKey": "5678"}}
+      controller.macDevices = {"test": {"key": "1234", "tenantKey": "5678"}}
+      controller.serialDevices = {"test": {"key": "1234", "tenantKey": "5678"}}
+
+    it "prepares for editItem as unmanaged mac", ->
+      controller.unmanagedSelectedButton == "MAC"
+      unmanaged = true
+      controller.prepareForEditView(unmanaged, resourceSearch)
+      expect($state.go).toHaveBeenCalledWith('editDevice', {
+        deviceKey: controller.unmanagedMacDevices[resourceSearch].key,
+        tenantKey: controller.unmanagedMacDevices[resourceSearch].tenantKey,
+        fromDevices: true
+      })
+
+    it "prepares for editItem as unmanaged serial;", ->
+      controller.unmanagedSelectedButton == "Serial Number"
+      unmanaged = true
+      controller.prepareForEditView(unmanaged, resourceSearch)
+      expect($state.go).toHaveBeenCalledWith('editDevice', {
+        deviceKey: controller.unmanagedMacDevices[resourceSearch].key,
+        tenantKey: controller.unmanagedMacDevices[resourceSearch].tenantKey,
+        fromDevices: true
+      })
+
+    it "prepares for editItem as managed mac", ->
+      controller.selectedButton == "MAC"
+      unmanaged = false
+      controller.prepareForEditView(unmanaged, resourceSearch)
+      expect($state.go).toHaveBeenCalledWith('editDevice', {
+        deviceKey: controller.macDevices[resourceSearch].key,
+        tenantKey: controller.macDevices[resourceSearch].tenantKey,
+        fromDevices: true
+      })
+
+    it "prepares for editItem as managed serial", ->
+      controller.selectedButton == "Serial Number"
+      unmanaged = false
+      controller.prepareForEditView(unmanaged, resourceSearch)
+      expect($state.go).toHaveBeenCalledWith('editDevice', {
+        deviceKey: controller.serialDevices[resourceSearch].key,
+        tenantKey: controller.serialDevices[resourceSearch].tenantKey,
+        fromDevices: true
+      })
+
+
+  describe '.isResourceValid', ->
+
+
+    beforeEach ->
+      controller = $controller 'DevicesListingCtrl', {}
+      controller.validSerials = ["1", "2", "3"]
+      controller.unmanagedValidSerials = ["4", "5", "6"]
+      controller.validMacs = ["7", "8", "9"]
+      controller.unmanagedValidMacs = ["10", "11", "12"]
+      controller.disabled = true
+      controller.unmanagedDisabled = true
+
+    it "checks as an unmanaged mac that is valid", ->
+      controller.unmanagedSelectedButton = "MAC"
+      unmanaged = true
+      controller.isResourceValid(unmanaged, controller.unmanagedValidMacs[0])
+      expect(controller.unmanagedDisabled).toEqual false
+
+    it "checks as an unmanaged mac that is not valid", ->
+      controller.unmanagedSelectedButton = "MAC"
+      unmanaged = true
+      controller.isResourceValid(unmanaged, "A")
+      expect(controller.unmanagedDisabled).toEqual true
+
+
+    it "checks as an unmanaged serial that is valid", ->
+      controller.unmanagedSelectedButton = "Serial Number"
+      unmanaged = true
+      controller.isResourceValid(unmanaged, controller.unmanagedValidSerials[0])
+      expect(controller.unmanagedDisabled).toEqual false
+
+    it "checks as an unmanaged serial that is not valid", ->
+      controller.unmanagedSelectedButton = "Serial Number"
+      unmanaged = true
+      controller.isResourceValid(unmanaged, "A")
+      expect(controller.unmanagedDisabled).toEqual true
+
+
+    it "checks as an managed mac that is valid", ->
+      controller.selectedButton = "MAC"
+      unmanaged = false
+      controller.isResourceValid(unmanaged, controller.validMacs[0])
+      expect(controller.disabled).toEqual false
+
+    it "checks as an managed mac that is not valid", ->
+      controller.selectedButton = "MAC"
+      unmanaged = false
+      controller.isResourceValid(unmanaged, "A")
+      expect(controller.disabled).toEqual true
+
+
+    it "checks as an managed serial that is valid", ->
+      controller.selectedButton = "Serial Number"
+      unmanaged = false
+      controller.isResourceValid(unmanaged, controller.validSerials[0])
+      expect(controller.disabled).toEqual false
+
+    it "checks as an managed serial that is not valid", ->
+      controller.selectedButton = "Serial Number"
+      unmanaged = false
+      controller.isResourceValid(unmanaged, "A")
+      expect(controller.disabled).toEqual true

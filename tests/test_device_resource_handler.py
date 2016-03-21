@@ -541,6 +541,56 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertTrue(len(response_json["devices"]) < 11)
         self.assertFalse(response_json["prev_cursor"])
 
+    def test_search_for_device_by_serial(self):
+        distributor = Distributor.create(name='Acme Brothers',
+                                         active=True)
+        distributor_key = distributor.put()
+        tenant_one_amount = 13
+        tenant_two_amount = 6
+        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(distributor_key,
+                                                                              tenant_1_device_count=tenant_one_amount,
+                                                                              tenant_2_device_count=tenant_two_amount)
+        uri = application.router.build(
+            None,
+            'search_for_device_by_serial',
+            None,
+            {
+                'distributor_urlsafe_key': distributor_key.urlsafe(),
+                'partial_serial': 'm-',
+                'unmanaged': 'false'
+            }
+        )
+
+        response = self.app.get(uri, headers=self.api_token_authorization_header)
+
+        response_json = json.loads(response.body)
+        self.assertTrue(len(response_json["serial_number_matches"]) == tenant_one_amount + tenant_two_amount)
+
+    def test_search_for_device_by_mac(self):
+        distributor = Distributor.create(name='Acme Brothers',
+                                         active=True)
+        distributor_key = distributor.put()
+        tenant_one_amount = 13
+        tenant_two_amount = 6
+        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(distributor_key,
+                                                                              tenant_1_device_count=tenant_one_amount,
+                                                                              tenant_2_device_count=tenant_two_amount)
+        uri = application.router.build(
+            None,
+            'search_for_device_by_mac',
+            None,
+            {
+                'distributor_urlsafe_key': distributor_key.urlsafe(),
+                'partial_mac': 'm-mac',
+                'unmanaged': 'false'
+            }
+        )
+
+        response = self.app.get(uri, headers=self.api_token_authorization_header)
+
+        response_json = json.loads(response.body)
+        self.assertTrue(len(response_json["mac_matches"]) == tenant_one_amount + tenant_two_amount)
+
     #################################################################################################################
     # get managed device
     #################################################################################################################
@@ -894,8 +944,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
         with self.assertRaises(AppError) as context:
             self.app.put('/api/v1/devices/{0}'.format(new_device_key.urlsafe()),
-                     json.dumps(request_body),
-                     headers=self.api_token_authorization_header)
+                         json.dumps(request_body),
+                         headers=self.api_token_authorization_header)
         message = 'Bad response: 409 Conflict. Customer display code "{0}" is already assigned for tenant.'.format(
             customer_display_code)
         self.assertTrue(message in context.exception.message)
@@ -915,8 +965,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         when(deferred).defer(any_matcher(update_chrome_os_device),
                              any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         response = self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
-                     json.dumps(request_body),
-                     headers=self.api_token_authorization_header)
+                                json.dumps(request_body),
+                                headers=self.api_token_authorization_header)
         self.assertEqual('204 No Content', response.status)
         self.assertEqual(device.customer_display_code, customer_display_code)
         self.assertEqual(device.customer_display_name, new_display_name)
@@ -1514,6 +1564,35 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                active=True)
         return tenant.put()
 
+    def __build_list_devices_with_serials(self, tenant_key=None, managed_number_to_build=5,
+                                          unmanaged_number_to_build=5):
+        results = []
+        if tenant_key is None:
+            tenant_key = self.__create_tenant()
+        for i in range(managed_number_to_build):
+            mac_address = 'm-mac{0}'.format(i)
+            gcm_registration_id = 'm-gcm{0}'.format(i)
+            device_id = 'd{0}'.format(i)
+            serial_number = 'm-serial{0}'.format(i)
+            device = ChromeOsDevice.create_managed(tenant_key=tenant_key,
+                                                   mac_address=mac_address,
+                                                   gcm_registration_id=gcm_registration_id,
+                                                   device_id=device_id,
+                                                   serial_number=serial_number)
+            device.put()
+            results.append(device)
+
+        for i in range(unmanaged_number_to_build):
+            mac_address = 'u-mac{0}'.format(i)
+            gcm_registration_id = 'u-gcm{0}'.format(i)
+            serial_number = 'u-serial{0}'.format(i)
+            device = ChromeOsDevice.create_unmanaged(gcm_registration_id=gcm_registration_id,
+                                                     mac_address=mac_address,
+                                                     serial_number=serial_number)
+            device.put()
+            results.append(device)
+        return results
+
     def __build_list_devices(self, tenant_key=None, managed_number_to_build=5, unmanaged_number_to_build=5):
         results = []
         if tenant_key is None:
@@ -1569,3 +1648,37 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         tenant_key_2 = tenant_2.put()
         self.__build_list_devices(tenant_key=tenant_key_2, managed_number_to_build=tenant_2_device_count,
                                   unmanaged_number_to_build=0)
+
+    def __setup_distributor_with_two_tenants_with_n_devices_with_serials(self, distributor_key, tenant_1_device_count,
+                                                                         tenant_2_device_count):
+        domain_1 = Domain.create(name='dev.acme.com',
+                                 distributor_key=distributor_key,
+                                 impersonation_admin_email_address='fred@acme.com',
+                                 active=True)
+        domain_key_1 = domain_1.put()
+        domain_2 = Domain.create(name='test.acme.com',
+                                 distributor_key=distributor_key,
+                                 impersonation_admin_email_address='fred@acme.com',
+                                 active=True)
+        domain_key_2 = domain_2.put()
+        tenant_1 = Tenant.create(tenant_code='foobar_inc',
+                                 name='Foobar, Inc',
+                                 admin_email='bill@foobar.com',
+                                 content_server_url=self.CONTENT_SERVER_URL,
+                                 content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                                 domain_key=domain_key_1,
+                                 active=True)
+        tenant_key_1 = tenant_1.put()
+
+        self.__build_list_devices_with_serials(tenant_key=tenant_key_1, managed_number_to_build=tenant_1_device_count,
+                                               unmanaged_number_to_build=0)
+        tenant_2 = Tenant.create(tenant_code='goober_inc',
+                                 name='Goober, Inc',
+                                 admin_email='bill@goober.com',
+                                 content_server_url=self.CONTENT_SERVER_URL,
+                                 content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                                 domain_key=domain_key_2,
+                                 active=True)
+        tenant_key_2 = tenant_2.put()
+        self.__build_list_devices_with_serials(tenant_key=tenant_key_2, managed_number_to_build=tenant_2_device_count,
+                                               unmanaged_number_to_build=0)
