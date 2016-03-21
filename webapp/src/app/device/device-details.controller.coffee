@@ -172,7 +172,10 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @onFailureDeviceSaveNotes = (errorObject) ->
     ProgressBarService.complete()
     $log.error errorObject
-    sweet.show('Oops...', 'Unable to save the device notes.', 'error')
+    if errorObject.status == 409
+        sweet.show('Oops...', 'This customer display code already exists for this tenant. Please choose another.', 'error')
+    else
+      sweet.show('Oops...', 'Unable to save the device notes.', 'error')
 
   @onClickResetSendButton = () ->
     if @editMode

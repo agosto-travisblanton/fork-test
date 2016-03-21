@@ -68,3 +68,4 @@ appModule.controller 'TenantLocationCtrl',
         @location.customerLocationCode = newCustomerLocationCode
 
     @
+
