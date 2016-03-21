@@ -209,7 +209,7 @@ describe 'DeviceDetailsCtrl', ->
     describe '.onFailureDeviceSaveNotes', ->
       beforeEach ->
         spyOn(sweet, 'show')
-        controller.onFailureDeviceSaveNotes()
+        controller.onFailureDeviceSaveNotes({status: 200})
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
