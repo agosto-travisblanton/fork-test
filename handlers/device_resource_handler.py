@@ -322,6 +322,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         if device is None:
             status = 404
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
+            self.response.set_status(status, message)
+            return
         else:
             request_json = json.loads(self.request.body)
             location_urlsafe_key = request_json.get('locationKey')
@@ -352,19 +354,20 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                         status = 409
                         message = "Conflict. Customer display code \"{0}\" is already assigned for tenant.".format(
                             customer_display_code)
+                        self.response.set_status(status, message)
+                        return
             notes = request_json.get('notes')
             if notes:
                 device.notes = notes
             gcm_registration_id = request_json.get('gcmRegistrationId')
             if gcm_registration_id:
-                logging.info('  PUT updating the gcmRegistrationId.')
                 device.gcm_registration_id = gcm_registration_id
-            panel_model = request_json.get('panelModel')
+            panel_model = request_json.get('panelModelNumber')
             if panel_model:
                 device.panel_model = panel_model
             else:
                 device.panel_model = None
-            panel_input = request_json.get('panelInput')
+            panel_input = request_json.get('panelSerialInput')
             if panel_input:
                 device.panel_input = panel_input
             else:
@@ -375,11 +378,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 if tenant and tenant.key != device.tenant_key:
                     device.tenant_key = tenant.key
                     if device.is_unmanaged_device:
-                        logging.info(' PUT add the tenant to unmanaged device.')
                         post_unmanaged_device_info(gcm_registration_id=device.gcm_registration_id,
                                                    device_urlsafe_key=device.key.urlsafe(), host=self.request.host_url)
                     else:
-                        logging.info(' PUT update tenant on device.')
                         device.put()
                         deferred.defer(ContentManagerApi().update_device,
                                        device_urlsafe_key=device.key.urlsafe(),
