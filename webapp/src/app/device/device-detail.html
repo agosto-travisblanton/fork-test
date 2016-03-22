@@ -9,28 +9,26 @@
             <div ncy-breadcrumb></div>
             <md-card>
                 <md-card-content>
-                    <div class="col-md-12">
-                        <div class="col-sm-2">
-                            <h5><i class="fa fa-fw fa-wifi"></i> {{deviceDetailsCtrl.currentDevice.macAddress}}</h5>
-                        </div>
-                        <div class="col-sm-2" ng-show="deviceDetailsCtrl.currentDevice.ethernetMacAddress">
-                            <h5><i class="fa fa-fw fa-plug"></i> {{deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                            </h5>
-                        </div>
-                        <div class="col-sm-3">
-                            <h5><i class="fa fa-hashtag"></i> {{deviceDetailsCtrl.currentDevice.serialNumber}}</h5>
-                        </div>
-                        <div class="col-sm-2 col-sm-offset-{{deviceDetailsCtrl.currentDevice.ethernetMacAddress ? '1' : '2'}}">
-                            <md-button ngclipboard data-clipboard-target="#hidden-device-key" class="md-raised">
-                                <i class="fa fa-fw fa-clipboard"></i> Copy device key</a>
-                            </md-button>
-                        </div>
-                        <div class="col-sm-2">
-                            <md-button class="md-raised">
-                                <a href="{{deviceDetailsCtrl.backUrl}}">
-                                    <i class="fa fa-fw fa-backward"></i>{{deviceDetailsCtrl.backUrlText}}</a>
-                            </md-button>
-                        </div>
+                    <div class="col-sm-2">
+                        <h5><i class="fa fa-fw fa-wifi"></i> {{deviceDetailsCtrl.currentDevice.macAddress}}</h5>
+                    </div>
+                    <div class="col-sm-2" ng-show="deviceDetailsCtrl.currentDevice.ethernetMacAddress">
+                        <h5><i class="fa fa-fw fa-plug"></i> {{deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
+                        </h5>
+                    </div>
+                    <div class="col-sm-2">
+                        <h5><i class="fa fa-hashtag"></i> {{deviceDetailsCtrl.currentDevice.serialNumber}}</h5>
+                    </div>
+                    <div class="col-sm-2 col-sm-offset-4">
+                        <md-button ngclipboard data-clipboard-target="#hidden-device-key" class="md-raised">
+                            <i class="fa fa-fw fa-clipboard"></i> Copy Device key</a>
+                        </md-button>
+                    </div>
+                    <div class="col-sm-1 ">
+                        <md-button class="md-raised">
+                            <a href="{{deviceDetailsCtrl.backUrl}}">
+                                <i class="fa fa-fw fa-backward"></i>Back</a>
+                        </md-button>
                     </div>
                 </md-card-content>
             </md-card>
