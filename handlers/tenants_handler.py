@@ -49,18 +49,26 @@ class TenantsHandler(RequestHandler):
             if admin_email is None or admin_email == '':
                 status = 400
                 error_message = 'The admin email parameter is invalid.'
+            else:
+                admin_email = admin_email.strip().lower()
             tenant_code = request_json.get('tenant_code')
             if tenant_code is None or tenant_code == '':
                 status = 400
                 error_message = 'The tenant code parameter is invalid.'
+            else:
+                tenant_code = tenant_code.strip().lower()
             content_server_url = request_json.get('content_server_url')
             if content_server_url is None or content_server_url == '':
                 status = 400
                 error_message = 'The content server url parameter is invalid.'
+            else:
+                content_server_url = content_server_url.strip().lower()
             content_manager_base_url = request_json.get('content_manager_base_url')
             if content_manager_base_url is None or content_manager_base_url == '':
                 status = 400
                 error_message = 'The content manager base url parameter is invalid.'
+            else:
+                content_manager_base_url = content_manager_base_url.strip().lower()
             notification_emails = delimited_string_to_list(request_json.get('notification_emails'))
             domain_key_input = request_json.get('domain_key')
             domain_key = None
@@ -87,10 +95,11 @@ class TenantsHandler(RequestHandler):
                 error_message = 'The proof_of_play_logging parameter is invalid.'
             else:
                 proof_of_play_logging = bool(proof_of_play_logging)
-                if proof_of_play_logging:
-                    proof_of_play_url = request_json.get('proof_of_play_url')
-                    if proof_of_play_url is None or proof_of_play_url == '':
-                        proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
+            proof_of_play_url = request_json.get('proof_of_play_url')
+            if proof_of_play_url is None or proof_of_play_url == '':
+                proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
+            else:
+                proof_of_play_url = proof_of_play_url.strip().lower()
             if status == 201:
                 if Tenant.is_tenant_code_unique(tenant_code):
                     tenant = Tenant.create(name=name,
@@ -126,14 +135,41 @@ class TenantsHandler(RequestHandler):
 
     @requires_api_token
     def put(self, tenant_key):
+        status = 204
+        error_message = None
         key = ndb.Key(urlsafe=tenant_key)
         tenant = key.get()
         request_json = json.loads(self.request.body)
-        tenant.tenant_code = request_json.get('tenant_code')
-        tenant.name = request_json.get('name')
-        tenant.admin_email = request_json.get('admin_email')
-        tenant.content_server_url = request_json.get('content_server_url')
-        tenant.content_manager_base_url = request_json.get('content_manager_base_url')
+        name = request_json.get('name')
+        if name is None or name == '':
+            status = 400
+            error_message = 'The name parameter is invalid.'
+        else:
+            tenant.name = name
+        tenant_code = request_json.get('tenant_code')
+        if tenant_code is None or tenant_code == '':
+            status = 400
+            error_message = 'The tenant code parameter is invalid.'
+        else:
+            tenant.tenant_code = tenant_code.strip().lower()
+        admin_email = request_json.get('admin_email')
+        if admin_email is None or admin_email == '':
+            status = 400
+            error_message = 'The admin email parameter is invalid.'
+        else:
+            tenant.admin_email = admin_email.strip().lower()
+        content_server_url = request_json.get('content_server_url')
+        if content_server_url is None or content_server_url == '':
+            status = 400
+            error_message = 'The content server url parameter is invalid.'
+        else:
+            tenant.content_server_url = content_server_url.strip().lower()
+        content_manager_base_url = request_json.get('content_manager_base_url')
+        if content_manager_base_url is None or content_manager_base_url == '':
+            status = 400
+            error_message = 'The content manager base url parameter is invalid.'
+        else:
+            tenant.content_manager_base_url = content_manager_base_url.strip().lower()
         email_list = delimited_string_to_list(request_json.get('notification_emails'))
         tenant.notification_emails = email_list
         domain_key_input = request_json.get('domain_key')
@@ -142,24 +178,26 @@ class TenantsHandler(RequestHandler):
         if str(proof_of_play_logging).lower() == 'true' or str(proof_of_play_logging).lower() == 'false':
             tenant.proof_of_play_logging = bool(proof_of_play_logging)
             Tenant.toggle_proof_of_play(tenant_code=tenant.tenant_code, enable=tenant.proof_of_play_logging)
-        if proof_of_play_logging:
-            proof_of_play_url = request_json.get('proof_of_play_url')
-            if proof_of_play_url is None or proof_of_play_url == '':
-                tenant.proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
-            else:
-                tenant.proof_of_play_url = proof_of_play_url
+        proof_of_play_url = request_json.get('proof_of_play_url')
+        if proof_of_play_url is None or proof_of_play_url == '':
+            tenant.proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
+        else:
+            tenant.proof_of_play_url = proof_of_play_url.strip().lower()
         try:
             domain_key = ndb.Key(urlsafe=domain_key_input)
         except Exception, e:
             logging.exception(e)
         if domain_key:
             tenant.domain_key = domain_key
-        if tenant.proof_of_play_url is None:
-            tenant.proof_of_play_url= config.DEFAULT_PROOF_OF_PLAY_URL
+        else:
+            status = 400
+            error_message = 'Error retrieving domain.'
+        if status == 204:
             tenant.put()
-        tenant.put()
-        self.response.headers.pop('Content-Type', None)
-        self.response.set_status(204)
+            self.response.headers.pop('Content-Type', None)
+            self.response.set_status(status)
+        else:
+            self.response.set_status(status, error_message)
 
     @requires_api_token
     def delete(self, tenant_key):
