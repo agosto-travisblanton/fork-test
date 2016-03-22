@@ -5,44 +5,50 @@
         </div>
     </md-toolbar>
     <md-content flex layout-padding>
+
         <div flex="100" flex-xs="100" layout="column">
             <div ncy-breadcrumb></div>
-            <div class="row margin-top-05">
-                <div class="col-sm-6">
-                    <table class="table table-responsive table-striped">
-                        <thead>
-                        <tr>
-                            <th><i class="fa fa-fw fa-wifi"></i> MAC</th>
-                            <th><i class="fa fa-fw fa-plug"></i> MAC</th>
-                            <th>Serial number</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress }}
-                            </td>
-                            <td class="reset-device-ethernet-mac-address">
-                                {{deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                            </td>
-                            <td class="reset-device-serial-number">
-                                {{deviceDetailsCtrl.currentDevice.serialNumber}}
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-sm-2 margin-top-20">
-                    <md-button ngclipboard data-clipboard-target="#hidden-device-key">
-                        <i class="fa fa-fw fa-clipboard"></i> Copy device key</a>
-                    </md-button>
-                </div>
-                <div class="col-sm-2 margin-top-20">
-                    <md-button>
-                        <a href="{{deviceDetailsCtrl.backUrl}}">
-                            <i class="fa fa-fw fa-backward"></i> {{deviceDetailsCtrl.backUrlText}}</a>
-                    </md-button>
-                </div>
-            </div>
+            <md-card>
+                <md-card-content>
+                    <div class="row margin-top-05">
+                        <div class="col-sm-6">
+                            <table class="table table-responsive table-striped">
+                                <thead>
+                                <tr>
+                                    <th><i class="fa fa-fw fa-wifi"></i> MAC</th>
+                                    <th><i class="fa fa-fw fa-plug"></i> MAC</th>
+                                    <th>Serial number</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress
+                                        }}
+                                    </td>
+                                    <td class="reset-device-ethernet-mac-address">
+                                        {{deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
+                                    </td>
+                                    <td class="reset-device-serial-number">
+                                        {{deviceDetailsCtrl.currentDevice.serialNumber}}
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-sm-2 margin-top-20">
+                            <md-button ngclipboard data-clipboard-target="#hidden-device-key">
+                                <i class="fa fa-fw fa-clipboard"></i> Copy device key</a>
+                            </md-button>
+                        </div>
+                        <div class="col-sm-2 margin-top-20">
+                            <md-button>
+                                <a href="{{deviceDetailsCtrl.backUrl}}">
+                                    <i class="fa fa-fw fa-backward"></i> {{deviceDetailsCtrl.backUrlText}}</a>
+                            </md-button>
+                        </div>
+                    </div>
+                </md-card-content>
+            </md-card>
             <md-tabs md-dynamic-height md-border-bottom>
                 <md-tab label="Properties">
                     <md-content class="md-padding" layout="row" layout-wrap layout-align="left start"
@@ -50,6 +56,8 @@
                         <div flex="35" flex-sm="35" flex-xs="35" layout="column">
                             <md-card>
                                 <md-card-content>
+                                    <h2>Device Information</h2>
+                                    <hr/>
                                     <div class="form-group"
                                          ng-hide="deviceDetailsCtrl.currentDevice.serialNumber == null ||
                                            deviceDetailsCtrl.currentDevice.serialNumber == ''">
@@ -274,206 +282,178 @@
                         </div>
                         <div flex="40" flex-sm="40" flex-xs="40" layout="column">
                             <md-card>
-                                <md-card-title>
-                                    <md-card-title-text>
-                                        <span class="md-headline">Edit Device</span>
 
-                                    </md-card-title-text>
-                                </md-card-title>
                                 <md-card-content>
+                                    <h2>Edit Device</h2>
+
                                     <hr/>
-                                    <md-card>
-                                        <md-card-title>
-                                            <md-card-title-text>
-                                                <span class="md-headline">Customer Display Code</span>
-                                            </md-card-title-text>
-                                        </md-card-title>
-                                        <md-card-content>
-                                            <form name="deviceUpdateForm"
-                                                  class="form-horizontal"
-                                                  ng-submit="deviceDetailsCtrl.onClickSaveDevice()"
-                                                  novalidate>
-                                                <div class="form-group"
-                                                     ng-hide="!deviceDetailsCtrl.currentDevice.proofOfPlayEditable">
-                                                    <div class="col-sm-12">
-                                                        <label>Proof of play logging</label>
-                                                        <div>
-                                                            <input type="checkbox"
-                                                                   ng-model="deviceDetailsCtrl.currentDevice.proofOfPlayLogging">
-                                                            <span>Enable</span>
-                                                        </div>
-                                                    </div>
+                                    <h3>Customer Display Code</h3>
+                                    <form name="deviceUpdateForm"
+                                          class="form-horizontal"
+                                          ng-submit="deviceDetailsCtrl.onClickSaveDevice()"
+                                          novalidate>
+                                        <div class="form-group"
+                                             ng-hide="!deviceDetailsCtrl.currentDevice.proofOfPlayEditable">
+                                            <div class="col-sm-12">
+                                                <label>Proof of play logging</label>
+                                                <div>
+                                                    <input type="checkbox"
+                                                           ng-model="deviceDetailsCtrl.currentDevice.proofOfPlayLogging">
+                                                    <span>Enable</span>
                                                 </div>
-                                                <div class="form-group">
-                                                    <div class="col-sm-12">
-                                                        <label>Notes</label>
-                                                        <div>
-                                                            <input type="text"
-                                                                   class="form-control"
-                                                                   name="notes"
-                                                                   ng-model="deviceDetailsCtrl.currentDevice.notes">
-                                                        </div>
-                                                    </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-12">
+                                                <label>Notes</label>
+                                                <div>
+                                                    <input type="text"
+                                                           class="form-control"
+                                                           name="notes"
+                                                           ng-model="deviceDetailsCtrl.currentDevice.notes">
                                                 </div>
-                                                <div class="form-group">
-                                                    <div class="col-sm-6">
-                                                        <label>Customer display name</label>
-                                                        <div>
-                                                            <input type="text"
-                                                                   class="form-control"
-                                                                   autofocus
-                                                                   name="customerDisplayName"
-                                                                   placeholder="e.g., Panel in Front Reception"
-                                                                   ng-change="deviceDetailsCtrl.autoGenerateCustomerDisplayCode()"
-                                                                   ng-model="deviceDetailsCtrl.currentDevice.customerDisplayName">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-6"
-                                                         ng-class="{ 'has-error' : deviceUpdateForm.customerDisplayCode.$invalid && !deviceUpdateForm.customerDisplayCode.$pristine }">
-                                                        <label>Customer display code</label>
-                                                        <div>
-                                                            <input type="text"
-                                                                   class="form-control"
-                                                                   name="customerDisplayCode"
-                                                                   placeholder="auto-generated"
-                                                                   ng-model="deviceDetailsCtrl.currentDevice.customerDisplayCode"
-                                                                   ng-pattern="/^[a-z0-9_]*$/">
-                                                            <p ng-show="deviceUpdateForm.customerDisplayCode.$invalid && !deviceUpdateForm.customerDisplayCode.$invalid.$pristine"
-                                                               class="help-block">
-                                                                Alphanumeric and underscore allowed.
-                                                            </p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-6">
+                                                <label>Customer display name</label>
+                                                <div>
+                                                    <input type="text"
+                                                           class="form-control"
+                                                           autofocus
+                                                           name="customerDisplayName"
+                                                           placeholder="e.g., Panel in Front Reception"
+                                                           ng-change="deviceDetailsCtrl.autoGenerateCustomerDisplayCode()"
+                                                           ng-model="deviceDetailsCtrl.currentDevice.customerDisplayName">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6"
+                                                 ng-class="{ 'has-error' : deviceUpdateForm.customerDisplayCode.$invalid && !deviceUpdateForm.customerDisplayCode.$pristine }">
+                                                <label>Customer display code</label>
+                                                <div>
+                                                    <input type="text"
+                                                           class="form-control"
+                                                           name="customerDisplayCode"
+                                                           placeholder="auto-generated"
+                                                           ng-model="deviceDetailsCtrl.currentDevice.customerDisplayCode"
+                                                           ng-pattern="/^[a-z0-9_]*$/">
+                                                    <p ng-show="deviceUpdateForm.customerDisplayCode.$invalid && !deviceUpdateForm.customerDisplayCode.$invalid.$pristine"
+                                                       class="help-block">
+                                                        Alphanumeric and underscore allowed.
+                                                    </p>
 
-                                                        </div>
-                                                    </div>
                                                 </div>
+                                            </div>
+                                        </div>
 
-                                                <!--- <md-card-actions layout="row" layout-align="end center">
-                                                    <md-button type="submit"
-                                                               ng-disabled="!deviceUpdateForm.$dirty || deviceUpdateForm.$invalid">
-                                                        <i class="fa fa-fw fa-save"></i>
-                                                        Save
-                                                    </md-button>
-                                                </md-card-actions> --->
-                                            </form>
-                                        </md-card-content>
-                                    </md-card>
-                                    <md-card>
-                                        <md-card-title>
-                                            <md-card-title-text>
-                                                <span class="md-headline">Location</span>
-                                            </md-card-title-text>
-                                        </md-card-title>
-                                        <md-card-content>
-                                            <form name="locationForm"
-                                                  class="form-horizontal"
-                                                  ng-submit="deviceDetailsCtrl.onClickSaveLocation()"
-                                                  novalidate>
-                                                <div class="form-group">
-                                                    <div class="col-sm-5">
-                                                        <label>Panel location</label>
-                                                        <select
-                                                                id="customerLocationName"
-                                                                class="form-control"
-                                                                ng-model="deviceDetailsCtrl.currentDevice.location"
-                                                                ng-options="i.customerLocationName for i in deviceDetailsCtrl.locations track by i.key">
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <!---     <md-card-actions layout="row" layout-align="end center">
-                                                          <md-button type="submit"
-                                                                     ng-disabled="!locationForm.$dirty || locationForm.$invalid">
-                                                              <i class="fa fa-fw fa-save"></i>
-                                                              Save
-                                                          </md-button>
-                                                      </md-card-actions> --->
-                                            </form>
-                                        </md-card-content>
-                                    </md-card>
-                                    <md-card>
-                                        <md-card-title>
-                                            <md-card-title-text>
-                                                <span class="md-headline">Serial control</span>
-                                            </md-card-title-text>
-                                        </md-card-title>
-                                        <md-card-content>
-                                            <form name="serialControlForm"
-                                                  class="form-horizontal"
-                                                  ng-submit="deviceDetailsCtrl.onClickSavePanels()"
-                                                  novalidate>
-                                                <div class="form-group">
-                                                    <div class="col-sm-5">
-                                                        <label>Panel model</label>
-                                                        <select
-                                                                id="panelModel"
-                                                                class="form-control"
-                                                                ng-model="deviceDetailsCtrl.currentDevice.panelModel"
-                                                                ng-options="p.displayName for p in deviceDetailsCtrl.panelModels track by p.id">
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-sm-5">
-                                                        <label>Panel input</label>
-                                                        <select
-                                                                id="panelInput"
-                                                                class="form-control"
-                                                                ng-required="deviceDetailsCtrl.currentDevice.panelModel !== null"
-                                                                ng-model="deviceDetailsCtrl.currentDevice.panelInput"
-                                                                ng-options="c.id for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <!---   <md-card-actions layout="row" layout-align="end center">
-                                                        <md-button type="submit"
-                                                                   ng-disabled="!serialControlForm.$dirty || serialControlForm.$invalid">
-                                                            <i class="fa fa-fw fa-save"></i>
-                                                            Save
-                                                        </md-button>
-                                                    </md-card-actions> --->
-                                            </form>
-                                        </md-card-content>
-                                    </md-card>
-                                    <md-card>
-                                        <md-card-title>
-                                            <md-card-title-text>
-                                                <span class="md-headline">Polling Intervals</span>
-                                            </md-card-title-text>
-                                        </md-card-title>
-                                        <md-card-content>
-                                            <form name="intervalsControlForm"
-                                                  class="form-horizontal"
-                                                  ng-submit="deviceDetailsCtrl.onClickSaveIntervals()"
-                                                  novalidate>
-                                                <div class="form-group">
-                                                    <div class="col-sm-4">
-                                                        <label>Heartbeat</label>
-                                                        <input type="number"
-                                                               class="form-control"
-                                                               name="heartbeatInterval"
-                                                               id="heartbeatInterval"
-                                                               ng-model="deviceDetailsCtrl.currentDevice.heartbeatInterval"
-                                                               min="1"
-                                                               ng-required="true">minutes
-                                                    </div>
-                                                    <div class="col-sm-4">
-                                                        <label>Check content</label>
-                                                        <input type="number"
-                                                               class="form-control"
-                                                               name="checkContentInterval"
-                                                               id="checkContentInterval"
-                                                               ng-model="deviceDetailsCtrl.currentDevice.checkContentInterval"
-                                                               min="0"
-                                                               ng-required="true">minutes
-                                                    </div>
-                                                </div>
-                                                <!---  <md-card-actions layout="row" layout-align="end center">
-                                                     <md-button type="submit"
-                                                                ng-disabled="!intervalsControlForm.$dirty || intervalsControlForm.$invalid">
-                                                         <i class="fa fa-fw fa-save"></i>
-                                                         Save
-                                                     </md-button>
-                                                 </md-card-actions> --->
-                                            </form>
-                                        </md-card-content>
-                                    </md-card>
+                                        <!--- <md-card-actions layout="row" layout-align="end center">
+                                            <md-button type="submit"
+                                                       ng-disabled="!deviceUpdateForm.$dirty || deviceUpdateForm.$invalid">
+                                                <i class="fa fa-fw fa-save"></i>
+                                                Save
+                                            </md-button>
+                                        </md-card-actions> --->
+                                    </form>
+
+                                    <hr/>
+                                    <h3>Location</h3>
+
+                                    <form name="locationForm"
+                                          class="form-horizontal"
+                                          ng-submit="deviceDetailsCtrl.onClickSaveLocation()"
+                                          novalidate>
+                                        <div class="form-group">
+                                            <div class="col-sm-5">
+                                                <label>Panel location</label>
+                                                <select
+                                                        id="customerLocationName"
+                                                        class="form-control"
+                                                        ng-model="deviceDetailsCtrl.currentDevice.location"
+                                                        ng-options="i.customerLocationName for i in deviceDetailsCtrl.locations track by i.key">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!---     <md-card-actions layout="row" layout-align="end center">
+                                                  <md-button type="submit"
+                                                             ng-disabled="!locationForm.$dirty || locationForm.$invalid">
+                                                      <i class="fa fa-fw fa-save"></i>
+                                                      Save
+                                                  </md-button>
+                                              </md-card-actions> --->
+                                    </form>
+                                    <hr/>
+                                    <h3>Serial control</h3>
+
+                                    <form name="serialControlForm"
+                                          class="form-horizontal"
+                                          ng-submit="deviceDetailsCtrl.onClickSavePanels()"
+                                          novalidate>
+                                        <div class="form-group">
+                                            <div class="col-sm-5">
+                                                <label>Panel model</label>
+                                                <select
+                                                        id="panelModel"
+                                                        class="form-control"
+                                                        ng-model="deviceDetailsCtrl.currentDevice.panelModel"
+                                                        ng-options="p.displayName for p in deviceDetailsCtrl.panelModels track by p.id">
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-5">
+                                                <label>Panel input</label>
+                                                <select
+                                                        id="panelInput"
+                                                        class="form-control"
+                                                        ng-required="deviceDetailsCtrl.currentDevice.panelModel !== null"
+                                                        ng-model="deviceDetailsCtrl.currentDevice.panelInput"
+                                                        ng-options="c.id for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!---   <md-card-actions layout="row" layout-align="end center">
+                                                <md-button type="submit"
+                                                           ng-disabled="!serialControlForm.$dirty || serialControlForm.$invalid">
+                                                    <i class="fa fa-fw fa-save"></i>
+                                                    Save
+                                                </md-button>
+                                            </md-card-actions> --->
+                                    </form>
+                                    <hr/>
+                                    <h3>Polling Intervals</h3>
+                                    <form name="intervalsControlForm"
+                                          class="form-horizontal"
+                                          ng-submit="deviceDetailsCtrl.onClickSaveIntervals()"
+                                          novalidate>
+                                        <div class="form-group">
+                                            <div class="col-sm-4">
+                                                <label>Heartbeat</label>
+                                                <input type="number"
+                                                       class="form-control"
+                                                       name="heartbeatInterval"
+                                                       id="heartbeatInterval"
+                                                       ng-model="deviceDetailsCtrl.currentDevice.heartbeatInterval"
+                                                       min="1"
+                                                       ng-required="true">minutes
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <label>Check content</label>
+                                                <input type="number"
+                                                       class="form-control"
+                                                       name="checkContentInterval"
+                                                       id="checkContentInterval"
+                                                       ng-model="deviceDetailsCtrl.currentDevice.checkContentInterval"
+                                                       min="0"
+                                                       ng-required="true">minutes
+                                            </div>
+                                        </div>
+                                        <!---  <md-card-actions layout="row" layout-align="end center">
+                                             <md-button type="submit"
+                                                        ng-disabled="!intervalsControlForm.$dirty || intervalsControlForm.$invalid">
+                                                 <i class="fa fa-fw fa-save"></i>
+                                                 Save
+                                             </md-button>
+                                         </md-card-actions> --->
+                                    </form>
+
                                     <hr/>
                                     <md-card-actions layout="row" layout-align="end center">
                                         <md-button type="submit" class="md-raised"
