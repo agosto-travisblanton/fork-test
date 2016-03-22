@@ -87,9 +87,10 @@ class TenantsHandler(RequestHandler):
                 error_message = 'The proof_of_play_logging parameter is invalid.'
             else:
                 proof_of_play_logging = bool(proof_of_play_logging)
-            proof_of_play_url = request_json.get('proof_of_play_url')
-            if proof_of_play_url is None or proof_of_play_url == '':
-                proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
+                if proof_of_play_logging:
+                    proof_of_play_url = request_json.get('proof_of_play_url')
+                    if proof_of_play_url is None or proof_of_play_url == '':
+                        proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
             if status == 201:
                 if Tenant.is_tenant_code_unique(tenant_code):
                     tenant = Tenant.create(name=name,
@@ -141,12 +142,21 @@ class TenantsHandler(RequestHandler):
         if str(proof_of_play_logging).lower() == 'true' or str(proof_of_play_logging).lower() == 'false':
             tenant.proof_of_play_logging = bool(proof_of_play_logging)
             Tenant.toggle_proof_of_play(tenant_code=tenant.tenant_code, enable=tenant.proof_of_play_logging)
+        if proof_of_play_logging:
+            proof_of_play_url = request_json.get('proof_of_play_url')
+            if proof_of_play_url is None or proof_of_play_url == '':
+                tenant.proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
+            else:
+                tenant.proof_of_play_url = proof_of_play_url
         try:
             domain_key = ndb.Key(urlsafe=domain_key_input)
         except Exception, e:
             logging.exception(e)
         if domain_key:
             tenant.domain_key = domain_key
+        if tenant.proof_of_play_url is None:
+            tenant.proof_of_play_url= config.DEFAULT_PROOF_OF_PLAY_URL
+            tenant.put()
         tenant.put()
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
