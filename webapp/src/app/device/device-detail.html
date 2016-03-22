@@ -482,6 +482,7 @@
                         <div flex="100" flex-sm="100" flex-xs="100" layout="column">
                             <md-card>
                                 <md-card-content>
+
                                     <form name="tenantForm" class="form-horizontal"
                                           ng-submit="deviceDetailsCtrl.onClickRefreshButton()"
                                           novalidate>
@@ -514,6 +515,10 @@
                                             </div>
                                         </div>
                                     </form>
+                                </md-card-content>
+                            </md-card>
+                            <md-card>
+                                <md-card-content>
                                     <div class="row margin-top-15">
                                         <div class="col-lg-12">
                                             <table class="table table-responsive table-striped">
@@ -570,179 +575,179 @@
                             <md-card>
                                 <md-card-content>
                                     <div class="col-md-12">
-                                    <h3>Commands</h3>
-                                    <hr/>
+                                        <h3>Commands</h3>
+                                        <hr/>
                                         <md-content class="md-padding" layout="row" layout-wrap layout-xs="column">
                                             <div class="col-md-6">
-                                            <md-card>
-                                                <md-card-title>
-                                                    <md-card-title-text>
-                                                        <span class="md-headline">Reset content</span>
-                                                    </md-card-title-text>
-                                                </md-card-title>
-                                                <md-card-content>
-                                                    <form name="resetForm" class="form-horizontal"
-                                                          ng-submit="deviceDetailsCtrl.onClickContentDeleteSendButton()"
-                                                          novalidate>
-                                                        <md-card-actions layout="row" layout-align="end center">
-                                                            <md-button type="submit"><i
-                                                                    class="fa fa-fw fa-building"></i>
-                                                                Send
-                                                            </md-button>
-                                                        </md-card-actions>
-                                                    </form>
-                                                </md-card-content>
-                                            </md-card>
-                                            </div>
-                                                                                        <div class="col-md-6">
-
-                                            <md-card>
-                                                <md-card-title>
-                                                    <md-card-title-text>
-                                                        <span class="md-headline">Reset player</span>
-                                                    </md-card-title-text>
-                                                </md-card-title>
-                                                <md-card-content>
-                                                    <form name="resetForm" class="form-horizontal"
-                                                          ng-submit="deviceDetailsCtrl.onClickResetSendButton()"
-                                                          novalidate>
-                                                        <md-card-actions layout="row"
-                                                                         layout-align="end center">
-                                                            <md-button type="submit"><i
-                                                                    class="fa fa-fw fa-building"></i>
-                                                                Send
-                                                            </md-button>
-                                                        </md-card-actions>
-                                                    </form>
-                                                </md-card-content>
-                                            </md-card>
+                                                <md-card>
+                                                    <md-card-title>
+                                                        <md-card-title-text>
+                                                            <span class="md-headline">Reset content</span>
+                                                        </md-card-title-text>
+                                                    </md-card-title>
+                                                    <md-card-content>
+                                                        <form name="resetForm" class="form-horizontal"
+                                                              ng-submit="deviceDetailsCtrl.onClickContentDeleteSendButton()"
+                                                              novalidate>
+                                                            <md-card-actions layout="row" layout-align="end center">
+                                                                <md-button type="submit"><i
+                                                                        class="fa fa-fw fa-building"></i>
+                                                                    Send
+                                                                </md-button>
+                                                            </md-card-actions>
+                                                        </form>
+                                                    </md-card-content>
+                                                </md-card>
                                             </div>
                                             <div class="col-md-6">
 
-                                            <md-card>
-                                                <md-card-title>
-                                                    <md-card-title-text>
-                                                        <span class="md-headline">Panel on</span>
-                                                    </md-card-title-text>
-                                                </md-card-title>
-                                                <md-card-content>
-                                                    <form name="powerOnForm" class="form-horizontal"
-                                                          ng-submit="deviceDetailsCtrl.onClickPowerOnSendButton()"
-                                                          novalidate>
-                                                        <md-card-actions layout="row"
-                                                                         layout-align="end center">
-                                                            <md-button type="submit"><i
-                                                                    class="fa fa-fw fa-building"></i>
-                                                                Send
-                                                            </md-button>
-                                                        </md-card-actions>
-                                                    </form>
-                                                </md-card-content>
-                                            </md-card>
-                                            </div>
-                                                                                        <div class="col-md-6">
-
-                                            <md-card>
-                                                <md-card-title>
-                                                    <md-card-title-text>
-                                                        <span class="md-headline">Panel off</span>
-                                                    </md-card-title-text>
-                                                </md-card-title>
-                                                <md-card-content>
-                                                    <form name="powerOffForm" class="form-horizontal"
-                                                          ng-submit="deviceDetailsCtrl.onClickPowerOffSendButton()"
-                                                          novalidate>
-                                                        <md-card-actions layout="row"
-                                                                         layout-align="end center">
-                                                            <md-button type="submit"><i
-                                                                    class="fa fa-fw fa-building"></i>
-                                                                Send
-                                                            </md-button>
-                                                        </md-card-actions>
-                                                    </form>
-                                                </md-card-content>
-                                            </md-card>
+                                                <md-card>
+                                                    <md-card-title>
+                                                        <md-card-title-text>
+                                                            <span class="md-headline">Reset player</span>
+                                                        </md-card-title-text>
+                                                    </md-card-title>
+                                                    <md-card-content>
+                                                        <form name="resetForm" class="form-horizontal"
+                                                              ng-submit="deviceDetailsCtrl.onClickResetSendButton()"
+                                                              novalidate>
+                                                            <md-card-actions layout="row"
+                                                                             layout-align="end center">
+                                                                <md-button type="submit"><i
+                                                                        class="fa fa-fw fa-building"></i>
+                                                                    Send
+                                                                </md-button>
+                                                            </md-card-actions>
+                                                        </form>
+                                                    </md-card-content>
+                                                </md-card>
                                             </div>
                                             <div class="col-md-6">
 
-                                            <md-card>
-                                                <md-card-title>
-                                                    <md-card-title-text>
-                                                        <span class="md-headline">Volume</span>
-                                                    </md-card-title-text>
-                                                </md-card-title>
-                                                <md-card-content>
-                                                    <form name="volumeForm" class="form-horizontal"
-                                                          ng-submit="deviceDetailsCtrl.onClickVolumeSendButton()"
-                                                          novalidate>
-                                                        <div class="row">
-                                                            <div class="col-sm-12">
-                                                                <div class="row">
-                                                                    <div class="col-sm-5 pull-right">
-                                                                        <input type="number"
-                                                                               class="form-control"
-                                                                               name="volume"
-                                                                               id="volume"
-                                                                               ng-model="deviceDetailsCtrl.currentDevice.volume"
-                                                                               min="1"
-                                                                               max="100"
-                                                                               ngMinlength="1"
-                                                                               ngMaxlength="3"
-                                                                               ng-required="true">
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <md-card-actions layout="row"
-                                                                         layout-align="end center">
-                                                            <md-button type="submit"
-                                                                       ng-disabled="!volumeForm.$dirty || volumeForm.$invalid">
-                                                                <i class="fa fa-fw fa-building"></i>
-                                                                Send
-                                                            </md-button>
-                                                        </md-card-actions>
-                                                    </form>
-                                                </md-card-content>
-
-                                            </md-card>
+                                                <md-card>
+                                                    <md-card-title>
+                                                        <md-card-title-text>
+                                                            <span class="md-headline">Panel on</span>
+                                                        </md-card-title-text>
+                                                    </md-card-title>
+                                                    <md-card-content>
+                                                        <form name="powerOnForm" class="form-horizontal"
+                                                              ng-submit="deviceDetailsCtrl.onClickPowerOnSendButton()"
+                                                              novalidate>
+                                                            <md-card-actions layout="row"
+                                                                             layout-align="end center">
+                                                                <md-button type="submit"><i
+                                                                        class="fa fa-fw fa-building"></i>
+                                                                    Send
+                                                                </md-button>
+                                                            </md-card-actions>
+                                                        </form>
+                                                    </md-card-content>
+                                                </md-card>
                                             </div>
-                                                                                        <div class="col-md-6">
+                                            <div class="col-md-6">
 
-                                            <md-card>
-                                                <md-card-title>
-                                                    <md-card-title-text>
-                                                        <span class="md-headline">Custom</span>
-                                                    </md-card-title-text>
-                                                </md-card-title>
-                                                <md-card-content>
-                                                    <form name="customForm" class="form-horizontal"
-                                                          ng-submit="deviceDetailsCtrl.onClickCommandSendButton()"
-                                                          novalidate>
-                                                        <div class="row">
-                                                            <div class="col-sm-12">
-                                                                <div class="row">
-                                                                    <div class="col-sm-9 pull-right">
-                                                                        <input type="text"
-                                                                               class="form-control"
-                                                                               name="custom"
-                                                                               id="custom"
-                                                                               ng-model="deviceDetailsCtrl.currentDevice.custom"
-                                                                               ng-required="true">
+                                                <md-card>
+                                                    <md-card-title>
+                                                        <md-card-title-text>
+                                                            <span class="md-headline">Panel off</span>
+                                                        </md-card-title-text>
+                                                    </md-card-title>
+                                                    <md-card-content>
+                                                        <form name="powerOffForm" class="form-horizontal"
+                                                              ng-submit="deviceDetailsCtrl.onClickPowerOffSendButton()"
+                                                              novalidate>
+                                                            <md-card-actions layout="row"
+                                                                             layout-align="end center">
+                                                                <md-button type="submit"><i
+                                                                        class="fa fa-fw fa-building"></i>
+                                                                    Send
+                                                                </md-button>
+                                                            </md-card-actions>
+                                                        </form>
+                                                    </md-card-content>
+                                                </md-card>
+                                            </div>
+                                            <div class="col-md-6">
+
+                                                <md-card>
+                                                    <md-card-title>
+                                                        <md-card-title-text>
+                                                            <span class="md-headline">Volume</span>
+                                                        </md-card-title-text>
+                                                    </md-card-title>
+                                                    <md-card-content>
+                                                        <form name="volumeForm" class="form-horizontal"
+                                                              ng-submit="deviceDetailsCtrl.onClickVolumeSendButton()"
+                                                              novalidate>
+                                                            <div class="row">
+                                                                <div class="col-sm-12">
+                                                                    <div class="row">
+                                                                        <div class="col-sm-5 pull-right">
+                                                                            <input type="number"
+                                                                                   class="form-control"
+                                                                                   name="volume"
+                                                                                   id="volume"
+                                                                                   ng-model="deviceDetailsCtrl.currentDevice.volume"
+                                                                                   min="1"
+                                                                                   max="100"
+                                                                                   ngMinlength="1"
+                                                                                   ngMaxlength="3"
+                                                                                   ng-required="true">
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                        <md-card-actions layout="row"
-                                                                         layout-align="end center">
-                                                            <md-button type="submit"
-                                                                       ng-disabled="!customForm.$dirty || customForm.$invalid">
-                                                                <i class="fa fa-fw fa-building"></i>
-                                                                Send
-                                                            </md-button>
-                                                        </md-card-actions>
-                                                    </form>
-                                                </md-card-content>
-                                            </md-card>
+                                                            <md-card-actions layout="row"
+                                                                             layout-align="end center">
+                                                                <md-button type="submit"
+                                                                           ng-disabled="!volumeForm.$dirty || volumeForm.$invalid">
+                                                                    <i class="fa fa-fw fa-building"></i>
+                                                                    Send
+                                                                </md-button>
+                                                            </md-card-actions>
+                                                        </form>
+                                                    </md-card-content>
+
+                                                </md-card>
+                                            </div>
+                                            <div class="col-md-6">
+
+                                                <md-card>
+                                                    <md-card-title>
+                                                        <md-card-title-text>
+                                                            <span class="md-headline">Custom</span>
+                                                        </md-card-title-text>
+                                                    </md-card-title>
+                                                    <md-card-content>
+                                                        <form name="customForm" class="form-horizontal"
+                                                              ng-submit="deviceDetailsCtrl.onClickCommandSendButton()"
+                                                              novalidate>
+                                                            <div class="row">
+                                                                <div class="col-sm-12">
+                                                                    <div class="row">
+                                                                        <div class="col-sm-9 pull-right">
+                                                                            <input type="text"
+                                                                                   class="form-control"
+                                                                                   name="custom"
+                                                                                   id="custom"
+                                                                                   ng-model="deviceDetailsCtrl.currentDevice.custom"
+                                                                                   ng-required="true">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <md-card-actions layout="row"
+                                                                             layout-align="end center">
+                                                                <md-button type="submit"
+                                                                           ng-disabled="!customForm.$dirty || customForm.$invalid">
+                                                                    <i class="fa fa-fw fa-building"></i>
+                                                                    Send
+                                                                </md-button>
+                                                            </md-card-actions>
+                                                        </form>
+                                                    </md-card-content>
+                                                </md-card>
                                             </div>
                                         </md-content>
                                     </div>
@@ -751,10 +756,10 @@
                         </div>
                         <div flex="50" flex-sm="50" flex-xs="50" layout="column">
                             <md-card>
-                                
+
                                 <md-card-content>
-                                <h3>Command history</h3>
-                                <hr/>
+                                    <h3>Command history</h3>
+                                    <hr/>
                                     <div class="row margin-top-15">
                                         <div class="col-lg-12">
                                             <table class="table table-responsive table-striped">
