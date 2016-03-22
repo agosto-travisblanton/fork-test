@@ -3,7 +3,8 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantAddCtrl',
-  ($log, TenantsService, DistributorsService, $state, sweet, ProgressBarService, $cookies) ->
+  ($log, $location, TenantsService, DistributorsService, $state, sweet, ProgressBarService, $cookies) ->
+    @gameStopServer = $location.host().indexOf('provisioning-gamestop') > -1
     @currentTenant = {
       key: undefined,
       name: undefined,
@@ -14,6 +15,7 @@ appModule.controller 'TenantAddCtrl',
       domain_key: undefined,
       notification_emails: undefined,
       proof_of_play_logging: false,
+      proof_of_play_url: undefined,
       active: true
     }
     @selectedDomain = undefined

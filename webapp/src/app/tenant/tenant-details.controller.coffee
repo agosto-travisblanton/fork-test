@@ -4,7 +4,8 @@ appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantDetailsCtrl',
   ($stateParams, TenantsService, DomainsService, DistributorsService, $state, sweet, ProgressBarService,
-    $cookies, $scope) ->
+    $cookies, $scope, $location) ->
+    @gameStopServer = $location.host().indexOf('provisioning-gamestop') > -1
     @currentTenant = {
       key: undefined,
       name: undefined,
@@ -15,6 +16,7 @@ appModule.controller 'TenantDetailsCtrl',
       domain_key: undefined,
       notification_emails: undefined,
       proof_of_play_logging: false,
+      proof_of_play_url: undefined,
       active: true
     }
     @selectedDomain = undefined
@@ -71,7 +73,6 @@ appModule.controller 'TenantDetailsCtrl',
     $scope.tabIndex = 0
 
     $scope.$watch 'tabIndex', (toTab, fromTab) ->
-
       if toTab != undefined
         switch toTab
           when 0
