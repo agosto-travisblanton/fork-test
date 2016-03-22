@@ -9,54 +9,28 @@
             <div ncy-breadcrumb></div>
             <md-card>
                 <md-card-content>
-                    <div class="col-sm-12">
-                        <!---
-                       <table class="table table-responsive table-striped">
-                           <thead>
-                           <tr>
-                               <th><i class="fa fa-fw fa-wifi"></i> MAC</th>
-                               <th><i class="fa fa-fw fa-plug"></i> MAC</th>
-                               <th>Serial number</th>
-                           </tr>
-                           </thead>
-                           <tbody>
-                           <tr>
-                               <td class="reset-device-mac-address">{{ deviceDetailsCtrl.currentDevice.macAddress}}
-                               </td>
-                               <td class="reset-device-ethernet-mac-address">
-                                   {{deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                               </td>
-                               <td class="reset-device-serial-number">
-                                   {{deviceDetailsCtrl.currentDevice.serialNumber}}
-                               </td>
-                           </tr>
-                           </tbody>
-                       </table> ---->
-                    </div>
-                    <div class="col-sm-2">
-                        <h5><i class="fa fa-fw fa-wifi"></i> {{deviceDetailsCtrl.currentDevice.macAddress}}</h5>
-
-                    </div>
-
-                    <div class="col-sm-2" ng-show="deviceDetailsCtrl.currentDevice.ethernetMacAddress">
-                        <h5><i class="fa fa-fw fa-plug"></i> {{deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
-                        </h5>
-
-                    </div>
-                    <div class="col-sm-3">
-                        <h5><i class="fa fa-hashtag"></i> {{deviceDetailsCtrl.currentDevice.serialNumber}}</h5>
-                    </div>
-
-                    <div class="col-sm-2 col-sm-offset-{{deviceDetailsCtrl.currentDevice.ethernetMacAddress ? '1' : '2'}}">
-                        <md-button ngclipboard data-clipboard-target="#hidden-device-key">
-                            <i class="fa fa-fw fa-clipboard"></i> Copy device key</a>
-                        </md-button>
-                    </div>
-                    <div class="col-sm-2">
-                        <md-button>
-                            <a href="{{deviceDetailsCtrl.backUrl}}">
-                                <i class="fa fa-fw fa-backward"></i> {{deviceDetailsCtrl.backUrlText}}</a>
-                        </md-button>
+                    <div class="col-md-12">
+                        <div class="col-sm-2">
+                            <h5><i class="fa fa-fw fa-wifi"></i> {{deviceDetailsCtrl.currentDevice.macAddress}}</h5>
+                        </div>
+                        <div class="col-sm-2" ng-show="deviceDetailsCtrl.currentDevice.ethernetMacAddress">
+                            <h5><i class="fa fa-fw fa-plug"></i> {{deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
+                            </h5>
+                        </div>
+                        <div class="col-sm-3">
+                            <h5><i class="fa fa-hashtag"></i> {{deviceDetailsCtrl.currentDevice.serialNumber}}</h5>
+                        </div>
+                        <div class="col-sm-2 col-sm-offset-{{deviceDetailsCtrl.currentDevice.ethernetMacAddress ? '1' : '2'}}">
+                            <md-button ngclipboard data-clipboard-target="#hidden-device-key" class="md-raised">
+                                <i class="fa fa-fw fa-clipboard"></i> Copy device key</a>
+                            </md-button>
+                        </div>
+                        <div class="col-sm-2">
+                            <md-button class="md-raised">
+                                <a href="{{deviceDetailsCtrl.backUrl}}">
+                                    <i class="fa fa-fw fa-backward"></i>{{deviceDetailsCtrl.backUrlText}}</a>
+                            </md-button>
+                        </div>
                     </div>
                 </md-card-content>
             </md-card>
@@ -295,8 +269,8 @@
                             <md-card>
                                 <md-card-content>
                                     <h2>Edit Device</h2>
-
                                     <hr/>
+
                                     <h3>Customer Display Code</h3>
                                     <form name="deviceUpdateForm"
                                           class="form-horizontal"
@@ -355,14 +329,6 @@
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <!--- <md-card-actions layout="row" layout-align="end center">
-                                            <md-button type="submit"
-                                                       ng-disabled="!deviceUpdateForm.$dirty || deviceUpdateForm.$invalid">
-                                                <i class="fa fa-fw fa-save"></i>
-                                                Save
-                                            </md-button>
-                                        </md-card-actions> ---->
                                     </form>
 
                                     <hr/>
@@ -383,14 +349,8 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <!---     <md-card-actions layout="row" layout-align="end center">
-                                                  <md-button type="submit"
-                                                             ng-disabled="!locationForm.$dirty || locationForm.$invalid">
-                                                      <i class="fa fa-fw fa-save"></i>
-                                                      Save
-                                                  </md-button>
-                                              </md-card-actions> ---->
                                     </form>
+
                                     <hr/>
                                     <h3>Serial control</h3>
 
@@ -419,16 +379,11 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <!---   <md-card-actions layout="row" layout-align="end center">
-                                                <md-button type="submit"
-                                                           ng-disabled="!serialControlForm.$dirty || serialControlForm.$invalid">
-                                                    <i class="fa fa-fw fa-save"></i>
-                                                    Save
-                                                </md-button>
-                                            </md-card-actions> ---->
                                     </form>
+
                                     <hr/>
                                     <h3>Polling Intervals</h3>
+
                                     <form name="intervalsControlForm"
                                           class="form-horizontal"
                                           ng-submit="deviceDetailsCtrl.onClickSaveIntervals()"
@@ -455,19 +410,15 @@
                                                        ng-required="true">minutes
                                             </div>
                                         </div>
-                                        <!---  <md-card-actions layout="row" layout-align="end center">
-                                             <md-button type="submit"
-                                                        ng-disabled="!intervalsControlForm.$dirty || intervalsControlForm.$invalid">
-                                                 <i class="fa fa-fw fa-save"></i>
-                                                 Save
-                                             </md-button>
-                                         </md-card-actions> ---->
                                     </form>
 
                                     <hr/>
                                     <md-card-actions layout="row" layout-align="end center">
-                                        <md-button type="submit" class="md-raised"
-                                                   ng-disabled="!intervalsControlForm.$dirty || intervalsControlForm.$invalid">
+                                        <md-button
+                                                ng-click="deviceDetailsCtrl.masterSaveClick(intervalsControlForm.$dirty, serialControlForm.$dirty, locationForm.$dirty, deviceUpdateForm.$dirty)"
+                                                class="md-raised md-primary"
+                                                ng-disabled="
+                                                   (intervalsControlForm.$pristine && serialControlForm.$pristine && locationForm.$pristine &&  deviceUpdateForm.$pristine) || intervalsControlForm.$invalid || serialControlForm.$invalid || ocationForm.$invalid || deviceUpdateForm.$invalid">
                                             <i class="fa fa-fw fa-save"></i>
                                             Save
                                         </md-button>
@@ -482,34 +433,31 @@
                         <div flex="100" flex-sm="100" flex-xs="100" layout="column">
                             <md-card>
                                 <md-card-content>
-
                                     <form name="tenantForm" class="form-horizontal"
                                           ng-submit="deviceDetailsCtrl.onClickRefreshButton()"
                                           novalidate>
                                         <div class="row">
-                                            <div class="col-sm-offset-6 col-sm-2">
-                                                <label for="startTime" class="control-label">From</label>
-                                                <input type="text" class="form-control input-sm"
-                                                       datetimepicker
-                                                       datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
-                                                       placeholder="{{deviceDetailsCtrl.startTime}}"
-                                                       name="startTime"
-                                                       id="startTime"
-                                                       ng-model="deviceDetailsCtrl.startTime">
+                                            <div class="col-sm-4">
+                                                <b><p>From:</p></b><input type="text" class="form-control input-sm"
+                                                                          datetimepicker
+                                                                          datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
+                                                                          placeholder="{{deviceDetailsCtrl.startTime}}"
+                                                                          name="startTime"
+                                                                          id="startTime"
+                                                                          ng-model="deviceDetailsCtrl.startTime">
                                                 </span>
                                             </div>
-                                            <div class="col-sm-2">
-                                                <label for="endTime" class="control-label">To</label>
-                                                <input type="text" class="form-control input-sm"
-                                                       datetimepicker
-                                                       datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
-                                                       placeholder="{{deviceDetailsCtrl.endTime}}"
-                                                       name="endTime"
-                                                       id="endTime"
-                                                       ng-model="deviceDetailsCtrl.endTime">
+                                            <div class="col-sm-4">
+                                                <b><p>To:</p></b><input type="text" class="form-control input-sm"
+                                                                        datetimepicker
+                                                                        datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
+                                                                        placeholder="{{deviceDetailsCtrl.endTime}}"
+                                                                        name="endTime"
+                                                                        id="endTime"
+                                                                        ng-model="deviceDetailsCtrl.endTime">
                                             </div>
-                                            <div class="col-sm-2 margin-top-15">
-                                                <md-button type="submit">
+                                            <div class="col-sm-2 col-sm-offset-2">
+                                                <md-button type="submit" class="md-raised">
                                                     <i class="fa fa-fw fa-filter"></i> Filter
                                                 </md-button>
                                             </div>
@@ -552,7 +500,7 @@
                                                     <td>{{ item.updated }}</td>
                                                     <td class="issue-{{ item.level_descriptor}}-text">
                                                         <i ng-class="item.level==1? 'fa fa-fw fa-warning' :
-                          item.level==0? 'fa fa-fw fa-check-circle': 'fa fa-fw fa-ambulance'"></i>
+                                                          item.level==0? 'fa fa-fw fa-check-circle': 'fa fa-fw fa-ambulance'"></i>
                                                         {{ item.elapsed_time }}
                                                     </td>
                                                 </tr>
@@ -567,7 +515,6 @@
                         </div>
                     </md-content>
                 </md-tab>
-
                 <md-tab label="Commands">
                     <md-content class="md-padding" layout="row" layout-wrap layout-align="left start"
                                 layout-xs="column">
@@ -600,7 +547,6 @@
                                                 </md-card>
                                             </div>
                                             <div class="col-md-6">
-
                                                 <md-card>
                                                     <md-card-title>
                                                         <md-card-title-text>
@@ -623,7 +569,6 @@
                                                 </md-card>
                                             </div>
                                             <div class="col-md-6">
-
                                                 <md-card>
                                                     <md-card-title>
                                                         <md-card-title-text>
@@ -646,7 +591,6 @@
                                                 </md-card>
                                             </div>
                                             <div class="col-md-6">
-
                                                 <md-card>
                                                     <md-card-title>
                                                         <md-card-title-text>
@@ -668,8 +612,7 @@
                                                     </md-card-content>
                                                 </md-card>
                                             </div>
-                                            <div class="col-md-6">
-
+                                            <div class="col-md-12">
                                                 <md-card>
                                                     <md-card-title>
                                                         <md-card-title-text>
@@ -708,11 +651,9 @@
                                                             </md-card-actions>
                                                         </form>
                                                     </md-card-content>
-
                                                 </md-card>
                                             </div>
-                                            <div class="col-md-6">
-
+                                            <div class="col-md-12">
                                                 <md-card>
                                                     <md-card-title>
                                                         <md-card-title-text>
@@ -756,7 +697,6 @@
                         </div>
                         <div flex="50" flex-sm="50" flex-xs="50" layout="column">
                             <md-card>
-
                                 <md-card-content>
                                     <h3>Command history</h3>
                                     <hr/>

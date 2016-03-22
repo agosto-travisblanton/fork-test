@@ -198,13 +198,14 @@ describe 'DeviceDetailsCtrl', ->
 
     describe '.onSuccessDeviceSave', ->
       beforeEach ->
+        spyOn(sweet, 'show')
         controller.onSuccessDeviceSave()
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it "the 'then' handler routes navigation to 'devices'", ->
-        expect($state.go).toHaveBeenCalledWith 'devices'
+      it "the 'then' handler shows a sweet", ->
+        expect(sweet.show).toHaveBeenCalledWith('WooHoo!', 'Your changes were saved!', 'success')
 
     describe '.onFailureDeviceSaveNotes', ->
       beforeEach ->
@@ -216,9 +217,6 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'displays a sweet alert', ->
         expect(sweet.show).toHaveBeenCalledWith('Oops...', 'Unable to save the device notes.', 'error')
-
-      it "the 'then' handler routes navigation back to 'devices'", ->
-        expect($state.go).toHaveBeenCalledWith 'devices'
 
   describe '.onClickSavePanels', ->
     beforeEach ->
@@ -268,13 +266,14 @@ describe 'DeviceDetailsCtrl', ->
 
     describe '.onSuccessDeviceSave', ->
       beforeEach ->
+        spyOn(sweet, 'show')
         controller.onSuccessDeviceSave()
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it "the 'then' handler routes navigation to 'devices'", ->
-        expect($state.go).toHaveBeenCalledWith 'devices'
+      it "the 'then' handler shows a sweet", ->
+        expect(sweet.show).toHaveBeenCalledWith('WooHoo!', 'Your changes were saved!', 'success')
 
     describe '.onFailureDeviceSavePanels', ->
       beforeEach ->
@@ -286,9 +285,6 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'displays a sweet alert', ->
         expect(sweet.show).toHaveBeenCalledWith('Oops...', 'Unable to save the serial control information.', 'error')
-
-      it "the 'then' handler routes navigation back to 'devices'", ->
-        expect($state.go).toHaveBeenCalledWith 'devices'
 
   describe '.onClickSaveIntervals', ->
     beforeEach ->
@@ -321,9 +317,6 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'displays a sweet alert', ->
         expect(sweet.show).toHaveBeenCalledWith('Oops...', 'Unable to save intervals information.', 'error')
-
-      it "the 'then' handler routes navigation back to 'devices'", ->
-        expect($state.go).toHaveBeenCalledWith 'devices'
 
   describe '.onClickResetSendButton', ->
     beforeEach ->
@@ -633,7 +626,6 @@ describe 'DeviceDetailsCtrl', ->
 
   describe 'isAgostoDomain', ->
     beforeEach ->
-
       cookieMock = {
         storage: {},
         put: (key, value) ->
@@ -642,7 +634,6 @@ describe 'DeviceDetailsCtrl', ->
           return this.storage[key]
       }
       controller = $controller 'DeviceDetailsCtrl', {$cookies: cookieMock}
-
 
 
     it 'is a valid domain if @demo.agosto.com', ->

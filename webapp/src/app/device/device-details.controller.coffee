@@ -10,8 +10,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   CommandsService,
   sweet,
   $cookies,
-  ProgressBarService
-) ->
+  ProgressBarService) ->
   @tenantKey = $stateParams.tenantKey
   @deviceKey = $stateParams.deviceKey
   @fromDevices = $stateParams.fromDevices is "true"
@@ -86,6 +85,18 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       issuesPromise.then (data) =>
         @issues = data
 
+
+  @masterSaveClick = (intervalsControlForm, serialControlForm, locationForm, deviceUpdateForm) ->
+    if intervalsControlForm
+      @onClickSaveIntervals()
+    if serialControlForm
+      @onClickSavePanels()
+    if locationForm
+      @onClickSaveLocation()
+    if deviceUpdateForm
+      @onClickSaveDevice()
+
+
   @onGetDeviceSuccess = (response) ->
     @currentDevice = response
     @tenantKey = @currentDevice.tenantKey if @tenantKey is undefined
@@ -146,7 +157,8 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onSuccessDeviceSave = ->
     ProgressBarService.complete()
-    $state.go 'devices'
+    sweet.show('WooHoo!', 'Your changes were saved!', 'success')
+
 
   @onFailureDeviceSavePanels = (errorObject) ->
     ProgressBarService.complete()
@@ -173,7 +185,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     ProgressBarService.complete()
     $log.error errorObject
     if errorObject.status == 409
-        sweet.show('Oops...', 'This customer display code already exists for this tenant. Please choose another.', 'error')
+      sweet.show('Oops...', 'This customer display code already exists for this tenant. Please choose another.', 'error')
     else
       sweet.show('Oops...', 'Unable to save the device notes.', 'error')
 
