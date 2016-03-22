@@ -3,14 +3,14 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'DeviceDetailsCtrl', ($log,
-  $stateParams,
-  $state,
-  DevicesService,
-  LocationsService,
-  CommandsService,
-  sweet,
-  $cookies,
-  ProgressBarService) ->
+    $stateParams,
+    $state,
+    DevicesService,
+    LocationsService,
+    CommandsService,
+    sweet,
+    $cookies,
+    ProgressBarService) ->
   @tenantKey = $stateParams.tenantKey
   @deviceKey = $stateParams.deviceKey
   @fromDevices = $stateParams.fromDevices is "true"

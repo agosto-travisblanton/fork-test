@@ -39,7 +39,7 @@
                         <div flex="50" flex-sm="50" flex-xs="50" layout="column">
                             <md-card>
                                 <md-card-content>
-                                    <h2>Device Information</h2>
+                                    <h2>Information</h2>
                                     <hr/>
                                     <div class="form-group"
                                          ng-hide="deviceDetailsCtrl.currentDevice.serialNumber == null ||
@@ -266,36 +266,43 @@
                         <div flex="50" flex-sm="50" flex-xs="50" layout="column">
                             <md-card>
                                 <md-card-content>
-                                    <h2>Edit Device</h2>
+                                    <h2>Edit</h2>
                                     <hr/>
+                                  <form name="deviceUpdateForm"
+                                        class="form-horizontal"
+                                        ng-submit="deviceDetailsCtrl.onClickSaveDevice()"
+                                        novalidate>
+                                    <div class="form-group"
+                                         ng-hide="!deviceDetailsCtrl.currentDevice.proofOfPlayEditable">
+                                      <div class="col-sm-12">
+                                        <label>Proof of play logging</label>
+                                        <div>
+                                          <input type="checkbox"
+                                                 ng-model="deviceDetailsCtrl.currentDevice.proofOfPlayLogging">
+                                          <span>Enable</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="form-group">
+                                      <div class="col-sm-12">
+                                        <label>Notes</label>
+                                        <div>
+                                          <input type="text"
+                                                 class="form-control"
+                                                 name="notes"
+                                                 ng-model="deviceDetailsCtrl.currentDevice.notes">
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </form>
 
-                                    <h3>Customer Display Code</h3>
-                                    <form name="deviceUpdateForm"
+                                  <hr/>
+
+                                    <h3>Display code</h3>
+                                    <form name="displayCodeUpdateForm"
                                           class="form-horizontal"
                                           ng-submit="deviceDetailsCtrl.onClickSaveDevice()"
                                           novalidate>
-                                        <div class="form-group"
-                                             ng-hide="!deviceDetailsCtrl.currentDevice.proofOfPlayEditable">
-                                            <div class="col-sm-12">
-                                                <label>Proof of play logging</label>
-                                                <div>
-                                                    <input type="checkbox"
-                                                           ng-model="deviceDetailsCtrl.currentDevice.proofOfPlayLogging">
-                                                    <span>Enable</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <div class="col-sm-12">
-                                                <label>Notes</label>
-                                                <div>
-                                                    <input type="text"
-                                                           class="form-control"
-                                                           name="notes"
-                                                           ng-model="deviceDetailsCtrl.currentDevice.notes">
-                                                </div>
-                                            </div>
-                                        </div>
                                         <div class="form-group">
                                             <div class="col-sm-6">
                                                 <label>Customer display name</label>
@@ -380,7 +387,7 @@
                                     </form>
 
                                     <hr/>
-                                    <h3>Polling Intervals</h3>
+                                    <h3>Intervals</h3>
 
                                     <form name="intervalsControlForm"
                                           class="form-horizontal"
