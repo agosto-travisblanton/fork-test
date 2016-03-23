@@ -198,132 +198,31 @@ describe 'DeviceDetailsCtrl', ->
 
     describe '.onSuccessDeviceSave', ->
       beforeEach ->
+        spyOn(sweet, 'show')
         controller.onSuccessDeviceSave()
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it "the 'then' handler routes navigation to 'devices'", ->
-        expect($state.go).toHaveBeenCalledWith 'devices'
+      it "the 'then' handler shows a sweet", ->
+        expect(sweet.show).toHaveBeenCalledWith('WooHoo!', 'Your changes were saved!', 'success')
 
-    describe '.onFailureDeviceSaveNotes', ->
+    describe '.onFailureDeviceSave', ->
       beforeEach ->
         spyOn(sweet, 'show')
-        controller.onFailureDeviceSaveNotes()
 
       it 'stops the progress bar', ->
+        controller.onFailureDeviceSave({status: 200})
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it 'displays a sweet alert', ->
-        expect(sweet.show).toHaveBeenCalledWith('Oops...', 'Unable to save the device notes.', 'error')
+      it 'displays a sweet alert for general save failure', ->
+        controller.onFailureDeviceSave({status: 400})
+        expect(sweet.show).toHaveBeenCalledWith('Oops...', 'Unable to save updated device.', 'error')
 
-      it "the 'then' handler routes navigation back to 'devices'", ->
-        expect($state.go).toHaveBeenCalledWith 'devices'
-
-  describe '.onClickSavePanels', ->
-    beforeEach ->
-      devicesServicePromise = new skykitProvisioning.q.Mock
-      spyOn(DevicesService, 'save').and.returnValue devicesServicePromise
-      spyOn($state, 'go')
-      $stateParams = {}
-      spyOn(progressBarService, 'start')
-      spyOn(progressBarService, 'complete')
-      controller = $controller 'DeviceDetailsCtrl', serviceInjection
-      controller.currentDevice.panelModel = {id: 'Sony-112'}
-      controller.currentDevice.panelInput = {id: 'HDMI1', parentId: 'Sony-112'}
-      controller.onClickSavePanels()
-      devicesServicePromise.resolve()
-
-    it 'starts the progress bar', ->
-      expect(progressBarService.start).toHaveBeenCalled()
-
-    it 'call DevicesService.save with the current device', ->
-      expect(DevicesService.save).toHaveBeenCalledWith controller.currentDevice
-
-    describe '.setPanelInfo', ->
-      it 'sets panel model None to null', ->
-        controller.currentDevice.panelModel = {id: 'None'}
-        controller.currentDevice.panelInput = {id: 'None'}
-        controller.setPanelInfo()
-        expect(controller.currentDevice.panelModel).toBe null
-
-      it 'sets panel model to id', ->
-        panelModel = 'Foobar-122'
-        controller.currentDevice.panelModel = {id: panelModel}
-        controller.currentDevice.panelInput = {id: 'DVI'}
-        controller.setPanelInfo()
-        expect(controller.currentDevice.panelModel).toBe panelModel
-
-      it 'sets panel input 0 to null', ->
-        controller.currentDevice.panelInput = {id: 'None'}
-        controller.setPanelInfo()
-        expect(controller.currentDevice.panelInput).toBe null
-
-      it 'sets panel input to id', ->
-        controller.currentDevice.panelModel = {id: 'Foobar-122'}
-        panelInput = 'DVI'
-        controller.currentDevice.panelInput = {id: panelInput}
-        controller.setPanelInfo()
-        expect(controller.currentDevice.panelInput).toBe panelInput.toLowerCase()
-
-    describe '.onSuccessDeviceSave', ->
-      beforeEach ->
-        controller.onSuccessDeviceSave()
-
-      it 'stops the progress bar', ->
-        expect(progressBarService.complete).toHaveBeenCalled()
-
-      it "the 'then' handler routes navigation to 'devices'", ->
-        expect($state.go).toHaveBeenCalledWith 'devices'
-
-    describe '.onFailureDeviceSavePanels', ->
-      beforeEach ->
-        spyOn(sweet, 'show')
-        controller.onFailureDeviceSavePanels()
-
-      it 'stops the progress bar', ->
-        expect(progressBarService.complete).toHaveBeenCalled()
-
-      it 'displays a sweet alert', ->
-        expect(sweet.show).toHaveBeenCalledWith('Oops...', 'Unable to save the serial control information.', 'error')
-
-      it "the 'then' handler routes navigation back to 'devices'", ->
-        expect($state.go).toHaveBeenCalledWith 'devices'
-
-  describe '.onClickSaveIntervals', ->
-    beforeEach ->
-      devicesServicePromise = new skykitProvisioning.q.Mock
-      spyOn(DevicesService, 'save').and.returnValue devicesServicePromise
-      spyOn($state, 'go')
-      $stateParams = {}
-      spyOn(progressBarService, 'start')
-      spyOn(progressBarService, 'complete')
-      controller = $controller 'DeviceDetailsCtrl', serviceInjection
-      controller.currentDevice.panelModel = {id: 'Sony-112'}
-      controller.currentDevice.panelInput = {id: 'HDMI1', parentId: 'Sony-112'}
-
-      controller.onClickSaveIntervals()
-      devicesServicePromise.resolve()
-
-    it 'starts the progress bar', ->
-      expect(progressBarService.start).toHaveBeenCalled()
-
-    it 'call DevicesService.save with the current device', ->
-      expect(DevicesService.save).toHaveBeenCalledWith controller.currentDevice
-
-    describe '.onFailureDeviceSaveIntervals', ->
-      beforeEach ->
-        spyOn(sweet, 'show')
-        controller.onFailureDeviceSaveIntervals()
-
-      it 'stops the progress bar', ->
-        expect(progressBarService.complete).toHaveBeenCalled()
-
-      it 'displays a sweet alert', ->
-        expect(sweet.show).toHaveBeenCalledWith('Oops...', 'Unable to save intervals information.', 'error')
-
-      it "the 'then' handler routes navigation back to 'devices'", ->
-        expect($state.go).toHaveBeenCalledWith 'devices'
+      it 'displays a sweet alert for customer display code already used for tenant', ->
+        controller.onFailureDeviceSave({status: 409})
+        expect(sweet.show).toHaveBeenCalledWith('Oops...',
+          'This customer display code already exists for this tenant. Please choose another.', 'error')
 
   describe '.onClickResetSendButton', ->
     beforeEach ->
@@ -630,10 +529,8 @@ describe 'DeviceDetailsCtrl', ->
       controller.autoGenerateCustomerDisplayCode()
       expect(controller.currentDevice.customerDisplayCode).toBe 'panel_in_reception'
 
-
   describe 'isAgostoDomain', ->
     beforeEach ->
-
       cookieMock = {
         storage: {},
         put: (key, value) ->
@@ -642,7 +539,6 @@ describe 'DeviceDetailsCtrl', ->
           return this.storage[key]
       }
       controller = $controller 'DeviceDetailsCtrl', {$cookies: cookieMock}
-
 
 
     it 'is a valid domain if @demo.agosto.com', ->
