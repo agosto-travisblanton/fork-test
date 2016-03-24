@@ -55,6 +55,19 @@ class MakeMigration(RequestHandler):
 
 
 ####################################################################################
+# DELETE MIGRATION
+####################################################################################
+class ManageRawPayloadTable(RequestHandler):
+    def get(self):
+        delete_raw_event_entries_older_than_thirty_days()
+        json_final = json.dumps({
+            "result": "success",
+            "message": "raw events older than thirty days were deleted"
+        })
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(json_final)
+
+####################################################################################
 # REST CALLS
 ####################################################################################
 class GetTenants(RequestHandler):

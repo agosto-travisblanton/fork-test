@@ -3,6 +3,7 @@ from os import path
 from provisioning_env import (
     on_development_server,
 )
+
 setup()
 basedir = path.abspath(path.dirname(__file__))
 
@@ -102,8 +103,13 @@ application = WSGIApplication([
     ),
 
     ################################################################
-    # Migrate DB
+    # Manage DB
     ################################################################
+    Route(
+        BASE_URI + '/manage_raw_events',
+        handler="proofplay.main.ManageRawPayloadTable",
+        name="ManageRawPayloadTable"
+    ),
 
     Route(
         BASE_URI + '/0730578567129494/make_migration',

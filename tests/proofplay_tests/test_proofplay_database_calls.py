@@ -1,5 +1,4 @@
 from env_setup import setup_test_paths
-
 setup_test_paths()
 
 from base_sql_test_config import SQLBaseTest
@@ -238,7 +237,6 @@ class TestDatabase(SQLBaseTest):
                                                         end_search,
                                                         self.customer_location_code,
                                                         self.tenant_code)
-        self.maxDiff = None
 
         expected_output = {u'6025': OrderedDict([(u'some_resource', [
             {'started_at': datetime.datetime(2016, 2, 2, 15, 31, 43, 683139),
