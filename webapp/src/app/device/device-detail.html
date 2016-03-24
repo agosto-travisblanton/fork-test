@@ -9,14 +9,14 @@
       <div ncy-breadcrumb></div>
       <md-card>
         <md-card-content>
-          <div class="col-sm-2">
+          <div class="col-sm-2" ng-show="deviceDetailsCtrl.currentDevice.macAddress">
             <h5><i class="fa fa-fw fa-wifi"></i> {{deviceDetailsCtrl.currentDevice.macAddress}}</h5>
           </div>
           <div class="col-sm-2" ng-show="deviceDetailsCtrl.currentDevice.ethernetMacAddress">
             <h5><i class="fa fa-fw fa-plug"></i> {{deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
             </h5>
           </div>
-          <div class="col-sm-2">
+          <div class="col-sm-2" ng-show="deviceDetailsCtrl.currentDevice.serialNumber">
             <h5><i class="fa fa-hashtag"></i> {{deviceDetailsCtrl.currentDevice.serialNumber}}</h5>
           </div>
           <div class="col-sm-2 col-sm-offset-4">
@@ -504,14 +504,14 @@
         <md-tab label="Commands">
           <md-content class="md-padding" layout="row" layout-wrap layout-align="left start"
                       layout-xs="column">
-            <div flex="50" flex-sm="50" flex-xs="50" layout="column">
+            <div flex="100" flex-sm="100" flex-xs="100" layout="column">
               <md-card>
                 <md-card-content>
                   <div class="col-md-12">
                     <h3>Commands</h3>
                     <hr/>
                     <md-content class="md-padding" layout="row" layout-wrap layout-xs="column">
-                      <div class="col-md-6">
+                      <div class="col-md-3">
                         <md-card>
                           <md-card-title>
                             <md-card-title-text>
@@ -532,7 +532,7 @@
                           </md-card-content>
                         </md-card>
                       </div>
-                      <div class="col-md-6">
+                      <div class="col-md-3">
                         <md-card>
                           <md-card-title>
                             <md-card-title-text>
@@ -554,7 +554,7 @@
                           </md-card-content>
                         </md-card>
                       </div>
-                      <div class="col-md-6">
+                      <div class="col-md-3">
                         <md-card>
                           <md-card-title>
                             <md-card-title-text>
@@ -576,7 +576,7 @@
                           </md-card-content>
                         </md-card>
                       </div>
-                      <div class="col-md-6">
+                      <div class="col-md-3">
                         <md-card>
                           <md-card-title>
                             <md-card-title-text>
@@ -598,7 +598,7 @@
                           </md-card-content>
                         </md-card>
                       </div>
-                      <div class="col-md-12">
+                      <div class="col-md-6">
                         <md-card>
                           <md-card-title>
                             <md-card-title-text>
@@ -639,7 +639,7 @@
                           </md-card-content>
                         </md-card>
                       </div>
-                      <div class="col-md-12">
+                      <div class="col-md-6">
                         <md-card>
                           <md-card-title>
                             <md-card-title-text>
@@ -681,7 +681,7 @@
                 </md-card-content>
               </md-card>
             </div>
-            <div flex="50" flex-sm="50" flex-xs="50" layout="column">
+            <div flex="100" flex-sm="100" flex-xs="100" layout="column">
               <md-card>
                 <md-card-content>
                   <h3>Command history</h3>
