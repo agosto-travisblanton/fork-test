@@ -4,6 +4,7 @@ describe 'TenantAddCtrl', ->
   $cookies = undefined
   controllerFactory = undefined
   controller = undefined
+  controllerGameStop = undefined
   DistributorsService = undefined
   distributorKey = 'ahtzfnNreWtpdC1kaXNwbGF5LWRldml0aXR5R3JvdXAMCxILRGlzdHJpYnV0b3IYgICAgMCcggoM'
   distributorPromise = undefined
@@ -14,11 +15,12 @@ describe 'TenantAddCtrl', ->
   $state = undefined
   sweet = undefined
   $log = undefined
+  $location = undefined
 
   beforeEach ->
     angular.mock.module 'skykitProvisioning'
 
-    inject (_$controller_, _$cookies_, _DistributorsService_, _TenantsService_, _$state_, _sweet_, _$log_) ->
+    inject (_$controller_, _$cookies_, _DistributorsService_, _TenantsService_, _$state_, _sweet_, _$log_, _$location_) ->
       controllerFactory = _$controller_
       $cookies = _$cookies_
       DistributorsService = _DistributorsService_
@@ -26,6 +28,7 @@ describe 'TenantAddCtrl', ->
       $state = _$state_
       sweet = _sweet_
       $log = _$log_
+      $location = _$location_
       progressBarService = {
         start: ->
         complete: ->
@@ -35,12 +38,28 @@ describe 'TenantAddCtrl', ->
           $cookies: $cookies,
           DistributorsService: DistributorsService,
           TenantsService: TenantsService,
-          ProgressBarService: progressBarService
+          ProgressBarService: progressBarService,
+          $location: {
+            host: () ->
+              return 'localhost'
+          }
+        }
+      )
+      controllerGameStop = controllerFactory('TenantAddCtrl',
+        {
+          $location: {
+            host: () ->
+              return 'provisioning-gamestop'
+          }
         }
       )
       return
 
   describe 'upon instantiation', ->
+    it 'sets gameStopServer false unless on GameStop host', ->
+      expect(controller.gameStopServer).toBeFalsy()
+      expect(controllerGameStop.gameStopServer).toBeTruthy()
+
     it 'declares a currentTenant who is active and has proof of play turned off', ->
       expect(controller.currentTenant).toBeDefined()
       expect(controller.currentTenant.active).toBeTruthy()

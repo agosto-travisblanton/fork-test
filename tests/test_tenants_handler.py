@@ -64,6 +64,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         self.assertEqual(response_json.get('notification_emails'), ', '.join(expected.notification_emails).strip(', '))
         self.assertEqual(response_json.get('created'), expected.created.strftime('%Y-%m-%d %H:%M:%S'))
         self.assertEqual(response_json.get('updated'), expected.updated.strftime('%Y-%m-%d %H:%M:%S'))
+        self.assertEqual(response_json.get('proof_of_play_url'), config.DEFAULT_PROOF_OF_PLAY_URL)
 
     def test_get_returns_ok_status(self):
         self.load_tenants()
@@ -126,6 +127,30 @@ class TestTenantsHandler(BaseTest, WebTest):
         email_list = delimited_string_to_list(emails)
         self.assertEqual(actual.notification_emails, email_list)
         self.assertIsNotNone(actual)
+
+    def test_post_trims_and_lowercase_url_and_email(self):
+        name = u'ABC'
+        invalid_admin_email = u'FOO@bar.com '
+        invalid_content_server_url = u'https://skykit-ContentManager-INT.appspot.com/content'
+        valid_admin_email = u'foo@bar.com'
+        valid_content_server_url = u'https://skykit-contentmanager-int.appspot.com/content'
+        when(ContentManagerApi).create_tenant(name, valid_admin_email).thenReturn(str('some key'))
+        when(ContentManagerApi).create_tenant(any_matcher()).thenReturn(True)
+        request_parameters = {'name': name,
+                              'tenant_code': 'acme',
+                              'admin_email': invalid_admin_email,
+                              'content_server_url': invalid_content_server_url,
+                              'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
+                              'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
+                              'domain_key': self.domain_key.urlsafe(),
+                              'notification_emails': 'foobar@skykit.com',
+                              'proof_of_play_logging': False,
+                              'active': True}
+        uri = application.router.build(None, 'tenants', None, {})
+        self.app.post_json(uri, params=request_parameters, headers=self.headers)
+        actual = Tenant.find_by_name(request_parameters['name'])
+        self.assertEqual(actual.admin_email, valid_admin_email)
+        self.assertEqual(actual.content_server_url, valid_content_server_url)
 
     def test_post_create_new_tenant_sets_location_header(self):
         name = u'ABC'
@@ -286,7 +311,8 @@ class TestTenantsHandler(BaseTest, WebTest):
             'name': 'foobar',
             'tenant_code': 'acme',
             'admin_email': 'foo@bar.com',
-            'content_server_url': 'https://www.foo.com',
+            'content_server_url': 'https://skykit-contentmanager-int.appspot.com',
+            'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com/content',
             'content_server_api_key': 'some key',
             'domain_key': self.domain_key.urlsafe(),
             'active': True,
@@ -295,6 +321,85 @@ class TestTenantsHandler(BaseTest, WebTest):
         }
         response = self.app.put_json(uri, entity_body, headers=self.headers)
         self.assertEqual(204, response.status_int)
+
+    def test_put_url_gets_trimmed_lowercase(self):
+        invalid_url = 'https://skykit-ContentManager-INT.appspot.com  '
+        valid_url = 'https://skykit-contentmanager-int.appspot.com'
+        tenant_keys = self.load_tenants()
+        uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': tenant_keys[0].urlsafe()})
+        expected = tenant_keys[0].get()
+        entity_body = {
+            'name': 'foobar',
+            'tenant_code': 'acme',
+            'admin_email': 'foo@bar.com',
+            'content_server_url': invalid_url,
+            'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com/content',
+            'content_server_api_key': 'some key',
+            'domain_key': self.domain_key.urlsafe(),
+            'proof_of_play_logging': False,
+            'active': True
+        }
+        self.app.put_json(uri, entity_body, headers=self.headers)
+        self.assertEqual(expected.content_server_url, valid_url)
+
+    def test_put_email_gets_trimmed_lowercase(self):
+        invalid_email = ' FOO@bar.com  '
+        valid_email = 'foo@bar.com'
+        tenant_keys = self.load_tenants()
+        uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': tenant_keys[0].urlsafe()})
+        expected = tenant_keys[0].get()
+        entity_body = {
+            'name': 'foobar',
+            'tenant_code': 'acme',
+            'admin_email': invalid_email,
+            'content_server_url': 'https://skykit-contentmanager-int.appspot.com',
+            'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com/content',
+            'content_server_api_key': 'some key',
+            'domain_key': self.domain_key.urlsafe(),
+            'proof_of_play_logging': False,
+            'active': True
+        }
+        self.app.put_json(uri, entity_body, headers=self.headers)
+        self.assertEqual(expected.admin_email, valid_email)
+
+    def test_put_returns_bad_request_status_for_blank_content_server_url(self):
+        tenant_keys = self.load_tenants()
+        uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': tenant_keys[0].urlsafe()})
+        entity_body = {
+            'name': 'foobar',
+            'tenant_code': 'acme',
+            'admin_email': 'foo@bar.com',
+            'content_server_url': '',
+            'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com/content',
+            'content_server_api_key': 'some key',
+            'domain_key': self.domain_key.urlsafe(),
+            'active': True,
+            'proof_of_play_logging': False,
+            'notifications_emails': ''
+        }
+        with self.assertRaises(AppError) as context:
+            self.app.put_json(uri, entity_body, headers=self.headers)
+        self.assertTrue('Bad response: 400 The content server url parameter is invalid.'
+                        in context.exception.message)
+
+    def test_put_returns_bad_request_status_for_non_existent_content_server_url(self):
+        tenant_keys = self.load_tenants()
+        uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': tenant_keys[0].urlsafe()})
+        entity_body = {
+            'name': 'foobar',
+            'tenant_code': 'acme',
+            'admin_email': 'foo@bar.com',
+            'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com/content',
+            'content_server_api_key': 'some key',
+            'domain_key': self.domain_key.urlsafe(),
+            'active': True,
+            'proof_of_play_logging': False,
+            'notifications_emails': ''
+        }
+        with self.assertRaises(AppError) as context:
+            self.app.put_json(uri, entity_body, headers=self.headers)
+        self.assertTrue('Bad response: 400 The content server url parameter is invalid.'
+                        in context.exception.message)
 
     def test_put_updates_selected_properties(self):
         notification_email = 'foobar@skykit.com'
@@ -308,7 +413,8 @@ class TestTenantsHandler(BaseTest, WebTest):
             'name': 'foobar',
             'tenant_code': 'acme',
             'admin_email': 'foo@bar.com',
-            'content_server_url': 'https://www.foo.com',
+            'content_server_url': 'https://skykit-contentmanager-int.appspot.com',
+            'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com/content',
             'content_server_api_key': 'some key',
             'domain_key': self.domain_key.urlsafe(),
             'active': False,
@@ -336,7 +442,8 @@ class TestTenantsHandler(BaseTest, WebTest):
             'name': 'foobar',
             'tenant_code': 'acme',
             'admin_email': 'foo@bar.com',
-            'content_server_url': 'https://www.foo.com',
+            'content_server_url': 'https://skykit-contentmanager-int.appspot.com',
+            'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com/content',
             'content_server_api_key': 'some key',
             'domain_key': new_domain_key.urlsafe(),
             'proof_of_play_logging': False,
@@ -367,7 +474,8 @@ class TestTenantsHandler(BaseTest, WebTest):
             'name': 'foobar',
             'tenant_code': 'acme',
             'admin_email': 'foo@bar.com',
-            'content_server_url': 'https://www.foo.com',
+            'content_server_url': 'https://skykit-contentmanager-int.appspot.com',
+            'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com/content',
             'content_server_api_key': 'some key',
             'domain_key': self.domain_key.urlsafe(),
             'active': False,
@@ -404,7 +512,8 @@ class TestTenantsHandler(BaseTest, WebTest):
             'name': 'foobar',
             'tenant_code': 'acme',
             'admin_email': 'foo@bar.com',
-            'content_server_url': 'https://www.foo.com',
+            'content_server_url': 'https://skykit-contentmanager-int.appspot.com',
+            'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com/content',
             'content_server_api_key': 'some key',
             'domain_key': self.domain_key.urlsafe(),
             'active': False,

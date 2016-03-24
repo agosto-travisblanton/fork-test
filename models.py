@@ -129,6 +129,7 @@ class Tenant(ndb.Model):
     domain_key = ndb.KeyProperty(kind=Domain, required=True, indexed=True)
     notification_emails = ndb.StringProperty(repeated=True, indexed=False, required=False)
     proof_of_play_logging = ndb.BooleanProperty(default=False, required=True, indexed=True)
+    proof_of_play_url = ndb.StringProperty(required=False)
     class_version = ndb.IntegerProperty()
 
     def get_domain(self):
@@ -229,7 +230,8 @@ class Tenant(ndb.Model):
 
     @classmethod
     def create(cls, tenant_code, name, admin_email, content_server_url, domain_key, active,
-               content_manager_base_url, notification_emails=[], proof_of_play_logging=False):
+               content_manager_base_url, notification_emails=[], proof_of_play_logging=False,
+               proof_of_play_url=config.DEFAULT_PROOF_OF_PLAY_URL):
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
                    tenant_code=tenant_code,
@@ -240,7 +242,8 @@ class Tenant(ndb.Model):
                    active=active,
                    content_manager_base_url=content_manager_base_url,
                    notification_emails=notification_emails,
-                   proof_of_play_logging=proof_of_play_logging)
+                   proof_of_play_logging=proof_of_play_logging,
+                   proof_of_play_url=proof_of_play_url)
 
     @classmethod
     def toggle_proof_of_play(cls, tenant_code, enable):

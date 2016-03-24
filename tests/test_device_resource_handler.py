@@ -323,6 +323,20 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json['gcmRegistrationId'], device.gcm_registration_id)
         self.assertEqual(response_json['deviceId'], device.device_id)
 
+    def test_get_list_mac_address_returns_proof_of_play_url(self):
+        mac_address = '2342342342342'
+        managed_device = ChromeOsDevice.create_managed(
+            tenant_key=self.tenant_key,
+            gcm_registration_id=self.GCM_REGISTRATION_ID,
+            device_id=self.DEVICE_ID,
+            mac_address=mac_address)
+        managed_device.put()
+        request_parameters = {'macAddress': mac_address}
+        uri = build_uri('devices-retrieval')
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['proofOfPlayUrl'], config.DEFAULT_PROOF_OF_PLAY_URL)
+
     def test_get_list_mac_address_query_parameter_payload_single_resource_even_when_dupes(self):
         # TODO would like a decent mocking framework to assert we're logging this edge case as an error
         mac_address = '2342342342342'

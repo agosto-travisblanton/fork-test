@@ -24,14 +24,6 @@
         <md-card-content>
           <form name="tenantForm" class="form-horizontal" ng-submit="tenantDetailsCtrl.onClickSaveButton()"
                 novalidate>
-            <!--<div class="form-group" ng-hide="!tenantDetailsCtrl.editMode">-->
-              <!--<div class="col-sm-12">-->
-                <!--<label>Key</label>-->
-                <!--<div>-->
-                  <!--{{tenantDetailsCtrl.currentTenant.key}}-->
-                <!--</div>-->
-              <!--</div>-->
-            <!--</div>-->
             <div class="form-group"
                  ng-class="{ 'has-error' : tenantForm.name.$invalid && !tenantForm.name.$pristine }">
               <div class="col-sm-4">
@@ -151,6 +143,26 @@
                        id="notificationEmails"
                        placeholder="Enter comma-delimited emails"
                        ng-model="tenantDetailsCtrl.currentTenant.notification_emails">
+              </div>
+            </div>
+            <div class="form-group"
+                 ng-hide="tenantDetailsCtrl.currentTenant.proof_of_play_logging == false  || tenantDetailsCtrl.gameStopServer"
+                 ng-class="{ 'has-error' : !tenantDetailsCtrl.gameStopServer && tenantForm.proofOfPlayUrl.$invalid &&
+                        !tenantForm.proofOfPlayUrl.$pristine }">
+              <div class="col-sm-5">
+                <label>Proof-of-play URL</label>
+                <input type="url"
+                       class="form-control"
+                       name="proofOfPlayUrl"
+                       id="proofOfPlayUrl"
+                       ng-required="tenantDetailsCtrl.currentTenant.proof_of_play_logging == true && !tenantDetailsCtrl.gameStopServer"
+                       placeholder="Enter proof-of-play URL"
+                       ng-model="tenantDetailsCtrl.currentTenant.proof_of_play_url"
+                       ng-pattern="/^https:\/\/\S+$/">
+              </div>
+              <div class="col-sm-4 margin-top-20 help-block" ng-show="tenantForm.proofOfPlayUrl.$invalid &&
+                        !tenantForm.proofOfPlayUrl.$pristine">
+                Proof-of-play URL must be a secure URL.
               </div>
             </div>
             <div class="form-group">

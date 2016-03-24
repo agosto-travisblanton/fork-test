@@ -33,7 +33,7 @@
                 <input type="text"
                        class="form-control"
                        name="tenantCode"
-                       placeholder="Code matching Google Device Management"
+                       placeholder="Code in Google Device Management"
                        ng-model="tenantAddCtrl.currentTenant.tenant_code" required
                        ng-pattern="/^[a-z0-9_]*$/">
               </div>
@@ -78,24 +78,23 @@
               </div>
             </div>
             <div class="form-group"
-                 ng-class="{ 'has-error' : tenantForm.contentManagerBaseUrl.$invalid && !tenantForm.contentManagerBaseUrl.$pristine }">
+                 ng-class="{ 'has-error' : tenantForm.contentServerUrl.$invalid &&
+                       !tenantForm.contentServerUrl.$pristine }">
               <div class="col-sm-5">
-                <label>Content manager URL</label>
+                <label>Player content URL</label>
                 <input type="url"
                        required
                        class="form-control"
-                       name="contentManagerBaseUrl"
-                       id="contentManagerBaseUrl"
-                       placeholder="Enter content manager base URL"
-                       ng-model="tenantAddCtrl.currentTenant.content_manager_base_url"
+                       name="contentServerUrl"
+                       id="contentServerUrl"
+                       placeholder="Enter content server URL"
+                       ng-model="tenantAddCtrl.currentTenant.content_server_url"
                        ng-pattern="/^https:\/\/\S+$/">
               </div>
               <div class="col-sm-5 margin-top-15">
-                <p
-                  ng-show="tenantForm.contentManagerBaseUrl.$invalid &&
-                        !tenantForm.contentManagerBaseUrl.$pristine"
-                  class="help-block">
-                  Content manager URL must be a secure URL.
+                <p ng-show="tenantForm.contentServerUrl.$invalid && !tenantForm.contentServerUrl.$pristine"
+                   class="help-block">
+                  Player content URL must be a secure URL.
                 </p>
               </div>
             </div>
@@ -131,9 +130,34 @@
                        ng-model="tenantAddCtrl.currentTenant.notification_emails">
               </div>
             </div>
+            <div class="form-group"
+                 ng-hide="tenantAddCtrl.currentTenant.proof_of_play_logging == false || tenantAddCtrl.gameStopServer"
+                 ng-class="{ 'has-error' : !tenantAddCtrl.gameStopServer && tenantForm.proofOfPlayUrl.$invalid &&
+                        !tenantForm.proofOfPlayUrl.$pristine }">
+              <div class="col-sm-5">
+                <label>Proof-of-play URL</label>
+                <input type="url"
+                       class="form-control"
+                       name="proofOfPlayUrl"
+                       id="proofOfPlayUrl"
+                       ng-required="tenantAddCtrl.currentTenant.proof_of_play_logging == true && !tenantAddCtrl.gameStopServer"
+                       placeholder="Enter proof-of-play URL"
+                       ng-model="tenantAddCtrl.currentTenant.proof_of_play_url"
+                       ng-pattern="/^https:\/\/\S+$/">
+              </div>
+              <div class="col-sm-1 margin-top-20 help-block">
+                <sup>*</sup>Required.
+              </div>
+              <div class="col-sm-4 margin-top-20 help-block" ng-show="tenantForm.proofOfPlayUrl.$invalid &&
+                        !tenantForm.proofOfPlayUrl.$pristine">
+                Proof-of-play URL must be a secure URL.
+              </div>
+            </div>
             <div class="form-group">
               <div class="col-sm-9">
                 <input type="checkbox"
+                       name="proofOfPlayLogging"
+                       id="proofOfPlayLogging"
                        ng-model="tenantAddCtrl.currentTenant.proof_of_play_logging"> <label>
                 Proof of play logging</label>
               </div>

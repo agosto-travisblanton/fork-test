@@ -1,3 +1,4 @@
+from app_config import config
 from env_setup import setup_test_paths
 
 setup_test_paths()
@@ -98,6 +99,25 @@ class TestTenantModel(BaseTest):
         self.assertEqual(self.NAME, tenant_created.name)
         self.assertEqual(self.domain_key, tenant_created.domain_key)
         self.assertLength(0, tenant_created.notification_emails)
+
+    def test_create_gives_default_proof_of_play_url(self):
+        tenant_created = Tenant.find_by_name(self.NAME)
+        self.assertEqual(tenant_created.proof_of_play_url, config.DEFAULT_PROOF_OF_PLAY_URL)
+
+    def test_create_can_override_default_proof_of_play_url(self):
+        proof_of_play_url = 'https://skykit-provisioning-FOOBAR.appspot.com/proofplay/api/v1/post_new_program_play'
+        tenant = Tenant.create(tenant_code=self.TENANT_CODE,
+                               name='FOOBAR_TENANT',
+                               admin_email=self.ADMIN_EMAIL,
+                               content_server_url=self.CONTENT_SERVER_URL,
+                               content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                               domain_key=self.domain_key,
+                               active=True,
+                               proof_of_play_url=proof_of_play_url)
+        tenant.put()
+        tenant_created = Tenant.find_by_name('FOOBAR_TENANT')
+        self.assertNotEqual(tenant_created.proof_of_play_url, config.DEFAULT_PROOF_OF_PLAY_URL)
+        self.assertEqual(tenant_created.proof_of_play_url, proof_of_play_url)
 
     def test_is_tenant_code_unique_returns_false_when_code_found(self):
         uniqueness_check = Tenant.is_tenant_code_unique(self.TENANT_CODE)
