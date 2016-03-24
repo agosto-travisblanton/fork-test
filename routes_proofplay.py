@@ -1,9 +1,9 @@
 from env_setup import setup
-
-setup()
-
 from os import path
-
+from provisioning_env import (
+    on_development_server,
+)
+setup()
 basedir = path.abspath(path.dirname(__file__))
 
 # DO NOT REMOVE
@@ -110,5 +110,17 @@ application = WSGIApplication([
         handler="proofplay.main.MakeMigration",
         name="MakeMigration"
     ),
-]
-)
+
+])
+
+if on_development_server:
+    dev_routes = [
+        Route(
+            BASE_URI + '/seed/<days>/<amount_a_day>',
+            handler="proofplay.main.Seed",
+            name="Seed"
+        ),
+    ]
+
+    for route in dev_routes:
+        application.router.add(route)

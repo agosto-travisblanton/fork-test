@@ -249,6 +249,3 @@ def send_mock_data(to_send, integration=False):
         "Authorization": config.API_TOKEN
     }
     requests.post(url, data=json.dumps(to_send), headers=headers)
-
-
-generate_mock_data(500, 10)
