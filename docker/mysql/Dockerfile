@@ -23,7 +23,8 @@ RUN \
   echo "mysql -e 'GRANT ALL PRIVILEGES ON *.* TO \"root\"@\"%\" WITH GRANT OPTION;'" >> /tmp/config && \
   echo "mysql -e 'FLUSH PRIVILEGES;'" >> /tmp/config  && \
   bash /tmp/config && \
-  rm -f /tmp/config
+  rm -f /tmp/config \
+  service mysql start
 
 # Define mountable directories.
 VOLUME ["/etc/mysql", "/var/lib/mysql"]

@@ -16,6 +16,23 @@ from decorators import (
     requires_api_token
 )
 
+from dev.generate_mock_data import generate_mock_data
+
+
+####################################################################################
+# SEED
+####################################################################################
+class Seed(RequestHandler):
+    def get(self, days, amount_a_day):
+        deferred.defer(generate_mock_data, int(days), int(amount_a_day))
+        json_final = json.dumps({
+            "result": "success",
+            "message": "The seed script has begun with {} days worth of data being posted {} times a day".format(
+                days, amount_a_day)
+        })
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(json_final)
+
 
 ####################################################################################
 # ALEMBIC MIGRATION
@@ -36,6 +53,19 @@ class MakeMigration(RequestHandler):
             self.response.out.write(
                 "FAILURE. Exception caught during alembic migrations. Check the developer console logs.")
 
+
+####################################################################################
+# DELETE MIGRATION
+####################################################################################
+class ManageRawPayloadTable(RequestHandler):
+    def get(self):
+        delete_raw_event_entries_older_than_thirty_days()
+        json_final = json.dumps({
+            "result": "success",
+            "message": "raw events older than thirty days were deleted"
+        })
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(json_final)
 
 ####################################################################################
 # REST CALLS

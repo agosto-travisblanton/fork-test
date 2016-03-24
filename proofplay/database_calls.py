@@ -11,6 +11,19 @@ from google.appengine.ext import ndb
 
 
 ####################################################################################
+# Maintenance
+####################################################################################
+def delete_raw_event_entries_older_than_thirty_days():
+    session = Session()
+    now = datetime.datetime.now()
+    midnight_now = datetime.datetime.combine(now.date(), datetime.time())
+    thirty_days_ago = midnight_now - datetime.timedelta(days=30)
+    session.query(ProgramPlayEvent).filter(ProgramPlayEvent.started_at < thirty_days_ago).delete()
+    session.commit()
+    session.close()
+
+
+####################################################################################
 # REST Queries
 ####################################################################################
 def retrieve_all_devices_of_tenant(tenant):

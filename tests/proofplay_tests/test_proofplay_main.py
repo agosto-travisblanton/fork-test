@@ -1,14 +1,13 @@
 from env_setup import setup_test_paths
-from app_config import config
 
 setup_test_paths()
 
 from agar.test import WebTest
 from base_sql_test_config import SQLBaseTest
-from proofplay.proofplay_models import Resource, ProgramRecord, TenantCode
+from proofplay.proofplay_models import Resource, ProgramRecord, TenantCode, ProgramPlayEvent
 from routes_proofplay import application
 import json
-from proofplay.dev.make_mock_data import make_one_days_worth_of_data
+from proofplay.dev.generate_mock_data import batch_up_one_day_without_changing_data
 from utils.web_util import build_uri
 import datetime
 from models import Tenant, Distributor, Domain
@@ -246,11 +245,15 @@ class TestMain(SQLBaseTest, WebTest):
 
     def test_post_new_program_play(self):
         uri = build_uri('PostNewProgramPlay', module='proofplay')
-        self.app.post(uri, params=json.dumps(make_one_days_worth_of_data(10, datetime.datetime.now())),
+        self.app.post(uri, params=json.dumps(batch_up_one_day_without_changing_data(
+            started_at=datetime.datetime.now(),
+            amount_a_day=10,
+            tenant="acme_inc"
+        )),
                       headers={"Authorization": config.API_TOKEN})
 
         self.assertRunAndClearTasksInQueue(1, queue_names="proof-of-play")
-        self.assertTrue(self.db_session.query(ProgramRecord).first())
+        self.assertTrue(len(self.db_session.query(ProgramRecord).all()), 10)
 
     def load_one_device(self):
         device_serial = "1234"
@@ -302,3 +305,30 @@ class TestMain(SQLBaseTest, WebTest):
         tenant_key = tenant.put()
         tenant_keys.append(tenant_key)
         return tenant_keys
+
+    def test_delete_raw_event_entries_older_than_thirty_days(self):
+        uri = build_uri('PostNewProgramPlay', module='proofplay')
+
+        for each in reversed(xrange(1, 36)):
+            started_at = datetime.datetime.now() - datetime.timedelta(days=each)
+            self.app.post(uri, params=json.dumps(
+                batch_up_one_day_without_changing_data(
+                    started_at=started_at,
+                    amount_a_day=10,
+                    tenant="acme_inc"
+                )
+            ), headers={"Authorization": config.API_TOKEN})
+
+        self.assertRunAndClearTasksInQueue(35, queue_names="proof-of-play")
+
+        all_events = self.db_session.query(ProgramPlayEvent).all()
+
+        self.assertEqual(len(all_events), 350)
+
+        delete_uri = build_uri('ManageRawPayloadTable', module='proofplay')
+
+        self.app.get(delete_uri)
+
+        all_events_now = self.db_session.query(ProgramPlayEvent).all()
+
+        self.assertEqual(len(all_events_now), 300)
