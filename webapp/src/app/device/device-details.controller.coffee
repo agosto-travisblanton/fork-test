@@ -3,15 +3,14 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'DeviceDetailsCtrl', ($log,
-  $stateParams,
-  $state,
-  DevicesService,
-  LocationsService,
-  CommandsService,
-  sweet,
-  $cookies,
-  ProgressBarService
-) ->
+    $stateParams,
+    $state,
+    DevicesService,
+    LocationsService,
+    CommandsService,
+    sweet,
+    $cookies,
+    ProgressBarService) ->
   @tenantKey = $stateParams.tenantKey
   @deviceKey = $stateParams.deviceKey
   @fromDevices = $stateParams.fromDevices is "true"
@@ -37,8 +36,8 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     osVersion: undefined #"42.0.2311.153"
     platformVersion: undefined #"6812.88.0 (Official Build) stable-channel zako"
     serialNumber: undefined #"5CD45183T6"
-    panelModel: undefined
-    panelInput: undefined
+    panelModelNumber: undefined
+    panelSerialInput: undefined
     status: undefined #"ACTIVE"
     tenantKey: undefined
     created: undefined #"2015-07-07 19:22:57"
@@ -50,7 +49,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     heartbeatInterval: undefined
     checkContentInterval: undefined
   }
-
+  @locations = []
   @commandEvents = []
   @dayRange = 30
   @editMode = !!$stateParams.deviceKey
@@ -125,54 +124,48 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
         if location.key is @currentDevice.locationKey
           @currentDevice.location = location
 
-  @onClickSavePanels = () ->
-    ProgressBarService.start()
-    @setPanelInfo()
-    promise = DevicesService.save @currentDevice
-    promise.then @onSuccessDeviceSave, @onFailureDeviceSavePanels
-
-  @onClickSaveIntervals = () ->
-    ProgressBarService.start()
-    @setPanelInfo()
-    promise = DevicesService.save @currentDevice
-    promise.then @onSuccessDeviceSave, @onFailureDeviceSaveIntervals
-
-  @onClickSaveLocation = () ->
-    ProgressBarService.start()
-    @currentDevice.locationKey = @currentDevice.location.key
-    @setPanelInfo()
-    promise = DevicesService.save @currentDevice
-    promise.then @onSuccessDeviceSave, @onFailureDeviceSaveLocation
-
-  @onSuccessDeviceSave = ->
-    ProgressBarService.complete()
-    $state.go 'devices'
-
-  @onFailureDeviceSavePanels = (errorObject) ->
-    ProgressBarService.complete()
-    $log.error errorObject
-    sweet.show('Oops...', 'Unable to save the serial control information.', 'error')
-
-  @onFailureDeviceSaveIntervals = (errorObject) ->
-    ProgressBarService.complete()
-    $log.error errorObject
-    sweet.show('Oops...', 'Unable to save intervals information.', 'error')
-
-  @onFailureDeviceSaveLocation = (errorObject) ->
-    ProgressBarService.complete()
-    $log.error errorObject
-    sweet.show('Oops...', 'Unable to save the location information.', 'error')
+  #####################
+  # Properties Tab
+  #####################
 
   @onClickSaveDevice = () ->
     ProgressBarService.start()
-    @setPanelInfo()
+    if @currentDevice.location != undefined &&  @currentDevice.location.key != undefined
+      @currentDevice.locationKey = @currentDevice.location.key
+    if @currentDevice.panelModel.id != undefined && @currentDevice.panelModel.id != 'None'
+      @currentDevice.panelModelNumber = @currentDevice.panelModel.id
+    if @currentDevice.panelInput.id != undefined && @currentDevice.panelInput.id != 'None'
+      @currentDevice.panelSerialInput = @currentDevice.panelInput.id.toLowerCase()
     promise = DevicesService.save @currentDevice
-    promise.then @onSuccessDeviceSave, @onFailureDeviceSaveNotes
+    promise.then @onSuccessDeviceSave, @onFailureDeviceSave
 
-  @onFailureDeviceSaveNotes = (errorObject) ->
+  @onSuccessDeviceSave = ->
+    ProgressBarService.complete()
+    sweet.show('WooHoo!', 'Your changes were saved!', 'success')
+
+  @onFailureDeviceSave = (errorObject) ->
     ProgressBarService.complete()
     $log.error errorObject
-    sweet.show('Oops...', 'Unable to save the device notes.', 'error')
+    if errorObject.status == 409
+      sweet.show('Oops...', 'This customer display code already exists for this tenant. Please choose another.', 'error')
+    else
+      sweet.show('Oops...', 'Unable to save updated device.', 'error')
+
+  @autoGenerateCustomerDisplayCode = ->
+    newDisplayCode = ''
+    if @currentDevice.customerDisplayName
+      newDisplayCode = @currentDevice.customerDisplayName.toLowerCase()
+      newDisplayCode = newDisplayCode.replace(/\s+/g, '_')
+      newDisplayCode = newDisplayCode.replace(/\W+/g, '')
+    @currentDevice.customerDisplayCode = newDisplayCode
+
+  @logglyForUser = () ->
+    userDomain = $cookies.get('userEmail').split("@")[1]
+    return  userDomain == "demo.agosto.com" || userDomain == "agosto.com"
+
+  #####################
+  # Commands Tab
+  #####################
 
   @onClickResetSendButton = () ->
     if @editMode
@@ -276,22 +269,4 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     ProgressBarService.complete()
     sweet.show('Oops...', "Power off error: #{error.data}", 'error')
 
-  @setPanelInfo = () ->
-    if @currentDevice.panelModel != null
-      @currentDevice.panelModel = if @currentDevice.panelModel.id == 'None' then null else @currentDevice.panelModel.id
-    if @currentDevice.panelInput != null
-      @currentDevice.panelInput = if @currentDevice.panelInput.id == 'None' then null else @currentDevice.panelInput.id.toLowerCase()
-
-  @autoGenerateCustomerDisplayCode = ->
-    newDisplayCode = ''
-    if @currentDevice.customerDisplayName
-      newDisplayCode = @currentDevice.customerDisplayName.toLowerCase()
-      newDisplayCode = newDisplayCode.replace(/\s+/g, '_')
-      newDisplayCode = newDisplayCode.replace(/\W+/g, '')
-    @currentDevice.customerDisplayCode = newDisplayCode
-
-
-  @logglyForUser = () ->
-    userDomain = $cookies.get('userEmail').split("@")[1]
-    return  userDomain == "demo.agosto.com" || userDomain == "agosto.com"
   @

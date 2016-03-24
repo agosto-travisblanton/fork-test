@@ -202,7 +202,38 @@ def batch_up_logs_for_tenant(
         should_use_new_location_code = True
         should_use_new_display_code = True
 
-    for item in xrange(1, amount_a_day):
+    for item in xrange(1, amount_a_day + 1):
+        ended_at = started_at + datetime.timedelta(minutes=10)
+        one_log = create_one_log(
+            started_at,
+            ended_at,
+            tenant,
+            should_use_no_location_code=should_use_no_location_code,
+            should_use_no_display_code=should_use_no_display_code,
+            should_use_new_location_code=should_use_new_location_code,
+            should_use_new_display_code=should_use_new_display_code
+        )
+        to_return["data"].append(one_log)
+        started_at += datetime.timedelta(minutes=10)
+
+    return to_return
+
+
+def batch_up_one_day_without_changing_data(
+        amount_a_day,
+        started_at,
+        tenant,
+):
+    to_return = {
+        "data": []
+    }
+
+    should_use_no_location_code = False
+    should_use_no_display_code = False
+    should_use_new_location_code = False
+    should_use_new_display_code = False
+
+    for item in xrange(1, amount_a_day + 1):
         ended_at = started_at + datetime.timedelta(minutes=10)
         one_log = create_one_log(
             started_at,
@@ -223,7 +254,7 @@ def generate_mock_data(days_of_logs, amount_a_day):
     print "Generating..."
 
     for key, value in information_to_post.iteritems():
-        for each in reversed(xrange(1, days_of_logs)):
+        for each in reversed(xrange(1, days_of_logs + 1)):
             started_at = datetime.datetime.now() - datetime.timedelta(days=each)
 
             # to not post some 1/10 days
@@ -249,6 +280,3 @@ def send_mock_data(to_send, integration=False):
         "Authorization": config.API_TOKEN
     }
     requests.post(url, data=json.dumps(to_send), headers=headers)
-
-
-generate_mock_data(500, 10)

@@ -22,7 +22,7 @@ myacmeservices_stores_dict = {
             {"serial_number": "F5MSCX001002", "device_key": "102", "customer_display_code": "my-device-3"}
         ],
         "customer_location_code": None,
-        "tenant_code": "myacmeservices",
+        "tenant_code": "acme_inc",
     },
     "2001": {
         "devices": [
@@ -31,7 +31,7 @@ myacmeservices_stores_dict = {
             {"serial_number": "F5MSCX002003", "device_key": "202", "customer_display_code": None}
         ],
         "customer_location_code": "my-2004-location",
-        "tenant_code": "myacmeservices",
+        "tenant_code": "acme_inc",
     },
     "3001": {
         "devices": [
@@ -40,7 +40,7 @@ myacmeservices_stores_dict = {
             {"serial_number": "F5MSCX003003", "device_key": "302", "customer_display_code": "my-device-9"}
         ],
         "customer_location_code": None,
-        "tenant_code": "myacmeservices",
+        "tenant_code": "acme_inc",
     }
 }
 
@@ -92,8 +92,8 @@ def queue_up_mock_data(day_amount, amount_a_day):
 
 
 def generate_mock_data(to_send):
-    first_part = "http://skykit-display-device-int.appspot.com"
-    # first_part = "http://localhost:8080"
+    # first_part = "http://skykit-display-device-int.appspot.com"
+    first_part = "http://localhost:8080"
     url = first_part + "/proofplay/api/v1/post_new_program_play"
     headers = {
         'Content-type': 'application/json',

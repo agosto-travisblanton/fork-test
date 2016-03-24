@@ -1,9 +1,10 @@
 from env_setup import setup
+from os import path
+from provisioning_env import (
+    on_development_server,
+)
 
 setup()
-
-from os import path
-
 basedir = path.abspath(path.dirname(__file__))
 
 # DO NOT REMOVE
@@ -102,13 +103,30 @@ application = WSGIApplication([
     ),
 
     ################################################################
-    # Migrate DB
+    # Manage DB
     ################################################################
+    Route(
+        BASE_URI + '/manage_raw_events',
+        handler="proofplay.main.ManageRawPayloadTable",
+        name="ManageRawPayloadTable"
+    ),
 
     Route(
         BASE_URI + '/0730578567129494/make_migration',
         handler="proofplay.main.MakeMigration",
         name="MakeMigration"
     ),
-]
-)
+
+])
+
+if on_development_server:
+    dev_routes = [
+        Route(
+            BASE_URI + '/seed/<days>/<amount_a_day>',
+            handler="proofplay.main.Seed",
+            name="Seed"
+        ),
+    ]
+
+    for route in dev_routes:
+        application.router.add(route)

@@ -578,7 +578,7 @@ def _SQLALCHEMY_DATABASE_URI():
     if on_test_harness:
         db_uri = 'sqlite:///:memory:'
     elif on_development_server:
-        db_uri = 'mysql+mysqldb://root@localhost/provisioning'
+        db_uri = 'mysql+mysqldb://root@127.0.0.1/provisioning'
     else:
         if on_integration_server:
             instance_name = 'provisioning-int-v2'

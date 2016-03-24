@@ -24,8 +24,8 @@ printf "\n${COLOR_LIGHT_GREEN}=====> The docker-machine $MACHINE_NAME process ha
 
 # CONFIGURE PORT MAPPINGS
 printf "\n${COLOR_LIGHT_GREEN}=====> Configuring docker-machine-vm $MACHINE_NAME port forwarding for port $MAPPED_PORT ...${COLOR_OFF}\n"
-VBoxManage modifyvm "$MACHINE_NAME" --natpf1 "tcp-port$MAPPED_PORT,tcp,,$MAPPED_PORT,,$MAPPED_PORT";
-VBoxManage modifyvm "$MACHINE_NAME" --natpf1 "udp-port$MAPPED_PORT,udp,,$MAPPED_PORT,,$MAPPED_PORT";
+VBoxManage modifyvm "$MACHINE_NAME" --natpf1 "tcp-port$MAPPED_PORT,tcp,127.0.0.1,$MAPPED_PORT,,$MAPPED_PORT";
+VBoxManage modifyvm "$MACHINE_NAME" --natpf1 "udp-port$MAPPED_PORT,udp,127.0.0.1,$MAPPED_PORT,,$MAPPED_PORT";
 printf "\n${COLOR_LIGHT_GREEN}=====> The docker-machine-vm $MACHINE_NAME port forwarding for port $MAPPED_PORT has been configured!${COLOR_OFF}\n"
 
 # START MACHINE

@@ -8,3 +8,8 @@ cron:
   url: /api/v1/monitor/devices
   schedule: every 4 mins
   timezone: US/Central
+
+- description: Raw Event Table delete entries older than 30 days
+  url: /proofplay/api/v1/manage_raw_events
+  schedule: every 24 hours
+  timezone: US/Central
