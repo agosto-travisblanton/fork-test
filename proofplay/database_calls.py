@@ -8,6 +8,7 @@ from data_processing import (
 import datetime
 from models import Domain, Tenant, TenantEntityGroup
 from google.appengine.ext import ndb
+from proofplay_config import config
 
 
 ####################################################################################
@@ -17,7 +18,7 @@ def delete_raw_event_entries_older_than_thirty_days():
     session = Session()
     now = datetime.datetime.now()
     midnight_now = datetime.datetime.combine(now.date(), datetime.time())
-    thirty_days_ago = midnight_now - datetime.timedelta(days=30)
+    thirty_days_ago = midnight_now - datetime.timedelta(days=config.DAYS_TO_KEEP_RAW_EVENTS)
     session.query(ProgramPlayEvent).filter(ProgramPlayEvent.started_at < thirty_days_ago).delete()
     session.commit()
     session.close()

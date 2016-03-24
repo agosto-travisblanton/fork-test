@@ -600,6 +600,8 @@ def _SQLALCHEMY_DATABASE_URI():
 
 proofplay_SQLALCHEMY_DATABASE_URI = _SQLALCHEMY_DATABASE_URI()
 
+proofplay_DAYS_TO_KEEP_RAW_EVENTS = 30
+
 
 ##############################################################################
 # VERSION  sprint_number.deployment_increment.hotfix_increment e.g., 30.1.0
@@ -623,3 +625,4 @@ def _PRODUCTION_HOTFIX_COUNTER():
 
 
 app_PRODUCTION_HOTFIX_COUNTER = _PRODUCTION_HOTFIX_COUNTER()
+
