@@ -130,29 +130,6 @@
                        ng-model="tenantAddCtrl.currentTenant.notification_emails">
               </div>
             </div>
-            <div class="form-group"
-                 ng-hide="tenantAddCtrl.currentTenant.proof_of_play_logging == false || tenantAddCtrl.gameStopServer"
-                 ng-class="{ 'has-error' : !tenantAddCtrl.gameStopServer && tenantForm.proofOfPlayUrl.$invalid &&
-                        !tenantForm.proofOfPlayUrl.$pristine }">
-              <div class="col-sm-5">
-                <label>Proof-of-play URL</label>
-                <input type="url"
-                       class="form-control"
-                       name="proofOfPlayUrl"
-                       id="proofOfPlayUrl"
-                       ng-required="tenantAddCtrl.currentTenant.proof_of_play_logging == true && !tenantAddCtrl.gameStopServer"
-                       placeholder="Enter proof-of-play URL"
-                       ng-model="tenantAddCtrl.currentTenant.proof_of_play_url"
-                       ng-pattern="/^https:\/\/\S+$/">
-              </div>
-              <div class="col-sm-1 margin-top-20 help-block">
-                <sup>*</sup>Required.
-              </div>
-              <div class="col-sm-4 margin-top-20 help-block" ng-show="tenantForm.proofOfPlayUrl.$invalid &&
-                        !tenantForm.proofOfPlayUrl.$pristine">
-                Proof-of-play URL must be a secure URL.
-              </div>
-            </div>
             <div class="form-group">
               <div class="col-sm-9">
                 <input type="checkbox"
