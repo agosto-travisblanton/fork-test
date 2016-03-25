@@ -1,7 +1,6 @@
 """
 Functions to initialize environment settings.
 """
-import logging
 
 
 def get_project_root():
@@ -37,35 +36,11 @@ def setup():
             sys.path.insert(0, lib_usr_path)
 
 
-def setup_django(settings='settings', version='1.3', ):
-    """
-    Sets up the django libraries.
-    :param settings: The name of the settings file. Default: ``'settings'``.
-    :param version: The django version to set up. Default: ``'1.3'``.
-    """
-    import os
-    os.environ['DJANGO_SETTINGS_MODULE'] = settings
-    from google.appengine.dist import use_library
-    use_library('django', version)
-    from django.conf import settings
-    _ = settings.TEMPLATE_DIRS
-
-
 def setup_tests():
     """Fix the sys.path to include our extra paths."""
     import os
     import sys
-    # Only works for UNIXy style OSes.
-    # Find App Engine SDK
-    dev_appserver = None
-    dir_path = ""
-    for d in os.environ["PATH"].split(":"):
-        dev_appserver_path = os.path.join(d, "dev_appserver.py")
-        if os.path.isfile(dev_appserver_path):
-            dir_path = os.path.abspath(os.path.dirname(os.path.realpath(dev_appserver_path)))
-            sys.path.append(dir_path)
-            import dev_appserver
-            sys.path.pop()
+
     if not hasattr(sys, 'version_info'):
         sys.stderr.write('Very old versions of Python are not supported. Please '
                          'use version 2.7 or greater.\n')
@@ -74,38 +49,53 @@ def setup_tests():
     if version_tuple != (2, 7):
         sys.stderr.write('Warning: Python %d.%d is not supported. Please use '
                          'version 2.7.\n' % version_tuple)
-    if not dir_path:
-        sys.stderr.write("Could not find SDK path.  Make sure dev_appserver.py is in your PATH")
+
+    # Only works for UNIXy style OSes.
+    # Find App Engine SDK
+    dev_appserver = None
+    DIR_PATH = ""
+
+    appengine_sdk_path = os.environ.get('APPENGINE_SDK')
+    if appengine_sdk_path:
+        dev_appserver_path = os.path.join(appengine_sdk_path, "dev_appserver.py")
+        if os.path.isfile(dev_appserver_path):
+            sys.path.append(appengine_sdk_path)
+            DIR_PATH = appengine_sdk_path
+            import dev_appserver
+        else:
+            sys.stderr.write('WARNING: Could not find dev_appserver.py in APPENGINE_SDK: {}\n'.format(dev_appserver_path))
+    else:
+        sys.stderr.write('WARNING: Environment variable APPENGINE_SDK not set\n')
+
+    if dev_appserver is None:
+        sys.stderr.write('Searching for dev_appserver.py in PATH\n')
+        for d in os.environ["PATH"].split(":"):
+            dev_appserver_path = os.path.join(d, "dev_appserver.py")
+            if os.path.isfile(dev_appserver_path):
+                DIR_PATH = os.path.abspath(os.path.dirname(os.path.realpath(dev_appserver_path)))
+                sys.path.append(DIR_PATH)
+                import dev_appserver
+                sys.path.pop()
+
+    if not DIR_PATH or not dev_appserver:
+        sys.stderr.write('Could not find SDK path.  Make sure dev_appserver.py is in your PATH or APPENGINE_SDK\n')
         sys.exit(1)
+
+    if not hasattr(dev_appserver, 'EXTRA_PATHS'):
+        sys.stderr.write('dev_appserver module missing attribute EXTRA_PATHS.\n')
+        sys.stderr.write('ERROR: dev_appserver is an incompatible version.\n')
+        sys.exit(1)
+
+    # Configure path
     extra_paths = dev_appserver.EXTRA_PATHS[:]
     substrate_paths = [
         os.path.join('.', 'lib', 'substrate'),
         os.path.join('.', 'local', 'substrate', 'lib'),
         os.path.join('.', 'local', 'substrate', 'manage'),
-        ]
+    ]
     usr_paths = [
         os.path.join('.', 'lib', 'usr'),
         os.path.join('.', 'local', 'usr', 'lib'),
         os.path.join('.', 'local', 'usr', 'manage'),
-        ]
-    sys.path = extra_paths + substrate_paths + usr_paths + sys.path
-
-
-def setup_test_paths():
-    import os, sys
-
-    LOCAL_SUBSTRATE_LIB_PATH = [
-        os.path.join('.', 'local', 'substrate', 'lib'),
-        os.path.join('.', 'lib', 'usr'),
-        os.path.join('.', 'lib', 'substrate')
     ]
-    sys.path = LOCAL_SUBSTRATE_LIB_PATH + sys.path
-
-    if 'APPENGINE_SDK' not in os.environ:
-        logging.error('APPENGINE_SDK environment variable is not set; exiting...')
-    sdk_path = os.environ['APPENGINE_SDK']
-
-    sys.path.insert(0, sdk_path)
-    import dev_appserver
-    dev_appserver.fix_sys_path()
-    import pytest
+    sys.path = extra_paths + substrate_paths + usr_paths + sys.path
