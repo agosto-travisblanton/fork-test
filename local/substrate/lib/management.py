@@ -5,31 +5,56 @@ from glob import glob
 import os
 import sys
 
+if not hasattr(sys, 'version_info'):
+    sys.stderr.write(
+        'Very old versions of Python are not supported. Please '
+        'use version 2.5 or greater.\n'
+    )
+    sys.exit(1)
+
+version_tuple = tuple(sys.version_info[:2])
+
+if version_tuple != (2, 5) and version_tuple != (2, 7):
+    sys.stderr.write(
+        'Warning: Python %d.%d is not supported. Please use '
+        'version 2.5 or 2.7.\n' % version_tuple
+    )
+
 # Only works for UNIXy style OSes.
 # Find App Engine SDK
 dev_appserver = None
 DIR_PATH = ""
-for d in os.environ["PATH"].split(":"):
-    dev_appserver_path = os.path.join(d, "dev_appserver.py")
+
+appengine_sdk_path = os.environ.get('APPENGINE_SDK')
+if appengine_sdk_path:
+    dev_appserver_path = os.path.join(appengine_sdk_path, "dev_appserver.py")
     if os.path.isfile(dev_appserver_path):
-        DIR_PATH = os.path.abspath(os.path.dirname(os.path.realpath(dev_appserver_path)))
-        sys.path.append(DIR_PATH)
+        sys.path.append(appengine_sdk_path)
+        DIR_PATH = appengine_sdk_path
         import dev_appserver
-        sys.path.pop()
+    else:
+        sys.stderr.write('WARNING: Could not find dev_appserver.py in APPENGINE_SDK: {}\n'.format(dev_appserver_path))
+else:
+    sys.stderr.write('WARNING: Environment variable APPENGINE_SDK not set\n')
 
+if dev_appserver is None:
+    sys.stderr.write('Searching for dev_appserver.py in PATH\n')
+    for d in os.environ["PATH"].split(":"):
+        dev_appserver_path = os.path.join(d, "dev_appserver.py")
+        if os.path.isfile(dev_appserver_path):
+            DIR_PATH = os.path.abspath(os.path.dirname(os.path.realpath(dev_appserver_path)))
+            sys.path.append(DIR_PATH)
+            import dev_appserver
 
-if not hasattr(sys, 'version_info'):
-    sys.stderr.write('Very old versions of Python are not supported. Please '
-                     'use version 2.5 or greater.\n')
+            sys.path.pop()
+
+if not DIR_PATH or not dev_appserver:
+    sys.stderr.write('Could not find SDK path.  Make sure dev_appserver.py is in your PATH or APPENGINE_SDK\n')
     sys.exit(1)
-version_tuple = tuple(sys.version_info[:2])
 
-if version_tuple != (2, 5) and version_tuple != (2, 7):
-    sys.stderr.write('Warning: Python %d.%d is not supported. Please use '
-                     'version 2.5 or 2.7.\n' % version_tuple)
-
-if not DIR_PATH:
-    sys.stderr.write("Could not find SDK path.  Make sure dev_appserver.py is in your PATH")
+if not hasattr(dev_appserver, 'EXTRA_PATHS'):
+    sys.stderr.write('dev_appserver module missing attribute EXTRA_PATHS.\n')
+    sys.stderr.write('ERROR: dev_appserver is an incompatible version.\n')
     sys.exit(1)
 
 # local 'helper' scripts
@@ -48,26 +73,28 @@ USR_PATHS = [
 ]
 
 COMMAND_FILE_PATTERN = '[a-z]*.py'
-SUBSTRATE_COMMAND_DIR=os.path.join('.', 'local', 'substrate', 'manage', 'substrate_manage', 'commands')
-USR_COMMAND_DIR=os.path.join('.', 'local', 'usr', 'manage', 'substrate_manage_usr', 'commands')
-
+SUBSTRATE_COMMAND_DIR = os.path.join('.', 'local', 'substrate', 'manage', 'substrate_manage', 'commands')
+USR_COMMAND_DIR = os.path.join('.', 'local', 'usr', 'manage', 'substrate_manage_usr', 'commands')
 
 substrate_commands = []
 usr_commands = []
+
 
 def fix_sys_path():
     """Fix the sys.path to include our extra paths."""
     sys.path = EXTRA_PATHS + SUBSTRATE_PATHS + USR_PATHS + sys.path
 
+
 def print_command_doc(cmd, cmd_width):
     doc = open(cmd).read().split('"""')[1]
     cmd_name = os.path.splitext(os.path.basename(cmd))[0]
-    print "  ", cmd_name.ljust(cmd_width), "-" if doc else "" ,  doc or ""
+    print "  ", cmd_name.ljust(cmd_width), "-" if doc else "", doc or ""
+
 
 def print_subcommand_overviews(substrate_commands, usr_commands):
     import logging
     logging.basicConfig(level=logging.ERROR)
-    cmd_width = max(len(os.path.splitext(os.path.basename(command))[0]) 
+    cmd_width = max(len(os.path.splitext(os.path.basename(command))[0])
                     for command in (substrate_commands + usr_commands))
 
     print "manage.py built-in commands: "
@@ -82,22 +109,22 @@ def print_subcommand_overviews(substrate_commands, usr_commands):
 def run_command(command, globals_, script_dir=SCRIPT_DIR):
     """Execute the file at the specified path with the passed-in globals."""
     fix_sys_path()
-    global substrate_commands, usr_commands 
+    global substrate_commands, usr_commands
     substrate_commands = glob(os.path.join(SUBSTRATE_COMMAND_DIR, COMMAND_FILE_PATTERN))
     usr_commands = glob(os.path.join(USR_COMMAND_DIR, COMMAND_FILE_PATTERN))
 
-    command_names = [os.path.splitext(os.path.basename(command))[0]  for command in substrate_commands + usr_commands]
+    command_names = [os.path.splitext(os.path.basename(command))[0] for command in substrate_commands + usr_commands]
     for arg in sys.argv:
         if arg in command_names:
             break
     else:
-        print_subcommand_overviews(substrate_commands , usr_commands)
+        print_subcommand_overviews(substrate_commands, usr_commands)
         sys.exit(1)
     command_idx = sys.argv.index(arg)
     script_name = sys.argv[command_idx]
     management_args = sys.argv[:command_idx]
-    script_path = (glob(os.path.join(SUBSTRATE_COMMAND_DIR, arg + '.py')) 
-            or glob(os.path.join(USR_COMMAND_DIR, arg + '.py')))[0]
+    script_path = (glob(os.path.join(SUBSTRATE_COMMAND_DIR, arg + '.py'))
+                   or glob(os.path.join(USR_COMMAND_DIR, arg + '.py')))[0]
 
     command_args = sys.argv[command_idx:]
     sys.argv = command_args
@@ -106,4 +133,3 @@ def run_command(command, globals_, script_dir=SCRIPT_DIR):
 
 if __name__ == '__main__':
     run_command(__file__, globals())
-
