@@ -36,7 +36,7 @@ def setup():
             sys.path.insert(0, lib_usr_path)
 
 
-def setup_tests():
+def setup_test_paths():
     """Fix the sys.path to include our extra paths."""
     import os
     import sys

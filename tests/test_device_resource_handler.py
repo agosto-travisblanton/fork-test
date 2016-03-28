@@ -538,7 +538,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
         response_json = json.loads(response.body)
 
-        self.assertTrue(len(response_json["devices"]) < 11)
+        self.assertTrue(len(response_json["devices"]) < 200)
         self.assertFalse(response_json["prev_cursor"])
 
     def test_search_for_device_by_serial(self):
