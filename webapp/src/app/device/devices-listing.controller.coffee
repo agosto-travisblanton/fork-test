@@ -30,39 +30,25 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
   @changeRadio = (unmanaged) ->
     if unmanaged
       @unmanagedSearchText = ''
-      @unmanagedDisabled = true
-      
-      if @unmanagedSelectedButton == "Serial Number"
-        DevicesService.searchDevicesByPartialSerial(@distributorKey, ' ', unmanaged)
-        .then (res) =>
-          result = res["serial_number_matches"]
-          @unmanagedSerialDevices = @convertArrayToDictionary(result, false)
-          @unmanagedValidSerials = [each.serial for each in result][0]
 
-      else
-        DevicesService.searchDevicesByPartialMac(@distributorKey, ' ', unmanaged)
-        .then (res) =>
-          result = res["mac_matches"]
-          @unmanagedMacDevices = @convertArrayToDictionary(result, true)
-          @unmanagedValidMacs = [each.mac for each in result][0]
+      @unmanagedDisabled = true
+
+      @unmanagedValidSerials = []
+      @unmanagedSerialDevices = {}
+
+      @unmanagedMacDevices = {}
+      @unmanagedValidMacs = []
 
     else
       @searchText = ''
+
       @disabled = true
 
-      if @selectedButton == "Serial Number"
-        DevicesService.searchDevicesByPartialSerial(@distributorKey, ' ', unmanaged)
-        .then (res) =>
-          result = res["serial_number_matches"]
-          @serialDevices = @convertArrayToDictionary(result, false)
-          @validSerials = [each.serial for each in result][0]
+      @serialDevices = {}
+      @validSerials = []
 
-      else
-        DevicesService.searchDevicesByPartialMac(@distributorKey, ' ', unmanaged)
-        .then (res) =>
-          result = res["mac_matches"]
-          @macDevices = @convertArrayToDictionary(result, true)
-          @validMacs = ([each.mac for each in result][0])
+      @macDevices = {}
+      @validMacs = []
 
   @convertArrayToDictionary = (theArray, mac) ->
     Devices = {}
