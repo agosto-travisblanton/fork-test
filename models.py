@@ -174,7 +174,7 @@ class Tenant(ndb.Model):
             .filter(ChromeOsDevice.mac_address <= partial_mac + u'\ufffd').fetch()
 
     @classmethod
-    def find_devices_paginated(cls, tenant_keys, fetch_size=10, unmanaged=False, prev_cursor_str=None,
+    def find_devices_paginated(cls, tenant_keys, fetch_size=200, unmanaged=False, prev_cursor_str=None,
                                next_cursor_str=None):
         objects = None
         next_cursor = None

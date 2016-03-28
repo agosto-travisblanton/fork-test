@@ -6,14 +6,19 @@ import os
 import sys
 
 if not hasattr(sys, 'version_info'):
-    sys.stderr.write('Very old versions of Python are not supported. Please '
-                     'use version 2.5 or greater.\n')
+    sys.stderr.write(
+        'Very old versions of Python are not supported. Please '
+        'use version 2.5 or greater.\n'
+    )
     sys.exit(1)
+
 version_tuple = tuple(sys.version_info[:2])
 
 if version_tuple != (2, 5) and version_tuple != (2, 7):
-    sys.stderr.write('Warning: Python %d.%d is not supported. Please use '
-                     'version 2.5 or 2.7.\n' % version_tuple)
+    sys.stderr.write(
+        'Warning: Python %d.%d is not supported. Please use '
+        'version 2.5 or 2.7.\n' % version_tuple
+    )
 
 # Only works for UNIXy style OSes.
 # Find App Engine SDK
@@ -40,8 +45,8 @@ if dev_appserver is None:
             DIR_PATH = os.path.abspath(os.path.dirname(os.path.realpath(dev_appserver_path)))
             sys.path.append(DIR_PATH)
             import dev_appserver
-            sys.path.pop()
 
+            sys.path.pop()
 
 if not DIR_PATH or not dev_appserver:
     sys.stderr.write('Could not find SDK path.  Make sure dev_appserver.py is in your PATH or APPENGINE_SDK\n')
@@ -68,21 +73,23 @@ USR_PATHS = [
 ]
 
 COMMAND_FILE_PATTERN = '[a-z]*.py'
-SUBSTRATE_COMMAND_DIR=os.path.join('.', 'local', 'substrate', 'manage', 'substrate_manage', 'commands')
-USR_COMMAND_DIR=os.path.join('.', 'local', 'usr', 'manage', 'substrate_manage_usr', 'commands')
-
+SUBSTRATE_COMMAND_DIR = os.path.join('.', 'local', 'substrate', 'manage', 'substrate_manage', 'commands')
+USR_COMMAND_DIR = os.path.join('.', 'local', 'usr', 'manage', 'substrate_manage_usr', 'commands')
 
 substrate_commands = []
 usr_commands = []
+
 
 def fix_sys_path():
     """Fix the sys.path to include our extra paths."""
     sys.path = EXTRA_PATHS + SUBSTRATE_PATHS + USR_PATHS + sys.path
 
+
 def print_command_doc(cmd, cmd_width):
     doc = open(cmd).read().split('"""')[1]
     cmd_name = os.path.splitext(os.path.basename(cmd))[0]
-    print "  ", cmd_name.ljust(cmd_width), "-" if doc else "" ,  doc or ""
+    print "  ", cmd_name.ljust(cmd_width), "-" if doc else "", doc or ""
+
 
 def print_subcommand_overviews(substrate_commands, usr_commands):
     import logging
@@ -106,18 +113,18 @@ def run_command(command, globals_, script_dir=SCRIPT_DIR):
     substrate_commands = glob(os.path.join(SUBSTRATE_COMMAND_DIR, COMMAND_FILE_PATTERN))
     usr_commands = glob(os.path.join(USR_COMMAND_DIR, COMMAND_FILE_PATTERN))
 
-    command_names = [os.path.splitext(os.path.basename(command))[0]  for command in substrate_commands + usr_commands]
+    command_names = [os.path.splitext(os.path.basename(command))[0] for command in substrate_commands + usr_commands]
     for arg in sys.argv:
         if arg in command_names:
             break
     else:
-        print_subcommand_overviews(substrate_commands , usr_commands)
+        print_subcommand_overviews(substrate_commands, usr_commands)
         sys.exit(1)
     command_idx = sys.argv.index(arg)
     script_name = sys.argv[command_idx]
     management_args = sys.argv[:command_idx]
     script_path = (glob(os.path.join(SUBSTRATE_COMMAND_DIR, arg + '.py'))
-            or glob(os.path.join(USR_COMMAND_DIR, arg + '.py')))[0]
+                   or glob(os.path.join(USR_COMMAND_DIR, arg + '.py')))[0]
 
     command_args = sys.argv[command_idx:]
     sys.argv = command_args
