@@ -78,44 +78,44 @@
               </div>
             </div>
             <div class="form-group"
-                 ng-class="{ 'has-error' : tenantForm.contentServerUrl.$invalid &&
-                       !tenantForm.contentServerUrl.$pristine }">
+                 ng-class="{ 'has-error' : tenantForm.contentManagerUrl.$invalid &&
+                       !tenantForm.contentManagerUrl.$pristine }">
               <div class="col-sm-5">
-                <label>Player content URL</label>
+                <label>Content manager URL</label>
                 <input type="url"
                        required
                        class="form-control"
-                       name="contentServerUrl"
-                       id="contentServerUrl"
+                       name="contentManagerUrl"
+                       id="contentManagerUrl"
                        placeholder="Enter content server URL"
-                       ng-model="tenantAddCtrl.currentTenant.content_server_url"
+                       ng-model="tenantAddCtrl.currentTenant.content_manager_base_url"
                        ng-pattern="/^https:\/\/\S+$/">
               </div>
               <div class="col-sm-5 margin-top-15">
-                <p ng-show="tenantForm.contentServerUrl.$invalid && !tenantForm.contentServerUrl.$pristine"
+                <p ng-show="tenantForm.contentManagerUrl.$invalid && !tenantForm.contentManagerUrl.$pristine"
                    class="help-block">
-                  Player content URL must be a secure URL.
+                  Content manager URL must be a secure https URL.
                 </p>
               </div>
             </div>
             <div class="form-group"
-                 ng-class="{ 'has-error' : tenantForm.contentServerUrl.$invalid &&
-                       !tenantForm.contentServerUrl.$pristine }">
+                 ng-class="{ 'has-error' : tenantForm.playerContentUrl.$invalid &&
+                       !tenantForm.playerContentUrl.$pristine }">
               <div class="col-sm-5">
                 <label>Player content URL</label>
                 <input type="url"
                        required
                        class="form-control"
-                       name="contentServerUrl"
-                       id="contentServerUrl"
+                       name="playerContentUrl"
+                       id="playerContentUrl"
                        placeholder="Enter content server URL"
                        ng-model="tenantAddCtrl.currentTenant.content_server_url"
                        ng-pattern="/^https:\/\/\S+$/">
               </div>
               <div class="col-sm-5 margin-top-15">
-                <p ng-show="tenantForm.contentServerUrl.$invalid && !tenantForm.contentServerUrl.$pristine"
+                <p ng-show="tenantForm.playerContentUrl.$invalid && !tenantForm.playerContentUrl.$pristine"
                    class="help-block">
-                  Player content URL must be a secure URL.
+                  Player content URL must be a secure https URL.
                 </p>
               </div>
             </div>
