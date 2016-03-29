@@ -11,7 +11,7 @@
     <div flex="75" flex-sm="50" flex-xs="30" layout="column">
       <md-card>
         <md-card-content>
-          <form name="locationForm" class="form-horizontal"
+          <form name="locationForm" class="form-horizontal" ng-submit="tenantLocationCtrl.onClickSaveButton()"
                 novalidate>
             <div class="form-group"
                  ng-class="{ 'has-error' : locationForm.customerLocationName.$invalid &&
@@ -164,7 +164,7 @@
               </div>
             </div>
             <md-card-actions layout="row" layout-align="center">
-              <md-button href="#"  ng-click="tenantLocationCtrl.onClickSaveButton()" ng-disabled="locationForm.$invalid"
+              <md-button type="submit" ng-disabled="locationForm.$invalid"
                          class="md-raised md-primary md-button md-ink-ripple">
                 <i class="fa fa-fw fa-save"></i> Save
               </md-button>
