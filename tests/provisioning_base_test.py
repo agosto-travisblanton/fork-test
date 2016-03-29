@@ -1,8 +1,8 @@
 from ae_test_data import build
-import env_setup
+from env_setup import setup_test_paths, setup
 
-env_setup.setup_test_paths()
-env_setup.setup()
+setup_test_paths()
+setup()
 
 import json
 import stormpath_api
