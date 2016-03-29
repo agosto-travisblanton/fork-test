@@ -4,6 +4,7 @@ setup()
 
 import os
 from google.appengine.ext import ereporter
+
 # This 'CURRENT_VERSION_ID' variable is not available when running tests
 if os.environ.get('CURRENT_VERSION_ID'):
     # this makes ereporter capture exceptions on all your handlers
@@ -62,7 +63,7 @@ application = WSGIApplication(
         Route(r'/api/v1/locations/<location_urlsafe_key>',
               handler='handlers.locations_handler.LocationsHandler',
               name='manage-location',
-              methods=['GET','PUT', 'DELETE']
+              methods=['GET', 'PUT', 'DELETE']
               ),
         Route(r'/api/v1/locations',
               handler='handlers.locations_handler.LocationsHandler',
@@ -178,6 +179,18 @@ application = WSGIApplication(
               handler_method='search_for_device_by_mac',
               methods=['GET']
               ),
+        Route(r'/api/v1/distributors/match/serial/<distributor_urlsafe_key>/<full_serial>/<unmanaged>/devices',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='match_for_device_by_serial',
+              handler_method='match_for_device_by_serial',
+              methods=['GET']
+              ),
+        Route(r'/api/v1/distributors/match/mac/<distributor_urlsafe_key>/<full_mac>/<unmanaged>/devices',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='match_for_device_by_mac',
+              handler_method='match_for_device_by_mac',
+              methods=['GET']
+              ),
         ############################################################
         # Tenants
         ############################################################
@@ -208,7 +221,7 @@ application = WSGIApplication(
               name='distributors',
               handler_method='get_list',
               methods=['GET']
-        ),
+              ),
         Route(r'/api/v1/distributors',
               handler='handlers.distributors_handler.DistributorsHandler',
               name='distributor-creator',
@@ -224,7 +237,7 @@ application = WSGIApplication(
               name='distributor-domains',
               handler_method='get_domains',
               methods=['GET']
-        ),
+              ),
 
         ############################################################
         # Domains

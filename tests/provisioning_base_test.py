@@ -1,7 +1,7 @@
 from ae_test_data import build
 import env_setup
 
-env_setup.setup_tests()
+env_setup.setup_test_paths()
 env_setup.setup()
 
 import json
