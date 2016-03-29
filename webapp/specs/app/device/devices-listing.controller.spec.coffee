@@ -153,10 +153,8 @@ describe 'DevicesListingCtrl', ->
 
       expect(controller.unmanagedSearchText).toEqual ''
       expect(controller.unmanagedDisabled).toEqual true
-      expect(controller.unmanagedValidSerials).toEqual []
       expect(controller.unmanagedSerialDevices).toEqual {}
       expect(controller.unmanagedMacDevices).toEqual {}
-      expect(controller.unmanagedValidMacs).toEqual []
 
     it 'resets variables whenever function is called with managed', ->
       unmanaged = false
@@ -165,9 +163,7 @@ describe 'DevicesListingCtrl', ->
       expect(controller.searchText).toEqual ''
       expect(controller.disabled).toEqual true
       expect(controller.serialDevices).toEqual {}
-      expect(controller.validSerials).toEqual []
       expect(controller.macDevices).toEqual {}
-      expect(controller.validMacs).toEqual []
 
 
     it 'converts array to dictionary with serial as key', ->
@@ -235,66 +231,3 @@ describe 'DevicesListingCtrl', ->
         fromDevices: true
       })
 
-
-  describe '.isResourceValid', ->
-
-
-    beforeEach ->
-      controller = $controller 'DevicesListingCtrl', {}
-      controller.validSerials = ["1", "2", "3"]
-      controller.unmanagedValidSerials = ["4", "5", "6"]
-      controller.validMacs = ["7", "8", "9"]
-      controller.unmanagedValidMacs = ["10", "11", "12"]
-      controller.disabled = true
-      controller.unmanagedDisabled = true
-
-    it "checks as an unmanaged mac that is valid", ->
-      controller.unmanagedSelectedButton = "MAC"
-      unmanaged = true
-      controller.isResourceValid(unmanaged, controller.unmanagedValidMacs[0])
-      expect(controller.unmanagedDisabled).toEqual false
-
-    it "checks as an unmanaged mac that is not valid", ->
-      controller.unmanagedSelectedButton = "MAC"
-      unmanaged = true
-      controller.isResourceValid(unmanaged, "A")
-      expect(controller.unmanagedDisabled).toEqual true
-
-
-    it "checks as an unmanaged serial that is valid", ->
-      controller.unmanagedSelectedButton = "Serial Number"
-      unmanaged = true
-      controller.isResourceValid(unmanaged, controller.unmanagedValidSerials[0])
-      expect(controller.unmanagedDisabled).toEqual false
-
-    it "checks as an unmanaged serial that is not valid", ->
-      controller.unmanagedSelectedButton = "Serial Number"
-      unmanaged = true
-      controller.isResourceValid(unmanaged, "A")
-      expect(controller.unmanagedDisabled).toEqual true
-
-
-    it "checks as an managed mac that is valid", ->
-      controller.selectedButton = "MAC"
-      unmanaged = false
-      controller.isResourceValid(unmanaged, controller.validMacs[0])
-      expect(controller.disabled).toEqual false
-
-    it "checks as an managed mac that is not valid", ->
-      controller.selectedButton = "MAC"
-      unmanaged = false
-      controller.isResourceValid(unmanaged, "A")
-      expect(controller.disabled).toEqual true
-
-
-    it "checks as an managed serial that is valid", ->
-      controller.selectedButton = "Serial Number"
-      unmanaged = false
-      controller.isResourceValid(unmanaged, controller.validSerials[0])
-      expect(controller.disabled).toEqual false
-
-    it "checks as an managed serial that is not valid", ->
-      controller.selectedButton = "Serial Number"
-      unmanaged = false
-      controller.isResourceValid(unmanaged, "A")
-      expect(controller.disabled).toEqual true
