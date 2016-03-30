@@ -64,9 +64,12 @@
                                                               md-highlight-flags="^i">{{item}}</span>
                                                 </md-item-template>
                                                 <md-not-found>
-                                                    <div ng-if="devicesListingCtrl.searchText !== ''">
+                                                    <div ng-if="devicesListingCtrl.searchText !== '' && devicesListingCtrl.searchText.length > 2">
                                                         No results for "{{devicesListingCtrl.searchText}}" were
                                                         found.
+                                                    </div>
+                                                    <div ng-if="devicesListingCtrl.searchText !== '' && devicesListingCtrl.searchText.length <= 2">
+                                                       Please enter at least 3 characters.
                                                     </div>
                                                 </md-not-found>
                                             </md-autocomplete>
@@ -191,11 +194,15 @@
                                                               md-highlight-flags="^i">{{item}}</span>
                                                 </md-item-template>
                                                 <md-not-found>
-                                                    <div ng-if="devicesListingCtrl.unmanagedSearchText !== ''">
+                                                    <div ng-if="devicesListingCtrl.unmanagedSearchText !== '' && devicesListingCtrl.unmanagedSearchText.length > 2">
                                                         No results for "{{devicesListingCtrl.unmanagedSearchText}}" were
                                                         found.
                                                     </div>
+                                                    <div ng-if="devicesListingCtrl.unmanagedSearchText !== '' && devicesListingCtrl.unmanagedSearchText.length <= 2">
+                                                       Please enter at least 3 characters.
+                                                    </div>
                                                 </md-not-found>
+
                                             </md-autocomplete>
                                         </div>
                                         <div class="col-md-1"

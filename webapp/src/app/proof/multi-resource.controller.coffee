@@ -34,6 +34,9 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService) ->
       @resources = (resource.resource_name for resource in data.data.resources)
       if @resources.length > 0
         @had_some_items = true
+      else
+        console.log("here")
+        @had_some_items = false
 
   @addToSelectedResources = (searchText) =>
     if @isResourceValid(searchText)
@@ -110,5 +113,24 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService) ->
 
     else
       ProofPlayService.downloadCSVForMultipleResourcesByDate(@final.start_date_unix, @final.end_date_unix, resources_as_ids)
+
+  @chosen_tenant = null
+  @tenants = null
+  
+  
+  @currentTenant = ProofPlayService.getTenant()
+
+  @initialize_tenant_select = () ->
+    ProofPlayService.getAllTenants()
+    .then (data) =>
+      @tenants = data.data.tenants
+
+
+  @submitTenant = (tenant) =>
+    ProofPlayService.setTenant(tenant)
+    @chosen_tenant = (tenant)
+    @initialize()
+    @currentTenant = ProofPlayService.getTenant()
+
 
   @

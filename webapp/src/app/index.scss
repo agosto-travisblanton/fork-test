@@ -403,6 +403,15 @@ ul.alert-dropdown {
   padding: 3px
 }
 
+.horizontal-submit {
+  display: flex;
+  align-self: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  margin: 0.50em;
+}
+
 .radio-horizontal {
   display: flex;
   align-self: center;
@@ -435,6 +444,10 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
     margin-top: -50px;
     margin-bottom: 50px;
   }
+}
+
+.center-block {
+  text-align: center;
 }
 
 //.distributor-selection {

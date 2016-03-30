@@ -1,5 +1,6 @@
 'use strict'
 
+
 describe 'DevicesListingCtrl', ->
   $controller = undefined
   controller = undefined
@@ -9,7 +10,9 @@ describe 'DevicesListingCtrl', ->
   promise = undefined
   unmanagedPromise = undefined
   ProgressBarService = undefined
+  serialPromise = undefined
   sweet = undefined
+
   to_respond_with_devices = {
     devices: [
       {key: 'dhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
@@ -58,18 +61,15 @@ describe 'DevicesListingCtrl', ->
 
     it 'starts the progress bar', ->
       controller.initialize()
+      promise.resolve to_respond_with_devices
+      unmanagedPromise.resolve to_respond_with_unmanagedDevices
+      expect(controller.devices).toBe to_respond_with_devices.devices
+      expect(controller.unmanagedDevices).toBe to_respond_with_unmanagedDevices.devices
       expect(ProgressBarService.start).toHaveBeenCalled()
 
     it 'calls DevicesService.getUnmanagedDevicesByDistributor to retrieve all distributor unmanaged devices', ->
       controller.initialize()
       expect(DevicesService.getUnmanagedDevicesByDistributor).toHaveBeenCalledWith controller.distributorKey, controller.unmanagedDevicesPrev, controller.unmanagedDevicesNext
-
-    it "the 'then' handler caches the retrieved devices and unmanaged devices in the controller", ->
-      controller.getManagedAndUnmanagedDevices()
-      promise.resolve to_respond_with_devices
-      unmanagedPromise.resolve to_respond_with_unmanagedDevices
-      expect(controller.devices).toBe to_respond_with_devices.devices
-      expect(controller.unmanagedDevices).toBe to_respond_with_unmanagedDevices.devices
 
   describe '.getFetchSuccess', ->
     beforeEach ->
@@ -153,10 +153,8 @@ describe 'DevicesListingCtrl', ->
 
       expect(controller.unmanagedSearchText).toEqual ''
       expect(controller.unmanagedDisabled).toEqual true
-      expect(controller.unmanagedValidSerials).toEqual []
       expect(controller.unmanagedSerialDevices).toEqual {}
       expect(controller.unmanagedMacDevices).toEqual {}
-      expect(controller.unmanagedValidMacs).toEqual []
 
     it 'resets variables whenever function is called with managed', ->
       unmanaged = false
@@ -165,9 +163,7 @@ describe 'DevicesListingCtrl', ->
       expect(controller.searchText).toEqual ''
       expect(controller.disabled).toEqual true
       expect(controller.serialDevices).toEqual {}
-      expect(controller.validSerials).toEqual []
       expect(controller.macDevices).toEqual {}
-      expect(controller.validMacs).toEqual []
 
 
     it 'converts array to dictionary with serial as key', ->
@@ -235,66 +231,159 @@ describe 'DevicesListingCtrl', ->
         fromDevices: true
       })
 
+  describe '.controlOpenButton', ->
+    beforeEach ->
+      controller = $controller 'DevicesListingCtrl', {}
+
+    it "unmanagedDisabled is false if unmanaged and a match", ->
+      isMatch = true
+      unmanaged = true
+      controller.controlOpenButton(unmanaged, isMatch)
+      expect(controller.unmanagedDisabled).toBeFalsy()
+
+    it "unmanagedDisabled is true if unmanaged and a not match", ->
+      isMatch = false
+      unmanaged = true
+      controller.controlOpenButton(unmanaged, isMatch)
+      expect(controller.unmanagedDisabled).toBeTruthy()
+
+
+    it "disabled is false if managed and a match", ->
+      isMatch = true
+      unmanaged = false
+      controller.controlOpenButton(unmanaged, isMatch)
+      expect(controller.disabled).toBeFalsy()
+
+    it "disabled is true if managed and a match", ->
+      isMatch = false
+      unmanaged = false
+      controller.controlOpenButton(unmanaged, isMatch)
+      expect(controller.disabled).toBeTruthy()
+
 
   describe '.isResourceValid', ->
-
+    resource = 'my-resource'
 
     beforeEach ->
       controller = $controller 'DevicesListingCtrl', {}
-      controller.validSerials = ["1", "2", "3"]
-      controller.unmanagedValidSerials = ["4", "5", "6"]
-      controller.validMacs = ["7", "8", "9"]
-      controller.unmanagedValidMacs = ["10", "11", "12"]
-      controller.disabled = true
-      controller.unmanagedDisabled = true
+      promise = new skykitProvisioning.q.Mock
+      serialPromise = new skykitProvisioning.q.Mock
 
-    it "checks as an unmanaged mac that is valid", ->
+      spyOn(DevicesService, 'matchDevicesByFullMac').and.returnValue promise
+      spyOn(DevicesService, 'matchDevicesByFullSerial').and.returnValue serialPromise
+
+    it "matchDevicesByFullMac called when unmanaged and button is mac", ->
+      unmanaged = true
       controller.unmanagedSelectedButton = "MAC"
-      unmanaged = true
-      controller.isResourceValid(unmanaged, controller.unmanagedValidMacs[0])
-      expect(controller.unmanagedDisabled).toEqual false
+      controller.isResourceValid(unmanaged, resource)
+      promise.resolve false
+      expect(DevicesService.matchDevicesByFullMac).toHaveBeenCalledWith controller.distributorKey, resource, unmanaged
 
-    it "checks as an unmanaged mac that is not valid", ->
+    it "matchDevicesByFullSerial called when unmanaged and button is not mac", ->
+      unmanaged = true
+      controller.unmanagedSelectedButton = "Serial Number"
+      controller.isResourceValid(unmanaged, resource)
+      serialPromise.resolve false
+      expect(DevicesService.matchDevicesByFullSerial).toHaveBeenCalledWith controller.distributorKey, resource, unmanaged
+
+    it "matchDevicesByFullMac called when managed and button is mac", ->
+      unmanaged = false
+      controller.selectedButton = "MAC"
+      controller.isResourceValid(unmanaged, resource)
+      promise.resolve false
+      expect(DevicesService.matchDevicesByFullMac).toHaveBeenCalledWith controller.distributorKey, resource, unmanaged
+
+    it "matchDevicesByFullSerial called when managed and button is not mac", ->
+      unmanaged = false
+      controller.selectedButton = "Serial Number"
+      controller.isResourceValid(unmanaged, resource)
+      serialPromise.resolve false
+      expect(DevicesService.matchDevicesByFullSerial).toHaveBeenCalledWith controller.distributorKey, resource, unmanaged
+
+  describe '.searchDevices', ->
+    partial = "it doesn't matter dwight!"
+    beforeEach ->
+      controller = $controller 'DevicesListingCtrl', {}
+      promise = new skykitProvisioning.q.Mock
+      serialPromise = new skykitProvisioning.q.Mock
+
+      spyOn(DevicesService, 'searchDevicesByPartialMac').and.returnValue promise
+      spyOn(DevicesService, 'searchDevicesByPartialSerial').and.returnValue serialPromise
+
+    convertArrayToDictionary = (theArray, mac) ->
+      Devices = {}
+      for item in theArray
+        if mac
+          Devices[item.mac] = item
+        else
+          Devices[item.serial] = item
+
+      return Devices
+
+    it "returns every serial name when called as an unmanaged serial", ->
+      unmanaged = true
+      controller.unmanagedSelectedButton = "Serial Number"
+      controller.searchDevices(unmanaged, partial)
+      serial_matches = {
+        "serial_number_matches": [
+          {"serial": "1234"},
+          {"serial": "45566"}
+        ]
+      }
+      serialPromise.resolve serial_matches
+      expect(controller.unmanagedSerialDevices).toEqual convertArrayToDictionary(serial_matches["serial_number_matches"], false)
+
+    it "returns every serial name when called as an unmanaged mac", ->
+      unmanaged = true
       controller.unmanagedSelectedButton = "MAC"
-      unmanaged = true
-      controller.isResourceValid(unmanaged, "A")
-      expect(controller.unmanagedDisabled).toEqual true
+      controller.searchDevices(unmanaged, partial)
+      mac_matches = {
+        "mac_matches": [
+          {"mac": "1234"},
+          {"mac": "45566"}
+        ]
+      }
+      promise.resolve mac_matches
+      expect(controller.unmanagedMacDevices).toEqual convertArrayToDictionary(mac_matches["mac_matches"], true)
 
-
-    it "checks as an unmanaged serial that is valid", ->
-      controller.unmanagedSelectedButton = "Serial Number"
-      unmanaged = true
-      controller.isResourceValid(unmanaged, controller.unmanagedValidSerials[0])
-      expect(controller.unmanagedDisabled).toEqual false
-
-    it "checks as an unmanaged serial that is not valid", ->
-      controller.unmanagedSelectedButton = "Serial Number"
-      unmanaged = true
-      controller.isResourceValid(unmanaged, "A")
-      expect(controller.unmanagedDisabled).toEqual true
-
-
-    it "checks as an managed mac that is valid", ->
-      controller.selectedButton = "MAC"
+    it "returns every serial name when called as an managed serial", ->
       unmanaged = false
-      controller.isResourceValid(unmanaged, controller.validMacs[0])
-      expect(controller.disabled).toEqual false
-
-    it "checks as an managed mac that is not valid", ->
-      controller.selectedButton = "MAC"
-      unmanaged = false
-      controller.isResourceValid(unmanaged, "A")
-      expect(controller.disabled).toEqual true
-
-
-    it "checks as an managed serial that is valid", ->
       controller.selectedButton = "Serial Number"
-      unmanaged = false
-      controller.isResourceValid(unmanaged, controller.validSerials[0])
-      expect(controller.disabled).toEqual false
+      controller.searchDevices(unmanaged, partial)
+      serial_matches = {
+        "serial_number_matches": [
+          {"serial": "1234"},
+          {"serial": "45566"}
+        ]
+      }
+      serialPromise.resolve serial_matches
+      expect(controller.serialDevices).toEqual convertArrayToDictionary(serial_matches["serial_number_matches"], false)
 
-    it "checks as an managed serial that is not valid", ->
-      controller.selectedButton = "Serial Number"
+    it "returns every mac name when called as an managed mac", ->
       unmanaged = false
-      controller.isResourceValid(unmanaged, "A")
-      expect(controller.disabled).toEqual true
+      controller.selectedButton = "MAC"
+      controller.searchDevices(unmanaged, partial)
+      mac_matches = {
+        "mac_matches": [
+          {"mac": "1234"},
+          {"mac": "45566"}
+        ]
+      }
+      promise.resolve mac_matches
+      expect(controller.macDevices).toEqual convertArrayToDictionary(mac_matches["mac_matches"], true)
+
+#    it "matchDevicesByFullMac called when managed and button is mac", ->
+#      unmanaged = false
+#      controller.selectedButton = "MAC"
+#      controller.isResourceValid(unmanaged, resource)
+#      promise.resolve false
+#      expect(DevicesService.matchDevicesByFullMac).toHaveBeenCalledWith controller.distributorKey, resource, unmanaged
+#
+#    it "matchDevicesByFullSerial called when managed and button is not mac", ->
+#      unmanaged = false
+#      controller.selectedButton = "Serial Number"
+#      controller.isResourceValid(unmanaged, resource)
+#      serialPromise.resolve false
+#      expect(DevicesService.matchDevicesByFullSerial).toHaveBeenCalledWith controller.distributorKey, resource, unmanaged
+#      
+#

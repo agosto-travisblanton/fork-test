@@ -45,6 +45,19 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($http, $log, Res
         url = "api/v1/distributors/search/mac/#{distributorKey}/#{partial_mac}/#{unmanaged}/devices"
         promise = Restangular.oneUrl(SERVICE_NAME, url).get()
         promise
+        
+        
+    matchDevicesByFullSerial: (distributorKey, full_serial, unmanaged) ->
+      unless distributorKey == undefined
+        url = "api/v1/distributors/match/serial/#{distributorKey}/#{full_serial}/#{unmanaged}/devices"
+        promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        promise
+
+    matchDevicesByFullMac: (distributorKey, full_mac, unmanaged) ->
+      unless distributorKey == undefined
+        url = "api/v1/distributors/match/mac/#{distributorKey}/#{full_mac}/#{unmanaged}/devices"
+        promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        promise
 
     getDevicesByDistributor: (distributorKey, prev, next) ->
       unless distributorKey == undefined

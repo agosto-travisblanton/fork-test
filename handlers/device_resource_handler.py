@@ -24,8 +24,42 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     MAILGUN_QUEUED_MESSAGE = 'Queued. Thank you.'
 
     @requires_api_token
+    def match_for_device_by_mac(self, distributor_urlsafe_key, full_mac, unmanaged):
+        unmanaged = unmanaged == "true"
+        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
+        tenant_keys = [tenant.key for tenant in domain_tenant_list]
+        is_match = Tenant.match_device_with_full_mac(
+            tenant_keys=tenant_keys,
+            unmanaged=unmanaged,
+            full_mac=full_mac
+        )
+        json_response(
+            self.response,
+            {
+                "is_match": is_match
+            },
+        )
+
+    @requires_api_token
+    def match_for_device_by_serial(self, distributor_urlsafe_key, full_serial, unmanaged):
+        unmanaged = unmanaged == "true"
+        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
+        tenant_keys = [tenant.key for tenant in domain_tenant_list]
+        is_match = Tenant.match_device_with_full_serial(
+            tenant_keys=tenant_keys,
+            unmanaged=unmanaged,
+            full_serial=full_serial
+        )
+        json_response(
+            self.response,
+            {
+                "is_match": is_match
+            },
+        )
+
+    @requires_api_token
     def search_for_device_by_mac(self, distributor_urlsafe_key, partial_mac, unmanaged):
-        unmanaged = True if unmanaged == "true" else False
+        unmanaged = unmanaged == "true"
         domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
         tenant_keys = [tenant.key for tenant in domain_tenant_list]
         resulting_devices = Tenant.find_devices_with_partial_mac(
@@ -47,7 +81,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @requires_api_token
     def search_for_device_by_serial(self, distributor_urlsafe_key, partial_serial, unmanaged):
-        unmanaged = True if unmanaged == "true" else False
+        unmanaged = unmanaged == "true"
         domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
         tenant_keys = [tenant.key for tenant in domain_tenant_list]
         resulting_devices = Tenant.find_devices_with_partial_serial(

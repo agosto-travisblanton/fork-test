@@ -151,7 +151,7 @@ class Tenant(ndb.Model):
 
     @classmethod
     def is_tenant_code_unique(cls, tenant_code):
-        return None is Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
+        return not Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
 
     @classmethod
     def find_devices(cls, tenant_key, unmanaged):
@@ -163,15 +163,46 @@ class Tenant(ndb.Model):
 
     @classmethod
     def find_devices_with_partial_serial(cls, tenant_keys, unmanaged, partial_serial):
-        return ChromeOsDevice.query().filter(ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
-            ChromeOsDevice.is_unmanaged_device == unmanaged).filter(ChromeOsDevice.serial_number >= partial_serial) \
-            .filter(ChromeOsDevice.serial_number <= partial_serial + u'\ufffd').fetch()
+        q = ChromeOsDevice.query().filter(ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
+            ChromeOsDevice.is_unmanaged_device == unmanaged).fetch()
+
+        return [item for item in q if partial_serial in item.serial_number]
+
+    @classmethod
+    def match_device_with_full_mac(cls, tenant_keys, unmanaged, full_mac):
+        return ChromeOsDevice.query(
+            ndb.OR(ChromeOsDevice.mac_address == full_mac,
+                   ChromeOsDevice.ethernet_mac_address == full_mac)).filter(
+            ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
+            ChromeOsDevice.is_unmanaged_device == unmanaged).count() > 0
+
+    @classmethod
+    def match_device_with_full_serial(cls, tenant_keys, unmanaged, full_serial):
+        return ChromeOsDevice.query().filter(
+            ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
+            ChromeOsDevice.is_unmanaged_device == unmanaged).filter(
+            ChromeOsDevice.serial_number == full_serial).count() > 0
 
     @classmethod
     def find_devices_with_partial_mac(cls, tenant_keys, unmanaged, partial_mac):
-        return ChromeOsDevice.query().filter(ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
-            ChromeOsDevice.is_unmanaged_device == unmanaged).filter(ChromeOsDevice.mac_address >= partial_mac) \
-            .filter(ChromeOsDevice.mac_address <= partial_mac + u'\ufffd').fetch()
+        q = ChromeOsDevice.query().filter(ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
+            ChromeOsDevice.is_unmanaged_device == unmanaged).fetch()
+
+        filtered_results = []
+
+        for item in q:
+            appended_already = False
+            if item.ethernet_mac_address:
+                if partial_mac in item.ethernet_mac_address:
+                    filtered_results.append(item)
+                    appended_already = True
+
+            if not appended_already:
+                if item.mac_address:
+                    if partial_mac in item.mac_address:
+                        filtered_results.append(item)
+
+        return filtered_results
 
     @classmethod
     def find_devices_paginated(cls, tenant_keys, fetch_size=200, unmanaged=False, prev_cursor_str=None,
@@ -299,7 +330,7 @@ class Location(ndb.Model):
 
     @classmethod
     def is_customer_location_code_unique(cls, customer_location_code, tenant_key):
-        return None is Location.query(
+        return not Location.query(
             ndb.AND(Location.customer_location_code == customer_location_code, Location.tenant_key == tenant_key)).get(
             keys_only=True)
 
