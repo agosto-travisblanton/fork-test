@@ -104,4 +104,20 @@ appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService) ->
     else
       ProofPlayService.downloadCSVForMultipleDevicesSummarized(@final.start_date_unix, @final.end_date_unix, @final.displays)
 
+
+  @chosen_tenant = null
+  @tenants = null
+
+  @initialize_tenant_select = () ->
+    ProofPlayService.getAllTenants()
+    .then (data) =>
+      console.log(data)
+      @tenants = data.data.tenants
+
+
+  @submitTenant = (tenant) =>
+    ProofPlayService.setTenant(tenant)
+    @chosen_tenant = (tenant)
+    @initialize()
+
   @
