@@ -33,6 +33,8 @@ appModule.controller "ProofOfPlayMultiLocationCtrl", (ProofPlayService) ->
       @locations = data.data.locations
       if @locations.length > 0
         @had_some_items = true
+      else
+        @had_some_items = false
 
   @addToSelectedLocations = (searchText) =>
     if @isLocationValid(searchText)
@@ -104,4 +106,22 @@ appModule.controller "ProofOfPlayMultiLocationCtrl", (ProofPlayService) ->
     else
       ProofPlayService.downloadCSVForMultipleLocationsSummarized(@final.start_date_unix, @final.end_date_unix, @final.locations)
 
+  @tenants = null
+  @currentTenant = ProofPlayService.getTenant()
+
+  @initialize_tenant_select = () ->
+    ProofPlayService.getAllTenants()
+    .then (data) =>
+      @tenants = data.data.tenants
+
+
+  @submitTenant = (tenant) =>
+    if tenant != @currentTenant
+      ProofPlayService.setTenant(tenant)
+      @initialize()
+      @selected_locations = []
+      @areLocationsValid()
+      @isDisabled()
+      @currentTenant = ProofPlayService.getTenant()
+    
   @

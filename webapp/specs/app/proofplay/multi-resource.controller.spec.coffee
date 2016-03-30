@@ -5,7 +5,7 @@ describe 'ProofOfPlayMultiResourceCtrl', ->
   controller = undefined
   ProofPlayService = undefined
   promise = undefined
-
+  selected_tenant = undefined
 
   beforeEach module('skykitProvisioning')
 
@@ -153,3 +153,28 @@ describe 'ProofOfPlayMultiResourceCtrl', ->
       controller.final.type = "2"
       controller.submit()
       expect(ProofPlayService.downloadCSVForMultipleResourcesByDate).toHaveBeenCalled()
+
+  describe '.tenant change related functions', ->
+    selected_tenant = "some_tenant"
+    beforeEach ->
+      promise = new skykitProvisioning.q.Mock
+      spyOn(ProofPlayService, 'getAllDisplays').and.returnValue promise
+      spyOn(ProofPlayService, 'getAllTenants').and.returnValue promise
+      spyOn(ProofPlayService, 'getTenant').and.returnValue selected_tenant
+      spyOn(ProofPlayService, 'setTenant').and.returnValue null
+
+
+    it 'initializeTenantSelection sets tenants', ->
+      controller.initialize_tenant_select()
+      to_resolve = {
+        data: {
+          tenants: ["one", "two"]
+        }
+      }
+      promise.resolve to_resolve
+      expect(controller.tenants).toEqual ["one", "two"]
+
+
+    it 'submitTenants sets currentTenant and getsAllDisplays again', ->
+      controller.submitTenant(selected_tenant)
+      expect(ProofPlayService.getAllDisplays).toHaveBeenCalled()
