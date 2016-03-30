@@ -25,7 +25,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @requires_api_token
     def match_for_device_by_mac(self, distributor_urlsafe_key, full_mac, unmanaged):
-        unmanaged = True if unmanaged == "true" else False
+        unmanaged = unmanaged == "true"
         domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
         tenant_keys = [tenant.key for tenant in domain_tenant_list]
         is_match = Tenant.match_device_with_full_mac(
@@ -42,7 +42,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @requires_api_token
     def match_for_device_by_serial(self, distributor_urlsafe_key, full_serial, unmanaged):
-        unmanaged = True if unmanaged == "true" else False
+        unmanaged = unmanaged == "true"
         domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
         tenant_keys = [tenant.key for tenant in domain_tenant_list]
         is_match = Tenant.match_device_with_full_serial(
@@ -59,7 +59,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @requires_api_token
     def search_for_device_by_mac(self, distributor_urlsafe_key, partial_mac, unmanaged):
-        unmanaged = True if unmanaged == "true" else False
+        unmanaged = unmanaged == "true"
         domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
         tenant_keys = [tenant.key for tenant in domain_tenant_list]
         resulting_devices = Tenant.find_devices_with_partial_mac(
@@ -81,7 +81,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @requires_api_token
     def search_for_device_by_serial(self, distributor_urlsafe_key, partial_serial, unmanaged):
-        unmanaged = True if unmanaged == "true" else False
+        unmanaged = unmanaged == "true"
         domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
         tenant_keys = [tenant.key for tenant in domain_tenant_list]
         resulting_devices = Tenant.find_devices_with_partial_serial(

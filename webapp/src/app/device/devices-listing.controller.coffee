@@ -66,85 +66,63 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
         @editItem @serialDevices[searchText]
 
 
-  @openTheButton = (unmanaged, isMatch) =>
+  @controlOpenButton = (unmanaged, isMatch) =>
     if not unmanaged
-      if isMatch
-        @disabled = false
-
-      else
-        @disabled = true
+      @disabled = !isMatch
 
     else
-      if isMatch
-        @unmanagedDisabled = false
-
-      else
-        @unmanagedDisabled = true
+      @unmanagedDisabled = !isMatch
 
   @isResourceValid = (unmanaged, resource) ->
     if resource
       if resource.length > 2
-        if unmanaged
-          mac = @unmanagedSelectedButton == "MAC"
-
-        else
-          mac = @selectedButton == "MAC"
+        if unmanaged then mac = @unmanagedSelectedButton == "MAC" else mac = @selectedButton == "MAC"
 
         if mac
           DevicesService.matchDevicesByFullMac(@distributorKey, resource, unmanaged)
           .then (res) =>
-            isMatch = res["is_match"]
-            @openTheButton(unmanaged, isMatch)
+            @controlOpenButton(unmanaged, res["is_match"])
 
         else
           DevicesService.matchDevicesByFullSerial(@distributorKey, resource, unmanaged)
           .then (res) =>
-            isMatch = res["is_match"]
-            @openTheButton(unmanaged, isMatch)
+            @controlOpenButton(unmanaged, res["is_match"])
 
       else
-        @openTheButton(unmanaged, false)
+        @controlOpenButton(unmanaged, false)
 
     else
-      @openTheButton(unmanaged, false)
+      @controlOpenButton(unmanaged, false)
 
 
   @searchDevices = (unmanaged, partial) =>
-    if unmanaged
-      if partial
-        if partial.length > 2
-          if @unmanagedSelectedButton == "Serial Number"
-            DevicesService.searchDevicesByPartialSerial(@distributorKey, partial, unmanaged)
-            .then (res) =>
-              result = res["serial_number_matches"]
+    if partial
+      if partial.length > 2
+        if unmanaged then button = @unmanagedSelectedButton else button = @selectedButton
+
+        if button == "Serial Number"
+          DevicesService.searchDevicesByPartialSerial(@distributorKey, partial, unmanaged)
+          .then (res) =>
+            result = res["serial_number_matches"]
+            
+            if unmanaged
               @unmanagedSerialDevices = @convertArrayToDictionary(result, false)
-              return [each.serial for each in result][0]
-
-          else
-            DevicesService.searchDevicesByPartialMac(@distributorKey, partial, unmanaged)
-            .then (res) =>
-              result = res["mac_matches"]
-              @unmanagedMacDevices = @convertArrayToDictionary(result, true)
-              return [each.mac for each in result][0]
-
-
-    else
-      if partial
-        if partial.length > 2
-          if @selectedButton == "Serial Number"
-            DevicesService.searchDevicesByPartialSerial(@distributorKey, partial, unmanaged)
-            .then (res) =>
-              result = res["serial_number_matches"]
+            else
               @serialDevices = @convertArrayToDictionary(result, false)
-              return [each.serial for each in result][0]
 
-          else
-            DevicesService.searchDevicesByPartialMac(@distributorKey, partial, unmanaged)
-            .then (res) =>
-              result = res["mac_matches"]
+            return [each.serial for each in result][0]
+
+        else
+          DevicesService.searchDevicesByPartialMac(@distributorKey, partial, unmanaged)
+          .then (res) =>
+            result = res["mac_matches"]
+
+            if unmanaged
+              @unmanagedMacDevices = @convertArrayToDictionary(result, true)
+            else
               @macDevices = @convertArrayToDictionary(result, true)
-              return [each.mac for each in result][0]
 
+            return [each.mac for each in result][0]
 
 
   @getManagedDevices = (key, prev, next) ->
@@ -170,14 +148,10 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
     ), (response) =>
       @getFetchFailure(response)
 
-  @getManagedAndUnmanagedDevices = () ->
-    @getManagedDevices(@distributorKey, @devicesPrev, @devicesNext)
-    @getUnmanagedDevices(@distributorKey, @unmanagedDevicesPrev, @unmanagedDevicesNext)
-
-
   @initialize = () ->
     @distributorKey = $cookies.get('currentDistributorKey')
-    @getManagedAndUnmanagedDevices()
+    @getManagedDevices(@distributorKey, @devicesPrev, @devicesNext)
+    @getUnmanagedDevices(@distributorKey, @unmanagedDevicesPrev, @unmanagedDevicesNext)
 
   @getFetchSuccess = () ->
     ProgressBarService.complete()
