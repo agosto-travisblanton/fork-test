@@ -13,14 +13,6 @@ snapdeploy: `python manage.py snapdeploy --ignore-branch -A skykit-provisioning 
 
 [SkyKit Provisioning](https://skykit-provisioning.appspot.com/#)
 
-### Setup CloudSQL
-
-```sh
-$ brew install mysql
-$ mysql.server start
-$ CREATE DATABASE provisioning;
-```
-
 ### Setup requirements
 
 ```sh
@@ -29,14 +21,11 @@ $ source venv/bin/activate
 $ pip install -r requirements.txt
 ```
 
-Ensure that the requirements are NOT installed to /lib/usr,
-as having MySQLdb in lib/usr/ will break the deployment.
-
 
 ### Run Back-End
-
+Make sure your virtualenv is activated and has the requirements installed before this step.
 ```sh
-$ python manage.py serve dispatch.yaml
+(venv)$ python manage.py serve dispatch.yaml
 ```
 
 ### Test Back-End
@@ -60,4 +49,12 @@ $ gulp test
 To update coverage
 ```sh
 $ gulp build
+```
+
+### Setup Local MySQL instance (only needed if you will be doing proof of play related testing)
+
+```sh
+$ brew install mysql
+$ mysql.server start
+$ CREATE DATABASE provisioning;
 ```
