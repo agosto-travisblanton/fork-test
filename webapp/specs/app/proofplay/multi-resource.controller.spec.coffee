@@ -156,9 +156,15 @@ describe 'ProofOfPlayMultiResourceCtrl', ->
 
   describe '.tenant change related functions', ->
     selected_tenant = "some_tenant"
+    resourcesData = {
+      data: {
+        resources: [{"resource_name": "one resource"}]
+      }
+    }
+
     beforeEach ->
       promise = new skykitProvisioning.q.Mock
-      spyOn(ProofPlayService, 'getAllDisplays').and.returnValue promise
+      spyOn(ProofPlayService, 'getAllResources').and.returnValue promise
       spyOn(ProofPlayService, 'getAllTenants').and.returnValue promise
       spyOn(ProofPlayService, 'getTenant').and.returnValue selected_tenant
       spyOn(ProofPlayService, 'setTenant').and.returnValue null
@@ -177,4 +183,5 @@ describe 'ProofOfPlayMultiResourceCtrl', ->
 
     it 'submitTenants sets currentTenant and getsAllDisplays again', ->
       controller.submitTenant(selected_tenant)
-      expect(ProofPlayService.getAllDisplays).toHaveBeenCalled()
+      promise.resolve resourcesData
+      expect(ProofPlayService.getAllResources).toHaveBeenCalled()

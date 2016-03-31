@@ -177,4 +177,4 @@ describe 'ProofOfPlayMultiLocationCtrl', ->
 
     it 'submitTenants sets currentTenant and getsAllDisplays again', ->
       controller.submitTenant(selected_tenant)
-      expect(ProofPlayService.getAllDisplays).toHaveBeenCalled()
+      expect(ProofPlayService.getAllLocations).toHaveBeenCalled()
