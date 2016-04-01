@@ -1,12 +1,12 @@
 import uuid
 
 from datetime import datetime
+from google.appengine.datastore.datastore_query import Cursor
 from google.appengine.ext import ndb
 
 from app_config import config
 from restler.decorators import ae_ndb_serializer
 from utils.timezone_util import TimezoneUtil
-from google.appengine.datastore.datastore_query import Cursor
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>. Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -43,7 +43,6 @@ class DistributorEntityGroup(ndb.Model):
 @ae_ndb_serializer
 class Distributor(ndb.Model):
     name = ndb.StringProperty(required=True, indexed=True)
-    # TODO Make admin_email required=True after migration run in prod
     admin_email = ndb.StringProperty(required=False, indexed=True)
     player_content_url = ndb.StringProperty(required=False, indexed=True)
     content_manager_url = ndb.StringProperty(required=False, indexed=True)
@@ -297,8 +296,6 @@ class Location(ndb.Model):
     tenant_key = ndb.KeyProperty(kind=Tenant, required=True, indexed=True)
     customer_location_code = ndb.StringProperty(required=True, indexed=True)
     customer_location_name = ndb.StringProperty(required=True, indexed=True)
-    timezone = ndb.StringProperty(required=True, indexed=True)
-    timezone_offset = ndb.IntegerProperty(required=True, indexed=True)  # computed property
     address = ndb.StringProperty(required=False, indexed=True)
     city = ndb.StringProperty(required=False, indexed=True)
     state = ndb.StringProperty(required=False, indexed=True)
@@ -311,15 +308,12 @@ class Location(ndb.Model):
     class_version = ndb.IntegerProperty()
 
     @classmethod
-    def create(cls, tenant_key, customer_location_name, customer_location_code, timezone):
-        timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
+    def create(cls, tenant_key, customer_location_name, customer_location_code):
         geo_location_default = ndb.GeoPt(44.98, -93.27)  # Home plate Target Field
         return cls(tenant_key=tenant_key,
                    customer_location_name=customer_location_name,
                    customer_location_code=customer_location_code,
-                   timezone=timezone,
-                   geo_location=geo_location_default,
-                   timezone_offset=timezone_offset)
+                   geo_location=geo_location_default)
 
     @classmethod
     def find_by_customer_location_code(cls, customer_location_code):
@@ -389,6 +383,8 @@ class ChromeOsDevice(ndb.Model):
     customer_display_name = ndb.StringProperty(required=False, indexed=True)
     customer_display_code = ndb.StringProperty(required=False, indexed=True)
     location_key = ndb.KeyProperty(required=False, indexed=True)
+    timezone = ndb.StringProperty(required=False, indexed=True)
+    timezone_offset = ndb.IntegerProperty(required=False, indexed=True)  # computed property
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):
@@ -403,7 +399,8 @@ class ChromeOsDevice(ndb.Model):
 
     @classmethod
     def create_managed(cls, tenant_key, gcm_registration_id, mac_address, device_id=None, serial_number=None,
-                       model=None):
+                       model=None, timezone='America/Chicago'):
+        timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
         device = cls(
             device_id=device_id,
             tenant_key=tenant_key,
@@ -419,11 +416,14 @@ class ChromeOsDevice(ndb.Model):
             heartbeat_updated=datetime.utcnow(),
             program='****initial****',
             program_id='****initial****',
-            heartbeat_interval_minutes=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES)
+            heartbeat_interval_minutes=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES,
+            timezone=timezone,
+            timezone_offset=timezone_offset)
         return device
 
     @classmethod
-    def create_unmanaged(cls, gcm_registration_id, mac_address):
+    def create_unmanaged(cls, gcm_registration_id, mac_address, timezone='America/Chicago'):
+        timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
         device = cls(
             gcm_registration_id=gcm_registration_id,
             mac_address=mac_address,
@@ -437,7 +437,9 @@ class ChromeOsDevice(ndb.Model):
             heartbeat_updated=datetime.utcnow(),
             program='****initial****',
             program_id='****initial****',
-            heartbeat_interval_minutes=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES)
+            heartbeat_interval_minutes=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES,
+            timezone=timezone,
+            timezone_offset=timezone_offset)
         return device
 
     @classmethod

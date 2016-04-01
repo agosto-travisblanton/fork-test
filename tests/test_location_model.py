@@ -23,8 +23,6 @@ class TestLocationModel(BaseTest):
     IMPERSONATION_EMAIL = 'test@test.com'
     CUSTOMER_LOCATION_NAME = 'Store #456'
     CUSTOMER_LOCATION_CODE = 'store_456'
-    TIMEZONE = 'US/Arizona'
-    TIMEZONE_OFFSET = -7
 
     def setUp(self):
         super(TestLocationModel, self).setUp()
@@ -48,26 +46,15 @@ class TestLocationModel(BaseTest):
     def test_find_by_customer_location_code_returns_expected_location(self):
         location = Location.create(tenant_key=self.tenant_key,
                                    customer_location_name=self.CUSTOMER_LOCATION_NAME,
-                                   customer_location_code=self.CUSTOMER_LOCATION_CODE,
-                                   timezone=self.TIMEZONE)
+                                   customer_location_code=self.CUSTOMER_LOCATION_CODE)
         location.put()
         actual = Location.find_by_customer_location_code(self.CUSTOMER_LOCATION_CODE)
         self.assertEqual(actual.customer_location_name, self.CUSTOMER_LOCATION_NAME)
 
-    def test_create_returns_expected_timezone_offset(self):
-        location = Location.create(tenant_key=self.tenant_key,
-                                   customer_location_name=self.CUSTOMER_LOCATION_NAME,
-                                   customer_location_code=self.CUSTOMER_LOCATION_CODE,
-                                   timezone=self.TIMEZONE)
-        location.put()
-        actual = Location.find_by_customer_location_code(self.CUSTOMER_LOCATION_CODE)
-        self.assertEqual(actual.timezone_offset, self.TIMEZONE_OFFSET)
-
     def test_is_customer_location_code_unique_returns_false_when_code_found(self):
         location = Location.create(tenant_key=self.tenant_key,
                                    customer_location_name=self.CUSTOMER_LOCATION_NAME,
-                                   customer_location_code=self.CUSTOMER_LOCATION_CODE,
-                                   timezone=self.TIMEZONE)
+                                   customer_location_code=self.CUSTOMER_LOCATION_CODE)
         location.put()
         uniqueness_check = Location.is_customer_location_code_unique(customer_location_code=self.CUSTOMER_LOCATION_CODE,
                                                                      tenant_key=self.tenant_key)
@@ -82,8 +69,7 @@ class TestLocationModel(BaseTest):
     def test_class_version_is_only_set_by_pre_put_hook_method(self):
         location = Location.create(tenant_key=self.tenant_key,
                                    customer_location_name=self.CUSTOMER_LOCATION_NAME,
-                                   customer_location_code=self.CUSTOMER_LOCATION_CODE,
-                                   timezone=self.TIMEZONE)
+                                   customer_location_code=self.CUSTOMER_LOCATION_CODE)
         location.class_version = 47
         location.put()
         self.assertEqual(location.class_version, self.CURRENT_CLASS_VERSION)

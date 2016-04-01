@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 import device_message_processor
 from env_setup import setup_test_paths
+from utils.timezone_util import TimezoneUtil
 from utils.web_util import build_uri
 from webtest import AppError
 
@@ -182,6 +183,41 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                           headers=self.api_token_authorization_header)
         self.assertTrue('Bad response: 400 Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
                         in context.exception.message)
+
+    def test_post_managed_device_creates_device_with_default_timezone_and_expected_offset(self):
+        tenant = self.tenant_key.get()
+        mac_address = '7889BE879f'
+        request_body = {'macAddress': mac_address,
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'tenantCode': tenant.tenant_code}
+        when(deferred).defer(any_matcher(refresh_device_by_mac_address),
+                             any_matcher(str),
+                             any_matcher(mac_address)).thenReturn(None)
+        response = self.app.post('/api/v1/devices', json.dumps(request_body),
+                                 headers=self.api_token_authorization_header)
+        location_uri_components = str(response.headers['Location']).split('/')
+        device = ndb.Key(urlsafe=location_uri_components[6]).get()
+        default_timezone = 'America/Chicago'
+        self.assertEqual(device.timezone_offset, TimezoneUtil.get_timezone_offset(default_timezone))
+        self.assertEqual(device.timezone, default_timezone)
+
+    def test_post_managed_device_creates_device_with_explicit_timezone_and_expected_offset(self):
+        tenant = self.tenant_key.get()
+        mac_address = '7889BE879f'
+        explicit_timezone = 'America/Denver'
+        request_body = {'macAddress': mac_address,
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'tenantCode': tenant.tenant_code,
+                        'timezone': explicit_timezone}
+        when(deferred).defer(any_matcher(refresh_device_by_mac_address),
+                             any_matcher(str),
+                             any_matcher(mac_address)).thenReturn(None)
+        response = self.app.post('/api/v1/devices', json.dumps(request_body),
+                                 headers=self.api_token_authorization_header)
+        location_uri_components = str(response.headers['Location']).split('/')
+        device = ndb.Key(urlsafe=location_uri_components[6]).get()
+        self.assertEqual(device.timezone_offset, TimezoneUtil.get_timezone_offset(explicit_timezone))
+        self.assertEqual(device.timezone, explicit_timezone)
 
     ##################################################################################################################
     # post unmanaged device
@@ -1012,8 +1048,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_device_resource_put_updates_location(self):
         location = Location.create(tenant_key=self.tenant_key,
                                    customer_location_name='Store 1234',
-                                   customer_location_code='store_1234',
-                                   timezone='America/Chicago')
+                                   customer_location_code='store_1234')
         location_key = location.put()
         request_body = {'locationKey': location_key.urlsafe()}
         when(deferred).defer(any_matcher(update_chrome_os_device),
@@ -1139,6 +1174,21 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                      headers=self.api_token_authorization_header)
         updated_display = self.managed_device_key.get()
         self.assertEqual(config.CHECK_FOR_CONTENT_INTERVAL_MINUTES, updated_display.check_for_content_interval_minutes)
+
+    def test_put_updates_timezone_from_default_to_explicit(self):
+        default_timezone = 'America/Chicago'
+        explicit_timezone = 'America/Denver'
+        self.assertEqual(self.managed_device.timezone_offset, TimezoneUtil.get_timezone_offset(default_timezone))
+        request_body = {'timezone': explicit_timezone}
+        when(deferred).defer(any_matcher(update_chrome_os_device),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
+                     json.dumps(request_body),
+                     headers=self.api_token_authorization_header)
+        updated_device = self.managed_device_key.get()
+        expected_offset = TimezoneUtil.get_timezone_offset(explicit_timezone)
+        self.assertEqual(updated_device.timezone, explicit_timezone)
+        self.assertEqual(updated_device.timezone_offset, expected_offset)
 
     ##################################################################################################################
     ## delete

@@ -16,6 +16,7 @@ from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY, DEVICE_ISSUE_LOG_STRATEGY
 from utils.mail_util import MailUtil
+from utils.timezone_util import TimezoneUtil
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -223,6 +224,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     @requires_api_token
     def get(self, device_urlsafe_key):
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
+        if device.timezone != None:
+            device.timezone_offset = TimezoneUtil.get_timezone_offset(device.timezone)
+        else:
+            device.timezone_offset = TimezoneUtil.get_timezone_offset('America/Chicago')
         if self.is_unmanaged_device is False:
             if not device.device_id:
                 deferred.defer(refresh_device_by_mac_address,
@@ -260,6 +265,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 error_message = 'The gcmRegistrationId parameter is invalid.'
                 self.response.set_status(status, error_message)
                 return
+            timezone = request_json.get('timezone')
+            if timezone is None or timezone == '':
+                timezone = 'America/Chicago'
             if self.is_unmanaged_device is True:
                 unmanaged_device = ChromeOsDevice.get_unmanaged_device_by_mac_address(device_mac_address)
                 if None is not unmanaged_device:
@@ -281,7 +289,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                     'an unmanaged device.'
                     self.response.set_status(status, error_message)
                     return
-                device = ChromeOsDevice.create_unmanaged(gcm_registration_id, device_mac_address)
+                device = ChromeOsDevice.create_unmanaged(gcm_registration_id=gcm_registration_id,
+                                                         mac_address=device_mac_address,
+                                                         timezone=timezone)
                 device_key = device.put()
                 device_uri = self.request.app.router.build(None,
                                                            'device-pairing-code',
@@ -311,7 +321,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 if status == 201:
                     device = ChromeOsDevice.create_managed(tenant_key=tenant_key,
                                                            gcm_registration_id=gcm_registration_id,
-                                                           mac_address=device_mac_address)
+                                                           mac_address=device_mac_address,
+                                                           timezone=timezone)
                     key = device.put()
                     deferred.defer(refresh_device_by_mac_address,
                                    device_urlsafe_key=key.urlsafe(),
@@ -423,6 +434,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             proof_of_play_logging = request_json.get('proofOfPlayLogging')
             if str(proof_of_play_logging).lower() == 'true' or str(proof_of_play_logging).lower() == 'false':
                 device.proof_of_play_logging = bool(proof_of_play_logging)
+            timezone = request_json.get('timezone')
+            if timezone:
+                device.timezone = timezone
+                device.timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
             device.put()
             if not device.is_unmanaged_device:
                 deferred.defer(update_chrome_os_device,
