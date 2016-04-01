@@ -44,7 +44,8 @@
                     {{ tenantLocationsCtrl.currentTenant.name }} has no locations.
                   </td>
                 </tr>
-                <tr ng-repeat="item in tenantLocationsCtrl.locations | orderBy:'customerLocationName' ">
+                <tr ng-repeat="item in tenantLocationsCtrl.locations | orderBy:'customerLocationName' "
+                    ng-click="tenantLocationsCtrl.editItem(item)">
                   <td>
                     <a ng-click="tenantLocationsCtrl.editItem(item)"
                        title="Location detail">

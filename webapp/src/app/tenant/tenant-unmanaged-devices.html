@@ -37,7 +37,8 @@
                 No unmanaged devices retrieved for {{ tenantUnmanagedDevicesCtrl.currentTenant.name }}.
               </td>
             </tr>
-            <tr ng-repeat="item in tenantUnmanagedDevicesCtrl.tenantDevices | orderBy:'-created' ">
+            <tr ng-repeat="item in tenantUnmanagedDevicesCtrl.tenantDevices | orderBy:'-created' "
+                ng-click="tenantUnmanagedDevicesCtrl.editItem(item)">
               <td>
                 <a ng-click="tenantUnmanagedDevicesCtrl.editItem(item)"
                    title="Device detail">
