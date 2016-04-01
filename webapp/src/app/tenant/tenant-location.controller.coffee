@@ -18,12 +18,8 @@ appModule.controller 'TenantLocationCtrl',
         @tenantKey = data.tenantKey
         @locationName = data.customerLocationName
         @fetchTenantName @tenantKey
-    @timezones = []
 
     @initialize = ->
-      timezonePromise = LocationsService.getTimezones()
-      timezonePromise.then (data) =>
-        @timezones = data
       if not @editMode
         @fetchTenantName @tenantKey
         @location = {
