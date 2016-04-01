@@ -59,8 +59,13 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       previous:'glyphicon glyphicon-arrow-left',
       up:'glyphicon glyphicon-arrow-up',
       down:'glyphicon glyphicon-arrow-down'}}"
+  @timezones = []
+  @selectedTimezone = 'America/Chicago'
 
   @initialize = () ->
+    timezonePromise = DevicesService.getTimezones()
+    timezonePromise.then (data) =>
+      @timezones = data
     @panelModels = DevicesService.getPanelModels()
     @panelInputs = DevicesService.getPanelInputs()
     if @editMode

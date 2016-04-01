@@ -90,12 +90,14 @@ describe 'DeviceDetailsCtrl', ->
       locationsServicePromise = new skykitProvisioning.q.Mock
       spyOn(LocationsService, 'getLocationsByTenantKey').and.returnValue locationsServicePromise
       getDevicePromise = new skykitProvisioning.q.Mock
+      timezonesPromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getDeviceByKey').and.returnValue getDevicePromise
       getPlayerCommandEventsPromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getCommandEventsByKey').and.returnValue getPlayerCommandEventsPromise
       getDeviceIssuesPromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getIssuesByKey').and.returnValue getDeviceIssuesPromise
       spyOn(DevicesService, 'getPanelModels').and.returnValue [{'id': 'Sony–FXD40LX2F'}, {'id': 'NEC–LCD4215'}]
+
       inputs = [
         {
           'id': 'HDMI2'
@@ -111,6 +113,7 @@ describe 'DeviceDetailsCtrl', ->
         }
       ]
       spyOn(DevicesService, 'getPanelInputs').and.returnValue inputs
+      spyOn(DevicesService, 'getTimezones').and.returnValue timezonesPromise
 
     describe 'new mode', ->
       beforeEach ->
@@ -121,6 +124,9 @@ describe 'DeviceDetailsCtrl', ->
           LocationsService: LocationsService
         }
         controller.initialize()
+
+      it 'should call DevicesService.getTimezones', ->
+        expect(DevicesService.getTimezones).toHaveBeenCalled()
 
       it 'currentDevice property should be defined', ->
         expect(controller.currentDevice).toBeDefined()
@@ -149,6 +155,9 @@ describe 'DeviceDetailsCtrl', ->
         today.setDate(today.getDate() - 30)
         @epochStart = moment(today).unix()
         controller.initialize()
+
+      it 'should call DevicesService.getTimezones', ->
+        expect(DevicesService.getTimezones).toHaveBeenCalled()
 
       it 'defines currentDevice property', ->
         expect(controller.currentDevice).toBeDefined()
