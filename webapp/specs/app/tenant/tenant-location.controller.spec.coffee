@@ -72,12 +72,8 @@ describe 'TenantLocationCtrl', ->
           $stateParams: $stateParams
           LocationsService: LocationsService
         }
-        spyOn(LocationsService, 'getTimezones').and.returnValue locationsServicePromise
         controller = $controller 'TenantLocationCtrl', serviceInjection
         controller.initialize()
-
-      it 'should call LocationsService.getTimezones', ->
-        expect(LocationsService.getTimezones).toHaveBeenCalled()
 
   describe '.onClickSaveButton', ->
     controller = undefined
