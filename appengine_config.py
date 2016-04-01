@@ -607,14 +607,14 @@ proofplay_DAYS_TO_KEEP_RAW_EVENTS = 30
 # VERSION  sprint_number.deployment_increment.hotfix_increment e.g., 30.1.0
 ##############################################################################
 def _SPRINT_NUMBER():
-    return 32
+    return 33
 
 
 app_SPRINT_NUMBER = _SPRINT_NUMBER()
 
 
 def _DEPLOYMENT_COUNTER():
-    return 7
+    return 1
 
 
 app_DEPLOYMENT_COUNTER = _DEPLOYMENT_COUNTER()
