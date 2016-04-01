@@ -2,7 +2,7 @@
 
 appModule = angular.module('skykitProvisioning')
 
-appModule.controller 'TenantDetailsCtrl',
+appModule.controller 'TenantDetailsCtrl2',
   ($log, $stateParams, TenantsService, DomainsService, DevicesService, DistributorsService, $state, sweet,
     ProgressBarService, $cookies, $mdDialog) ->
     @currentTenant = {
