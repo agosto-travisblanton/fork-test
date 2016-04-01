@@ -3,6 +3,7 @@ The configuration file used by :py:mod:`agar.config` implementations and other l
 `google.appengine.api.lib_config`_ configuration library. Configuration overrides go in this file.
 """
 from env_setup import setup
+
 setup()
 
 import os
@@ -220,7 +221,7 @@ def _CONTENT_MANAGER_API_SERVER_KEY():
     elif on_stage_server:
         return 'OTJkMGNjMmYzMmZlNjI4MDVmNGVlMjEx'
     elif on_gamestop_server:
-        return '' # Calls into CM-Sim
+        return ''  # Calls into CM-Sim
     elif on_production_server:
         return 'uXyQWMr3mAUvLFhvYuzYnfehkKop7ZCe'
     else:
@@ -429,6 +430,7 @@ def _CHECK_FOR_CONTENT_INTERVAL_MINUTES():
 
 app_CHECK_FOR_CONTENT_INTERVAL_MINUTES = _CHECK_FOR_CONTENT_INTERVAL_MINUTES()
 
+
 def _ETHERNET_CONNECTION():
     return 'Ethernet'
 
@@ -486,6 +488,7 @@ def _DEFAULT_PROOF_OF_PLAY_URL():
 
 
 app_DEFAULT_PROOF_OF_PLAY_URL = _DEFAULT_PROOF_OF_PLAY_URL()
+
 
 def _STORMPATH_CLIENT():
     """
@@ -625,4 +628,3 @@ def _PRODUCTION_HOTFIX_COUNTER():
 
 
 app_PRODUCTION_HOTFIX_COUNTER = _PRODUCTION_HOTFIX_COUNTER()
-
