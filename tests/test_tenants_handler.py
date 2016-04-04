@@ -98,6 +98,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': self.domain_key.urlsafe(),
                               'proof_of_play_logging': False,
+                              'default_timezone': 'America/Denver',
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
@@ -120,6 +121,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'domain_key': self.domain_key.urlsafe(),
                               'notification_emails': emails,
                               'proof_of_play_logging': False,
+                              'default_timezone': 'America/Denver',
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
@@ -145,6 +147,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'domain_key': self.domain_key.urlsafe(),
                               'notification_emails': 'foobar@skykit.com',
                               'proof_of_play_logging': False,
+                              'default_timezone': 'America/Denver',
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
@@ -165,6 +168,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': self.domain_key.urlsafe(),
                               'proof_of_play_logging': False,
+                              'default_timezone': 'America/Denver',
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
@@ -188,6 +192,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': self.domain_key.urlsafe(),
                               'proof_of_play_logging': False,
+                              'default_timezone': 'America/Denver',
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         self.app.post_json(uri, params=request_parameters, headers=self.headers)
@@ -208,6 +213,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': self.domain_key.urlsafe(),
                               'proof_of_play_logging': False,
+                              'default_timezone': 'America/Denver',
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         self.app.post(uri, json.dumps(request_parameters), headers=self.headers)
@@ -226,6 +232,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': '',
                               'proof_of_play_logging': False,
+                              'default_timezone': 'America/Denver',
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         with self.assertRaises(AppError) as context:
@@ -251,6 +258,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': self.domain_key.urlsafe(),
                               'proof_of_play_logging': False,
+                              'default_timezone': 'America/Denver',
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         with self.assertRaises(AppError) as context:
@@ -272,6 +280,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'domain_key': '',
                               'proof_of_play_logging': 'invalid input',
+                              'default_timezone': 'America/Denver',
                               'active': True}
         uri = application.router.build(None, 'tenants', None, {})
         with self.assertRaises(AppError) as context:
@@ -291,6 +300,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com',
                               'content_server_api_key': 'dfhajskdhahdfyyadfgdfhgjkdhlf',
                               'proof_of_play_logging': False,
+                              'default_timezone': 'America/Denver',
                               'active': 'invalid input',
                               'domain_key': ''}
         uri = application.router.build(None, 'tenants', None, {})
@@ -317,6 +327,7 @@ class TestTenantsHandler(BaseTest, WebTest):
             'domain_key': self.domain_key.urlsafe(),
             'active': True,
             'proof_of_play_logging': False,
+            'default_timezone': 'America/Denver',
             'notifications_emails': ''
         }
         response = self.app.put_json(uri, entity_body, headers=self.headers)
@@ -337,6 +348,7 @@ class TestTenantsHandler(BaseTest, WebTest):
             'content_server_api_key': 'some key',
             'domain_key': self.domain_key.urlsafe(),
             'proof_of_play_logging': False,
+            'default_timezone': 'America/Denver',
             'active': True
         }
         self.app.put_json(uri, entity_body, headers=self.headers)
@@ -357,6 +369,7 @@ class TestTenantsHandler(BaseTest, WebTest):
             'content_server_api_key': 'some key',
             'domain_key': self.domain_key.urlsafe(),
             'proof_of_play_logging': False,
+            'default_timezone': 'America/Denver',
             'active': True
         }
         self.app.put_json(uri, entity_body, headers=self.headers)
@@ -375,6 +388,7 @@ class TestTenantsHandler(BaseTest, WebTest):
             'domain_key': self.domain_key.urlsafe(),
             'active': True,
             'proof_of_play_logging': False,
+            'default_timezone': 'America/Denver',
             'notifications_emails': ''
         }
         with self.assertRaises(AppError) as context:
@@ -394,6 +408,7 @@ class TestTenantsHandler(BaseTest, WebTest):
             'domain_key': self.domain_key.urlsafe(),
             'active': True,
             'proof_of_play_logging': False,
+            'default_timezone': 'America/Denver',
             'notifications_emails': ''
         }
         with self.assertRaises(AppError) as context:
@@ -419,11 +434,13 @@ class TestTenantsHandler(BaseTest, WebTest):
             'domain_key': self.domain_key.urlsafe(),
             'active': False,
             'proof_of_play_logging': False,
+            'default_timezone': 'America/Denver',
             'notification_emails': notification_email
         }
         self.app.put_json(uri, entity_body, headers=self.headers)
         self.assertEqual(expected.name, 'foobar')
         self.assertFalse(expected.active)
+        self.assertEqual(expected.default_timezone,'America/Denver')
         self.assertNotEqual(expected.notification_emails, self.ORIGINAL_NOTIFICATION_EMAILS)
         email_list = delimited_string_to_list(notification_email)
         self.assertEqual(expected.notification_emails, email_list)
@@ -447,6 +464,7 @@ class TestTenantsHandler(BaseTest, WebTest):
             'content_server_api_key': 'some key',
             'domain_key': new_domain_key.urlsafe(),
             'proof_of_play_logging': False,
+            'default_timezone': 'America/Denver',
             'active': False
         }
         self.app.put_json(uri, entity_body, headers=self.headers)
@@ -479,7 +497,8 @@ class TestTenantsHandler(BaseTest, WebTest):
             'content_server_api_key': 'some key',
             'domain_key': self.domain_key.urlsafe(),
             'active': False,
-            'proof_of_play_logging': False
+            'proof_of_play_logging': False,
+            'default_timezone': 'America/Denver'
         }
         self.assertTrue(tenant.proof_of_play_logging)
         self.assertTrue(device.proof_of_play_logging)
@@ -517,7 +536,8 @@ class TestTenantsHandler(BaseTest, WebTest):
             'content_server_api_key': 'some key',
             'domain_key': self.domain_key.urlsafe(),
             'active': False,
-            'proof_of_play_logging': True
+            'proof_of_play_logging': True,
+            'default_timezone': 'America/Denver'
         }
         self.assertFalse(tenant.proof_of_play_logging)
         self.assertTrue(device.proof_of_play_logging)
