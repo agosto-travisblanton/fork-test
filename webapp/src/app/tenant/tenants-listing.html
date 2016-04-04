@@ -29,7 +29,7 @@
                 <tr ng-hide="tenantsCtrl.tenants.length">
                   <td class="no-devices text-center text-danger" colspan="5">No tenants</td>
                 </tr>
-                <tr ng-repeat="item in tenantsCtrl.tenants | orderBy:'name' ">
+                <tr ng-repeat="item in tenantsCtrl.tenants | orderBy:'name' " ng-click="tenantsCtrl.editItem(item)">
                   <td>
                     <a ng-click="tenantsCtrl.editItem(item)" title="Tenant detail">
                       <ng-md-icon icon="mode_edit" size="48">

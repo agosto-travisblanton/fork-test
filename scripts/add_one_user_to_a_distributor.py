@@ -1,14 +1,21 @@
 from models import User, Distributor
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
-user = User.get_or_insert_by_email(email='bob.macneal@agosto.com')
-distributor = Distributor.query(Distributor.name == 'Agosto').get()
+distributor_name = 'Agosto'
+user_email = 'bob.macneal@agosto.com'
+
+user = User.get_or_insert_by_email(email=user_email)
+distributor = Distributor.query(Distributor.name == distributor_name).get()
 
 if None == distributor:
-    print 'Distributor not found'
+    distributor = Distributor.create(name=distributor_name, active=True)
+    distributor.put()
+    print 'Distributor ' + distributor.name + ' created.'
 else:
-    if None == user:
-        print 'User not found'
-    else:
-        user.add_distributor(distributor.key)
-        print 'SUCCESS! ' + user.email + ' is linked to ' + distributor.name
+    print distributor.name + ' found.'
+
+if None == user:
+    print 'User not found'
+else:
+    user.add_distributor(distributor.key)
+    print 'SUCCESS! ' + user.email + ' is linked to ' + distributor.name

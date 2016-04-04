@@ -40,12 +40,6 @@ describe 'TenantLocationCtrl', ->
     it 'should set tenantKey to $stateParams.tenantKey', ->
       expect(controller.tenantKey).toBe $stateParams.tenantKey
 
-    it 'should set default selected timezone to Chicago', ->
-      expect(controller.selectedTimezone).toBe 'America/Chicago'
-
-    it 'should set timezones to array', ->
-      expect(controller.timezones).toBeDefined()
-
     describe 'editing an existing location', ->
       beforeEach ->
         $stateParams = {locationKey: 'fahdsfyudsyfauisdyfoiusydfu'}
@@ -72,12 +66,8 @@ describe 'TenantLocationCtrl', ->
           $stateParams: $stateParams
           LocationsService: LocationsService
         }
-        spyOn(LocationsService, 'getTimezones').and.returnValue locationsServicePromise
         controller = $controller 'TenantLocationCtrl', serviceInjection
         controller.initialize()
-
-      it 'should call LocationsService.getTimezones', ->
-        expect(LocationsService.getTimezones).toHaveBeenCalled()
 
   describe '.onClickSaveButton', ->
     controller = undefined

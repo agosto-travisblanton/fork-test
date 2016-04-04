@@ -50,28 +50,6 @@
 
             </div>
             <div class="form-group"
-                 ng-class="{ 'has-error' : locationForm.timezone.$invalid &&
-                 !locationForm.timezone.$pristine }">
-              <div class="col-sm-4">
-                <label>Timezone</label>
-                <br>
-                <select id="timezone"
-                        ng-model="tenantLocationCtrl.selectedTimezone"
-                        class="form-control"
-                        ng-options="item for item in tenantLocationCtrl.timezones track by item">
-                  <option value=''>Select timezone</option>
-                </select>
-              </div>
-              <div class="col-sm-5 margin-top-15">
-                <p
-                  ng-show="locationForm.tenantCode.$invalid && !locationForm.tenantCode.$pristine"
-                  class="help-block">
-                  Alphanumeric and underscore are allowed.
-                </p>
-              </div>
-
-            </div>
-            <div class="form-group"
                  ng-class="{ 'has-error' : locationForm.address.$invalid &&
                  !locationForm.address.$pristine }">
               <div class="col-sm-4">

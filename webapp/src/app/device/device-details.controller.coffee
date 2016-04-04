@@ -59,8 +59,13 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       previous:'glyphicon glyphicon-arrow-left',
       up:'glyphicon glyphicon-arrow-up',
       down:'glyphicon glyphicon-arrow-down'}}"
+  @timezones = []
+  @selectedTimezone = 'America/Chicago'
 
   @initialize = () ->
+    timezonePromise = DevicesService.getTimezones()
+    timezonePromise.then (data) =>
+      @timezones = data
     @panelModels = DevicesService.getPanelModels()
     @panelInputs = DevicesService.getPanelInputs()
     if @editMode
@@ -87,6 +92,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onGetDeviceSuccess = (response) ->
     @currentDevice = response
+    @selectedTimezone = response.timezone if response.timezone != @selectedTimezone
     @tenantKey = @currentDevice.tenantKey if @tenantKey is undefined
     if $stateParams.fromDevices is "true"
       @backUrl = '/#/devices'
@@ -130,12 +136,13 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onClickSaveDevice = () ->
     ProgressBarService.start()
-    if @currentDevice.location != undefined &&  @currentDevice.location.key != undefined
+    if @currentDevice.location != undefined && @currentDevice.location.key != undefined
       @currentDevice.locationKey = @currentDevice.location.key
     if @currentDevice.panelModel.id != undefined && @currentDevice.panelModel.id != 'None'
       @currentDevice.panelModelNumber = @currentDevice.panelModel.id
     if @currentDevice.panelInput.id != undefined && @currentDevice.panelInput.id != 'None'
       @currentDevice.panelSerialInput = @currentDevice.panelInput.id.toLowerCase()
+    @currentDevice.timezone = @selectedTimezone
     promise = DevicesService.save @currentDevice
     promise.then @onSuccessDeviceSave, @onFailureDeviceSave
 

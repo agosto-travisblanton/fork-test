@@ -10,7 +10,6 @@ from models import Location
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import LOCATION_STRATEGY
-from utils.timezone_util import TimezoneUtil
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -56,12 +55,6 @@ class LocationsHandler(RequestHandler, KeyValidatorMixin):
                 error_message = 'The customer location name parameter is invalid.'
                 self.response.set_status(status, error_message)
                 return
-            timezone = request_json.get('timezone')
-            if timezone is None or timezone == '':
-                status = 400
-                error_message = 'The timezone parameter is invalid.'
-                self.response.set_status(status, error_message)
-                return
             active = request_json.get('active')
             if active is None or active == '' or (str(active).lower() != 'true' and str(active).lower() != 'false'):
                 status = 400
@@ -89,8 +82,7 @@ class LocationsHandler(RequestHandler, KeyValidatorMixin):
                 if Location.is_customer_location_code_unique(customer_location_code, tenant_key):
                     location = Location.create(tenant_key=tenant_key,
                                                customer_location_name=customer_location_name,
-                                               customer_location_code=customer_location_code,
-                                               timezone=timezone)
+                                               customer_location_code=customer_location_code)
                     if address:
                         location.address = address
                     if city:
@@ -124,10 +116,6 @@ class LocationsHandler(RequestHandler, KeyValidatorMixin):
         location = key.get()
         request_json = json.loads(self.request.body)
         location.customer_location_name = request_json.get('customerLocationName')
-        timezone = request_json.get('timezone')
-        if timezone:
-            location.timezone = timezone
-            location.timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
         address = request_json.get('address')
         if address:
             location.address = address

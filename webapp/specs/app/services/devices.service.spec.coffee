@@ -100,7 +100,7 @@ describe 'DevicesService', ->
       spyOn(Restangular, 'oneUrl').and.returnValue deviceRestangularService
       spyOn(deviceRestangularService, 'get').and.returnValue promise
       actual = DevicesService.getCommandEventsByKey(deviceKey)
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices',"/api/v1/player-command-events/#{deviceKey}"
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "/api/v1/player-command-events/#{deviceKey}"
       expect(deviceRestangularService.get).toHaveBeenCalled()
       expect(actual).toBe promise
 
@@ -114,7 +114,7 @@ describe 'DevicesService', ->
       spyOn(Restangular, 'oneUrl').and.returnValue deviceRestangularService
       spyOn(deviceRestangularService, 'get').and.returnValue promise
       actual = DevicesService.searchDevicesByPartialMac(distributorKey, partialMac, unmanaged)
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices',"api/v1/distributors/search/mac/#{distributorKey}/#{partialMac}/#{unmanaged}/devices"
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/distributors/search/mac/#{distributorKey}/#{partialMac}/#{unmanaged}/devices"
       expect(deviceRestangularService.get).toHaveBeenCalled()
       expect(actual).toBe promise
 
@@ -127,7 +127,7 @@ describe 'DevicesService', ->
       spyOn(Restangular, 'oneUrl').and.returnValue deviceRestangularService
       spyOn(deviceRestangularService, 'get').and.returnValue promise
       actual = DevicesService.searchDevicesByPartialSerial(distributorKey, partialMac, unmanaged)
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices',"api/v1/distributors/search/serial/#{distributorKey}/#{partialMac}/#{unmanaged}/devices"
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/distributors/search/serial/#{distributorKey}/#{partialMac}/#{unmanaged}/devices"
       expect(deviceRestangularService.get).toHaveBeenCalled()
       expect(actual).toBe promise
 
@@ -140,7 +140,7 @@ describe 'DevicesService', ->
       spyOn(Restangular, 'oneUrl').and.returnValue deviceRestangularService
       spyOn(deviceRestangularService, 'get').and.returnValue promise
       actual = DevicesService.matchDevicesByFullMac(distributorKey, partialMac, unmanaged)
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices',"api/v1/distributors/match/mac/#{distributorKey}/#{partialMac}/#{unmanaged}/devices"
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/distributors/match/mac/#{distributorKey}/#{partialMac}/#{unmanaged}/devices"
       expect(deviceRestangularService.get).toHaveBeenCalled()
       expect(actual).toBe promise
 
@@ -153,6 +153,16 @@ describe 'DevicesService', ->
       spyOn(Restangular, 'oneUrl').and.returnValue deviceRestangularService
       spyOn(deviceRestangularService, 'get').and.returnValue promise
       actual = DevicesService.matchDevicesByFullSerial(distributorKey, partialMac, unmanaged)
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices',"api/v1/distributors/match/serial/#{distributorKey}/#{partialMac}/#{unmanaged}/devices"
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/distributors/match/serial/#{distributorKey}/#{partialMac}/#{unmanaged}/devices"
+      expect(deviceRestangularService.get).toHaveBeenCalled()
+      expect(actual).toBe promise
+
+  describe '.getTimezones', ->
+    it 'retrieve list of timezones, returning a promise', ->
+      deviceRestangularService = {get: ->}
+      spyOn(Restangular, 'oneUrl').and.returnValue deviceRestangularService
+      spyOn(deviceRestangularService, 'get').and.returnValue promise
+      actual = DevicesService.getTimezones promise
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'timezones', 'api/v1/timezones'
       expect(deviceRestangularService.get).toHaveBeenCalled()
       expect(actual).toBe promise

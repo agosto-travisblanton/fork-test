@@ -45,8 +45,7 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($http, $log, Res
         url = "api/v1/distributors/search/mac/#{distributorKey}/#{partial_mac}/#{unmanaged}/devices"
         promise = Restangular.oneUrl(SERVICE_NAME, url).get()
         promise
-        
-        
+
     matchDevicesByFullSerial: (distributorKey, full_serial, unmanaged) ->
       unless distributorKey == undefined
         url = "api/v1/distributors/match/serial/#{distributorKey}/#{full_serial}/#{unmanaged}/devices"
@@ -169,5 +168,9 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($http, $log, Res
           'parentId': 'NEC-LCD4215'
         }
       ]
+
+    getTimezones: () ->
+      promise = Restangular.oneUrl('timezones', 'api/v1/timezones').get()
+      promise
 
   new DevicesService()

@@ -28,7 +28,7 @@
                 <tr ng-hide="domainsCtrl.domains.length">
                   <td class="no-devices text-center text-danger" colspan="4">No domains</td>
                 </tr>
-                <tr ng-repeat="item in domainsCtrl.domains | orderBy:'-created'">
+                <tr ng-repeat="item in domainsCtrl.domains | orderBy:'-created'" ng-click="domainsCtrl.editItem(item)">
                   <td>
                     <a ng-click="domainsCtrl.editItem(item)" title="Domain detail">
                       <ng-md-icon icon="mode_edit" size="48">
@@ -40,7 +40,7 @@
                       </ng-md-icon>
                     </a>
                   </td>
-                  <td class="domain-key"><a name="edit-domain" class="btn"
+                  <td class="domain-key"><a name="edit-domain" class="md-primary md-ink-ripple"
                                             ng-click="domainsCtrl.editItem(item)"
                                             title="Edit domain">{{item.name}}</a></td>
                   <td class="domain-impersonation-admin-email-address">{{item.impersonation_admin_email_address}}</td>

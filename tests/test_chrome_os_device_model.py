@@ -113,7 +113,7 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertEqual(device.program_id, '****initial****')
         self.assertTrue(device.heartbeat_interval_minutes is config.PLAYER_HEARTBEAT_INTERVAL_MINUTES)
 
-    def test_json_serialization_strategy(self):
+    def test_json_serialization_strategy_with_default_timezone(self):
         device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
                                                device_id=self.TESTING_DEVICE_ID,
                                                gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
@@ -129,8 +129,7 @@ class TestChromeOsDeviceModel(BaseTest):
         timezone = 'America/Chicago'
         location = Location.create(tenant_key=self.tenant_key,
                                    customer_location_name=customer_location_name,
-                                   customer_location_code=customer_location_code,
-                                   timezone=timezone)
+                                   customer_location_code=customer_location_code)
         location.geo_location = ndb.GeoPt(self.LATITUDE, self.LONGITUDE)
         device.location_key = location.put()
         device.put()
@@ -157,6 +156,19 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertEqual(TimezoneUtil.get_timezone_offset(json_representation['timezone']),
                          json_representation['timezoneOffset'])
 
+    def test_json_serialization_strategy_with_explicit_timezone(self):
+        timezone = 'America/Denver'
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS,
+                                               timezone=timezone)
+        device.put()
+        json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
+        self.assertEqual(timezone, json_representation['timezone'])
+        self.assertEqual(TimezoneUtil.get_timezone_offset(json_representation['timezone']),
+                         json_representation['timezoneOffset'])
+
     def test_json_serialization_strategy_with_default_geo_location(self):
         device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
                                                device_id=self.TESTING_DEVICE_ID,
@@ -169,8 +181,7 @@ class TestChromeOsDeviceModel(BaseTest):
         timezone = 'America/Chicago'
         location = Location.create(tenant_key=self.tenant_key,
                                    customer_location_name=customer_location_name,
-                                   customer_location_code=customer_location_code,
-                                   timezone=timezone)
+                                   customer_location_code=customer_location_code)
         device.location_key = location.put()
         device.put()
         json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
