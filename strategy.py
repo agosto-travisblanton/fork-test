@@ -13,6 +13,7 @@ TENANT_FIELDS = [
     'content_manager_base_url',
     'proof_of_play_logging',
     'proof_of_play_url',
+    'default_timezone',
     'active',
     'created',
     'updated'
