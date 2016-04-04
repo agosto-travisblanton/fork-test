@@ -495,6 +495,39 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             if last_error:
                 if device.last_error != last_error:
                     device.last_error = last_error
+            timezone = request_json.get('timezone')
+            if timezone:
+                if device.timezone != timezone:
+                    new_log_entry = DeviceIssueLog.create(device_key=device.key,
+                                                          category=config.DEVICE_ISSUE_TIMEZONE_CHANGE,
+                                                          up=True,
+                                                          storage_utilization=storage,
+                                                          memory_utilization=memory,
+                                                          program=program,
+                                                          program_id=program_id,
+                                                          last_error=last_error,
+                                                          resolved=True,
+                                                          resolved_datetime=datetime.utcnow())
+                    new_log_entry.put()
+            timezone_offset = request_json.get('timezoneOffset')
+            if timezone_offset and timezone:
+                if timezone_offset != TimezoneUtil.get_timezone_offset(timezone):
+                    change_intent(
+                        gcm_registration_id=device.gcm_registration_id,
+                        payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                        device_urlsafe_key=device_urlsafe_key,
+                        host=self.request.host_url)
+                    new_log_entry = DeviceIssueLog.create(device_key=device.key,
+                                                          category=config.DEVICE_ISSUE_TIMEZONE_OFFSET_CHANGE,
+                                                          up=True,
+                                                          storage_utilization=storage,
+                                                          memory_utilization=memory,
+                                                          program=program,
+                                                          program_id=program_id,
+                                                          last_error=last_error,
+                                                          resolved=True,
+                                                          resolved_datetime=datetime.utcnow())
+                    new_log_entry.put()
             sk_player_version = request_json.get('playerVersion')
             if sk_player_version:
                 if device.sk_player_version != sk_player_version:
