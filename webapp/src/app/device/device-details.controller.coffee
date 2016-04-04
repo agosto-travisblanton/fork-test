@@ -61,7 +61,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       up:'glyphicon glyphicon-arrow-up',
       down:'glyphicon glyphicon-arrow-down'}}"
   @timezones = []
-  @selectedTimezone = 'America/Chicago'
+  @selectedTimezone = undefined
 
   @initialize = () ->
     timezonePromise = TimezonesService.getUsTimezones()

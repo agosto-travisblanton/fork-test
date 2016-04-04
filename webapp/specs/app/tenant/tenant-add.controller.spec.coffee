@@ -6,9 +6,11 @@ describe 'TenantAddCtrl', ->
   controller = undefined
   controllerGameStop = undefined
   DistributorsService = undefined
+  TimezonesService = undefined
   distributorKey = 'ahtzfnNreWtpdC1kaXNwbGF5LWRldml0aXR5R3JvdXAMCxILRGlzdHJpYnV0b3IYgICAgMCcggoM'
   distributorPromise = undefined
   distributorDomainsPromise = undefined
+  timezonesPromise = undefined
   TenantsService = undefined
   tenantsServicePromise = undefined
   progressBarService = undefined
@@ -20,10 +22,12 @@ describe 'TenantAddCtrl', ->
   beforeEach ->
     angular.mock.module 'skykitProvisioning'
 
-    inject (_$controller_, _$cookies_, _DistributorsService_, _TenantsService_, _$state_, _sweet_, _$log_, _$location_) ->
+    inject (_$controller_, _$cookies_, _DistributorsService_, _TimezonesService_, _TenantsService_, _$state_, _sweet_,
+      _$log_, _$location_) ->
       controllerFactory = _$controller_
       $cookies = _$cookies_
       DistributorsService = _DistributorsService_
+      TimezonesService = _TimezonesService_
       TenantsService = _TenantsService_
       $state = _$state_
       sweet = _sweet_
@@ -78,14 +82,27 @@ describe 'TenantAddCtrl', ->
       expect(angular.isArray(controller.distributorDomains)).toBeTruthy()
       expect(controller.distributorDomains.length).toBe 0
 
+    it 'declares timezones as an empty array', ->
+      expect(angular.isArray(controller.timezones)).toBeTruthy()
+      expect(controller.timezones.length).toBe 0
+
+    it 'sets a selectedTimezone', ->
+      expect(controller.selectedTimezone).toBe 'America/Chicago'
+
   describe '.initialize', ->
     beforeEach ->
       spyOn($cookies, 'get').and.returnValue distributorKey
       distributorPromise = new skykitProvisioning.q.Mock
+      timezonesPromise = new skykitProvisioning.q.Mock
       spyOn(DistributorsService, 'getByKey').and.returnValue distributorPromise
       distributorDomainsPromise = new skykitProvisioning.q.Mock
       spyOn(DistributorsService, 'getDomainsByKey').and.returnValue distributorDomainsPromise
+      spyOn(TimezonesService, 'getUsTimezones').and.returnValue timezonesPromise
       controller.initialize()
+
+    it 'calls TimezonesService.getUsTimezones to retrieve US timezones', ->
+      controller.initialize()
+      expect(TimezonesService.getUsTimezones).toHaveBeenCalled()
 
     it 'invokes $cookies to obtain the currentDistributorKey', ->
       expect($cookies.get).toHaveBeenCalledWith 'currentDistributorKey'

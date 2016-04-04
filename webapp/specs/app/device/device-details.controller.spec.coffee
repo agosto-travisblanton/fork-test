@@ -138,6 +138,14 @@ describe 'DeviceDetailsCtrl', ->
       it 'issues array should be defined', ->
         expect(controller.issues).toBeDefined()
 
+      it 'declares timezones as an empty array', ->
+        expect(angular.isArray(controller.timezones)).toBeTruthy()
+        expect(controller.timezones.length).toBe 0
+
+      it 'declares a selectedTimezone', ->
+        expect(controller.selectedTimezone).toBeUndefined()
+
+
     describe 'edit mode', ->
       beforeEach ->
         $stateParams = {
