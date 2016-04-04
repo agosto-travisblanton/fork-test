@@ -20,3 +20,8 @@ class TimezoneUtil(object):
     def get_us_timezones():
         timezones = pytz.country_timezones['us']
         return timezones
+
+    @staticmethod
+    def get_all_common_timezones():
+        timezones = pytz.common_timezones
+        return timezones

@@ -156,13 +156,3 @@ describe 'DevicesService', ->
       expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/distributors/match/serial/#{distributorKey}/#{partialMac}/#{unmanaged}/devices"
       expect(deviceRestangularService.get).toHaveBeenCalled()
       expect(actual).toBe promise
-
-  describe '.getTimezones', ->
-    it 'retrieve list of timezones, returning a promise', ->
-      deviceRestangularService = {get: ->}
-      spyOn(Restangular, 'oneUrl').and.returnValue deviceRestangularService
-      spyOn(deviceRestangularService, 'get').and.returnValue promise
-      actual = DevicesService.getTimezones promise
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'timezones', 'api/v1/timezones'
-      expect(deviceRestangularService.get).toHaveBeenCalled()
-      expect(actual).toBe promise

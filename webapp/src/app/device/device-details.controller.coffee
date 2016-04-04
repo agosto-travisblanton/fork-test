@@ -8,6 +8,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     DevicesService,
     LocationsService,
     CommandsService,
+    TimezonesService,
     sweet,
     $cookies,
     ProgressBarService) ->
@@ -63,7 +64,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @selectedTimezone = 'America/Chicago'
 
   @initialize = () ->
-    timezonePromise = DevicesService.getTimezones()
+    timezonePromise = TimezonesService.getUsTimezones()
     timezonePromise.then (data) =>
       @timezones = data
     @panelModels = DevicesService.getPanelModels()
