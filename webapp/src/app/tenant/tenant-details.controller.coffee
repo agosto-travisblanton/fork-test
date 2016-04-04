@@ -41,12 +41,14 @@ appModule.controller 'TenantDetailsCtrl',
         @distributorDomains = domains
 
     @onSuccessResolvingTenant = (tenant) =>
+      @selectedTimezone = tenant.default_timezone
       domainPromise = DomainsService.getDomainByKey tenant.domain_key
       domainPromise.then (data) =>
         @selectedDomain = data
 
     @onClickSaveButton = ->
       ProgressBarService.start()
+      @currentTenant.default_timezone = @selectedTimezone
       @currentTenant.domain_key = @selectedDomain.key
       promise = TenantsService.save @currentTenant
       promise.then @onSuccessTenantSave, @onFailureTenantSave
