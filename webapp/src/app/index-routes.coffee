@@ -13,6 +13,16 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     controller: "AuthenticationCtrl",
     controllerAs: 'authenticationCtrl',
   })
+  $stateProvider.state("signed_out", {
+    resolve: {
+      identity: (IdentityService) ->
+        IdentityService.getIdentity()
+    },
+    url: "/signed_out",
+    templateUrl: "app/authentication/signed_out.html",
+    controller: "AuthenticationCtrl",
+    controllerAs: 'authenticationCtrl',
+  })
   $stateProvider.state("sign_out", {
     resolve: {
       identity: (IdentityService) ->
