@@ -6,13 +6,31 @@ describe 'WelcomeCtrl', ->
   VersionsService = undefined
   promise = undefined
   versionData = undefined
+  cookieMock = undefined
+  $stateParams = undefined
+  $state = undefined
 
   beforeEach module('skykitProvisioning')
 
-  beforeEach inject (_$controller_, _VersionsService_) ->
+  beforeEach inject (_$controller_, _VersionsService_, _$state_) ->
     $controller = _$controller_
     VersionsService = _VersionsService_
-    controller = $controller 'WelcomeCtrl', {VersionsService: VersionsService}
+    $stateParams = {}
+    $state = {}
+    $state = _$state_
+    cookieMock = {
+      storage: {},
+      put: (key, value) ->
+        this.storage[key] = value
+      get: (key) ->
+        return this.storage[key]
+    }
+    controller = $controller 'WelcomeCtrl', {
+      VersionsService: VersionsService,
+      $cookies: cookieMock,
+      $stateParams: $stateParams,
+      $state: $state
+    }
 
   describe 'initialization', ->
     it 'version_data should be an empty array', ->
@@ -31,13 +49,25 @@ describe 'WelcomeCtrl', ->
 
     beforeEach ->
       promise = new skykitProvisioning.q.Mock
+      spyOn($state, 'go')
       spyOn(VersionsService, 'getVersions').and.returnValue promise
 
-    it 'call VersionsService.getVersions to retrieve module version', ->
+    it 'call VersionsService.getVersions to retrieve module version with auth', ->
+      cookieMock.put("userEmail", "some.user@demo.agosto.com")
       controller.initialize()
       expect(VersionsService.getVersions).toHaveBeenCalled()
 
-    it "the 'then' handler caches the retrieved version data on the controller", ->
+    it "the 'then' handler caches the retrieved version data on the controller with auth", ->
+      cookieMock.put("userEmail", "some.user@demo.agosto.com")
       controller.initialize()
       promise.resolve versionData
       expect(controller.version_data).toBe versionData
+
+    it 'call VersionsService.getVersions to retrieve module version without auth', ->
+      controller.initialize()
+      expect($state.go).toHaveBeenCalledWith('sign_in')
+
+      
+    it "the 'then' handler caches the retrieved version data on the controller without auth", ->
+      controller.initialize()
+      expect($state.go).toHaveBeenCalledWith('sign_in')
