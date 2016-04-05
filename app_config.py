@@ -66,6 +66,8 @@ class AppConfig(Config):
     MAIL_EVENTS_URL = None
     MAIL_API_KEY = None
     MAIL_FROM = None
+    MAIL_SERVER_QUEUED_RESPONSE_MESSAGE = 'Queued. Thank you.'
+
 
     EMAIL_SUPPORT = False
 

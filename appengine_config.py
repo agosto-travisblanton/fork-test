@@ -557,6 +557,13 @@ def _MAIL_FROM():
 app_MAIL_FROM = _MAIL_FROM()
 
 
+def _MAIL_SERVER_QUEUED_RESPONSE_MESSAGE():
+    return 'Queued. Thank you.'
+
+
+app_MAIL_SERVER_QUEUED_RESPONSE_MESSAGE = _MAIL_SERVER_QUEUED_RESPONSE_MESSAGE()
+
+
 def _EMAIL_SUPPORT():
     if on_development_server or not on_server:
         return True

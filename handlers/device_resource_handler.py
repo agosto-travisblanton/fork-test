@@ -15,6 +15,7 @@ from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup, DeviceIssu
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY, DEVICE_ISSUE_LOG_STRATEGY
+from utils.email_notify import EmailNotify
 from utils.mail_util import MailUtil
 from utils.timezone_util import TimezoneUtil
 
@@ -340,15 +341,16 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     self.response.headers['Location'] = device_uri
                     self.response.headers.pop('Content-Type', None)
                     self.response.set_status(status)
-                    tenant_notification_emails = Tenant.find_by_tenant_code(tenant_code).notification_emails
-                    if tenant_notification_emails is not None and len(tenant_notification_emails) > 0:
-                        response = MailUtil.send_message(
-                            recipients=tenant_notification_emails,
-                            subject='Device Added',
-                            text='A new device was added with MAC address {0}.'.format(device_mac_address))
-                        response_json = json.loads(response)
-                        if response_json['message'] is not self.MAILGUN_QUEUED_MESSAGE:
-                            logging.warning('Tenant notification email for device add was not queued.')
+                    EmailNotify.device_enrolled(tenant_code=tenant_code, device_mac_address=device_mac_address)
+                    # tenant_notification_emails = Tenant.find_by_tenant_code(tenant_code).notification_emails
+                    # if tenant_notification_emails is not None and len(tenant_notification_emails) > 0:
+                    #     response = MailUtil.send_message(
+                    #         recipients=tenant_notification_emails,
+                    #         subject='Device Added',
+                    #         text='A new device was added with MAC address {0}.'.format(device_mac_address))
+                    #     response_json = json.loads(response)
+                    #     if response_json['message'] is not self.MAILGUN_QUEUED_MESSAGE:
+                    #         logging.warning('Tenant notification email for device add was not queued.')
                 else:
                     self.response.set_status(status, error_message)
         else:
