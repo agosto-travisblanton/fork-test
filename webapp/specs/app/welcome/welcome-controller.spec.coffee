@@ -71,3 +71,8 @@ describe 'WelcomeCtrl', ->
     it "the 'then' handler caches the retrieved version data on the controller without auth", ->
       controller.initialize()
       expect($state.go).toHaveBeenCalledWith('sign_in')
+
+    
+    it "goes to sign in view when hit", ->
+      controller.proceedToSignIn()
+      expect($state.go).toHaveBeenCalledWith('sign_in')
