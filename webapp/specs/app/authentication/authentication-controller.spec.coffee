@@ -171,16 +171,17 @@ describe 'AuthenticationCtrl', ->
       spyOn(SessionsService, 'removeUserInfo')
       spyOn($timeoutMock, 'timeout').and.callFake (callback) -> callback()
       spyOn(controller, 'proceedToSignIn').and.callFake ->
+      spyOn(controller, 'proceedToSignedOut').and.callFake ->
       controller.initializeSignOut()
 
     it "calls SessionsService.removeUserInfo ", ->
       expect(SessionsService.removeUserInfo).toHaveBeenCalled()
 
-    it "calls $timeout with the proceed with sign in function and delay", ->
-      expect($timeoutMock.timeout).toHaveBeenCalledWith controller.proceedToSignIn, 1500
+    it "calls $timeout with the proceed with signed out function and delay", ->
+      expect($timeoutMock.timeout).toHaveBeenCalledWith controller.proceedToSignedOut, 1500
 
-    it "calls proceedToSignIn after timeout delay", ->
-      expect(controller.proceedToSignIn).toHaveBeenCalled()
+    it "calls proceedToSignedOut after timeout delay", ->
+      expect(controller.proceedToSignedOut).toHaveBeenCalled()
 
 
   describe '.loginSuccess', ->
