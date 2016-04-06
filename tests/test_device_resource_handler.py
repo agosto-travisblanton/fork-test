@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 import device_message_processor
 from env_setup import setup_test_paths
+from utils.email_notify import EmailNotify
 from utils.timezone_util import TimezoneUtil
 from utils.web_util import build_uri
 from webtest import AppError
@@ -97,6 +98,11 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     ##################################################################################################################
 
     def test_post_managed_device_http_status_created(self):
+        when(EmailNotify).device_enrolled(tenant_code=any_matcher(),
+                                          tenant_name=any_matcher(),
+                                          device_mac_address=any_matcher(),
+                                          timestamp=any_matcher()).thenReturn(None)
+
         tenant = self.tenant_key.get()
         mac_address = '7889BE879f'
         request_body = {'macAddress': mac_address,
@@ -111,6 +117,11 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(201, response.status_int)
 
     def test_post_managed_device_returns_resource_url_in_location_header(self):
+        when(EmailNotify).device_enrolled(tenant_code=any_matcher(),
+                                          tenant_name=any_matcher(),
+                                          device_mac_address=any_matcher(),
+                                          timestamp=any_matcher()).thenReturn(None)
+
         tenant = self.tenant_key.get()
         mac_address = '7889BE879f'
         request_body = {'macAddress': mac_address,
@@ -185,6 +196,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         in context.exception.message)
 
     def test_post_managed_device_creates_device_with_default_timezone_and_expected_offset(self):
+        when(EmailNotify).device_enrolled(tenant_code=any_matcher(),
+                                          tenant_name=any_matcher(),
+                                          device_mac_address=any_matcher(),
+                                          timestamp=any_matcher()).thenReturn(None)
         tenant = self.tenant_key.get()
         mac_address = '7889BE879f'
         request_body = {'macAddress': mac_address,
@@ -202,6 +217,11 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(device.timezone, default_timezone)
 
     def test_post_managed_device_creates_device_with_explicit_timezone_and_expected_offset(self):
+        when(EmailNotify).device_enrolled(tenant_code=any_matcher(),
+                                          tenant_name=any_matcher(),
+                                          device_mac_address=any_matcher(),
+                                          timestamp=any_matcher()).thenReturn(None)
+
         tenant = self.tenant_key.get()
         mac_address = '7889BE879f'
         explicit_timezone = 'America/Denver'
