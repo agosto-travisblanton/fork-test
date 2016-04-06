@@ -6,8 +6,7 @@ describe 'DeviceDetailsCtrl', ->
   $stateParams = undefined
   $state = undefined
   DevicesService = undefined
-  devicesServicePromise = undefined
-  getDevicePromise = undefined
+  TimezonesService = undefined
   getDeviceIssuesPromise = undefined
   getPlayerCommandEventsPromise = undefined
   LocationsService = undefined
@@ -65,12 +64,14 @@ describe 'DeviceDetailsCtrl', ->
 
   beforeEach module('skykitProvisioning')
 
-  beforeEach inject (_$controller_, _DevicesService_, _LocationsService_, _CommandsService_, _sweet_, _$state_) ->
+  beforeEach inject (_$controller_, _DevicesService_, _TimezonesService_, _LocationsService_, _CommandsService_,
+    _sweet_, _$state_) ->
     $controller = _$controller_
     $stateParams = {}
     $state = {}
     $state = _$state_
     DevicesService = _DevicesService_
+    TimezonesService = _TimezonesService_
     LocationsService = _LocationsService_
     CommandsService = _CommandsService_
     progressBarService = {
@@ -97,7 +98,6 @@ describe 'DeviceDetailsCtrl', ->
       getDeviceIssuesPromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getIssuesByKey').and.returnValue getDeviceIssuesPromise
       spyOn(DevicesService, 'getPanelModels').and.returnValue [{'id': 'Sony–FXD40LX2F'}, {'id': 'NEC–LCD4215'}]
-
       inputs = [
         {
           'id': 'HDMI2'
@@ -113,7 +113,7 @@ describe 'DeviceDetailsCtrl', ->
         }
       ]
       spyOn(DevicesService, 'getPanelInputs').and.returnValue inputs
-      spyOn(DevicesService, 'getTimezones').and.returnValue timezonesPromise
+      spyOn(TimezonesService, 'getUsTimezones').and.returnValue timezonesPromise
 
     describe 'new mode', ->
       beforeEach ->
@@ -121,12 +121,13 @@ describe 'DeviceDetailsCtrl', ->
           $stateParams: $stateParams
           $state: $state
           DevicesService: DevicesService
+          TimezonesService: TimezonesService
           LocationsService: LocationsService
         }
         controller.initialize()
 
-      it 'should call DevicesService.getTimezones', ->
-        expect(DevicesService.getTimezones).toHaveBeenCalled()
+      it 'should call TimezonesService.getUsTimezones', ->
+        expect(TimezonesService.getUsTimezones).toHaveBeenCalled()
 
       it 'currentDevice property should be defined', ->
         expect(controller.currentDevice).toBeDefined()
@@ -136,6 +137,14 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'issues array should be defined', ->
         expect(controller.issues).toBeDefined()
+
+      it 'declares timezones as an empty array', ->
+        expect(angular.isArray(controller.timezones)).toBeTruthy()
+        expect(controller.timezones.length).toBe 0
+
+      it 'declares a selectedTimezone', ->
+        expect(controller.selectedTimezone).toBeUndefined()
+
 
     describe 'edit mode', ->
       beforeEach ->
@@ -147,6 +156,7 @@ describe 'DeviceDetailsCtrl', ->
           $stateParams: $stateParams
           $state: $state
           DevicesService: DevicesService
+          TimezonesService: TimezonesService
           LocationsService: LocationsService
         }
         now = new Date()
@@ -156,8 +166,8 @@ describe 'DeviceDetailsCtrl', ->
         @epochStart = moment(today).unix()
         controller.initialize()
 
-      it 'should call DevicesService.getTimezones', ->
-        expect(DevicesService.getTimezones).toHaveBeenCalled()
+      it 'should call TimezonesService.getTimezones', ->
+        expect(TimezonesService.getUsTimezones).toHaveBeenCalled()
 
       it 'defines currentDevice property', ->
         expect(controller.currentDevice).toBeDefined()

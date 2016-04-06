@@ -8,22 +8,26 @@ describe 'TenantDetailsCtrl', ->
   $stateParams = undefined
   TenantsService = undefined
   DomainsService = undefined
+  TimezonesService = undefined
   DistributorsService = undefined
   progressBarService = undefined
   tenantsServicePromise = undefined
   distributorsServicePromise = undefined
   distributorsDomainsServicePromise = undefined
   domainsServicePromise = undefined
+  timezoneServicePromise = undefined
   sweet = undefined
   serviceInjection = undefined
 
   beforeEach module('skykitProvisioning')
-  beforeEach inject (_$controller_, _TenantsService_, _DomainsService_, _DistributorsService_, _$state_, _sweet_) ->
+  beforeEach inject (_$controller_, _TenantsService_, _DomainsService_, _TimezonesService_, _DistributorsService_,
+    _$state_, _sweet_) ->
     $controller = _$controller_
     $state = _$state_
     $stateParams = {}
     TenantsService = _TenantsService_
     DomainsService = _DomainsService_
+    TimezonesService = _TimezonesService_
     DistributorsService = _DistributorsService_
     progressBarService = {
       start: ->
@@ -45,9 +49,11 @@ describe 'TenantDetailsCtrl', ->
       distributorsServicePromise = new skykitProvisioning.q.Mock
       distributorsDomainsServicePromise = new skykitProvisioning.q.Mock
       domainsServicePromise = new skykitProvisioning.q.Mock
+      timezoneServicePromise = new skykitProvisioning.q.Mock
       spyOn(TenantsService, 'getTenantByKey').and.returnValue tenantsServicePromise
       spyOn(DistributorsService, 'getDomainsByKey').and.returnValue distributorsDomainsServicePromise
       spyOn(DomainsService, 'getDomainByKey').and.returnValue domainsServicePromise
+      spyOn(TimezonesService, 'getUsTimezones').and.returnValue timezoneServicePromise
 
     it 'gameStopServer should be set', ->
       controller = $controller 'TenantDetailsCtrl', serviceInjection
@@ -101,6 +107,10 @@ describe 'TenantDetailsCtrl', ->
       beforeEach ->
         controller = $controller 'TenantDetailsCtrl', serviceInjection
         controller.currentDistributorKey = 'some-key'
+
+      it 'calls TimezonesService.getUsTimezones to retrieve US timezones', ->
+        controller.initialize()
+        expect(TimezonesService.getUsTimezones).toHaveBeenCalled()
 
       it 'calls DistributorsService.getDomainsByKey to retrieve distributor domains', ->
         controller.initialize()

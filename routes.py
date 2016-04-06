@@ -283,9 +283,17 @@ application = WSGIApplication(
         ############################################################
         # Timezones
         ############################################################
-        Route(r'/api/v1/timezones',
+        Route(r'/api/v1/timezones/us',
               handler='handlers.timezones_handler.TimezonesHandler',
-              name='timezones-list',
+              name='us-timezones',
+              handler_method='get_us_timezones',
+              methods=['GET']
+              ),
+
+        Route(r'/api/v1/timezones/all',
+              handler='handlers.timezones_handler.TimezonesHandler',
+              name='all-timezones',
+              handler_method='get_all_common_timezones',
               methods=['GET']
               ),
 

@@ -6,14 +6,20 @@ appModule.controller 'AppController', ($mdSidenav, $state, $cookies) ->
   vm = @
 
   vm.identity = {}
-
-  vm.initialize = ->
+  
+  @getIdentity = () ->
     vm.identity = {
       key:  $cookies.get('userKey')
       email:  $cookies.get('userEmail')
       distributorKey: $cookies.get('currentDistributorKey')
       distributorName: $cookies.get('currentDistributorName')
     }
+    
+    return vm.identity
+
+  vm.initialize = ->
+    @getIdentity()
+  
 
   vm.toggleSidenav = ->
     $mdSidenav('left').toggle()
