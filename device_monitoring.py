@@ -1,10 +1,11 @@
 import logging
-from datetime import datetime
 
+from datetime import datetime
 from google.appengine.ext.deferred import deferred
 
 from app_config import config
 from models import ChromeOsDevice, DeviceIssueLog
+from utils.email_notify import EmailNotify
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -55,6 +56,12 @@ def sweep_devices_for_responsiveness(devices, current_time):
                                               last_error=device.last_error,
                                               resolved=False)
                 issue.put()
+                tenant = device.get_tenant()
+                notifier = EmailNotify()
+                notifier.device_down(tenant_code=tenant.tenant_code,
+                                     tenant_name=tenant.name,
+                                     device_serial_number=device.serial_number,
+                                     timestamp=datetime.utcnow())
 
 
 def sweep_devices_for_exceeding_thresholds(devices, current_time):

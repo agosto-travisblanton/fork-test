@@ -573,6 +573,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             previously_down = device.up is False
             if previously_down:
                 DeviceIssueLog.resolve_device_down_issues(device_key=device.key, resolved_datetime=resolved_datetime)
+                notifier = EmailNotify()
+                tenant = device.get_tenant()
+                notifier.device_up(tenant_code=tenant.tenant_code,
+                                   tenant_name=tenant.name,
+                                   device_serial_number=device.serial_number)
                 new_log_entry = DeviceIssueLog.create(device_key=device.key,
                                                       category=config.DEVICE_ISSUE_PLAYER_UP,
                                                       up=True,
