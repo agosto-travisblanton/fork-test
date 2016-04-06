@@ -4,6 +4,12 @@ set -e
 COLOR_LIGHT_GREEN='\033[1;32m'
 COLOR_OFF='\033[0m'
 
+
+
+printf "\n${COLOR_LIGHT_GREEN}===> Installing Python packages via pip...${COLOR_OFF}\n"
+pip install PyOpenSSL
+pip install py
+
 printf "\n${COLOR_LIGHT_GREEN}===> Configuring AppEngine SDK environment...${COLOR_OFF}\n"
 
 export APPENGINE_SDK=/home/rof/appengine/python_appengine
