@@ -28,3 +28,5 @@ npm install
 
 printf "\n${COLOR_LIGHT_GREEN}===> Installing web packages via bower...${COLOR_OFF}\n"
 bower install
+
+cd ..
