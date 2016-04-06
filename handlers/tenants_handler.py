@@ -100,6 +100,12 @@ class TenantsHandler(RequestHandler):
                 proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
             else:
                 proof_of_play_url = proof_of_play_url.strip().lower()
+            default_timezone = request_json.get('default_timezone')
+            if default_timezone is None or default_timezone == '':
+                status = 400
+                error_message = 'The default timezone is invalid.'
+            else:
+                default_timezone = default_timezone
             if status == 201:
                 if Tenant.is_tenant_code_unique(tenant_code):
                     tenant = Tenant.create(name=name,
@@ -111,7 +117,8 @@ class TenantsHandler(RequestHandler):
                                            active=active,
                                            notification_emails = notification_emails,
                                            proof_of_play_logging=proof_of_play_logging,
-                                           proof_of_play_url=proof_of_play_url)
+                                           proof_of_play_url=proof_of_play_url,
+                                           default_timezone=default_timezone)
                     tenant_key = tenant.put()
                     content_manager_api = ContentManagerApi()
                     notify_content_manager = content_manager_api.create_tenant(tenant)
@@ -170,6 +177,12 @@ class TenantsHandler(RequestHandler):
             error_message = 'The content manager base url parameter is invalid.'
         else:
             tenant.content_manager_base_url = content_manager_base_url.strip().lower()
+        default_timezone = request_json.get('default_timezone')
+        if default_timezone is None or default_timezone == '':
+            status = 400
+            error_message = 'The default timezone parameter is invalid.'
+        else:
+            tenant.default_timezone = default_timezone
         email_list = delimited_string_to_list(request_json.get('notification_emails'))
         tenant.notification_emails = email_list
         domain_key_input = request_json.get('domain_key')

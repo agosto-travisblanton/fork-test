@@ -9,6 +9,11 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 class TimezonesHandler(RequestHandler):
     @requires_api_token
-    def get(self):
+    def get_us_timezones(self):
         result = TimezoneUtil.get_us_timezones()
+        json_response(self.response, result)
+
+    @requires_api_token
+    def get_all_common_timezones(self):
+        result = TimezoneUtil.get_all_common_timezones()
         json_response(self.response, result)

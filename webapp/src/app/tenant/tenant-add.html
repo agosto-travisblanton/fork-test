@@ -121,6 +121,16 @@
             </div>
             <div class="form-group">
               <div class="col-sm-5">
+                <label>Default timezone</label>
+                <select id="timezone"
+                        ng-model="tenantAddCtrl.selectedTimezone"
+                        class="form-control"
+                        ng-options="item for item in tenantAddCtrl.timezones track by item">
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-5">
                 <label>Notification emails</label>
                 <input type="text"
                        class="form-control"

@@ -169,8 +169,4 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($http, $log, Res
         }
       ]
 
-    getTimezones: () ->
-      promise = Restangular.oneUrl('timezones', 'api/v1/timezones').get()
-      promise
-
   new DevicesService()
