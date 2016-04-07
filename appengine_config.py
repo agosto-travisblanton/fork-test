@@ -376,6 +376,13 @@ app_MAIL_EVENTS_URL = "https://api.mailgun.net/v3/skykit.com/events"
 app_MAIL_FROM = "Skykit Provisioning <noreply-provisioning@skykit.com>"
 
 
+def _MAIL_SERVER_QUEUED_RESPONSE_MESSAGE():
+    return 'Queued. Thank you.'
+
+
+app_MAIL_SERVER_QUEUED_RESPONSE_MESSAGE = _MAIL_SERVER_QUEUED_RESPONSE_MESSAGE()
+
+
 def _EMAIL_SUPPORT():
     if on_development_server or not on_server:
         return True
