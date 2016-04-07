@@ -17,4 +17,4 @@ export APPENGINE_SDK=/home/rof/appengine/python_appengine
 
 printf "\n${COLOR_LIGHT_GREEN}===> Running Python tests...${COLOR_OFF}\n"
 
-./manage.py pytest --cov-report=term --cov-report=html --cov=. tests/proofplay_tests
+./manage.py pytest --cov-report=term --cov-report=html --cov=. tests
