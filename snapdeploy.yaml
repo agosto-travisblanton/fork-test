@@ -3,4 +3,4 @@ module_yaml_files:
 - app.yaml
 - migration.yaml
 - proofplay.yaml
-version: 33-1-0
+version: 33-2-0
