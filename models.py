@@ -400,7 +400,8 @@ class ChromeOsDevice(ndb.Model):
                 return chrome_os_device_key.get()
 
     @classmethod
-    def create_managed(cls, tenant_key, gcm_registration_id, mac_address, device_id=None, serial_number=None,
+    def create_managed(cls, tenant_key, gcm_registration_id, mac_address, ethernet_mac_address=None, device_id=None,
+                       serial_number=None,
                        model=None, timezone='America/Chicago'):
         timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
         device = cls(
@@ -408,6 +409,7 @@ class ChromeOsDevice(ndb.Model):
             tenant_key=tenant_key,
             gcm_registration_id=gcm_registration_id,
             mac_address=mac_address,
+            ethernet_mac_address=ethernet_mac_address,
             api_key=str(uuid.uuid4().hex),
             serial_number=serial_number,
             model=model,
