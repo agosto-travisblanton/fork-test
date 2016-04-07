@@ -1,4 +1,9 @@
 <div ng-controller="WelcomeCtrl as welcomeCtrl" ng-init="welcomeCtrl.initialize()" layout="column" ng-cloak>
+  <md-toolbar class="md-hue-2">
+    <div class="md-toolbar-tools">
+      <h2 class="md-flex">{{ welcomeCtrl.identity.distributorName }}</h2>
+    </div>
+  </md-toolbar>
   <md-content flex layout-padding>
     <div flex="35" flex-sm="35" flex-xs="35" layout="column">
       <md-card>

@@ -21,5 +21,4 @@ appModule.controller "DistributorSelectorCtrl", ($scope, $log, $state, $cookies,
     $cookies.put('currentDistributorKey', @currentDistributor.key)
     $state.go 'welcome'
 
-
   @
