@@ -73,7 +73,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             {
                 "mac_matches": [
                     {
-                        "mac": device.mac_address,
+                        "mac": device.mac_address if partial_mac in device.mac_address else device.ethernet_mac_address,
                         "key": device.key.urlsafe(),
                         "tenantKey": device.tenant_key.urlsafe()
                     } for device in resulting_devices]
