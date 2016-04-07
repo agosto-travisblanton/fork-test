@@ -331,4 +331,6 @@ class TestMain(SQLBaseTest, WebTest):
 
         all_events_now = self.db_session.query(ProgramPlayEvent).all()
 
+        print all_events_now
+
         self.assertEqual(len(all_events_now), 300)
