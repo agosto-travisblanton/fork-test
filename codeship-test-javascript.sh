@@ -1,16 +1,16 @@
-##!/usr/bin/env bash
-#set -e
-#
-#COLOR_LIGHT_GREEN='\033[1;32m'
-#COLOR_OFF='\033[0m'
-#NODEJS_RUNTIME_VERSION=4.1.1
-#
-#cd webapp
-#
-#printf "\n${COLOR_LIGHT_GREEN}===> Sourcing nvm...${COLOR_OFF}\n"
-#. ~/.nvm/nvm.sh
-#
-#printf "\n${COLOR_LIGHT_GREEN}===> Installing node runtime via nvm...${COLOR_OFF}\n"
+#!/usr/bin/env bash
+set -e
+
+COLOR_LIGHT_GREEN='\033[1;32m'
+COLOR_OFF='\033[0m'
+NODEJS_RUNTIME_VERSION=4.1.1
+
+cd webapp
+
+printf "\n${COLOR_LIGHT_GREEN}===> Sourcing nvm...${COLOR_OFF}\n"
+. ~/.nvm/nvm.sh
+
+printf "\n${COLOR_LIGHT_GREEN}===> Installing node runtime via nvm...${COLOR_OFF}\n"
 #nvm install $NODEJS_RUNTIME_VERSION
 #nvm use $NODEJS_RUNTIME_VERSION
 #
