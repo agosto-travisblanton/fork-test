@@ -107,76 +107,94 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         pairing_code = self.request.get('pairingCode')
         device_mac_address = self.request.get('macAddress')
         gcm_registration_id = self.request.get('gcmRegistrationId')
+
         if device_mac_address:
-            query = ChromeOsDevice.query(ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
-                                                ChromeOsDevice.ethernet_mac_address == device_mac_address))
-            query_results = query.fetch()
-            if len(query_results) is 1:
+            query_results = ChromeOsDevice.query(
+                ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
+                       ChromeOsDevice.ethernet_mac_address == device_mac_address)).fetch()
+
+            if len(query_results) == 1:
                 if ChromeOsDevice.is_rogue_unmanaged_device(device_mac_address):
                     self.delete(query_results[0].key.urlsafe())
                     error_message = "Rogue unmanaged device with MAC address: {0} no longer exists.".format(
                         device_mac_address)
                     self.response.set_status(404, error_message)
+
                 else:
                     json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+
             elif len(query_results) > 1:
                 json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
                 error_message = "Multiple devices have MAC address {0}".format(device_mac_address)
                 logging.error(error_message)
+
             else:
                 error_message = "Unable to find Chrome OS device by MAC address: {0}".format(device_mac_address)
                 self.response.set_status(404, error_message)
+
         elif gcm_registration_id:
-            query = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id)
-            query_results = query.fetch()
-            if len(query_results) is 1:
+            query_results = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id).fetch()
+
+            if len(query_results) == 1:
                 json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+
             elif len(query_results) > 1:
                 json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
                 error_message = "Multiple devices have GCM registration ID {0}".format(gcm_registration_id)
                 logging.error(error_message)
+
             else:
                 error_message = "Unable to find Chrome OS device by GCM registration ID: {0}".format(
                     gcm_registration_id)
                 self.response.set_status(404, error_message)
+
         elif pairing_code:
-            query = ChromeOsDevice.query(ChromeOsDevice.pairing_code == pairing_code)
-            query_results = query.fetch()
-            if len(query_results) is 1:
+            query_results = ChromeOsDevice.query(ChromeOsDevice.pairing_code == pairing_code).fetch()
+
+            if len(query_results) == 1:
                 json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+
             elif len(query_results) > 1:
                 json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
                 error_message = "Multiple devices have pairing code {0}".format(pairing_code)
                 logging.error(error_message)
+
             else:
                 error_message = "Unable to find device by pairing code: {0}".format(pairing_code)
                 self.response.set_status(404, error_message)
         else:
             query = ChromeOsDevice.query().order(ChromeOsDevice.created)
-            # query_forward = query.order(ChromeOsDevice.key)
-            # query_reverse = query.order(-ChromeOsDevice.key)
-            # query_results = self.fetch_page(query_forward, query_reverse)
-            # json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
             query_results = query.fetch(1000)
             json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
 
     @requires_api_token
-    def get_devices_by_tenant(self, tenant_urlsafe_key):
+    def get_devices_by_tenant(self, tenant_urlsafe_key, cur_prev_cursor, cur_next_cursor):
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
         unmanaged_filter = self.request.get('unmanaged')
-        if unmanaged_filter == '' or str(unmanaged_filter) == 'false':
-            unmanaged = False
-        else:
-            unmanaged = True
-        query = ChromeOsDevice.query(
-            ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
-                    ChromeOsDevice.is_unmanaged_device == unmanaged)
+        unmanaged = not bool(unmanaged_filter == '' or str(unmanaged_filter) == 'false')
+        cur_next_cursor = cur_next_cursor if cur_next_cursor != "null" else None
+        cur_prev_cursor = cur_prev_cursor if cur_prev_cursor != "null" else None
+
+        tenant_devices = Tenant.find_devices_paginated(
+            tenant_keys=[tenant_key],
+            unmanaged=unmanaged,
+            prev_cursor_str=cur_prev_cursor,
+            next_cursor_str=cur_next_cursor
         )
-        # query_forward = query.order(ChromeOsDevice.key)
-        # query_reverse = query.order(-ChromeOsDevice.key)
-        # result_data = self.fetch_page(query_forward, query_reverse)
-        result_data = query.fetch(1000)
-        json_response(self.response, result_data, strategy=CHROME_OS_DEVICE_STRATEGY)
+
+        prev_cursor = tenant_devices["prev_cursor"]
+        next_cursor = tenant_devices["next_cursor"]
+        devices = tenant_devices["objects"]
+
+        json_response(
+            self.response,
+            {
+                "devices": devices,
+                "next_cursor": next_cursor,
+                "prev_cursor": prev_cursor,
+            },
+            strategy=CHROME_OS_DEVICE_STRATEGY
+        )
 
     @staticmethod
     def get_domain_tenant_list_from_distributor(distributor_urlsafe_key):
@@ -189,26 +207,23 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @requires_api_token
     def get_devices_by_distributor(self, distributor_urlsafe_key, cur_prev_cursor, cur_next_cursor):
-        if cur_next_cursor == "null":
-            cur_next_cursor = None
-
-        if cur_prev_cursor == "null":
-            cur_prev_cursor = None
-
+        cur_next_cursor = cur_next_cursor if cur_next_cursor != "null" else None
+        cur_prev_cursor = cur_prev_cursor if cur_prev_cursor != "null" else None
         unmanaged_filter = self.request.get('unmanaged')
         unmanaged = not bool(unmanaged_filter == '' or str(unmanaged_filter) == 'false')
         domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
         tenant_keys = [tenant.key for tenant in domain_tenant_list]
 
-        tenant_devices = Tenant.find_devices_paginated(
+        distributor_devices = Tenant.find_devices_paginated(
             tenant_keys=tenant_keys,
             unmanaged=unmanaged,
             prev_cursor_str=cur_prev_cursor,
             next_cursor_str=cur_next_cursor
         )
-        prev_cursor = tenant_devices["prev_cursor"]
-        next_cursor = tenant_devices["next_cursor"]
-        devices = tenant_devices["objects"]
+
+        prev_cursor = distributor_devices["prev_cursor"]
+        next_cursor = distributor_devices["next_cursor"]
+        devices = distributor_devices["objects"]
 
         json_response(
             self.response,
