@@ -184,7 +184,7 @@ class Tenant(ndb.Model):
         to_return = []
 
         for item in q:
-            if partial_serial in item.serial_number:
+            if item.serial_number and partial_serial in item.serial_number:
                 to_return.append(item)
 
         return to_return
