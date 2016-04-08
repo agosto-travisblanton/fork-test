@@ -162,13 +162,6 @@ class Tenant(ndb.Model):
             ).fetch()
 
     @classmethod
-    def find_devices_with_partial_serial(cls, tenant_keys, unmanaged, partial_serial):
-        q = ChromeOsDevice.query().filter(ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
-            ChromeOsDevice.is_unmanaged_device == unmanaged).fetch()
-
-        return [item for item in q if partial_serial in item.serial_number]
-
-    @classmethod
     def match_device_with_full_mac(cls, tenant_keys, unmanaged, full_mac):
         return ChromeOsDevice.query(
             ndb.OR(ChromeOsDevice.mac_address == full_mac,
@@ -182,6 +175,16 @@ class Tenant(ndb.Model):
             ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
             ChromeOsDevice.is_unmanaged_device == unmanaged).filter(
             ChromeOsDevice.serial_number == full_serial).count() > 0
+
+    @classmethod
+    def find_devices_with_partial_serial(cls, tenant_keys, unmanaged, partial_serial):
+        q = ChromeOsDevice.query().filter(ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
+            ChromeOsDevice.is_unmanaged_device == unmanaged).fetch()
+
+        if q:
+            return [item for item in q if partial_serial in item.serial_number]
+        else:
+            return []
 
     @classmethod
     def find_devices_with_partial_mac(cls, tenant_keys, unmanaged, partial_mac):
