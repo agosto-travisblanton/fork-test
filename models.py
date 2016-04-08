@@ -181,10 +181,13 @@ class Tenant(ndb.Model):
         q = ChromeOsDevice.query().filter(ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
             ChromeOsDevice.is_unmanaged_device == unmanaged).fetch()
 
-        if q:
-            return [item for item in q if partial_serial in item.serial_number]
-        else:
-            return []
+        to_return = []
+
+        for item in q:
+            if partial_serial in item.serial_number:
+                to_return.append(item)
+
+        return to_return
 
     @classmethod
     def find_devices_with_partial_mac(cls, tenant_keys, unmanaged, partial_mac):
