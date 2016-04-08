@@ -3,7 +3,8 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantAddCtrl',
-  ($log, $location, TenantsService, DistributorsService, $state, sweet, ProgressBarService, $cookies) ->
+  ($log, $location, TenantsService, DistributorsService, TimezonesService, $state, sweet, ProgressBarService,
+    $cookies) ->
     @gameStopServer = $location.host().indexOf('provisioning-gamestop') > -1
     @currentTenant = {
       key: undefined,
@@ -20,8 +21,13 @@ appModule.controller 'TenantAddCtrl',
     }
     @selectedDomain = undefined
     @distributorDomains = []
+    @timezones = []
+    @selectedTimezone = 'America/Chicago'
 
     @initialize = ->
+      timezonePromise = TimezonesService.getUsTimezones()
+      timezonePromise.then (data) =>
+        @timezones = data
       @currentDistributorKey = $cookies.get('currentDistributorKey')
       distributorPromise = DistributorsService.getByKey @currentDistributorKey
       distributorPromise.then (data) =>
@@ -33,6 +39,7 @@ appModule.controller 'TenantAddCtrl',
 
     @onClickSaveButton = ->
       ProgressBarService.start()
+      @currentTenant.default_timezone = @selectedTimezone
       @currentTenant.domain_key = @selectedDomain.key
       promise = TenantsService.save @currentTenant
       promise.then @onSuccessTenantSave, @onFailureTenantSave

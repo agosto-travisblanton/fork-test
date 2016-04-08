@@ -54,13 +54,3 @@ describe 'LocationsService', ->
       expect(Restangular.oneUrl).toHaveBeenCalledWith 'locations', "api/v1/locations/#{locationKey}"
       expect(locationRestangularService.get).toHaveBeenCalled()
       expect(actual).toBe promise
-
-  describe '.getTimezones', ->
-    it 'retrieve list of timezones, returning a promise', ->
-      locationRestangularService = { get: -> }
-      spyOn(Restangular, 'oneUrl').and.returnValue locationRestangularService
-      spyOn(locationRestangularService, 'get').and.returnValue promise
-      actual = LocationsService.getTimezones promise
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'timezones', 'api/v1/timezones'
-      expect(locationRestangularService.get).toHaveBeenCalled()
-      expect(actual).toBe promise

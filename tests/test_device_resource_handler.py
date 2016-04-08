@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 
 import device_message_processor
 from env_setup import setup_test_paths
+from utils.email_notify import EmailNotify
+from utils.timezone_util import TimezoneUtil
 from utils.web_util import build_uri
 from webtest import AppError
 
@@ -96,6 +98,11 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     ##################################################################################################################
 
     def test_post_managed_device_http_status_created(self):
+        when(EmailNotify).device_enrolled(tenant_code=any_matcher(),
+                                          tenant_name=any_matcher(),
+                                          device_mac_address=any_matcher(),
+                                          timestamp=any_matcher()).thenReturn(None)
+
         tenant = self.tenant_key.get()
         mac_address = '7889BE879f'
         request_body = {'macAddress': mac_address,
@@ -110,6 +117,11 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(201, response.status_int)
 
     def test_post_managed_device_returns_resource_url_in_location_header(self):
+        when(EmailNotify).device_enrolled(tenant_code=any_matcher(),
+                                          tenant_name=any_matcher(),
+                                          device_mac_address=any_matcher(),
+                                          timestamp=any_matcher()).thenReturn(None)
+
         tenant = self.tenant_key.get()
         mac_address = '7889BE879f'
         request_body = {'macAddress': mac_address,
@@ -182,6 +194,50 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                           headers=self.api_token_authorization_header)
         self.assertTrue('Bad response: 400 Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
                         in context.exception.message)
+
+    def test_post_managed_device_creates_device_with_default_timezone_and_expected_offset(self):
+        when(EmailNotify).device_enrolled(tenant_code=any_matcher(),
+                                          tenant_name=any_matcher(),
+                                          device_mac_address=any_matcher(),
+                                          timestamp=any_matcher()).thenReturn(None)
+        tenant = self.tenant_key.get()
+        mac_address = '7889BE879f'
+        request_body = {'macAddress': mac_address,
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'tenantCode': tenant.tenant_code}
+        when(deferred).defer(any_matcher(refresh_device_by_mac_address),
+                             any_matcher(str),
+                             any_matcher(mac_address)).thenReturn(None)
+        response = self.app.post('/api/v1/devices', json.dumps(request_body),
+                                 headers=self.api_token_authorization_header)
+        location_uri_components = str(response.headers['Location']).split('/')
+        device = ndb.Key(urlsafe=location_uri_components[6]).get()
+        default_timezone = 'America/Chicago'
+        self.assertEqual(device.timezone_offset, TimezoneUtil.get_timezone_offset(default_timezone))
+        self.assertEqual(device.timezone, default_timezone)
+
+    def test_post_managed_device_creates_device_with_explicit_timezone_and_expected_offset(self):
+        when(EmailNotify).device_enrolled(tenant_code=any_matcher(),
+                                          tenant_name=any_matcher(),
+                                          device_mac_address=any_matcher(),
+                                          timestamp=any_matcher()).thenReturn(None)
+
+        tenant = self.tenant_key.get()
+        mac_address = '7889BE879f'
+        explicit_timezone = 'America/Denver'
+        request_body = {'macAddress': mac_address,
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'tenantCode': tenant.tenant_code,
+                        'timezone': explicit_timezone}
+        when(deferred).defer(any_matcher(refresh_device_by_mac_address),
+                             any_matcher(str),
+                             any_matcher(mac_address)).thenReturn(None)
+        response = self.app.post('/api/v1/devices', json.dumps(request_body),
+                                 headers=self.api_token_authorization_header)
+        location_uri_components = str(response.headers['Location']).split('/')
+        device = ndb.Key(urlsafe=location_uri_components[6]).get()
+        self.assertEqual(device.timezone_offset, TimezoneUtil.get_timezone_offset(explicit_timezone))
+        self.assertEqual(device.timezone, explicit_timezone)
 
     ##################################################################################################################
     # post unmanaged device
@@ -591,6 +647,108 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertTrue(len(response_json["mac_matches"]) == tenant_one_amount + tenant_two_amount)
 
+    def test_match_for_device_by_serial(self):
+        distributor = Distributor.create(name='Acme Brothers')
+        distributor_key = distributor.put()
+        tenant_one_amount = 13
+        tenant_two_amount = 6
+        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(
+            distributor_key,
+            tenant_1_device_count=tenant_one_amount,
+            tenant_2_device_count=tenant_two_amount
+        )
+        uri = application.router.build(
+            None,
+            'match_for_device_by_serial',
+            None,
+            {
+                'distributor_urlsafe_key': distributor_key.urlsafe(),
+                'full_serial': 'm-serial0',
+                'unmanaged': 'false'
+            }
+        )
+
+        response = self.app.get(uri, headers=self.api_token_authorization_header)
+
+        response_json = json.loads(response.body)
+        self.assertTrue(response_json["is_match"])
+
+    def test_match_for_device_by_mac(self):
+        distributor = Distributor.create(name='Acme Brothers')
+        distributor_key = distributor.put()
+        tenant_one_amount = 13
+        tenant_two_amount = 6
+        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(
+            distributor_key,
+            tenant_1_device_count=tenant_one_amount,
+            tenant_2_device_count=tenant_two_amount
+        )
+        uri = application.router.build(
+            None,
+            'match_for_device_by_mac',
+            None,
+            {
+                'distributor_urlsafe_key': distributor_key.urlsafe(),
+                'full_mac': 'm-mac0',
+                'unmanaged': 'false'
+            }
+        )
+
+        response = self.app.get(uri, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertTrue(response_json["is_match"])
+
+    def test_not_match_for_device_by_serial(self):
+        distributor = Distributor.create(name='Acme Brothers')
+        distributor_key = distributor.put()
+        tenant_one_amount = 13
+        tenant_two_amount = 6
+        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(
+            distributor_key,
+            tenant_1_device_count=tenant_one_amount,
+            tenant_2_device_count=tenant_two_amount
+        )
+        uri = application.router.build(
+            None,
+            'match_for_device_by_serial',
+            None,
+            {
+                'distributor_urlsafe_key': distributor_key.urlsafe(),
+                'full_serial': 'm-serial093942392349423',
+                'unmanaged': 'false'
+            }
+        )
+
+        response = self.app.get(uri, headers=self.api_token_authorization_header)
+
+        response_json = json.loads(response.body)
+        self.assertFalse(response_json["is_match"])
+
+    def test_not_match_for_device_by_mac(self):
+        distributor = Distributor.create(name='Acme Brothers')
+        distributor_key = distributor.put()
+        tenant_one_amount = 13
+        tenant_two_amount = 6
+        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(
+            distributor_key,
+            tenant_1_device_count=tenant_one_amount,
+            tenant_2_device_count=tenant_two_amount
+        )
+        uri = application.router.build(
+            None,
+            'match_for_device_by_mac',
+            None,
+            {
+                'distributor_urlsafe_key': distributor_key.urlsafe(),
+                'full_mac': 'm-mac09249423923492349',
+                'unmanaged': 'false'
+            }
+        )
+
+        response = self.app.get(uri, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertFalse(response_json["is_match"])
+
     #################################################################################################################
     # get managed device
     #################################################################################################################
@@ -910,8 +1068,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     def test_device_resource_put_updates_location(self):
         location = Location.create(tenant_key=self.tenant_key,
                                    customer_location_name='Store 1234',
-                                   customer_location_code='store_1234',
-                                   timezone='America/Chicago')
+                                   customer_location_code='store_1234')
         location_key = location.put()
         request_body = {'locationKey': location_key.urlsafe()}
         when(deferred).defer(any_matcher(update_chrome_os_device),
@@ -1037,6 +1194,21 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                      headers=self.api_token_authorization_header)
         updated_display = self.managed_device_key.get()
         self.assertEqual(config.CHECK_FOR_CONTENT_INTERVAL_MINUTES, updated_display.check_for_content_interval_minutes)
+
+    def test_put_updates_timezone_from_default_to_explicit(self):
+        default_timezone = 'America/Chicago'
+        explicit_timezone = 'America/Denver'
+        self.assertEqual(self.managed_device.timezone_offset, TimezoneUtil.get_timezone_offset(default_timezone))
+        request_body = {'timezone': explicit_timezone}
+        when(deferred).defer(any_matcher(update_chrome_os_device),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
+                     json.dumps(request_body),
+                     headers=self.api_token_authorization_header)
+        updated_device = self.managed_device_key.get()
+        expected_offset = TimezoneUtil.get_timezone_offset(explicit_timezone)
+        self.assertEqual(updated_device.timezone, explicit_timezone)
+        self.assertEqual(updated_device.timezone_offset, expected_offset)
 
     ##################################################################################################################
     ## delete
@@ -1409,6 +1581,59 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                              DeviceIssueLog.category == config.DEVICE_ISSUE_OS_VERSION_CHANGE)).get()
         self.assertIsNotNone(log_entry)
         self.assertEqual(log_entry.category, config.DEVICE_ISSUE_OS_VERSION_CHANGE)
+
+    def test_put_heartbeat_records_to_timezone_change(self):
+        device = ChromeOsDevice.create_managed(
+            tenant_key=self.tenant_key,
+            gcm_registration_id=self.GCM_REGISTRATION_ID,
+            device_id='1231231',
+            mac_address='2313412341233')
+        device.timezone = 'America/Denver'
+        device_key = device.put()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        'macAddress': '2313412341233',
+                        'osVersion': '10.0',
+                        'timezone': 'America/Boise'}
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        log_entry = DeviceIssueLog.query(DeviceIssueLog.device_key == device_key,
+                                         ndb.AND(
+                                             DeviceIssueLog.category ==
+                                             config.DEVICE_ISSUE_TIMEZONE_CHANGE)).get()
+        self.assertIsNotNone(log_entry)
+        self.assertEqual(log_entry.category, config.DEVICE_ISSUE_TIMEZONE_CHANGE)
+
+    def test_put_heartbeat_records_to_timezone_offset_change(self):
+        device = ChromeOsDevice.create_managed(
+            tenant_key=self.tenant_key,
+            gcm_registration_id=self.GCM_REGISTRATION_ID,
+            device_id='1231231',
+            mac_address='2313412341233')
+        device.timezone = 'America/Chicago'
+        device_key = device.put()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        'macAddress': '2313412341233',
+                        'osVersion': '10.0',
+                        'timezone': 'America/Chicago',
+                        'timezoneOffset': TimezoneUtil.get_timezone_offset('America/Chicago') + 3}
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': device_key.urlsafe()})
+        when(device_message_processor).change_intent(
+            any_matcher(), config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND).thenReturn(None)
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        log_entry = DeviceIssueLog.query(DeviceIssueLog.device_key == device_key,
+                                         ndb.AND(
+                                             DeviceIssueLog.category ==
+                                             config.DEVICE_ISSUE_TIMEZONE_OFFSET_CHANGE)).get()
+        self.assertIsNotNone(log_entry)
+        self.assertEqual(log_entry.category, config.DEVICE_ISSUE_TIMEZONE_OFFSET_CHANGE)
 
     ##################################################################################################################
     ## device issues

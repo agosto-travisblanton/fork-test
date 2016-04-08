@@ -34,15 +34,15 @@ class TestTimezonesHandler(BaseTest, WebTest):
     ## get
     ##################################################################################################################
 
-    def test_get_returns_ok(self):
+    def test_get_us_timezones_returns_ok(self):
         request_parameters = {}
-        uri = application.router.build(None, 'timezones-list', None, {})
+        uri = application.router.build(None, 'us-timezones', None, {})
         response = self.app.get(uri, params=request_parameters, headers=self.headers)
         self.assertOK(response)
 
-    def test_get_returns_expected_list_of_timezones(self):
+    def test_get_us_timezones_returns_expected_list_of_timezones(self):
         request_parameters = {}
-        uri = application.router.build(None, 'timezones-list', None, {})
+        uri = application.router.build(None, 'us-timezones', None, {})
         response = self.app.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 30)
@@ -51,9 +51,9 @@ class TestTimezonesHandler(BaseTest, WebTest):
         self.assertEqual(response_json[17], 'America/Denver')
         self.assertEqual(response_json[21], 'America/Los_Angeles')
 
-    def test_get_fails_with_bad_authorization_token(self):
+    def test_get_us_timezones_fails_with_bad_authorization_token(self):
         request_parameters = {}
-        uri = application.router.build(None, 'timezones-list', None, {})
+        uri = application.router.build(None, 'us-timezones', None, {})
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.bad_authorization_header)
         self.assertTrue(self.FORBIDDEN in context.exception.message)

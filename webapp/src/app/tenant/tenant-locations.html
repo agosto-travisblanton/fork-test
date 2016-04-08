@@ -35,7 +35,7 @@
                   <th></th>
                   <th>Customer Location Name</th>
                   <th>Customer Location Code</th>
-                  <th><i class="fa fa-fw fa-clock-o"></i> Timezone</th>
+                  <th>City</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -44,7 +44,8 @@
                     {{ tenantLocationsCtrl.currentTenant.name }} has no locations.
                   </td>
                 </tr>
-                <tr ng-repeat="item in tenantLocationsCtrl.locations | orderBy:'customerLocationName' ">
+                <tr ng-repeat="item in tenantLocationsCtrl.locations | orderBy:'customerLocationName' "
+                    ng-click="tenantLocationsCtrl.editItem(item)">
                   <td>
                     <a ng-click="tenantLocationsCtrl.editItem(item)"
                        title="Location detail">
@@ -59,7 +60,7 @@
                   </td>
                   <td>{{item.customerLocationName}}</td>
                   <td>{{item.customerLocationCode}}</td>
-                  <td>{{item.timezone}}</td>
+                  <td>{{item.city}} {{item.state}}</td>
                 </tr>
                 </tbody>
               </table>

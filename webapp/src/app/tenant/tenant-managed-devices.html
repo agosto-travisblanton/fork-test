@@ -39,17 +39,25 @@
                 No managed devices retrieved for {{ tenantManagedDevicesCtrl.currentTenant.name }}.
               </td>
             </tr>
-            <tr ng-repeat="item in tenantManagedDevicesCtrl.tenantDevices | orderBy:'-created' ">
+            <tr ng-repeat="item in tenantManagedDevicesCtrl.tenantDevices | orderBy:'-created' "
+                ng-click="tenantManagedDevicesCtrl.editItem(item)">
               <td>
-                <a ng-click="tenantManagedDevicesCtrl.editItem(item)"
+                <a ng-click="tenantManagedDevicesCtrl.editItem(item)" class="md-primary md-ink-ripple"
                    title="Device detail">
-                  <ng-md-icon icon="mode_edit" size="48"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"></path><path d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path></svg></ng-md-icon>
+                  <ng-md-icon icon="mode_edit" size="48">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"></path>
+                      <path
+                        d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+                    </svg>
+                  </ng-md-icon>
                 </a>
               </td>
               <td>{{ item.macAddress }}</td>
               <td>{{ item.ethernetMacAddress }}</td>
               <td>
-                <a name="edit-device" class="btn" ng-click="tenantManagedDevicesCtrl.editItem(item)"
+                <a name="edit-device" class="md-primary md-ink-ripple"
+                   ng-click="tenantManagedDevicesCtrl.editItem(item)"
                    title="Device detail">{{item.serialNumber}}</a>
               </td>
               <td>{{ item.created }}</td>

@@ -12,6 +12,9 @@ angular.module('skykitProvisioning')
 
     setTenant: (tenant) ->
       @chosenTenant = tenant
+      
+    getTenant: () ->
+      return @chosenTenant
 
 
     createFilterFor: (query) ->

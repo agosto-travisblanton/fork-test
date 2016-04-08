@@ -34,3 +34,7 @@ class TestTimezoneUtil(BaseTest):
     def test_get_us_timezones_returns_array(self):
         timezones = TimezoneUtil.get_us_timezones()
         self.assertGreaterEqual(30,len(timezones))
+
+    def test_get_all_common_timezones_returns_array(self):
+        timezones = TimezoneUtil.get_all_common_timezones()
+        self.assertGreaterEqual(400,len(timezones))

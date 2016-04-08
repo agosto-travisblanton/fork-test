@@ -1,12 +1,12 @@
 import uuid
 
 from datetime import datetime
+from google.appengine.datastore.datastore_query import Cursor
 from google.appengine.ext import ndb
 
 from app_config import config
 from restler.decorators import ae_ndb_serializer
 from utils.timezone_util import TimezoneUtil
-from google.appengine.datastore.datastore_query import Cursor
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>. Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -43,7 +43,6 @@ class DistributorEntityGroup(ndb.Model):
 @ae_ndb_serializer
 class Distributor(ndb.Model):
     name = ndb.StringProperty(required=True, indexed=True)
-    # TODO Make admin_email required=True after migration run in prod
     admin_email = ndb.StringProperty(required=False, indexed=True)
     player_content_url = ndb.StringProperty(required=False, indexed=True)
     content_manager_url = ndb.StringProperty(required=False, indexed=True)
@@ -130,6 +129,7 @@ class Tenant(ndb.Model):
     notification_emails = ndb.StringProperty(repeated=True, indexed=False, required=False)
     proof_of_play_logging = ndb.BooleanProperty(default=False, required=True, indexed=True)
     proof_of_play_url = ndb.StringProperty(required=False)
+    default_timezone = ndb.StringProperty(required=True, indexed=True, default='America/Chicago')
     class_version = ndb.IntegerProperty()
 
     def get_domain(self):
@@ -151,7 +151,7 @@ class Tenant(ndb.Model):
 
     @classmethod
     def is_tenant_code_unique(cls, tenant_code):
-        return None is Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
+        return not Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
 
     @classmethod
     def find_devices(cls, tenant_key, unmanaged):
@@ -162,16 +162,53 @@ class Tenant(ndb.Model):
             ).fetch()
 
     @classmethod
+    def match_device_with_full_mac(cls, tenant_keys, unmanaged, full_mac):
+        return ChromeOsDevice.query(
+            ndb.OR(ChromeOsDevice.mac_address == full_mac,
+                   ChromeOsDevice.ethernet_mac_address == full_mac)).filter(
+            ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
+            ChromeOsDevice.is_unmanaged_device == unmanaged).count() > 0
+
+    @classmethod
+    def match_device_with_full_serial(cls, tenant_keys, unmanaged, full_serial):
+        return ChromeOsDevice.query().filter(
+            ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
+            ChromeOsDevice.is_unmanaged_device == unmanaged).filter(
+            ChromeOsDevice.serial_number == full_serial).count() > 0
+
+    @classmethod
     def find_devices_with_partial_serial(cls, tenant_keys, unmanaged, partial_serial):
-        return ChromeOsDevice.query().filter(ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
-            ChromeOsDevice.is_unmanaged_device == unmanaged).filter(ChromeOsDevice.serial_number >= partial_serial) \
-            .filter(ChromeOsDevice.serial_number <= partial_serial + u'\ufffd').fetch()
+        q = ChromeOsDevice.query().filter(ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
+            ChromeOsDevice.is_unmanaged_device == unmanaged).fetch()
+
+        to_return = []
+
+        for item in q:
+            if item.serial_number and partial_serial in item.serial_number:
+                to_return.append(item)
+
+        return to_return
 
     @classmethod
     def find_devices_with_partial_mac(cls, tenant_keys, unmanaged, partial_mac):
-        return ChromeOsDevice.query().filter(ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
-            ChromeOsDevice.is_unmanaged_device == unmanaged).filter(ChromeOsDevice.mac_address >= partial_mac) \
-            .filter(ChromeOsDevice.mac_address <= partial_mac + u'\ufffd').fetch()
+        q = ChromeOsDevice.query().filter(ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
+            ChromeOsDevice.is_unmanaged_device == unmanaged).fetch()
+
+        filtered_results = []
+
+        for item in q:
+            appended_already = False
+            if item.ethernet_mac_address:
+                if partial_mac in item.ethernet_mac_address:
+                    filtered_results.append(item)
+                    appended_already = True
+
+            if not appended_already:
+                if item.mac_address:
+                    if partial_mac in item.mac_address:
+                        filtered_results.append(item)
+
+        return filtered_results
 
     @classmethod
     def find_devices_paginated(cls, tenant_keys, fetch_size=200, unmanaged=False, prev_cursor_str=None,
@@ -231,7 +268,7 @@ class Tenant(ndb.Model):
     @classmethod
     def create(cls, tenant_code, name, admin_email, content_server_url, domain_key, active,
                content_manager_base_url, notification_emails=[], proof_of_play_logging=False,
-               proof_of_play_url=config.DEFAULT_PROOF_OF_PLAY_URL):
+               proof_of_play_url=config.DEFAULT_PROOF_OF_PLAY_URL, default_timezone='America/Chicago'):
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
                    tenant_code=tenant_code,
@@ -243,7 +280,8 @@ class Tenant(ndb.Model):
                    content_manager_base_url=content_manager_base_url,
                    notification_emails=notification_emails,
                    proof_of_play_logging=proof_of_play_logging,
-                   proof_of_play_url=proof_of_play_url)
+                   proof_of_play_url=proof_of_play_url,
+                   default_timezone=default_timezone)
 
     @classmethod
     def toggle_proof_of_play(cls, tenant_code, enable):
@@ -266,8 +304,6 @@ class Location(ndb.Model):
     tenant_key = ndb.KeyProperty(kind=Tenant, required=True, indexed=True)
     customer_location_code = ndb.StringProperty(required=True, indexed=True)
     customer_location_name = ndb.StringProperty(required=True, indexed=True)
-    timezone = ndb.StringProperty(required=True, indexed=True)
-    timezone_offset = ndb.IntegerProperty(required=True, indexed=True)  # computed property
     address = ndb.StringProperty(required=False, indexed=True)
     city = ndb.StringProperty(required=False, indexed=True)
     state = ndb.StringProperty(required=False, indexed=True)
@@ -280,15 +316,12 @@ class Location(ndb.Model):
     class_version = ndb.IntegerProperty()
 
     @classmethod
-    def create(cls, tenant_key, customer_location_name, customer_location_code, timezone):
-        timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
+    def create(cls, tenant_key, customer_location_name, customer_location_code):
         geo_location_default = ndb.GeoPt(44.98, -93.27)  # Home plate Target Field
         return cls(tenant_key=tenant_key,
                    customer_location_name=customer_location_name,
                    customer_location_code=customer_location_code,
-                   timezone=timezone,
-                   geo_location=geo_location_default,
-                   timezone_offset=timezone_offset)
+                   geo_location=geo_location_default)
 
     @classmethod
     def find_by_customer_location_code(cls, customer_location_code):
@@ -299,7 +332,7 @@ class Location(ndb.Model):
 
     @classmethod
     def is_customer_location_code_unique(cls, customer_location_code, tenant_key):
-        return None is Location.query(
+        return not Location.query(
             ndb.AND(Location.customer_location_code == customer_location_code, Location.tenant_key == tenant_key)).get(
             keys_only=True)
 
@@ -358,6 +391,8 @@ class ChromeOsDevice(ndb.Model):
     customer_display_name = ndb.StringProperty(required=False, indexed=True)
     customer_display_code = ndb.StringProperty(required=False, indexed=True)
     location_key = ndb.KeyProperty(required=False, indexed=True)
+    timezone = ndb.StringProperty(required=False, indexed=True)
+    timezone_offset = ndb.IntegerProperty(required=False, indexed=True)  # computed property
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):
@@ -371,13 +406,16 @@ class ChromeOsDevice(ndb.Model):
                 return chrome_os_device_key.get()
 
     @classmethod
-    def create_managed(cls, tenant_key, gcm_registration_id, mac_address, device_id=None, serial_number=None,
-                       model=None):
+    def create_managed(cls, tenant_key, gcm_registration_id, mac_address, ethernet_mac_address=None, device_id=None,
+                       serial_number=None,
+                       model=None, timezone='America/Chicago'):
+        timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
         device = cls(
             device_id=device_id,
             tenant_key=tenant_key,
             gcm_registration_id=gcm_registration_id,
             mac_address=mac_address,
+            ethernet_mac_address=ethernet_mac_address,
             api_key=str(uuid.uuid4().hex),
             serial_number=serial_number,
             model=model,
@@ -388,11 +426,14 @@ class ChromeOsDevice(ndb.Model):
             heartbeat_updated=datetime.utcnow(),
             program='****initial****',
             program_id='****initial****',
-            heartbeat_interval_minutes=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES)
+            heartbeat_interval_minutes=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES,
+            timezone=timezone,
+            timezone_offset=timezone_offset)
         return device
 
     @classmethod
-    def create_unmanaged(cls, gcm_registration_id, mac_address):
+    def create_unmanaged(cls, gcm_registration_id, mac_address, timezone='America/Chicago'):
+        timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
         device = cls(
             gcm_registration_id=gcm_registration_id,
             mac_address=mac_address,
@@ -406,7 +447,9 @@ class ChromeOsDevice(ndb.Model):
             heartbeat_updated=datetime.utcnow(),
             program='****initial****',
             program_id='****initial****',
-            heartbeat_interval_minutes=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES)
+            heartbeat_interval_minutes=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES,
+            timezone=timezone,
+            timezone_offset=timezone_offset)
         return device
 
     @classmethod

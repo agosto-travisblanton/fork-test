@@ -13,6 +13,7 @@ TENANT_FIELDS = [
     'content_manager_base_url',
     'proof_of_play_logging',
     'proof_of_play_url',
+    'default_timezone',
     'active',
     'created',
     'updated'
@@ -102,9 +103,8 @@ CHROME_OS_DEVICE_STRATEGY += [
                         context: o.location_key.get().geo_location.lat if o.location_key is not None else None},
     {'longitude': lambda o, field_name,
                          context: o.location_key.get().geo_location.lon if o.location_key is not None else None},
-    {'timezone': lambda o, field_name, context: o.location_key.get().timezone if o.location_key is not None else None},
-    {'timezoneOffset': lambda o, field_name,
-                              context: o.location_key.get().timezone_offset if o.location_key is not None else None}
+    {'timezone': lambda o, field_name, context: o.key.get().timezone},
+    {'timezoneOffset': lambda o, field_name, context: o.key.get().timezone_offset}
 ]
 
 LOCATION_STRATEGY = ModelStrategy(Location)
@@ -114,8 +114,6 @@ LOCATION_STRATEGY += [
     {'tenantName': lambda o, field_name, context: o.tenant_key.get().name if o.tenant_key is not None else None},
     {'customerLocationCode': lambda o, field_name, context: o.key.get().customer_location_code},
     {'customerLocationName': lambda o, field_name, context: o.key.get().customer_location_name},
-    {'timezone': lambda o, field_name, context: o.key.get().timezone},
-    {'timezoneOffset': lambda o, field_name, context: o.key.get().timezone_offset},
     {'address': lambda o, field_name, context: o.key.get().address},
     {'city': lambda o, field_name, context: o.key.get().city},
     {'state': lambda o, field_name, context: o.key.get().state},

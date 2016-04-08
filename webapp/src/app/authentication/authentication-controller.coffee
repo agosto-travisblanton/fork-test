@@ -31,7 +31,7 @@ app.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
 
   @initializeSignOut = ->
     SessionsService.removeUserInfo()
-    $timeout @proceedToSignIn, 1500
+    $timeout @proceedToSignedOut, 1500
 
   @loginSuccess = (response) ->
     SessionsService.setIdentity(response)
@@ -41,6 +41,10 @@ app.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
   @loginFailure = () ->
     ProgressBarService.complete()
     sweet.show('Oops...', 'Unable to authenticate to Stormpath.', 'error')
+
+
+  @proceedToSignedOut = ->
+    $state.go 'signed_out'
 
   @proceedToSignIn = ->
     $state.go 'sign_in'

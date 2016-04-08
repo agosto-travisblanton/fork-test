@@ -21,8 +21,4 @@ appModule.factory 'LocationsService', (Restangular) ->
       promise = Restangular.oneUrl('locations', "api/v1/locations/#{locationKey}").get()
       promise
 
-    getTimezones: () ->
-      promise = Restangular.oneUrl('timezones', 'api/v1/timezones').get()
-      promise
-
   new LocationsService()

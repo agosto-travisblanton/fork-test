@@ -15,7 +15,8 @@ from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup, DeviceIssu
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY, DEVICE_ISSUE_LOG_STRATEGY
-from utils.mail_util import MailUtil
+from utils.email_notify import EmailNotify
+from utils.timezone_util import TimezoneUtil
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -24,8 +25,42 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     MAILGUN_QUEUED_MESSAGE = 'Queued. Thank you.'
 
     @requires_api_token
+    def match_for_device_by_mac(self, distributor_urlsafe_key, full_mac, unmanaged):
+        unmanaged = unmanaged == "true"
+        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
+        tenant_keys = [tenant.key for tenant in domain_tenant_list]
+        is_match = Tenant.match_device_with_full_mac(
+            tenant_keys=tenant_keys,
+            unmanaged=unmanaged,
+            full_mac=full_mac
+        )
+        json_response(
+            self.response,
+            {
+                "is_match": is_match
+            },
+        )
+
+    @requires_api_token
+    def match_for_device_by_serial(self, distributor_urlsafe_key, full_serial, unmanaged):
+        unmanaged = unmanaged == "true"
+        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
+        tenant_keys = [tenant.key for tenant in domain_tenant_list]
+        is_match = Tenant.match_device_with_full_serial(
+            tenant_keys=tenant_keys,
+            unmanaged=unmanaged,
+            full_serial=full_serial
+        )
+        json_response(
+            self.response,
+            {
+                "is_match": is_match
+            },
+        )
+
+    @requires_api_token
     def search_for_device_by_mac(self, distributor_urlsafe_key, partial_mac, unmanaged):
-        unmanaged = True if unmanaged == "true" else False
+        unmanaged = unmanaged == "true"
         domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
         tenant_keys = [tenant.key for tenant in domain_tenant_list]
         resulting_devices = Tenant.find_devices_with_partial_mac(
@@ -38,7 +73,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             {
                 "mac_matches": [
                     {
-                        "mac": device.mac_address,
+                        "mac": device.mac_address if partial_mac in device.mac_address else device.ethernet_mac_address,
                         "key": device.key.urlsafe(),
                         "tenantKey": device.tenant_key.urlsafe()
                     } for device in resulting_devices]
@@ -47,7 +82,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @requires_api_token
     def search_for_device_by_serial(self, distributor_urlsafe_key, partial_serial, unmanaged):
-        unmanaged = True if unmanaged == "true" else False
+        unmanaged = unmanaged == "true"
         domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
         tenant_keys = [tenant.key for tenant in domain_tenant_list]
         resulting_devices = Tenant.find_devices_with_partial_serial(
@@ -189,6 +224,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     @requires_api_token
     def get(self, device_urlsafe_key):
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
+        if device.timezone != None:
+            device.timezone_offset = TimezoneUtil.get_timezone_offset(device.timezone)
+        else:
+            device.timezone_offset = TimezoneUtil.get_timezone_offset('America/Chicago')
         if self.is_unmanaged_device is False:
             if not device.device_id:
                 deferred.defer(refresh_device_by_mac_address,
@@ -226,6 +265,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 error_message = 'The gcmRegistrationId parameter is invalid.'
                 self.response.set_status(status, error_message)
                 return
+            timezone = request_json.get('timezone')
+            if timezone is None or timezone == '':
+                timezone = 'America/Chicago'
             if self.is_unmanaged_device is True:
                 unmanaged_device = ChromeOsDevice.get_unmanaged_device_by_mac_address(device_mac_address)
                 if None is not unmanaged_device:
@@ -247,7 +289,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                     'an unmanaged device.'
                     self.response.set_status(status, error_message)
                     return
-                device = ChromeOsDevice.create_unmanaged(gcm_registration_id, device_mac_address)
+                device = ChromeOsDevice.create_unmanaged(gcm_registration_id=gcm_registration_id,
+                                                         mac_address=device_mac_address,
+                                                         timezone=timezone)
                 device_key = device.put()
                 device_uri = self.request.app.router.build(None,
                                                            'device-pairing-code',
@@ -277,7 +321,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 if status == 201:
                     device = ChromeOsDevice.create_managed(tenant_key=tenant_key,
                                                            gcm_registration_id=gcm_registration_id,
-                                                           mac_address=device_mac_address)
+                                                           mac_address=device_mac_address,
+                                                           timezone=timezone)
                     key = device.put()
                     deferred.defer(refresh_device_by_mac_address,
                                    device_urlsafe_key=key.urlsafe(),
@@ -295,15 +340,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     self.response.headers['Location'] = device_uri
                     self.response.headers.pop('Content-Type', None)
                     self.response.set_status(status)
-                    tenant_notification_emails = Tenant.find_by_tenant_code(tenant_code).notification_emails
-                    if tenant_notification_emails is not None and len(tenant_notification_emails) > 0:
-                        response = MailUtil.send_message(
-                            recipients=tenant_notification_emails,
-                            subject='Device Added',
-                            text='A new device was added with MAC address {0}.'.format(device_mac_address))
-                        response_json = json.loads(response)
-                        if response_json['message'] is not self.MAILGUN_QUEUED_MESSAGE:
-                            logging.warning('Tenant notification email for device add was not queued.')
+                    notifier = EmailNotify()
+                    notifier.device_enrolled(tenant_code=tenant_code,
+                                             tenant_name=device.get_tenant().name,
+                                             device_mac_address=device_mac_address,
+                                             timestamp=datetime.utcnow())
                 else:
                     self.response.set_status(status, error_message)
         else:
@@ -389,6 +430,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             proof_of_play_logging = request_json.get('proofOfPlayLogging')
             if str(proof_of_play_logging).lower() == 'true' or str(proof_of_play_logging).lower() == 'false':
                 device.proof_of_play_logging = bool(proof_of_play_logging)
+            timezone = request_json.get('timezone')
+            if timezone:
+                device.timezone = timezone
+                device.timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
             device.put()
             if not device.is_unmanaged_device:
                 deferred.defer(update_chrome_os_device,
@@ -446,6 +491,39 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             if last_error:
                 if device.last_error != last_error:
                     device.last_error = last_error
+            timezone = request_json.get('timezone')
+            if timezone:
+                if device.timezone != timezone:
+                    new_log_entry = DeviceIssueLog.create(device_key=device.key,
+                                                          category=config.DEVICE_ISSUE_TIMEZONE_CHANGE,
+                                                          up=True,
+                                                          storage_utilization=storage,
+                                                          memory_utilization=memory,
+                                                          program=program,
+                                                          program_id=program_id,
+                                                          last_error=last_error,
+                                                          resolved=True,
+                                                          resolved_datetime=datetime.utcnow())
+                    new_log_entry.put()
+            timezone_offset = request_json.get('timezoneOffset')
+            if timezone_offset and timezone:
+                if timezone_offset != TimezoneUtil.get_timezone_offset(timezone):
+                    change_intent(
+                        gcm_registration_id=device.gcm_registration_id,
+                        payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                        device_urlsafe_key=device_urlsafe_key,
+                        host=self.request.host_url)
+                    new_log_entry = DeviceIssueLog.create(device_key=device.key,
+                                                          category=config.DEVICE_ISSUE_TIMEZONE_OFFSET_CHANGE,
+                                                          up=True,
+                                                          storage_utilization=storage,
+                                                          memory_utilization=memory,
+                                                          program=program,
+                                                          program_id=program_id,
+                                                          last_error=last_error,
+                                                          resolved=True,
+                                                          resolved_datetime=datetime.utcnow())
+                    new_log_entry.put()
             sk_player_version = request_json.get('playerVersion')
             if sk_player_version:
                 if device.sk_player_version != sk_player_version:
@@ -495,6 +573,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             previously_down = device.up is False
             if previously_down:
                 DeviceIssueLog.resolve_device_down_issues(device_key=device.key, resolved_datetime=resolved_datetime)
+                notifier = EmailNotify()
+                tenant = device.get_tenant()
+                notifier.device_up(tenant_code=tenant.tenant_code,
+                                   tenant_name=tenant.name,
+                                   device_serial_number=device.serial_number)
                 new_log_entry = DeviceIssueLog.create(device_key=device.key,
                                                       category=config.DEVICE_ISSUE_PLAYER_UP,
                                                       up=True,

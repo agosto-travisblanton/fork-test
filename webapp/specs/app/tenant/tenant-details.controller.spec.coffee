@@ -1,44 +1,44 @@
 'use strict'
 
 describe 'TenantDetailsCtrl', ->
-  scope = undefined
+  $scope = undefined
   $controller = undefined
   controller = undefined
   $state = undefined
   $stateParams = undefined
   TenantsService = undefined
   DomainsService = undefined
-  DevicesService = undefined
+  TimezonesService = undefined
   DistributorsService = undefined
   progressBarService = undefined
   tenantsServicePromise = undefined
-  devicesServicePromise = undefined
-  unmanagedDevicesServicePromise = undefined
   distributorsServicePromise = undefined
   distributorsDomainsServicePromise = undefined
   domainsServicePromise = undefined
+  timezoneServicePromise = undefined
   sweet = undefined
   serviceInjection = undefined
 
   beforeEach module('skykitProvisioning')
-
-  beforeEach inject (_$controller_, _TenantsService_, _DomainsService_, _DevicesService_, _DistributorsService_,
+  beforeEach inject (_$controller_, _TenantsService_, _DomainsService_, _TimezonesService_, _DistributorsService_,
     _$state_, _sweet_) ->
     $controller = _$controller_
     $state = _$state_
     $stateParams = {}
     TenantsService = _TenantsService_
     DomainsService = _DomainsService_
-    DevicesService = _DevicesService_
+    TimezonesService = _TimezonesService_
     DistributorsService = _DistributorsService_
     progressBarService = {
       start: ->
       complete: ->
     }
     sweet = _sweet_
-    scope = {}
+    $scope = {
+      $watch: ->
+    }
     serviceInjection = {
-      $scope: scope
+      $scope: $scope
       $stateParams: $stateParams
       ProgressBarService: progressBarService
     }
@@ -46,41 +46,27 @@ describe 'TenantDetailsCtrl', ->
   describe 'initialization', ->
     beforeEach ->
       tenantsServicePromise = new skykitProvisioning.q.Mock
-      devicesServicePromise = new skykitProvisioning.q.Mock
-      unmanagedDevicesServicePromise = new skykitProvisioning.q.Mock
       distributorsServicePromise = new skykitProvisioning.q.Mock
       distributorsDomainsServicePromise = new skykitProvisioning.q.Mock
       domainsServicePromise = new skykitProvisioning.q.Mock
+      timezoneServicePromise = new skykitProvisioning.q.Mock
       spyOn(TenantsService, 'getTenantByKey').and.returnValue tenantsServicePromise
-      spyOn(DevicesService, 'getDevicesByTenant').and.returnValue devicesServicePromise
-      spyOn(DevicesService, 'getUnmanagedDevicesByTenant').and.returnValue unmanagedDevicesServicePromise
       spyOn(DistributorsService, 'getDomainsByKey').and.returnValue distributorsDomainsServicePromise
       spyOn(DomainsService, 'getDomainByKey').and.returnValue domainsServicePromise
+      spyOn(TimezonesService, 'getUsTimezones').and.returnValue timezoneServicePromise
+
+    it 'gameStopServer should be set', ->
+      controller = $controller 'TenantDetailsCtrl', serviceInjection
+      expect(controller.gameStopServer).toBeDefined()
 
     it 'currentTenant should be set', ->
       controller = $controller 'TenantDetailsCtrl', serviceInjection
       expect(controller.currentTenant).toBeDefined()
-      expect(controller.currentTenant.key).toBeUndefined()
-      expect(controller.currentTenant.name).toBeUndefined()
-      expect(controller.currentTenant.tenant_code).toBeUndefined()
-      expect(controller.currentTenant.admin_email).toBeUndefined()
-      expect(controller.currentTenant.content_server_url).toBeUndefined()
-      expect(controller.currentTenant.chrome_device_domain).toBeUndefined()
-      expect(controller.currentTenant.domain_key).toBeUndefined()
-      expect(controller.currentTenant.notification_emails).toBeUndefined()
       expect(controller.currentTenant.active).toBeTruthy()
 
     it 'selectedDomain should be defined', ->
       controller = $controller 'TenantDetailsCtrl', serviceInjection
       expect(controller.selectedDomain).toBeUndefined()
-
-    it 'currentTenantDisplays property should be defined', ->
-      controller = $controller 'TenantDetailsCtrl', serviceInjection
-      expect(controller.currentTenantDisplays).toBeDefined()
-
-    it 'currentTenantUnmanagedDisplays property should be defined', ->
-      controller = $controller 'TenantDetailsCtrl', serviceInjection
-      expect(controller.currentTenantUnmanagedDisplays).toBeDefined()
 
     it 'distributorDomains property should be defined', ->
       controller = $controller 'TenantDetailsCtrl', serviceInjection
@@ -90,7 +76,7 @@ describe 'TenantDetailsCtrl', ->
       beforeEach ->
         $stateParams = {tenantKey: 'fahdsfyudsyfauisdyfoiusydfu'}
         serviceInjection = {
-          $scope: scope
+          $scope: $scope
           $stateParams: $stateParams
           ProgressBarService: progressBarService
         }
@@ -106,22 +92,6 @@ describe 'TenantDetailsCtrl', ->
         expect(TenantsService.getTenantByKey).toHaveBeenCalledWith($stateParams.tenantKey)
         expect(controller.currentTenant).toBe(tenant)
 
-      it 'retrieve tenant\'s devices by tenant key from DevicesService', ->
-        controller = $controller 'TenantDetailsCtrl', serviceInjection
-        devices = [{key: 'f8sa76d78fa978d6fa7dg7ds55'}, {key: 'f8sa76d78fa978d6fa7dg7ds56'}]
-        data = {objects: devices}
-        devicesServicePromise.resolve(data)
-        expect(DevicesService.getDevicesByTenant).toHaveBeenCalledWith($stateParams.tenantKey)
-        expect(controller.currentTenantDisplays).toBe(devices)
-
-      it 'retrieve tenant\'s unmanaged devices by tenant key from DevicesService', ->
-        controller = $controller 'TenantDetailsCtrl', serviceInjection
-        unmanagedDevices = [{key: 'f8sa76d78fa978d6fa7dg7ds55'}, {key: 'f8sa76d78fa978d6fa7dg7ds56'}]
-        data = {objects: unmanagedDevices}
-        unmanagedDevicesServicePromise.resolve data
-        expect(DevicesService.getUnmanagedDevicesByTenant).toHaveBeenCalledWith $stateParams.tenantKey
-        expect(controller.currentTenantUnmanagedDisplays).toBe(unmanagedDevices)
-
     describe 'creating a new tenant', ->
       it 'editMode should be set to false', ->
         $stateParams = {}
@@ -133,19 +103,27 @@ describe 'TenantDetailsCtrl', ->
         controller = $controller 'TenantDetailsCtrl', serviceInjection
         expect(TenantsService.getTenantByKey).not.toHaveBeenCalled()
 
-      it 'do not call Devices.getDevicesByTenant', ->
-        $stateParams = {}
-        controller = $controller 'TenantDetailsCtrl', serviceInjection
-        expect(DevicesService.getDevicesByTenant).not.toHaveBeenCalled()
-
     describe '.initialize', ->
       beforeEach ->
         controller = $controller 'TenantDetailsCtrl', serviceInjection
         controller.currentDistributorKey = 'some-key'
 
+      it 'calls TimezonesService.getUsTimezones to retrieve US timezones', ->
+        controller.initialize()
+        expect(TimezonesService.getUsTimezones).toHaveBeenCalled()
+
       it 'calls DistributorsService.getDomainsByKey to retrieve distributor domains', ->
         controller.initialize()
         expect(DistributorsService.getDomainsByKey).toHaveBeenCalledWith controller.currentDistributorKey
+
+    describe '.onSuccessResolvingTenant', ->
+      tenant = {domain_key: 'some_key'}
+      beforeEach ->
+        controller = $controller 'TenantDetailsCtrl', serviceInjection
+
+      it 'calls DomainsService.getDomainByKey to retrieve domain', ->
+        controller.onSuccessResolvingTenant tenant
+        expect(DomainsService.getDomainByKey).toHaveBeenCalledWith tenant.domain_key
 
   describe '.onClickSaveButton', ->
     domain_key = undefined

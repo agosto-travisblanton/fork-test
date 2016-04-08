@@ -8,22 +8,16 @@ appModule.controller 'TenantLocationCtrl',
       key: undefined
     }
     @tenantKey = $stateParams.tenantKey
-    @selectedTimezone = 'America/Chicago'
     @editMode = !!$stateParams.locationKey
     if @editMode
       locationPromise = LocationsService.getLocationByKey $stateParams.locationKey
       locationPromise.then (data) =>
         @location = data
-        @selectedTimezone = data.timezone
         @tenantKey = data.tenantKey
         @locationName = data.customerLocationName
         @fetchTenantName @tenantKey
-    @timezones = []
 
     @initialize = ->
-      timezonePromise = LocationsService.getTimezones()
-      timezonePromise.then (data) =>
-        @timezones = data
       if not @editMode
         @fetchTenantName @tenantKey
         @location = {
@@ -33,7 +27,6 @@ appModule.controller 'TenantLocationCtrl',
 
     @onClickSaveButton = ->
       ProgressBarService.start()
-      @location.timezone = @selectedTimezone
       promise = LocationsService.save @location
       promise.then @onSuccessSavingLocation(@tenantKey), @onFailureSavingLocation
 

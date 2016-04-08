@@ -33,6 +33,8 @@ appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService) ->
       @displays = data.data.devices
       if @displays.length > 0
         @had_some_items = true
+      else
+        @had_some_items = false
 
   @addToSelectedDisplays = (searchText) =>
     if @isDisplayValid(searchText)
@@ -104,4 +106,24 @@ appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService) ->
     else
       ProofPlayService.downloadCSVForMultipleDevicesSummarized(@final.start_date_unix, @final.end_date_unix, @final.displays)
 
+
+  @tenants = null
+  @currentTenant = ProofPlayService.getTenant()
+
+  @initialize_tenant_select = () ->
+    ProofPlayService.getAllTenants()
+    .then (data) =>
+      @tenants = data.data.tenants
+
+
+  @submitTenant = (tenant) =>
+    if tenant != @currentTenant
+      ProofPlayService.setTenant(tenant)
+      @initialize()
+      @selected_displays = []
+      @areDisplaysValid()
+      @isDisabled()
+      @currentTenant = ProofPlayService.getTenant()
+   
+    
   @
