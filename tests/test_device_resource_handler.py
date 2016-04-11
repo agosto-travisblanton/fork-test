@@ -520,37 +520,181 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json['macAddress'], mac_address)
 
     ##################################################################################################################
-    # get_devices_by_tenant
+    # TENANT VIEW TESTS
     ##################################################################################################################
 
     def test_get_devices_by_tenant_http_status_ok(self):
         self.__build_list_devices(tenant_key=self.tenant_key, managed_number_to_build=20,
                                   unmanaged_number_to_build=0)
         request_parameters = {}
+
         uri = application.router.build(None, 'devices-by-tenant', None,
-                                       {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
+                                       {'tenant_urlsafe_key': self.tenant_key.urlsafe(), 'cur_prev_cursor': "null",
+                                        "cur_next_cursor": "null"})
+
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertOK(response)
 
-    def test_get_devices_by_tenant_entity_body_json(self):
+    def test_get_devices_by_tenant_entity_body_json_and_page_forward(self):
         self.__build_list_devices(tenant_key=self.tenant_key, managed_number_to_build=20,
                                   unmanaged_number_to_build=0)
+
         request_parameters = {'unmanaged': 'false'}
+
         uri = application.router.build(None, 'devices-by-tenant', None,
-                                       {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
+                                       {'tenant_urlsafe_key': self.tenant_key.urlsafe(), 'cur_prev_cursor': "null",
+                                        "cur_next_cursor": "null"})
+
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertLength(21, response_json)
+        self.assertLength(5, response_json["devices"])
+
+        next_uri = application.router.build(None, 'devices-by-tenant', None,
+                                            {'tenant_urlsafe_key': self.tenant_key.urlsafe(), 'cur_prev_cursor': "null",
+                                             "cur_next_cursor": response_json["next_cursor"]})
+
+        next_response = self.app.get(next_uri, params=request_parameters, headers=self.api_token_authorization_header)
+        next_response_json = json.loads(next_response.body)
+        self.assertLength(5, next_response_json["devices"])
+        self.assertTrue(next_response_json["prev_cursor"])
 
     def test_get_filter_unmanaged_devices_by_tenant_entity_body_json(self):
         self.__build_list_devices(tenant_key=self.tenant_key, managed_number_to_build=20,
                                   unmanaged_number_to_build=0)
+
         request_parameters = {'unmanaged': 'true'}
+
         uri = application.router.build(None, 'devices-by-tenant', None,
-                                       {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
+                                       {'tenant_urlsafe_key': self.tenant_key.urlsafe(), 'cur_prev_cursor': "null",
+                                        "cur_next_cursor": "null"})
+
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertLength(0, response_json)
+        self.assertLength(0, response_json["devices"])
+
+    ############################################################
+    # TENANT SEARCH AND MAC
+    ############################################################
+    def test_search_for_device_by_serial_by_tenant(self):
+        managed_number_build = 20
+        self.__build_list_devices_with_serials(tenant_key=self.tenant_key, managed_number_to_build=managed_number_build,
+                                               unmanaged_number_to_build=0)
+
+        uri = application.router.build(
+            None,
+            'search_for_device_by_serial_by_tenant',
+            None,
+            {
+                'tenant_urlsafe_key': self.tenant_key.urlsafe(),
+                'partial_serial': 'm-',
+                'unmanaged': 'false'
+            }
+        )
+
+        response = self.app.get(uri, headers=self.api_token_authorization_header)
+
+        response_json = json.loads(response.body)
+        self.assertTrue(len(response_json["serial_number_matches"]) == managed_number_build)
+
+    def test_search_for_device_by_mac_by_tenant(self):
+        managed_number_build = 20
+        self.__build_list_devices_with_serials(tenant_key=self.tenant_key, managed_number_to_build=managed_number_build,
+                                               unmanaged_number_to_build=0)
+
+        uri = application.router.build(
+            None,
+            'search_for_device_by_mac_by_tenant',
+            None,
+            {
+                'tenant_urlsafe_key': self.tenant_key.urlsafe(),
+                'partial_mac': 'm-mac',
+                'unmanaged': 'false'
+            }
+        )
+
+        response = self.app.get(uri, headers=self.api_token_authorization_header)
+
+        response_json = json.loads(response.body)
+        self.assertTrue(len(response_json["mac_matches"]) == managed_number_build)
+
+    def test_match_for_device_by_serial_by_tenant(self):
+        managed_number_build = 20
+        self.__build_list_devices_with_serials(tenant_key=self.tenant_key, managed_number_to_build=managed_number_build,
+                                               unmanaged_number_to_build=0)
+        uri = application.router.build(
+            None,
+            'match_for_device_by_serial_by_tenant',
+            None,
+            {
+                'tenant_urlsafe_key': self.tenant_key.urlsafe(),
+                'full_serial': 'm-serial0',
+                'unmanaged': 'false'
+            }
+        )
+
+        response = self.app.get(uri, headers=self.api_token_authorization_header)
+
+        response_json = json.loads(response.body)
+        self.assertTrue(response_json["is_match"])
+
+    def test_match_for_device_by_mac_by_tenant(self):
+        managed_number_build = 20
+        self.__build_list_devices_with_serials(tenant_key=self.tenant_key, managed_number_to_build=managed_number_build,
+                                               unmanaged_number_to_build=0)
+        uri = application.router.build(
+            None,
+            'match_for_device_by_mac_by_tenant',
+            None,
+            {
+                'tenant_urlsafe_key': self.tenant_key.urlsafe(),
+                'full_mac': 'm-mac0',
+                'unmanaged': 'false'
+            }
+        )
+
+        response = self.app.get(uri, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertTrue(response_json["is_match"])
+
+    def test_not_match_for_device_by_serial_by_tenant(self):
+        managed_number_build = 20
+        self.__build_list_devices_with_serials(tenant_key=self.tenant_key, managed_number_to_build=managed_number_build,
+                                               unmanaged_number_to_build=0)
+        uri = application.router.build(
+            None,
+            'match_for_device_by_serial_by_tenant',
+            None,
+            {
+                'tenant_urlsafe_key': self.tenant_key.urlsafe(),
+                'full_serial': 'm-serial093942392349423',
+                'unmanaged': 'false'
+            }
+        )
+
+        response = self.app.get(uri, headers=self.api_token_authorization_header)
+
+        response_json = json.loads(response.body)
+        self.assertFalse(response_json["is_match"])
+
+    def test_not_match_for_device_by_mac_by_tenant(self):
+        managed_number_build = 20
+        self.__build_list_devices_with_serials(tenant_key=self.tenant_key, managed_number_to_build=managed_number_build,
+                                               unmanaged_number_to_build=0)
+
+        uri = application.router.build(
+            None,
+            'match_for_device_by_mac_by_tenant',
+            None,
+            {
+                'tenant_urlsafe_key': self.tenant_key.urlsafe(),
+                'full_mac': 'm-mac09249423923492349',
+                'unmanaged': 'false'
+            }
+        )
+
+        response = self.app.get(uri, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertFalse(response_json["is_match"])
 
     #################################################################################################################
     # get_devices_by_distributor
@@ -1236,10 +1380,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertIsNone(self.managed_device_key.get())
 
     ##################################################################################################################
-    ## heartbeat
+    # heartbeat
     ##################################################################################################################
 
-    def test_device_resource_put_no_authorization_header_returns_forbidden(self):
+    def test_device_resource_put_no_authorization_header_returns_forbidden_not_gcm(self):
         request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
                         'program': self.PROGRAM}
@@ -1819,9 +1963,12 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         return results
 
     def __build_list_devices(self, tenant_key=None, managed_number_to_build=5, unmanaged_number_to_build=5):
+
         results = []
+
         if tenant_key is None:
             tenant_key = self.__create_tenant()
+
         for i in range(managed_number_to_build):
             mac_address = 'm-mac{0}'.format(i)
             gcm_registration_id = 'm-gcm{0}'.format(i)
@@ -1832,6 +1979,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                                    device_id=device_id)
             device.put()
             results.append(device)
+
         for i in range(unmanaged_number_to_build):
             mac_address = 'u-mac{0}'.format(i)
             gcm_registration_id = 'u-gcm{0}'.format(i)
@@ -1839,6 +1987,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                                      mac_address=mac_address)
             device.put()
             results.append(device)
+
         return results
 
     def __setup_distributor_with_two_tenants_with_n_devices(self, distributor_key, tenant_1_device_count,
