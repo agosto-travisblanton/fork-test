@@ -24,6 +24,46 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob
 class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidatorMixin):
     MAILGUN_QUEUED_MESSAGE = 'Queued. Thank you.'
 
+    ############################################################################################
+    # TENANTS VIEW
+    ############################################################################################
+    @requires_api_token
+    def get_devices_by_tenant(self, tenant_urlsafe_key, cur_prev_cursor, cur_next_cursor):
+        tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
+        unmanaged_filter = self.request.get('unmanaged')
+        unmanaged = not bool(unmanaged_filter == '' or str(unmanaged_filter) == 'false')
+
+        if cur_next_cursor == "null":
+            cur_next_cursor = None
+
+        if cur_prev_cursor == "null":
+            cur_prev_cursor = None
+
+        tenant_devices = Tenant.find_devices_paginated(
+            tenant_keys=[tenant_key],
+            unmanaged=unmanaged,
+            prev_cursor_str=cur_prev_cursor,
+            next_cursor_str=cur_next_cursor,
+            fetch_size=5
+        )
+
+        prev_cursor = tenant_devices["prev_cursor"]
+        next_cursor = tenant_devices["next_cursor"]
+        devices = tenant_devices["objects"]
+
+        json_response(
+            self.response,
+            {
+                "devices": devices,
+                "next_cursor": next_cursor,
+                "prev_cursor": prev_cursor,
+            },
+            strategy=CHROME_OS_DEVICE_STRATEGY
+        )
+
+    ############################################################################################
+    # DEVICES VIEW
+    ############################################################################################
     @requires_api_token
     def match_for_device_by_mac(self, distributor_urlsafe_key, full_mac, unmanaged):
         unmanaged = unmanaged == "true"
@@ -102,6 +142,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             },
         )
 
+    ############################################################################################
+    # END DEVICES VIEW
+    ############################################################################################
     @requires_api_token
     def get_list(self):
         pairing_code = self.request.get('pairingCode')
@@ -168,49 +211,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
 
     @requires_api_token
-    def get_devices_by_tenant(self, tenant_urlsafe_key, cur_prev_cursor, cur_next_cursor):
-        tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
-        unmanaged_filter = self.request.get('unmanaged')
-        unmanaged = not bool(unmanaged_filter == '' or str(unmanaged_filter) == 'false')
-
-        if cur_next_cursor == "null":
-            cur_next_cursor = None
-
-        if cur_prev_cursor == "null":
-            cur_prev_cursor = None
-
-        tenant_devices = Tenant.find_devices_paginated(
-            tenant_keys=[tenant_key],
-            unmanaged=unmanaged,
-            prev_cursor_str=cur_prev_cursor,
-            next_cursor_str=cur_next_cursor,
-            fetch_size=5
-        )
-
-        prev_cursor = tenant_devices["prev_cursor"]
-        next_cursor = tenant_devices["next_cursor"]
-        devices = tenant_devices["objects"]
-
-        json_response(
-            self.response,
-            {
-                "devices": devices,
-                "next_cursor": next_cursor,
-                "prev_cursor": prev_cursor,
-            },
-            strategy=CHROME_OS_DEVICE_STRATEGY
-        )
-
-    @staticmethod
-    def get_domain_tenant_list_from_distributor(distributor_urlsafe_key):
-        distributor = ndb.Key(urlsafe=distributor_urlsafe_key)
-        domain_keys = Domain.query(Domain.distributor_key == distributor).fetch(100, keys_only=True)
-        tenant_list = Tenant.query(ancestor=TenantEntityGroup.singleton().key)
-        tenant_list = filter(lambda x: x.active is True, tenant_list)
-        domain_tenant_list = filter(lambda x: x.domain_key in domain_keys, tenant_list)
-        return domain_tenant_list
-
-    @requires_api_token
     def get_devices_by_distributor(self, distributor_urlsafe_key, cur_prev_cursor, cur_next_cursor):
         if cur_next_cursor == "null":
             cur_next_cursor = None
@@ -248,7 +248,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     @requires_api_token
     def get(self, device_urlsafe_key):
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
-        if device.timezone != None:
+        if device.timezone:
             device.timezone_offset = TimezoneUtil.get_timezone_offset(device.timezone)
         else:
             device.timezone_offset = TimezoneUtil.get_timezone_offset('America/Chicago')
@@ -380,35 +380,46 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         status = 204
         message = None
         device = None
+
         try:
             device = ndb.Key(urlsafe=device_urlsafe_key).get()
+
         except Exception, e:
             logging.exception(e)
+
         if device is None:
             status = 404
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
-            self.response.set_status(status, message)
-            return
+            return self.response.set_status(status, message)
+
+
         else:
             request_json = json.loads(self.request.body)
             location_urlsafe_key = request_json.get('locationKey')
             if location_urlsafe_key:
                 try:
                     location = ndb.Key(urlsafe=location_urlsafe_key).get()
+                    device.location_key = location.key
                 except Exception, e:
                     logging.exception(e)
-                if location:
-                    device.location_key = location.key
+
             heartbeat_interval_minutes = request_json.get('heartbeatInterval')
+
             if heartbeat_interval_minutes is not None and heartbeat_interval_minutes > 0:
                 device.heartbeat_interval_minutes = heartbeat_interval_minutes
+
             check_for_content_interval_minutes = request_json.get('checkContentInterval')
+
             if check_for_content_interval_minutes is not None and check_for_content_interval_minutes > -1:
                 device.check_for_content_interval_minutes = check_for_content_interval_minutes
+
             customer_display_name = request_json.get('customerDisplayName')
+
             if customer_display_name:
                 device.customer_display_name = customer_display_name
+
             customer_display_code = request_json.get('customerDisplayCode')
+
             if customer_display_code:
                 if device.customer_display_code != customer_display_code:
                     if ChromeOsDevice.is_customer_display_code_unique(
@@ -421,27 +432,40 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                             customer_display_code)
                         self.response.set_status(status, message)
                         return
+
             notes = request_json.get('notes')
+
             if notes:
                 device.notes = notes
+
             gcm_registration_id = request_json.get('gcmRegistrationId')
+
             if gcm_registration_id:
                 device.gcm_registration_id = gcm_registration_id
+
             panel_model = request_json.get('panelModelNumber')
+
             if panel_model:
                 device.panel_model = panel_model
+
             else:
                 device.panel_model = None
+
             panel_input = request_json.get('panelSerialInput')
+
             if panel_input:
                 device.panel_input = panel_input
             else:
                 device.panel_input = None
+
             tenant_code = request_json.get('tenantCode')
+
             if tenant_code:
                 tenant = Tenant.find_by_tenant_code(tenant_code)
+
                 if tenant and tenant.key != device.tenant_key:
                     device.tenant_key = tenant.key
+
                     if device.is_unmanaged_device:
                         post_unmanaged_device_info(gcm_registration_id=device.gcm_registration_id,
                                                    device_urlsafe_key=device.key.urlsafe(), host=self.request.host_url)
@@ -471,51 +495,72 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         status = 204
         message = None
         device = None
+
         try:
             device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
+
         except Exception, e:
             logging.exception(e)
+
         if device is None:
             status = 404
             message = 'Unrecognized heartbeat device_key: {0}'.format(device_urlsafe_key)
+
         else:
             request_json = json.loads(self.request.body)
             mac_address = request_json.get('macAddress')
+
             if mac_address:
-                if device.is_unmanaged_device == False and ChromeOsDevice.mac_address_already_assigned(mac_address):
+                if not device.is_unmanaged_device and ChromeOsDevice.mac_address_already_assigned(mac_address):
+
                     if device.ethernet_mac_address == mac_address:
                         device.connection_type = config.ETHERNET_CONNECTION
+
                     elif device.mac_address == mac_address:
                         device.connection_type = config.WIFI_CONNECTION
                 else:
+
                     if device.mac_address != mac_address or device.ethernet_mac_address != mac_address:
-                        info_message = \
-                            "Heartbeat got an unrecognized macAddress {0} for device {1}".format(mac_address,
-                                                                                                 device_urlsafe_key)
+                        info_message = "Heartbeat got an unrecognized macAddress {0} for device {1}".format(
+                            mac_address,
+                            device_urlsafe_key
+                        )
                         logging.info(info_message)
+
             storage = request_json.get('storage')
+
             if storage is not None:
                 storage = int(storage)
+
                 if device.storage_utilization != storage:
                     device.storage_utilization = storage
+
             memory = request_json.get('memory')
+
             if memory is not None:
                 memory = int(memory)
                 if device.memory_utilization != memory:
                     device.memory_utilization = memory
+
             program = request_json.get('program')
+
             if program:
                 if device.program != program:
                     device.program = program
+
             program_id = request_json.get('programId')
+
             if program_id:
                 if device.program_id != program_id:
                     device.program_id = program_id
+
             last_error = request_json.get('lastError')
+
             if last_error:
                 if device.last_error != last_error:
                     device.last_error = last_error
             timezone = request_json.get('timezone')
+
             if timezone:
                 if device.timezone != timezone:
                     new_log_entry = DeviceIssueLog.create(device_key=device.key,
@@ -529,7 +574,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                           resolved=True,
                                                           resolved_datetime=datetime.utcnow())
                     new_log_entry.put()
+
             timezone_offset = request_json.get('timezoneOffset')
+
             if timezone_offset and timezone:
                 if timezone_offset != TimezoneUtil.get_timezone_offset(timezone):
                     change_intent(
@@ -548,7 +595,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                           resolved=True,
                                                           resolved_datetime=datetime.utcnow())
                     new_log_entry.put()
+
             sk_player_version = request_json.get('playerVersion')
+
             if sk_player_version:
                 if device.sk_player_version != sk_player_version:
                     device.sk_player_version = sk_player_version
@@ -563,7 +612,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                           resolved=True,
                                                           resolved_datetime=datetime.utcnow())
                     new_log_entry.put()
+
             os = request_json.get('os')
+
             if os:
                 if device.os != os:
                     device.os = os
@@ -578,7 +629,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                           resolved=True,
                                                           resolved_datetime=datetime.utcnow())
                     new_log_entry.put()
+
             os_version = request_json.get('osVersion')
+
             if os_version:
                 if device.os_version != os_version:
                     device.os_version = os_version
@@ -595,6 +648,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     new_log_entry.put()
             resolved_datetime = datetime.utcnow()
             previously_down = device.up is False
+
             if previously_down:
                 DeviceIssueLog.resolve_device_down_issues(device_key=device.key, resolved_datetime=resolved_datetime)
                 notifier = EmailNotify()
@@ -614,6 +668,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                       resolved_datetime=datetime.utcnow())
                 new_log_entry.put()
             previous_memory_issues = DeviceIssueLog.device_has_unresolved_memory_issues(device.key)
+
             if previous_memory_issues and device.memory_utilization < config.MEMORY_UTILIZATION_THRESHOLD:
                 DeviceIssueLog.resolve_device_memory_issues(device_key=device.key, resolved_datetime=resolved_datetime)
                 new_log_entry = DeviceIssueLog.create(device_key=device.key,
@@ -628,6 +683,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                       resolved_datetime=resolved_datetime)
                 new_log_entry.put()
             previous_storage_issues = DeviceIssueLog.device_has_unresolved_storage_issues(device.key)
+
             if previous_storage_issues and device.memory_utilization < config.STORAGE_UTILIZATION_THRESHOLD:
                 DeviceIssueLog.resolve_device_storage_issues(device_key=device.key, resolved_datetime=resolved_datetime)
                 new_log_entry = DeviceIssueLog.create(device_key=device.key,
@@ -641,6 +697,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                       resolved=True,
                                                       resolved_datetime=resolved_datetime)
                 new_log_entry.put()
+
             if DeviceIssueLog.device_not_reported(device_key=device.key):
                 new_log_entry = DeviceIssueLog.create(device_key=device.key,
                                                       category=config.DEVICE_ISSUE_FIRST_HEARTBEAT,
@@ -654,6 +711,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             device.heartbeat_updated = datetime.utcnow()
             device.put()
             self.response.headers.pop('Content-Type', None)
+
         self.response.set_status(status, message)
 
     @requires_api_token
@@ -666,6 +724,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         query = DeviceIssueLog.query(DeviceIssueLog.device_key == device.key,
                                      ndb.AND(DeviceIssueLog.created > start),
                                      ndb.AND(DeviceIssueLog.created <= end)).order(-DeviceIssueLog.created)
+
         latest_issues = query.fetch(config.LATEST_DEVICE_ISSUES_FETCH_COUNT)
         return json_response(self.response, latest_issues, strategy=DEVICE_ISSUE_LOG_STRATEGY)
 
@@ -674,13 +733,16 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         status = 204
         message = None
         device = None
+
         try:
             device = ndb.Key(urlsafe=device_urlsafe_key).get()
         except Exception, e:
             logging.exception(e)
+
         if device is None:
             status = 404
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
+
         else:
             change_intent(
                 gcm_registration_id=device.gcm_registration_id,
@@ -689,4 +751,14 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 host=self.request.host_url)
             device.key.delete()
             self.response.headers.pop('Content-Type', None)
+
         self.response.set_status(status, message)
+
+    @staticmethod
+    def get_domain_tenant_list_from_distributor(distributor_urlsafe_key):
+        distributor = ndb.Key(urlsafe=distributor_urlsafe_key)
+        domain_keys = Domain.query(Domain.distributor_key == distributor).fetch(100, keys_only=True)
+        tenant_list = Tenant.query(ancestor=TenantEntityGroup.singleton().key)
+        tenant_list = filter(lambda x: x.active is True, tenant_list)
+        domain_tenant_list = filter(lambda x: x.domain_key in domain_keys, tenant_list)
+        return domain_tenant_list
