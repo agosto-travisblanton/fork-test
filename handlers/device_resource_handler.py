@@ -28,16 +28,94 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     # TENANTS VIEW
     ############################################################################################
     @requires_api_token
+    def match_for_device_by_mac_by_tenant(self, tenant_urlsafe_key, full_mac, unmanaged):
+        unmanaged = unmanaged == "true"
+        tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
+
+        is_match = Tenant.match_device_with_full_mac(
+            tenant_keys=[tenant_key],
+            unmanaged=unmanaged,
+            full_mac=full_mac
+        )
+
+        json_response(
+            self.response,
+            {
+                "is_match": is_match
+            },
+        )
+
+    @requires_api_token
+    def match_for_device_by_serial_by_tenant(self, tenant_urlsafe_key, full_serial, unmanaged):
+        unmanaged = unmanaged == "true"
+        tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
+
+        is_match = Tenant.match_device_with_full_serial(
+            tenant_keys=[tenant_key],
+            unmanaged=unmanaged,
+            full_serial=full_serial
+        )
+
+        json_response(
+            self.response,
+            {
+                "is_match": is_match
+            },
+        )
+
+    @requires_api_token
+    def search_for_device_by_mac_by_tenant(self, tenant_urlsafe_key, partial_mac, unmanaged):
+        unmanaged = unmanaged == "true"
+        tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
+
+        resulting_devices = Tenant.find_devices_with_partial_mac(
+            tenant_keys=[tenant_key],
+            unmanaged=unmanaged,
+            partial_mac=partial_mac
+        )
+
+        json_response(
+            self.response,
+            {
+                "mac_matches": [
+                    {
+                        "mac": device.mac_address if partial_mac in device.mac_address else device.ethernet_mac_address,
+                        "key": device.key.urlsafe(),
+                        "tenantKey": device.tenant_key.urlsafe()
+                    } for device in resulting_devices]
+            },
+        )
+
+    @requires_api_token
+    def search_for_device_by_serial_by_tenant(self, tenant_urlsafe_key, partial_serial, unmanaged):
+        unmanaged = unmanaged == "true"
+        tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
+
+        resulting_devices = Tenant.find_devices_with_partial_serial(
+            tenant_keys=[tenant_key],
+            unmanaged=unmanaged,
+            partial_serial=partial_serial
+        )
+
+        json_response(
+            self.response,
+            {
+                "serial_number_matches": [
+                    {
+                        "serial": device.serial_number,
+                        "key": device.key.urlsafe(),
+                        "tenantKey": device.tenant_key.urlsafe()
+                    } for device in resulting_devices]
+            },
+        )
+
+    @requires_api_token
     def get_devices_by_tenant(self, tenant_urlsafe_key, cur_prev_cursor, cur_next_cursor):
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
         unmanaged_filter = self.request.get('unmanaged')
         unmanaged = not bool(unmanaged_filter == '' or str(unmanaged_filter) == 'false')
-
-        if cur_next_cursor == "null":
-            cur_next_cursor = None
-
-        if cur_prev_cursor == "null":
-            cur_prev_cursor = None
+        cur_next_cursor = cur_next_cursor if cur_next_cursor != "null" else None
+        cur_prev_cursor = cur_prev_cursor if cur_prev_cursor != "null" else None
 
         tenant_devices = Tenant.find_devices_paginated(
             tenant_keys=[tenant_key],
@@ -212,12 +290,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @requires_api_token
     def get_devices_by_distributor(self, distributor_urlsafe_key, cur_prev_cursor, cur_next_cursor):
-        if cur_next_cursor == "null":
-            cur_next_cursor = None
-
-        if cur_prev_cursor == "null":
-            cur_prev_cursor = None
-
+        cur_next_cursor = cur_next_cursor if cur_next_cursor != "null" else None
+        cur_prev_cursor = cur_prev_cursor if cur_prev_cursor != "null" else None
         unmanaged_filter = self.request.get('unmanaged')
         unmanaged = not bool(unmanaged_filter == '' or str(unmanaged_filter) == 'false')
         domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
