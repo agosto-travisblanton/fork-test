@@ -182,4 +182,5 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
 
       if not managed
         @getUnmanagedDevices @distributorKey, @unmanagedDevicesPrev, null
+  
   @

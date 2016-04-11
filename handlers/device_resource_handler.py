@@ -172,8 +172,12 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
         unmanaged_filter = self.request.get('unmanaged')
         unmanaged = not bool(unmanaged_filter == '' or str(unmanaged_filter) == 'false')
-        cur_next_cursor = cur_next_cursor if cur_next_cursor != "null" else None
-        cur_prev_cursor = cur_prev_cursor if cur_prev_cursor != "null" else None
+
+        if cur_next_cursor == "null":
+            cur_next_cursor = None
+
+        if cur_prev_cursor == "null":
+            cur_prev_cursor = None
 
         tenant_devices = Tenant.find_devices_paginated(
             tenant_keys=[tenant_key],
@@ -208,8 +212,12 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @requires_api_token
     def get_devices_by_distributor(self, distributor_urlsafe_key, cur_prev_cursor, cur_next_cursor):
-        cur_next_cursor = cur_next_cursor if cur_next_cursor != "null" else None
-        cur_prev_cursor = cur_prev_cursor if cur_prev_cursor != "null" else None
+        if cur_next_cursor == "null":
+            cur_next_cursor = None
+
+        if cur_prev_cursor == "null":
+            cur_prev_cursor = None
+
         unmanaged_filter = self.request.get('unmanaged')
         unmanaged = not bool(unmanaged_filter == '' or str(unmanaged_filter) == 'false')
         domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)

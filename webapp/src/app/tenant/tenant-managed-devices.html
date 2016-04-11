@@ -21,12 +21,12 @@
                         <div class="col-sm-3">
                             <md-button class="md-raised"
                                        ng-disabled="!vm.devicesPrev"
-                                       ng-click="vm.paginateCall(false, true)">
+                                       ng-click="vm.paginateCall(false)">
                                 Prev
                             </md-button>
                             <md-button class="md-raised"
                                        ng-disabled="!vm.devicesNext"
-                                       ng-click="vm.paginateCall(true, true)">
+                                       ng-click="vm.paginateCall(true)">
                                 Next
                             </md-button>
                         </div>
@@ -106,15 +106,15 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr ng-hide="tenantManagedDevicesCtrl.tenantDevices.length">
+                        <tr ng-hide="vm.tenantDevices.length">
                             <td colspan="6" class="text-center text-danger">
-                                No managed devices retrieved for {{ tenantManagedDevicesCtrl.currentTenant.name }}.
+                                No managed devices retrieved for {{ vm.currentTenant.name }}.
                             </td>
                         </tr>
-                        <tr ng-repeat="item in tenantManagedDevicesCtrl.tenantDevices | orderBy:'-created' "
-                            ng-click="tenantManagedDevicesCtrl.editItem(item)">
+                        <tr ng-repeat="item in vm.tenantDevices | orderBy:'-created' "
+                            ng-click="vm.editItem(item)">
                             <td>
-                                <a ng-click="tenantManagedDevicesCtrl.editItem(item)" class="md-primary md-ink-ripple"
+                                <a ng-click="vm.editItem(item)" class="md-primary md-ink-ripple"
                                    title="Device detail">
                                     <ng-md-icon icon="mode_edit" size="48">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24"
@@ -130,7 +130,7 @@
                             <td>{{ item.ethernetMacAddress }}</td>
                             <td>
                                 <a name="edit-device" class="md-primary md-ink-ripple"
-                                   ng-click="tenantManagedDevicesCtrl.editItem(item)"
+                                   ng-click="vm.editItem(item)"
                                    title="Device detail">{{item.serialNumber}}</a>
                             </td>
                             <td>{{ item.created }}</td>
