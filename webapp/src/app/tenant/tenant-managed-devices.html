@@ -32,7 +32,7 @@
                         </div>
                         <div class="col-md-3 col-md-offset-2">
                             <md-radio-group ng-model="vm.selectedButton"
-                                            ng-change="vm.changeRadio(false)"
+                                            ng-change="vm.changeRadio()"
                                             class="radio-horizontal">
 
                                 <div class="col-md-4">
@@ -57,11 +57,11 @@
                                     md-no-cache="true"
                                     md-selected-item="vm.selectedItem"
                                     md-search-text="vm.searchText"
-                                    md-items="item in vm.searchDevices(false, vm.searchText)"
+                                    md-items="item in vm.searchDevices(vm.searchText)"
                                     md-item-text="item"
                                     md-min-length="0"
-                                    md-search-text-change="vm.isResourceValid(false, vm.searchText)"
-                                    md-selected-item-change="vm.isResourceValid(false, vm.searchText)"
+                                    md-search-text-change="vm.isResourceValid(vm.searchText)"
+                                    md-selected-item-change="vm.isResourceValid(vm.searchText)"
                                     placeholder="Make A Search">
 
                                 <md-item-template>
@@ -84,7 +84,7 @@
                              style="margin-left: -20px !important; margin-top: -4px !important">
                             <md-button class="md-raised md-primary"
                                        ng-disabled="vm.disabled"
-                                       ng-click="vm.prepareForEditView(false, vm.searchText)">
+                                       ng-click="vm.prepareForEditView(vm.searchText)">
                                 OPEN
                             </md-button>
                         </div>

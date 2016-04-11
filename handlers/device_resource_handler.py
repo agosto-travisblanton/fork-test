@@ -63,7 +63,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             },
         )
 
-    @requires_api_token
+    # @requires_api_token
     def search_for_device_by_mac_by_tenant(self, tenant_urlsafe_key, partial_mac, unmanaged):
         unmanaged = unmanaged == "true"
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
@@ -86,7 +86,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             },
         )
 
-    @requires_api_token
+    # @requires_api_token
     def search_for_device_by_serial_by_tenant(self, tenant_urlsafe_key, partial_serial, unmanaged):
         unmanaged = unmanaged == "true"
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
