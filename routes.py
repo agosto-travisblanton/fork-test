@@ -155,7 +155,7 @@ application = WSGIApplication(
               handler_method='content_delete',
               methods=['POST']
               ),
-        Route(r'/api/v1/tenants/<tenant_urlsafe_key>/devices',
+        Route(r'/api/v1/tenants/<cur_prev_cursor>/<cur_next_cursor>/<tenant_urlsafe_key>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='devices-by-tenant',
               handler_method='get_devices_by_tenant',

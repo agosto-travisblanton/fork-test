@@ -2,8 +2,7 @@
 
 appModule = angular.module('skykitProvisioning')
 
-appModule.controller 'TenantManagedDevicesCtrl',
-  ($scope, $stateParams, TenantsService, DevicesService, $state) ->
+appModule.controller 'TenantManagedDevicesCtrl', ($scope, $stateParams, TenantsService, DevicesService, $state) ->
     @currentTenant = {
       key: undefined,
       name: undefined,
@@ -23,9 +22,12 @@ appModule.controller 'TenantManagedDevicesCtrl',
       tenantPromise = TenantsService.getTenantByKey $stateParams.tenantKey
       tenantPromise.then (tenant) =>
         @currentTenant = tenant
+      
       devicesPromise = DevicesService.getDevicesByTenant $stateParams.tenantKey
       devicesPromise.then (data) =>
-        @tenantDevices = data
+        @devicesPrev = data["prev_cursor"]
+        @devicesNext = data["next_cursor"]
+        @tenantDevices = data["devices"]
 
     $scope.tabIndex = 1
 

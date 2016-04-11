@@ -22,15 +22,19 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($http, $log, Res
         "/api/v1/player-command-events/#{deviceKey}").get()
       promise
 
-    getDevicesByTenant: (tenantKey) ->
+    getDevicesByTenant: (tenantKey, prev, next) ->
       unless tenantKey == undefined
-        url = "api/v1/tenants/#{tenantKey}/devices?unmanaged=false"
+        prev = if prev == undefined or null then null else prev
+        next = if next == undefined or null then null else next
+        url = "api/v1/tenants/#{prev}/#{next}/#{tenantKey}/devices?unmanaged=false"
         promise = Restangular.oneUrl(SERVICE_NAME, url).get()
         promise
 
-    getUnmanagedDevicesByTenant: (tenantKey) ->
+    getUnmanagedDevicesByTenant: (tenantKey, prev, next) ->
       unless tenantKey == undefined
-        url = "api/v1/tenants/#{tenantKey}/devices?unmanaged=true"
+        prev = if prev == undefined or null then null else prev
+        next = if next == undefined or null then null else next
+        url = "api/v1/tenants/#{prev}/#{next}/#{tenantKey}/devices?unmanaged=true"
         promise = Restangular.oneUrl(SERVICE_NAME, url).get()
         promise
 
