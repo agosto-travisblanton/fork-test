@@ -464,8 +464,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             status = 404
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
             return self.response.set_status(status, message)
-
-
         else:
             request_json = json.loads(self.request.body)
             location_urlsafe_key = request_json.get('locationKey')
@@ -475,24 +473,16 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     device.location_key = location.key
                 except Exception, e:
                     logging.exception(e)
-
             heartbeat_interval_minutes = request_json.get('heartbeatInterval')
-
             if heartbeat_interval_minutes is not None and heartbeat_interval_minutes > 0:
                 device.heartbeat_interval_minutes = heartbeat_interval_minutes
-
             check_for_content_interval_minutes = request_json.get('checkContentInterval')
-
             if check_for_content_interval_minutes is not None and check_for_content_interval_minutes > -1:
                 device.check_for_content_interval_minutes = check_for_content_interval_minutes
-
             customer_display_name = request_json.get('customerDisplayName')
-
             if customer_display_name:
                 device.customer_display_name = customer_display_name
-
             customer_display_code = request_json.get('customerDisplayCode')
-
             if customer_display_code:
                 if device.customer_display_code != customer_display_code:
                     if ChromeOsDevice.is_customer_display_code_unique(
@@ -505,40 +495,27 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                             customer_display_code)
                         self.response.set_status(status, message)
                         return
-
             notes = request_json.get('notes')
-
             if notes:
                 device.notes = notes
-
             gcm_registration_id = request_json.get('gcmRegistrationId')
-
             if gcm_registration_id:
                 device.gcm_registration_id = gcm_registration_id
-
             panel_model = request_json.get('panelModelNumber')
-
             if panel_model:
                 device.panel_model = panel_model
-
             else:
                 device.panel_model = None
-
             panel_input = request_json.get('panelSerialInput')
-
             if panel_input:
                 device.panel_input = panel_input
             else:
                 device.panel_input = None
-
             tenant_code = request_json.get('tenantCode')
-
             if tenant_code:
                 tenant = Tenant.find_by_tenant_code(tenant_code)
-
                 if tenant and tenant.key != device.tenant_key:
                     device.tenant_key = tenant.key
-
                     if device.is_unmanaged_device:
                         post_unmanaged_device_info(gcm_registration_id=device.gcm_registration_id,
                                                    device_urlsafe_key=device.key.urlsafe(), host=self.request.host_url)
