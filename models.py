@@ -232,7 +232,8 @@ class Tenant(ndb.Model):
                 ndb.AND(ChromeOsDevice.tenant_key.IN(tenant_keys),
                         ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(
                 page_size=fetch_size,
-                start_cursor=cursor)
+                start_cursor=cursor
+            )
 
             prev_cursor = next_cursor_str
             next_cursor = next_cursor.urlsafe() if more else None

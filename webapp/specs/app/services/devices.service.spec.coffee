@@ -18,8 +18,8 @@ describe 'DevicesService', ->
       spyOn(Restangular, 'oneUrl').and.returnValue restangularServiceStub
       spyOn(restangularServiceStub, 'get').and.returnValue promise
       tenantKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFud'
-      actual = DevicesService.getDevicesByTenant tenantKey
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/tenants/#{tenantKey}/devices?unmanaged=false"
+      actual = DevicesService.getDevicesByTenant tenantKey, null, null
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/tenants/null/null/#{tenantKey}/devices?unmanaged=false"
       expect(actual).toBe promise
 
   describe '.getUnmanagedDevicesByTenant', ->
@@ -28,8 +28,8 @@ describe 'DevicesService', ->
       spyOn(Restangular, 'oneUrl').and.returnValue restangularServiceStub
       spyOn(restangularServiceStub, 'get').and.returnValue promise
       tenantKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFud'
-      actual = DevicesService.getUnmanagedDevicesByTenant tenantKey
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/tenants/#{tenantKey}/devices?unmanaged=true"
+      actual = DevicesService.getUnmanagedDevicesByTenant tenantKey, null, null
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/tenants/null/null/#{tenantKey}/devices?unmanaged=true"
       expect(actual).toBe promise
 
   describe '.getDevicesByDistributor', ->
@@ -154,5 +154,58 @@ describe 'DevicesService', ->
       spyOn(deviceRestangularService, 'get').and.returnValue promise
       actual = DevicesService.matchDevicesByFullSerial(distributorKey, partialMac, unmanaged)
       expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/distributors/match/serial/#{distributorKey}/#{partialMac}/#{unmanaged}/devices"
+      expect(deviceRestangularService.get).toHaveBeenCalled()
+      expect(actual).toBe promise
+      
+      
+  describe '.searchDevicesByPartialMacByTenant', ->
+    it 'search devices with a partial mac address returns an http promise', ->
+      tenantKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw'
+      partialMac = "1234"
+      unmanaged = false
+      deviceRestangularService = {get: ->}
+      spyOn(Restangular, 'oneUrl').and.returnValue deviceRestangularService
+      spyOn(deviceRestangularService, 'get').and.returnValue promise
+      actual = DevicesService.searchDevicesByPartialMacByTenant(tenantKey, partialMac, unmanaged)
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/tenants/search/mac/#{tenantKey}/#{partialMac}/#{unmanaged}/devices"
+      expect(deviceRestangularService.get).toHaveBeenCalled()
+      expect(actual).toBe promise
+
+  describe '.searchDevicesByPartialSerialByTenant', ->
+    it 'search devices with a partial mac address returns an http promise', ->
+      tenantKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw'
+      partialMac = "1234"
+      unmanaged = false
+      deviceRestangularService = {get: ->}
+      spyOn(Restangular, 'oneUrl').and.returnValue deviceRestangularService
+      spyOn(deviceRestangularService, 'get').and.returnValue promise
+      actual = DevicesService.searchDevicesByPartialSerialByTenant(tenantKey, partialMac, unmanaged)
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/tenants/search/serial/#{tenantKey}/#{partialMac}/#{unmanaged}/devices"
+      expect(deviceRestangularService.get).toHaveBeenCalled()
+      expect(actual).toBe promise
+
+  describe '.matchDevicesByFullMacByTenant', ->
+    it 'match devices with a full mac address returns an http promise', ->
+      tenantKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw'
+      partialMac = "1234"
+      unmanaged = false
+      deviceRestangularService = {get: ->}
+      spyOn(Restangular, 'oneUrl').and.returnValue deviceRestangularService
+      spyOn(deviceRestangularService, 'get').and.returnValue promise
+      actual = DevicesService.matchDevicesByFullMacByTenant(tenantKey, partialMac, unmanaged)
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/tenants/match/mac/#{tenantKey}/#{partialMac}/#{unmanaged}/devices"
+      expect(deviceRestangularService.get).toHaveBeenCalled()
+      expect(actual).toBe promise
+
+  describe '.matchDevicesByFullSerialByTenant', ->
+    it 'match devices with a full mac address returns an http promise', ->
+      tenantKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw'
+      partialMac = "1234"
+      unmanaged = false
+      deviceRestangularService = {get: ->}
+      spyOn(Restangular, 'oneUrl').and.returnValue deviceRestangularService
+      spyOn(deviceRestangularService, 'get').and.returnValue promise
+      actual = DevicesService.matchDevicesByFullSerialByTenant(tenantKey, partialMac, unmanaged)
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/tenants/match/serial/#{tenantKey}/#{partialMac}/#{unmanaged}/devices"
       expect(deviceRestangularService.get).toHaveBeenCalled()
       expect(actual).toBe promise

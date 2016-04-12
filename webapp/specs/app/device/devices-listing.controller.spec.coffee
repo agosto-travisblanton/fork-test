@@ -371,19 +371,3 @@ describe 'DevicesListingCtrl', ->
       }
       promise.resolve mac_matches
       expect(controller.macDevices).toEqual convertArrayToDictionary(mac_matches["mac_matches"], true)
-
-#    it "matchDevicesByFullMac called when managed and button is mac", ->
-#      unmanaged = false
-#      controller.selectedButton = "MAC"
-#      controller.isResourceValid(unmanaged, resource)
-#      promise.resolve false
-#      expect(DevicesService.matchDevicesByFullMac).toHaveBeenCalledWith controller.distributorKey, resource, unmanaged
-#
-#    it "matchDevicesByFullSerial called when managed and button is not mac", ->
-#      unmanaged = false
-#      controller.selectedButton = "Serial Number"
-#      controller.isResourceValid(unmanaged, resource)
-#      serialPromise.resolve false
-#      expect(DevicesService.matchDevicesByFullSerial).toHaveBeenCalledWith controller.distributorKey, resource, unmanaged
-#      
-#
