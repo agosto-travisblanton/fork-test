@@ -12,28 +12,33 @@ describe 'TenantManagedDevicesCtrl', ->
   devicesServicePromise = undefined
   controller = undefined
   promise = undefined
+  ProgressBarService = undefined
   partial = undefined
   beforeEach module('skykitProvisioning')
 
-  beforeEach inject (_$controller_, _TenantsService_, _DevicesService_, _$state_, _$rootScope_) ->
+  beforeEach inject (_$controller_, _TenantsService_, _DevicesService_, _ProgressBarService_, _$state_, _$rootScope_) ->
     $controller = _$controller_
     $state = _$state_
     $stateParams = {}
     $rootScope = _$rootScope_
     TenantsService = _TenantsService_
     DevicesService = _DevicesService_
+    ProgressBarService = _ProgressBarService_
     scope = $rootScope.$new()
     serviceInjection = {
       $scope: scope
       $stateParams: $stateParams
       TenantsService: TenantsService
       DevicesService: DevicesService
+      ProgressBarService: ProgressBarService
     }
 
   describe 'initialization', ->
     beforeEach ->
       tenantsServicePromise = new skykitProvisioning.q.Mock
       devicesServicePromise = new skykitProvisioning.q.Mock
+      spyOn(ProgressBarService, 'start')
+      spyOn(ProgressBarService, 'complete')
       spyOn(TenantsService, 'getTenantByKey').and.returnValue tenantsServicePromise
       spyOn(DevicesService, 'getDevicesByTenant').and.returnValue devicesServicePromise
 

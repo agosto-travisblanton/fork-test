@@ -7,35 +7,40 @@ describe 'TenantUnmanagedDevicesCtrl', ->
   $stateParams = undefined
   TenantsService = undefined
   DevicesService = undefined
+  ProgressBarService = undefined
   serviceInjection = undefined
   tenantsServicePromise = undefined
   controller = undefined
   partial = undefined
   promise = undefined
   devicesServicePromise = undefined
-  
+
 
   beforeEach module('skykitProvisioning')
 
-  beforeEach inject (_$controller_, _TenantsService_, _DevicesService_, _$state_, _$rootScope_) ->
+  beforeEach inject (_$controller_, _TenantsService_, _DevicesService_, _$state_, _ProgressBarService_, _$rootScope_) ->
     $controller = _$controller_
     $state = _$state_
     $stateParams = {}
     $rootScope = _$rootScope_
     TenantsService = _TenantsService_
     DevicesService = _DevicesService_
+    ProgressBarService = _ProgressBarService_
     scope = $rootScope.$new()
     serviceInjection = {
       $scope: scope
       $stateParams: $stateParams
       TenantsService: TenantsService
       DevicesService: DevicesService
+      ProgressBarService: ProgressBarService
     }
 
   describe 'initialization', ->
     beforeEach ->
       tenantsServicePromise = new skykitProvisioning.q.Mock
       devicesServicePromise = new skykitProvisioning.q.Mock
+      spyOn(ProgressBarService, 'start')
+      spyOn(ProgressBarService, 'complete')
       spyOn(TenantsService, 'getTenantByKey').and.returnValue tenantsServicePromise
       spyOn(DevicesService, 'getUnmanagedDevicesByTenant').and.returnValue devicesServicePromise
 
@@ -141,7 +146,7 @@ describe 'TenantUnmanagedDevicesCtrl', ->
         spyOn(DevicesService, 'searchDevicesByPartialMacByTenant').and.returnValue promise
         spyOn(DevicesService, 'searchDevicesByPartialSerialByTenant').and.returnValue promise
         controller = $controller 'TenantUnmanagedDevicesCtrl', serviceInjection
-        
+
 
       convertArrayToDictionary = (theArray, mac) ->
         Devices = {}
@@ -193,16 +198,16 @@ describe 'TenantUnmanagedDevicesCtrl', ->
         controller.paginateCall(false)
         expect(DevicesService.getUnmanagedDevicesByTenant).toHaveBeenCalledWith controller.tenantKey, controller.devicesPrev, null
 
-  
+
       describe '.prepareForEditItem', ->
         resourceSearch = "test"
-  
+
         beforeEach ->
           controller = $controller 'TenantUnmanagedDevicesCtrl', serviceInjection
           controller.macDevices = {"test": {"key": "1234", "tenantKey": "5678"}}
           controller.serialDevices = {"test": {"key": "1234", "tenantKey": "5678"}}
-  
-  
+
+
         it "prepares for editItem as", ->
           controller.selectedButton == "MAC"
           controller.prepareForEditView(resourceSearch)
@@ -211,7 +216,7 @@ describe 'TenantUnmanagedDevicesCtrl', ->
             tenantKey: controller.tenantKey,
             fromDevices: false
           })
-  
+
         it "prepares for editItem as serial", ->
           controller.selectedButton == "Serial Number"
           controller.prepareForEditView(resourceSearch)
@@ -220,10 +225,10 @@ describe 'TenantUnmanagedDevicesCtrl', ->
             tenantKey: controller.tenantKey,
             fromDevices: false
           })
-  
+
       describe '.isResourceValid', ->
         resource = 'my-resource'
-  
+
         beforeEach ->
           tenantKey = 'bhjad897d987fa32fg708fg72'
           $stateParams = {tenantKey: tenantKey}
@@ -235,13 +240,13 @@ describe 'TenantUnmanagedDevicesCtrl', ->
           promise = new skykitProvisioning.q.Mock
           spyOn(DevicesService, 'matchDevicesByFullMacByTenant').and.returnValue promise
           spyOn(DevicesService, 'matchDevicesByFullSerialByTenant').and.returnValue promise
-  
+
         it "matchDevicesByFullMac called when managed and button is mac", ->
           controller.selectedButton = "MAC"
           controller.isResourceValid(resource)
           promise.resolve false
           expect(DevicesService.matchDevicesByFullMacByTenant).toHaveBeenCalledWith controller.tenantKey, resource, true
-  
+
         it "matchDevicesByFullSerial called button is not mac", ->
           controller.selectedButton = "Serial Number"
           controller.isResourceValid(resource)

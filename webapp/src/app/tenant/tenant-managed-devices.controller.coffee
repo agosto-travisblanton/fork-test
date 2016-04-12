@@ -2,7 +2,7 @@
 
 appModule = angular.module('skykitProvisioning')
 
-appModule.controller 'TenantManagedDevicesCtrl', ($scope, $stateParams, TenantsService, DevicesService, $state) ->
+appModule.controller 'TenantManagedDevicesCtrl', ($scope, $stateParams, TenantsService, DevicesService, ProgressBarService, $state) ->
   @currentTenant = {
     key: undefined,
     name: undefined,
@@ -26,11 +26,13 @@ appModule.controller 'TenantManagedDevicesCtrl', ($scope, $stateParams, TenantsS
   @tenantKey = $stateParams.tenantKey
   
   @getManagedDevices = (tenantKey, prev_cursor, next_cursor) ->
+    ProgressBarService.start()
     devicesPromise = DevicesService.getDevicesByTenant tenantKey, prev_cursor, next_cursor
     devicesPromise.then (data) =>
       @devicesPrev = data["prev_cursor"]
       @devicesNext = data["next_cursor"]
       @tenantDevices = data["devices"]
+      ProgressBarService.complete()
 
   if @editMode
     tenantPromise = TenantsService.getTenantByKey @tenantKey
