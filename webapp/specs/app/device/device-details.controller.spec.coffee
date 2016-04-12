@@ -5,6 +5,7 @@ describe 'DeviceDetailsCtrl', ->
   controller = undefined
   $stateParams = undefined
   $state = undefined
+  $log = undefined
   $mdDialog = undefined
   DevicesService = undefined
   TimezonesService = undefined
@@ -66,11 +67,12 @@ describe 'DeviceDetailsCtrl', ->
   beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _DevicesService_, _TimezonesService_, _LocationsService_, _CommandsService_,
-    _sweet_, _$state_, _$mdDialog_) ->
+    _sweet_, _$state_, _$mdDialog_, _$log_) ->
     $controller = _$controller_
     $stateParams = {}
     $state = {}
     $state = _$state_
+    $log = _$log_
     $mdDialog = _$mdDialog_
     DevicesService = _DevicesService_
     TimezonesService = _TimezonesService_
@@ -248,20 +250,89 @@ describe 'DeviceDetailsCtrl', ->
 
   describe '.confirmDeviceDelete', ->
     jquery_event = {}
-    key = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHIbCxIOQ2hyb21lT3NEZXZpY2UYgICAgICAhggM'
+    device_key = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHIbCxIOQ2hyb21lT3NEZXZpY2UYgICAgICAhggM'
+    confirm = undefined
+    promise = undefined
+
     beforeEach ->
-      deletePromise = new skykitProvisioning.q.Mock
-      showPromise = new skykitProvisioning.q.Mock
-      spyOn(DevicesService, 'delete').and.returnValue deletePromise
-      spyOn($state, 'go')
-      spyOn($mdDialog, 'confirm').and.callFake -> return true
-      spyOn($mdDialog, 'show').and.returnValue showPromise
-
+      promise = new skykitProvisioning.q.Mock
+      spyOn($mdDialog, 'confirm').and.callFake -> return 'ok'
+      spyOn($mdDialog, 'show').and.returnValue promise
+      confirm = $mdDialog.confirm(
+        {
+          title: 'Are you sure to delete this device?'
+          textContent: 'Please remember, you MUST remove this device from Content Manager before deleting it from Provisioning.'
+          targetEvent: event
+          ok: 'Delete'
+          cancel: 'Cancel'
+        }
+      )
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
-      controller.confirmDeviceDelete(jquery_event, key)
 
-    it 'call DevicesService.delete with the current device key', ->
-      expect(DevicesService.delete).toHaveBeenCalledWith key
+    it 'calls $mdDialog.show confirm object', ->
+      controller.confirmDeviceDelete(jquery_event, device_key)
+      expect($mdDialog.show).toHaveBeenCalledWith confirm
+
+    it 'calls controller.onConfirmDelete when promise resolved', ->
+      spyOn(controller, 'onConfirmDelete')
+      controller.confirmDeviceDelete(jquery_event, device_key)
+      confirmResponse = [{result: 'ok'}]
+      promise.resolve confirmResponse
+      expect(controller.onConfirmDelete).toHaveBeenCalledWith device_key
+
+    it 'calls controller.onConfirmCancel when promise rejected', ->
+      spyOn(controller, 'onConfirmCancel')
+      controller.confirmDeviceDelete(jquery_event, device_key)
+      promise.reject([])
+      expect(controller.onConfirmCancel).toHaveBeenCalled()
+
+  describe '.onConfirmDelete', ->
+    device_key = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHIbCxIOQ2hyb21lT3NEZXZpY2UYgICAgICAhggM'
+    promise = undefined
+
+    beforeEach ->
+      promise = new skykitProvisioning.q.Mock
+      spyOn(DevicesService, 'delete').and.returnValue promise
+      spyOn(sweet, 'show')
+      spyOn($state, 'go')
+      spyOn($log, 'error')
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+
+    describe 'when promise is resolved', ->
+      it 'calls DevicesService.delete with device key', ->
+        controller.onConfirmDelete device_key
+        expect(DevicesService.delete).toHaveBeenCalledWith device_key
+
+      it 'calls sweet alert', ->
+        controller.onConfirmDelete device_key
+        promise.resolve()
+        expect(sweet.show).toHaveBeenCalledWith('Ok', 'Delete processed.', 'success')
+
+      it 'calls $state router', ->
+        controller.onConfirmDelete device_key
+        promise.resolve()
+        expect($state.go).toHaveBeenCalledWith 'devices'
+
+    describe 'when promise is rejected', ->
+      it 'calls sweet alert with friendly message', ->
+        controller.onConfirmDelete device_key
+        promise.reject([])
+        expect(sweet.show).toHaveBeenCalledWith('Oops...', 'Unable to delete device', 'error')
+
+      it 'logs a detailed error', ->
+        response = {status: 400, statusText: 'Bad request'}
+        controller.onConfirmDelete device_key
+        promise.reject(response)
+        expect($log.error).toHaveBeenCalledWith "Unable to delete device with key #{device_key}: 400 Bad request"
+
+  describe '.onConfirmCancel', ->
+    beforeEach ->
+      spyOn(sweet, 'show')
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+
+    it 'calls sweet alert confirming delete was cancelled', ->
+      controller.onConfirmCancel()
+      expect(sweet.show).toHaveBeenCalledWith('Ok', 'Delete cancelled.', 'success')
 
   describe '.onClickResetSendButton', ->
     beforeEach ->

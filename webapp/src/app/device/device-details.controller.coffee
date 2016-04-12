@@ -161,9 +161,15 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       sweet.show('Oops...', 'Unable to save updated device.', 'error')
 
   @confirmDeviceDelete = (event, key) ->
-    title = 'Are you sure to delete this device?'
-    content = 'Please remember, you MUST remove this device from Content Manager before deleting it from Provisioning.'
-    confirm = $mdDialog.confirm().title(title).textContent(content).ariaLabel('confirmation').targetEvent(event).ok('Delete').cancel('Cancel')
+    confirm = $mdDialog.confirm(
+      {
+        title:'Are you sure to delete this device?'
+        textContent: 'Please remember, you MUST remove this device from Content Manager before deleting it from Provisioning.'
+        targetEvent: event
+        ok: 'Delete'
+        cancel: 'Cancel'
+      }
+    )
     showPromise = $mdDialog.show confirm
     success = =>
       @onConfirmDelete key
@@ -178,7 +184,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     failure = (error) ->
       friendlyMessage = 'Unable to delete device'
       sweet.show('Oops...', friendlyMessage, 'error')
-      $log.error "Unable to delete device for key #{key}: #{error.status } #{error.statusText}"
+      $log.error "Unable to delete device with key #{key}: #{error.status } #{error.statusText}"
     deletePromise = DevicesService.delete key
     deletePromise.then success, failure
 
