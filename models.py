@@ -252,12 +252,11 @@ class Tenant(ndb.Model):
                 ndb.AND(DeviceIssueLog.created > start),
                 ndb.AND(DeviceIssueLog.created <= end)
             ).order(
-                DeviceIssueLog.created
+                DeviceIssueLog.created # notice that this is sorted forward due to cursor being reversed
             ).fetch_page(
                 page_size=fetch_size,
                 start_cursor=cursor.reversed()
             )
-
 
             # needed because we are using a reverse cursor
             objects.reverse()

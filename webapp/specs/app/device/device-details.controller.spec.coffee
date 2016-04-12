@@ -14,7 +14,7 @@ describe 'DeviceDetailsCtrl', ->
   CommandsService = undefined
   commandsServicePromise = undefined
   sweet = undefined
-  progressBarService = undefined
+  ProgressBarService = undefined
   serviceInjection = undefined
   cookieMock = undefined
   device = {key: 'dhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
@@ -74,7 +74,7 @@ describe 'DeviceDetailsCtrl', ->
     TimezonesService = _TimezonesService_
     LocationsService = _LocationsService_
     CommandsService = _CommandsService_
-    progressBarService = {
+    ProgressBarService = {
       start: ->
       complete: ->
     }
@@ -83,7 +83,7 @@ describe 'DeviceDetailsCtrl', ->
     serviceInjection = {
       $scope: scope
       $stateParams: $stateParams
-      ProgressBarService: progressBarService
+      ProgressBarService: ProgressBarService
     }
 
   describe 'initialize', ->
@@ -98,6 +98,8 @@ describe 'DeviceDetailsCtrl', ->
       getDeviceIssuesPromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getIssuesByKey').and.returnValue getDeviceIssuesPromise
       spyOn(DevicesService, 'getPanelModels').and.returnValue [{'id': 'Sony–FXD40LX2F'}, {'id': 'NEC–LCD4215'}]
+      spyOn(ProgressBarService, 'start')
+      spyOn(ProgressBarService, 'complete')
       inputs = [
         {
           'id': 'HDMI2'
@@ -158,14 +160,17 @@ describe 'DeviceDetailsCtrl', ->
           DevicesService: DevicesService
           TimezonesService: TimezonesService
           LocationsService: LocationsService
+          ProgressBarService: ProgressBarService
         }
+
+
         now = new Date()
         today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
         @epochEnd = moment(new Date()).unix()
         today.setDate(today.getDate() - 30)
         @epochStart = moment(today).unix()
         controller.initialize()
-
+ 
       it 'should call TimezonesService.getTimezones', ->
         expect(TimezonesService.getUsTimezones).toHaveBeenCalled()
 
@@ -185,10 +190,10 @@ describe 'DeviceDetailsCtrl', ->
         expect(DevicesService.getCommandEventsByKey).toHaveBeenCalledWith $stateParams.deviceKey
 
       it 'calls DevicesService.getIssuesByKey to retrieve the issues for a given device and datetime range', ->
-        expect(DevicesService.getIssuesByKey).toHaveBeenCalledWith($stateParams.deviceKey, @epochStart, @epochEnd)
+        expect(DevicesService.getIssuesByKey).toHaveBeenCalledWith($stateParams.deviceKey, @epochStart, @epochEnd, undefined, undefined)
 
       it "the 'then' handler caches the retrieved issues for a given device key in the controller", ->
-        getDeviceIssuesPromise.resolve issues
+        getDeviceIssuesPromise.resolve {issues: issues}
         expect(controller.issues).toBe issues
 
       it "the 'then' handler caches the retrieved command events in the controller", ->
@@ -201,8 +206,8 @@ describe 'DeviceDetailsCtrl', ->
       spyOn(DevicesService, 'save').and.returnValue devicesServicePromise
       spyOn($state, 'go')
       $stateParams = {}
-      spyOn(progressBarService, 'start')
-      spyOn(progressBarService, 'complete')
+      spyOn(ProgressBarService, 'start')
+      spyOn(ProgressBarService, 'complete')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.currentDevice.panelModel = {id: 'Sony-112'}
       controller.currentDevice.panelInput = {id: 'HDMI1', parentId: 'Sony-112'}
@@ -210,7 +215,7 @@ describe 'DeviceDetailsCtrl', ->
       devicesServicePromise.resolve()
 
     it 'starts the progress bar', ->
-      expect(progressBarService.start).toHaveBeenCalled()
+      expect(ProgressBarService.start).toHaveBeenCalled()
 
     it 'call DevicesService.save with the current device', ->
       expect(DevicesService.save).toHaveBeenCalledWith controller.currentDevice
@@ -221,7 +226,7 @@ describe 'DeviceDetailsCtrl', ->
         controller.onSuccessDeviceSave()
 
       it 'stops the progress bar', ->
-        expect(progressBarService.complete).toHaveBeenCalled()
+        expect(ProgressBarService.complete).toHaveBeenCalled()
 
       it "the 'then' handler shows a sweet", ->
         expect(sweet.show).toHaveBeenCalledWith('WooHoo!', 'Your changes were saved!', 'success')
@@ -232,7 +237,7 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'stops the progress bar', ->
         controller.onFailureDeviceSave({status: 200})
-        expect(progressBarService.complete).toHaveBeenCalled()
+        expect(ProgressBarService.complete).toHaveBeenCalled()
 
       it 'displays a sweet alert for general save failure', ->
         controller.onFailureDeviceSave({status: 400})
@@ -247,14 +252,14 @@ describe 'DeviceDetailsCtrl', ->
     beforeEach ->
       commandsServicePromise = new skykitProvisioning.q.Mock
       spyOn(CommandsService, 'reset').and.returnValue commandsServicePromise
-      spyOn(progressBarService, 'start')
-      spyOn(progressBarService, 'complete')
+      spyOn(ProgressBarService, 'start')
+      spyOn(ProgressBarService, 'complete')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.editMode = true
       controller.onClickResetSendButton()
 
     it 'starts the progress bar', ->
-      expect(progressBarService.start).toHaveBeenCalled()
+      expect(ProgressBarService.start).toHaveBeenCalled()
 
     it 'call CommandsService.reset with the current device', ->
       expect(CommandsService.reset).toHaveBeenCalledWith controller.currentDevice.key
@@ -265,7 +270,7 @@ describe 'DeviceDetailsCtrl', ->
         controller.onResetSuccess()
 
       it 'stops the progress bar', ->
-        expect(progressBarService.complete).toHaveBeenCalled()
+        expect(ProgressBarService.complete).toHaveBeenCalled()
 
       it 'displays a sweet alert', ->
         expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent a reset command to Google Cloud Messaging.',
@@ -278,7 +283,7 @@ describe 'DeviceDetailsCtrl', ->
         controller.onResetFailure @error
 
       it 'stops the progress bar', ->
-        expect(progressBarService.complete).toHaveBeenCalled()
+        expect(ProgressBarService.complete).toHaveBeenCalled()
 
       it 'displays a sweet alert', ->
         expect(sweet.show).toHaveBeenCalledWith('Oops...', "Reset error: #{@error.data}", 'error')
@@ -287,15 +292,15 @@ describe 'DeviceDetailsCtrl', ->
     beforeEach ->
       commandsServicePromise = new skykitProvisioning.q.Mock
       spyOn(CommandsService, 'volume').and.returnValue commandsServicePromise
-      spyOn(progressBarService, 'start')
-      spyOn(progressBarService, 'complete')
+      spyOn(ProgressBarService, 'start')
+      spyOn(ProgressBarService, 'complete')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.editMode = true
       controller.currentDevice.volume = 5
       controller.onClickVolumeSendButton()
 
     it 'starts the progress bar', ->
-      expect(progressBarService.start).toHaveBeenCalled()
+      expect(ProgressBarService.start).toHaveBeenCalled()
 
     it 'calls CommandsService.volume with the current device', ->
       expect(CommandsService.volume).toHaveBeenCalledWith(controller.currentDevice.key, controller.currentDevice.volume)
@@ -306,7 +311,7 @@ describe 'DeviceDetailsCtrl', ->
         controller.onVolumeSuccess controller.currentDevice.volume
 
       it 'stops the progress bar', ->
-        expect(progressBarService.complete).toHaveBeenCalled()
+        expect(ProgressBarService.complete).toHaveBeenCalled()
 
       it 'displays a sweet alert', ->
         expect(sweet.show).toHaveBeenCalledWith('Success!',
@@ -319,7 +324,7 @@ describe 'DeviceDetailsCtrl', ->
         controller.onVolumeFailure @error
 
       it 'stops the progress bar', ->
-        expect(progressBarService.complete).toHaveBeenCalled()
+        expect(ProgressBarService.complete).toHaveBeenCalled()
 
       it 'displays a sweet alert', ->
         expect(sweet.show).toHaveBeenCalledWith('Oops...', "Volume error: #{@error.data}", 'error')
@@ -328,15 +333,15 @@ describe 'DeviceDetailsCtrl', ->
     beforeEach ->
       commandsServicePromise = new skykitProvisioning.q.Mock
       spyOn(CommandsService, 'custom').and.returnValue(commandsServicePromise)
-      spyOn(progressBarService, 'start')
-      spyOn(progressBarService, 'complete')
+      spyOn(ProgressBarService, 'start')
+      spyOn(ProgressBarService, 'complete')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.editMode = true
       controller.currentDevice.custom = 'skykit.com/skdchromeapp/channel/2'
       controller.onClickCommandSendButton()
 
     it 'starts the progress bar', ->
-      expect(progressBarService.start).toHaveBeenCalled()
+      expect(ProgressBarService.start).toHaveBeenCalled()
 
     it 'calls CommandsService.custom with the current device', ->
       expect(CommandsService.custom).toHaveBeenCalledWith(controller.currentDevice.key, controller.currentDevice.custom)
@@ -347,7 +352,7 @@ describe 'DeviceDetailsCtrl', ->
         controller.onCommandSuccess controller.currentDevice.custom
 
       it 'stops the progress bar', ->
-        expect(progressBarService.complete).toHaveBeenCalled()
+        expect(ProgressBarService.complete).toHaveBeenCalled()
 
       it 'displays a sweet alert', ->
         expect(sweet.show).toHaveBeenCalledWith('Success!',
@@ -360,7 +365,7 @@ describe 'DeviceDetailsCtrl', ->
         controller.onCommandFailure @error
 
       it 'stops the progress bar', ->
-        expect(progressBarService.complete).toHaveBeenCalled()
+        expect(ProgressBarService.complete).toHaveBeenCalled()
 
       it 'displays a sweet alert', ->
         expect(sweet.show).toHaveBeenCalledWith('Oops...', "Command error: #{@error.data}", 'error')
@@ -369,14 +374,14 @@ describe 'DeviceDetailsCtrl', ->
     beforeEach ->
       commandsServicePromise = new skykitProvisioning.q.Mock
       spyOn(CommandsService, 'powerOn').and.returnValue commandsServicePromise
-      spyOn(progressBarService, 'start')
-      spyOn(progressBarService, 'complete')
+      spyOn(ProgressBarService, 'start')
+      spyOn(ProgressBarService, 'complete')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.editMode = true
       controller.onClickPowerOnSendButton()
 
     it 'starts the progress bar', ->
-      expect(progressBarService.start).toHaveBeenCalled()
+      expect(ProgressBarService.start).toHaveBeenCalled()
 
     it 'call CommandsService.powerOn with the current device', ->
       expect(CommandsService.powerOn).toHaveBeenCalledWith controller.currentDevice.key
@@ -387,7 +392,7 @@ describe 'DeviceDetailsCtrl', ->
           controller.onPowerOnSuccess()
 
         it 'stops the progress bar', ->
-          expect(progressBarService.complete).toHaveBeenCalled()
+          expect(ProgressBarService.complete).toHaveBeenCalled()
 
         it 'displays a sweet alert', ->
           expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent a power on command to Google Cloud Messaging.',
@@ -400,7 +405,7 @@ describe 'DeviceDetailsCtrl', ->
           controller.onPowerOnFailure @error
 
         it 'stops the progress bar', ->
-          expect(progressBarService.complete).toHaveBeenCalled()
+          expect(ProgressBarService.complete).toHaveBeenCalled()
 
         it 'displays a sweet alert', ->
           expect(sweet.show).toHaveBeenCalledWith('Oops...', "Reset error: #{@error.data}", 'error')
@@ -409,14 +414,14 @@ describe 'DeviceDetailsCtrl', ->
     beforeEach ->
       commandsServicePromise = new skykitProvisioning.q.Mock
       spyOn(CommandsService, 'powerOff').and.returnValue commandsServicePromise
-      spyOn(progressBarService, 'start')
-      spyOn(progressBarService, 'complete')
+      spyOn(ProgressBarService, 'start')
+      spyOn(ProgressBarService, 'complete')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.editMode = true
       controller.onClickPowerOffSendButton()
 
     it 'starts the progress bar', ->
-      expect(progressBarService.start).toHaveBeenCalled()
+      expect(ProgressBarService.start).toHaveBeenCalled()
 
     it 'call CommandsService.powerOff with the current device', ->
       expect(CommandsService.powerOff).toHaveBeenCalledWith controller.currentDevice.key
@@ -427,7 +432,7 @@ describe 'DeviceDetailsCtrl', ->
           controller.onPowerOffSuccess()
 
         it 'stops the progress bar', ->
-          expect(progressBarService.complete).toHaveBeenCalled()
+          expect(ProgressBarService.complete).toHaveBeenCalled()
 
         it 'displays a sweet alert', ->
           expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent a power off command to Google Cloud Messaging.',
@@ -440,7 +445,7 @@ describe 'DeviceDetailsCtrl', ->
           controller.onPowerOnFailure @error
 
         it 'stops the progress bar', ->
-          expect(progressBarService.complete).toHaveBeenCalled()
+          expect(ProgressBarService.complete).toHaveBeenCalled()
 
         it 'displays a sweet alert', ->
           expect(sweet.show).toHaveBeenCalledWith('Oops...', "Reset error: #{@error.data}", 'error')
@@ -449,14 +454,14 @@ describe 'DeviceDetailsCtrl', ->
     beforeEach ->
       commandsServicePromise = new skykitProvisioning.q.Mock
       spyOn(CommandsService, 'contentDelete').and.returnValue commandsServicePromise
-      spyOn(progressBarService, 'start')
-      spyOn(progressBarService, 'complete')
+      spyOn(ProgressBarService, 'start')
+      spyOn(ProgressBarService, 'complete')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.editMode = true
       controller.onClickContentDeleteSendButton()
 
     it 'starts the progress bar', ->
-      expect(progressBarService.start).toHaveBeenCalled()
+      expect(ProgressBarService.start).toHaveBeenCalled()
 
     it 'calls CommandsService.contentDelete with the current device', ->
       expect(CommandsService.contentDelete).toHaveBeenCalledWith controller.currentDevice.key
@@ -467,7 +472,7 @@ describe 'DeviceDetailsCtrl', ->
           controller.onContentDeleteSuccess()
 
         it 'stops the progress bar', ->
-          expect(progressBarService.complete).toHaveBeenCalled()
+          expect(ProgressBarService.complete).toHaveBeenCalled()
 
         it 'displays a sweet alert', ->
           expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent a content delete command to Google Cloud Messaging.',
@@ -480,7 +485,7 @@ describe 'DeviceDetailsCtrl', ->
           controller.onContentDeleteFailure @error
 
         it 'stops the progress bar', ->
-          expect(progressBarService.complete).toHaveBeenCalled()
+          expect(ProgressBarService.complete).toHaveBeenCalled()
 
         it 'displays a sweet alert', ->
           expect(sweet.show).toHaveBeenCalledWith('Oops...', "Content delete error: #{@error.data}", 'error')
@@ -489,18 +494,18 @@ describe 'DeviceDetailsCtrl', ->
     beforeEach ->
       devicesServicePromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getIssuesByKey').and.returnValue getDeviceIssuesPromise
-      spyOn(progressBarService, 'start')
+      spyOn(ProgressBarService, 'start')
       $stateParams.deviceKey = 'fkasdhfjfa9s8udyva7dygoudyg'
       controller = $controller 'DeviceDetailsCtrl', {
         $stateParams: $stateParams
         $state: $state
         DevicesService: DevicesService
-        ProgressBarService: progressBarService
+        ProgressBarService: ProgressBarService
       }
       controller.onClickRefreshButton()
 
     it 'starts the progress bar', ->
-      expect(progressBarService.start).toHaveBeenCalled()
+      expect(ProgressBarService.start).toHaveBeenCalled()
 
     it 'defines epochStart', ->
       expect(controller.epochStart).toBeDefined()
@@ -514,11 +519,11 @@ describe 'DeviceDetailsCtrl', ->
 
     describe '.onRefreshIssuesSuccess', ->
       beforeEach ->
-        spyOn(progressBarService, 'complete')
+        spyOn(ProgressBarService, 'complete')
         controller.onRefreshIssuesSuccess(issues)
 
       it 'stops the progress bar', ->
-        expect(progressBarService.complete).toHaveBeenCalled()
+        expect(ProgressBarService.complete).toHaveBeenCalled()
 
       it 'populates the issues array with two records', ->
         expect(controller.issues.length).toBe 2
@@ -527,14 +532,14 @@ describe 'DeviceDetailsCtrl', ->
       error_text = undefined
 
       beforeEach ->
-        spyOn(progressBarService, 'complete')
+        spyOn(ProgressBarService, 'complete')
         spyOn(sweet, 'show')
         error_text = '403 Forbidden'
         error = {'data': error_text}
         controller.onRefreshIssuesFailure(error)
 
       it 'stops the progress bar', ->
-        expect(progressBarService.complete).toHaveBeenCalled()
+        expect(ProgressBarService.complete).toHaveBeenCalled()
 
       it 'displays a sweet alert with error information', ->
         expect(sweet.show).toHaveBeenCalledWith('Oops...', "Refresh error: #{error_text}", 'error')

@@ -533,8 +533,30 @@
                                             </table>
                                         </div>
                                     </div>
-                                    <div class="row margin-top-50">
-                                    </div>
+
+                                </md-card-content>
+                            </md-card>
+                             <md-card>
+                                <md-card-content>
+                                    <form name="tenantForm" class="form-horizontal"
+                                          ng-submit="deviceDetailsCtrl.onClickRefreshButton()"
+                                          novalidate>
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <md-button class="md-raised"
+                                                           ng-disabled="!deviceDetailsCtrl.prev_cursor"
+                                                           ng-click="deviceDetailsCtrl.paginateCall(false)">
+                                                    Prev
+                                                </md-button>
+                                                <md-button class="md-raised"
+                                                           ng-disabled="!deviceDetailsCtrl.next_cursor"
+                                                           ng-click="deviceDetailsCtrl.paginateCall(true)">
+                                                    Next
+                                                </md-button>
+                                            </div>
+
+                                        </div>
+                                    </form>
                                 </md-card-content>
                             </md-card>
                         </div>

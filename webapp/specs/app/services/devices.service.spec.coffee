@@ -89,7 +89,7 @@ describe 'DevicesService', ->
       spyOn(deviceRestangularService, 'get').and.returnValue promise
       actual = DevicesService.getIssuesByKey(deviceKey, epochStart, epochEnd)
       expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices',
-        "api/v1/devices/#{deviceKey}/issues?start=#{epochStart}&end=#{epochEnd}"
+        "api/v1/devices/null/null/#{deviceKey}/issues?start=#{epochStart}&end=#{epochEnd}"
       expect(deviceRestangularService.get).toHaveBeenCalled()
       expect(actual).toBe promise
 

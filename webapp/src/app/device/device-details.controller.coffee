@@ -70,8 +70,6 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       @issues = data.issues
       @prev_cursor = data.prev
       @next_cursor = data.next
-      console.log(@prev_cursor)
-      console.log(@next_cursor)
       ProgressBarService.complete()
 
   @paginateCall = (forward) =>
