@@ -22,18 +22,52 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($http, $log, Res
         "/api/v1/player-command-events/#{deviceKey}").get()
       promise
 
-    getDevicesByTenant: (tenantKey) ->
+    ########################################################################
+    # TENANT VIEW
+    ########################################################################
+    getDevicesByTenant: (tenantKey, prev, next) ->
       unless tenantKey == undefined
-        url = "api/v1/tenants/#{tenantKey}/devices?unmanaged=false"
+        prev = if prev == undefined or null then null else prev
+        next = if next == undefined or null then null else next
+        url = "api/v1/tenants/#{prev}/#{next}/#{tenantKey}/devices?unmanaged=false"
         promise = Restangular.oneUrl(SERVICE_NAME, url).get()
         promise
 
-    getUnmanagedDevicesByTenant: (tenantKey) ->
+    getUnmanagedDevicesByTenant: (tenantKey, prev, next) ->
       unless tenantKey == undefined
-        url = "api/v1/tenants/#{tenantKey}/devices?unmanaged=true"
+        prev = if prev == undefined or null then null else prev
+        next = if next == undefined or null then null else next
+        url = "api/v1/tenants/#{prev}/#{next}/#{tenantKey}/devices?unmanaged=true"
         promise = Restangular.oneUrl(SERVICE_NAME, url).get()
         promise
 
+    searchDevicesByPartialSerialByTenant: (tenantKey, partial_serial, unmanaged) ->
+      unless tenantKey == undefined
+        url = "api/v1/tenants/search/serial/#{tenantKey}/#{partial_serial}/#{unmanaged}/devices"
+        promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        promise
+
+    searchDevicesByPartialMacByTenant: (tenantKey, partial_mac, unmanaged) ->
+      unless tenantKey == undefined
+        url = "api/v1/tenants/search/mac/#{tenantKey}/#{partial_mac}/#{unmanaged}/devices"
+        promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        promise
+
+    matchDevicesByFullSerialByTenant: (tenantKey, full_serial, unmanaged) ->
+      unless tenantKey == undefined
+        url = "api/v1/tenants/match/serial/#{tenantKey}/#{full_serial}/#{unmanaged}/devices"
+        promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        promise
+
+    matchDevicesByFullMacByTenant: (tenantKey, full_mac, unmanaged) ->
+      unless tenantKey == undefined
+        url = "api/v1/tenants/match/mac/#{tenantKey}/#{full_mac}/#{unmanaged}/devices"
+        promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        promise
+
+    ########################################################################
+    # DEVICES VIEW
+    ########################################################################
     searchDevicesByPartialSerial: (distributorKey, partial_serial, unmanaged) ->
       unless distributorKey == undefined
         url = "api/v1/distributors/search/serial/#{distributorKey}/#{partial_serial}/#{unmanaged}/devices"
