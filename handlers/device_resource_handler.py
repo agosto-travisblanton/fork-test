@@ -658,11 +658,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             status = 404
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
         else:
-            # change_intent(
-            #     gcm_registration_id=device.gcm_registration_id,
-            #     payload=config.PLAYER_RESET_COMMAND,
-            #     device_urlsafe_key=device_urlsafe_key,
-            #     host=self.request.host_url)
-            # device.key.delete()
+            change_intent(
+                gcm_registration_id=device.gcm_registration_id,
+                payload=config.PLAYER_RESET_COMMAND,
+                device_urlsafe_key=device_urlsafe_key,
+                host=self.request.host_url)
+            device.key.delete()
             self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
