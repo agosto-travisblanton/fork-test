@@ -11,7 +11,8 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     TimezonesService,
     sweet,
     $cookies,
-    ProgressBarService) ->
+    ProgressBarService,
+    $mdDialog) ->
   @tenantKey = $stateParams.tenantKey
   @deviceKey = $stateParams.deviceKey
   @fromDevices = $stateParams.fromDevices is "true"
@@ -158,6 +159,37 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       sweet.show('Oops...', 'This customer display code already exists for this tenant. Please choose another.', 'error')
     else
       sweet.show('Oops...', 'Unable to save updated device.', 'error')
+
+  @confirmDeviceDelete = (event, key) ->
+    confirm = $mdDialog.confirm(
+      {
+        title:'Are you sure to delete this device?'
+        textContent: 'Please remember, you MUST remove this device from Content Manager before deleting it from Provisioning.'
+        targetEvent: event
+        ok: 'Delete'
+        cancel: 'Cancel'
+      }
+    )
+    showPromise = $mdDialog.show confirm
+    success = =>
+      @onConfirmDelete key
+    failure = =>
+      @onConfirmCancel()
+    showPromise.then success, failure
+
+  @onConfirmDelete = (key) ->
+    success = () ->
+      sweet.show('Ok', 'Delete processed.', 'success')
+      $state.go 'devices'
+    failure = (error) ->
+      friendlyMessage = 'Unable to delete device'
+      sweet.show('Oops...', friendlyMessage, 'error')
+      $log.error "Unable to delete device with key #{key}: #{error.status } #{error.statusText}"
+    deletePromise = DevicesService.delete key
+    deletePromise.then success, failure
+
+  @onConfirmCancel = ->
+    sweet.show('Ok', 'Delete cancelled.', 'success')
 
   @autoGenerateCustomerDisplayCode = ->
     newDisplayCode = ''

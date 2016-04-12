@@ -15,11 +15,11 @@ describe 'DistributorSelectorCtrl', ->
   beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_,
-                     _$state_,
-                     _$rootScope_,
-                     _$log_,
-                     _DistributorsService_,
-                     _SessionsService_) ->
+    _$state_,
+    _$rootScope_,
+    _$log_,
+    _DistributorsService_,
+    _SessionsService_) ->
     $controller = _$controller_
     $state = _$state_
     $rootScope = _$rootScope_
