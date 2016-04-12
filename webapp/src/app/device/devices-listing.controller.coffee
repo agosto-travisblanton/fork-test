@@ -126,8 +126,8 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
 
 
   @getManagedDevices = (key, prev, next) ->
-    devicesPromise = DevicesService.getDevicesByDistributor key, prev, next
     ProgressBarService.start()
+    devicesPromise = DevicesService.getDevicesByDistributor key, prev, next
     devicesPromise.then ((response) =>
       @devices = response.devices
       @devicesNext = response.next_cursor
@@ -138,8 +138,8 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
 
 
   @getUnmanagedDevices = (key, prev, next) ->
-    unmanagedDevicesPromise = DevicesService.getUnmanagedDevicesByDistributor key, prev, next
     ProgressBarService.start()
+    unmanagedDevicesPromise = DevicesService.getUnmanagedDevicesByDistributor key, prev, next
     unmanagedDevicesPromise.then ((response) =>
       @unmanagedDevices = response.devices
       @unmanagedDevicesPrev = response.prev_cursor

@@ -135,6 +135,26 @@
 
                 </md-card-content>
             </md-card>
+            <md-card ng-if="vm.tenantDevices.length > 10">
+                <md-card-content>
+                    <div class="col-md-12">
+                        <div class="col-sm-3">
+                            <md-button class="md-raised"
+                                       ng-disabled="!vm.devicesPrev"
+                                       ng-click="vm.paginateCall(false)">
+                                Prev
+                            </md-button>
+                            <md-button class="md-raised"
+                                       ng-disabled="!vm.devicesNext"
+                                       ng-click="vm.paginateCall(true)">
+                                Next
+                            </md-button>
+                        </div>
+
+
+                    </div>
+                </md-card-content>
+            </md-card>
         </div>
     </md-content>
 </div>
