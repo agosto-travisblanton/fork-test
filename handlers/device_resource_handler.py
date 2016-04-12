@@ -799,7 +799,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 payload=config.PLAYER_RESET_COMMAND,
                 device_urlsafe_key=device_urlsafe_key,
                 host=self.request.host_url)
-            device.key.delete()
+            #TODO-make soft delete
+            # device.key.delete()
             self.response.headers.pop('Content-Type', None)
 
         self.response.set_status(status, message)
