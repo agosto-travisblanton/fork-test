@@ -24,8 +24,7 @@ appModule.controller 'TenantManagedDevicesCtrl', ($scope, $stateParams, TenantsS
   @macDevices = {}
   @editMode = !!$stateParams.tenantKey
   @tenantKey = $stateParams.tenantKey
-
-
+  
   @getManagedDevices = (tenantKey, prev_cursor, next_cursor) ->
     devicesPromise = DevicesService.getDevicesByTenant tenantKey, prev_cursor, next_cursor
     devicesPromise.then (data) =>
