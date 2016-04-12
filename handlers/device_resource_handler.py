@@ -122,7 +122,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             unmanaged=unmanaged,
             prev_cursor_str=cur_prev_cursor,
             next_cursor_str=cur_next_cursor,
-            fetch_size=5
         )
 
         prev_cursor = tenant_devices["prev_cursor"]
