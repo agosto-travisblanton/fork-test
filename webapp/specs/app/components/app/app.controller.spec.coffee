@@ -15,7 +15,7 @@ describe 'AppController', ->
   describe '.goTo', ->
     stateName = 'devices'
     id = 5
-    idParam = ({ id: id })
+    idParam = ({id: id})
 
     beforeEach ->
       spyOn($state, 'go')

@@ -20,7 +20,7 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, $cookies) ->
 
     if !vm.identity.email
       $state.go "sign_in"
-    
+
     else
       promise = VersionsService.getVersions()
       promise.then (data) ->

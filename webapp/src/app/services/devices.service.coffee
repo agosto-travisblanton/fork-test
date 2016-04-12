@@ -81,6 +81,10 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($http, $log, Res
         promise = Restangular.service('devices').post(device)
       promise
 
+    delete: (deviceKey) ->
+      promise = Restangular.one(SERVICE_NAME, deviceKey).remove()
+      promise
+
     getPanelModels: () ->
       [
         {

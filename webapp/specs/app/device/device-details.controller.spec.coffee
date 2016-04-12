@@ -5,6 +5,7 @@ describe 'DeviceDetailsCtrl', ->
   controller = undefined
   $stateParams = undefined
   $state = undefined
+  $mdDialog = undefined
   DevicesService = undefined
   TimezonesService = undefined
   getDeviceIssuesPromise = undefined
@@ -65,11 +66,12 @@ describe 'DeviceDetailsCtrl', ->
   beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _DevicesService_, _TimezonesService_, _LocationsService_, _CommandsService_,
-    _sweet_, _$state_) ->
+    _sweet_, _$state_, _$mdDialog_) ->
     $controller = _$controller_
     $stateParams = {}
     $state = {}
     $state = _$state_
+    $mdDialog = _$mdDialog_
     DevicesService = _DevicesService_
     TimezonesService = _TimezonesService_
     LocationsService = _LocationsService_
@@ -84,6 +86,7 @@ describe 'DeviceDetailsCtrl', ->
       $scope: scope
       $stateParams: $stateParams
       ProgressBarService: progressBarService
+      $mdDialog: $mdDialog
     }
 
   describe 'initialize', ->
@@ -242,6 +245,23 @@ describe 'DeviceDetailsCtrl', ->
         controller.onFailureDeviceSave({status: 409})
         expect(sweet.show).toHaveBeenCalledWith('Oops...',
           'This customer display code already exists for this tenant. Please choose another.', 'error')
+
+  describe '.confirmDeviceDelete', ->
+    jquery_event = {}
+    key = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHIbCxIOQ2hyb21lT3NEZXZpY2UYgICAgICAhggM'
+    beforeEach ->
+      deletePromise = new skykitProvisioning.q.Mock
+      showPromise = new skykitProvisioning.q.Mock
+      spyOn(DevicesService, 'delete').and.returnValue deletePromise
+      spyOn($state, 'go')
+      spyOn($mdDialog, 'confirm').and.callFake -> return true
+      spyOn($mdDialog, 'show').and.returnValue showPromise
+
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+      controller.confirmDeviceDelete(jquery_event, key)
+
+    it 'call DevicesService.delete with the current device key', ->
+      expect(DevicesService.delete).toHaveBeenCalledWith key
 
   describe '.onClickResetSendButton', ->
     beforeEach ->
