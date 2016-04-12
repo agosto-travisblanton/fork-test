@@ -3,15 +3,15 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'DeviceDetailsCtrl', ($log,
-    $stateParams,
-    $state,
-    DevicesService,
-    LocationsService,
-    CommandsService,
-    TimezonesService,
-    sweet,
-    $cookies,
-    ProgressBarService) ->
+  $stateParams,
+  $state,
+  DevicesService,
+  LocationsService,
+  CommandsService,
+  TimezonesService,
+  sweet,
+  $cookies,
+  ProgressBarService) ->
   @tenantKey = $stateParams.tenantKey
   @deviceKey = $stateParams.deviceKey
   @fromDevices = $stateParams.fromDevices is "true"
@@ -63,6 +63,24 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @timezones = []
   @selectedTimezone = undefined
 
+  @getIssues = (device, epochStart, epochEnd, prev, next) =>
+    ProgressBarService.start()
+    issuesPromise = DevicesService.getIssuesByKey(device, epochStart, epochEnd, prev, next)
+    issuesPromise.then (data) =>
+      @issues = data.issues
+      @prev_cursor = data.prev
+      @next_cursor = data.next
+      console.log(@prev_cursor)
+      console.log(@next_cursor)
+      ProgressBarService.complete()
+
+  @paginateCall = (forward) =>
+    if forward
+      @getIssues @deviceKey, @epochStart, @epochEnd, null, @next_cursor
+
+    else
+      @getIssues @deviceKey, @epochStart, @epochEnd, @prev_cursor, null
+
   @initialize = () ->
     timezonePromise = TimezonesService.getUsTimezones()
     timezonePromise.then (data) =>
@@ -87,9 +105,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       @startTime = today.toLocaleString().replace(/,/g, "")
       @epochStart = moment(new Date(@startTime)).unix()
       @epochEnd = moment(new Date(@endTime)).unix()
-      issuesPromise = DevicesService.getIssuesByKey(@deviceKey, @epochStart, @epochEnd)
-      issuesPromise.then (data) =>
-        @issues = data
+      @getIssues(@deviceKey, @epochStart, @epochEnd)
 
   @onGetDeviceSuccess = (response) ->
     @currentDevice = response

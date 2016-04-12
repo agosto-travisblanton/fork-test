@@ -449,7 +449,19 @@
                                           ng-submit="deviceDetailsCtrl.onClickRefreshButton()"
                                           novalidate>
                                         <div class="row">
-                                            <div class="col-sm-4">
+                                            <div class="col-sm-3">
+                                                <md-button class="md-raised"
+                                                           ng-disabled="!deviceDetailsCtrl.prev_cursor"
+                                                           ng-click="deviceDetailsCtrl.paginateCall(false)">
+                                                    Prev
+                                                </md-button>
+                                                <md-button class="md-raised"
+                                                           ng-disabled="!deviceDetailsCtrl.next_cursor"
+                                                           ng-click="deviceDetailsCtrl.paginateCall(true)">
+                                                    Next
+                                                </md-button>
+                                            </div>
+                                            <div class="col-sm-2  col-sm-offset-3">
                                                 <b><p>From:</p></b><input type="text" class="form-control input-sm"
                                                                           datetimepicker
                                                                           datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
@@ -459,7 +471,7 @@
                                                                           ng-model="deviceDetailsCtrl.startTime">
                                                 </span>
                                             </div>
-                                            <div class="col-sm-4">
+                                            <div class="col-sm-2">
                                                 <b><p>To:</p></b><input type="text" class="form-control input-sm"
                                                                         datetimepicker
                                                                         datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
@@ -468,7 +480,7 @@
                                                                         id="endTime"
                                                                         ng-model="deviceDetailsCtrl.endTime">
                                             </div>
-                                            <div class="col-sm-2 col-sm-offset-2">
+                                            <div class="col-sm-2">
                                                 <md-button type="submit" class="md-raised">
                                                     <i class="fa fa-fw fa-filter"></i> Filter
                                                 </md-button>
@@ -477,6 +489,7 @@
                                     </form>
                                 </md-card-content>
                             </md-card>
+
                             <md-card>
                                 <md-card-content>
                                     <div class="row margin-top-15">
