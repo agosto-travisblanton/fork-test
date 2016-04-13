@@ -3,14 +3,15 @@
 describe 'AppController', ->
   $controller = undefined
   controller = undefined
-  $mdSidenav('left').isOpen
+  $mdSidenav = undefined
   $state = undefined
 
   beforeEach module('skykitProvisioning')
 
-  beforeEach inject (_$controller_, _$state_) ->
+  beforeEach inject (_$controller_, _$state_, _$mdSidenav_) ->
     $controller = _$controller_
     $state = _$state_
+    $mdSidenav = _$mdSidenav_
 
   describe '.goTo', ->
     stateName = 'devices'
