@@ -31,6 +31,9 @@ describe 'AppController', ->
     id = 5
     idParam = ({id: id})
 
+
+
+
     beforeEach ->
       spyOn($state, 'go')
       controller = $controller 'AppController'

@@ -25,6 +25,6 @@ appModule.controller 'AppController', ($mdSidenav, $state, $cookies) ->
 
   vm.goTo = (stateName, id) ->
     $state.go stateName, {id: id}
-    $mdSidenav('left').close() if $mdSidenav('left').isOpen()
+#    $mdSidenav('left').close() if $mdSidenav('left').isOpen()
 
   vm
