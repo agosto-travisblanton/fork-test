@@ -3,7 +3,7 @@
 describe 'AppController', ->
   $controller = undefined
   controller = undefined
-  $mdSidenav = undefined
+  $mdSidenav('left').isOpen
   $state = undefined
 
   beforeEach module('skykitProvisioning')
