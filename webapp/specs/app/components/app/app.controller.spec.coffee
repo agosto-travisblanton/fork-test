@@ -4,19 +4,27 @@ describe 'AppController', ->
   $controller = undefined
   controller = undefined
   $mdSidenav = undefined
+  mock_nav = () ->
+    {
+      close: ->
+        true
+      isOpen: ->
+        true
+    }
   $state = undefined
 
   beforeEach module('skykitProvisioning')
 
-  beforeEach inject (_$controller_, _$state_, _$mdSidenav_) ->
+  beforeEach inject (_$controller_, _$state_) ->
     $controller = _$controller_
     $state = _$state_
-    $mdSidenav = _$mdSidenav_
+    $mdSidenav = mock_nav()
 
 #  vm.goTo = (stateName, id) ->
 #    $state.go stateName, {id: id}
 #    $mdSidenav('left').close() if $mdSidenav('left').isOpen()
 #  spyOn could not find an object to spy upon for isOpen()
+#$mdSidenav('left').isOpen()
 
   describe '.goTo', ->
     stateName = 'devices'
@@ -25,8 +33,6 @@ describe 'AppController', ->
 
     beforeEach ->
       spyOn($state, 'go')
-      spyOn($mdSidenav('left'), 'isOpen').and.callFake(true)
-      spyOn($mdSidenav('left'), 'close')
       controller = $controller 'AppController'
       controller.goTo stateName, id
 
