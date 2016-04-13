@@ -16,7 +16,7 @@ describe 'AppController', ->
 #  vm.goTo = (stateName, id) ->
 #    $state.go stateName, {id: id}
 #    $mdSidenav('left').close() if $mdSidenav('left').isOpen()
-
+#  spyOn could not find an object to spy upon for isOpen()
 
   describe '.goTo', ->
     stateName = 'devices'
@@ -25,7 +25,7 @@ describe 'AppController', ->
 
     beforeEach ->
       spyOn($state, 'go')
-      spyOn($mdSidenav('left'), 'isOpen').and.returnValue false
+      spyOn($mdSidenav('left'), 'isOpen').and.callFake(true)
       spyOn($mdSidenav('left'), 'close')
       controller = $controller 'AppController'
       controller.goTo stateName, id
