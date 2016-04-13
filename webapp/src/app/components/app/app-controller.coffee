@@ -20,7 +20,6 @@ appModule.controller 'AppController', ($mdSidenav, $state, $cookies) ->
   vm.initialize = ->
     @getIdentity()
 
-
   vm.toggleSidenav = ->
     $mdSidenav('left').toggle()
 

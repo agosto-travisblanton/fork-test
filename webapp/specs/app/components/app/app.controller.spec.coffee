@@ -13,6 +13,11 @@ describe 'AppController', ->
     $state = _$state_
     $mdSidenav = _$mdSidenav_
 
+#  vm.goTo = (stateName, id) ->
+#    $state.go stateName, {id: id}
+#    $mdSidenav('left').close() if $mdSidenav('left').isOpen()
+
+
   describe '.goTo', ->
     stateName = 'devices'
     id = 5
@@ -20,6 +25,8 @@ describe 'AppController', ->
 
     beforeEach ->
       spyOn($state, 'go')
+      spyOn($mdSidenav('left'), 'isOpen').and.returnValue false
+      spyOn($mdSidenav('left'), 'close')
       controller = $controller 'AppController'
       controller.goTo stateName, id
 
