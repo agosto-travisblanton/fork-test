@@ -14,6 +14,7 @@ describe 'DeviceDetailsCtrl', ->
   LocationsService = undefined
   locationsServicePromise = undefined
   CommandsService = undefined
+  ToastsService = undefined
   commandsServicePromise = undefined
   sweet = undefined
   progressBarService = undefined
@@ -67,7 +68,7 @@ describe 'DeviceDetailsCtrl', ->
   beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _DevicesService_, _TimezonesService_, _LocationsService_, _CommandsService_,
-    _sweet_, _$state_, _$mdDialog_, _$log_) ->
+    _sweet_, _ToastsService_, _$state_, _$mdDialog_, _$log_) ->
     $controller = _$controller_
     $stateParams = {}
     $state = {}
@@ -78,6 +79,7 @@ describe 'DeviceDetailsCtrl', ->
     TimezonesService = _TimezonesService_
     LocationsService = _LocationsService_
     CommandsService = _CommandsService_
+    ToastsService = _ToastsService_
     progressBarService = {
       start: ->
       complete: ->
@@ -150,7 +152,6 @@ describe 'DeviceDetailsCtrl', ->
       it 'declares a selectedTimezone', ->
         expect(controller.selectedTimezone).toBeUndefined()
 
-
     describe 'edit mode', ->
       beforeEach ->
         $stateParams = {
@@ -222,31 +223,44 @@ describe 'DeviceDetailsCtrl', ->
 
     describe '.onSuccessDeviceSave', ->
       beforeEach ->
-        spyOn(sweet, 'show')
+        spyOn(ToastsService, 'showSuccessToast')
         controller.onSuccessDeviceSave()
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
       it "the 'then' handler shows a sweet", ->
-        expect(sweet.show).toHaveBeenCalledWith('WooHoo!', 'Your changes were saved!', 'success')
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith 'We saved your updates to this device.'
 
     describe '.onFailureDeviceSave', ->
       beforeEach ->
+        spyOn($log, 'info')
         spyOn(sweet, 'show')
+        spyOn($log, 'error')
+        spyOn(ToastsService, 'showErrorToast')
 
       it 'stops the progress bar', ->
         controller.onFailureDeviceSave({status: 200})
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it 'displays a sweet alert for general save failure', ->
-        controller.onFailureDeviceSave({status: 400})
-        expect(sweet.show).toHaveBeenCalledWith('Oops...', 'Unable to save updated device.', 'error')
-
-      it 'displays a sweet alert for customer display code already used for tenant', ->
-        controller.onFailureDeviceSave({status: 409})
+      it 'displays a sweet alert when the customer display code has already been used for the tenant', ->
+        controller.onFailureDeviceSave({status: 409, statusText: 'Conflict'})
         expect(sweet.show).toHaveBeenCalledWith('Oops...',
           'This customer display code already exists for this tenant. Please choose another.', 'error')
+
+      it 'logs info to the console when the customer display code has already been used for the tenant', ->
+        controller.onFailureDeviceSave({status: 409, statusText: 'Conflict'})
+        infoMessage = 'Failure saving device. Customer display code already exists for tenant: 409 Conflict'
+        expect($log.info).toHaveBeenCalledWith infoMessage
+
+      it 'displays a toast for general save failure', ->
+        controller.onFailureDeviceSave({status: 400, statusText: 'Bad Request'})
+        expect(ToastsService.showErrorToast).toHaveBeenCalledWith(
+          'Oops. We were unable to save your updates to this device at this time.')
+
+      it 'logs a detailed error to the console for a general save failure', ->
+        controller.onFailureDeviceSave({status: 400, statusText: 'Bad Request'})
+        expect($log.error).toHaveBeenCalledWith 'Failure saving device: 400 Bad Request'
 
   describe '.confirmDeviceDelete', ->
     jquery_event = {}
@@ -294,6 +308,8 @@ describe 'DeviceDetailsCtrl', ->
       promise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'delete').and.returnValue promise
       spyOn(sweet, 'show')
+      spyOn(ToastsService, 'showSuccessToast')
+      spyOn(ToastsService, 'showErrorToast')
       spyOn($state, 'go')
       spyOn($log, 'error')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
@@ -303,10 +319,10 @@ describe 'DeviceDetailsCtrl', ->
         controller.onConfirmDelete device_key
         expect(DevicesService.delete).toHaveBeenCalledWith device_key
 
-      it 'calls sweet alert', ->
+      it 'displays a toast confirming that the delete request was processed', ->
         controller.onConfirmDelete device_key
         promise.resolve()
-        expect(sweet.show).toHaveBeenCalledWith('Ok', 'Delete processed.', 'success')
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith 'We processed your delete request.'
 
       it 'calls $state router', ->
         controller.onConfirmDelete device_key
@@ -314,25 +330,26 @@ describe 'DeviceDetailsCtrl', ->
         expect($state.go).toHaveBeenCalledWith 'devices'
 
     describe 'when promise is rejected', ->
-      it 'calls sweet alert with friendly message', ->
+      it 'display an error toast with a friendly message about delete failure', ->
         controller.onConfirmDelete device_key
         promise.reject([])
-        expect(sweet.show).toHaveBeenCalledWith('Oops...', 'Unable to delete device', 'error')
+        expect(ToastsService.showErrorToast).toHaveBeenCalledWith(
+          'We were unable to complete your delete request at this time.')
 
-      it 'logs a detailed error', ->
+      it 'logs a detailed error to the console', ->
         response = {status: 400, statusText: 'Bad request'}
         controller.onConfirmDelete device_key
         promise.reject(response)
-        expect($log.error).toHaveBeenCalledWith "Unable to delete device with key #{device_key}: 400 Bad request"
+        expect($log.error).toHaveBeenCalledWith "Delete device failure for device_key #{device_key}: 400 Bad request"
 
   describe '.onConfirmCancel', ->
     beforeEach ->
-      spyOn(sweet, 'show')
+      spyOn(ToastsService, 'showInfoToast')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
-
-    it 'calls sweet alert confirming delete was cancelled', ->
       controller.onConfirmCancel()
-      expect(sweet.show).toHaveBeenCalledWith('Ok', 'Delete cancelled.', 'success')
+
+    it 'displays a toast indicating delete request was canceled', ->
+      expect(ToastsService.showInfoToast).toHaveBeenCalledWith 'We canceled your delete request.'
 
   describe '.onClickResetSendButton', ->
     beforeEach ->
@@ -352,27 +369,32 @@ describe 'DeviceDetailsCtrl', ->
 
     describe '.onResetSuccess', ->
       beforeEach ->
-        spyOn(sweet, 'show')
+        spyOn(ToastsService, 'showSuccessToast')
         controller.onResetSuccess()
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it 'displays a sweet alert', ->
-        expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent a reset command to Google Cloud Messaging.',
-          'success')
+      it 'displays a toast indicating reset command was sent to the player queue', ->
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith "We posted your reset command into the player's queue."
 
     describe '.onResetFailure', ->
+      error = {status: 404, statusText: 'Not Found'}
+
       beforeEach ->
-        @error = {data: '404 Not Found'}
+        spyOn($log, 'error')
         spyOn(sweet, 'show')
-        controller.onResetFailure @error
+        controller.onResetFailure error
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it 'displays a sweet alert', ->
-        expect(sweet.show).toHaveBeenCalledWith('Oops...', "Reset error: #{@error.data}", 'error')
+      it 'displays a sweet alert indicating unable to send reset command to the player queue', ->
+        expect(sweet.show).toHaveBeenCalledWith(
+          'Oops...', "We were unable to post your reset command into the player's queue.", 'error')
+
+      it 'logs a detailed error to the console', ->
+        expect($log.error).toHaveBeenCalledWith "Reset command error: #{error.status} #{error.statusText}"
 
   describe '.onClickVolumeSendButton', ->
     beforeEach ->
@@ -393,27 +415,34 @@ describe 'DeviceDetailsCtrl', ->
 
     describe '.onVolumeSuccess', ->
       beforeEach ->
-        spyOn(sweet, 'show')
+        spyOn(ToastsService, 'showSuccessToast')
         controller.onVolumeSuccess controller.currentDevice.volume
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it 'displays a sweet alert', ->
-        expect(sweet.show).toHaveBeenCalledWith('Success!',
-          "Sent a volume level of #{controller.currentDevice.volume} to Google Cloud Messaging.", 'success')
+      it 'displays a toast indicating volume command was sent to the player queue', ->
+        message = "We posted a volume level command of #{controller.currentDevice.volume} into the player's queue."
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith message
 
     describe '.onVolumeFailure', ->
+      error = {status: 404, statusText: 'Not Found'}
+
       beforeEach ->
-        @error = {data: '404 Not Found'}
+        spyOn($log, 'error')
         spyOn(sweet, 'show')
-        controller.onVolumeFailure @error
+        controller.onVolumeFailure error
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it 'displays a sweet alert', ->
-        expect(sweet.show).toHaveBeenCalledWith('Oops...', "Volume error: #{@error.data}", 'error')
+      it 'displays a sweet alert indicating unable to send volume command to the player queue', ->
+        expect(sweet.show).toHaveBeenCalledWith(
+          'Oops...', "We were unable to post your volume level command into the player's queue.", 'error')
+
+      it 'logs a detailed error to the console', ->
+        expect($log.error).toHaveBeenCalledWith "Volume level command error: #{error.status} #{error.statusText}"
+
 
   describe '.onClickCommandSendButton', ->
     beforeEach ->
@@ -434,27 +463,33 @@ describe 'DeviceDetailsCtrl', ->
 
     describe '.onCommandSuccess', ->
       beforeEach ->
-        spyOn(sweet, 'show')
+        spyOn(ToastsService, 'showSuccessToast')
         controller.onCommandSuccess controller.currentDevice.custom
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it 'displays a sweet alert', ->
-        expect(sweet.show).toHaveBeenCalledWith('Success!',
-          "Sent '#{controller.currentDevice.custom}' to Google Cloud Messaging.", 'success')
+      it 'displays a toast indicating command was sent to the player queue', ->
+        message = "We posted your command '#{controller.currentDevice.custom}' into the player's queue."
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith message
 
     describe '.onCommandFailure', ->
+      error = {status: 404, statusText: 'Not Found'}
+
       beforeEach ->
-        @error = {data: '404 Not Found'}
         spyOn(sweet, 'show')
-        controller.onCommandFailure @error
+        spyOn($log, 'error')
+        controller.onCommandFailure error
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it 'displays a sweet alert', ->
-        expect(sweet.show).toHaveBeenCalledWith('Oops...', "Command error: #{@error.data}", 'error')
+      it 'displays a sweet alert indicating unable to command to the player queue', ->
+        expect(sweet.show).toHaveBeenCalledWith(
+          'Oops...', "We were unable to post your command into the player's queue.", 'error')
+
+      it 'logs a detailed error to the console', ->
+        expect($log.error).toHaveBeenCalledWith "Command error: #{error.status} #{error.statusText}"
 
   describe '.onClickPowerOnSendButton', ->
     beforeEach ->
@@ -472,29 +507,35 @@ describe 'DeviceDetailsCtrl', ->
     it 'call CommandsService.powerOn with the current device', ->
       expect(CommandsService.powerOn).toHaveBeenCalledWith controller.currentDevice.key
 
-      describe '.onPowerOnSuccess', ->
-        beforeEach ->
-          spyOn(sweet, 'show')
-          controller.onPowerOnSuccess()
+    describe '.onPowerOnSuccess', ->
+      beforeEach ->
+        spyOn(ToastsService, 'showSuccessToast')
+        controller.onPowerOnSuccess()
 
-        it 'stops the progress bar', ->
-          expect(progressBarService.complete).toHaveBeenCalled()
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
 
-        it 'displays a sweet alert', ->
-          expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent a power on command to Google Cloud Messaging.',
-            'success')
+      it 'displays a toast indicating command was sent to player', ->
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith(
+          "We posted a power on command into the player's queue.")
 
-      describe '.onPowerOnFailure', ->
-        beforeEach ->
-          @error = {data: '404 Not Found'}
-          spyOn(sweet, 'show')
-          controller.onPowerOnFailure @error
+    describe '.onPowerOnFailure', ->
+      error = {status: 404, statusText: 'Not Found'}
 
-        it 'stops the progress bar', ->
-          expect(progressBarService.complete).toHaveBeenCalled()
+      beforeEach ->
+        spyOn(sweet, 'show')
+        spyOn($log, 'error')
+        controller.onPowerOnFailure error
 
-        it 'displays a sweet alert', ->
-          expect(sweet.show).toHaveBeenCalledWith('Oops...', "Reset error: #{@error.data}", 'error')
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a sweet alert', ->
+        expect(sweet.show).toHaveBeenCalledWith(
+          'Oops...', "We were unable to post your power on command into the player's queue.", 'error')
+
+      it 'logs a detailed error to the console', ->
+        expect($log.error).toHaveBeenCalledWith "Power on command error: #{error.status} #{error.statusText}"
 
   describe '.onClickPowerOffSendButton', ->
     beforeEach ->
@@ -512,29 +553,35 @@ describe 'DeviceDetailsCtrl', ->
     it 'call CommandsService.powerOff with the current device', ->
       expect(CommandsService.powerOff).toHaveBeenCalledWith controller.currentDevice.key
 
-      describe '.onPowerOffSuccess', ->
-        beforeEach ->
-          spyOn(sweet, 'show')
-          controller.onPowerOffSuccess()
+    describe '.onPowerOffSuccess', ->
+      beforeEach ->
+        spyOn(ToastsService, 'showSuccessToast')
+        controller.onPowerOffSuccess()
 
-        it 'stops the progress bar', ->
-          expect(progressBarService.complete).toHaveBeenCalled()
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
 
-        it 'displays a sweet alert', ->
-          expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent a power off command to Google Cloud Messaging.',
-            'success')
+      it 'displays a toast indicating command was sent to player', ->
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith(
+          "We posted a power off command into the player's queue.")
 
-      describe '.onPowerOffFailure', ->
-        beforeEach ->
-          @error = {data: '404 Not Found'}
-          spyOn(sweet, 'show')
-          controller.onPowerOnFailure @error
+    describe '.onPowerOffFailure', ->
+      error = {status: 404, statusText: 'Not Found'}
 
-        it 'stops the progress bar', ->
-          expect(progressBarService.complete).toHaveBeenCalled()
+      beforeEach ->
+        spyOn(sweet, 'show')
+        spyOn($log, 'error')
+        controller.onPowerOffFailure error
 
-        it 'displays a sweet alert', ->
-          expect(sweet.show).toHaveBeenCalledWith('Oops...', "Reset error: #{@error.data}", 'error')
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a sweet alert', ->
+        expect(sweet.show).toHaveBeenCalledWith(
+          'Oops...', "We were unable to post your power off command into the player's queue.", 'error')
+
+      it 'logs a detailed error to the console', ->
+        expect($log.error).toHaveBeenCalledWith "Power off command error: #{error.status} #{error.statusText}"
 
   describe '.onClickContentDeleteSendButton', ->
     beforeEach ->
@@ -552,29 +599,35 @@ describe 'DeviceDetailsCtrl', ->
     it 'calls CommandsService.contentDelete with the current device', ->
       expect(CommandsService.contentDelete).toHaveBeenCalledWith controller.currentDevice.key
 
-      describe '.onContentDeleteSuccess', ->
-        beforeEach ->
-          spyOn(sweet, 'show')
-          controller.onContentDeleteSuccess()
+    describe '.onContentDeleteSuccess', ->
+      beforeEach ->
+        spyOn(ToastsService, 'showSuccessToast')
+        controller.onContentDeleteSuccess()
 
-        it 'stops the progress bar', ->
-          expect(progressBarService.complete).toHaveBeenCalled()
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
 
-        it 'displays a sweet alert', ->
-          expect(sweet.show).toHaveBeenCalledWith('Success!', 'Sent a content delete command to Google Cloud Messaging.',
-            'success')
+      it 'displays a toast indicating command was sent to player', ->
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith(
+          "We posted your content delete command into the player's queue.")
 
-      describe '.onContentDeleteFailure', ->
-        beforeEach ->
-          @error = {data: '404 Not Found'}
-          spyOn(sweet, 'show')
-          controller.onContentDeleteFailure @error
+    describe '.onContentDeleteFailure', ->
+      error = {status: 404, statusText: 'Not Found'}
 
-        it 'stops the progress bar', ->
-          expect(progressBarService.complete).toHaveBeenCalled()
+      beforeEach ->
+        spyOn(sweet, 'show')
+        spyOn($log, 'error')
+        controller.onContentDeleteFailure error
 
-        it 'displays a sweet alert', ->
-          expect(sweet.show).toHaveBeenCalledWith('Oops...', "Content delete error: #{@error.data}", 'error')
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a sweet alert', ->
+        expect(sweet.show).toHaveBeenCalledWith(
+          'Oops...', "We were unable to post your delete content command into the player's queue.", 'error')
+
+      it 'logs a detailed error to the console', ->
+        expect($log.error).toHaveBeenCalledWith "Content delete command error: #{error.status} #{error.statusText}"
 
   describe '.onClickRefreshButton', ->
     beforeEach ->
@@ -615,20 +668,24 @@ describe 'DeviceDetailsCtrl', ->
         expect(controller.issues.length).toBe 2
 
     describe '.onRefreshIssuesFailure', ->
-      error_text = undefined
+      error = {status: 403, statusText: 'Forbidden'}
 
       beforeEach ->
         spyOn(progressBarService, 'complete')
-        spyOn(sweet, 'show')
-        error_text = '403 Forbidden'
-        error = {'data': error_text}
-        controller.onRefreshIssuesFailure(error)
+        spyOn(ToastsService, 'showInfoToast')
+        spyOn($log, 'error')
+        controller.onRefreshIssuesFailure error
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it 'displays a sweet alert with error information', ->
-        expect(sweet.show).toHaveBeenCalledWith('Oops...', "Refresh error: #{error_text}", 'error')
+      it 'displays a toast with error information', ->
+        expect(ToastsService.showInfoToast).toHaveBeenCalledWith(
+          'We were unable to refresh the device issues list at this time.')
+
+      it 'logs a detailed error to the console for failure to refresh issues', ->
+        expect($log.error).toHaveBeenCalledWith(
+          "Failure to refresh device issues: #{error.status } #{error.statusText}")
 
   describe '.autoGenerateCustomerDisplayCode', ->
     beforeEach ->
@@ -658,7 +715,6 @@ describe 'DeviceDetailsCtrl', ->
     it 'is a valid domain if @agosto.com', ->
       cookieMock.put("userEmail", "some.user@agosto.com")
       expect(controller.logglyForUser()).toBeTruthy()
-
 
     it 'is not if anything else', ->
       cookieMock.put("userEmail", "some.user@123.com")
