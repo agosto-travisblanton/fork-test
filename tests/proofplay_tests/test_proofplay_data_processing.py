@@ -2,10 +2,10 @@ from env_setup import setup_test_paths
 
 setup_test_paths()
 
-from agar.test import BaseTest
 import unittest
 from collections import OrderedDict
 import datetime
+from base_sql_test_config import SQLBaseTest
 
 from proofplay.data_processing import (
     calculate_location_count, calculate_serial_count,
@@ -28,12 +28,18 @@ from proofplay.data_processing import (
     generate_location_csv_by_device
 )
 
+import mock
+
 
 def convert_datetime_to_string_of_day_at_midnight(date):
     return str(datetime.datetime.combine(date.date(), datetime.time()))
 
 
-class TestDataProcessing(BaseTest):
+def retrieve_resource_name_from_resource_identifier_as_expected(dontmatter):
+    return "GSAD_4334"
+
+
+class TestDataProcessing(SQLBaseTest):
     a_date_timestamp = datetime.datetime(2011, 4, 9, 10, 30)
     start_date = a_date_timestamp - datetime.timedelta(days=5)
     end_date = a_date_timestamp + datetime.timedelta(days=1)
@@ -226,11 +232,11 @@ class TestDataProcessing(BaseTest):
 
         expected_output = {
             'GSAD_4334': OrderedDict(
-                    [('2016-01-01 00:00:00', {'PlayCount': 4, 'PlayerCount': 3, 'LocationCount': 1}),
-                     ('2016-01-02 00:00:00', {'PlayCount': 2, 'PlayerCount': 1, 'LocationCount': 1})]),
+                [('2016-01-01 00:00:00', {'PlayCount': 4, 'PlayerCount': 3, 'LocationCount': 1}),
+                 ('2016-01-02 00:00:00', {'PlayCount': 2, 'PlayerCount': 1, 'LocationCount': 1})]),
             'GSAD_5553': OrderedDict(
-                    [('2016-01-01 00:00:00', {'PlayCount': 4, 'PlayerCount': 3, 'LocationCount': 1}),
-                     ('2016-01-02 00:00:00', {'PlayCount': 4, 'PlayerCount': 2, 'LocationCount': 1})])}
+                [('2016-01-01 00:00:00', {'PlayCount': 4, 'PlayerCount': 3, 'LocationCount': 1}),
+                 ('2016-01-02 00:00:00', {'PlayCount': 4, 'PlayerCount': 2, 'LocationCount': 1})])}
 
         start = datetime.datetime(2016, 1, 1, 0, 0, 0)
 
@@ -239,11 +245,13 @@ class TestDataProcessing(BaseTest):
         self.assertEqual(expected_output,
                          format_program_record_data_with_array_of_resources_by_date(start, end, example_input))
 
-    def test_generate_date_range_csv_by_location(self):
+    @mock.patch('proofplay.database_calls.retrieve_resource_name_from_resource_identifier',
+                side_effect=retrieve_resource_name_from_resource_identifier_as_expected)
+    def test_generate_date_range_csv_by_location(self, retrieve_function):
         now = datetime.datetime.now()
         resources = ["GSAD_4334"]
         expected_output = """Creation Date,Start Date,End Date,Content\r\n{},2016-02-01 00:00:00,2016-02-02 00:00:00,GSAD_4334\r\nContent,Display,Location,Play Count\r\nGSAD_4334,F5MSCX001001,6034,3\r\nGSAD_4334,F5MSCX001000,6034,4\r\nGSAD_4334,F5MSCX001002,6034,5\r\n""".format(
-                str(now))
+            str(now))
 
         start_time = datetime.datetime.strptime("Feb 1 2016", '%b %d %Y')
         end_time = datetime.datetime.strptime("Feb 2 2016", '%b %d %Y')
@@ -259,38 +267,40 @@ class TestDataProcessing(BaseTest):
         ]
 
         result = generate_resource_csv_by_device(
-                start_date=start_time,
-                end_date=end_time,
-                resources=resources,
-                array_of_data=example_input,
-                created_time=now
+            start_date=start_time,
+            end_date=end_time,
+            resources=resources,
+            array_of_data=example_input,
+            created_time=now
         ).read()
 
         self.assertEqual(expected_output, result)
 
-    def test_generate_date_range_csv_by_date(self):
+    @mock.patch('proofplay.database_calls.retrieve_resource_name_from_resource_identifier',
+                side_effect=retrieve_resource_name_from_resource_identifier_as_expected)
+    def test_generate_date_range_csv_by_date(self, retrieve_function):
         now = datetime.datetime.now()
         resources = ["GSAD_4334"]
         expected_output = """Creation Date,Start Date,End Date,Start Time,End Time,All Content\r\n{},2016-02-01 00:00:00,2016-02-02 00:00:00,12:00 AM,11:59 PM,GSAD_4334\r\nContent,Date,Location Count,Display Count,Play Count\r\nGSAD_4334,2016-02-01 00:00:00,1,2,6\r\nGSAD_4334,2016-02-02 00:00:00,1,3,6\r\n""".format(
-                str(now))
+            str(now))
 
         start_time = datetime.datetime.strptime("Feb 1 2016", '%b %d %Y')
         end_time = datetime.datetime.strptime("Feb 2 2016", '%b %d %Y')
 
         example_input = {
             'GSAD_4334': OrderedDict(
-                    [
-                        ('2016-02-01 00:00:00', {'PlayCount': 6, 'LocationCount': 1, 'PlayerCount': 2}),
-                        ('2016-02-02 00:00:00', {'PlayCount': 6, 'LocationCount': 1, 'PlayerCount': 3})]
+                [
+                    ('2016-02-01 00:00:00', {'PlayCount': 6, 'LocationCount': 1, 'PlayerCount': 2}),
+                    ('2016-02-02 00:00:00', {'PlayCount': 6, 'LocationCount': 1, 'PlayerCount': 3})]
             )
         }
 
         result = generate_resource_csv_by_date(
-                start_date=start_time,
-                end_date=end_time,
-                resources=resources,
-                dictionary=example_input,
-                now=now
+            start_date=start_time,
+            end_date=end_time,
+            resources=resources,
+            dictionary=example_input,
+            now=now
         ).read()
 
         self.assertEqual(expected_output, result)
@@ -417,59 +427,59 @@ class TestDataProcessing(BaseTest):
             (
                 'my-device-3',
                 OrderedDict(
-                        [
-                            (
-                                '2016-02-02 00:00:00', {
-                                    'GSAD_4334': {
-                                        'playcount': 1, 'location': '1001'}}
-                            )
-                        ]
+                    [
+                        (
+                            '2016-02-02 00:00:00', {
+                                'GSAD_4334': {
+                                    'playcount': 1, 'location': '1001'}}
+                        )
+                    ]
                 )),
             (
                 'my-device-7',
                 OrderedDict(
-                        [
-                            (
-                                '2016-02-01 00:00:00', {
-                                    'GSAD_4334': {
-                                        'playcount': 2,
-                                        'location': '3001'
-                                    },
-                                    'GSAD_2222': {
-                                        'playcount': 1,
-                                        'location': '3001'
-                                    },
-                                    'GSAD_5447': {
-                                        'playcount': 1,
-                                        'location': '3001'
-                                    }
+                    [
+                        (
+                            '2016-02-01 00:00:00', {
+                                'GSAD_4334': {
+                                    'playcount': 2,
+                                    'location': '3001'
+                                },
+                                'GSAD_2222': {
+                                    'playcount': 1,
+                                    'location': '3001'
+                                },
+                                'GSAD_5447': {
+                                    'playcount': 1,
+                                    'location': '3001'
                                 }
-                            ),
-                            (
-                                '2016-02-02 00:00:00', {
-                                    'GSAD_2222': {
-                                        'playcount': 1,
-                                        'location': '3001'
-                                    }
+                            }
+                        ),
+                        (
+                            '2016-02-02 00:00:00', {
+                                'GSAD_2222': {
+                                    'playcount': 1,
+                                    'location': '3001'
                                 }
-                            ),
-                            (
-                                '2016-02-03 00:00:00', {
-                                    'GSAD_4334': {
-                                        'playcount': 1,
-                                        'location': '3001'
-                                    },
-                                    'GSAD_2222': {
-                                        'playcount': 1,
-                                        'location': '3001'
-                                    },
-                                    'GSAD_5447': {
-                                        'playcount': 1,
-                                        'location': '3001'
-                                    }
+                            }
+                        ),
+                        (
+                            '2016-02-03 00:00:00', {
+                                'GSAD_4334': {
+                                    'playcount': 1,
+                                    'location': '3001'
+                                },
+                                'GSAD_2222': {
+                                    'playcount': 1,
+                                    'location': '3001'
+                                },
+                                'GSAD_5447': {
+                                    'playcount': 1,
+                                    'location': '3001'
                                 }
-                            )
-                        ]
+                            }
+                        )
+                    ]
                 )
             )
         ])
@@ -488,7 +498,7 @@ class TestDataProcessing(BaseTest):
         now = str(datetime.datetime.now())
 
         expected_output = """Creation Date,Start Date,End Date,Displays\r\n{},2016-02-01 00:00:00,2016-02-03 00:00:00,"my-device-3, my-device-7"\r\nDisplay,Location,Content,Play Count\r\nmy-device-3,1001,GSAD_4334,1\r\nmy-device-7,3001,GSAD_2222,3\r\nmy-device-7,3001,GSAD_4334,3\r\nmy-device-7,3001,GSAD_5447,2\r\n""".format(
-                now)
+            now)
 
         start_time = datetime.datetime.strptime("Feb 1 2016", '%b %d %Y')
         end_time = datetime.datetime.strptime("Feb 3 2016", '%b %d %Y')
@@ -499,49 +509,49 @@ class TestDataProcessing(BaseTest):
 
     def test_generate_device_csv_by_date(self):
         example_input = OrderedDict(
-                [
-                    ('my-device-3',
-                     OrderedDict(
-                             [('2016-02-02 00:00:00', {'GSAD_4334': {'location': '1001', 'playcount': 1}})])),
-                    ('my-device-7',
-                     OrderedDict(
-                             [(
-                                 '2016-02-01 00:00:00',
-                                 {
-                                     'GSAD_5447': {
-                                         'location': '3001',
-                                         'playcount': 1},
-                                     'GSAD_4334': {
-                                         'location': '3001',
-                                         'playcount': 2},
-                                     'GSAD_2222': {
-                                         'location': '3001',
-                                         'playcount': 1}}),
-                                 (
-                                     '2016-02-02 00:00:00',
-                                     {
-                                         'GSAD_2222': {
-                                             'location': '3001',
-                                             'playcount': 1}}),
-                                 (
-                                     '2016-02-03 00:00:00',
-                                     {
-                                         'GSAD_5447': {
-                                             'location': '3001',
-                                             'playcount': 1},
-                                         'GSAD_4334': {
-                                             'location': '3001',
-                                             'playcount': 1},
-                                         'GSAD_2222': {
-                                             'location': '3001',
-                                             'playcount': 1}})]))]
+            [
+                ('my-device-3',
+                 OrderedDict(
+                     [('2016-02-02 00:00:00', {'GSAD_4334': {'location': '1001', 'playcount': 1}})])),
+                ('my-device-7',
+                 OrderedDict(
+                     [(
+                         '2016-02-01 00:00:00',
+                         {
+                             'GSAD_5447': {
+                                 'location': '3001',
+                                 'playcount': 1},
+                             'GSAD_4334': {
+                                 'location': '3001',
+                                 'playcount': 2},
+                             'GSAD_2222': {
+                                 'location': '3001',
+                                 'playcount': 1}}),
+                         (
+                             '2016-02-02 00:00:00',
+                             {
+                                 'GSAD_2222': {
+                                     'location': '3001',
+                                     'playcount': 1}}),
+                         (
+                             '2016-02-03 00:00:00',
+                             {
+                                 'GSAD_5447': {
+                                     'location': '3001',
+                                     'playcount': 1},
+                                 'GSAD_4334': {
+                                     'location': '3001',
+                                     'playcount': 1},
+                                 'GSAD_2222': {
+                                     'location': '3001',
+                                     'playcount': 1}})]))]
         )
 
         now = str(datetime.datetime.now())
         devices = ["my-device-3", "my-device-7"]
 
         expected_result = 'Creation Date,Start Date,End Date,Displays\r\n{},2016-02-01 00:00:00,2016-02-03 00:00:00,"my-device-3, my-device-7"\r\nDisplay,Location,Date,Content,Play Count\r\nmy-device-3,1001,2016-02-02 00:00:00,GSAD_4334,1\r\nmy-device-7,3001,2016-02-01 00:00:00,GSAD_5447,1\r\nmy-device-7,3001,2016-02-01 00:00:00,GSAD_2222,1\r\nmy-device-7,3001,2016-02-01 00:00:00,GSAD_4334,2\r\nmy-device-7,3001,2016-02-02 00:00:00,GSAD_2222,1\r\nmy-device-7,3001,2016-02-03 00:00:00,GSAD_5447,1\r\nmy-device-7,3001,2016-02-03 00:00:00,GSAD_2222,1\r\nmy-device-7,3001,2016-02-03 00:00:00,GSAD_4334,1\r\n'.format(
-                now)
+            now)
 
         start_time = datetime.datetime.strptime("Feb 1 2016", '%b %d %Y')
         end_time = datetime.datetime.strptime("Feb 3 2016", '%b %d %Y')
@@ -646,9 +656,9 @@ class TestDataProcessing(BaseTest):
     def test_generate_location_csv_summarized(self):
         example_input = {
             '3001': OrderedDict(
-                    [('GSAD_2222', 3), ('GSAD_5533', 3), ('GSAD_4334', 3)]),
+                [('GSAD_2222', 3), ('GSAD_5533', 3), ('GSAD_4334', 3)]),
             '1001': OrderedDict(
-                    [('GSAD_5447', 3), ('GSAD_2222', 4), ('GSAD_5533', 1), ('GSAD_5553', 2), ('GSAD_4334', 1)])}
+                [('GSAD_5447', 3), ('GSAD_2222', 4), ('GSAD_5533', 1), ('GSAD_5553', 2), ('GSAD_4334', 1)])}
 
         now = str(datetime.datetime.now())
 
@@ -657,7 +667,7 @@ class TestDataProcessing(BaseTest):
         locations = ["1001", "3001"]
 
         expected_result = 'Creation Date,Start Date,End Date,Locations\r\n{},2016-02-01 00:00:00,2016-02-03 00:00:00,"1001, 3001"\r\nLocation,Content,Play Count\r\n3001,GSAD_2222,3\r\n3001,GSAD_5533,3\r\n3001,GSAD_4334,3\r\n1001,GSAD_5447,3\r\n1001,GSAD_2222,4\r\n1001,GSAD_5533,1\r\n1001,GSAD_5553,2\r\n1001,GSAD_4334,1\r\n'.format(
-                now)
+            now)
 
         self.assertEqual(generate_location_csv_summarized(now, start_time, end_time, locations, example_input).read(),
                          expected_result)
@@ -667,7 +677,7 @@ class TestDataProcessing(BaseTest):
             '3001': OrderedDict([('GSAD_2222', OrderedDict([('my-device-9', 2), ('my-device-8', 1)])),
                                  ('GSAD_5533', OrderedDict([('my-device-7', 1), ('my-device-8', 2)])), (
                                      'GSAD_4334', OrderedDict(
-                                             [('my-device-8', 1), ('my-device-7', 1), ('my-device-9', 1)]))]),
+                                         [('my-device-8', 1), ('my-device-7', 1), ('my-device-9', 1)]))]),
             '1001': OrderedDict([('GSAD_5447', OrderedDict([('my-device-1', 1), ('my-device-3', 2)])), (
                 'GSAD_2222', OrderedDict([('my-device-1', 2), ('my-device-2', 1), ('my-device-3', 1)])),
                                  ('GSAD_5533', OrderedDict([('my-device-2', 1)])),
@@ -681,7 +691,7 @@ class TestDataProcessing(BaseTest):
         locations = ["1001", "3001"]
 
         expected_result = 'Creation Date,Start Date,End Date,Locations\r\n{},2016-02-01 00:00:00,2016-02-03 00:00:00,"1001, 3001"\r\nLocation,Device,Content,Play Count\r\n3001,my-device-9,GSAD_2222,2\r\n3001,my-device-8,GSAD_2222,1\r\n3001,my-device-7,GSAD_5533,1\r\n3001,my-device-8,GSAD_5533,2\r\n3001,my-device-8,GSAD_4334,1\r\n3001,my-device-7,GSAD_4334,1\r\n3001,my-device-9,GSAD_4334,1\r\n1001,my-device-1,GSAD_5447,1\r\n1001,my-device-3,GSAD_5447,2\r\n1001,my-device-1,GSAD_2222,2\r\n1001,my-device-2,GSAD_2222,1\r\n1001,my-device-3,GSAD_2222,1\r\n1001,my-device-2,GSAD_5533,1\r\n1001,my-device-2,GSAD_5553,1\r\n1001,my-device-3,GSAD_5553,1\r\n1001,my-device-3,GSAD_4334,1\r\n'.format(
-                now)
+            now)
 
         self.assertEqual(generate_location_csv_by_device(now, start_time, end_time, locations, example_input).read(),
                          expected_result)

@@ -1,4 +1,5 @@
 from env_setup import setup_test_paths
+
 setup_test_paths()
 
 from base_sql_test_config import SQLBaseTest
@@ -27,11 +28,11 @@ from proofplay.database_calls import (
 
 class TestDatabase(SQLBaseTest):
     resource_name = "some_resource"
+    tenant_code = "SOME_TENANT"
     resource_id = "1234"
     customer_location_code = "6025"
     device_serial = "62525"
     device_key = "5678"
-    tenant_code = "SOME_TENANT"
     customer_display_code = "some_display_code"
     started_at = datetime.datetime(2016, 2, 2, 15, 31, 43, 683139)
     ended_at = datetime.datetime(2016, 2, 2, 16, 31, 43, 683139)
@@ -58,7 +59,11 @@ class TestDatabase(SQLBaseTest):
         self.test_insert_new_resource()
         resources = retrieve_all_resources_of_tenant(self.tenant_code)
         self.assertEqual(resources, [
-            {'resource_identifier': unicode(self.resource_id) + u"__" + unicode(self.tenant_code), 'resource_name': unicode(self.resource_name)}])
+            {
+                'resource_identifier': self.resource_id + "__" + self.tenant_code,
+                'resource_name': unicode(self.resource_name)
+            }
+        ])
 
     def test_retrieve_all_resources(self):
         self.test_insert_new_resource()
@@ -93,7 +98,7 @@ class TestDatabase(SQLBaseTest):
         location_id = insert_new_location_or_get_existing(self.customer_location_code, self.tenant_code)
 
         device_id = insert_new_device_or_get_existing(
-            1,
+            location_id,
             self.device_serial,
             self.device_key,
             self.customer_display_code,
@@ -118,11 +123,11 @@ class TestDatabase(SQLBaseTest):
     def test_program_record_for_device_summarized(self):
         self.test_insert_new_program_record()
         expected_result = {
-            u'some_display_code': [
+            unicode(self.customer_display_code): [
                 {
                     'started_at': datetime.datetime(2016, 2, 2, 15, 31, 43, 683139),
                     'ended_at': datetime.datetime(2016, 2, 2, 16, 31, 43, 683139),
-                    'resource_id': u'some_resource', 'location_id': u'6025',
+                    'resource_id': unicode(self.resource_name), 'location_id': unicode(self.customer_location_code),
                     'device_id': unicode(self.customer_display_code)}
             ]
         }
@@ -144,8 +149,8 @@ class TestDatabase(SQLBaseTest):
                 {
                     'started_at': datetime.datetime(2016, 2, 2, 15, 31, 43, 683139),
                     'ended_at': datetime.datetime(2016, 2, 2, 16, 31, 43, 683139),
-                    'resource_id': u'some_resource',
-                    'location_id': u'6025',
+                    'resource_id': unicode(self.resource_name),
+                    'location_id': unicode(self.customer_location_code),
                     'device_id': unicode(self.customer_display_code)
                 }
             ]
@@ -191,7 +196,8 @@ class TestDatabase(SQLBaseTest):
                 {
                     'started_at': datetime.datetime(2016, 2, 2, 15, 31, 43, 683139),
                     'ended_at': datetime.datetime(2016, 2, 2, 16, 31, 43, 683139),
-                    'resource_id': u'some_resource', 'location_id': u'6025',
+                    'resource_id': unicode(self.resource_name),
+                    'location_id': unicode(self.customer_location_code),
                     'device_id': unicode(self.customer_display_code)
                 }
             ]
@@ -200,7 +206,7 @@ class TestDatabase(SQLBaseTest):
         self.assertEqual(program_record_for_resource_by_device(
             self.started_at,
             self.ended_at,
-            self.resource_id,
+            self.resource_id + "__" + self.tenant_code,
             self.tenant_code
         ), expected_output)
 
@@ -238,10 +244,10 @@ class TestDatabase(SQLBaseTest):
                                                         self.customer_location_code,
                                                         self.tenant_code)
 
-        expected_output = {u'6025': OrderedDict([(u'some_resource', [
+        expected_output = {unicode(self.customer_location_code): OrderedDict([(unicode(self.resource_name), [
             {'started_at': datetime.datetime(2016, 2, 2, 15, 31, 43, 683139),
-             'ended_at': datetime.datetime(2016, 2, 2, 16, 31, 43, 683139), 'resource_id': u'some_resource',
-             'location_id': u'6025', 'device_id': u'some_display_code'}])])}
+             'ended_at': datetime.datetime(2016, 2, 2, 16, 31, 43, 683139), 'resource_id': unicode(self.resource_name),
+             'location_id': unicode(self.customer_location_code), 'device_id': unicode(self.customer_display_code)}])])}
 
         self.assertEqual(result, expected_output)
 
@@ -252,8 +258,8 @@ class TestDatabase(SQLBaseTest):
                 {
                     'started_at': datetime.datetime(2016, 2, 2, 15, 31, 43, 683139),
                     'ended_at': datetime.datetime(2016, 2, 2, 16, 31, 43, 683139),
-                    'resource_id': u'some_resource',
-                    'location_id': u'6025', 'device_id': unicode(self.customer_display_code)
+                    'resource_id': unicode(self.resource_name),
+                    'location_id': unicode(self.customer_location_code), 'device_id': unicode(self.customer_display_code)
                 }
             ]
         }
@@ -261,7 +267,7 @@ class TestDatabase(SQLBaseTest):
         self.assertEqual(program_record_for_resource_by_date(
             self.started_at,
             self.ended_at,
-            self.resource_id,
+            self.resource_id + "__" + self.tenant_code,
             self.tenant_code
 
         ), expected_output)
