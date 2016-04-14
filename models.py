@@ -394,6 +394,7 @@ class ChromeOsDevice(ndb.Model):
     location_key = ndb.KeyProperty(required=False, indexed=True)
     timezone = ndb.StringProperty(required=False, indexed=True)
     timezone_offset = ndb.IntegerProperty(required=False, indexed=True)  # computed property
+    archived = ndb.BooleanProperty(default=False, required=True, indexed=True)
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):
@@ -457,7 +458,8 @@ class ChromeOsDevice(ndb.Model):
     def get_unmanaged_device_by_mac_address(cls, mac_address):
         if mac_address:
             device_key = ChromeOsDevice.query(ndb.AND(ChromeOsDevice.mac_address == mac_address,
-                                                      ChromeOsDevice.is_unmanaged_device == True)).get(keys_only=True)
+                                                      ChromeOsDevice.is_unmanaged_device == True,
+                                                      ChromeOsDevice.archived == False)).get(keys_only=True)
             if not device_key:
                 return None
             else:
@@ -469,7 +471,8 @@ class ChromeOsDevice(ndb.Model):
     def get_unmanaged_device_by_gcm_registration_id(cls, gcm_registration_id):
         if gcm_registration_id:
             device_key = ChromeOsDevice.query(ndb.AND(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
-                                                      ChromeOsDevice.is_unmanaged_device == True)).get(keys_only=True)
+                                                      ChromeOsDevice.is_unmanaged_device == True,
+                                                      ChromeOsDevice.archived == False)).get(keys_only=True)
             if not device_key:
                 return None
             else:
@@ -481,7 +484,8 @@ class ChromeOsDevice(ndb.Model):
     def mac_address_already_assigned(cls, device_mac_address):
         mac_address_assigned_to_device = ChromeOsDevice.query(
             ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
-                   ChromeOsDevice.ethernet_mac_address == device_mac_address)).count() > 0
+                   ChromeOsDevice.ethernet_mac_address == device_mac_address),
+            ndb.AND(ChromeOsDevice.archived == False)).count() > 0
         return mac_address_assigned_to_device
 
     @classmethod
@@ -496,7 +500,8 @@ class ChromeOsDevice(ndb.Model):
     def is_customer_display_code_unique(cls, customer_display_code, tenant_key):
         return None is ChromeOsDevice.query(
             ndb.AND(ChromeOsDevice.customer_display_code == customer_display_code,
-                    ChromeOsDevice.tenant_key == tenant_key)).get(
+                    ChromeOsDevice.tenant_key == tenant_key,
+                    ChromeOsDevice.archived == False)).get(
             keys_only=True)
 
     def _pre_put_hook(self):

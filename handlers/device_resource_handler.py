@@ -321,6 +321,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     @requires_api_token
     def get(self, device_urlsafe_key):
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
+        if device.archived:
+            status = 404
+            message = 'Device with key: {0} archived.'.format(device_urlsafe_key)
+            return self.response.set_status(status, message)
         if device.timezone:
             device.timezone_offset = TimezoneUtil.get_timezone_offset(device.timezone)
         else:
@@ -453,13 +457,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         status = 204
         message = None
         device = None
-
         try:
             device = ndb.Key(urlsafe=device_urlsafe_key).get()
-
         except Exception, e:
             logging.exception(e)
-
         if device is None:
             status = 404
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
@@ -783,26 +784,22 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         status = 204
         message = None
         device = None
-
         try:
             device = ndb.Key(urlsafe=device_urlsafe_key).get()
         except Exception, e:
             logging.exception(e)
-
-        if device is None:
+        if device is None or device.archived==True:
             status = 404
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
-
         else:
             change_intent(
                 gcm_registration_id=device.gcm_registration_id,
                 payload=config.PLAYER_RESET_COMMAND,
                 device_urlsafe_key=device_urlsafe_key,
                 host=self.request.host_url)
-            #TODO-make soft delete
-            # device.key.delete()
+            device.archived = True
+            device.put()
             self.response.headers.pop('Content-Type', None)
-
         self.response.set_status(status, message)
 
     @staticmethod

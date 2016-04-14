@@ -491,20 +491,22 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['gcmRegistrationId'], device.gcm_registration_id)
 
-    # TODO -Remove this after soft delete implemented
-    # def test_get_list_by_mac_address_on_rogue_unmanged_device_without_tenant_key_deletes_device(self):
-    #     mac_address = '2e871e619346'
-    #     unmanaged_device = ChromeOsDevice.create_unmanaged(self.GCM_REGISTRATION_ID, mac_address)
-    #     unmanaged_device_key = unmanaged_device.put()
-    #     self.assertIsNone(unmanaged_device.tenant_key)
-    #     self.assertIsNotNone(unmanaged_device)
-    #     request_parameters = {'macAddress': mac_address}
-    #     uri = build_uri('devices-retrieval')
-    #     with self.assertRaises(AppError) as context:
-    #         self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
-    #     self.assertTrue('Bad response: 404 Rogue unmanaged device with MAC address: {0} no longer exists.'.format(
-    #         mac_address) in context.exception.message)
-    #     self.assertIsNone(unmanaged_device_key.get())
+    def test_get_list_by_mac_address_on_rogue_unmanged_device_without_tenant_key_deletes_device(self):
+        mac_address = '2e871e619346'
+        unmanaged_device = ChromeOsDevice.create_unmanaged(self.GCM_REGISTRATION_ID, mac_address)
+        unmanaged_device_key = unmanaged_device.put()
+        self.assertIsNone(unmanaged_device.tenant_key)
+        self.assertIsNotNone(unmanaged_device)
+        self.assertFalse(unmanaged_device.archived)
+        request_parameters = {'macAddress': mac_address}
+        uri = build_uri('devices-retrieval')
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 404 Rogue unmanaged device with MAC address: {0} no longer exists.'.format(
+            mac_address) in context.exception.message)
+        modified_unmanaged_device = unmanaged_device_key.get()
+        self.assertIsNotNone(modified_unmanaged_device)
+        self.assertTrue(modified_unmanaged_device.archived)
 
     def test_get_list_by_mac_address_on_rogue_unmanged_device_with_tenant_key_does_not_delete_device(self):
         mac_address = '2e871e619346'
@@ -513,10 +515,13 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         unmanaged_device_key = unmanaged_device.put()
         self.assertIsNotNone(unmanaged_device.tenant_key)
         self.assertIsNotNone(unmanaged_device)
+        self.assertFalse(unmanaged_device.archived)
         request_parameters = {'macAddress': mac_address}
         uri = build_uri('devices-retrieval')
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
-        self.assertIsNotNone(unmanaged_device_key.get())
+        device = unmanaged_device_key.get()
+        self.assertIsNotNone(device)
+        self.assertFalse(device.archived)
         response_json = json.loads(response.body)
         self.assertEqual(response_json['macAddress'], mac_address)
 
@@ -914,21 +919,44 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertOK(response)
 
-    # TODO -Remove this after soft delete implemented
-    # def test_get_device_by_key_returns_not_found_status_with_a_valid_key_not_found(self):
-    #     request_parameters = {}
-    #     uri = application.router.build(None,
-    #                                    'device',
-    #                                    None,
-    #                                    {'device_urlsafe_key': self.managed_device_key.urlsafe()})
-    #     self.app.delete('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
-    #                     json.dumps({}),
-    #                     headers=self.api_token_authorization_header)
-    #     when(deferred).defer(any_matcher(refresh_device),
-    #                          any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
-    #     with self.assertRaises(AppError) as context:
-    #         self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
-    #     self.assertTrue('404 Not Found' in context.exception.message)
+    def test_get_device_by_key_returns_not_found_status_with_a_valid_key_not_found(self):
+        new_device = ChromeOsDevice.create_managed(
+            tenant_key=self.tenant_key,
+            gcm_registration_id=self.GCM_REGISTRATION_ID,
+            device_id='4444-55555',
+            mac_address='1231231321444')
+        new_device_key = new_device.put()
+        request_parameters = {}
+        uri = application.router.build(None,
+                                       'device',
+                                       None,
+                                       {'device_urlsafe_key': new_device_key.urlsafe()})
+        new_device.key.delete()
+        when(deferred).defer(any_matcher(refresh_device),
+                             any_matcher(new_device_key.urlsafe())).thenReturn(None)
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        self.assertTrue('404 Not Found' in context.exception.message)
+
+    def test_get_device_by_key_returns_not_found_status_with_archived_true(self):
+        new_device = ChromeOsDevice.create_managed(
+            tenant_key=self.tenant_key,
+            gcm_registration_id=self.GCM_REGISTRATION_ID,
+            device_id='2444-55550',
+            mac_address='3231231321444')
+        new_device.archived = True
+        new_device_key = new_device.put()
+        request_parameters = {}
+        uri = application.router.build(None,
+                                       'device',
+                                       None,
+                                       {'device_urlsafe_key': new_device_key.urlsafe()})
+        when(deferred).defer(any_matcher(refresh_device),
+                             any_matcher(new_device_key.urlsafe())).thenReturn(None)
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 404 Device with key: {0} achived.'.format(new_device_key.urlsafe())
+                        in context.exception.message)
 
     def test_get_device_by_key_returns_bad_request_status_with_invalid_key(self):
         request_parameters = {}
