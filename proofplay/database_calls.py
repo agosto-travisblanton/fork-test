@@ -24,6 +24,10 @@ def delete_raw_event_entries_older_than_thirty_days():
     session.close()
 
 
+def unique_tenant_resource_identifier(resource_identifier, tenant_code):
+    return str(resource_identifier) + "__" + str(tenant_code)
+
+
 ####################################################################################
 # REST Queries
 ####################################################################################
@@ -88,9 +92,10 @@ def retrieve_all_resources_of_tenant(tenant):
         return []
 
 
-def retrieve_resource_name_from_resource_id(resource_identifier):
+def retrieve_resource_name_from_resource_identifier(modified_resource_identifier):
     session = Session()
-    resource_name = session.query(Resource).filter_by(resource_identifier=resource_identifier).first().resource_name
+    resource_name = session.query(Resource).filter_by(
+        resource_identifier=modified_resource_identifier).first().resource_name
     session.close()
     return resource_name
 
@@ -150,15 +155,18 @@ def insert_new_program_record(location_id, device_id, resource_id, started_at, e
 
 def insert_new_resource_or_get_existing(resource_name, resource_identifier, tenant_code):
     session = Session()
-
-    resource_exists = session.query(Resource).filter_by(resource_identifier=resource_identifier).first()
+    unique_resource_identifier = unique_tenant_resource_identifier(
+        resource_identifier=resource_identifier,
+        tenant_code=tenant_code
+    )
+    resource_exists = session.query(Resource).filter_by(resource_identifier=unique_resource_identifier).first()
 
     if not resource_exists:
         tenant_id = session.query(TenantCode).filter_by(tenant_code=tenant_code).first().id
 
         new_resource = Resource(
             resource_name=resource_name,
-            resource_identifier=resource_identifier,
+            resource_identifier=unique_resource_identifier,
             tenant_id=tenant_id
         )
         session.add(new_resource)
@@ -248,7 +256,7 @@ def insert_new_device_or_get_existing(location_id, serial_number, device_key, cu
 ####################################################################################
 # BY RESOURCE
 ####################################################################################
-def program_record_for_resource_by_location(start_date, end_date, resource, tenant_code):
+def program_record_for_resource_by_device(start_date, end_date, resource, tenant_code):
     from_db = get_raw_program_record_data_by_resource(start_date, end_date, resource, tenant_code)
     all_results = transform_db_data_to_by_device(from_db)
     return all_results
@@ -262,6 +270,7 @@ def program_record_for_resource_by_date(start_date, end_date, resource, tenant_c
 
 def get_raw_program_record_data_by_resource(start_date, end_date, resource_identifier, tenant_code):
     session = Session()
+
     resource_id = session.query(Resource).filter_by(resource_identifier=resource_identifier).first().id
     tenant_id = session.query(TenantCode).filter_by(tenant_code=tenant_code).first().id
 
