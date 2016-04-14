@@ -53,6 +53,7 @@ module.exports = function (config) {
 
     plugins: [
       'karma-phantomjs-launcher',
+      'karma-chrome-launcher',
       'karma-jasmine',
       'karma-coverage',
       'karma-coffee-preprocessor',
