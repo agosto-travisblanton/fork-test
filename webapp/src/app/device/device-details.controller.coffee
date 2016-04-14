@@ -12,7 +12,8 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     sweet,
     $cookies,
     ProgressBarService,
-    $mdDialog) ->
+    $mdDialog,
+    ToastsService) ->
   @tenantKey = $stateParams.tenantKey
   @deviceKey = $stateParams.deviceKey
   @fromDevices = $stateParams.fromDevices is "true"
@@ -112,8 +113,9 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       @setSelectedOptions()
 
   @onGetDeviceFailure = (response) ->
-    errorMessage = "No detail for key ##{@deviceKey}.\nError: #{response.status} #{response.statusText}"
-    sweet.show('Oops...', errorMessage, 'error')
+    ToastsService.showErrorToast 'Oops. We were unable to fetch the details for this device at this time.'
+    errorMessage = "No detail for device_key ##{@deviceKey}.\nError: #{response.status} #{response.statusText}"
+    $log.error errorMessage
 
   @setSelectedOptions = () ->
     if @currentDevice.panelModel == null
@@ -150,20 +152,22 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onSuccessDeviceSave = ->
     ProgressBarService.complete()
-    sweet.show('WooHoo!', 'Your changes were saved!', 'success')
+    ToastsService.showSuccessToast 'We saved your updates to this device.'
 
-  @onFailureDeviceSave = (errorObject) ->
+  @onFailureDeviceSave = (error) ->
     ProgressBarService.complete()
-    $log.error errorObject
-    if errorObject.status == 409
+    if error.status == 409
+      $log.info(
+        "Failure saving device. Customer display code already exists for tenant: #{error.status } #{error.statusText}")
       sweet.show('Oops...', 'This customer display code already exists for this tenant. Please choose another.', 'error')
     else
-      sweet.show('Oops...', 'Unable to save updated device.', 'error')
+      $log.error "Failure saving device: #{error.status } #{error.statusText}"
+      ToastsService.showErrorToast 'Oops. We were unable to save your updates to this device at this time.'
 
   @confirmDeviceDelete = (event, key) ->
     confirm = $mdDialog.confirm(
       {
-        title:'Are you sure to delete this device?'
+        title: 'Are you sure to delete this device?'
         textContent: 'Please remember, you MUST remove this device from Content Manager before deleting it from Provisioning.'
         targetEvent: event
         ok: 'Delete'
@@ -179,17 +183,17 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onConfirmDelete = (key) ->
     success = () ->
-      sweet.show('Ok', 'Delete processed.', 'success')
+      ToastsService.showSuccessToast 'We processed your delete request.'
       $state.go 'devices'
     failure = (error) ->
-      friendlyMessage = 'Unable to delete device'
-      sweet.show('Oops...', friendlyMessage, 'error')
-      $log.error "Unable to delete device with key #{key}: #{error.status } #{error.statusText}"
+      friendlyMessage = 'We were unable to complete your delete request at this time.'
+      ToastsService.showErrorToast friendlyMessage
+      $log.error "Delete device failure for device_key #{key}: #{error.status } #{error.statusText}"
     deletePromise = DevicesService.delete key
     deletePromise.then success, failure
 
   @onConfirmCancel = ->
-    sweet.show('Ok', 'Delete cancelled.', 'success')
+    ToastsService.showInfoToast 'We canceled your delete request.'
 
   @autoGenerateCustomerDisplayCode = ->
     newDisplayCode = ''
@@ -215,11 +219,12 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onResetSuccess = () ->
     ProgressBarService.complete()
-    sweet.show('Success!', 'Sent a reset command to Google Cloud Messaging.', 'success')
+    ToastsService.showSuccessToast "We posted your reset command into the player's queue."
 
   @onResetFailure = (error) ->
     ProgressBarService.complete()
-    sweet.show('Oops...', "Reset error: #{error.data}", 'error')
+    $log.error "Reset command error: #{error.status } #{error.statusText}"
+    sweet.show('Oops...', "We were unable to post your reset command into the player's queue.", 'error')
 
   @onClickContentDeleteSendButton = () ->
     if @editMode
@@ -229,11 +234,12 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onContentDeleteSuccess = () ->
     ProgressBarService.complete()
-    sweet.show('Success!', 'Sent a content delete command to Google Cloud Messaging.', 'success')
+    ToastsService.showSuccessToast "We posted your content delete command into the player's queue."
 
   @onContentDeleteFailure = (error) ->
     ProgressBarService.complete()
-    sweet.show('Oops...', "Content delete error: #{error.data}", 'error')
+    $log.error "Content delete command error: #{error.status } #{error.statusText}"
+    sweet.show('Oops...', "We were unable to post your delete content command into the player's queue.", 'error')
 
   @onClickVolumeSendButton = () ->
     if @editMode
@@ -243,11 +249,12 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onVolumeSuccess = (level) ->
     ProgressBarService.complete()
-    sweet.show('Success!', "Sent a volume level of #{level} to Google Cloud Messaging.", 'success')
+    ToastsService.showSuccessToast "We posted a volume level command of #{level} into the player's queue."
 
   @onVolumeFailure = (error) ->
     ProgressBarService.complete()
-    sweet.show('Oops...', "Volume error: #{error.data}", 'error')
+    $log.error "Volume level command error: #{error.status } #{error.statusText}"
+    sweet.show('Oops...', "We were unable to post your volume level command into the player's queue.", 'error')
 
   @onClickCommandSendButton = () ->
     if @editMode
@@ -257,11 +264,12 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onCommandSuccess = (command) ->
     ProgressBarService.complete()
-    sweet.show('Success!', "Sent '#{command}' to Google Cloud Messaging.", 'success')
+    ToastsService.showSuccessToast "We posted your command '#{command}' into the player's queue."
 
   @onCommandFailure = (error) ->
     ProgressBarService.complete()
-    sweet.show('Oops...', "Command error: #{error.data}", 'error')
+    $log.error "Command error: #{error.status } #{error.statusText}"
+    sweet.show('Oops...', "We were unable to post your command into the player's queue.", 'error')
 
   @onClickRefreshButton = () ->
     ProgressBarService.start()
@@ -279,7 +287,8 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onRefreshIssuesFailure = (error) ->
     ProgressBarService.complete()
-    sweet.show('Oops...', "Refresh error: #{error.data}", 'error')
+    ToastsService.showInfoToast 'We were unable to refresh the device issues list at this time.'
+    $log.error "Failure to refresh device issues: #{error.status } #{error.statusText}"
 
   @onClickPowerOnSendButton = () ->
     if @editMode
@@ -289,11 +298,12 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onPowerOnSuccess = () ->
     ProgressBarService.complete()
-    sweet.show('Success!', 'Sent a power on command to Google Cloud Messaging.', 'success')
+    ToastsService.showSuccessToast "We posted a power on command into the player's queue."
 
   @onPowerOnFailure = (error) ->
     ProgressBarService.complete()
-    sweet.show('Oops...', "Power on error: #{error.data}", 'error')
+    $log.error "Power on command error: #{error.status } #{error.statusText}"
+    sweet.show('Oops...', "We were unable to post your power on command into the player's queue.", 'error')
 
   @onClickPowerOffSendButton = () ->
     if @editMode
@@ -303,10 +313,11 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onPowerOffSuccess = () ->
     ProgressBarService.complete()
-    sweet.show('Success!', 'Sent a power off command to Google Cloud Messaging.', 'success')
+    ToastsService.showSuccessToast "We posted a power off command into the player's queue."
 
   @onPowerOffFailure = (error) ->
     ProgressBarService.complete()
-    sweet.show('Oops...', "Power off error: #{error.data}", 'error')
+    $log.error "Power off command error: #{error.status } #{error.statusText}"
+    sweet.show('Oops...', "We were unable to post your power off command into the player's queue.", 'error')
 
   @
