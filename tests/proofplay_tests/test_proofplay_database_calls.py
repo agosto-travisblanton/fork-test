@@ -12,7 +12,7 @@ from proofplay.database_calls import (
     insert_new_location_or_get_existing,
     insert_new_device_or_get_existing,
     program_record_for_resource_by_date,
-    program_record_for_resource_by_location,
+    program_record_for_resource_by_device,
     retrieve_all_resources_of_tenant,
     retrieve_all_resources,
     get_raw_program_record_data_by_device,
@@ -58,7 +58,7 @@ class TestDatabase(SQLBaseTest):
         self.test_insert_new_resource()
         resources = retrieve_all_resources_of_tenant(self.tenant_code)
         self.assertEqual(resources, [
-            {'resource_identifier': unicode(self.resource_id), 'resource_name': unicode(self.resource_name)}])
+            {'resource_identifier': unicode(self.resource_id) + u"__" + unicode(self.tenant_code), 'resource_name': unicode(self.resource_name)}])
 
     def test_retrieve_all_resources(self):
         self.test_insert_new_resource()
@@ -197,7 +197,7 @@ class TestDatabase(SQLBaseTest):
             ]
         }
 
-        self.assertEqual(program_record_for_resource_by_location(
+        self.assertEqual(program_record_for_resource_by_device(
             self.started_at,
             self.ended_at,
             self.resource_id,
