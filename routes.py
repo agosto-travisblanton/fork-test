@@ -21,16 +21,18 @@ from provisioning_env import on_production_server
 application = WSGIApplication(
     [
         ############################################################
-        # warmup
+        # WARMUP
         ############################################################
+
         Route(r'/_ah/warmup',
               handler='handlers.warmup.WarmupHandler',
               name='warmup',
               ),
 
         ############################################################
-        # version
+        # VERSION
         ############################################################
+
         Route(
             r'/api/v1/versions',
             handler='handlers.versions_handler.VersionsHandler',
@@ -40,8 +42,9 @@ application = WSGIApplication(
         ),
 
         ############################################################
-        # login
+        # LOGIN
         ############################################################
+
         Route(r'/api/v1/identity',
               handler='handlers.identity_handler.IdentityHandler',
               name='identity'
@@ -58,8 +61,9 @@ application = WSGIApplication(
               ),
 
         ############################################################
-        # Locations
+        # LOCATIONS
         ############################################################
+
         Route(r'/api/v1/locations/<location_urlsafe_key>',
               handler='handlers.locations_handler.LocationsHandler',
               name='manage-location',
@@ -78,8 +82,9 @@ application = WSGIApplication(
               ),
 
         ############################################################
-        # device
+        # DEVICE_RESOURCE_HANDLER
         ############################################################
+
         Route(r'/api/v1/devices/<device_urlsafe_key>/heartbeat',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='devices-heartbeat',
@@ -155,12 +160,11 @@ application = WSGIApplication(
               handler_method='content_delete',
               methods=['POST']
               ),
-        Route(r'/api/v1/tenants/<tenant_urlsafe_key>/devices',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='devices-by-tenant',
-              handler_method='get_devices_by_tenant',
-              methods=['GET']
-              ),
+
+        ############################################################
+        # DISTRIBUTOR DEVICE ROUTES
+        ############################################################
+
         Route(r'/api/v1/distributors/<cur_prev_cursor>/<cur_next_cursor>/<distributor_urlsafe_key>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='devices-by-distributor',
@@ -191,9 +195,43 @@ application = WSGIApplication(
               handler_method='match_for_device_by_mac',
               methods=['GET']
               ),
+
         ############################################################
-        # Tenants
+        # TENANTS
         ############################################################
+
+        Route(r'/api/v1/tenants/search/serial/<tenant_urlsafe_key>/<partial_serial>/<unmanaged>/devices',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='search_for_device_by_serial_by_tenant',
+              handler_method='search_for_device_by_serial_by_tenant',
+              methods=['GET']
+              ),
+        Route(r'/api/v1/tenants/search/mac/<tenant_urlsafe_key>/<partial_mac>/<unmanaged>/devices',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='search_for_device_by_mac_by_tenant',
+              handler_method='search_for_device_by_mac_by_tenant',
+              methods=['GET']
+              ),
+        Route(r'/api/v1/tenants/match/serial/<tenant_urlsafe_key>/<full_serial>/<unmanaged>/devices',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='match_for_device_by_serial_by_tenant',
+              handler_method='match_for_device_by_serial_by_tenant',
+              methods=['GET']
+              ),
+        Route(r'/api/v1/tenants/match/mac/<tenant_urlsafe_key>/<full_mac>/<unmanaged>/devices',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='match_for_device_by_mac_by_tenant',
+              handler_method='match_for_device_by_mac_by_tenant',
+              methods=['GET']
+              ),
+
+        Route(r'/api/v1/tenants/<cur_prev_cursor>/<cur_next_cursor>/<tenant_urlsafe_key>/devices',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='devices-by-tenant',
+              handler_method='get_devices_by_tenant',
+              methods=['GET']
+              ),
+
         Route(r'/api/v1/tenants',
               handler='handlers.tenants_handler.TenantsHandler',
               name='tenants',
@@ -207,8 +245,9 @@ application = WSGIApplication(
         ),
 
         ############################################################
-        # Distributors
+        # DISTRIBUTORS
         ############################################################
+
         Route(
             r'/api/v1/users/<user_urlsafe_key>/distributors',
             handler='handlers.distributors_handler.DistributorsHandler',
@@ -240,8 +279,9 @@ application = WSGIApplication(
               ),
 
         ############################################################
-        # Domains
+        # DOMAINS
         ############################################################
+
         Route(r'/api/v1/domains',
               handler='handlers.domains_handler.DomainsHandler',
               name='domains',
@@ -254,8 +294,9 @@ application = WSGIApplication(
               ),
 
         ############################################################
-        # Device Monitoring
+        # DEVICE MONITORING
         ############################################################
+
         Route(r'/api/v1/monitor/devices',
               handler='handlers.monitor_devices_handler.MonitorDevicesHandler',
               name='monitor-devices',
@@ -264,8 +305,9 @@ application = WSGIApplication(
               ),
 
         ############################################################
-        # Player Command Events
+        # PLAYER COMMAND EVENTS
         ############################################################
+
         Route(r'/api/v1/player-command-events/<urlsafe_event_key>',
               handler='handlers.player_command_events_handler.PlayerCommandEventsHandler',
               name='manage-event',
@@ -281,8 +323,9 @@ application = WSGIApplication(
               ),
 
         ############################################################
-        # Timezones
+        # TIMEZONES
         ############################################################
+
         Route(r'/api/v1/timezones/us',
               handler='handlers.timezones_handler.TimezonesHandler',
               name='us-timezones',
@@ -300,6 +343,7 @@ application = WSGIApplication(
         ############################################################
         # /dev/ routes secured by admin:required
         ############################################################
+
         Route(
             r'/dev/versions',
             handler='handlers.versions.VersionHandler',
