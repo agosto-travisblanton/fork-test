@@ -152,13 +152,13 @@
                                                 <md-list>
                                                     <ol>
                                                         <li ng-repeat="item in vm.selected_resources">
-                                                            <p>{{ item }}
-                                                                <md-button md-no-ink class="md-primary"
+                                                            <md-button md-no-ink class="md-primary"
                                                                            id="proofplay-selected-items"
                                                                            ng-click="vm.removeFromSelectedResource(item)">
                                                                     X
-                                                                </md-button>
-                                                            </p>
+                                                                </md-button>{{ item }}
+
+
 
 
                                                         </li>
@@ -341,12 +341,12 @@
                                                 <md-list>
                                                     <ol>
                                                         <li ng-repeat="item in vm.selected_locations">
-                                                            {{ item }}
                                                             <md-button md-no-ink class="md-primary"
                                                                        id="proofplay-selected-items"
                                                                        ng-click="vm.removeFromSelectedLocation(item)">X
                                                             </md-button>
-                                                            </button>
+                                                            {{ item }}
+
 
                                                         </li>
                                                     </ol>
@@ -525,13 +525,13 @@
                                                 <md-list>
                                                     <ol>
                                                         <li ng-repeat="item in vm.selected_displays">
-                                                            {{ item }}
                                                             <md-button md-no-ink class="md-primary"
                                                                        id="proofplay-selected-items"
 
                                                                        ng-click="vm.removeFromSelectedDisplay(item)">X
                                                             </md-button>
-                                                            </button>
+                                                            {{ item }}
+
 
                                                         </li>
                                                     </ol>

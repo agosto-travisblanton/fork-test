@@ -249,15 +249,19 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     ProgressBarService.start()
     @epochStart = moment(new Date(@startTime)).unix()
     @epochEnd = moment(new Date(@endTime)).unix()
-    issuesPromise = DevicesService.getIssuesByKey(@deviceKey, @epochStart, @epochEnd)
+    @prev_cursor = null
+    @next_cursor = null
+    issuesPromise = DevicesService.getIssuesByKey(@deviceKey, @epochStart, @epochEnd, @prev_cursor, @next_cursor)
     issuesPromise.then ((data) =>
       @onRefreshIssuesSuccess(data)
     ), (error) =>
       @onRefreshIssuesFailure(error)
 
   @onRefreshIssuesSuccess = (data) ->
+    @issues = data.issues
+    @prev_cursor = data.prev
+    @next_cursor = data.next
     ProgressBarService.complete()
-    @issues = data
 
   @onRefreshIssuesFailure = (error) ->
     ProgressBarService.complete()
