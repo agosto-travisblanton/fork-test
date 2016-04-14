@@ -18,30 +18,32 @@ describe 'DeviceDetailsCtrl', ->
   serviceInjection = undefined
   cookieMock = undefined
   device = {key: 'dhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
-  issues = [
-    {
-      category: "Player down"
-      created: "2015-12-15 18:05:52"
-      elapsed_time: "37.3 minutes"
-      level: 2
-      level_descriptor: "danger"
-      memory_utilization: 40
-      program: "Test Content"
-      storage_utilization: 44
-      up: false
-    }
-    {
-      category: "Player up"
-      created: "2015-12-15 18:05:52"
-      elapsed_time: "37.3 minutes"
-      level: 0
-      level_descriptor: "normal"
-      memory_utilization: 40
-      program: "Test Content"
-      storage_utilization: 44
-      up: true
-    }
-  ]
+  issues = {
+    issues: [
+      {
+        category: "Player down"
+        created: "2015-12-15 18:05:52"
+        elapsed_time: "37.3 minutes"
+        level: 2
+        level_descriptor: "danger"
+        memory_utilization: 40
+        program: "Test Content"
+        storage_utilization: 44
+        up: false
+      }
+      {
+        category: "Player up"
+        created: "2015-12-15 18:05:52"
+        elapsed_time: "37.3 minutes"
+        level: 0
+        level_descriptor: "normal"
+        memory_utilization: 40
+        program: "Test Content"
+        storage_utilization: 44
+        up: true
+      }
+    ]
+  }
   commandEvents = [
     {
       payload: 'skykit.com/skdchromeapp/reset'
@@ -169,8 +171,10 @@ describe 'DeviceDetailsCtrl', ->
         @epochEnd = moment(new Date()).unix()
         today.setDate(today.getDate() - 30)
         @epochStart = moment(today).unix()
+        @prev_cursor = null
+        @next_cursor = null
         controller.initialize()
- 
+
       it 'should call TimezonesService.getTimezones', ->
         expect(TimezonesService.getUsTimezones).toHaveBeenCalled()
 
@@ -515,7 +519,7 @@ describe 'DeviceDetailsCtrl', ->
 
     it 'calls service to refresh issues for a given device within a specified datetime range', ->
       expect(DevicesService.getIssuesByKey).toHaveBeenCalledWith(
-        $stateParams.deviceKey, controller.epochStart, controller.epochEnd)
+        $stateParams.deviceKey, controller.epochStart, controller.epochEnd, controller.prev_cursor, controller.next_cursor)
 
     describe '.onRefreshIssuesSuccess', ->
       beforeEach ->
