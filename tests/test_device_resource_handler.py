@@ -955,7 +955,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                              any_matcher(new_device_key.urlsafe())).thenReturn(None)
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
-        self.assertTrue('Bad response: 404 Device with key: {0} achived.'.format(new_device_key.urlsafe())
+        self.assertTrue('Bad response: 404 Device with key: {0} archived.'.format(new_device_key.urlsafe())
                         in context.exception.message)
 
     def test_get_device_by_key_returns_bad_request_status_with_invalid_key(self):
