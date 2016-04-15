@@ -413,7 +413,9 @@ def _SQLALCHEMY_DATABASE_URI():
         return db_uri
     else:
         if on_integration_server:
-            instance_name = "skykit-display-device-int:us-central1:provisioning-int-2"
+            db_uri = "mysql+mysqldb://root:MPclyl0VK5lu@104.154.74.153:3306/provisioning?unix_socket=/cloudsql/{}:{}".format(
+                appid, "skykit-display-device-int:us-central1:provisioning-int-2")
+            return db_uri
         elif on_stage_server:
             instance_name = 'provisioning-stage'
         elif on_gamestop_server:
