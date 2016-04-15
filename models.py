@@ -245,7 +245,8 @@ class Tenant(ndb.Model):
         elif prev_cursor_str:
             cursor = Cursor(urlsafe=prev_cursor_str)
             objects, prev, more = ChromeOsDevice.query(
-                ndb.AND(ChromeOsDevice.tenant_key.IN(tenant_keys),
+                ndb.AND(ChromeOsDevice.archived == False,
+                        ChromeOsDevice.tenant_key.IN(tenant_keys),
                         ChromeOsDevice.is_unmanaged_device == unmanaged)).order(-ChromeOsDevice.key).fetch_page(
                 page_size=fetch_size,
                 start_cursor=cursor.reversed()
@@ -407,7 +408,9 @@ class ChromeOsDevice(ndb.Model):
     @classmethod
     def get_by_device_id(cls, device_id):
         if device_id:
-            chrome_os_device_key = ChromeOsDevice.query(ChromeOsDevice.device_id == device_id).get(keys_only=True)
+            chrome_os_device_key = ChromeOsDevice.query(ndb.AND(ChromeOsDevice.archived == False,
+                                                                ChromeOsDevice.device_id == device_id)).get(
+                keys_only=True)
             if chrome_os_device_key:
                 return chrome_os_device_key.get()
 
@@ -503,7 +506,8 @@ class ChromeOsDevice(ndb.Model):
     @classmethod
     def is_customer_display_code_unique(cls, customer_display_code, tenant_key):
         return None is ChromeOsDevice.query(
-            ndb.AND(ChromeOsDevice.customer_display_code == customer_display_code,
+            ndb.AND(ChromeOsDevice.archived == False,
+                    ChromeOsDevice.customer_display_code == customer_display_code,
                     ChromeOsDevice.tenant_key == tenant_key)).get(
             keys_only=True)
 
