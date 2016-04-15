@@ -50,7 +50,7 @@ class MakeMigration(RequestHandler):
                 "SUCCESS. Migrations Applied Successfully (or no change to model schema necessary).")
 
         except Exception as e:
-            print e
+            logging.error(e)
             self.response.out.write(
                 "FAILURE. Exception caught during alembic migrations. Check the developer console logs.")
 
@@ -150,28 +150,31 @@ class MultiResourceByDevice(RequestHandler):
             seconds=1
         )
 
-        all_the_resources = resource_identifiers.split("|")
-        all_the_resources_final = all_the_resources[1:]
+        all_the_resource_identifiers = resource_identifiers.split("|")
+        all_the_resource_identifiers_final = all_the_resource_identifiers[1:]
         now = datetime.datetime.now()
         ###########################################################
-
+        # BUSINESS LOGIC
+        ###########################################################
         array_of_transformed_record_data_by_location = [
             {
-                "resource": retrieve_resource_name_from_resource_id(resource),
-                "raw_data": program_record_for_resource_by_location(
+                "resource": resource_identifier,
+                "raw_data": program_record_for_resource_by_device(
                     midnight_start_day,
                     just_before_next_day_end_date,
-                    resource,
+                    resource_identifier,
                     tenant
                 )
-            } for resource in all_the_resources_final]
+            } for resource_identifier in all_the_resource_identifiers_final]
 
-        formatted_record_data_for_each_resource = list(map(
-            reformat_program_record_array_by_location,
-            array_of_transformed_record_data_by_location
-        ))
+        formatted_record_data_for_each_resource = [
+            reformat_program_record_array_by_location(record_data) for record_data in
+            array_of_transformed_record_data_by_location]
 
-        resource_identifiers_to_resource_names = map(retrieve_resource_name_from_resource_id, all_the_resources_final)
+        resource_identifiers_to_resource_names = [
+            retrieve_resource_name_from_resource_identifier(resource_identifier) for
+            resource_identifier in
+            all_the_resource_identifiers_final]
 
         csv_to_publish = generate_resource_csv_by_device(
             midnight_start_day,
@@ -203,23 +206,23 @@ class MultiResourceByDate(RequestHandler):
             seconds=1
         )
 
-        all_the_resources = resource_identifiers.split("|")
-        all_the_resources_final = all_the_resources[1:]
+        all_the_resource_identifiers = resource_identifiers.split("|")
+        all_the_resource_identifiers_final = all_the_resource_identifiers[1:]
         now = datetime.datetime.now()
-
         ###########################################################
-
+        # BUSINESS LOGIC
+        ###########################################################
         pre_formatted_program_record_by_date = [
             {
-                "resource": retrieve_resource_name_from_resource_id(resource),
+                "resource": resource_identifier,
                 # program_record is the transformed program record table data
                 "raw_data": program_record_for_resource_by_date(
                     midnight_start_day,
                     just_before_next_day_end_date,
-                    resource,
+                    resource_identifier,
                     tenant
                 )
-            } for resource in all_the_resources_final]
+            } for resource_identifier in all_the_resource_identifiers_final]
 
         formatted_data = format_program_record_data_with_array_of_resources_by_date(
             midnight_start_day,
@@ -227,7 +230,9 @@ class MultiResourceByDate(RequestHandler):
             pre_formatted_program_record_by_date
         )
 
-        resource_identifiers_to_resource_names = map(retrieve_resource_name_from_resource_id, all_the_resources_final)
+        resource_identifiers_to_resource_names = [retrieve_resource_name_from_resource_identifier(resource_identifier) for
+                                                  resource_identifier in
+                                                  all_the_resource_identifiers_final]
 
         csv_to_publish = generate_resource_csv_by_date(
             midnight_start_day,
@@ -387,10 +392,10 @@ class MultiLocationSummarized(RequestHandler):
                 )
             } for location in all_the_locations_final]
 
-        formatted_data = map(
-            format_multi_location_summarized,
+        formatted_data = [
+            format_multi_location_summarized(the_data) for the_data in
             array_of_transformed_program_data_by_device
-        )
+            ]
 
         merged_formatted_data = create_merged_dictionary(formatted_data)
 
@@ -442,10 +447,10 @@ class MultiLocationByDevice(RequestHandler):
                 )
             } for location in all_the_locations_final]
 
-        formatted_data = map(
-            format_multi_location_by_device,
+        formatted_data = [
+            format_multi_location_by_device(program_data) for program_data in
             array_of_transformed_program_data_by_device
-        )
+            ]
 
         merged_formatted_data = create_merged_dictionary(formatted_data)
 
@@ -489,6 +494,9 @@ def handle_posting_a_new_program_play(incoming_data):
 
                 if not customer_display_code:
                     customer_display_code = "None"
+
+                logging.info("ABOUT TO INSERT NEW LOG")
+                logging.info(each_log)
 
                 tenant_id = insert_new_tenant_code_or_get_existing(
                     tenant_code
