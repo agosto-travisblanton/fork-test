@@ -410,9 +410,10 @@ def _SQLALCHEMY_DATABASE_URI():
         db_uri = 'sqlite:///:memory:'
     elif on_development_server:
         db_uri = 'mysql+mysqldb://root@127.0.0.1/provisioning'
+        return db_uri
     else:
         if on_integration_server:
-            instance_name = 'provisioning-int-v2'
+            instance_name = "provisioning-int-v2"
         elif on_stage_server:
             instance_name = 'provisioning-stage'
         elif on_gamestop_server:
@@ -457,4 +458,4 @@ app_SPRINT_NUMBER = 33
 
 app_DEPLOYMENT_COUNTER = 7
 
-app_PRODUCTION_HOTFIX_COUNTER = 0
+app_PRODUCTION_HOTFIX_COUNTER = 1
