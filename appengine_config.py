@@ -414,7 +414,8 @@ def _SQLALCHEMY_DATABASE_URI():
         return db_uri
     else:
         if on_integration_server:
-            instance_name = 'provisioning-int-2'
+            db_uri = 'mysql+mysqldb://root:MPclyl0VK5lu@104.154.74.153:3306/provisioning'
+            return db_uri
         elif on_stage_server:
             instance_name = 'provisioning-stage'
         elif on_gamestop_server:
