@@ -413,7 +413,7 @@ def _SQLALCHEMY_DATABASE_URI():
         return db_uri
     else:
         if on_integration_server:
-            instance_name = "provisioning-int-2"
+            instance_name = "skykit-display-device-int:us-central1:provisioning-int-2"
         elif on_stage_server:
             instance_name = 'provisioning-stage'
         elif on_gamestop_server:
