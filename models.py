@@ -157,13 +157,14 @@ class Tenant(ndb.Model):
     def find_devices(cls, tenant_key, unmanaged):
         if tenant_key:
             return ChromeOsDevice.query(
-                ndb.AND(ChromeOsDevice.tenant_key == tenant_key,
+                ndb.AND(ChromeOsDevice.archived == False,
+                        ChromeOsDevice.tenant_key == tenant_key,
                         ChromeOsDevice.is_unmanaged_device == unmanaged)
             ).fetch()
 
     @classmethod
     def match_device_with_full_mac(cls, tenant_keys, unmanaged, full_mac):
-        return ChromeOsDevice.query(
+        return ChromeOsDevice.query(ChromeOsDevice.archived == False,
             ndb.OR(ChromeOsDevice.mac_address == full_mac,
                    ChromeOsDevice.ethernet_mac_address == full_mac)).filter(
             ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
@@ -171,14 +172,14 @@ class Tenant(ndb.Model):
 
     @classmethod
     def match_device_with_full_serial(cls, tenant_keys, unmanaged, full_serial):
-        return ChromeOsDevice.query().filter(
+        return ChromeOsDevice.query(ChromeOsDevice.archived == False).filter(
             ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
             ChromeOsDevice.is_unmanaged_device == unmanaged).filter(
             ChromeOsDevice.serial_number == full_serial).count() > 0
 
     @classmethod
     def find_devices_with_partial_serial(cls, tenant_keys, unmanaged, partial_serial):
-        q = ChromeOsDevice.query().filter(ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
+        q = ChromeOsDevice.query(ChromeOsDevice.archived == False).filter(ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
             ChromeOsDevice.is_unmanaged_device == unmanaged).fetch()
 
         to_return = []
@@ -191,7 +192,8 @@ class Tenant(ndb.Model):
 
     @classmethod
     def find_devices_with_partial_mac(cls, tenant_keys, unmanaged, partial_mac):
-        q = ChromeOsDevice.query().filter(ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
+        q = ChromeOsDevice.query(ChromeOsDevice.archived == False).\
+            filter(ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
             ChromeOsDevice.is_unmanaged_device == unmanaged).fetch()
 
         filtered_results = []
@@ -219,7 +221,8 @@ class Tenant(ndb.Model):
 
         if not prev_cursor_str and not next_cursor_str:
             objects, next_cursor, more = ChromeOsDevice.query(
-                ndb.AND(ChromeOsDevice.tenant_key.IN(tenant_keys),
+                ndb.AND(ChromeOsDevice.archived == False,
+                        ChromeOsDevice.tenant_key.IN(tenant_keys),
                         ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(
                 page_size=fetch_size)
 
@@ -229,7 +232,8 @@ class Tenant(ndb.Model):
         elif next_cursor_str:
             cursor = Cursor(urlsafe=next_cursor_str)
             objects, next_cursor, more = ChromeOsDevice.query(
-                ndb.AND(ChromeOsDevice.tenant_key.IN(tenant_keys),
+                ndb.AND(ChromeOsDevice.archived == False,
+                        ChromeOsDevice.tenant_key.IN(tenant_keys),
                         ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(
                 page_size=fetch_size,
                 start_cursor=cursor
@@ -500,8 +504,7 @@ class ChromeOsDevice(ndb.Model):
     def is_customer_display_code_unique(cls, customer_display_code, tenant_key):
         return None is ChromeOsDevice.query(
             ndb.AND(ChromeOsDevice.customer_display_code == customer_display_code,
-                    ChromeOsDevice.tenant_key == tenant_key,
-                    ChromeOsDevice.archived == False)).get(
+                    ChromeOsDevice.tenant_key == tenant_key)).get(
             keys_only=True)
 
     def _pre_put_hook(self):

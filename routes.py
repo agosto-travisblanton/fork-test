@@ -94,7 +94,7 @@ application = WSGIApplication(
         Route(r'/api/v1/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='devices-retrieval',
-              handler_method='get_list',
+              handler_method='get_device_by_parameter',
               methods=['GET']
               ),
         Route(r'/api/v1/devices',
