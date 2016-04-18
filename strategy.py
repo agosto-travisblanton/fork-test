@@ -104,7 +104,8 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'longitude': lambda o, field_name,
                          context: o.location_key.get().geo_location.lon if o.location_key is not None else None},
     {'timezone': lambda o, field_name, context: o.key.get().timezone},
-    {'timezoneOffset': lambda o, field_name, context: o.key.get().timezone_offset}
+    {'timezoneOffset': lambda o, field_name, context: o.key.get().timezone_offset},
+    {'archived': lambda o, field_name, context: o.key.get().archived}
 ]
 
 LOCATION_STRATEGY = ModelStrategy(Location)

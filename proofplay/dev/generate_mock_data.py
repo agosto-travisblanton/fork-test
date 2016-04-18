@@ -2,13 +2,12 @@ import requests
 import json
 import datetime
 import random
-import uuid
 from app_config import config
 
 analytics = {}
 
 information_to_post = {
-    "acmeservices": {
+    "acme_inc": {
         "resource_choices": [
             {"name": "ACME_5553", "id": "086b8e3df6a211e5b4256003088f14f4"},
             {"name": "ACME_5447", "id": "11ff1887f6a211e585a16003088f14f4"},
