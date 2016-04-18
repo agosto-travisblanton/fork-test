@@ -1087,20 +1087,19 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                 headers=self.unmanaged_api_token_authorization_header)
         self.assertOK(response)
 
-    # TODO - remove this after soft delete implemented
-    # def test_get_unmanaged_device_by_key_returns_not_found_status_with_a_key_for_a_deleted_device(self):
-    #     request_parameters = {}
-    #     uri = application.router.build(None,
-    #                                    'device',
-    #                                    None,
-    #                                    {'device_urlsafe_key': self.unmanaged_device_key.urlsafe()})
-    #     self.app.delete('/api/v1/devices/{0}'.format(self.unmanaged_device_key.urlsafe()),
-    #                     json.dumps({}),
-    #                     headers=self.unmanaged_api_token_authorization_header)
-    #     with self.assertRaises(AppError) as context:
-    #         self.app.get(uri, params=request_parameters,
-    #                      headers=self.unmanaged_api_token_authorization_header)
-    #     self.assertTrue('404 Not Found' in context.exception.message)
+    def test_get_unmanaged_device_by_key_returns_not_found_status_with_a_key_for_a_soft_deleted_device(self):
+        request_parameters = {}
+        uri = application.router.build(None,
+                                       'device',
+                                       None,
+                                       {'device_urlsafe_key': self.unmanaged_device_key.urlsafe()})
+        self.unmanaged_device.archived = True
+        self.unmanaged_device.put()
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters,
+                         headers=self.unmanaged_api_token_authorization_header)
+        self.assertTrue('Device with key: {0} archived.'.format(self.unmanaged_device_key.urlsafe())
+                        in context.exception.message)
 
     ##################################################################################################################
     ## get pairing code
@@ -1172,11 +1171,28 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                          headers=self.unmanaged_api_token_authorization_header)
         self.assertTrue('Bad response: 403 Forbidden' in context.exception.message)
 
+    def test_get_get_pairing_code_returns_not_found_for_archived_device(self):
+        device = ChromeOsDevice.create_unmanaged(
+            gcm_registration_id=self.GCM_REGISTRATION_ID,
+            mac_address='9931231321444')
+        device.archived = True
+        device_key = device.put()
+        request_parameters = {}
+        uri = application.router.build(None,
+                                       'device-pairing-code',
+                                       None,
+                                       {'device_urlsafe_key': device_key.urlsafe()})
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters,
+                         headers=self.unmanaged_registration_token_authorization_header)
+        self.assertTrue('Bad response: 404 Device with key: {0} archived.'.format(device_key.urlsafe())
+                        in context.exception.message)
+
     ##################################################################################################################
     # put
     ##################################################################################################################
 
-    def test_device_resource_put_no_authorization_header_returns_forbidden(self):
+    def test_put_no_authorization_header_returns_forbidden(self):
         request_body = {'gcmRegistrationId': self.GCM_REGISTRATION_ID,
                         'tenantCode': self.TENANT_CODE,
                         'notes': self.DEVICE_NOTES}
@@ -1197,6 +1213,24 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                 headers=self.api_token_authorization_header)
         self.assertEqual('204 No Content', response.status)
         self.assertEqual(204, response.status_int)
+
+    def test_put_returns_not_found_for_archived_device(self):
+        device = ChromeOsDevice.create_managed(
+            tenant_key=self.tenant_key,
+            gcm_registration_id=self.GCM_REGISTRATION_ID,
+            device_id='3444-55550',
+            mac_address='9931231321444')
+        device.archived = True
+        device_key = device.put()
+        request_body = {}
+        when(deferred).defer(any_matcher(update_chrome_os_device),
+                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
+        with self.assertRaises(AppError) as context:
+            self.app.put('/api/v1/devices/{0}'.format(device_key.urlsafe()),
+                         json.dumps(request_body),
+                         headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 404 Device with key: {0} archived.'.format(device_key.urlsafe())
+                        in context.exception.message)
 
     def test_put_updates_device_notes(self):
         new_note = 'new note'
@@ -1288,7 +1322,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json['gcmRegistrationId'], self.GCM_REGISTRATION_ID)
         self.assertEqual(response_json['macAddress'], self.MAC_ADDRESS)
 
-    def test_device_resource_put_updates_location(self):
+    def test_put_updates_location(self):
         location = Location.create(tenant_key=self.tenant_key,
                                    customer_location_name='Store 1234',
                                    customer_location_code='store_1234')
@@ -1302,7 +1336,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         updated_device = self.managed_device_key.get()
         self.assertEqual(updated_device.location_key, location_key)
 
-    def test_device_resource_put_does_not_update_non_unique_customer_display_code(self):
+    def test_put_does_not_update_non_unique_customer_display_code(self):
         customer_display_name = 'Panel in Reception'
         customer_display_code = 'panel_in_reception'
         device = self.managed_device_key.get()
@@ -1330,7 +1364,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             customer_display_code)
         self.assertTrue(message in context.exception.message)
 
-    def test_device_resource_put_does_not_update_non_same_customer_display_code(self):
+    def test_put_does_not_update_non_same_customer_display_code(self):
         customer_display_name = 'Panel in Reception'
         customer_display_code = 'panel_in_reception'
         device = self.managed_device_key.get()
@@ -1467,11 +1501,29 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertIsNotNone(updated_device)
         self.assertTrue(updated_device.archived)
 
+    def test_delete_returns_not_found_for_archived_device(self):
+        device = ChromeOsDevice.create_managed(
+            tenant_key=self.tenant_key,
+            gcm_registration_id=self.GCM_REGISTRATION_ID,
+            device_id='3444-55550',
+            mac_address='9931231321444')
+        device.archived = True
+        device_key = device.put()
+        request_body = {}
+        when(device_message_processor).change_intent(any_matcher(), config.PLAYER_RESET_COMMAND).thenReturn(None)
+        with self.assertRaises(AppError) as context:
+            self.app.delete('/api/v1/devices/{0}'.format(device_key.urlsafe()),
+                            json.dumps(request_body),
+                            headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 404 Device with key: {0} archived.'.format(device_key.urlsafe())
+                        in context.exception.message)
+
+
     ##################################################################################################################
     # heartbeat
     ##################################################################################################################
 
-    def test_device_resource_put_no_authorization_header_returns_forbidden_not_gcm(self):
+    def test_put_heartbeat_no_authorization_header_returns_forbidden_not_gcm(self):
         request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
                         'program': self.PROGRAM}
@@ -1866,6 +1918,32 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                              config.DEVICE_ISSUE_TIMEZONE_OFFSET_CHANGE)).get()
         self.assertIsNotNone(log_entry)
         self.assertEqual(log_entry.category, config.DEVICE_ISSUE_TIMEZONE_OFFSET_CHANGE)
+
+        request_parameters = {}
+        uri = application.router.build(None,
+                                       'device',
+                                       None,
+                                       {'device_urlsafe_key': self.unmanaged_device_key.urlsafe()})
+        self.unmanaged_device.archived = True
+        self.unmanaged_device.put()
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters,
+                         headers=self.unmanaged_api_token_authorization_header)
+        self.assertTrue('Device with key: {0} archived.'.format(self.unmanaged_device_key.urlsafe())
+                        in context.exception.message)
+
+    def test_put_heartbeat_returns_not_found_for_archived_device(self):
+        device = ChromeOsDevice.create_managed(
+            tenant_key=self.tenant_key,
+            gcm_registration_id=self.GCM_REGISTRATION_ID,
+            device_id='3444-55550',
+            mac_address='9931231321444')
+        device.archived = True
+        device_key = device.put()
+        request_body = {}
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': device_key.urlsafe()})
+        response = self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        self.assertEqual('404 Device with key: {0} archived.'.format(device_key.urlsafe()), response.status)
 
     ##################################################################################################################
     ## device issues
