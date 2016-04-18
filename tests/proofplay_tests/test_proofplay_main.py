@@ -243,17 +243,17 @@ class TestMain(SQLBaseTest, WebTest):
 
         self.assertEqual(json.loads(response.body), {u'devices': [self.one_device_customer_display_code]})
 
-    def test_post_new_program_play(self):
-        uri = build_uri('PostNewProgramPlay', module='proofplay')
-        self.app.post(uri, params=json.dumps(batch_up_one_day_without_changing_data(
-            started_at=datetime.datetime.now(),
-            amount_a_day=10,
-            tenant="acme_inc"
-        )),
-                      headers={"Authorization": config.API_TOKEN})
-
-        self.assertRunAndClearTasksInQueue(1, queue_names="proof-of-play")
-        self.assertTrue(len(self.db_session.query(ProgramRecord).all()), 10)
+    # def test_post_new_program_play(self):
+    #     uri = build_uri('PostNewProgramPlay', module='proofplay')
+    #     self.app.post(uri, params=json.dumps(batch_up_one_day_without_changing_data(
+    #         started_at=datetime.datetime.now(),
+    #         amount_a_day=10,
+    #         tenant="acme_inc"
+    #     )),
+    #                   headers={"Authorization": config.API_TOKEN})
+    #
+    #     self.assertRunAndClearTasksInQueue(1, queue_names="proof-of-play")
+    #     self.assertTrue(len(self.db_session.query(ProgramRecord).all()), 10)
 
     def load_one_device(self):
         device_serial = "1234"
@@ -313,31 +313,31 @@ class TestMain(SQLBaseTest, WebTest):
         else:
             return False
 
-    def test_delete_raw_event_entries_older_than_thirty_days(self):
-        uri = build_uri('PostNewProgramPlay', module='proofplay')
-
-        for each in reversed(xrange(1, 36)):
-            started_at = datetime.datetime.now() - datetime.timedelta(days=each)
-            self.app.post(uri, params=json.dumps(
-                batch_up_one_day_without_changing_data(
-                    started_at=started_at,
-                    amount_a_day=10,
-                    tenant="acme_inc"
-                )
-            ), headers={"Authorization": config.API_TOKEN})
-
-        self.assertRunAndClearTasksInQueue(35, queue_names="proof-of-play")
-
-        all_events = self.db_session.query(ProgramPlayEvent).all()
-
-        self.assertEqual(len(all_events), 350)
-
-        delete_uri = build_uri('ManageRawPayloadTable', module='proofplay')
-
-        self.app.get(delete_uri)
-
-        all_events_now = self.db_session.query(ProgramPlayEvent).all()
-
-        # have to do this x is within x of another because codeship is broken on some timezones
-        # this doesn't need to be exact anyway
-        self.assertEqual(len(all_events_now), TestMain.num_is_within_x_of_another(300, len(all_events_now), 15))
+    # def test_delete_raw_event_entries_older_than_thirty_days(self):
+    #     uri = build_uri('PostNewProgramPlay', module='proofplay')
+    #
+    #     for each in reversed(xrange(1, 36)):
+    #         started_at = datetime.datetime.now() - datetime.timedelta(days=each)
+    #         self.app.post(uri, params=json.dumps(
+    #             batch_up_one_day_without_changing_data(
+    #                 started_at=started_at,
+    #                 amount_a_day=10,
+    #                 tenant="acme_inc"
+    #             )
+    #         ), headers={"Authorization": config.API_TOKEN})
+    #
+    #     self.assertRunAndClearTasksInQueue(35, queue_names="proof-of-play")
+    #
+    #     all_events = self.db_session.query(ProgramPlayEvent).all()
+    #
+    #     self.assertEqual(len(all_events), 350)
+    #
+    #     delete_uri = build_uri('ManageRawPayloadTable', module='proofplay')
+    #
+    #     self.app.get(delete_uri)
+    #
+    #     all_events_now = self.db_session.query(ProgramPlayEvent).all()
+    #
+    #     # have to do this x is within x of another because codeship is broken on some timezones
+    #     # this doesn't need to be exact anyway
+    #     self.assertEqual(len(all_events_now), TestMain.num_is_within_x_of_another(300, len(all_events_now), 15))

@@ -223,68 +223,58 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     # END DEVICES VIEW
     ############################################################################################
     @requires_api_token
-    def get_list(self):
+    def get_device_by_parameter(self):
         pairing_code = self.request.get('pairingCode')
         device_mac_address = self.request.get('macAddress')
         gcm_registration_id = self.request.get('gcmRegistrationId')
-
         if device_mac_address:
             query_results = ChromeOsDevice.query(
                 ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
-                       ChromeOsDevice.ethernet_mac_address == device_mac_address)).fetch()
-
+                       ChromeOsDevice.ethernet_mac_address == device_mac_address),
+                ndb.AND(ChromeOsDevice.archived == False)).fetch()
             if len(query_results) == 1:
                 if ChromeOsDevice.is_rogue_unmanaged_device(device_mac_address):
                     self.delete(query_results[0].key.urlsafe())
                     error_message = "Rogue unmanaged device with MAC address: {0} no longer exists.".format(
                         device_mac_address)
                     self.response.set_status(404, error_message)
-
                 else:
                     json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
-
             elif len(query_results) > 1:
                 json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
                 error_message = "Multiple devices have MAC address {0}".format(device_mac_address)
                 logging.error(error_message)
-
             else:
                 error_message = "Unable to find Chrome OS device by MAC address: {0}".format(device_mac_address)
                 self.response.set_status(404, error_message)
-
         elif gcm_registration_id:
-            query_results = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id).fetch()
-
+            query_results = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
+                                                 ndb.AND(ChromeOsDevice.archived == False)).fetch()
             if len(query_results) == 1:
                 json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
-
             elif len(query_results) > 1:
                 json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
                 error_message = "Multiple devices have GCM registration ID {0}".format(gcm_registration_id)
                 logging.error(error_message)
-
             else:
                 error_message = "Unable to find Chrome OS device by GCM registration ID: {0}".format(
                     gcm_registration_id)
                 self.response.set_status(404, error_message)
-
         elif pairing_code:
-            query_results = ChromeOsDevice.query(ChromeOsDevice.pairing_code == pairing_code).fetch()
-
+            query_results = ChromeOsDevice.query(ChromeOsDevice.pairing_code == pairing_code,
+                                                 ndb.AND(ChromeOsDevice.archived == False)).fetch()
             if len(query_results) == 1:
                 json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
-
             elif len(query_results) > 1:
                 json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
                 error_message = "Multiple devices have pairing code {0}".format(pairing_code)
                 logging.error(error_message)
-
             else:
                 error_message = "Unable to find device by pairing code: {0}".format(pairing_code)
                 self.response.set_status(404, error_message)
         else:
-            query = ChromeOsDevice.query().order(ChromeOsDevice.created)
-            query_results = query.fetch(1000)
+            query = ChromeOsDevice.query(ChromeOsDevice.archived == False)
+            query_results = query.fetch()
             json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
 
     @requires_api_token
@@ -321,6 +311,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     @requires_api_token
     def get(self, device_urlsafe_key):
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
+        if device.archived:
+            status = 404
+            message = 'Device with key: {0} archived.'.format(device_urlsafe_key)
+            return self.response.set_status(status, message)
         if device.timezone:
             device.timezone_offset = TimezoneUtil.get_timezone_offset(device.timezone)
         else:
@@ -453,13 +447,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         status = 204
         message = None
         device = None
-
         try:
             device = ndb.Key(urlsafe=device_urlsafe_key).get()
-
         except Exception, e:
             logging.exception(e)
-
         if device is None:
             status = 404
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
@@ -783,26 +774,22 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         status = 204
         message = None
         device = None
-
         try:
             device = ndb.Key(urlsafe=device_urlsafe_key).get()
         except Exception, e:
             logging.exception(e)
-
-        if device is None:
+        if device is None or device.archived==True:
             status = 404
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
-
         else:
             change_intent(
                 gcm_registration_id=device.gcm_registration_id,
                 payload=config.PLAYER_RESET_COMMAND,
                 device_urlsafe_key=device_urlsafe_key,
                 host=self.request.host_url)
-            #TODO-make soft delete
-            # device.key.delete()
+            device.archived = True
+            device.put()
             self.response.headers.pop('Content-Type', None)
-
         self.response.set_status(status, message)
 
     @staticmethod
