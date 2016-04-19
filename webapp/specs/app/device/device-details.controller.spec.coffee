@@ -95,8 +95,6 @@ describe 'DeviceDetailsCtrl', ->
 
   describe 'initialize', ->
     beforeEach ->
-      locationsServicePromise = new skykitProvisioning.q.Mock
-      spyOn(LocationsService, 'getLocationsByTenantKey').and.returnValue locationsServicePromise
       getDevicePromise = new skykitProvisioning.q.Mock
       timezonesPromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getDeviceByKey').and.returnValue getDevicePromise
@@ -200,6 +198,108 @@ describe 'DeviceDetailsCtrl', ->
       it "the 'then' handler caches the retrieved command events in the controller", ->
         getPlayerCommandEventsPromise.resolve commandEvents
         expect(controller.commandEvents).toBe commandEvents
+
+  describe '.onGetDeviceSuccess', ->
+    tenantKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWR3JvdXAiEXRlbmFudlbmFudBiAgICAgIDACAw'
+    timezone = 'America/Denver'
+    response = {
+      tenantKey: tenantKey
+      tenantName: 'Acme, Inc.'
+      timezone: timezone
+      timezoneOffset: -6
+    }
+    beforeEach ->
+      $stateParams = {fromDevices: "true"}
+      locationsServicePromise = new skykitProvisioning.q.Mock
+      spyOn(LocationsService, 'getLocationsByTenantKey').and.returnValue locationsServicePromise
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+      controller.tenantKey = undefined
+      controller.selectedTimezone = "America/Chicago"
+      controller.onGetDeviceSuccess(response)
+
+    it 'sets the current device', ->
+      expect(controller.currentDevice).toBe response
+
+    it 'sets the selected timezone', ->
+      expect(controller.selectedTimezone).toBe timezone
+
+    it 'sets the tenant key', ->
+      expect(controller.tenantKey).toBe tenantKey
+
+    it 'calls LocationsService.getLocationsByTenantKey with tenant key to get tenant locations', ->
+      expect(LocationsService.getLocationsByTenantKey).toHaveBeenCalledWith tenantKey
+
+    describe 'coming from devices', ->
+      beforeEach ->
+        $stateParams = {fromDevices: "true"}
+        controller = $controller 'DeviceDetailsCtrl', {
+          $stateParams: $stateParams
+        }
+        controller.onGetDeviceSuccess(response)
+
+      it 'sets the back button text according to previous context', ->
+        expect(controller.backUrlText).toBe 'Back to devices'
+
+#      if @currentDevice.isUnmanagedDevice is true
+#        @backUrl = "/#/tenants/#{@tenantKey}/unmanaged"
+#        @backUrlText = 'Back to tenant unmanaged devices'
+#      else
+#        @backUrl = "/#/tenants/#{@tenantKey}/managed"
+#        @backUrlText = 'Back to tenant managed devices'
+
+
+    describe 'coming from tenant unmanaged devices', ->
+      beforeEach ->
+        $stateParams = {fromDevices: "false"}
+        controller = $controller 'DeviceDetailsCtrl', {
+          $stateParams: $stateParams
+        }
+        response.isUnmanagedDevice = true
+        controller.onGetDeviceSuccess(response)
+
+      it 'sets the back button text according to previous context', ->
+        expect(controller.backUrlText).toBe 'Back to tenant unmanaged devices'
+
+      it 'sets the back url according to previous context', ->
+        expect(controller.backUrl).toBe "/#/tenants/#{tenantKey}/unmanaged"
+
+    describe 'coming from tenant managed devices', ->
+      beforeEach ->
+        $stateParams = {fromDevices: "false"}
+        controller = $controller 'DeviceDetailsCtrl', {
+          $stateParams: $stateParams
+        }
+        response.isUnmanagedDevice = false
+        controller.onGetDeviceSuccess(response)
+
+      it 'sets the back button text according to previous context', ->
+        expect(controller.backUrlText).toBe 'Back to tenant managed devices'
+
+      it 'sets the back url according to previous context', ->
+        expect(controller.backUrl).toBe "/#/tenants/#{tenantKey}/managed"
+
+
+  describe '.onGetDeviceFailure', ->
+    beforeEach ->
+      spyOn($log, 'error')
+      spyOn($state, 'go')
+      spyOn(ToastsService, 'showErrorToast')
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+      controller.deviceKey = 'key'
+      response = {status: 400, statusText: 'Bad Request'}
+      controller.onGetDeviceFailure(response)
+
+    it 'displays a toast notifying the user', ->
+      expect(ToastsService.showErrorToast).toHaveBeenCalledWith(
+        'Oops. We were unable to fetch the details for this device at this time.')
+
+    it 'logs error to the console', ->
+      errorMessage = "No detail for device_key ##{controller.deviceKey = 'key'}. Error: 400 Bad Request"
+      expect($log.error).toHaveBeenCalledWith errorMessage
+
+    it 'navigates back to devices list', ->
+      expect($state.go).toHaveBeenCalledWith 'devices'
+
 
   describe '.onClickSaveDevice', ->
     beforeEach ->
@@ -442,7 +542,6 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'logs a detailed error to the console', ->
         expect($log.error).toHaveBeenCalledWith "Volume level command error: #{error.status} #{error.statusText}"
-
 
   describe '.onClickCommandSendButton', ->
     beforeEach ->

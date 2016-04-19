@@ -114,8 +114,9 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onGetDeviceFailure = (response) ->
     ToastsService.showErrorToast 'Oops. We were unable to fetch the details for this device at this time.'
-    errorMessage = "No detail for device_key ##{@deviceKey}.\nError: #{response.status} #{response.statusText}"
+    errorMessage = "No detail for device_key ##{@deviceKey}. Error: #{response.status} #{response.statusText}"
     $log.error errorMessage
+    $state.go 'devices'
 
   @setSelectedOptions = () ->
     if @currentDevice.panelModel == null
