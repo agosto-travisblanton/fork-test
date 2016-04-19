@@ -336,6 +336,14 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     @requires_unmanaged_registration_token
     def get_pairing_code(self, device_urlsafe_key):
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
+        if device is None:
+            status = 404
+            message = 'Unrecognized device_key: {0}'.format(device_urlsafe_key)
+            return self.response.set_status(status, message)
+        elif device.archived:
+            status = 404
+            message = 'Device with key: {0} archived.'.format(device_urlsafe_key)
+            return self.response.set_status(status, message)
         return json_response(self.response, device, strategy=DEVICE_PAIRING_CODE_STRATEGY)
 
     @requires_registration_token
@@ -455,6 +463,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             status = 404
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
             return self.response.set_status(status, message)
+        elif device.archived:
+            status = 404
+            message = 'Device with key: {0} archived.'.format(device_urlsafe_key)
+            return self.response.set_status(status, message)
         else:
             request_json = json.loads(self.request.body)
             location_urlsafe_key = request_json.get('locationKey')
@@ -536,21 +548,21 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         status = 204
         message = None
         device = None
-
         try:
             device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
-
         except Exception, e:
             logging.exception(e)
-
         if device is None:
             status = 404
             message = 'Unrecognized heartbeat device_key: {0}'.format(device_urlsafe_key)
-
+            return self.response.set_status(status, message)
+        elif device.archived:
+            status = 404
+            message = 'Device with key: {0} archived.'.format(device_urlsafe_key)
+            return self.response.set_status(status, message)
         else:
             request_json = json.loads(self.request.body)
             mac_address = request_json.get('macAddress')
-
             if mac_address:
                 if not device.is_unmanaged_device and ChromeOsDevice.mac_address_already_assigned(mac_address):
 
@@ -778,9 +790,12 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             device = ndb.Key(urlsafe=device_urlsafe_key).get()
         except Exception, e:
             logging.exception(e)
-        if device is None or device.archived==True:
+        if device is None:
             status = 404
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
+        elif device.archived:
+            status = 404
+            message = 'Device with key: {0} archived.'.format(device_urlsafe_key)
         else:
             change_intent(
                 gcm_registration_id=device.gcm_registration_id,
