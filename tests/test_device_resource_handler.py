@@ -93,236 +93,236 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
         self.empty_header = {}
 
-    # ##################################################################################################################
-    # # post ChromeOsDevice
-    # ##################################################################################################################
-    #
-    # def test_post_managed_device_http_status_created(self):
-    #     when(EmailNotify).device_enrolled(tenant_code=any_matcher(),
-    #                                       tenant_name=any_matcher(),
-    #                                       device_mac_address=any_matcher(),
-    #                                       timestamp=any_matcher()).thenReturn(None)
-    #
-    #     tenant = self.tenant_key.get()
-    #     mac_address = '7889BE879f'
-    #     request_body = {'macAddress': mac_address,
-    #                     'gcmRegistrationId': self.GCM_REGISTRATION_ID,
-    #                     'tenantCode': tenant.tenant_code}
-    #     when(deferred).defer(any_matcher(refresh_device_by_mac_address),
-    #                          any_matcher(str),
-    #                          any_matcher(mac_address)).thenReturn(None)
-    #     response = self.app.post('/api/v1/devices', json.dumps(request_body),
-    #                              headers=self.api_token_authorization_header)
-    #     self.assertEqual('201 Created', response.status)
-    #     self.assertEqual(201, response.status_int)
-    #
-    # def test_post_managed_device_returns_resource_url_in_location_header(self):
-    #     when(EmailNotify).device_enrolled(tenant_code=any_matcher(),
-    #                                       tenant_name=any_matcher(),
-    #                                       device_mac_address=any_matcher(),
-    #                                       timestamp=any_matcher()).thenReturn(None)
-    #
-    #     tenant = self.tenant_key.get()
-    #     mac_address = '7889BE879f'
-    #     request_body = {'macAddress': mac_address,
-    #                     'gcmRegistrationId': self.GCM_REGISTRATION_ID,
-    #                     'tenantCode': tenant.tenant_code}
-    #     when(deferred).defer(any_matcher(refresh_device_by_mac_address),
-    #                          any_matcher(str),
-    #                          any_matcher(mac_address)).thenReturn(None)
-    #     response = self.app.post('/api/v1/devices', json.dumps(request_body),
-    #                              headers=self.api_token_authorization_header)
-    #     location_uri_components = str(response.headers['Location']).split('/')
-    #     self.assertEqual(location_uri_components[5], "devices")
-    #     device = ndb.Key(urlsafe=location_uri_components[6]).get()
-    #     self.assertIsNotNone(device)
-    #
-    # def test_device_resource_handler_post_no_authorization_header_returns_forbidden(self):
-    #     request_body = {'macAddress': self.MAC_ADDRESS,
-    #                     'gcmRegistrationId': self.GCM_REGISTRATION_ID,
-    #                     'tenantCode': self.TENANT_CODE}
-    #     uri = build_uri('device-creator')
-    #     response = self.post(uri, params=request_body, headers=self.empty_header)
-    #     self.assertForbidden(response)
-    #
-    # def test_device_resource_handler_post_no_returns_bad_response_if_mac_address_already_assigned_to_device(self):
-    #     request_body = {'macAddress': self.MAC_ADDRESS,
-    #                     'gcmRegistrationId': self.GCM_REGISTRATION_ID,
-    #                     'tenantCode': self.TENANT_CODE}
-    #     with self.assertRaises(AppError) as context:
-    #         self.app.post('/api/v1/devices', json.dumps(request_body),
-    #                       headers=self.api_token_authorization_header)
-    #     self.assertTrue('Bad response: 400 Cannot register because macAddress already assigned to managed device.'
-    #                     in context.exception.message)
-    #
-    # def test_device_resource_handler_post_no_returns_bad_response_for_empty_tenant_code(self):
-    #     request_body = {'macAddress': '232323243223',
-    #                     'gcmRegistrationId': self.GCM_REGISTRATION_ID,
-    #                     'tenantCode': None}
-    #     with self.assertRaises(AppError) as context:
-    #         self.app.post('/api/v1/devices', json.dumps(request_body),
-    #                       headers=self.api_token_authorization_header)
-    #     self.assertTrue('Bad response: 400 The tenantCode parameter is invalid.'
-    #                     in context.exception.message)
-    #
-    # def test_device_resource_handler_post_no_returns_bad_response_for_empty_gcm(self):
-    #     request_body = {'macAddress': self.MAC_ADDRESS,
-    #                     'gcmRegistrationId': None,
-    #                     'tenantCode': self.TENANT_CODE}
-    #     with self.assertRaises(AppError) as context:
-    #         self.app.post('/api/v1/devices', json.dumps(request_body),
-    #                       headers=self.api_token_authorization_header)
-    #     self.assertTrue('Bad response: 400 The gcmRegistrationId parameter is invalid.'
-    #                     in context.exception.message)
-    #
-    # def test_device_resource_handler_post_no_returns_bad_response_for_empty_mac_address(self):
-    #     request_body = {'macAddress': None,
-    #                     'gcmRegistrationId': self.GCM_REGISTRATION_ID,
-    #                     'tenantCode': self.TENANT_CODE}
-    #     with self.assertRaises(AppError) as context:
-    #         self.app.post('/api/v1/devices', json.dumps(request_body),
-    #                       headers=self.api_token_authorization_header)
-    #     self.assertTrue('Bad response: 400 The macAddress parameter is invalid.'
-    #                     in context.exception.message)
-    #
-    # def test_post_managed_device_when_cannot_resolve_tenant(self):
-    #     request_body = {'macAddress': '232323243223',
-    #                     'gcmRegistrationId': self.GCM_REGISTRATION_ID,
-    #                     'tenantCode': 'unresolvable_tenant_code'}
-    #     with self.assertRaises(AppError) as context:
-    #         self.app.post('/api/v1/devices', json.dumps(request_body),
-    #                       headers=self.api_token_authorization_header)
-    #     self.assertTrue('Bad response: 400 Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
-    #                     in context.exception.message)
-    #
-    # def test_post_managed_device_creates_device_with_default_timezone_and_expected_offset(self):
-    #     when(EmailNotify).device_enrolled(tenant_code=any_matcher(),
-    #                                       tenant_name=any_matcher(),
-    #                                       device_mac_address=any_matcher(),
-    #                                       timestamp=any_matcher()).thenReturn(None)
-    #     tenant = self.tenant_key.get()
-    #     mac_address = '7889BE879f'
-    #     request_body = {'macAddress': mac_address,
-    #                     'gcmRegistrationId': self.GCM_REGISTRATION_ID,
-    #                     'tenantCode': tenant.tenant_code}
-    #     when(deferred).defer(any_matcher(refresh_device_by_mac_address),
-    #                          any_matcher(str),
-    #                          any_matcher(mac_address)).thenReturn(None)
-    #     response = self.app.post('/api/v1/devices', json.dumps(request_body),
-    #                              headers=self.api_token_authorization_header)
-    #     location_uri_components = str(response.headers['Location']).split('/')
-    #     device = ndb.Key(urlsafe=location_uri_components[6]).get()
-    #     default_timezone = 'America/Chicago'
-    #     self.assertEqual(device.timezone_offset, TimezoneUtil.get_timezone_offset(default_timezone))
-    #     self.assertEqual(device.timezone, default_timezone)
-    #
-    # def test_post_managed_device_creates_device_with_explicit_timezone_and_expected_offset(self):
-    #     when(EmailNotify).device_enrolled(tenant_code=any_matcher(),
-    #                                       tenant_name=any_matcher(),
-    #                                       device_mac_address=any_matcher(),
-    #                                       timestamp=any_matcher()).thenReturn(None)
-    #
-    #     tenant = self.tenant_key.get()
-    #     mac_address = '7889BE879f'
-    #     explicit_timezone = 'America/Denver'
-    #     request_body = {'macAddress': mac_address,
-    #                     'gcmRegistrationId': self.GCM_REGISTRATION_ID,
-    #                     'tenantCode': tenant.tenant_code,
-    #                     'timezone': explicit_timezone}
-    #     when(deferred).defer(any_matcher(refresh_device_by_mac_address),
-    #                          any_matcher(str),
-    #                          any_matcher(mac_address)).thenReturn(None)
-    #     response = self.app.post('/api/v1/devices', json.dumps(request_body),
-    #                              headers=self.api_token_authorization_header)
-    #     location_uri_components = str(response.headers['Location']).split('/')
-    #     device = ndb.Key(urlsafe=location_uri_components[6]).get()
-    #     self.assertEqual(device.timezone_offset, TimezoneUtil.get_timezone_offset(explicit_timezone))
-    #     self.assertEqual(device.timezone, explicit_timezone)
-    #
-    # ##################################################################################################################
-    # # post unmanaged device
-    # ##################################################################################################################
-    # def test_device_resource_handler_unmanaged_post_returns_created_status_code(self):
-    #     new_mac_address = '1111111111'
-    #     new_gcm_registration_id = '222222222'
-    #     request_body = {'macAddress': new_mac_address,
-    #                     'gcmRegistrationId': new_gcm_registration_id}
-    #     response = self.app.post('/api/v1/devices', json.dumps(request_body),
-    #                              headers=self.unmanaged_registration_token_authorization_header)
-    #     self.assertEqual('201 Created', response.status)
-    #     self.assertEqual(201, response.status_int)
-    #
-    # def test_device_resource_handler_unmanaged_post_returns_cannot_register_when_mac_address_already_assigned(self):
-    #     request_body = {'macAddress': self.MAC_ADDRESS,
-    #                     'gcmRegistrationId': '123'}
-    #     with self.assertRaises(AppError) as context:
-    #         self.app.post('/api/v1/devices', json.dumps(request_body),
-    #                       headers=self.unmanaged_registration_token_authorization_header)
-    #     self.assertTrue('Bad response: 409 Registration conflict because macAddress is already assigned '
-    #                     'to an unmanaged device.' in context.exception.message)
-    #
-    # def test_device_resource_handler_unmanaged_post_returns_cannot_register_when_gcm_already_assigned(self):
-    #     request_body = {'macAddress': '123',
-    #                     'gcmRegistrationId': self.GCM_REGISTRATION_ID}
-    #     with self.assertRaises(AppError) as context:
-    #         self.app.post('/api/v1/devices', json.dumps(request_body),
-    #                       headers=self.unmanaged_registration_token_authorization_header)
-    #     self.assertTrue('Bad response: 409 Registration conflict because gcmRegistrationId is already assigned '
-    #                     'to an unmanaged device.' in context.exception.message)
-    #
-    # def test_device_resource_handler_unmanaged_post_returns_bad_response_for_empty_gcm(self):
-    #     request_body = {'macAddress': self.MAC_ADDRESS,
-    #                     'gcmRegistrationId': None}
-    #     with self.assertRaises(AppError) as context:
-    #         self.app.post('/api/v1/devices', json.dumps(request_body),
-    #                       headers=self.unmanaged_registration_token_authorization_header)
-    #     self.assertTrue('Bad response: 400 The gcmRegistrationId parameter is invalid.'
-    #                     in context.exception.message)
-    #
-    # def test_device_resource_handler_unmanaged_post_returns_bad_response_for_empty_mac_address(self):
-    #     request_body = {'macAddress': None,
-    #                     'gcmRegistrationId': self.GCM_REGISTRATION_ID}
-    #     with self.assertRaises(AppError) as context:
-    #         self.app.post('/api/v1/devices', json.dumps(request_body),
-    #                       headers=self.unmanaged_registration_token_authorization_header)
-    #     self.assertTrue('Bad response: 400 The macAddress parameter is invalid.'
-    #                     in context.exception.message)
-    #
-    # def test_device_resource_handler_unmanaged_post_populates_location_header(self):
-    #     new_mac_address = '1111111111'
-    #     new_gcm_registration_id = '222222222'
-    #     request_body = {'macAddress': new_mac_address,
-    #                     'gcmRegistrationId': new_gcm_registration_id}
-    #     response = self.app.post('/api/v1/devices', json.dumps(request_body),
-    #                              headers=self.unmanaged_registration_token_authorization_header)
-    #     self.assertIsNotNone(response.headers['Location'])
-    #
-    # def test_device_resource_handler_unmanaged_post_populates_location_header_with_devices_route(self):
-    #     new_mac_address = '1111111111'
-    #     new_gcm_registration_id = '222222222'
-    #     request_body = {'macAddress': new_mac_address,
-    #                     'gcmRegistrationId': new_gcm_registration_id}
-    #     response = self.app.post('/api/v1/devices', json.dumps(request_body),
-    #                              headers=self.unmanaged_registration_token_authorization_header)
-    #     location_uri_components = str(response.headers['Location']).split('/')
-    #     self.assertEqual(location_uri_components[5], "devices")
-    #
-    # def test_device_resource_handler_unmanaged_post_populates_location_header_with_resolvable_resource(self):
-    #     new_mac_address = '1111111111'
-    #     new_gcm_registration_id = '222222222'
-    #     request_body = {'macAddress': new_mac_address,
-    #                     'gcmRegistrationId': new_gcm_registration_id}
-    #     response = self.app.post('/api/v1/devices', json.dumps(request_body),
-    #                              headers=self.unmanaged_registration_token_authorization_header)
-    #     uri = response.headers['Location']
-    #     request_parameters = {}
-    #     response = self.app.get(uri, params=request_parameters,
-    #                             headers=self.unmanaged_registration_token_authorization_header)
-    #     response_json = json.loads(response.body)
-    #     self.assertLength(3, response_json)
-    #     self.assertIsNotNone(response_json['pairingCode'])
-    #     self.assertEqual(response_json['gcmRegistrationId'], new_gcm_registration_id)
-    #     self.assertEqual(response_json['macAddress'], new_mac_address)
+    ##################################################################################################################
+    # post ChromeOsDevice
+    ##################################################################################################################
+
+    def test_post_managed_device_http_status_created(self):
+        when(EmailNotify).device_enrolled(tenant_code=any_matcher(),
+                                          tenant_name=any_matcher(),
+                                          device_mac_address=any_matcher(),
+                                          timestamp=any_matcher()).thenReturn(None)
+
+        tenant = self.tenant_key.get()
+        mac_address = '7889BE879f'
+        request_body = {'macAddress': mac_address,
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'tenantCode': tenant.tenant_code}
+        when(deferred).defer(any_matcher(refresh_device_by_mac_address),
+                             any_matcher(str),
+                             any_matcher(mac_address)).thenReturn(None)
+        response = self.app.post('/api/v1/devices', json.dumps(request_body),
+                                 headers=self.api_token_authorization_header)
+        self.assertEqual('201 Created', response.status)
+        self.assertEqual(201, response.status_int)
+
+    def test_post_managed_device_returns_resource_url_in_location_header(self):
+        when(EmailNotify).device_enrolled(tenant_code=any_matcher(),
+                                          tenant_name=any_matcher(),
+                                          device_mac_address=any_matcher(),
+                                          timestamp=any_matcher()).thenReturn(None)
+
+        tenant = self.tenant_key.get()
+        mac_address = '7889BE879f'
+        request_body = {'macAddress': mac_address,
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'tenantCode': tenant.tenant_code}
+        when(deferred).defer(any_matcher(refresh_device_by_mac_address),
+                             any_matcher(str),
+                             any_matcher(mac_address)).thenReturn(None)
+        response = self.app.post('/api/v1/devices', json.dumps(request_body),
+                                 headers=self.api_token_authorization_header)
+        location_uri_components = str(response.headers['Location']).split('/')
+        self.assertEqual(location_uri_components[5], "devices")
+        device = ndb.Key(urlsafe=location_uri_components[6]).get()
+        self.assertIsNotNone(device)
+
+    def test_device_resource_handler_post_no_authorization_header_returns_forbidden(self):
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'tenantCode': self.TENANT_CODE}
+        uri = build_uri('device-creator')
+        response = self.post(uri, params=request_body, headers=self.empty_header)
+        self.assertForbidden(response)
+
+    def test_device_resource_handler_post_no_returns_bad_response_if_mac_address_already_assigned_to_device(self):
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'tenantCode': self.TENANT_CODE}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body),
+                          headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 400 Cannot register because macAddress already assigned to managed device.'
+                        in context.exception.message)
+
+    def test_device_resource_handler_post_no_returns_bad_response_for_empty_tenant_code(self):
+        request_body = {'macAddress': '232323243223',
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'tenantCode': None}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body),
+                          headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 400 The tenantCode parameter is invalid.'
+                        in context.exception.message)
+
+    def test_device_resource_handler_post_no_returns_bad_response_for_empty_gcm(self):
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': None,
+                        'tenantCode': self.TENANT_CODE}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body),
+                          headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 400 The gcmRegistrationId parameter is invalid.'
+                        in context.exception.message)
+
+    def test_device_resource_handler_post_no_returns_bad_response_for_empty_mac_address(self):
+        request_body = {'macAddress': None,
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'tenantCode': self.TENANT_CODE}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body),
+                          headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 400 The macAddress parameter is invalid.'
+                        in context.exception.message)
+
+    def test_post_managed_device_when_cannot_resolve_tenant(self):
+        request_body = {'macAddress': '232323243223',
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'tenantCode': 'unresolvable_tenant_code'}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body),
+                          headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 400 Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
+                        in context.exception.message)
+
+    def test_post_managed_device_creates_device_with_default_timezone_and_expected_offset(self):
+        when(EmailNotify).device_enrolled(tenant_code=any_matcher(),
+                                          tenant_name=any_matcher(),
+                                          device_mac_address=any_matcher(),
+                                          timestamp=any_matcher()).thenReturn(None)
+        tenant = self.tenant_key.get()
+        mac_address = '7889BE879f'
+        request_body = {'macAddress': mac_address,
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'tenantCode': tenant.tenant_code}
+        when(deferred).defer(any_matcher(refresh_device_by_mac_address),
+                             any_matcher(str),
+                             any_matcher(mac_address)).thenReturn(None)
+        response = self.app.post('/api/v1/devices', json.dumps(request_body),
+                                 headers=self.api_token_authorization_header)
+        location_uri_components = str(response.headers['Location']).split('/')
+        device = ndb.Key(urlsafe=location_uri_components[6]).get()
+        default_timezone = 'America/Chicago'
+        self.assertEqual(device.timezone_offset, TimezoneUtil.get_timezone_offset(default_timezone))
+        self.assertEqual(device.timezone, default_timezone)
+
+    def test_post_managed_device_creates_device_with_explicit_timezone_and_expected_offset(self):
+        when(EmailNotify).device_enrolled(tenant_code=any_matcher(),
+                                          tenant_name=any_matcher(),
+                                          device_mac_address=any_matcher(),
+                                          timestamp=any_matcher()).thenReturn(None)
+
+        tenant = self.tenant_key.get()
+        mac_address = '7889BE879f'
+        explicit_timezone = 'America/Denver'
+        request_body = {'macAddress': mac_address,
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'tenantCode': tenant.tenant_code,
+                        'timezone': explicit_timezone}
+        when(deferred).defer(any_matcher(refresh_device_by_mac_address),
+                             any_matcher(str),
+                             any_matcher(mac_address)).thenReturn(None)
+        response = self.app.post('/api/v1/devices', json.dumps(request_body),
+                                 headers=self.api_token_authorization_header)
+        location_uri_components = str(response.headers['Location']).split('/')
+        device = ndb.Key(urlsafe=location_uri_components[6]).get()
+        self.assertEqual(device.timezone_offset, TimezoneUtil.get_timezone_offset(explicit_timezone))
+        self.assertEqual(device.timezone, explicit_timezone)
+
+    ##################################################################################################################
+    # post unmanaged device
+    ##################################################################################################################
+    def test_device_resource_handler_unmanaged_post_returns_created_status_code(self):
+        new_mac_address = '1111111111'
+        new_gcm_registration_id = '222222222'
+        request_body = {'macAddress': new_mac_address,
+                        'gcmRegistrationId': new_gcm_registration_id}
+        response = self.app.post('/api/v1/devices', json.dumps(request_body),
+                                 headers=self.unmanaged_registration_token_authorization_header)
+        self.assertEqual('201 Created', response.status)
+        self.assertEqual(201, response.status_int)
+
+    def test_device_resource_handler_unmanaged_post_returns_cannot_register_when_mac_address_already_assigned(self):
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': '123'}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body),
+                          headers=self.unmanaged_registration_token_authorization_header)
+        self.assertTrue('Bad response: 409 Registration conflict because macAddress is already assigned '
+                        'to an unmanaged device.' in context.exception.message)
+
+    def test_device_resource_handler_unmanaged_post_returns_cannot_register_when_gcm_already_assigned(self):
+        request_body = {'macAddress': '123',
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body),
+                          headers=self.unmanaged_registration_token_authorization_header)
+        self.assertTrue('Bad response: 409 Registration conflict because gcmRegistrationId is already assigned '
+                        'to an unmanaged device.' in context.exception.message)
+
+    def test_device_resource_handler_unmanaged_post_returns_bad_response_for_empty_gcm(self):
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': None}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body),
+                          headers=self.unmanaged_registration_token_authorization_header)
+        self.assertTrue('Bad response: 400 The gcmRegistrationId parameter is invalid.'
+                        in context.exception.message)
+
+    def test_device_resource_handler_unmanaged_post_returns_bad_response_for_empty_mac_address(self):
+        request_body = {'macAddress': None,
+                        'gcmRegistrationId': self.GCM_REGISTRATION_ID}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body),
+                          headers=self.unmanaged_registration_token_authorization_header)
+        self.assertTrue('Bad response: 400 The macAddress parameter is invalid.'
+                        in context.exception.message)
+
+    def test_device_resource_handler_unmanaged_post_populates_location_header(self):
+        new_mac_address = '1111111111'
+        new_gcm_registration_id = '222222222'
+        request_body = {'macAddress': new_mac_address,
+                        'gcmRegistrationId': new_gcm_registration_id}
+        response = self.app.post('/api/v1/devices', json.dumps(request_body),
+                                 headers=self.unmanaged_registration_token_authorization_header)
+        self.assertIsNotNone(response.headers['Location'])
+
+    def test_device_resource_handler_unmanaged_post_populates_location_header_with_devices_route(self):
+        new_mac_address = '1111111111'
+        new_gcm_registration_id = '222222222'
+        request_body = {'macAddress': new_mac_address,
+                        'gcmRegistrationId': new_gcm_registration_id}
+        response = self.app.post('/api/v1/devices', json.dumps(request_body),
+                                 headers=self.unmanaged_registration_token_authorization_header)
+        location_uri_components = str(response.headers['Location']).split('/')
+        self.assertEqual(location_uri_components[5], "devices")
+
+    def test_device_resource_handler_unmanaged_post_populates_location_header_with_resolvable_resource(self):
+        new_mac_address = '1111111111'
+        new_gcm_registration_id = '222222222'
+        request_body = {'macAddress': new_mac_address,
+                        'gcmRegistrationId': new_gcm_registration_id}
+        response = self.app.post('/api/v1/devices', json.dumps(request_body),
+                                 headers=self.unmanaged_registration_token_authorization_header)
+        uri = response.headers['Location']
+        request_parameters = {}
+        response = self.app.get(uri, params=request_parameters,
+                                headers=self.unmanaged_registration_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertLength(3, response_json)
+        self.assertIsNotNone(response_json['pairingCode'])
+        self.assertEqual(response_json['gcmRegistrationId'], new_gcm_registration_id)
+        self.assertEqual(response_json['macAddress'], new_mac_address)
 
     #################################################################################################################
     # get_device_by_parameter
