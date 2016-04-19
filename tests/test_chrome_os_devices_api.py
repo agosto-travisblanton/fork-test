@@ -44,11 +44,11 @@ class TestChromeOsDevicesApi(BaseTest):
                                             mac_address=self.mac_address)
         self.device_key = self.device.put()
 
-    # def test_list(self):
-    #     devices = self.chrome_os_devices_api.list(self.SKYKIT_COM_CUSTOMER_ID)
-    #     # pprint(devices)
-    #     self.assertIsNotNone(devices)
-    #     self.assertTrue(len(devices) > 0)
+    def test_list(self):
+        devices = self.chrome_os_devices_api.list(self.SKYKIT_COM_CUSTOMER_ID)
+        # pprint(devices)
+        self.assertIsNotNone(devices)
+        self.assertTrue(len(devices) > 0)
 
     def test_get(self):
         device = self.chrome_os_devices_api.get(self.SKYKIT_COM_CUSTOMER_ID, self.TESTING_DEVICE_ID)
@@ -115,10 +115,10 @@ class TestChromeOsDevicesApi(BaseTest):
         else:
             return None
 
-    # def test_refresh_device_by_mac_address(self):
-    #     """ Tests the live connection to Admin SDK Directory API. """
-    #     result = refresh_device_by_mac_address(self.device_key.urlsafe(), self.mac_address)
-    #     self.assertEqual(result.device_id, self.TESTING_DEVICE_ID)
+    def test_refresh_device_by_mac_address(self):
+        """ Tests the live connection to Admin SDK Directory API. """
+        result = refresh_device_by_mac_address(self.device_key.urlsafe(), self.mac_address)
+        self.assertEqual(result.device_id, self.TESTING_DEVICE_ID)
 
     def test_get_impersonation_email_from_device_key(self):
         result = get_impersonation_email_from_device_key(self.device_key.urlsafe())
