@@ -48,6 +48,11 @@ class TestTenantModel(BaseTest):
                                               gcm_registration_id='c098d70a8d78a6dfa6df76dfas7',
                                               mac_address='48d2247f2132')
         self.device_2_key = self.device_2.put()
+        self.device_to_be_archived = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                                                   gcm_registration_id='f090d7348d78b6cfa6df76dfa1b',
+                                                                   mac_address='98d2247f2101')
+        self.device_to_be_archived_key = self.device_to_be_archived.put()
+
 
     def test_create_sets_tenant_entity_group_as_parent(self):
         actual = Tenant.find_by_name(self.NAME)
@@ -142,6 +147,8 @@ class TestTenantModel(BaseTest):
         self.assertIsNone(actual)
 
     def test_find_devices_returns_expected_device_count_for_tenant_key(self):
+        self.device_to_be_archived.archived = True
+        self.device_to_be_archived.put()
         devices = Tenant.find_devices(self.tenant_key, unmanaged=False)
         self.assertLength(2, devices)
 
@@ -187,3 +194,140 @@ class TestTenantModel(BaseTest):
         for device in devices:
             self.assertFalse(device.proof_of_play_logging)
             self.assertTrue(device.proof_of_play_editable)
+
+    def test_match_device_with_full_mac(self):
+        mac_address = '1231233434'
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
+                                               mac_address=mac_address)
+        device.put()
+        is_match = Tenant.match_device_with_full_mac(
+            tenant_keys=[self.tenant_key],
+            unmanaged=False,
+            full_mac=mac_address)
+        self.assertTrue(is_match)
+
+    def test_match_device_with_full_mac_archived(self):
+        mac_address = '1231233434'
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
+                                               mac_address=mac_address)
+        device.archived = True
+        device.put()
+        is_match = Tenant.match_device_with_full_mac(
+            tenant_keys=[self.tenant_key],
+            unmanaged=False,
+            full_mac=mac_address)
+        self.assertFalse(is_match)
+
+    def test_match_device_with_full_serial(self):
+        serial_number = 'SN123-123-3434'
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
+                                               mac_address='123123123')
+        device.serial_number = serial_number
+        device.put()
+        is_match = Tenant.match_device_with_full_serial(
+            tenant_keys=[self.tenant_key],
+            unmanaged=False,
+            full_serial=serial_number)
+        self.assertTrue(is_match)
+
+    def test_match_device_with_full_serial_archived(self):
+        serial_number = 'SN123-123-3434'
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
+                                               mac_address='123123123')
+        device.serial_number = serial_number
+        device.archived = True
+        device.put()
+        is_match = Tenant.match_device_with_full_serial(
+            tenant_keys=[self.tenant_key],
+            unmanaged=False,
+            full_serial=serial_number)
+        self.assertFalse(is_match)
+
+    def test_find_devices_with_partial_serial(self):
+        serial_number = 'SN445-123-3434'
+        partial_serial = 'SN445'
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
+                                               mac_address='123123123')
+        device.serial_number = serial_number
+        device.put()
+        devices = Tenant.find_devices_with_partial_serial(
+            tenant_keys=[self.tenant_key],
+            unmanaged=False,
+            partial_serial=partial_serial)
+        self.assertLength(1, devices)
+
+    def test_find_devices_with_partial_serial_archived(self):
+        serial_number = 'SN445-123-3434'
+        partial_serial = 'SN445'
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
+                                               mac_address='123123123')
+        device.serial_number = serial_number
+        device.archived = True
+        device.put()
+        devices = Tenant.find_devices_with_partial_serial(
+            tenant_keys=[self.tenant_key],
+            unmanaged=False,
+            partial_serial=partial_serial)
+        self.assertLength(0, devices)
+
+    def test_find_devices_with_partial_mac(self):
+        mac_address = '80324771123'
+        partial_mac = '8032'
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
+                                               mac_address=mac_address)
+        device.put()
+        devices = Tenant.find_devices_with_partial_mac(
+            tenant_keys=[self.tenant_key],
+            unmanaged=False,
+            partial_mac=partial_mac)
+        self.assertLength(1, devices)
+
+    def test_find_devices_with_partial_mac_archived(self):
+        mac_address = '80324771123'
+        partial_mac = '8032'
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
+                                               mac_address=mac_address)
+        device.archived = True
+        device.put()
+        devices = Tenant.find_devices_with_partial_mac(
+            tenant_keys=[self.tenant_key],
+            unmanaged=False,
+            partial_mac=partial_mac)
+        self.assertLength(0, devices)
+
+    # TODO: ask Daniel to fix this
+    # def test_find_devices_paginated(self):
+    #     tenant = Tenant.create(tenant_code='foobar_inc',
+    #                            name='Foobar, Inc.',
+    #                            admin_email=self.ADMIN_EMAIL,
+    #                            content_server_url=self.CONTENT_SERVER_URL,
+    #                            content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+    #                            domain_key=self.domain_key,
+    #                            active=True)
+    #     tenant_key = tenant.put()
+    #
+    #     device_1 = ChromeOsDevice.create_managed(tenant_key,
+    #                                              gcm_registration_id='1PA91bHyMJRcN7mj7b0aXGWE7Ae',
+    #                                              mac_address='1')
+    #     device_1.archived = False
+    #     device_1.put()
+    #     device_2 = ChromeOsDevice.create_managed(tenant_key=tenant_key,
+    #                                              gcm_registration_id='2PA91bHyMJRcN7mj7b0aXGWE7Ae',
+    #                                              mac_address='2')
+    #     device_2.archived = False
+    #     device_2.put()
+    #     device_3 = ChromeOsDevice.create_managed(tenant_key=tenant_key,
+    #                                              gcm_registration_id='3PA91bHyMJRcN7mj7b0aXGWE7Ae',
+    #                                              mac_address='3')
+    #     device_3.archived = True
+    #     device_3.put()
+    #     devices = Tenant.find_devices_paginated(tenant_keys=[tenant_key])
+    #     self.assertLength(2, devices)

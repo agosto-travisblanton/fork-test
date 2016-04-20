@@ -18,7 +18,12 @@ describe 'TenantsCtrl', ->
     TenantsService = _TenantsService_
     ProgressBarService = _ProgressBarService_
     sweet = _sweet_
-    controller = $controller 'TenantsCtrl', {$state: $state, TenantsService: TenantsService, ProgressBarService: ProgressBarService, sweet: sweet, }
+    controller = $controller 'TenantsCtrl', {
+      $state: $state,
+      TenantsService: TenantsService,
+      ProgressBarService: ProgressBarService,
+      sweet: sweet,
+    }
 
   describe 'initialization', ->
     it 'tenants should be an empty array', ->
@@ -26,9 +31,24 @@ describe 'TenantsCtrl', ->
 
   describe '.initialize', ->
     tenants = [
-      {key: 'dhjad897d987fadafg708fg7d', name: 'Foobar1', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
-      {key: 'dhjad897d987fadafg708y67d', name: 'Foobar2', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
-      {key: 'dhjad897d987fadafg708hb55', name: 'Foobar3', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
+      {
+        key: 'dhjad897d987fadafg708fg7d',
+        name: 'Foobar1',
+        created: '2015-05-10 22:15:10',
+        updated: '2015-05-10 22:15:10'
+      }
+      {
+        key: 'dhjad897d987fadafg708y67d',
+        name: 'Foobar2',
+        created: '2015-05-10 22:15:10',
+        updated: '2015-05-10 22:15:10'
+      }
+      {
+        key: 'dhjad897d987fadafg708hb55',
+        name: 'Foobar3',
+        created: '2015-05-10 22:15:10',
+        updated: '2015-05-10 22:15:10'
+      }
     ]
 
     beforeEach ->

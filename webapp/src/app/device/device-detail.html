@@ -270,6 +270,26 @@
                                     </div>
                                 </md-card-content>
                             </md-card>
+                          <md-card>
+                            <md-card-content>
+                              <h2>Delete</h2>
+                              <hr/>
+                              <div class="form-group">
+                                <label>Device key</label>
+                                <div>
+                                  {{deviceDetailsCtrl.currentDevice.key}}
+                                </div>
+                                <md-card-actions layout="row" layout-align="end center">
+                                  <button class="md-raised md-primary md-button md-ink-ripple" type="button"
+                                          aria-label="Delete" layout-align="right" ng-click="deviceDetailsCtrl.confirmDeviceDelete(
+                              $event, deviceDetailsCtrl.currentDevice.key)">
+                                    <i class="fa fa-fw fa-trash ng-scope"></i><span class="ng-scope">
+                        Delete
+                      </span></button>
+                                </md-card-actions>
+                              </div>
+                            </md-card-content>
+                          </md-card>
                         </div>
                         <div flex="50" flex-sm="50" flex-xs="50" layout="column">
                             <md-card>

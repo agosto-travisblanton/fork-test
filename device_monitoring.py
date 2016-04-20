@@ -1,6 +1,7 @@
 import logging
 
 from datetime import datetime
+from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
 from app_config import config
@@ -11,7 +12,7 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 def device_heartbeat_sweep():
-    query = ChromeOsDevice.query(ChromeOsDevice.up == True)
+    query = ChromeOsDevice.query(ndb.AND(ChromeOsDevice.archived == False, ChromeOsDevice.up == True))
     devices, cursor, more = query.fetch_page(page_size=config.DEVICE_SWEEP_PAGING_SIZE)
     current_time = datetime.utcnow()
     deferred.defer(sweep_devices_for_responsiveness, devices=devices, current_time=current_time, _queue='device-monitor', _countdown=5)
@@ -23,7 +24,7 @@ def device_heartbeat_sweep():
 
 
 def device_threshold_sweep():
-    query = ChromeOsDevice.query(ChromeOsDevice.up == True)
+    query = ChromeOsDevice.query(ndb.AND(ChromeOsDevice.archived == False, ChromeOsDevice.up == True))
     devices, cursor, more = query.fetch_page(page_size=config.DEVICE_SWEEP_PAGING_SIZE)
     current_time = datetime.utcnow()
     deferred.defer(sweep_devices_for_exceeding_thresholds, devices=devices, current_time=current_time, _queue='device-monitor', _countdown=5)

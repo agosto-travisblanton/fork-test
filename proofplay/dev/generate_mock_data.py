@@ -2,7 +2,6 @@ import requests
 import json
 import datetime
 import random
-import uuid
 from app_config import config
 
 analytics = {}

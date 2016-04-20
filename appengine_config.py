@@ -410,9 +410,12 @@ def _SQLALCHEMY_DATABASE_URI():
         db_uri = 'sqlite:///:memory:'
     elif on_development_server:
         db_uri = 'mysql+mysqldb://root@127.0.0.1/provisioning'
+        return db_uri
     else:
         if on_integration_server:
-            instance_name = 'provisioning-int-v2'
+            db_uri = "mysql+mysqldb://root:MPclyl0VK5lu@104.154.74.153:3306/provisioning?unix_socket=/cloudsql/{}:{}".format(
+                appid, "skykit-display-device-int:us-central1:provisioning-int-2")
+            return db_uri
         elif on_stage_server:
             instance_name = 'provisioning-stage'
         elif on_gamestop_server:
@@ -453,8 +456,8 @@ proofplay_DAYS_TO_KEEP_RAW_EVENTS = 30
 ##############################################################################
 # VERSION  sprint_number.deployment_increment.hotfix_increment e.g., 33.3.0
 ##############################################################################
-app_SPRINT_NUMBER = 33
+app_SPRINT_NUMBER = 34
 
-app_DEPLOYMENT_COUNTER = 7
+app_DEPLOYMENT_COUNTER = 2
 
 app_PRODUCTION_HOTFIX_COUNTER = 0

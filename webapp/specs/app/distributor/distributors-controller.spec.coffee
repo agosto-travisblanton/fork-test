@@ -13,10 +13,10 @@ describe 'DistributorsCtrl', ->
   beforeEach inject (_$controller_, _$state_) ->
     $controller = _$controller_
     $state = _$state_
-#    DistributorsService = _DistributorsService_
+    #    DistributorsService = _DistributorsService_
     controller = $controller 'DistributorsCtrl', {
       $state: $state
-      #DistributorsService: DistributorsService
+#DistributorsService: DistributorsService
     }
 
   describe 'initialization', ->
