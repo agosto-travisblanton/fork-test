@@ -55,7 +55,6 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @locations = []
   @commandEvents = []
   @dayRange = 30
-  @editMode = !!$stateParams.deviceKey
   @issues = []
   @pickerOptions = "{widgetPositioning: {vertical:'bottom'}, showTodayButton: true, sideBySide: true, icons:{
       next:'glyphicon glyphicon-arrow-right',
@@ -64,6 +63,13 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       down:'glyphicon glyphicon-arrow-down'}}"
   @timezones = []
   @selectedTimezone = undefined
+  @epochStart = moment(new Date(@startTime)).unix()
+  @epochEnd = moment(new Date(@endTime)).unix()
+  now = new Date()
+  today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  @endTime = now.toLocaleString().replace(/,/g, "")
+  today.setDate(now.getDate() - @dayRange)
+  @startTime = today.toLocaleString().replace(/,/g, "")
 
   @getIssues = (device, epochStart, epochEnd, prev, next) =>
     ProgressBarService.start()
@@ -87,25 +93,18 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       @timezones = data
     @panelModels = DevicesService.getPanelModels()
     @panelInputs = DevicesService.getPanelInputs()
-    if @editMode
-      devicePromise = DevicesService.getDeviceByKey @deviceKey
-      devicePromise.then ((response) =>
-        @onGetDeviceSuccess(response)
-        return
-      ), (response) =>
-        @onGetDeviceFailure(response)
-        return
-      commandEventsPromise = DevicesService.getCommandEventsByKey @deviceKey
-      commandEventsPromise.then (data) =>
-        @commandEvents = data
-      now = new Date()
-      today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-      @endTime = now.toLocaleString().replace(/,/g, "")
-      today.setDate(now.getDate() - @dayRange)
-      @startTime = today.toLocaleString().replace(/,/g, "")
-      @epochStart = moment(new Date(@startTime)).unix()
-      @epochEnd = moment(new Date(@endTime)).unix()
-      @getIssues(@deviceKey, @epochStart, @epochEnd)
+    devicePromise = DevicesService.getDeviceByKey @deviceKey
+    devicePromise.then ((response) =>
+      @onGetDeviceSuccess(response)
+      return
+    ), (response) =>
+      @onGetDeviceFailure(response)
+      return
+    commandEventsPromise = DevicesService.getCommandEventsByKey @deviceKey
+    commandEventsPromise.then (data) =>
+      @commandEvents = data
+
+    @getIssues(@deviceKey, @epochStart, @epochEnd)
 
   @onGetDeviceSuccess = (response) ->
     @currentDevice = response
@@ -227,10 +226,9 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   #####################
 
   @onClickResetSendButton = () ->
-    if @editMode
-      ProgressBarService.start()
-      promise = CommandsService.reset @deviceKey
-      promise.then @onResetSuccess, @onResetFailure
+    ProgressBarService.start()
+    promise = CommandsService.reset @deviceKey
+    promise.then @onResetSuccess, @onResetFailure
 
   @onResetSuccess = () ->
     ProgressBarService.complete()
@@ -242,10 +240,9 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     sweet.show('Oops...', "We were unable to post your reset command into the player's queue.", 'error')
 
   @onClickContentDeleteSendButton = () ->
-    if @editMode
-      ProgressBarService.start()
-      promise = CommandsService.contentDelete @deviceKey
-      promise.then @onContentDeleteSuccess, @onContentDeleteFailure
+    ProgressBarService.start()
+    promise = CommandsService.contentDelete @deviceKey
+    promise.then @onContentDeleteSuccess, @onContentDeleteFailure
 
   @onContentDeleteSuccess = () ->
     ProgressBarService.complete()
@@ -257,10 +254,9 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     sweet.show('Oops...', "We were unable to post your delete content command into the player's queue.", 'error')
 
   @onClickVolumeSendButton = () ->
-    if @editMode
-      ProgressBarService.start()
-      promise = CommandsService.volume @deviceKey, @currentDevice.volume
-      promise.then @onVolumeSuccess(@currentDevice.volume), @onVolumeFailure
+    ProgressBarService.start()
+    promise = CommandsService.volume @deviceKey, @currentDevice.volume
+    promise.then @onVolumeSuccess(@currentDevice.volume), @onVolumeFailure
 
   @onVolumeSuccess = (level) ->
     ProgressBarService.complete()
@@ -272,10 +268,9 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     sweet.show('Oops...', "We were unable to post your volume level command into the player's queue.", 'error')
 
   @onClickCommandSendButton = () ->
-    if @editMode
-      ProgressBarService.start()
-      promise = CommandsService.custom @deviceKey, @currentDevice.custom
-      promise.then @onCommandSuccess(@currentDevice.custom), @onCommandFailure
+    ProgressBarService.start()
+    promise = CommandsService.custom @deviceKey, @currentDevice.custom
+    promise.then @onCommandSuccess(@currentDevice.custom), @onCommandFailure
 
   @onCommandSuccess = (command) ->
     ProgressBarService.complete()
@@ -310,10 +305,9 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     $log.error "Failure to refresh device issues: #{error.status } #{error.statusText}"
 
   @onClickPowerOnSendButton = () ->
-    if @editMode
-      ProgressBarService.start()
-      promise = CommandsService.powerOn @deviceKey
-      promise.then @onPowerOnSuccess, @onPowerOnFailure
+    ProgressBarService.start()
+    promise = CommandsService.powerOn @deviceKey
+    promise.then @onPowerOnSuccess, @onPowerOnFailure
 
   @onPowerOnSuccess = () ->
     ProgressBarService.complete()
@@ -325,10 +319,9 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     sweet.show('Oops...', "We were unable to post your power on command into the player's queue.", 'error')
 
   @onClickPowerOffSendButton = () ->
-    if @editMode
-      ProgressBarService.start()
-      promise = CommandsService.powerOff @deviceKey
-      promise.then @onPowerOffSuccess, @onPowerOffFailure
+    ProgressBarService.start()
+    promise = CommandsService.powerOff @deviceKey
+    promise.then @onPowerOffSuccess, @onPowerOffFailure
 
   @onPowerOffSuccess = () ->
     ProgressBarService.complete()

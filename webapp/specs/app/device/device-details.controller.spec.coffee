@@ -20,7 +20,7 @@ describe 'DeviceDetailsCtrl', ->
   progressBarService = undefined
   serviceInjection = undefined
   cookieMock = undefined
-  
+
   device = {key: 'dhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
   issues = {
     issues: [
@@ -101,11 +101,14 @@ describe 'DeviceDetailsCtrl', ->
       getDevicePromise = new skykitProvisioning.q.Mock
       timezonesPromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getDeviceByKey').and.returnValue getDevicePromise
+      spyOn(progressBarService, 'start')
+      spyOn(progressBarService, 'complete')
       getPlayerCommandEventsPromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getCommandEventsByKey').and.returnValue getPlayerCommandEventsPromise
       getDeviceIssuesPromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getIssuesByKey').and.returnValue getDeviceIssuesPromise
       spyOn(DevicesService, 'getPanelModels').and.returnValue [{'id': 'Sony–FXD40LX2F'}, {'id': 'NEC–LCD4215'}]
+
       inputs = [
         {
           'id': 'HDMI2'
@@ -120,15 +123,18 @@ describe 'DeviceDetailsCtrl', ->
           'parentId': 'NEC–LCD4215'
         }
       ]
+
       spyOn(DevicesService, 'getPanelInputs').and.returnValue inputs
       spyOn(TimezonesService, 'getUsTimezones').and.returnValue timezonesPromise
 
     describe 'new mode', ->
       beforeEach ->
+
         controller = $controller 'DeviceDetailsCtrl', {
           $stateParams: $stateParams
           $state: $state
           DevicesService: DevicesService
+          ProgressBarService: progressBarService
           TimezonesService: TimezonesService
           LocationsService: LocationsService
         }
@@ -162,15 +168,18 @@ describe 'DeviceDetailsCtrl', ->
         controller = $controller 'DeviceDetailsCtrl', {
           $stateParams: $stateParams
           $state: $state
+          ProgressBarService: progressBarService
           DevicesService: DevicesService
           TimezonesService: TimezonesService
           LocationsService: LocationsService
         }
         now = new Date()
         today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-        @epochEnd = moment(new Date()).unix()
         today.setDate(today.getDate() - 30)
+        @epochEnd = moment(new Date()).unix()
         @epochStart = moment(today).unix()
+        controller.epochEnd = @epochEnd
+        controller.epochStart = @epochStart
         controller.initialize()
 
       it 'should call TimezonesService.getTimezones', ->

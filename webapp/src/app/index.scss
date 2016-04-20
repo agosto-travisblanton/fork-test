@@ -456,6 +456,41 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
   text-align: center;
 }
 
+.proof-of-play-tenant-name {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis // This is where the magic happens
+}
+
+
+.proof-of-play-tenant-name-option-v2 {
+  width: auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: center;
+  positition: relative !important;
+  text-overflow: ellipsis // This is where the magic happens
+  //p {
+  //  font-size: .01em;
+  //}
+
+}
+
+.proof-of-play-tenant-name-option {
+  width: 6em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: center;
+  positition: absolute;
+  text-overflow: ellipsis // This is where the magic happens
+  //p {
+  //  font-size: .01em;
+  //}
+
+}
+
 //.distributor-selection {
 //  font-size: 20pt;
 //  border: solid 1px #c9c9c9;

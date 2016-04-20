@@ -178,7 +178,7 @@
                                 <md-card>
                                     <md-card-content>
                                         <div class="center-block">
-                                            <h4>{{vm.currentTenant}}</h4>
+                                            <h4 class="proof-of-play-tenant-name">{{vm.currentTenant}}</h4>
                                             <hr/>
                                             <div>
                                                 <div ng-hide="vm.tenants">
@@ -194,7 +194,7 @@
                                                         <label class="center-block">Tenant</label>
                                                         <md-select ng-model="vm.which_tenant">
                                                             <md-option ng-repeat="tenant in vm.tenants"
-                                                                       value="{{tenant}}">
+                                                                       value="{{tenant}}" class="proof-of-play-tenant-name">
                                                                 {{tenant}}
                                                             </md-option>
                                                         </md-select>
@@ -365,7 +365,7 @@
                                 <md-card>
                                     <md-card-content>
                                         <div class="center-block">
-                                            <h4>{{vm.currentTenant}}</h4>
+                                            <h4 class="proof-of-play-tenant-name">{{vm.currentTenant}}</h4>
                                             <hr/>
                                             <div>
                                                 <div ng-hide="vm.tenants">
@@ -381,7 +381,7 @@
                                                         <label class="center-block">Tenant</label>
                                                         <md-select ng-model="vm.which_tenant">
                                                             <md-option ng-repeat="tenant in vm.tenants"
-                                                                       value="{{tenant}}">
+                                                                       value="{{tenant}}" class="proof-of-play-tenant-name">
                                                                 {{tenant}}
                                                             </md-option>
                                                         </md-select>
@@ -550,7 +550,7 @@
                                 <md-card>
                                     <md-card-content>
                                         <div class="center-block">
-                                            <h4>{{vm.currentTenant}}</h4>
+                                            <h4 class="proof-of-play-tenant-name">{{vm.currentTenant}}</h4>
                                             <hr/>
                                             <div>
                                                 <div ng-hide="vm.tenants">
@@ -567,7 +567,9 @@
                                                         <md-select ng-model="vm.which_tenant">
                                                             <md-option ng-repeat="tenant in vm.tenants"
                                                                        value="{{tenant}}">
-                                                                {{tenant}}
+                                                                <p class="proof-of-play-tenant-name-option">
+                                                                {{tenant}}asdfasdfasdfasdfasdf
+                                                                </p>
                                                             </md-option>
                                                         </md-select>
                                                     </md-input-container>
