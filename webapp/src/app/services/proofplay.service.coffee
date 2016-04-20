@@ -12,7 +12,7 @@ angular.module('skykitProvisioning')
 
     setTenant: (tenant) ->
       @chosenTenant = tenant
-      
+
     getTenant: () ->
       return @chosenTenant
 
@@ -24,40 +24,78 @@ angular.module('skykitProvisioning')
         return (resource.indexOf(query) == 0)
 
 
+    makeHTTPRequest: (where_to_go, distributorKey) =>
+      distributorKey = $cookies.get('currentDistributorKey')
+
+      $http.get(@uriBase + where_to_go + @chosenTenant,
+        headers: {
+          'X-Provisioning-Distributor': distributorKey
+        }
+      )
+
+
+
     getAllResources: () ->
       deferred = $q.defer()
       if @cachedResources
-        deferred.
-        resolve(@cachedResources)
+        deferred.resolve(@cachedResources)
       else
-        distributorKey = $cookies.get('currentDistributorKey')
-        $http.get(@uriBase + '/retrieve_all_resources/' + @chosenTenant,
-          headers: {
-            'X-Provisioning-Distributor': distributorKey
-          }
-        )
-        .then (data) =>
+        r = @makeHTTPRequest("/retrieve_all_resources/")
+        r.then (data) =>
           @cachedResource = data
           deferred.resolve(data)
+
+        r.catch () =>
+          success = false
+          while not success
+            success = true # pending so don't make a bunch of http calls
+            r = @makeHTTPRequest("/retrieve_all_resources/")
+            r.then (data) =>
+              deferred.resolve(data)
+            r.catch () =>
+              success = false
+
 
       deferred.promise
 
 
     getAllDisplays: () ->
-      distributorKey = $cookies.get('currentDistributorKey')
-      $http.get(@uriBase + '/retrieve_all_displays/' + @chosenTenant,
-        headers: {
-          'X-Provisioning-Distributor': distributorKey
-        }
-      )
+      deferred = $q.defer()
+      r = @makeHTTPRequest("/retrieve_all_displays/")
+      r.then (data) =>
+        deferred.resolve(data)
+
+      r.catch () =>
+        success = false
+        while not success
+          success = true # pending so don't make a bunch of http calls
+          r = @makeHTTPRequest("/retrieve_all_displays/")
+          r.then (data) =>
+            deferred.resolve(data)
+          r.catch () =>
+            success = false
+
+      deferred.promise
+
 
     getAllLocations: () ->
-      distributorKey = $cookies.get('currentDistributorKey')
-      $http.get(@uriBase + '/retrieve_all_locations/' + @chosenTenant,
-        headers: {
-          'X-Provisioning-Distributor': distributorKey
-        }
-      )
+      deferred = $q.defer()
+      r = @makeHTTPRequest("/retrieve_all_locations/")
+      r.then (data) =>
+        deferred.resolve(data)
+
+      r.catch () =>
+        success = false
+        while not success
+          success = true # pending so don't make a bunch of http calls
+          r = @makeHTTPRequest("/retrieve_all_locations/")
+          r.then (data) =>
+            deferred.resolve(data)
+          r.catch () =>
+            success = false
+
+
+      deferred.promise
 
 
     getAllTenants: () ->

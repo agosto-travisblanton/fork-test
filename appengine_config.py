@@ -1,3 +1,4 @@
+# appengine_config.py
 """
 The configuration file used by :py:mod:`agar.config` implementations and other libraries using the
 `google.appengine.api.lib_config`_ configuration library. Configuration overrides go in this file.
@@ -413,7 +414,7 @@ def _SQLALCHEMY_DATABASE_URI():
         return db_uri
     else:
         if on_integration_server:
-            instance_name = "provisioning-int-v2"
+            instance_name = 'provisioning-int-v2'
         elif on_stage_server:
             instance_name = 'provisioning-stage'
         elif on_gamestop_server:
@@ -454,8 +455,8 @@ proofplay_DAYS_TO_KEEP_RAW_EVENTS = 30
 ##############################################################################
 # VERSION  sprint_number.deployment_increment.hotfix_increment e.g., 33.3.0
 ##############################################################################
-app_SPRINT_NUMBER = 33
+app_SPRINT_NUMBER = 34
 
-app_DEPLOYMENT_COUNTER = 7
+app_DEPLOYMENT_COUNTER = 2
 
 app_PRODUCTION_HOTFIX_COUNTER = 2
