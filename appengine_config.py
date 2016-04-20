@@ -456,6 +456,6 @@ proofplay_DAYS_TO_KEEP_RAW_EVENTS = 30
 ##############################################################################
 app_SPRINT_NUMBER = 34
 
-app_DEPLOYMENT_COUNTER = 3
+app_DEPLOYMENT_COUNTER = 4
 
 app_PRODUCTION_HOTFIX_COUNTER = 0
