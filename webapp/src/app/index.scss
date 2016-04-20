@@ -465,29 +465,13 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
 }
 
 
-.proof-of-play-tenant-name-option-v2 {
-  width: auto;
-  white-space: nowrap;
-  overflow: hidden;
-  text-align: center;
-  positition: relative !important;
-  text-overflow: ellipsis // This is where the magic happens
-  //p {
-  //  font-size: .01em;
-  //}
-
-}
-
 .proof-of-play-tenant-name-option {
-  width: 6em;
+  width: 7em;
   white-space: nowrap;
   overflow: hidden;
   text-align: center;
   positition: absolute;
   text-overflow: ellipsis // This is where the magic happens
-  //p {
-  //  font-size: .01em;
-  //}
 
 }
 
