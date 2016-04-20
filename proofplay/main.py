@@ -87,8 +87,6 @@ class RetrieveAllDevicesOfTenant(RequestHandler):
     @has_tenant_in_distributor_header
     def get(self, tenant):
         devices = retrieve_all_devices_of_tenant(tenant)
-        if not devices:
-            return self.abort(400)
         final = json.dumps({"devices": devices})
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(final)
@@ -98,8 +96,6 @@ class RetrieveAllResourcesOfTenant(RequestHandler):
     @has_tenant_in_distributor_header
     def get(self, tenant):
         resources = retrieve_all_resources_of_tenant(tenant)
-        if not resources:
-            return self.abort(400)
         final = json.dumps({"resources": resources})
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(final)
@@ -109,8 +105,6 @@ class RetrieveAllLocationsOfTenant(RequestHandler):
     @has_tenant_in_distributor_header
     def get(self, tenant):
         locations = retrieve_all_locations_of_tenant(tenant)
-        if not locations:
-            return self.abort(400)
         final = json.dumps({"locations": locations})
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(final)
