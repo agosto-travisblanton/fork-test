@@ -153,7 +153,7 @@ def insert_new_program_record(location_id, device_id, resource_id, started_at, e
     session.add(new_program_record)
     session.commit()
     session.close()
-    return True
+
 
 
 def insert_new_resource_or_get_existing(resource_name, resource_identifier, tenant_code, retries=0):

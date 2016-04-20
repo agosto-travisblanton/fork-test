@@ -526,16 +526,10 @@ def handle_posting_a_new_program_play(incoming_data):
                     tenant_code
                 )
 
-                successful_insert = insert_new_program_record(
+                insert_new_program_record(
                     location_id, device_id, resource_id, started_at, ended_at)
 
-                if not successful_insert:
-                    deferred.defer(handle_posting_a_new_program_play,
-                                   incoming_data,
-                                   _queue="proof-of-play")
-                else:
-
-                    mark_raw_event_complete(raw_event_id)
+                mark_raw_event_complete(raw_event_id)
 
         except KeyError:
             logging.warn("ERROR: KEYERROR IN POSTING A NEW PROGRAM PLAY. THE RECORD WILL NOT BE STORED. ")
