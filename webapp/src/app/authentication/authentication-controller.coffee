@@ -3,12 +3,10 @@
 app = angular.module 'skykitProvisioning'
 
 app.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
-                                            identity,
-                                            sweet,
-                                            SessionsService,
-                                            ProgressBarService) ->
-
-
+    identity,
+    sweet,
+    SessionsService,
+    ProgressBarService) ->
   @onGooglePlusSignInSuccess = (event, authResult) =>
     unless @googlePlusSignInButtonClicked
       ProgressBarService.start()

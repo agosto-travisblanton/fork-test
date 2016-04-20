@@ -28,12 +28,12 @@ describe 'AuthenticationCtrl', ->
   )
 
   beforeEach inject (_$controller_,
-                     _$state_,
-                     _$rootScope_,
-                     _$log_,
-                     _sweet_,
-                     _SessionsService_,
-                     _ProgressBarService_) ->
+    _$state_,
+    _$rootScope_,
+    _$log_,
+    _sweet_,
+    _SessionsService_,
+    _ProgressBarService_) ->
     $controller = _$controller_
     $state = _$state_
     $rootScope = _$rootScope_
