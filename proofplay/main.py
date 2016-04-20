@@ -1,3 +1,4 @@
+# main.py
 from webapp2 import RequestHandler
 from database_calls import *
 from data_processing import *
@@ -230,7 +231,8 @@ class MultiResourceByDate(RequestHandler):
             pre_formatted_program_record_by_date
         )
 
-        resource_identifiers_to_resource_names = [retrieve_resource_name_from_resource_identifier(resource_identifier) for
+        resource_identifiers_to_resource_names = [retrieve_resource_name_from_resource_identifier(resource_identifier)
+                                                  for
                                                   resource_identifier in
                                                   all_the_resource_identifiers_final]
 
