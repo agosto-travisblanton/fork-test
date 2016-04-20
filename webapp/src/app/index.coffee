@@ -15,4 +15,5 @@ app = angular.module 'skykitProvisioning', [
   'datetimepicker'
   'ngMaterial'
   'ngclipboard'
+  'toastr'
 ]

@@ -1,4 +1,3 @@
-# appengine_config.py
 """
 The configuration file used by :py:mod:`agar.config` implementations and other libraries using the
 `google.appengine.api.lib_config`_ configuration library. Configuration overrides go in this file.
