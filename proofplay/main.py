@@ -1,3 +1,4 @@
+# main.py
 from webapp2 import RequestHandler
 from database_calls import *
 from data_processing import *
@@ -86,6 +87,8 @@ class RetrieveAllDevicesOfTenant(RequestHandler):
     @has_tenant_in_distributor_header
     def get(self, tenant):
         devices = retrieve_all_devices_of_tenant(tenant)
+        if not devices:
+            return self.abort(400)
         final = json.dumps({"devices": devices})
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(final)
@@ -95,6 +98,8 @@ class RetrieveAllResourcesOfTenant(RequestHandler):
     @has_tenant_in_distributor_header
     def get(self, tenant):
         resources = retrieve_all_resources_of_tenant(tenant)
+        if not resources:
+            return self.abort(400)
         final = json.dumps({"resources": resources})
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(final)
@@ -104,6 +109,8 @@ class RetrieveAllLocationsOfTenant(RequestHandler):
     @has_tenant_in_distributor_header
     def get(self, tenant):
         locations = retrieve_all_locations_of_tenant(tenant)
+        if not locations:
+            return self.abort(400)
         final = json.dumps({"locations": locations})
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(final)
@@ -230,7 +237,8 @@ class MultiResourceByDate(RequestHandler):
             pre_formatted_program_record_by_date
         )
 
-        resource_identifiers_to_resource_names = [retrieve_resource_name_from_resource_identifier(resource_identifier) for
+        resource_identifiers_to_resource_names = [retrieve_resource_name_from_resource_identifier(resource_identifier)
+                                                  for
                                                   resource_identifier in
                                                   all_the_resource_identifiers_final]
 
