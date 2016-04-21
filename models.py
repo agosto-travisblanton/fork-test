@@ -480,11 +480,12 @@ class ChromeOsDevice(ndb.Model):
 
     @classmethod
     def create_managed(cls, tenant_key, gcm_registration_id, mac_address, ethernet_mac_address=None, device_id=None,
-                       serial_number=None,
+                       serial_number=None, archived=False,
                        model=None, timezone='America/Chicago'):
         timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
         device = cls(
             device_id=device_id,
+            archived=archived,
             tenant_key=tenant_key,
             gcm_registration_id=gcm_registration_id,
             mac_address=mac_address,
