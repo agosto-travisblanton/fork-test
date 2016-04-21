@@ -303,31 +303,30 @@ class TestTenantModel(BaseTest):
             partial_mac=partial_mac)
         self.assertLength(0, devices)
 
-    # TODO: ask Daniel to fix this
-    # def test_find_devices_paginated(self):
-    #     tenant = Tenant.create(tenant_code='foobar_inc',
-    #                            name='Foobar, Inc.',
-    #                            admin_email=self.ADMIN_EMAIL,
-    #                            content_server_url=self.CONTENT_SERVER_URL,
-    #                            content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
-    #                            domain_key=self.domain_key,
-    #                            active=True)
-    #     tenant_key = tenant.put()
-    #
-    #     device_1 = ChromeOsDevice.create_managed(tenant_key,
-    #                                              gcm_registration_id='1PA91bHyMJRcN7mj7b0aXGWE7Ae',
-    #                                              mac_address='1')
-    #     device_1.archived = False
-    #     device_1.put()
-    #     device_2 = ChromeOsDevice.create_managed(tenant_key=tenant_key,
-    #                                              gcm_registration_id='2PA91bHyMJRcN7mj7b0aXGWE7Ae',
-    #                                              mac_address='2')
-    #     device_2.archived = False
-    #     device_2.put()
-    #     device_3 = ChromeOsDevice.create_managed(tenant_key=tenant_key,
-    #                                              gcm_registration_id='3PA91bHyMJRcN7mj7b0aXGWE7Ae',
-    #                                              mac_address='3')
-    #     device_3.archived = True
-    #     device_3.put()
-    #     devices = Tenant.find_devices_paginated(tenant_keys=[tenant_key])
-    #     self.assertLength(2, devices)
+    def test_find_devices_paginated(self):
+        tenant = Tenant.create(tenant_code='foobar_inc',
+                               name='Foobar, Inc.',
+                               admin_email=self.ADMIN_EMAIL,
+                               content_server_url=self.CONTENT_SERVER_URL,
+                               content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                               domain_key=self.domain_key,
+                               active=True)
+        tenant_key = tenant.put()
+
+        device_1 = ChromeOsDevice.create_managed(tenant_key,
+                                                 gcm_registration_id='1PA91bHyMJRcN7mj7b0aXGWE7Ae',
+                                                 mac_address='1')
+        device_1.archived = False
+        device_1.put()
+        device_2 = ChromeOsDevice.create_managed(tenant_key=tenant_key,
+                                                 gcm_registration_id='2PA91bHyMJRcN7mj7b0aXGWE7Ae',
+                                                 mac_address='2')
+        device_2.archived = False
+        device_2.put()
+        device_3 = ChromeOsDevice.create_managed(tenant_key=tenant_key,
+                                                 gcm_registration_id='3PA91bHyMJRcN7mj7b0aXGWE7Ae',
+                                                 mac_address='3')
+        device_3.archived = True
+        device_3.put()
+        devices = Tenant.find_devices_paginated(tenant_keys=[tenant_key])
+        self.assertLength(2, devices["objects"])

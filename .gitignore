@@ -8,3 +8,4 @@ functional_tests/.screenshots/*.png
 venv
 venv2
 coverage_html_report
+.coverage

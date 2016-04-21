@@ -454,8 +454,8 @@ proofplay_DAYS_TO_KEEP_RAW_EVENTS = 30
 ##############################################################################
 # VERSION  sprint_number.deployment_increment.hotfix_increment e.g., 33.3.0
 ##############################################################################
-app_SPRINT_NUMBER = 33
+app_SPRINT_NUMBER = 34
 
-app_DEPLOYMENT_COUNTER = 7
+app_DEPLOYMENT_COUNTER = 4
 
-app_PRODUCTION_HOTFIX_COUNTER = 3
+app_PRODUCTION_HOTFIX_COUNTER = 0
