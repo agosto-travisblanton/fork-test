@@ -303,7 +303,6 @@ class TestTenantModel(BaseTest):
             partial_mac=partial_mac)
         self.assertLength(0, devices)
 
-    # TODO: ask Daniel to fix this
     def test_find_devices_paginated(self):
         tenant = Tenant.create(tenant_code='foobar_inc',
                                name='Foobar, Inc.',
