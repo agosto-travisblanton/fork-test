@@ -285,7 +285,8 @@ class Tenant(ndb.Model):
 
         if not prev_cursor_str and not next_cursor_str:
             objects, next_cursor, more = ChromeOsDevice.query(
-                ndb.AND(ChromeOsDevice.archived == False,
+                ndb.OR(ChromeOsDevice.archived == None, ChromeOsDevice.archived == False),
+                ndb.AND(
                         ChromeOsDevice.tenant_key.IN(tenant_keys),
                         ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(
                 page_size=fetch_size)
@@ -296,7 +297,8 @@ class Tenant(ndb.Model):
         elif next_cursor_str:
             cursor = Cursor(urlsafe=next_cursor_str)
             objects, next_cursor, more = ChromeOsDevice.query(
-                ndb.AND(ChromeOsDevice.archived == False,
+                ndb.OR(ChromeOsDevice.archived == None, ChromeOsDevice.archived == False),
+                ndb.AND(
                         ChromeOsDevice.tenant_key.IN(tenant_keys),
                         ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(
                 page_size=fetch_size,
@@ -309,7 +311,8 @@ class Tenant(ndb.Model):
         elif prev_cursor_str:
             cursor = Cursor(urlsafe=prev_cursor_str)
             objects, prev, more = ChromeOsDevice.query(
-                ndb.AND(ChromeOsDevice.archived == False,
+                ndb.OR(ChromeOsDevice.archived == None, ChromeOsDevice.archived == False),
+                ndb.AND(
                         ChromeOsDevice.tenant_key.IN(tenant_keys),
                         ChromeOsDevice.is_unmanaged_device == unmanaged)).order(-ChromeOsDevice.key).fetch_page(
                 page_size=fetch_size,
