@@ -7,7 +7,8 @@ from google.appengine.ext.deferred import deferred
 from webapp2 import RequestHandler
 
 from app_config import config
-from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address, update_chrome_os_device)
+from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address, register_device,
+                                   update_chrome_os_device)
 from content_manager_api import ContentManagerApi
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from device_message_processor import post_unmanaged_device_info, change_intent
@@ -423,15 +424,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                            mac_address=device_mac_address,
                                                            timezone=timezone)
                     key = device.put()
-                    deferred.defer(refresh_device_by_mac_address,
+                    deferred.defer(register_device,
                                    device_urlsafe_key=key.urlsafe(),
                                    device_mac_address=device_mac_address,
                                    _queue='directory-api',
-                                   _countdown=30)
-                    deferred.defer(ContentManagerApi().create_device,
-                                   device_urlsafe_key=key.urlsafe(),
-                                   _queue='content-server',
-                                   _countdown=5)
+                                   _countdown=3)
                     device_uri = self.request.app.router.build(None,
                                                                'device',
                                                                None,
