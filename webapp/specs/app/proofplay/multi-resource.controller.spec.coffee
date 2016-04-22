@@ -4,15 +4,26 @@ describe 'ProofOfPlayMultiResourceCtrl', ->
   $controller = undefined
   controller = undefined
   ProofPlayService = undefined
+  $stateParams = undefined
+  $state = undefined
+  ToastsService = undefined
   promise = undefined
   selected_tenant = undefined
 
   beforeEach module('skykitProvisioning')
-
-  beforeEach inject (_$controller_, _ProofPlayService_) ->
+  
+  beforeEach inject (_$controller_, _ProofPlayService_, _ToastsService_, _$state_) ->
     $controller = _$controller_
     ProofPlayService = _ProofPlayService_
-    controller = $controller 'ProofOfPlayMultiResourceCtrl', {ProofPlayService: ProofPlayService}
+    ToastsService = _ToastsService_
+    $stateParams = {}
+    $state = _$state_
+    controller = $controller 'ProofOfPlayMultiResourceCtrl', {
+      ProofPlayService: ProofPlayService,
+      ToastsService: ToastsService,
+      $stateParams: $stateParams,
+      $state: $state
+    }
 
   describe 'initialization', ->
     it 'radioButtonChoices should equal', ->
@@ -56,6 +67,7 @@ describe 'ProofOfPlayMultiResourceCtrl', ->
     beforeEach ->
       promise = new skykitProvisioning.q.Mock
       querySearch = () ->
+      spyOn($state, 'go')
       spyOn(ProofPlayService, 'getAllResources').and.returnValue promise
       spyOn(ProofPlayService, 'querySearch').and.returnValue querySearch
       spyOn(ProofPlayService, 'downloadCSVForMultipleResourcesByDate').and.returnValue true
@@ -166,8 +178,6 @@ describe 'ProofOfPlayMultiResourceCtrl', ->
       promise = new skykitProvisioning.q.Mock
       spyOn(ProofPlayService, 'getAllResources').and.returnValue promise
       spyOn(ProofPlayService, 'getAllTenants').and.returnValue promise
-      spyOn(ProofPlayService, 'getTenant').and.returnValue selected_tenant
-      spyOn(ProofPlayService, 'setTenant').and.returnValue null
 
 
     it 'initializeTenantSelection sets tenants', ->

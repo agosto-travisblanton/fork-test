@@ -74,7 +74,6 @@ describe 'DeviceDetailsCtrl', ->
     _sweet_, _ToastsService_, _$state_, _$mdDialog_, _$log_) ->
     $controller = _$controller_
     $stateParams = {}
-    $state = {}
     $state = _$state_
     $log = _$log_
     $mdDialog = _$mdDialog_

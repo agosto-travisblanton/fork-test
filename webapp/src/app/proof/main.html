@@ -16,7 +16,7 @@
                     <md-input-container>
                         <label>Tenant</label>
                         <md-select ng-model="vm.which_tenant">
-                            <md-option ng-repeat="tenant in vm.tenants" value="{{tenant}}">
+                            <md-option ng-repeat="tenant in vm.tenants | orderBy:'tenant'" value="{{tenant}}">
                                 {{tenant}}
                             </md-option>
                         </md-select>

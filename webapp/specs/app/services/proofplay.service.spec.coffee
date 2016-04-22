@@ -11,21 +11,19 @@ describe 'ProofPlayService', ->
   q = undefined
   window = undefined
   cookie_token = undefined
-
-
+  
   beforeEach module('skykitProvisioning')
 
-  beforeEach inject (_$httpBackend_, _$q_, _ProofPlayService_, _$http_, _$window_, _$cookies_, _ToastsService_) ->
+  beforeEach inject (_$httpBackend_, _$q_, _ProofPlayService_, _$http_, _$window_, _$cookies_, _ToastsService_, _$state_) ->
     ProofPlayService = _ProofPlayService_
     $http = _$http_
     ToastsService = _ToastsService_
     $httpBackend = _$httpBackend_
     q = _$q_
     $stateParams = {}
-    $state = {}
+    $state = _$state_
     $cookies = _$cookies_
     window = _$window_
-
 
   describe 'querying for csvs', ->
 
@@ -33,6 +31,7 @@ describe 'ProofPlayService', ->
       spyOn(window, 'open').and.callFake(() ->
         return true
       )
+      spyOn($state, 'go')
       spyOn(ToastsService, 'showErrorToast')
       spyOn(ToastsService, 'showSuccessToast')
       cookie_token = 'test'

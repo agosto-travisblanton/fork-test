@@ -168,7 +168,7 @@
                                                 <md-input-container>
                                                     <label class="center-block">Tenant</label>
                                                     <md-select ng-model="vm.which_tenant">
-                                                        <md-option ng-repeat="tenant in vm.tenants"
+                                                        <md-option ng-repeat="tenant in vm.tenants | orderBy:'tenant'"
                                                                    value="{{tenant}}" class="proof-of-play-tenant-name">
                                                             {{tenant}}
                                                         </md-option>
@@ -355,7 +355,7 @@
                                                 <md-input-container>
                                                     <label class="center-block">Tenant</label>
                                                     <md-select ng-model="vm.which_tenant">
-                                                        <md-option ng-repeat="tenant in vm.tenants"
+                                                        <md-option ng-repeat="tenant in vm.tenants | orderBy:'tenant'"
                                                                    value="{{tenant}}" class="proof-of-play-tenant-name">
                                                             {{tenant}}
                                                         </md-option>
@@ -540,7 +540,7 @@
                                                 <md-input-container>
                                                     <label class="center-block">Tenant</label>
                                                     <md-select ng-model="vm.which_tenant">
-                                                        <md-option ng-repeat="tenant in vm.tenants"
+                                                        <md-option ng-repeat="tenant in vm.tenants | orderBy:'tenant'"
                                                                    value="{{tenant}}">
                                                             <p class="proof-of-play-tenant-name-option">
                                                                 {{tenant}}
