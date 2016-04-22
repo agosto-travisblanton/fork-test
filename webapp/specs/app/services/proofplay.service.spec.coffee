@@ -3,6 +3,9 @@
 describe 'ProofPlayService', ->
   ProofPlayService = undefined
   $http = undefined
+  $stateParams = undefined
+  $state = undefined
+  ToastsService = undefined
   $httpBackend = undefined
   $cookies = undefined
   q = undefined
@@ -12,21 +15,17 @@ describe 'ProofPlayService', ->
 
   beforeEach module('skykitProvisioning')
 
-  beforeEach inject (_$httpBackend_, _$q_, _ProofPlayService_, _$http_, _$window_, _$cookies_) ->
+  beforeEach inject (_$httpBackend_, _$q_, _ProofPlayService_, _$http_, _$window_, _$cookies_, _ToastsService_) ->
     ProofPlayService = _ProofPlayService_
     $http = _$http_
+    ToastsService = _ToastsService_
     $httpBackend = _$httpBackend_
     q = _$q_
+    $stateParams = {}
+    $state = {}
     $cookies = _$cookies_
     window = _$window_
 
-
-  describe 'initialization', ->
-    it 'sets @uriBase variable', ->
-      expect(ProofPlayService.uriBase).toEqual 'proofplay/api/v1'
-
-    it 'sets @cachedResources variable to null', ->
-      expect(ProofPlayService.cachedResources).toBeFalsy()
 
   describe 'querying for csvs', ->
 
@@ -34,10 +33,18 @@ describe 'ProofPlayService', ->
       spyOn(window, 'open').and.callFake(() ->
         return true
       )
+      spyOn(ToastsService, 'showErrorToast')
+      spyOn(ToastsService, 'showSuccessToast')
       cookie_token = 'test'
       $cookies.put('currentDistributorKey', cookie_token)
 
 
+    it 'sets @uriBase variable', ->
+      expect(ProofPlayService.uriBase).toEqual 'proofplay/api/v1'
+
+    it 'sets @cachedResources variable to null', ->
+      expect(ProofPlayService.cachedResources).toBeFalsy()
+    
     it 'gets all tenants', ->
       to_respond = {
         data: {
@@ -58,8 +65,7 @@ describe 'ProofPlayService', ->
       end_date = 234234
       resources = ["some_resource", "another"]
       tenants = ["one_tenant", "two_tenant"]
-      ProofPlayService.setTenant(tenants[0])
-      ProofPlayService.downloadCSVForMultipleResourcesByDate(start_date, end_date, resources)
+      ProofPlayService.downloadCSVForMultipleResourcesByDate(start_date, end_date, resources, tenants[0])
       expect(window.open).toHaveBeenCalled()
 
       allResources = []
@@ -76,8 +82,7 @@ describe 'ProofPlayService', ->
       end_date = 234234
       resources = ["some_resource", "another"]
       tenants = ["one_tenant", "two_tenant"]
-      ProofPlayService.setTenant(tenants[0])
-      ProofPlayService.downloadCSVForMultipleResourcesByDevice(start_date, end_date, resources)
+      ProofPlayService.downloadCSVForMultipleResourcesByDevice(start_date, end_date, resources, tenants[0])
       expect(window.open).toHaveBeenCalled()
 
       allResources = ''
@@ -94,8 +99,7 @@ describe 'ProofPlayService', ->
       end_date = 234234
       devices = ["some_devices", "another_device"]
       tenants = ["one_tenant", "two_tenant"]
-      ProofPlayService.setTenant(tenants[0])
-      ProofPlayService.downloadCSVForMultipleDevicesSummarized(start_date, end_date, devices)
+      ProofPlayService.downloadCSVForMultipleDevicesSummarized(start_date, end_date, devices, tenants[0])
       expect(window.open).toHaveBeenCalled()
 
       allDevices = ''
@@ -111,8 +115,7 @@ describe 'ProofPlayService', ->
       end_date = 234234
       devices = ["some_devices", "another_device"]
       tenants = ["one_tenant", "two_tenant"]
-      ProofPlayService.setTenant(tenants[0])
-      ProofPlayService.downloadCSVForMultipleDevicesByDate(start_date, end_date, devices)
+      ProofPlayService.downloadCSVForMultipleDevicesByDate(start_date, end_date, devices, tenants[0])
       expect(window.open).toHaveBeenCalled()
 
       allDevices = ''
@@ -128,8 +131,7 @@ describe 'ProofPlayService', ->
       end_date = 234234
       locations = ["some_location", "another_location"]
       tenants = ["one_tenant", "two_tenant"]
-      ProofPlayService.setTenant(tenants[0])
-      ProofPlayService.downloadCSVForMultipleLocationsByDevice(start_date, end_date, locations)
+      ProofPlayService.downloadCSVForMultipleLocationsByDevice(start_date, end_date, locations, tenants[0])
       expect(window.open).toHaveBeenCalled()
 
       allLocations = ''
@@ -146,8 +148,7 @@ describe 'ProofPlayService', ->
       end_date = 234234
       locations = ["some_location", "another_location"]
       tenants = ["one_tenant", "two_tenant"]
-      ProofPlayService.setTenant(tenants[0])
-      ProofPlayService.downloadCSVForMultipleLocationsSummarized(start_date, end_date, locations)
+      ProofPlayService.downloadCSVForMultipleLocationsSummarized(start_date, end_date, locations, tenants[0])
       expect(window.open).toHaveBeenCalled()
 
       allLocations = ''
@@ -168,11 +169,9 @@ describe 'ProofPlayService', ->
 
       chosen_tenant = "some-tenant"
 
-      ProofPlayService.setTenant(chosen_tenant)
-
       $httpBackend.expectGET("proofplay/api/v1/retrieve_all_displays/" + chosen_tenant).respond(to_respond)
 
-      ProofPlayService.getAllDisplays()
+      ProofPlayService.getAllDisplays(chosen_tenant)
       .then (data) ->
         expect(angular.equals(data.data.displays, to_respond.data.displays))
 
@@ -187,11 +186,9 @@ describe 'ProofPlayService', ->
 
       chosen_tenant = "some-tenant"
 
-      ProofPlayService.setTenant(chosen_tenant)
-
       $httpBackend.expectGET("proofplay/api/v1/retrieve_all_locations/" + chosen_tenant).respond(to_respond)
 
-      ProofPlayService.getAllLocations()
+      ProofPlayService.getAllLocations(chosen_tenant)
       .then (data) ->
         expect(angular.equals(data.data.locations, to_respond.data.locations))
 

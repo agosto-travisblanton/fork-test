@@ -1,8 +1,6 @@
 'use strict'
-
 appModule = angular.module 'skykitProvisioning'
-
-appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService) ->
+appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService, $stateParams, $state, ToastsService) ->
   @radioButtonChoices = {
     group1: 'By Date',
     group2: 'Summarized',
@@ -21,13 +19,14 @@ appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService) ->
     displays: false,
   }
 
+  @tenant = $stateParams.tenant
   @no_cache = true
   @loading = true
   @disabled = true
   @selected_displays = []
 
   @initialize = =>
-    ProofPlayService.getAllDisplays()
+    ProofPlayService.getAllDisplays(@tenant)
     .then (data) =>
       @loading = false
       @displays = data.data.devices
@@ -101,14 +100,14 @@ appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService) ->
 
   @submit = () =>
     if @final.type is "1"
-      ProofPlayService.downloadCSVForMultipleDevicesByDate(@final.start_date_unix, @final.end_date_unix, @final.displays)
+      ProofPlayService.downloadCSVForMultipleDevicesByDate(@final.start_date_unix, @final.end_date_unix, @final.displays, @tenant)
 
     else
-      ProofPlayService.downloadCSVForMultipleDevicesSummarized(@final.start_date_unix, @final.end_date_unix, @final.displays)
+      ProofPlayService.downloadCSVForMultipleDevicesSummarized(@final.start_date_unix, @final.end_date_unix, @final.displays, @tenant)
 
 
   @tenants = null
-  @currentTenant = ProofPlayService.getTenant()
+  @currentTenant = @tenant
 
   @initialize_tenant_select = () ->
     ProofPlayService.getAllTenants()
@@ -118,12 +117,12 @@ appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService) ->
 
   @submitTenant = (tenant) =>
     if tenant != @currentTenant
-      ProofPlayService.setTenant(tenant)
-      @initialize()
-      @selected_displays = []
-      @areDisplaysValid()
-      @isDisabled()
-      @currentTenant = ProofPlayService.getTenant()
-   
-    
+      $state.go 'proofDetail', {
+        tenant: tenant
+      }
+      ToastsService.showSuccessToast "Proof of Play reporting set to " + tenant 
+    else 
+      ToastsService.showErrorToast "Proof of Play reporting is already set to " + tenant 
+
+
   @

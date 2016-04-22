@@ -1,7 +1,5 @@
 'use strict'
-
 appModule = angular.module('skykitProvisioning')
-
 appModule.controller 'DeviceDetailsCtrl', ($log,
   $stateParams,
   $state,
@@ -13,7 +11,8 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   $cookies,
   ProgressBarService,
   $mdDialog,
-  ToastsService) ->
+  ToastsService
+) ->
   @tenantKey = $stateParams.tenantKey
   @deviceKey = $stateParams.deviceKey
   @fromDevices = $stateParams.fromDevices is "true"

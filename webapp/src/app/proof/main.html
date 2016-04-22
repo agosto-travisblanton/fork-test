@@ -1,0 +1,32 @@
+<div ng-controller="ProofOfPlayCtrl as vm" layout="column" ng-cloak>
+    <md-toolbar class="md-hue-2">
+        <div class="md-toolbar-tools">
+            <h2 class="md-flex"><i class="fa fa-fw fa-film ng-scope"></i>Proof of Play</h2>
+        </div>
+    </md-toolbar>
+    <md-content>
+        <div class="container">
+            <div ng-if="!vm.chosen_tenant" ng-init="vm.initialize()">
+                <div ng-hide="vm.tenants">
+                    <h3>Loading tenants...</h3>
+                </div>
+                <div ng-show="vm.tenants">
+                    <h3>Please choose a tenant</h3>
+
+                    <md-input-container>
+                        <label>Tenant</label>
+                        <md-select ng-model="vm.which_tenant">
+                            <md-option ng-repeat="tenant in vm.tenants" value="{{tenant}}">
+                                {{tenant}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                    <md-button md-no-ink class="md-primary"
+                               ng-click="vm.submitTenant(vm.which_tenant)">
+                        Submit
+                    </md-button>
+                </div>
+            </div>
+        </div>
+    </md-content>
+</div>
