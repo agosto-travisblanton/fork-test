@@ -215,13 +215,24 @@ class Tenant(ndb.Model):
     @classmethod
     def find_devices_paginated(cls, tenant_keys, fetch_size=200, unmanaged=False, prev_cursor_str=None,
                                next_cursor_str=None):
+
         objects = None
         next_cursor = None
         prev_cursor = None
 
+        no_tenant_keys = len(tenant_keys) == 0
+        if no_tenant_keys:
+            return {
+                'objects': objects or [],
+                'next_cursor': next_cursor,
+                'prev_cursor': prev_cursor,
+
+            }
+
         if not prev_cursor_str and not next_cursor_str:
             objects, next_cursor, more = ChromeOsDevice.query(
-                ndb.AND(ChromeOsDevice.archived == False,
+                ndb.OR(ChromeOsDevice.archived == None, ChromeOsDevice.archived == False),
+                ndb.AND(
                         ChromeOsDevice.tenant_key.IN(tenant_keys),
                         ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(
                 page_size=fetch_size)
@@ -232,7 +243,8 @@ class Tenant(ndb.Model):
         elif next_cursor_str:
             cursor = Cursor(urlsafe=next_cursor_str)
             objects, next_cursor, more = ChromeOsDevice.query(
-                ndb.AND(ChromeOsDevice.archived == False,
+                ndb.OR(ChromeOsDevice.archived == None, ChromeOsDevice.archived == False),
+                ndb.AND(
                         ChromeOsDevice.tenant_key.IN(tenant_keys),
                         ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(
                 page_size=fetch_size,
@@ -245,7 +257,8 @@ class Tenant(ndb.Model):
         elif prev_cursor_str:
             cursor = Cursor(urlsafe=prev_cursor_str)
             objects, prev, more = ChromeOsDevice.query(
-                ndb.AND(ChromeOsDevice.archived == False,
+                ndb.OR(ChromeOsDevice.archived == None, ChromeOsDevice.archived == False),
+                ndb.AND(
                         ChromeOsDevice.tenant_key.IN(tenant_keys),
                         ChromeOsDevice.is_unmanaged_device == unmanaged)).order(-ChromeOsDevice.key).fetch_page(
                 page_size=fetch_size,
