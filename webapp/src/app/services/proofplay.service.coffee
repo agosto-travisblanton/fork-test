@@ -24,8 +24,6 @@ angular.module('skykitProvisioning')
         }
       )
 
-
-
     getAllResources: (tenant) ->
       deferred = $q.defer()
       if @cachedResources
@@ -40,31 +38,19 @@ angular.module('skykitProvisioning')
           status = err.status
           if status == 403
             ToastsService.showErrorToast "You are not allowed to view this tenant!"
-            $state.go 'proof', {
-
-            }
+            $state.go 'proof', {}
 
       deferred.promise
 
 
     getAllDisplays: (tenant) ->
-      deferred = $q.defer()
-      r = @makeHTTPRequest("/retrieve_all_displays/", tenant)
-      r.then (data) ->
-        deferred.resolve(data)
+      @makeHTTPRequest("/retrieve_all_displays/", tenant)
 
-      deferred.promise
-
-
+    
     getAllLocations: (tenant) ->
-      deferred = $q.defer()
-      r = @makeHTTPRequest("/retrieve_all_locations/", tenant)
-      r.then (data) ->
-        deferred.resolve(data)
+      @makeHTTPRequest("/retrieve_all_locations/", tenant)
 
-      deferred.promise
-
-
+    
     getAllTenants: () ->
       distributorKey = $cookies.get('currentDistributorKey')
       $http.get(@uriBase + '/retrieve_my_tenants',
@@ -72,7 +58,6 @@ angular.module('skykitProvisioning')
           'X-Provisioning-Distributor': distributorKey
         }
       )
-
 
     downloadCSVForMultipleResourcesByDate: (start_date, end_date, resources, tenant) ->
       allResources = ''

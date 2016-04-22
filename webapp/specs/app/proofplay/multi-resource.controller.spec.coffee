@@ -178,6 +178,7 @@ describe 'ProofOfPlayMultiResourceCtrl', ->
       promise = new skykitProvisioning.q.Mock
       spyOn(ProofPlayService, 'getAllResources').and.returnValue promise
       spyOn(ProofPlayService, 'getAllTenants').and.returnValue promise
+      spyOn($state, 'go')
 
 
     it 'initializeTenantSelection sets tenants', ->
@@ -193,5 +194,4 @@ describe 'ProofOfPlayMultiResourceCtrl', ->
 
     it 'submitTenants sets currentTenant and getsAllDisplays again', ->
       controller.submitTenant(selected_tenant)
-      promise.resolve resourcesData
-      expect(ProofPlayService.getAllResources).toHaveBeenCalled()
+      expect($state.go).toHaveBeenCalledWith 'proofDetail', {tenant: selected_tenant}

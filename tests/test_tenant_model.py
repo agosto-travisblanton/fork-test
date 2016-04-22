@@ -1,10 +1,12 @@
 from app_config import config
 from env_setup import setup_test_paths
+import random
 
 setup_test_paths()
+import datetime
 
 from agar.test import BaseTest
-from models import Tenant, Distributor, TENANT_ENTITY_GROUP_NAME, Domain, ChromeOsDevice
+from models import Tenant, Distributor, TENANT_ENTITY_GROUP_NAME, Domain, ChromeOsDevice, DeviceIssueLog
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
@@ -41,18 +43,17 @@ class TestTenantModel(BaseTest):
         self.tenant_key = self.tenant.put()
 
         self.device_1 = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                              gcm_registration_id='APA91bHyMJRcN7mj7b0aXGWE7Ae',
-                                              mac_address='54271ee81302')
+                                                      gcm_registration_id='APA91bHyMJRcN7mj7b0aXGWE7Ae',
+                                                      mac_address='54271ee81302')
         self.device_1_key = self.device_1.put()
         self.device_2 = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                              gcm_registration_id='c098d70a8d78a6dfa6df76dfas7',
-                                              mac_address='48d2247f2132')
+                                                      gcm_registration_id='c098d70a8d78a6dfa6df76dfas7',
+                                                      mac_address='48d2247f2132')
         self.device_2_key = self.device_2.put()
         self.device_to_be_archived = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
                                                                    gcm_registration_id='f090d7348d78b6cfa6df76dfa1b',
                                                                    mac_address='98d2247f2101')
         self.device_to_be_archived_key = self.device_to_be_archived.put()
-
 
     def test_create_sets_tenant_entity_group_as_parent(self):
         actual = Tenant.find_by_name(self.NAME)
@@ -327,3 +328,45 @@ class TestTenantModel(BaseTest):
         device_3.put()
         devices = Tenant.find_devices_paginated(tenant_keys=[tenant_key])
         self.assertLength(2, devices["objects"])
+
+    def test_find_issues_paginated(self):
+        tenant = Tenant.create(tenant_code='foobar_inc',
+                               name='Foobar, Inc.',
+                               admin_email=self.ADMIN_EMAIL,
+                               content_server_url=self.CONTENT_SERVER_URL,
+                               content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                               domain_key=self.domain_key,
+                               active=True)
+        tenant_key = tenant.put()
+
+        device_1 = ChromeOsDevice.create_managed(tenant_key,
+                                                 gcm_registration_id='1PA91bHyMJRcN7mj7b0aXGWE7Ae', archived=False,
+                                                 mac_address='1')
+        device_1.put()
+        start = datetime.datetime.utcnow()
+        for i in range(1, 300):
+            issue = DeviceIssueLog.create(device_key=device_1.key,
+                                          category=config.DEVICE_ISSUE_PLAYER_DOWN,
+                                          up=False,
+                                          storage_utilization=random.randint(1, 100),
+                                          memory_utilization=random.randint(1, 100),
+                                          program=str(random.randint(1, 100)),
+                                          program_id=device_1.program_id,
+                                          last_error=device_1.last_error,
+                                          )
+
+            issue.put()
+        end = datetime.datetime.utcnow()
+
+        devices = Tenant.find_issues_paginated(start, end, device_1, prev_cursor_str=None,
+                                               next_cursor_str=None)
+        self.assertLength(25, devices["objects"])
+        self.assertTrue(devices["next_cursor"])
+        self.assertFalse(devices["prev_cursor"])
+
+        next_devices = Tenant.find_issues_paginated(start, end, device_1, prev_cursor_str=None,
+                                                    next_cursor_str=devices["next_cursor"])
+
+        self.assertLength(25, next_devices["objects"])
+        self.assertTrue(next_devices["next_cursor"])
+        self.assertTrue(next_devices["prev_cursor"])

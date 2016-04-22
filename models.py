@@ -272,8 +272,6 @@ class Tenant(ndb.Model):
             'prev_cursor': prev_cursor,
         }
 
-        print to_return["next_cursor"]
-        print to_return["prev_cursor"]
         return to_return
 
     @classmethod
