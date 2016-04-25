@@ -119,8 +119,10 @@ appModule.controller "ProofOfPlayMultiLocationCtrl", (ProofPlayService, $statePa
       $state.go 'proofDetail', {
         tenant: tenant
       }
-      ToastsService.showSuccessToast "Proof of Play reporting set to " + tenant 
-    else 
-      ToastsService.showErrorToast "Proof of Play reporting is already set to " + tenant 
+
+      ToastsService.showSuccessToast "Proof of Play reporting set to " + tenant
+
+    else
+      ToastsService.showErrorToast "Proof of Play reporting is already set to " + tenant
 
   @
