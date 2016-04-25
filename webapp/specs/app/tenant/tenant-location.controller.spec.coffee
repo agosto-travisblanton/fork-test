@@ -109,6 +109,19 @@ describe 'TenantLocationCtrl', ->
       it "displays a success toast", ->
         expect(ToastsService.showSuccessToast).toHaveBeenCalledWith 'We saved your location.'
 
+    describe '.onSuccessUpdatingLocation', ->
+      tenant_key = 'some key'
+      beforeEach ->
+        spyOn(ToastsService, 'showSuccessToast')
+        controller.editMode = true
+        controller.onSuccessUpdatingLocation tenant_key
+
+      it 'stops the progress bar animation', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it "displays a success toast", ->
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith 'We updated your location.'
+
     describe '.onFailureSavingLocation 409 conflict', ->
       beforeEach ->
         spyOn(ToastsService, 'showErrorToast')

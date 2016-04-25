@@ -28,13 +28,24 @@ appModule.controller 'TenantLocationCtrl',
     @onClickSaveButton = ->
       ProgressBarService.start()
       promise = LocationsService.save @location
-      promise.then @onSuccessSavingLocation, @onFailureSavingLocation
+      if @editMode
+        promise.then @onSuccessUpdatingLocation(@tenantKey), @onFailureSavingLocation
+      else
+        promise.then @onSuccessSavingLocation, @onFailureSavingLocation
 
     @onSuccessSavingLocation = ()->
       ProgressBarService.complete()
       ToastsService.showSuccessToast 'We saved your location.'
       setTimeout (->
         $state.go 'tenantLocations', {tenantKey: $stateParams.tenantKey}
+        return
+      ), 1000
+
+    @onSuccessUpdatingLocation = (tenant_key)->
+      ProgressBarService.complete()
+      ToastsService.showSuccessToast 'We updated your location.'
+      setTimeout (->
+        $state.go 'tenantLocations', {tenantKey: tenant_key}
         return
       ), 1000
 
