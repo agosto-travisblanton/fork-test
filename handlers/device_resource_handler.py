@@ -349,7 +349,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @requires_registration_token
     def post(self):
-        if self.request.body is not str('') and self.request.body is not None:
+        if self.request.body is not '' and self.request.body is not None:
             status = 201
             error_message = None
             request_json = json.loads(self.request.body)
@@ -765,18 +765,21 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         self.response.set_status(status, message)
 
     @requires_api_token
-    def get_latest_issues(self, device_urlsafe_key):
+    def get_latest_issues(self, device_urlsafe_key, prev_cursor_str, next_cursor_str):
         start_epoch = int(self.request.params['start'])
         end_epoch = int(self.request.params['end'])
+        next_cursor_str = next_cursor_str if next_cursor_str != "null" else None
+        prev_cursor_str = prev_cursor_str if prev_cursor_str != "null" else None
         start = datetime.utcfromtimestamp(start_epoch)
         end = datetime.utcfromtimestamp(end_epoch)
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
-        query = DeviceIssueLog.query(DeviceIssueLog.device_key == device.key,
-                                     ndb.AND(DeviceIssueLog.created > start),
-                                     ndb.AND(DeviceIssueLog.created <= end)).order(-DeviceIssueLog.created)
-
-        latest_issues = query.fetch(config.LATEST_DEVICE_ISSUES_FETCH_COUNT)
-        return json_response(self.response, latest_issues, strategy=DEVICE_ISSUE_LOG_STRATEGY)
+        paginated_results = Tenant.find_issues_paginated(start, end, device, prev_cursor_str=prev_cursor_str,
+                                                         next_cursor_str=next_cursor_str)
+        return json_response(self.response, {
+            "issues": paginated_results["objects"],
+            "prev": paginated_results["prev_cursor"],
+            "next": paginated_results["next_cursor"]
+        }, strategy=DEVICE_ISSUE_LOG_STRATEGY)
 
     @requires_api_token
     def delete(self, device_urlsafe_key):

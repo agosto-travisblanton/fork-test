@@ -1,4 +1,7 @@
 from env_setup import setup
+from provisioning_env import (
+    on_development_server,
+)
 
 setup()
 
@@ -114,7 +117,7 @@ application = WSGIApplication(
               handler_method='get_pairing_code',
               methods=['GET']
               ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>/issues',
+        Route(r'/api/v1/devices/<prev_cursor_str>/<next_cursor_str>/<device_urlsafe_key>/issues',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='device-issues',
               handler_method='get_latest_issues',
@@ -354,3 +357,15 @@ application = WSGIApplication(
     ],
     debug=not on_production_server
 )
+
+if on_development_server:
+    dev_routes = [
+        Route(r'/api/v1/seed',
+              handler="handlers.dev_handlers.SeedScript",
+              name="Seed",
+              methods=["GET"]
+              ),
+    ]
+
+    for route in dev_routes:
+        application.router.add(route)

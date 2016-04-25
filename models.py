@@ -213,6 +213,68 @@ class Tenant(ndb.Model):
         return filtered_results
 
     @classmethod
+    def find_issues_paginated(cls, start, end, device, fetch_size=25, prev_cursor_str=None,
+                              next_cursor_str=None):
+        objects = None
+        next_cursor = None
+        prev_cursor = None
+
+        if not prev_cursor_str and not next_cursor_str:
+            objects, next_cursor, more = DeviceIssueLog.query(
+                DeviceIssueLog.device_key == device.key,
+                ndb.AND(DeviceIssueLog.created > start),
+                ndb.AND(DeviceIssueLog.created <= end)
+            ).order(
+                -DeviceIssueLog.created
+            ).fetch_page(fetch_size)
+
+            prev_cursor = None
+            next_cursor = next_cursor.urlsafe() if more else None
+
+        elif next_cursor_str:
+            cursor = Cursor(urlsafe=next_cursor_str)
+            objects, next_cursor, more = DeviceIssueLog.query(
+                DeviceIssueLog.device_key == device.key,
+                ndb.AND(DeviceIssueLog.created > start),
+                ndb.AND(DeviceIssueLog.created <= end)
+            ).order(
+                -DeviceIssueLog.created
+            ).fetch_page(
+                page_size=fetch_size,
+                start_cursor=cursor
+            )
+
+            prev_cursor = next_cursor_str
+            next_cursor = next_cursor.urlsafe() if more else None
+
+        elif prev_cursor_str:
+            cursor = Cursor(urlsafe=prev_cursor_str)
+            objects, prev, more = DeviceIssueLog.query(
+                DeviceIssueLog.device_key == device.key,
+                ndb.AND(DeviceIssueLog.created > start),
+                ndb.AND(DeviceIssueLog.created <= end)
+            ).order(
+                DeviceIssueLog.created # notice that this is sorted forward due to cursor being reversed
+            ).fetch_page(
+                page_size=fetch_size,
+                start_cursor=cursor.reversed()
+            )
+
+            # needed because we are using a reverse cursor
+            objects.reverse()
+
+            next_cursor = prev_cursor_str
+            prev_cursor = prev.urlsafe() if more else None
+
+        to_return = {
+            'objects': objects or [],
+            'next_cursor': next_cursor,
+            'prev_cursor': prev_cursor,
+        }
+
+        return to_return
+
+    @classmethod
     def find_devices_paginated(cls, tenant_keys, fetch_size=200, unmanaged=False, prev_cursor_str=None,
                                next_cursor_str=None):
 
@@ -429,11 +491,12 @@ class ChromeOsDevice(ndb.Model):
 
     @classmethod
     def create_managed(cls, tenant_key, gcm_registration_id, mac_address, ethernet_mac_address=None, device_id=None,
-                       serial_number=None,
+                       serial_number=None, archived=False,
                        model=None, timezone='America/Chicago'):
         timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
         device = cls(
             device_id=device_id,
+            archived=archived,
             tenant_key=tenant_key,
             gcm_registration_id=gcm_registration_id,
             mac_address=mac_address,

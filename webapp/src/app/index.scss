@@ -456,6 +456,26 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
   text-align: center;
 }
 
+.proof-of-play-tenant-name {
+  width: 100%;
+  font-size: 1.2em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis // This is where the magic happens
+}
+
+
+.proof-of-play-tenant-name-option {
+  width: 7em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: center;
+  positition: absolute;
+  text-overflow: ellipsis // This is where the magic happens
+
+}
+
 //.distributor-selection {
 //  font-size: 20pt;
 //  border: solid 1px #c9c9c9;

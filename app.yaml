@@ -100,7 +100,6 @@ skip_files:
 - ^coverage_html_report/.*
 - ^migration/.*
 - ^scripts/.*
-- ^snapdeploy.yaml
 - ^images/readme.md
 - ^local/.*
 - ^tests/.*

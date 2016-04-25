@@ -20,31 +20,34 @@ describe 'DeviceDetailsCtrl', ->
   progressBarService = undefined
   serviceInjection = undefined
   cookieMock = undefined
+
   device = {key: 'dhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
-  issues = [
-    {
-      category: "Player down"
-      created: "2015-12-15 18:05:52"
-      elapsed_time: "37.3 minutes"
-      level: 2
-      level_descriptor: "danger"
-      memory_utilization: 40
-      program: "Test Content"
-      storage_utilization: 44
-      up: false
-    }
-    {
-      category: "Player up"
-      created: "2015-12-15 18:05:52"
-      elapsed_time: "37.3 minutes"
-      level: 0
-      level_descriptor: "normal"
-      memory_utilization: 40
-      program: "Test Content"
-      storage_utilization: 44
-      up: true
-    }
-  ]
+  issues = {
+    issues: [
+      {
+        category: "Player down"
+        created: "2015-12-15 18:05:52"
+        elapsed_time: "37.3 minutes"
+        level: 2
+        level_descriptor: "danger"
+        memory_utilization: 40
+        program: "Test Content"
+        storage_utilization: 44
+        up: false
+      }
+      {
+        category: "Player up"
+        created: "2015-12-15 18:05:52"
+        elapsed_time: "37.3 minutes"
+        level: 0
+        level_descriptor: "normal"
+        memory_utilization: 40
+        program: "Test Content"
+        storage_utilization: 44
+        up: true
+      }
+    ]
+  }
   commandEvents = [
     {
       payload: 'skykit.com/skdchromeapp/reset'
@@ -71,7 +74,6 @@ describe 'DeviceDetailsCtrl', ->
     _sweet_, _ToastsService_, _$state_, _$mdDialog_, _$log_) ->
     $controller = _$controller_
     $stateParams = {}
-    $state = {}
     $state = _$state_
     $log = _$log_
     $mdDialog = _$mdDialog_
@@ -98,11 +100,14 @@ describe 'DeviceDetailsCtrl', ->
       getDevicePromise = new skykitProvisioning.q.Mock
       timezonesPromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getDeviceByKey').and.returnValue getDevicePromise
+      spyOn(progressBarService, 'start')
+      spyOn(progressBarService, 'complete')
       getPlayerCommandEventsPromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getCommandEventsByKey').and.returnValue getPlayerCommandEventsPromise
       getDeviceIssuesPromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getIssuesByKey').and.returnValue getDeviceIssuesPromise
       spyOn(DevicesService, 'getPanelModels').and.returnValue [{'id': 'Sony–FXD40LX2F'}, {'id': 'NEC–LCD4215'}]
+
       inputs = [
         {
           'id': 'HDMI2'
@@ -117,15 +122,18 @@ describe 'DeviceDetailsCtrl', ->
           'parentId': 'NEC–LCD4215'
         }
       ]
+
       spyOn(DevicesService, 'getPanelInputs').and.returnValue inputs
       spyOn(TimezonesService, 'getUsTimezones').and.returnValue timezonesPromise
 
     describe 'new mode', ->
       beforeEach ->
+
         controller = $controller 'DeviceDetailsCtrl', {
           $stateParams: $stateParams
           $state: $state
           DevicesService: DevicesService
+          ProgressBarService: progressBarService
           TimezonesService: TimezonesService
           LocationsService: LocationsService
         }
@@ -159,15 +167,18 @@ describe 'DeviceDetailsCtrl', ->
         controller = $controller 'DeviceDetailsCtrl', {
           $stateParams: $stateParams
           $state: $state
+          ProgressBarService: progressBarService
           DevicesService: DevicesService
           TimezonesService: TimezonesService
           LocationsService: LocationsService
         }
         now = new Date()
         today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-        @epochEnd = moment(new Date()).unix()
         today.setDate(today.getDate() - 30)
+        @epochEnd = moment(new Date()).unix()
         @epochStart = moment(today).unix()
+        controller.epochEnd = @epochEnd
+        controller.epochStart = @epochStart
         controller.initialize()
 
       it 'should call TimezonesService.getTimezones', ->
@@ -189,10 +200,10 @@ describe 'DeviceDetailsCtrl', ->
         expect(DevicesService.getCommandEventsByKey).toHaveBeenCalledWith $stateParams.deviceKey
 
       it 'calls DevicesService.getIssuesByKey to retrieve the issues for a given device and datetime range', ->
-        expect(DevicesService.getIssuesByKey).toHaveBeenCalledWith($stateParams.deviceKey, @epochStart, @epochEnd)
+        expect(DevicesService.getIssuesByKey).toHaveBeenCalledWith($stateParams.deviceKey, @epochStart, @epochEnd, undefined, undefined)
 
       it "the 'then' handler caches the retrieved issues for a given device key in the controller", ->
-        getDeviceIssuesPromise.resolve issues
+        getDeviceIssuesPromise.resolve {issues: issues}
         expect(controller.issues).toBe issues
 
       it "the 'then' handler caches the retrieved command events in the controller", ->
@@ -740,6 +751,8 @@ describe 'DeviceDetailsCtrl', ->
         DevicesService: DevicesService
         ProgressBarService: progressBarService
       }
+      controller.prev_cursor = null
+      controller.next_cursor = null
       controller.onClickRefreshButton()
 
     it 'starts the progress bar', ->
@@ -751,9 +764,10 @@ describe 'DeviceDetailsCtrl', ->
     it 'defines epochEnd', ->
       expect(controller.epochEnd).toBeDefined()
 
+
     it 'calls service to refresh issues for a given device within a specified datetime range', ->
       expect(DevicesService.getIssuesByKey).toHaveBeenCalledWith(
-        $stateParams.deviceKey, controller.epochStart, controller.epochEnd)
+        $stateParams.deviceKey, controller.epochStart, controller.epochEnd, controller.prev_cursor, controller.next_cursor)
 
     describe '.onRefreshIssuesSuccess', ->
       beforeEach ->
