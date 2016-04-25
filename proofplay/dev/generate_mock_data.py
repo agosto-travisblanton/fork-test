@@ -263,6 +263,7 @@ def generate_mock_data(days_of_logs, amount_a_day):
 
     print "THE FOLLOWING IS ANALYTICS ABOUT YOUR POSTED DATA"
     print analytics
+    print "DONE!!!"
 
 
 def send_mock_data(to_send, integration=False):

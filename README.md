@@ -34,9 +34,9 @@ You will see a message explaining that the seed script has started in the backgr
 and a subsequent message expalining when the seed script has finished.
 
 ### Bootstrap Proof of Play back-end: 
-After starting the server, hit `localhost:8080/api/v1/seed`
-You will see a message explaining that the seed script has started in the background,
-and a subsequent message expalining when the seed script has finished.
+After starting the server, hit `localhost:8080/proofplay/api/v1/seed/<number_of_days_back_to_post>/<number_of_times_a_day>`
+You will see a message explaining that the seed script has started in the background.
+A message will print to the terminal after all tasks have completed. 
 
 
 ### Test Back-End
