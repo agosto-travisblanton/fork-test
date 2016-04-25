@@ -1,12 +1,11 @@
 from webapp2 import RequestHandler
-
-from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from google.appengine.ext.deferred import deferred
 from google.appengine.ext import ndb
 from app_config import config
 from models import User, Distributor, Domain, Tenant, ChromeOsDevice, PlayerCommandEvent, TenantEntityGroup, \
     DeviceIssueLog, DistributorEntityGroup, Location, DistributorUser
 import time
+import random
 
 USER_EMAIL = 'daniel.ternyak@agosto.com'
 DISTRIBUTOR_NAME = 'Agosto'
@@ -20,7 +19,6 @@ MAC_ADDRESS = '54271e619346'
 UNMANAGED_MAC_ADDRESS = '04271e61934b'
 UNMANAGED_GCM_REGISTRATION_ID = '3c70a8d70a6dfa6df76dfas2'
 SERIAL_NUMBER = 'E6MSCX057790'
-import random
 
 
 class SeedScript(RequestHandler):
@@ -30,16 +28,27 @@ class SeedScript(RequestHandler):
             "A SEED SCRIPT HAS BEEN KICKED OFF. PLEASE WATCH FOR A COMPLETE STATEMENT IN THE TERMINAL"
         )
 
-    @requires_registration_token
-    def post(self):
-        pass
-
-    @requires_unmanaged_registration_token
-    def put(self):
-        pass
-
 
 def kick_off():
+    print "-------------------------------------------------------------------------------"
+    print "SEED SCRIPT HAS BEGUN!!! "
+    print "-------------------------------------------------------------------------------"
+    print "-------------------------------------------------------------------------------"
+    print "DELETING CURRENT DATASTORE!!! "
+    print "-------------------------------------------------------------------------------"
+    delete_all()
+    print "-------------------------------------------------------------------------------"
+    print "CREATE DATA FOR DATASTORE!!! "
+    print "-------------------------------------------------------------------------------"
+    make_data_for_a_distributor()
+    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    print "-------------------------------------------------------------------------------"
+    print "COMPLETED SEED SCRIPT"
+    print "-------------------------------------------------------------------------------"
+    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+
+
+def delete_all():
     print "-------------------------------------------------------------------------------"
     print "SEED SCRIPT HAS BEGUN!!! "
     print "-------------------------------------------------------------------------------"
@@ -87,6 +96,8 @@ def kick_off():
         DeviceIssueLog.query().fetch(keys_only=True),
     )
 
+
+def make_data_for_a_distributor():
     ##########################################################################################
     # DISTRIBUTORS
     ##########################################################################################
@@ -231,9 +242,3 @@ def kick_off():
             tenant.proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
             tenant.put()
         print '{0}: {1}'.format(tenant.name, tenant.proof_of_play_url)
-
-    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    print "-------------------------------------------------------------------------------"
-    print "COMPLETED SEED SCRIPT"
-    print "-------------------------------------------------------------------------------"
-    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"

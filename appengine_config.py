@@ -23,8 +23,6 @@ basedir = path.abspath(path.dirname(__file__))
 ##############################################################################
 # APPLICATION SETTINGS
 ##############################################################################
-
-
 app_APP_ROOT = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
@@ -449,9 +447,7 @@ def _DEFAULT_PROOF_OF_PLAY_URL():
 
 
 app_DEFAULT_PROOF_OF_PLAY_URL = _DEFAULT_PROOF_OF_PLAY_URL()
-
 proofplay_SQLALCHEMY_DATABASE_URI = _SQLALCHEMY_DATABASE_URI()
-
 proofplay_DAYS_TO_KEEP_RAW_EVENTS = 30
 
 
@@ -469,7 +465,7 @@ def _return_yaml_data():
         app_SPRINT_NUMBER = array_of_versions_as_int[0]
         app_DEPLOYMENT_COUNTER = array_of_versions_as_int[1]
         app_PRODUCTION_HOTFIX_COUNTER = array_of_versions_as_int[2]
-        return [app_SPRINT_NUMBER, app_DEPLOYMENT_COUNTER, app_PRODUCTION_HOTFIX_COUNTER]
+        return app_SPRINT_NUMBER, app_DEPLOYMENT_COUNTER, app_PRODUCTION_HOTFIX_COUNTER
 
 snapdeploy_yaml_data = _return_yaml_data()
 app_SPRINT_NUMBER = snapdeploy_yaml_data[0]
