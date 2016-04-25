@@ -62,8 +62,6 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       down:'glyphicon glyphicon-arrow-down'}}"
   @timezones = []
   @selectedTimezone = undefined
-  @epochStart = moment(new Date(@startTime)).unix()
-  @epochEnd = moment(new Date(@endTime)).unix()
   now = new Date()
   today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   @endTime = now.toLocaleString().replace(/,/g, "")
@@ -87,6 +85,8 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       @getIssues @deviceKey, @epochStart, @epochEnd, @prev_cursor, null
 
   @initialize = () ->
+    @epochStart = moment(new Date(@startTime)).unix()
+    @epochEnd = moment(new Date(@endTime)).unix()
     timezonePromise = TimezonesService.getUsTimezones()
     timezonePromise.then (data) =>
       @timezones = data
