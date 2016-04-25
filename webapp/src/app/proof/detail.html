@@ -7,13 +7,41 @@
     <md-content>
         <md-tabs md-dynamic-height>
             <md-tab label="{{vm.resource.title}}" layout-align="center center">
-                <div ng-controller="ProofOfPlayMultiResourceCtrl as vm" layout="column" ng-cloak>
-                    <div class="row" ng-init="vm.initialize()">
-                        <div style="padding-top: 25px; padding-left: 50px; text-align: left"
-                             class="col-md-6 col-sm-12">
+                <div ng-controller="ProofOfPlayMultiResourceCtrl as vm" layout="column" class="container" ng-cloak>
+                    <div ng-init="vm.initialize()">
+                        <md-card>
+                            <md-card-content>
+                                <div class="col-md-12" ng-init="vm.initialize_tenant_select()">
+                                    <div class="col-sm-3">
+                                        <h3>{{vm.currentTenant}}</h3>
+                                    </div>
+
+                                    <div class="col-md-3 col-md-offset-6 radio-horizontal" ng-show="vm.tenants">
+
+                                        <md-input-container>
+                                            <label class="center-block">Change Tenant</label>
+                                            <md-select ng-model="vm.which_tenant">
+                                                <md-option ng-repeat="tenant in vm.tenants | orderBy:'tenant'"
+                                                           value="{{tenant}}" class="proof-of-play-tenant-name">
+                                                    {{tenant}}
+                                                </md-option>
+                                            </md-select>
+                                        </md-input-container>
+                                        <div>
+                                            <md-button md-no-ink class="md-primary"
+                                                       ng-click="vm.submitTenant(vm.which_tenant)">
+                                                Submit
+                                            </md-button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </md-card-content>
+                        </md-card>
+                        <div style="padding-top: 25px; text-align: left"
+                             class="col-md-6">
                             <md-card>
                                 <md-card-content>
-                                    <md-content class="md-padding">
+                                    <div class="md-padding">
 
                                         <div ng-show="vm.loading">
 
@@ -90,10 +118,10 @@
                                                 <md-radio-group
                                                         ng-model="vm.radioButtonChoices.selection"
                                                         ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
-                                                    <md-radio-button style="margin-left: 20px" value="1">
+                                                    <md-radio-button value="1">
                                                         {{vm.radioButtonChoices.group1}}
                                                     </md-radio-button>
-                                                    <md-radio-button style="margin-left: 20px" value="2">
+                                                    <md-radio-button value="2">
                                                         {{vm.radioButtonChoices.group2}}
                                                     </md-radio-button>
                                                 </md-radio-group>
@@ -112,16 +140,16 @@
                                             <h3>This tenant has no resources logged. Make sure your devices have
                                                 proof of play activated.</h3>
                                         </div>
-                                    </md-content>
+                                    </div>
 
                                 </md-card-content>
                             </md-card>
                         </div>
                         <div style="padding-top: 25px; text-align: left"
-                             class="col-md-4 col-sm-6">
+                             class="col-md-6">
                             <md-card>
                                 <md-card-content>
-                                    <md-content class="md-padding">
+                                    <div class="md-padding">
                                         <h3>Selected Resources</h3>
                                         <hr/>
                                         <div ng-show="vm.selected_resources.length > 0">
@@ -143,64 +171,53 @@
                                         <div ng-hide="vm.selected_resources.length > 0">
                                             <h5>You have no selected resources</h5>
                                         </div>
-                                    </md-content>
-
-                                </md-card-content>
-                            </md-card>
-                        </div>
-                        <div style="padding-top: 25px; margin-left: -1em;"
-                             class="col-md-2 col-sm-6" ng-init="vm.initialize_tenant_select()">
-                            <md-card>
-                                <md-card-content>
-                                    <div class="center-block">
-                                        <h4 class="proof-of-play-tenant-name">{{vm.currentTenant}}</h4>
-                                        <hr/>
-                                        <div>
-                                            <div ng-hide="vm.tenants">
-                                                <h5>Loading tenants...</h5>
-
-                                            </div>
-                                            <div ng-show="vm.tenants">
-                                                <h5>Change Tenant</h5>
-                                                <hr/>
-
-
-                                                <md-input-container>
-                                                    <label class="center-block">Tenant</label>
-                                                    <md-select ng-model="vm.which_tenant">
-                                                        <md-option ng-repeat="tenant in vm.tenants | orderBy:'tenant'"
-                                                                   value="{{tenant}}" class="proof-of-play-tenant-name">
-                                                            {{tenant}}
-                                                        </md-option>
-                                                    </md-select>
-                                                </md-input-container>
-                                                <div>
-                                                    <md-button md-no-ink class="md-primary"
-                                                               ng-click="vm.submitTenant(vm.which_tenant)">
-                                                        Submit
-                                                    </md-button>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
 
-
                                 </md-card-content>
                             </md-card>
                         </div>
+
                     </div>
                 </div>
             </md-tab>
 
 
             <md-tab label="{{vm.location.title}}" layout-align="center center">
-                <div ng-controller="ProofOfPlayMultiLocationCtrl as vm" layout="column" ng-cloak>
-                    <div class="row" ng-init="vm.initialize()">
-                        <div style="padding-top: 25px; padding-left: 50px; text-align: left"
-                             class="col-md-6 col-sm-12">
+                <div ng-controller="ProofOfPlayMultiLocationCtrl as vm" layout="column"  class="container" ng-cloak>
+                    <div ng-init="vm.initialize()">
+                        <md-card>
+                            <md-card-content>
+                                <div class="col-md-12" ng-init="vm.initialize_tenant_select()">
+                                    <div class="col-sm-3">
+                                        <h3>{{vm.currentTenant}}</h3>
+                                    </div>
+
+                                    <div class="col-md-3 col-md-offset-6 radio-horizontal" ng-show="vm.tenants">
+
+                                        <md-input-container>
+                                            <label class="center-block">Change Tenant</label>
+                                            <md-select ng-model="vm.which_tenant">
+                                                <md-option ng-repeat="tenant in vm.tenants | orderBy:'tenant'"
+                                                           value="{{tenant}}" class="proof-of-play-tenant-name">
+                                                    {{tenant}}
+                                                </md-option>
+                                            </md-select>
+                                        </md-input-container>
+                                        <div>
+                                            <md-button md-no-ink class="md-primary"
+                                                       ng-click="vm.submitTenant(vm.which_tenant)">
+                                                Submit
+                                            </md-button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </md-card-content>
+                        </md-card>
+                        <div style="padding-top: 25px; text-align: left"
+                             class="col-md-6">
                             <md-card>
                                 <md-card-content>
-                                    <md-content class="md-padding">
+                                    <div class="md-padding">
 
                                         <div ng-show="vm.loading">
 
@@ -278,10 +295,10 @@
                                                 <md-radio-group
                                                         ng-model="vm.radioButtonChoices.selection"
                                                         ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
-                                                    <md-radio-button style="margin-left: 20px" value="1">
+                                                    <md-radio-button value="1">
                                                         {{vm.radioButtonChoices.group1}}
                                                     </md-radio-button>
-                                                    <md-radio-button style="margin-left: 20px" value="2">
+                                                    <md-radio-button value="2">
                                                         {{vm.radioButtonChoices.group2}}
                                                     </md-radio-button>
                                                 </md-radio-group>
@@ -300,16 +317,16 @@
                                             <h3>This tenant has no locations logged. Make sure your devices have
                                                 proof of play activated.</h3>
                                         </div>
-                                    </md-content>
+                                    </div>
 
                                 </md-card-content>
                             </md-card>
                         </div>
                         <div style="padding-top: 25px; text-align: left"
-                             class="col-md-4 col-sm-6">
+                             class="col-md-6">
                             <md-card>
                                 <md-card-content>
-                                    <md-content class="md-padding">
+                                    <div class="md-padding">
                                         <h3>Selected Locations</h3>
                                         <hr/>
                                         <div ng-show="vm.selected_locations.length > 0">
@@ -330,62 +347,51 @@
                                         <div ng-hide="vm.selected_locations.length > 0">
                                             <h5>You have no selected locations</h5>
                                         </div>
-                                    </md-content>
-
-                                </md-card-content>
-                            </md-card>
-                        </div>
-                        <div style="padding-top: 25px; margin-left: -1em;"
-                             class="col-md-2 col-sm-6" ng-init="vm.initialize_tenant_select()">
-                            <md-card>
-                                <md-card-content>
-                                    <div class="center-block">
-                                        <h4 class="proof-of-play-tenant-name">{{vm.currentTenant}}</h4>
-                                        <hr/>
-                                        <div>
-                                            <div ng-hide="vm.tenants">
-                                                <h5>Loading tenants...</h5>
-
-                                            </div>
-                                            <div ng-show="vm.tenants">
-                                                <h5>Change Tenant</h5>
-                                                <hr/>
-
-
-                                                <md-input-container>
-                                                    <label class="center-block">Tenant</label>
-                                                    <md-select ng-model="vm.which_tenant">
-                                                        <md-option ng-repeat="tenant in vm.tenants | orderBy:'tenant'"
-                                                                   value="{{tenant}}" class="proof-of-play-tenant-name">
-                                                            {{tenant}}
-                                                        </md-option>
-                                                    </md-select>
-                                                </md-input-container>
-                                                <div>
-                                                    <md-button md-no-ink class="md-primary"
-                                                               ng-click="vm.submitTenant(vm.which_tenant)">
-                                                        Submit
-                                                    </md-button>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
 
-
                                 </md-card-content>
                             </md-card>
                         </div>
+
                     </div>
                 </div>
             </md-tab>
             <md-tab label="{{vm.display.title}}" layout-align="center center">
-                <div ng-controller="ProofOfPlayMultiDisplayCtrl as vm" layout="column" ng-cloak>
-                    <div class="row" ng-init="vm.initialize()">
-                        <div style="padding-top: 25px; padding-left: 50px; text-align: left"
-                             class="col-md-6 col-sm-12">
+                <div ng-controller="ProofOfPlayMultiDisplayCtrl as vm" layout="column" class="container" ng-cloak>
+                    <div ng-init="vm.initialize()">
+                        <md-card>
+                            <md-card-content>
+                                <div class="col-md-12" ng-init="vm.initialize_tenant_select()">
+                                    <div class="col-sm-3">
+                                        <h3>{{vm.currentTenant}}</h3>
+                                    </div>
+
+                                    <div class="col-md-3 col-md-offset-6 radio-horizontal" ng-show="vm.tenants">
+
+                                        <md-input-container>
+                                            <label class="center-block">Change Tenant</label>
+                                            <md-select ng-model="vm.which_tenant">
+                                                <md-option ng-repeat="tenant in vm.tenants | orderBy:'tenant'"
+                                                           value="{{tenant}}" class="proof-of-play-tenant-name">
+                                                    {{tenant}}
+                                                </md-option>
+                                            </md-select>
+                                        </md-input-container>
+                                        <div>
+                                            <md-button md-no-ink class="md-primary"
+                                                       ng-click="vm.submitTenant(vm.which_tenant)">
+                                                Submit
+                                            </md-button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </md-card-content>
+                        </md-card>
+                        <div style="padding-top: 25px; text-align: left"
+                             class="col-md-6">
                             <md-card>
                                 <md-card-content>
-                                    <md-content class="md-padding">
+                                    <div class="md-padding">
                                         <div ng-show="vm.loading">
 
                                             <md-content class="md-padding">
@@ -462,10 +468,10 @@
                                                 <md-radio-group
                                                         ng-model="vm.radioButtonChoices.selection"
                                                         ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
-                                                    <md-radio-button style="margin-left: 20px" value="1">
+                                                    <md-radio-button value="1">
                                                         {{vm.radioButtonChoices.group1}}
                                                     </md-radio-button>
-                                                    <md-radio-button style="margin-left: 20px" value="2">
+                                                    <md-radio-button value="2">
                                                         {{vm.radioButtonChoices.group2}}
                                                     </md-radio-button>
                                                 </md-radio-group>
@@ -484,16 +490,16 @@
                                             <h3>This tenant has no displays logged. Make sure your devices have
                                                 proof of play activated.</h3>
                                         </div>
-                                    </md-content>
+                                    </div>
 
                                 </md-card-content>
                             </md-card>
                         </div>
                         <div style="padding-top: 25px; text-align: left"
-                             class="col-md-4 col-sm-6">
+                             class="col-md-6">
                             <md-card>
                                 <md-card-content>
-                                    <md-content class="md-padding">
+                                    <div class="md-padding">
                                         <h3>Selected Displays</h3>
                                         <hr/>
                                         <div ng-show="vm.selected_displays.length > 0">
@@ -515,48 +521,8 @@
                                         <div ng-hide="vm.selected_displays.length > 0">
                                             <h5>You have no selected displays</h5>
                                         </div>
-                                    </md-content>
-
-                                </md-card-content>
-                            </md-card>
-                        </div>
-                        <div style="padding-top: 25px; margin-left: -1em;"
-                             class="col-md-2 col-sm-6" ng-init="vm.initialize_tenant_select()">
-                            <md-card>
-                                <md-card-content>
-                                    <div class="center-block">
-                                        <h4 class="proof-of-play-tenant-name">{{vm.currentTenant}}</h4>
-                                        <hr/>
-                                        <div>
-                                            <div ng-hide="vm.tenants">
-                                                <h5>Loading tenants...</h5>
-
-                                            </div>
-                                            <div ng-show="vm.tenants">
-                                                <h5>Change Tenant</h5>
-                                                <hr/>
-
-
-                                                <md-input-container>
-                                                    <label class="center-block">Tenant</label>
-                                                    <md-select ng-model="vm.which_tenant">
-                                                        <md-option ng-repeat="tenant in vm.tenants | orderBy:'tenant'"
-                                                                   value="{{tenant}}">
-                                                            <p class="proof-of-play-tenant-name-option">
-                                                                {{tenant}}
-                                                            </p>
-                                                        </md-option>
-                                                    </md-select>
-                                                </md-input-container>
-                                                <div>
-                                                    <md-button md-no-ink class="md-primary"
-                                                               ng-click="vm.submitTenant(vm.which_tenant)">
-                                                        Submit
-                                                    </md-button>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
+
                                 </md-card-content>
                             </md-card>
                         </div>
