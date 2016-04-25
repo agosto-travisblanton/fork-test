@@ -39,6 +39,9 @@ angular.module('skykitProvisioning')
           if status == 403
             ToastsService.showErrorToast "You are not allowed to view this tenant!"
             $state.go 'proof', {}
+          if status == 404
+            ToastsService.showErrorToast "You must select a tenant first!"
+            $state.go 'proof', {}
 
       deferred.promise
 

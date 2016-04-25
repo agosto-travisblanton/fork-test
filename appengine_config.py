@@ -3,7 +3,6 @@ The configuration file used by :py:mod:`agar.config` implementations and other l
 `google.appengine.api.lib_config`_ configuration library. Configuration overrides go in this file.
 """
 from env_setup import setup
-
 setup()
 
 import os
@@ -462,10 +461,7 @@ def _return_yaml_data():
         only_numbers = version_without_newlines[9:]
         array_of_versions = only_numbers.split('-')
         array_of_versions_as_int = [int(each) for each in array_of_versions]
-        app_SPRINT_NUMBER = array_of_versions_as_int[0]
-        app_DEPLOYMENT_COUNTER = array_of_versions_as_int[1]
-        app_PRODUCTION_HOTFIX_COUNTER = array_of_versions_as_int[2]
-        return app_SPRINT_NUMBER, app_DEPLOYMENT_COUNTER, app_PRODUCTION_HOTFIX_COUNTER
+        return array_of_versions_as_int[0], array_of_versions_as_int[1], array_of_versions_as_int[2]
 
 snapdeploy_yaml_data = _return_yaml_data()
 app_SPRINT_NUMBER = snapdeploy_yaml_data[0]
