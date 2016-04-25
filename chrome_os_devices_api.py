@@ -155,26 +155,26 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, page_token
     A function that is meant to be run asynchronously to update the device entity
     with ChromeOsDevice information from Directory API using the MAC address to match.
     """
-    if device_urlsafe_key is None:
+    if not device_urlsafe_key:
         raise deferred.PermanentTaskFailure(
             'register_device: The device URL-safe key parameter is None. It is required.')
-    if device_mac_address is None:
+    if not device_mac_address:
         raise deferred.PermanentTaskFailure(
             'register_device: The device MAC address parameter is None. It is required.')
     impersonation_admin_email_address = get_impersonation_email_from_device_key(device_urlsafe_key)
-    if None == impersonation_admin_email_address:
+    if not impersonation_admin_email_address:
         logging.info('register_device: Impersonation email not found for device with device key {0}.'.
                      format(device_urlsafe_key))
         return
     chrome_os_devices_api = ChromeOsDevicesApi(impersonation_admin_email_address)
     chrome_os_devices, new_page_token = chrome_os_devices_api.cursor_list(customer_id=config.GOOGLE_CUSTOMER_ID,
                                                                           next_page_token=page_token)
-    if chrome_os_devices is not None and len(chrome_os_devices) > 0:
+    if chrome_os_devices and len(chrome_os_devices) > 0:
         lowercase_device_mac_address = device_mac_address.lower()
         loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == lowercase_device_mac_address or
                               x.get('ethernetMacAddress') == lowercase_device_mac_address)
         chrome_os_device = next(loop_comprehension, None)
-        if chrome_os_device is not None:
+        if chrome_os_device:
             device_key = ndb.Key(urlsafe=device_urlsafe_key)
             device = device_key.get()
             device.device_id = chrome_os_device.get('deviceId')
@@ -204,7 +204,7 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, page_token
                            _countdown=5)
             return device
         else:
-            if new_page_token is not None:
+            if new_page_token:
                 deferred.defer(refresh_device_by_mac_address,
                                device_urlsafe_key=device_urlsafe_key,
                                device_mac_address=device_mac_address,

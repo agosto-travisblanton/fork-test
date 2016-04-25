@@ -42,9 +42,9 @@ class ContentManagerApi(object):
     def create_device(self, device_urlsafe_key):
         key = ndb.Key(urlsafe=device_urlsafe_key)
         chrome_os_device = key.get()
-        if chrome_os_device.tenant_key is not None:
+        if chrome_os_device.tenant_key:
             tenant = chrome_os_device.tenant_key.get()
-            if tenant is not None:
+            if tenant:
                 payload = {
                     "device_key": device_urlsafe_key,
                     "api_key": chrome_os_device.api_key,
