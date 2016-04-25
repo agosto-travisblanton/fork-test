@@ -16,6 +16,9 @@ from provisioning_env import (
     on_server,
     on_test_harness)
 from agar.env import appid
+from os import path
+
+basedir = path.abspath(path.dirname(__file__))
 
 ##############################################################################
 # APPLICATION SETTINGS
@@ -451,11 +454,24 @@ proofplay_SQLALCHEMY_DATABASE_URI = _SQLALCHEMY_DATABASE_URI()
 
 proofplay_DAYS_TO_KEEP_RAW_EVENTS = 30
 
+
 ##############################################################################
 # VERSION  sprint_number.deployment_increment.hotfix_increment e.g., 33.3.0
 ##############################################################################
-app_SPRINT_NUMBER = 34
+def _return_yaml_data():
+    with open(os.path.join(basedir, 'snapdeploy.yaml'), 'r') as f:
+        data = f.readlines()
+        version = data[-1]
+        version_without_newlines = version.rstrip()
+        only_numbers = version_without_newlines[9:]
+        array_of_versions = only_numbers.split('-')
+        array_of_versions_as_int = [int(each) for each in array_of_versions]
+        app_SPRINT_NUMBER = array_of_versions_as_int[0]
+        app_DEPLOYMENT_COUNTER = array_of_versions_as_int[1]
+        app_PRODUCTION_HOTFIX_COUNTER = array_of_versions_as_int[2]
+        return [app_SPRINT_NUMBER, app_DEPLOYMENT_COUNTER, app_PRODUCTION_HOTFIX_COUNTER]
 
-app_DEPLOYMENT_COUNTER = 4
-
-app_PRODUCTION_HOTFIX_COUNTER = 0
+snapdeploy_yaml_data = _return_yaml_data()
+app_SPRINT_NUMBER = snapdeploy_yaml_data[0]
+app_DEPLOYMENT_COUNTER = snapdeploy_yaml_data[1]
+app_PRODUCTION_HOTFIX_COUNTER = snapdeploy_yaml_data[2]

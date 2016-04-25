@@ -12,9 +12,11 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($http, $log, Res
       promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{deviceKey}").get()
       promise
 
-    getIssuesByKey: (deviceKey, startEpoch, endEpoch) ->
+    getIssuesByKey: (deviceKey, startEpoch, endEpoch, prev, next) ->
+      prev = if prev == undefined or null then null else prev
+      next = if next == undefined or null then null else next
       promise = Restangular.oneUrl(SERVICE_NAME,
-        "api/v1/devices/#{deviceKey}/issues?start=#{startEpoch}&end=#{endEpoch}").get()
+        "api/v1/devices/#{prev}/#{next}/#{deviceKey}/issues?start=#{startEpoch}&end=#{endEpoch}").get()
       promise
 
     getCommandEventsByKey: (deviceKey) ->

@@ -1,8 +1,6 @@
 'use strict'
-
 appModule = angular.module 'skykitProvisioning'
-
-appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService) ->
+appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService, $stateParams, $state, ToastsService) ->
   @radioButtonChoices = {
     group1: 'By Device',
     group2: 'By Date',
@@ -21,13 +19,14 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService) ->
     resources: false,
   }
 
+  @tenant = $stateParams.tenant
   @no_cache = true
   @loading = true
   @disabled = true
   @selected_resources = []
 
   @initialize = =>
-    ProofPlayService.getAllResources()
+    ProofPlayService.getAllResources(@tenant)
     .then (data) =>
       @loading = false
       @full_resource_map = data.data.resources
@@ -94,7 +93,6 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService) ->
         end_date_unix: moment(@dateTimeSelection.end).unix(),
         resources: @selected_resources,
         type: @radioButtonChoices.selection
-
       }
 
     else
@@ -108,13 +106,13 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService) ->
           resources_as_ids.push each["resource_identifier"]
 
     if @final.type is "1"
-      ProofPlayService.downloadCSVForMultipleResourcesByDevice(@final.start_date_unix, @final.end_date_unix, resources_as_ids)
+      ProofPlayService.downloadCSVForMultipleResourcesByDevice(@final.start_date_unix, @final.end_date_unix, resources_as_ids, @tenant)
 
     else
-      ProofPlayService.downloadCSVForMultipleResourcesByDate(@final.start_date_unix, @final.end_date_unix, resources_as_ids)
+      ProofPlayService.downloadCSVForMultipleResourcesByDate(@final.start_date_unix, @final.end_date_unix, resources_as_ids, @tenant)
 
   @tenants = null
-  @currentTenant = ProofPlayService.getTenant()
+  @currentTenant = @tenant
 
   @initialize_tenant_select = () ->
     ProofPlayService.getAllTenants()
@@ -124,12 +122,12 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService) ->
 
   @submitTenant = (tenant) =>
     if tenant != @currentTenant
-      ProofPlayService.setTenant(tenant)
-      @initialize()
-      @selected_resources = []
-      @areResourcesValid()
-      @isDisabled()
-      @currentTenant = ProofPlayService.getTenant()
+      $state.go 'proofDetail', {
+        tenant: tenant
+      }
+      ToastsService.showSuccessToast "Proof of Play reporting set to " + tenant
+    else
+      ToastsService.showErrorToast "Proof of Play reporting is already set to " + tenant
 
 
   @

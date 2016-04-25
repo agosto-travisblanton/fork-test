@@ -53,3 +53,8 @@ indexes:
   - name: is_unmanaged_device
   - name: tenant_key
   - name: serial_number
+
+- kind: DeviceIssueLog
+  properties:
+  - name: device_key
+  - name: created

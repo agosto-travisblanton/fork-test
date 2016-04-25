@@ -4,16 +4,27 @@ describe 'ProofOfPlayMultiDisplayCtrl', ->
   $controller = undefined
   controller = undefined
   ProofPlayService = undefined
+  $stateParams = undefined
+  $state = undefined
+  ToastsService = undefined
   promise = undefined
   selected_tenant = undefined
 
 
   beforeEach module('skykitProvisioning')
 
-  beforeEach inject (_$controller_, _ProofPlayService_) ->
+  beforeEach inject (_$controller_, _ProofPlayService_, _ToastsService_, _$state_) ->
     $controller = _$controller_
     ProofPlayService = _ProofPlayService_
-    controller = $controller 'ProofOfPlayMultiDisplayCtrl', {ProofPlayService: ProofPlayService}
+    ToastsService = _ToastsService_
+    $stateParams = {}
+    $state = _$state_
+    controller = $controller 'ProofOfPlayMultiDisplayCtrl', {
+      ProofPlayService: ProofPlayService,
+      ToastsService: ToastsService,
+      $stateParams: $stateParams,
+      $state: $state
+    }
 
   describe 'initialization', ->
     it 'radioButtonChoices should equal', ->
@@ -65,6 +76,7 @@ describe 'ProofOfPlayMultiDisplayCtrl', ->
 
     it 'call getAllDisplays to populate autocomplete with devices', ->
       controller.initialize()
+      promise.resolve devicesData
       expect(ProofPlayService.getAllDisplays).toHaveBeenCalled()
 
 
@@ -157,10 +169,9 @@ describe 'ProofOfPlayMultiDisplayCtrl', ->
     selected_tenant = "some_tenant"
     beforeEach ->
       promise = new skykitProvisioning.q.Mock
+      spyOn($state, 'go')
       spyOn(ProofPlayService, 'getAllDisplays').and.returnValue promise
       spyOn(ProofPlayService, 'getAllTenants').and.returnValue promise
-      spyOn(ProofPlayService, 'getTenant').and.returnValue selected_tenant
-      spyOn(ProofPlayService, 'setTenant').and.returnValue null
 
 
     it 'initializeTenantSelection sets tenants', ->
@@ -176,4 +187,4 @@ describe 'ProofOfPlayMultiDisplayCtrl', ->
 
     it 'submitTenants sets currentTenant and getsAllDisplays again', ->
       controller.submitTenant(selected_tenant)
-      expect(ProofPlayService.getAllDisplays).toHaveBeenCalled()
+      expect($state.go).toHaveBeenCalledWith 'proofDetail', {tenant: selected_tenant}

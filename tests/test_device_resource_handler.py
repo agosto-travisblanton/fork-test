@@ -376,7 +376,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertTrue("Unable to find Chrome OS device by MAC address: {0}".format(mac_address) in
-            context.exception.message)
+                        context.exception.message)
 
     def test_get_device_by_mac_address_with_archived_false_returns_expected_device(self):
         mac_address = '2342342342342'
@@ -504,7 +504,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertTrue("Unable to find device by pairing code: {0}".format(self.PAIRING_CODE) in
-            context.exception.message)
+                        context.exception.message)
 
     def test_get_device_by_pairing_code_returns_zeroeth_resource_when_dupes(self):
         # TODO would like a decent mocking framework to assert we're logging this edge case as an error
@@ -1486,10 +1486,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_delete_archives_device(self):
         device = ChromeOsDevice.create_managed(
-                    tenant_key=self.tenant_key,
-                    gcm_registration_id=self.GCM_REGISTRATION_ID,
-                    device_id='12312314',
-                    mac_address='00012341230')
+            tenant_key=self.tenant_key,
+            gcm_registration_id=self.GCM_REGISTRATION_ID,
+            device_id='12312314',
+            mac_address='00012341230')
         device.put()
         request_body = {}
         self.assertFalse(device.archived)
@@ -1517,7 +1517,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                             headers=self.api_token_authorization_header)
         self.assertTrue('Bad response: 404 Device with key: {0} archived.'.format(device_key.urlsafe())
                         in context.exception.message)
-
 
     ##################################################################################################################
     # heartbeat
@@ -1951,7 +1950,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def test_get_latest_issues_without_token_returns_forbidden(self):
         request_body = {}
-        uri = build_uri('device-issues', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        uri = build_uri('device-issues',
+                        params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe(), 'prev_cursor_str': 'null',
+                                     'next_cursor_str': 'null'})
         response = self.get(uri, params=request_body, headers=self.empty_header)
         self.assertForbidden(response)
 
@@ -1962,7 +1963,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         end_epoch = int((end - datetime(1970, 1, 1)).total_seconds())
         request_parameters = {}
         uri = build_uri('device-issues', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe(),
-                                                      'start': start_epoch, 'end': end_epoch})
+                                                      'start': start_epoch, 'end': end_epoch, 'next_cursor_str': 'null',
+                                                      'prev_cursor_str': 'null'
+                                                      })
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertOK(response)
 
@@ -1981,8 +1984,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         issue.created = datetime.utcnow() - timedelta(seconds=59)
         issue.put()
         request_parameters = {}
-        uri = build_uri('device-issues', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe(),
-                                                      'start': start_epoch, 'end': end_epoch})
+        uri = build_uri('device-issues',
+                        params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe(), 'prev_cursor_str': 'null',
+                                     'next_cursor_str': 'null',
+                                     'start': start_epoch, 'end': end_epoch})
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
 
@@ -1990,31 +1995,31 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         issue.put()
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json[0]['elapsed_time'], '1.5 minutes')
+        self.assertEqual(response_json["issues"][0]['elapsed_time'], '1.5 minutes')
 
         issue.created = datetime.utcnow() - timedelta(minutes=59)
         issue.put()
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json[0]['elapsed_time'], '59.0 minutes')
+        self.assertEqual(response_json["issues"][0]['elapsed_time'], '59.0 minutes')
 
         issue.created = datetime.utcnow() - timedelta(minutes=90)
         issue.put()
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json[0]['elapsed_time'], '1.5 hours')
+        self.assertEqual(response_json["issues"][0]['elapsed_time'], '1.5 hours')
 
         issue.created = datetime.utcnow() - timedelta(hours=23)
         issue.put()
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json[0]['elapsed_time'], '23.0 hours')
+        self.assertEqual(response_json["issues"][0]['elapsed_time'], '23.0 hours')
 
         issue.created = datetime.utcnow() - timedelta(hours=48)
         issue.put()
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json[0]['elapsed_time'], '2.0 days')
+        self.assertEqual(response_json["issues"][0]['elapsed_time'], '2.0 days')
 
     def test_get_latest_issues_returns_expected_issue_order_with_latest_first(self):
         start = datetime.utcnow() - timedelta(days=5)
@@ -2049,14 +2054,16 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         issue.created = datetime.utcnow() - timedelta(minutes=10)
         issue.put()
         request_parameters = {}
-        uri = build_uri('device-issues', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe(),
-                                                      'start': start_epoch, 'end': end_epoch})
+        uri = build_uri('device-issues',
+                        params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe(), 'next_cursor_str': 'null',
+                                     'prev_cursor_str': 'null',
+                                     'start': start_epoch, 'end': end_epoch})
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
         self.assertLength(3, response_json)
-        self.assertEqual(response_json[0]['category'], config.DEVICE_ISSUE_PLAYER_DOWN)
-        self.assertEqual(response_json[1]['category'], config.DEVICE_ISSUE_MEMORY_HIGH)
-        self.assertEqual(response_json[2]['category'], config.DEVICE_ISSUE_STORAGE_LOW)
+        self.assertEqual(response_json["issues"][0]['category'], config.DEVICE_ISSUE_PLAYER_DOWN)
+        self.assertEqual(response_json["issues"][1]['category'], config.DEVICE_ISSUE_MEMORY_HIGH)
+        self.assertEqual(response_json["issues"][2]['category'], config.DEVICE_ISSUE_STORAGE_LOW)
 
     def test_get_latest_issues_returns_zero_issues_with_out_of_range_datetime(self):
         issue = DeviceIssueLog.create(device_key=self.managed_device_key,
@@ -2073,11 +2080,13 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         start_epoch = int((start - datetime(1970, 1, 1)).total_seconds())
         end_epoch = int((end - datetime(1970, 1, 1)).total_seconds())
         request_parameters = {}
-        uri = build_uri('device-issues', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe(),
-                                                      'start': start_epoch, 'end': end_epoch})
+        uri = build_uri('device-issues',
+                        params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe(), 'prev_cursor_str': 'null',
+                                     'next_cursor_str': 'null',
+                                     'start': start_epoch, 'end': end_epoch})
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertLength(0, response_json)
+        self.assertLength(0, response_json["issues"])
 
     def __initialize_heartbeat_info(self, up=True):
         self.managed_device.storage_utilization = self.STORAGE_UTILIZATION

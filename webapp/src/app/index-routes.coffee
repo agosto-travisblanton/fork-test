@@ -227,7 +227,16 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("proof", {
     url: "/proof",
-    templateUrl: "app/proof/index.html",
+    templateUrl: "app/proof/main.html",
+    controller: "ProofOfPlayCtrl",
+    controllerAs: 'vm',
+    ncyBreadcrumb: {
+      label: 'Proof of Play'
+    }
+  })
+  $stateProvider.state("proofDetail", {
+    url: "/proof/:tenant",
+    templateUrl: "app/proof/detail.html",
     controller: "ProofOfPlayCtrl",
     controllerAs: 'vm',
     ncyBreadcrumb: {
