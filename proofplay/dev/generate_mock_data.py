@@ -9,7 +9,7 @@ analytics = {}
 information_to_post = {
     "acme_inc": {
         "resource_choices": [
-            {"name": "ACME_5553", "id": "086b8e3df6a211e5b4256003088f14f4"},
+            {"name": "ACME_6051_DARK_SOULS_III_SHADOWS_AHEAD_CUTDOWN_AVAILABLE_NOW", "id": "086b8e3df6a211e5b4256003088f14f4"},
             {"name": "ACME_5447", "id": "11ff1887f6a211e585a16003088f14f4"},
             {"name": "ACME_2222", "id": "1fcad2a3f6a211e589336003088f14f4"},
             {"name": "ACME_5533", "id": "2434f099f6a211e580826003088f14f4"},

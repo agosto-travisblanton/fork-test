@@ -154,8 +154,8 @@
                                         <hr/>
                                         <div ng-show="vm.selected_resources.length > 0">
                                             <md-list>
-                                                <ol>
-                                                    <li ng-repeat="item in vm.selected_resources">
+                                                    <li ng-repeat="item in vm.selected_resources"
+                                                        class="proof-of-play-selected-item">
                                                         <md-button md-no-ink class="md-primary"
                                                                    id="proofplay-selected-items"
                                                                    ng-click="vm.removeFromSelectedResource(item)">
@@ -165,7 +165,6 @@
 
 
                                                     </li>
-                                                </ol>
                                             </md-list>
                                         </div>
                                         <div ng-hide="vm.selected_resources.length > 0">
@@ -183,7 +182,7 @@
 
 
             <md-tab label="{{vm.location.title}}" layout-align="center center">
-                <div ng-controller="ProofOfPlayMultiLocationCtrl as vm" layout="column"  class="container" ng-cloak>
+                <div ng-controller="ProofOfPlayMultiLocationCtrl as vm" layout="column" class="container" ng-cloak>
                     <div ng-init="vm.initialize()">
                         <md-card>
                             <md-card-content>
@@ -331,8 +330,8 @@
                                         <hr/>
                                         <div ng-show="vm.selected_locations.length > 0">
                                             <md-list>
-                                                <ol>
-                                                    <li ng-repeat="item in vm.selected_locations">
+                                                    <li ng-repeat="item in vm.selected_locations"
+                                                        class="proof-of-play-selected-item">
                                                         <md-button md-no-ink class="md-primary"
                                                                    id="proofplay-selected-items"
                                                                    ng-click="vm.removeFromSelectedLocation(item)">X
@@ -341,7 +340,6 @@
 
 
                                                     </li>
-                                                </ol>
                                             </md-list>
                                         </div>
                                         <div ng-hide="vm.selected_locations.length > 0">
@@ -504,8 +502,8 @@
                                         <hr/>
                                         <div ng-show="vm.selected_displays.length > 0">
                                             <md-list>
-                                                <ol>
-                                                    <li ng-repeat="item in vm.selected_displays">
+                                                    <li ng-repeat="item in vm.selected_displays"
+                                                        class="proof-of-play-selected-item">
                                                         <md-button md-no-ink class="md-primary"
                                                                    id="proofplay-selected-items"
 
@@ -515,7 +513,6 @@
 
 
                                                     </li>
-                                                </ol>
                                             </md-list>
                                         </div>
                                         <div ng-hide="vm.selected_displays.length > 0">

@@ -48,53 +48,28 @@ def kick_off():
     print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
 
+def run_delete_multi_on_model(model):
+    ndb.delete_multi(
+        model.query().fetch(keys_only=True),
+    )
+    return True
+
+
 def delete_all():
-    print "-------------------------------------------------------------------------------"
-    print "SEED SCRIPT HAS BEGUN!!! "
-    print "-------------------------------------------------------------------------------"
-    ##########################################################################################
-    # CLEAR EXISTING
-    ##########################################################################################
-    ndb.delete_multi(
-        DistributorEntityGroup.query().fetch(keys_only=True),
-    )
-    ndb.delete_multi(
-        Location.query().fetch(keys_only=True),
-    )
-    ndb.delete_multi(
-        DistributorUser.query().fetch(keys_only=True),
-    )
-    ndb.delete_multi(
-        ChromeOsDevice.query().fetch(keys_only=True),
-
-    )
-    ndb.delete_multi(
-        User.query().fetch(keys_only=True),
-    )
-
-    ndb.delete_multi(
-        Distributor.query().fetch(keys_only=True),
-    )
-
-    ndb.delete_multi(
-        Domain.query().fetch(keys_only=True),
-    )
-
-    ndb.delete_multi(
-        Tenant.query().fetch(keys_only=True),
-    )
-
-    ndb.delete_multi(
-        PlayerCommandEvent.query().fetch(keys_only=True),
-    )
-
-    ndb.delete_multi(
-        TenantEntityGroup.query().fetch(keys_only=True),
-    )
-
-    ndb.delete_multi(
-        DeviceIssueLog.query().fetch(keys_only=True),
-    )
+    models_to_delete = [
+        DistributorEntityGroup,
+        Location,
+        DistributorUser,
+        ChromeOsDevice,
+        User,
+        Distributor,
+        Domain,
+        Tenant,
+        PlayerCommandEvent,
+        TenantEntityGroup,
+        DeviceIssueLog
+    ]
+    return [run_delete_multi_on_model(model) for model in models_to_delete]
 
 
 def make_data_for_a_distributor():
