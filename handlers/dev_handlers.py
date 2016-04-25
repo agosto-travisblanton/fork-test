@@ -21,15 +21,22 @@ UNMANAGED_GCM_REGISTRATION_ID = '3c70a8d70a6dfa6df76dfas2'
 SERIAL_NUMBER = 'E6MSCX057790'
 
 
+def create_email(first, last):
+    return first + "." + last + "@agosto.com"
+
+
 class SeedScript(RequestHandler):
-    def get(self):
-        deferred.defer(kick_off)
+    def get(self, user_first, user_last):
+        deferred.defer(kick_off, user_first, user_last)
         self.response.out.write(
-            "A SEED SCRIPT HAS BEEN KICKED OFF. PLEASE WATCH FOR A COMPLETE STATEMENT IN THE TERMINAL"
+            "A SEED SCRIPT HAS BEEN KICKED OFF FOR {}. PLEASE WATCH FOR A COMPLETE STATEMENT IN THE TERMINAL".format(
+                create_email(user_first, user_last))
         )
 
 
-def kick_off():
+def kick_off(user_first, user_last):
+    global USER_EMAIL
+    USER_EMAIL = create_email(user_first, user_last)
     print "-------------------------------------------------------------------------------"
     print "SEED SCRIPT HAS BEGUN!!! "
     print "-------------------------------------------------------------------------------"
@@ -161,7 +168,7 @@ def make_data_for_a_distributor():
             managed_device.put()
             print 'Managed device created with MAC ' + str(i) + MAC_ADDRESS
 
-            for z in range(1, 200):
+            for z in range(1, 101):
                 issue = DeviceIssueLog.create(device_key=managed_device.key,
                                               category=config.DEVICE_ISSUE_PLAYER_DOWN,
                                               up=False,
@@ -182,31 +189,30 @@ def make_data_for_a_distributor():
     query = ChromeOsDevice.query().order(ChromeOsDevice.created)
     devices = query.fetch(1000)
     print 'Device count = ' + str(len(devices))
-    i = 0
     for device in devices:
-        i += 1
-        payload = 'reset content'.format(i)
-        gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
-        event = PlayerCommandEvent.create(device_urlsafe_key=device.key.urlsafe(),
-                                          payload=payload, gcm_registration_id=gcm_registration_id)
+        for i in range(1, 100):
+            payload = 'reset content'.format(i)
+            gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
+            event = PlayerCommandEvent.create(device_urlsafe_key=device.key.urlsafe(),
+                                              payload=payload, gcm_registration_id=gcm_registration_id)
 
-        event.put()
-        print 'Added ' + payload + ' event to ' + device.key.urlsafe()
-        payload = 'reset player'.format(i)
-        gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
-        event = PlayerCommandEvent.create(device_urlsafe_key=device.key.urlsafe(),
-                                          payload=payload, gcm_registration_id=gcm_registration_id)
-        event.player_has_confirmed = True
-        event.put()
-        print 'Added ' + payload + ' event to ' + device.key.urlsafe()
-        payload = 'panel on'.format(i)
-        gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
-        event = PlayerCommandEvent.create(device_urlsafe_key=device.key.urlsafe(),
-                                          payload=payload, gcm_registration_id=gcm_registration_id)
+            event.put()
+            print 'Added ' + payload + ' event to ' + device.key.urlsafe()
+            payload = 'reset player'.format(i)
+            gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
+            event = PlayerCommandEvent.create(device_urlsafe_key=device.key.urlsafe(),
+                                              payload=payload, gcm_registration_id=gcm_registration_id)
+            event.player_has_confirmed = True
+            event.put()
+            print 'Added ' + payload + ' event to ' + device.key.urlsafe()
+            payload = 'panel on'.format(i)
+            gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
+            event = PlayerCommandEvent.create(device_urlsafe_key=device.key.urlsafe(),
+                                              payload=payload, gcm_registration_id=gcm_registration_id)
 
-        event.player_has_confirmed = True
-        event.put()
-        print 'Added ' + payload + ' event to ' + device.key.urlsafe()
+            event.player_has_confirmed = True
+            event.put()
+            print 'Added ' + payload + ' event to ' + device.key.urlsafe()
 
     ##########################################################################################
     # PROOF OF PLAY

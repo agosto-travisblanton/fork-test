@@ -29,12 +29,15 @@ Make sure your virtualenv is activated and has the requirements installed before
 ```
 
 ### Bootstrap back-end: 
+After starting the server, hit `localhost:8080/api/v1/seed/<user_first>/<user_last>`
+You will see a message explaining that the seed script has started in the background,
+and a subsequent message expalining when the seed script has finished.
+
+### Bootstrap Proof of Play back-end: 
 After starting the server, hit `localhost:8080/api/v1/seed`
 You will see a message explaining that the seed script has started in the background,
 and a subsequent message expalining when the seed script has finished.
 
-<b>NOTE</b>: you will need to edit the username associated with the seed script to match your agosto domain.
-Edit the following: `handlers.dev_handlers.USER_EMAIL`
 
 ### Test Back-End
 After following the directions found <a href="https://sites.google.com/a/dev.agosto.com/skykit/tenant-provisioning/testing">here</a>
