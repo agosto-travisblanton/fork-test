@@ -42,32 +42,37 @@ class ContentManagerApi(object):
     def create_device(self, device_urlsafe_key):
         key = ndb.Key(urlsafe=device_urlsafe_key)
         chrome_os_device = key.get()
-        if chrome_os_device.tenant_key is not None:
+        if chrome_os_device.tenant_key:
             tenant = chrome_os_device.tenant_key.get()
-            payload = {
-                "device_key": device_urlsafe_key,
-                "api_key": chrome_os_device.api_key,
-                "tenant_code": tenant.tenant_code,
-                "serial_number": chrome_os_device.serial_number
-            }
-            url = "{content_manager_base_url}/provisioning/v1/displays".format(
-                content_manager_base_url=tenant.content_manager_base_url)
-            http_client_request = HttpClientRequest(url=url,
-                                                    payload=json.dumps(payload),
-                                                    headers=self.HEADERS)
-            http_client_response = HttpClient().post(http_client_request)
-            if http_client_response.status_code == 201:
-                logging.info(
-                    'create_device to CM: url={0}, device_key={1}, api_key={2}, tenant_code={3}, SN = {4}'.format(
-                        url,
-                        device_urlsafe_key,
-                        chrome_os_device.api_key,
-                        tenant.tenant_code,
-                        chrome_os_device.serial_number))
-                return True
+            if tenant:
+                payload = {
+                    "device_key": device_urlsafe_key,
+                    "api_key": chrome_os_device.api_key,
+                    "tenant_code": tenant.tenant_code,
+                    "serial_number": chrome_os_device.serial_number
+                }
+                url = "{content_manager_base_url}/provisioning/v1/displays".format(
+                    content_manager_base_url=tenant.content_manager_base_url)
+                http_client_request = HttpClientRequest(url=url,
+                                                        payload=json.dumps(payload),
+                                                        headers=self.HEADERS)
+                http_client_response = HttpClient().post(http_client_request)
+                if http_client_response.status_code == 201:
+                    logging.info(
+                        'create_device to CM: url={0}, device_key={1}, api_key={2}, tenant_code={3}, SN = {4}'.format(
+                            url,
+                            device_urlsafe_key,
+                            chrome_os_device.api_key,
+                            tenant.tenant_code,
+                            chrome_os_device.serial_number))
+                    return True
+                else:
+                    error_message = 'Unable to create device in Content Manager with tenant code {0}. Status code: {1}, ' \
+                                    'url={2}'.format(tenant.tenant_code, http_client_response.status_code, url)
+                    logging.error(error_message)
+                    raise RuntimeError(error_message)
             else:
-                error_message = 'Unable to create device in Content Manager with tenant code {0}. Status code: {1}, ' \
-                                'url={2}'.format(tenant.tenant_code, http_client_response.status_code, url)
+                error_message = 'Unable to resolve tenant'
                 logging.error(error_message)
                 raise RuntimeError(error_message)
         else:
