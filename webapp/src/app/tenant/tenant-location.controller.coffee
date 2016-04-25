@@ -3,7 +3,7 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantLocationCtrl',
-  ($stateParams, TenantsService, LocationsService, $state, sweet, ProgressBarService) ->
+  ($stateParams, TenantsService, LocationsService, $state, sweet, ProgressBarService, ToastsService) ->
     @location = {
       key: undefined
     }
@@ -28,23 +28,25 @@ appModule.controller 'TenantLocationCtrl',
     @onClickSaveButton = ->
       ProgressBarService.start()
       promise = LocationsService.save @location
-      promise.then @onSuccessSavingLocation(@tenantKey), @onFailureSavingLocation
+      promise.then @onSuccessSavingLocation, @onFailureSavingLocation
 
-    @onSuccessSavingLocation = (tenantKey)->
+    @onSuccessSavingLocation = ()->
       ProgressBarService.complete()
+      ToastsService.showSuccessToast 'We saved your location.'
       setTimeout (->
-        $state.go 'tenantLocations', {tenantKey: tenantKey}
+        $state.go 'tenantLocations', {tenantKey: $stateParams.tenantKey}
         return
       ), 1000
 
-    @onFailureSavingLocation = (errorObject) ->
+    @onFailureSavingLocation = (response) ->
       ProgressBarService.complete()
-      if errorObject.status is 409
+      if response.status is 409
+        ToastsService.showErrorToast 'Location code conflict. Unable to save your location.'
         sweet.show('Oops...',
-          'Location code unavailable. Please modify customer location name to generate a unique location code.',
+          'Please change your customer location name. Location name must generate a unique location code.',
           'error')
       else
-        sweet.show('Oops...', 'Unable to save the location.', 'error')
+        ToastsService.showErrorToast 'Unable to save your location.'
 
     @fetchTenantName = (tenantKey) =>
       tenantPromise = TenantsService.getTenantByKey tenantKey

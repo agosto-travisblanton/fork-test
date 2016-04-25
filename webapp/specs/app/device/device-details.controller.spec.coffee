@@ -240,14 +240,6 @@ describe 'DeviceDetailsCtrl', ->
       it 'sets the back button text according to previous context', ->
         expect(controller.backUrlText).toBe 'Back to devices'
 
-#      if @currentDevice.isUnmanagedDevice is true
-#        @backUrl = "/#/tenants/#{@tenantKey}/unmanaged"
-#        @backUrlText = 'Back to tenant unmanaged devices'
-#      else
-#        @backUrl = "/#/tenants/#{@tenantKey}/managed"
-#        @backUrlText = 'Back to tenant managed devices'
-
-
     describe 'coming from tenant unmanaged devices', ->
       beforeEach ->
         $stateParams = {fromDevices: "false"}
@@ -329,7 +321,7 @@ describe 'DeviceDetailsCtrl', ->
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it "the 'then' handler shows a sweet", ->
+      it "displays a success toast", ->
         expect(ToastsService.showSuccessToast).toHaveBeenCalledWith 'We saved your updates to this device.'
 
     describe '.onFailureDeviceSave', ->
