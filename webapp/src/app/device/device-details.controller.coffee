@@ -66,7 +66,8 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @endTime = now.toLocaleString().replace(/,/g, "")
   today.setDate(now.getDate() - @dayRange)
   @startTime = today.toLocaleString().replace(/,/g, "")
-
+  
+  # event tab
   @getIssues = (device, epochStart, epochEnd, prev, next) =>
     ProgressBarService.start()
     issuesPromise = DevicesService.getIssuesByKey(device, epochStart, epochEnd, prev, next)
@@ -76,6 +77,17 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       @next_cursor = data.next
       ProgressBarService.complete()
 
+
+  # command history tab
+  @getEvents = (deviceKey, prev, next) =>
+    ProgressBarService.start()
+    commandEventsPromise = DevicesService.getCommandEventsByKey deviceKey, prev, next
+    commandEventsPromise.then (data) =>
+      @event_next_cursor = data.next_cursor
+      @event_prev_cursor = data.prev_cursor
+      @commandEvents = data.events
+      ProgressBarService.complete()
+
   @paginateCall = (forward) =>
     if forward
       @getIssues @deviceKey, @epochStart, @epochEnd, null, @next_cursor
@@ -83,13 +95,6 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     else
       @getIssues @deviceKey, @epochStart, @epochEnd, @prev_cursor, null
 
-
-  @getEvents = (deviceKey, prev, next) =>
-    commandEventsPromise = DevicesService.getCommandEventsByKey deviceKey, prev, next
-    commandEventsPromise.then (data) =>
-      @event_next_cursor = data.next_cursor
-      @event_prev_cursor = data.prev_cursor
-      @commandEvents = data.events
 
   @paginateEventCall = (forward) =>
     if forward
@@ -230,7 +235,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     else
       @onSaveDevice()
 
-  @onUpdateLocation  = ->
+  @onUpdateLocation = ->
     @onSaveDevice()
 
   @autoGenerateCustomerDisplayCode = ->
