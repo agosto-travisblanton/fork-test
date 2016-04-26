@@ -165,7 +165,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onSuccessDeviceSave = ->
     ProgressBarService.complete()
-    ToastsService.showSuccessToast 'We saved your updates to this device.'
+    ToastsService.showSuccessToast 'We saved your update.'
 
   @onFailureDeviceSave = (error) ->
     ProgressBarService.complete()
@@ -211,10 +211,15 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @onProofOfPlayLoggingCheck = ->
     if @currentDevice.proofOfPlayLogging
       if @currentDevice.locationKey == null
-        ToastsService.showErrorToast 'Cannot enable proof of play logging until this device has a location.'
+        sweet.show('Oops...', "Must have a location for this device to enable Proof of Play.", 'error')
         @currentDevice.proofOfPlayLogging = false
+      else
+        @onClickSaveDevice()
     else
-      ToastsService.showInfoToast 'Proof of play logging disabled'
+      @onClickSaveDevice()
+
+  @onUpdateLocation  = ->
+    @onClickSaveDevice()
 
   @autoGenerateCustomerDisplayCode = ->
     newDisplayCode = ''
