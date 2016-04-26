@@ -25,6 +25,9 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, $cookies) ->
     vm.identity.full_name = vm.identity.first_name + " " + vm.identity.last_name
 
 
+    @changeDistributor = () =>
+        $state.go 'distributor_selection'
+    
     if !vm.identity.email
       $state.go "sign_in"
 

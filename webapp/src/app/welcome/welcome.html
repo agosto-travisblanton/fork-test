@@ -10,8 +10,14 @@
                 <h3>Welcome <b>{{ vm.identity.full_name }}</b>!</h3>
                 <h3>You are signed in under the <b>{{
                     vm.identity.distributorName }}</b> distributor.</h3>
-                <br/>
                 <p> Click on the hamburger icon in the top-left to get started.</p>
+                <h5>OR</h5>
+                <h4>Click
+                    <md-button class="md-raised" ng-click="vm.changeDistributor()">Here</md-button>
+                    to change your Distributor
+                </h4>
+
+
             </div>
         </md-card>
         <div flex="35" flex-sm="35" flex-xs="35" layout="column">
