@@ -6,12 +6,11 @@
     </md-toolbar>
     <md-content>
         <div flex="100" flex-sm="100" flex-xs="100" layout="column">
-
             <md-tabs md-dynamic-height md-border-bottom>
                 <div class="container">
                     <md-tab label="{{vm.resource.title}}" layout-align="center center">
                         <div ng-controller="ProofOfPlayMultiResourceCtrl as vm" layout="column" ng-cloak>
-                            <div ng-init="vm.initialize()">
+                            <div ng-init="vm.initialize()" class="container">
                                 <md-card>
                                     <div class="col-md-12" ng-init="vm.initialize_tenant_select()">
                                         <div class="col-sm-3">
@@ -182,7 +181,7 @@
 
                     <md-tab label="{{vm.location.title}}" layout-align="center center">
                         <div ng-controller="ProofOfPlayMultiLocationCtrl as vm" layout="column" ng-cloak>
-                            <div ng-init="vm.initialize()">
+                            <div ng-init="vm.initialize()" class="container">
                                 <md-card>
                                     <div class="col-md-12" ng-init="vm.initialize_tenant_select()">
                                         <div class="col-sm-3">
@@ -353,7 +352,7 @@
                     </md-tab>
                     <md-tab label="{{vm.display.title}}" layout-align="center center">
                         <div ng-controller="ProofOfPlayMultiDisplayCtrl as vm" layout="column" ng-cloak>
-                            <div ng-init="vm.initialize()">
+                            <div ng-init="vm.initialize()" class="container">
                                 <md-card>
                                     <div class="col-md-12" ng-init="vm.initialize_tenant_select()">
                                         <div class="col-sm-3">
