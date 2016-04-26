@@ -128,7 +128,6 @@ describe 'DeviceDetailsCtrl', ->
 
     describe 'new mode', ->
       beforeEach ->
-
         controller = $controller 'DeviceDetailsCtrl', {
           $stateParams: $stateParams
           $state: $state
@@ -304,7 +303,7 @@ describe 'DeviceDetailsCtrl', ->
       expect($state.go).toHaveBeenCalledWith 'devices'
 
 
-  describe '.onClickSaveDevice', ->
+  describe '.onSaveDevice', ->
     beforeEach ->
       devicesServicePromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'save').and.returnValue devicesServicePromise
@@ -315,7 +314,7 @@ describe 'DeviceDetailsCtrl', ->
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.currentDevice.panelModel = {id: 'Sony-112'}
       controller.currentDevice.panelInput = {id: 'HDMI1', parentId: 'Sony-112'}
-      controller.onClickSaveDevice()
+      controller.onSaveDevice()
       devicesServicePromise.resolve()
 
     it 'starts the progress bar', ->
@@ -333,7 +332,7 @@ describe 'DeviceDetailsCtrl', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
       it "displays a success toast", ->
-        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith 'We saved your updates to this device.'
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith 'We saved your update.'
 
     describe '.onFailureDeviceSave', ->
       beforeEach ->
@@ -453,6 +452,52 @@ describe 'DeviceDetailsCtrl', ->
 
     it 'displays a toast indicating delete request was canceled', ->
       expect(ToastsService.showInfoToast).toHaveBeenCalledWith 'We canceled your delete request.'
+
+  describe '.onProofOfPlayLoggingCheck', ->
+    beforeEach ->
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+
+    describe 'proof of play logging is true with a location specified', ->
+      beforeEach ->
+        spyOn(controller, 'onSaveDevice')
+        controller.currentDevice.proofOfPlayLogging = true
+        controller.currentDevice.locationKey = 'ah1kZXZ-c2t5a2l0LW'
+        controller.onProofOfPlayLoggingCheck()
+
+      it 'saves proof of play is true on the device entity', ->
+        expect(controller.onSaveDevice).toHaveBeenCalled()
+
+    describe 'proof of play logging is true with no location specified', ->
+      beforeEach ->
+        spyOn(sweet, 'show')
+        controller.currentDevice.proofOfPlayLogging = true
+        controller.currentDevice.locationKey = null
+        controller.onProofOfPlayLoggingCheck()
+
+      it 'displays a sweet alert indicating a location is needed to enable Proof of Play', ->
+        expect(sweet.show).toHaveBeenCalledWith('Oops...',
+          "Must have a location for this device to enable Proof of Play.", 'error')
+
+      it 'set proofOfPlayLogging to false since the location pre-condition is not met', ->
+        expect(controller.currentDevice.proofOfPlayLogging).toBe false
+
+    describe 'proof of play logging is false', ->
+      beforeEach ->
+        spyOn(controller, 'onSaveDevice')
+        controller.currentDevice.proofOfPlayLogging = false
+        controller.onProofOfPlayLoggingCheck()
+
+      it 'saves proof of play is false on the device entity', ->
+        expect(controller.onSaveDevice).toHaveBeenCalled()
+
+  describe '.onUpdateLocation', ->
+    beforeEach ->
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+      spyOn(controller, 'onSaveDevice')
+      controller.onUpdateLocation()
+
+    it 'saves proof of play on the device entity', ->
+      expect(controller.onSaveDevice).toHaveBeenCalled()
 
   describe '.onClickResetSendButton', ->
     beforeEach ->

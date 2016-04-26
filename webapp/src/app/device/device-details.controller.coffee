@@ -163,7 +163,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   # Properties Tab
   #####################
 
-  @onClickSaveDevice = () ->
+  @onSaveDevice = () ->
     ProgressBarService.start()
     if @currentDevice.location != undefined && @currentDevice.location.key != undefined
       @currentDevice.locationKey = @currentDevice.location.key
@@ -177,7 +177,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onSuccessDeviceSave = ->
     ProgressBarService.complete()
-    ToastsService.showSuccessToast 'We saved your updates to this device.'
+    ToastsService.showSuccessToast 'We saved your update.'
 
   @onFailureDeviceSave = (error) ->
     ProgressBarService.complete()
@@ -219,6 +219,19 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
   @onConfirmCancel = ->
     ToastsService.showInfoToast 'We canceled your delete request.'
+
+  @onProofOfPlayLoggingCheck = ->
+    if @currentDevice.proofOfPlayLogging
+      if @currentDevice.locationKey == null
+        sweet.show('Oops...', "Must have a location for this device to enable Proof of Play.", 'error')
+        @currentDevice.proofOfPlayLogging = false
+      else
+        @onSaveDevice()
+    else
+      @onSaveDevice()
+
+  @onUpdateLocation  = ->
+    @onSaveDevice()
 
   @autoGenerateCustomerDisplayCode = ->
     newDisplayCode = ''
