@@ -151,7 +151,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   # Properties Tab
   #####################
 
-  @onClickSaveDevice = () ->
+  @onSaveDevice = () ->
     ProgressBarService.start()
     if @currentDevice.location != undefined && @currentDevice.location.key != undefined
       @currentDevice.locationKey = @currentDevice.location.key
@@ -214,12 +214,12 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
         sweet.show('Oops...', "Must have a location for this device to enable Proof of Play.", 'error')
         @currentDevice.proofOfPlayLogging = false
       else
-        @onClickSaveDevice()
+        @onSaveDevice()
     else
-      @onClickSaveDevice()
+      @onSaveDevice()
 
   @onUpdateLocation  = ->
-    @onClickSaveDevice()
+    @onSaveDevice()
 
   @autoGenerateCustomerDisplayCode = ->
     newDisplayCode = ''
