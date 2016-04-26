@@ -11,8 +11,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   $cookies,
   ProgressBarService,
   $mdDialog,
-  ToastsService
-) ->
+  ToastsService) ->
   @tenantKey = $stateParams.tenantKey
   @deviceKey = $stateParams.deviceKey
   @fromDevices = $stateParams.fromDevices is "true"
@@ -84,25 +83,38 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     else
       @getIssues @deviceKey, @epochStart, @epochEnd, @prev_cursor, null
 
+
+  @getEvents = (deviceKey, prev, next) =>
+    commandEventsPromise = DevicesService.getCommandEventsByKey deviceKey, prev, next
+    commandEventsPromise.then (data) =>
+      @event_next_cursor = data.next_cursor
+      @event_prev_cursor = data.prev_cursor
+      @commandEvents = data.events
+
+  @paginateEventCall = (forward) =>
+    if forward
+      @getEvents @deviceKey, null, @event_next_cursor
+
+    else
+      @getEvents @deviceKey, @event_prev_cursor, null
+
   @initialize = () ->
     @epochStart = moment(new Date(@startTime)).unix()
     @epochEnd = moment(new Date(@endTime)).unix()
     timezonePromise = TimezonesService.getUsTimezones()
     timezonePromise.then (data) =>
       @timezones = data
+
     @panelModels = DevicesService.getPanelModels()
     @panelInputs = DevicesService.getPanelInputs()
+
     devicePromise = DevicesService.getDeviceByKey @deviceKey
     devicePromise.then ((response) =>
       @onGetDeviceSuccess(response)
-      return
     ), (response) =>
       @onGetDeviceFailure(response)
-      return
-    commandEventsPromise = DevicesService.getCommandEventsByKey @deviceKey
-    commandEventsPromise.then (data) =>
-      @commandEvents = data
 
+    @getEvents @deviceKey
     @getIssues(@deviceKey, @epochStart, @epochEnd)
 
   @onGetDeviceSuccess = (response) ->

@@ -58,3 +58,8 @@ indexes:
   properties:
   - name: device_key
   - name: created
+
+- kind: PlayerCommandEvent
+  properties:
+  - name: device_urlsafe_key
+  - name: posted

@@ -270,26 +270,26 @@
                                     </div>
                                 </md-card-content>
                             </md-card>
-                          <md-card>
-                            <md-card-content>
-                              <h2>Delete</h2>
-                              <hr/>
-                              <div class="form-group">
-                                <label>Device key</label>
-                                <div class="gcm-registration-id-word-break">
-                                  {{deviceDetailsCtrl.currentDevice.key}}
-                                </div>
-                                <md-card-actions layout="row" layout-align="end center">
-                                  <button class="md-raised md-primary md-button md-ink-ripple" type="button"
-                                          aria-label="Delete" layout-align="right" ng-click="deviceDetailsCtrl.confirmDeviceDelete(
+                            <md-card>
+                                <md-card-content>
+                                    <h2>Delete</h2>
+                                    <hr/>
+                                    <div class="form-group">
+                                        <label>Device key</label>
+                                        <div class="gcm-registration-id-word-break">
+                                            {{deviceDetailsCtrl.currentDevice.key}}
+                                        </div>
+                                        <md-card-actions layout="row" layout-align="end center">
+                                            <button class="md-raised md-primary md-button md-ink-ripple" type="button"
+                                                    aria-label="Delete" layout-align="right" ng-click="deviceDetailsCtrl.confirmDeviceDelete(
                               $event, deviceDetailsCtrl.currentDevice.key)">
-                                    <i class="fa fa-fw fa-trash ng-scope"></i><span class="ng-scope">
+                                                <i class="fa fa-fw fa-trash ng-scope"></i><span class="ng-scope">
                         Delete
                       </span></button>
-                                </md-card-actions>
-                              </div>
-                            </md-card-content>
-                          </md-card>
+                                        </md-card-actions>
+                                    </div>
+                                </md-card-content>
+                            </md-card>
                         </div>
                         <div flex="50" flex-sm="50" flex-xs="50" layout="column">
                             <md-card>
@@ -555,7 +555,7 @@
 
                                 </md-card-content>
                             </md-card>
-                             <md-card>
+                            <md-card>
                                 <md-card-content>
                                     <form name="tenantForm" class="form-horizontal"
                                           ng-submit="deviceDetailsCtrl.onClickRefreshButton()"
@@ -800,11 +800,27 @@
                             </md-card>
                         </div>
                         <div flex="65" flex-sm="65" flex-xs="65" layout="column">
+
                             <md-card>
                                 <md-card-content>
                                     <h3>Command history</h3>
                                     <hr/>
-                                    <div class="row margin-top-15">
+
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <md-button class="md-raised"
+                                                       ng-disabled="!deviceDetailsCtrl.event_prev_cursor"
+                                                       ng-click="deviceDetailsCtrl.paginateEventCall(false)">
+                                                Prev
+                                            </md-button>
+                                            <md-button class="md-raised"
+                                                       ng-disabled="!deviceDetailsCtrl.event_next_cursor"
+                                                       ng-click="deviceDetailsCtrl.paginateEventCall(true)">
+                                                Next
+                                            </md-button>
+                                            <hr/>
+                                        </div>
                                         <div class="col-lg-12">
                                             <table class="table table-responsive table-striped">
                                                 <thead>
@@ -830,6 +846,20 @@
                                                 </tr>
                                                 </tbody>
                                             </table>
+                                        </div>
+                                        <div class="col-md-12" ng-if="deviceDetailsCtrl.commandEvents.length > 10">
+                                            <hr/>
+                                            <md-button class="md-raised"
+                                                       ng-disabled="!deviceDetailsCtrl.event_prev_cursor"
+                                                       ng-click="deviceDetailsCtrl.paginateEventCall(false)">
+                                                Prev
+                                            </md-button>
+                                            <md-button class="md-raised"
+                                                       ng-disabled="!deviceDetailsCtrl.event_next_cursor"
+                                                       ng-click="deviceDetailsCtrl.paginateEventCall(true)">
+                                                Next
+                                            </md-button>
+                                            <hr/>
                                         </div>
                                     </div>
                                 </md-card-content>
