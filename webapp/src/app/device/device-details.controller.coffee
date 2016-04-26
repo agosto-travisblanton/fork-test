@@ -208,6 +208,14 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @onConfirmCancel = ->
     ToastsService.showInfoToast 'We canceled your delete request.'
 
+  @onProofOfPlayLoggingCheck = ->
+    if @currentDevice.proofOfPlayLogging
+      if @currentDevice.locationKey == null
+        ToastsService.showErrorToast 'Cannot enable proof of play logging until this device has a location.'
+        @currentDevice.proofOfPlayLogging = false
+    else
+      ToastsService.showInfoToast 'Proof of play logging disabled'
+
   @autoGenerateCustomerDisplayCode = ->
     newDisplayCode = ''
     if @currentDevice.customerDisplayName
