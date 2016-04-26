@@ -403,6 +403,8 @@ ul.alert-dropdown {
 
 #proofplay-selected-items {
   min-width: 0px !important;
+  margin: 0 auto;
+  padding: 0 auto;
 }
 
 .radio-button {
@@ -456,12 +458,11 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
   text-align: center;
 }
 
-.proof-of-play-tenant-name {
+.proof-of-play-selected-item {
   width: 100%;
-  font-size: 1.2em;
   white-space: nowrap;
   overflow: hidden;
-  text-align: center;
+  text-align: left;
   text-overflow: ellipsis // This is where the magic happens
 }
 

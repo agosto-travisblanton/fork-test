@@ -1,12 +1,11 @@
 from webapp2 import RequestHandler
-
-from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from google.appengine.ext.deferred import deferred
 from google.appengine.ext import ndb
 from app_config import config
 from models import User, Distributor, Domain, Tenant, ChromeOsDevice, PlayerCommandEvent, TenantEntityGroup, \
     DeviceIssueLog, DistributorEntityGroup, Location, DistributorUser
 import time
+import random
 
 USER_EMAIL = 'daniel.ternyak@agosto.com'
 DISTRIBUTOR_NAME = 'Agosto'
@@ -20,73 +19,67 @@ MAC_ADDRESS = '54271e619346'
 UNMANAGED_MAC_ADDRESS = '04271e61934b'
 UNMANAGED_GCM_REGISTRATION_ID = '3c70a8d70a6dfa6df76dfas2'
 SERIAL_NUMBER = 'E6MSCX057790'
-import random
+
+
+def create_email(first, last):
+    return first + "." + last + "@agosto.com"
 
 
 class SeedScript(RequestHandler):
-    def get(self):
-        deferred.defer(kick_off)
+    def get(self, user_first, user_last):
+        deferred.defer(kick_off, user_first, user_last)
         self.response.out.write(
-            "A SEED SCRIPT HAS BEEN KICKED OFF. PLEASE WATCH FOR A COMPLETE STATEMENT IN THE TERMINAL"
+            "A SEED SCRIPT HAS BEEN KICKED OFF FOR {}. PLEASE WATCH FOR A COMPLETE STATEMENT IN THE TERMINAL".format(
+                create_email(user_first, user_last))
         )
 
-    @requires_registration_token
-    def post(self):
-        pass
 
-    @requires_unmanaged_registration_token
-    def put(self):
-        pass
-
-
-def kick_off():
+def kick_off(user_first, user_last):
+    global USER_EMAIL
+    USER_EMAIL = create_email(user_first, user_last)
     print "-------------------------------------------------------------------------------"
     print "SEED SCRIPT HAS BEGUN!!! "
     print "-------------------------------------------------------------------------------"
-    ##########################################################################################
-    # CLEAR EXISTING
-    ##########################################################################################
-    ndb.delete_multi(
-        DistributorEntityGroup.query().fetch(keys_only=True),
-    )
-    ndb.delete_multi(
-        Location.query().fetch(keys_only=True),
-    )
-    ndb.delete_multi(
-        DistributorUser.query().fetch(keys_only=True),
-    )
-    ndb.delete_multi(
-        ChromeOsDevice.query().fetch(keys_only=True),
+    print "-------------------------------------------------------------------------------"
+    print "DELETING CURRENT DATASTORE!!! "
+    print "-------------------------------------------------------------------------------"
+    delete_all()
+    print "-------------------------------------------------------------------------------"
+    print "CREATE DATA FOR DATASTORE!!! "
+    print "-------------------------------------------------------------------------------"
+    make_data_for_a_distributor()
+    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    print "-------------------------------------------------------------------------------"
+    print "COMPLETED SEED SCRIPT"
+    print "-------------------------------------------------------------------------------"
+    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
-    )
-    ndb.delete_multi(
-        User.query().fetch(keys_only=True),
-    )
 
+def run_delete_multi_on_model(model):
     ndb.delete_multi(
-        Distributor.query().fetch(keys_only=True),
+        model.query().fetch(keys_only=True),
     )
+    return True
 
-    ndb.delete_multi(
-        Domain.query().fetch(keys_only=True),
-    )
 
-    ndb.delete_multi(
-        Tenant.query().fetch(keys_only=True),
-    )
+def delete_all():
+    models_to_delete = [
+        DistributorEntityGroup,
+        Location,
+        DistributorUser,
+        ChromeOsDevice,
+        User,
+        Distributor,
+        Domain,
+        Tenant,
+        PlayerCommandEvent,
+        TenantEntityGroup,
+        DeviceIssueLog
+    ]
+    return [run_delete_multi_on_model(model) for model in models_to_delete]
 
-    ndb.delete_multi(
-        PlayerCommandEvent.query().fetch(keys_only=True),
-    )
 
-    ndb.delete_multi(
-        TenantEntityGroup.query().fetch(keys_only=True),
-    )
-
-    ndb.delete_multi(
-        DeviceIssueLog.query().fetch(keys_only=True),
-    )
-
+def make_data_for_a_distributor():
     ##########################################################################################
     # DISTRIBUTORS
     ##########################################################################################
@@ -175,7 +168,7 @@ def kick_off():
             managed_device.put()
             print 'Managed device created with MAC ' + str(i) + MAC_ADDRESS
 
-            for z in range(1, 200):
+            for z in range(1, 101):
                 issue = DeviceIssueLog.create(device_key=managed_device.key,
                                               category=config.DEVICE_ISSUE_PLAYER_DOWN,
                                               up=False,
@@ -196,31 +189,30 @@ def kick_off():
     query = ChromeOsDevice.query().order(ChromeOsDevice.created)
     devices = query.fetch(1000)
     print 'Device count = ' + str(len(devices))
-    i = 0
     for device in devices:
-        i += 1
-        payload = 'reset content'.format(i)
-        gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
-        event = PlayerCommandEvent.create(device_urlsafe_key=device.key.urlsafe(),
-                                          payload=payload, gcm_registration_id=gcm_registration_id)
+        for i in range(1, 100):
+            payload = 'reset content'.format(i)
+            gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
+            event = PlayerCommandEvent.create(device_urlsafe_key=device.key.urlsafe(),
+                                              payload=payload, gcm_registration_id=gcm_registration_id)
 
-        event.put()
-        print 'Added ' + payload + ' event to ' + device.key.urlsafe()
-        payload = 'reset player'.format(i)
-        gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
-        event = PlayerCommandEvent.create(device_urlsafe_key=device.key.urlsafe(),
-                                          payload=payload, gcm_registration_id=gcm_registration_id)
-        event.player_has_confirmed = True
-        event.put()
-        print 'Added ' + payload + ' event to ' + device.key.urlsafe()
-        payload = 'panel on'.format(i)
-        gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
-        event = PlayerCommandEvent.create(device_urlsafe_key=device.key.urlsafe(),
-                                          payload=payload, gcm_registration_id=gcm_registration_id)
+            event.put()
+            print 'Added ' + payload + ' event to ' + device.key.urlsafe()
+            payload = 'reset player'.format(i)
+            gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
+            event = PlayerCommandEvent.create(device_urlsafe_key=device.key.urlsafe(),
+                                              payload=payload, gcm_registration_id=gcm_registration_id)
+            event.player_has_confirmed = True
+            event.put()
+            print 'Added ' + payload + ' event to ' + device.key.urlsafe()
+            payload = 'panel on'.format(i)
+            gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
+            event = PlayerCommandEvent.create(device_urlsafe_key=device.key.urlsafe(),
+                                              payload=payload, gcm_registration_id=gcm_registration_id)
 
-        event.player_has_confirmed = True
-        event.put()
-        print 'Added ' + payload + ' event to ' + device.key.urlsafe()
+            event.player_has_confirmed = True
+            event.put()
+            print 'Added ' + payload + ' event to ' + device.key.urlsafe()
 
     ##########################################################################################
     # PROOF OF PLAY
@@ -231,9 +223,3 @@ def kick_off():
             tenant.proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
             tenant.put()
         print '{0}: {1}'.format(tenant.name, tenant.proof_of_play_url)
-
-    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    print "-------------------------------------------------------------------------------"
-    print "COMPLETED SEED SCRIPT"
-    print "-------------------------------------------------------------------------------"
-    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"

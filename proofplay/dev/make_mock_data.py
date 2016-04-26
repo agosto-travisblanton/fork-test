@@ -5,7 +5,7 @@ import random
 from app_config import config
 
 resource_choices = [
-    {"name": "GSAD_5553", "id": "1000"},
+    {"name": "GSAD_6051_DARK_SOULS_III_SHADOWS_AHEAD_CUTDOWN_AVAILABLE_NOW", "id": "1000"},
     {"name": "GSAD_5447", "id": "1001"},
     {"name": "GSAD_2222", "id": "1002"},
     {"name": "GSAD_5533", "id": "1003"},

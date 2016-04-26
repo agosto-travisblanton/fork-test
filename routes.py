@@ -360,7 +360,7 @@ application = WSGIApplication(
 
 if on_development_server:
     dev_routes = [
-        Route(r'/api/v1/seed',
+        Route(r'/api/v1/seed/<user_first>/<user_last>',
               handler="handlers.dev_handlers.SeedScript",
               name="Seed",
               methods=["GET"]

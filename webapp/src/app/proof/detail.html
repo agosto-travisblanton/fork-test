@@ -5,564 +5,522 @@
         </div>
     </md-toolbar>
     <md-content>
-        <md-tabs md-dynamic-height>
-            <md-tab label="{{vm.resource.title}}" layout-align="center center">
-                <div ng-controller="ProofOfPlayMultiResourceCtrl as vm" layout="column" ng-cloak>
-                    <div class="row" ng-init="vm.initialize()">
-                        <div style="padding-top: 25px; padding-left: 50px; text-align: left"
-                             class="col-md-6 col-sm-12">
-                            <md-card>
-                                <md-card-content>
-                                    <md-content class="md-padding">
-
-                                        <div ng-show="vm.loading">
-
-                                            <md-content class="md-padding">
-                                                <h3>Loading resources...</h3>
-                                            </md-content>
-                                            <hr/>
-
+        <div flex="100" flex-sm="100" flex-xs="100" layout="column">
+            <md-tabs md-dynamic-height md-border-bottom>
+                <div class="container">
+                    <md-tab label="{{vm.resource.title}}" layout-align="center center">
+                        <div ng-controller="ProofOfPlayMultiResourceCtrl as vm" layout="column" ng-cloak>
+                            <div ng-init="vm.initialize()" class="container">
+                                <md-card>
+                                    <div class="col-md-12" ng-init="vm.initialize_tenant_select()">
+                                        <div class="col-sm-3">
+                                            <h3>{{vm.currentTenant}}</h3>
                                         </div>
-                                        <div ng-if="vm.had_some_items && !vm.loading">
+                                        <div class="col-md-3 col-md-offset-6 radio-horizontal" ng-show="vm.tenants">
+                                            <md-input-container>
+                                                <label class="center-block">Change Tenant</label>
+                                                <md-select ng-model="vm.which_tenant">
+                                                    <md-option ng-repeat="tenant in vm.tenants | orderBy:'tenant'"
+                                                               value="{{tenant}}" class="proof-of-play-tenant-name">
+                                                        {{tenant}}
+                                                    </md-option>
+                                                </md-select>
+                                            </md-input-container>
+                                            <div>
+                                                <md-button md-no-ink class="md-primary"
+                                                           ng-click="vm.submitTenant(vm.which_tenant)">
+                                                    Submit
+                                                </md-button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </md-card>
+                                <div style=" text-align: left"
+                                     class="col-md-6">
+                                    <md-card>
+                                        <md-card-content>
+                                            <div class="md-padding">
 
-                                            <div ng-hide="vm.loading">
-                                                <h4 class="proof-of-play-label">Resource Selection</h4>
+                                                <div ng-show="vm.loading">
 
-                                                <form ng-submit="$event.preventDefault()">
-                                                    <md-autocomplete
-                                                            md-no-cache="true"
-                                                            md-selected-item="vm.selectedItem"
-                                                            md-search-text="vm.searchText"
-                                                            md-items="item in vm.querySearch(vm.resources, vm.searchText)"
-                                                            md-item-text="item"
-                                                            md-min-length="0"
-                                                            md-search-text-change="vm.isResourceValid(vm.searchText)"
-                                                            md-selected-item-change="vm.isResourceValid(vm.searchText)"
-                                                            placeholder="Select a resource">
-                                                        <md-item-template>
+                                                    <md-content class="md-padding">
+                                                        <h3>Loading resources...</h3>
+                                                    </md-content>
+                                                    <hr/>
+
+                                                </div>
+                                                <div ng-if="vm.had_some_items && !vm.loading">
+
+                                                    <div ng-hide="vm.loading">
+                                                        <h4 class="proof-of-play-label">Resource Selection</h4>
+
+                                                        <form ng-submit="$event.preventDefault()">
+                                                            <md-autocomplete
+                                                                    md-no-cache="true"
+                                                                    md-selected-item="vm.selectedItem"
+                                                                    md-search-text="vm.searchText"
+                                                                    md-items="item in vm.querySearch(vm.resources, vm.searchText)"
+                                                                    md-item-text="item"
+                                                                    md-min-length="0"
+                                                                    md-search-text-change="vm.isResourceValid(vm.searchText)"
+                                                                    md-selected-item-change="vm.isResourceValid(vm.searchText)"
+                                                                    placeholder="Select a resource">
+                                                                <md-item-template>
                                                         <span md-highlight-text="vm.searchText"
                                                               md-highlight-flags="^i">{{item}}</span>
-                                                        </md-item-template>
-                                                        <md-not-found>
-                                                            No matching item for search "{{vm.searchText}}" was
-                                                            found.
-                                                        </md-not-found>
-                                                    </md-autocomplete>
-                                                    <br/>
+                                                                </md-item-template>
+                                                                <md-not-found>
+                                                                    No matching item for search "{{vm.searchText}}" was
+                                                                    found.
+                                                                </md-not-found>
+                                                            </md-autocomplete>
+                                                            <br/>
 
-                                                    <md-button class="md-raised"
-                                                               ng-click="vm.addToSelectedResources(vm.searchText)"
-                                                               style="float: right">Add
-                                                    </md-button>
-                                                    <br/>
-                                                    <br/>
-                                                    <br/>
+                                                            <md-button class="md-raised"
+                                                                       ng-click="vm.addToSelectedResources(vm.searchText)"
+                                                                       style="float: right">Add
+                                                            </md-button>
+                                                            <br/>
+                                                            <br/>
+                                                            <br/>
+
+                                                            <hr/>
+
+
+                                                        </form>
+                                                    </div>
+
+
+                                                    <div class="row">
+
+                                                        <div class="col-sm-3">
+                                                            <h4 class="proof-of-play-label">Start Date</h4>
+                                                            <md-datepicker ng-model="vm.dateTimeSelection.start"
+                                                                           ng-change="vm.isStartDateValid(vm.dateTimeSelection.start)"
+                                                                           required
+                                                                           md-placeholder="Enter date"></md-datepicker>
+                                                        </div>
+                                                        <div class="col-sm-3 col-sm-offset-4">
+
+                                                            <h4 class="proof-of-play-label">End Date</h4>
+                                                            <md-datepicker ng-model="vm.dateTimeSelection.end"
+                                                                           ng-change="vm.isEndDateValid(vm.dateTimeSelection.end)"
+                                                                           required
+                                                                           md-placeholder="Enter date"></md-datepicker>
+                                                        </div>
+                                                    </div>
+                                                    <hr/>
+
+                                                    <md-input-container class="md-block">
+                                                        <h4 class="proof-of-play-label">Report Type</h4>
+                                                        <md-radio-group
+                                                                ng-model="vm.radioButtonChoices.selection"
+                                                                ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
+                                                            <md-radio-button value="1">
+                                                                {{vm.radioButtonChoices.group1}}
+                                                            </md-radio-button>
+                                                            <md-radio-button value="2">
+                                                                {{vm.radioButtonChoices.group2}}
+                                                            </md-radio-button>
+                                                        </md-radio-group>
+
+                                                    </md-input-container>
 
                                                     <hr/>
 
-
-                                                </form>
-                                            </div>
-
-
-                                            <div class="row">
-
-                                                <div class="col-sm-3">
-                                                    <h4 class="proof-of-play-label">Start Date</h4>
-                                                    <md-datepicker ng-model="vm.dateTimeSelection.start"
-                                                                   ng-change="vm.isStartDateValid(vm.dateTimeSelection.start)"
-                                                                   required
-                                                                   md-placeholder="Enter date"></md-datepicker>
-                                                </div>
-                                                <div class="col-sm-3 col-sm-offset-4">
-
-                                                    <h4 class="proof-of-play-label">End Date</h4>
-                                                    <md-datepicker ng-model="vm.dateTimeSelection.end"
-                                                                   ng-change="vm.isEndDateValid(vm.dateTimeSelection.end)"
-                                                                   required
-                                                                   md-placeholder="Enter date"></md-datepicker>
-                                                </div>
-                                            </div>
-                                            <hr/>
-
-                                            <md-input-container class="md-block">
-                                                <h4 class="proof-of-play-label">Report Type</h4>
-                                                <md-radio-group
-                                                        ng-model="vm.radioButtonChoices.selection"
-                                                        ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
-                                                    <md-radio-button style="margin-left: 20px" value="1">
-                                                        {{vm.radioButtonChoices.group1}}
-                                                    </md-radio-button>
-                                                    <md-radio-button style="margin-left: 20px" value="2">
-                                                        {{vm.radioButtonChoices.group2}}
-                                                    </md-radio-button>
-                                                </md-radio-group>
-
-                                            </md-input-container>
-
-                                            <hr/>
-
-                                            <md-button class="md-raised" ng-click="vm.submit()"
-                                                       ng-disabled="vm.disabled"
-                                                       style="margin-top: 25px; float: right; margin-bottom: 50px">
-                                                Submit
-                                            </md-button>
-                                        </div>
-                                        <div ng-if="!vm.had_some_items && !vm.loading">
-                                            <h3>This tenant has no resources logged. Make sure your devices have
-                                                proof of play activated.</h3>
-                                        </div>
-                                    </md-content>
-
-                                </md-card-content>
-                            </md-card>
-                        </div>
-                        <div style="padding-top: 25px; text-align: left"
-                             class="col-md-4 col-sm-6">
-                            <md-card>
-                                <md-card-content>
-                                    <md-content class="md-padding">
-                                        <h3>Selected Resources</h3>
-                                        <hr/>
-                                        <div ng-show="vm.selected_resources.length > 0">
-                                            <md-list>
-                                                <ol>
-                                                    <li ng-repeat="item in vm.selected_resources">
-                                                        <md-button md-no-ink class="md-primary"
-                                                                   id="proofplay-selected-items"
-                                                                   ng-click="vm.removeFromSelectedResource(item)">
-                                                            X
-                                                        </md-button>
-                                                        {{ item }}
-
-
-                                                    </li>
-                                                </ol>
-                                            </md-list>
-                                        </div>
-                                        <div ng-hide="vm.selected_resources.length > 0">
-                                            <h5>You have no selected resources</h5>
-                                        </div>
-                                    </md-content>
-
-                                </md-card-content>
-                            </md-card>
-                        </div>
-                        <div style="padding-top: 25px; margin-left: -1em;"
-                             class="col-md-2 col-sm-6" ng-init="vm.initialize_tenant_select()">
-                            <md-card>
-                                <md-card-content>
-                                    <div class="center-block">
-                                        <h4 class="proof-of-play-tenant-name">{{vm.currentTenant}}</h4>
-                                        <hr/>
-                                        <div>
-                                            <div ng-hide="vm.tenants">
-                                                <h5>Loading tenants...</h5>
-
-                                            </div>
-                                            <div ng-show="vm.tenants">
-                                                <h5>Change Tenant</h5>
-                                                <hr/>
-
-
-                                                <md-input-container>
-                                                    <label class="center-block">Tenant</label>
-                                                    <md-select ng-model="vm.which_tenant">
-                                                        <md-option ng-repeat="tenant in vm.tenants | orderBy:'tenant'"
-                                                                   value="{{tenant}}" class="proof-of-play-tenant-name">
-                                                            {{tenant}}
-                                                        </md-option>
-                                                    </md-select>
-                                                </md-input-container>
-                                                <div>
-                                                    <md-button md-no-ink class="md-primary"
-                                                               ng-click="vm.submitTenant(vm.which_tenant)">
+                                                    <md-button class="md-raised" ng-click="vm.submit()"
+                                                               ng-disabled="vm.disabled"
+                                                               style="margin-top: 25px; float: right; margin-bottom: 50px">
                                                         Submit
                                                     </md-button>
                                                 </div>
+                                                <div ng-if="!vm.had_some_items && !vm.loading">
+                                                    <h3>This tenant has no resources logged. Make sure your devices have
+                                                        proof of play activated.</h3>
+                                                </div>
+                                            </div>
+
+                                        </md-card-content>
+                                    </md-card>
+                                </div>
+                                <div style="text-align: left"
+                                     class="col-md-6">
+                                    <md-card>
+                                        <md-card-content>
+                                            <div class="md-padding">
+                                                <h3>Selected Resources</h3>
+                                                <hr/>
+                                                <div ng-show="vm.selected_resources.length > 0">
+                                                    <md-list>
+                                                        <li ng-repeat="item in vm.selected_resources"
+                                                            class="proof-of-play-selected-item">
+                                                            <md-button md-no-ink class="md-primary"
+                                                                       id="proofplay-selected-items"
+                                                                       ng-click="vm.removeFromSelectedResource(item)">
+                                                                X
+                                                            </md-button>
+                                                            {{ item }}
+
+
+                                                        </li>
+                                                    </md-list>
+                                                </div>
+                                                <div ng-hide="vm.selected_resources.length > 0">
+                                                    <h5>You have no selected resources</h5>
+                                                </div>
+                                            </div>
+
+                                        </md-card-content>
+                                    </md-card>
+                                </div>
+
+                            </div>
+                        </div>
+                    </md-tab>
+
+
+                    <md-tab label="{{vm.location.title}}" layout-align="center center">
+                        <div ng-controller="ProofOfPlayMultiLocationCtrl as vm" layout="column" ng-cloak>
+                            <div ng-init="vm.initialize()" class="container">
+                                <md-card>
+                                    <div class="col-md-12" ng-init="vm.initialize_tenant_select()">
+                                        <div class="col-sm-3">
+                                            <h3>{{vm.currentTenant}}</h3>
+                                        </div>
+
+                                        <div class="col-md-3 col-md-offset-6 radio-horizontal" ng-show="vm.tenants">
+
+                                            <md-input-container>
+                                                <label class="center-block">Change Tenant</label>
+                                                <md-select ng-model="vm.which_tenant">
+                                                    <md-option ng-repeat="tenant in vm.tenants | orderBy:'tenant'"
+                                                               value="{{tenant}}" class="proof-of-play-tenant-name">
+                                                        {{tenant}}
+                                                    </md-option>
+                                                </md-select>
+                                            </md-input-container>
+                                            <div>
+                                                <md-button md-no-ink class="md-primary"
+                                                           ng-click="vm.submitTenant(vm.which_tenant)">
+                                                    Submit
+                                                </md-button>
                                             </div>
                                         </div>
                                     </div>
+                                </md-card>
+                                <div style="text-align: left"
+                                     class="col-md-6">
+                                    <md-card>
+                                        <md-card-content>
+                                            <div class="md-padding">
 
+                                                <div ng-show="vm.loading">
 
-                                </md-card-content>
-                            </md-card>
-                        </div>
-                    </div>
-                </div>
-            </md-tab>
+                                                    <md-content class="md-padding">
+                                                        <h3>Loading Locations...</h3>
+                                                    </md-content>
+                                                    <hr/>
 
+                                                </div>
+                                                <div ng-if="vm.had_some_items && !vm.loading">
 
-            <md-tab label="{{vm.location.title}}" layout-align="center center">
-                <div ng-controller="ProofOfPlayMultiLocationCtrl as vm" layout="column" ng-cloak>
-                    <div class="row" ng-init="vm.initialize()">
-                        <div style="padding-top: 25px; padding-left: 50px; text-align: left"
-                             class="col-md-6 col-sm-12">
-                            <md-card>
-                                <md-card-content>
-                                    <md-content class="md-padding">
+                                                    <div ng-hide="vm.loading">
+                                                        <h4 class="proof-of-play-label">Location Selection</h4>
 
-                                        <div ng-show="vm.loading">
+                                                        <form ng-submit="$event.preventDefault()">
+                                                            <md-autocomplete
+                                                                    md-no-cache="true"
 
-                                            <md-content class="md-padding">
-                                                <h3>Loading Locations...</h3>
-                                            </md-content>
-                                            <hr/>
-
-                                        </div>
-                                        <div ng-if="vm.had_some_items && !vm.loading">
-
-                                            <div ng-hide="vm.loading">
-                                                <h4 class="proof-of-play-label">Location Selection</h4>
-
-                                                <form ng-submit="$event.preventDefault()">
-                                                    <md-autocomplete
-                                                            md-no-cache="true"
-
-                                                            md-selected-item="vm.selectedItem"
-                                                            md-search-text="vm.searchText"
-                                                            md-items="item in vm.querySearch(vm.locations, vm.searchText)"
-                                                            md-item-text="item"
-                                                            md-min-length="0"
-                                                            md-search-text-change="vm.isLocationValid(vm.searchText)"
-                                                            md-selected-item-change="vm.isLocationValid(vm.searchText)"
-                                                            placeholder="Select a resource">
-                                                        <md-item-template>
+                                                                    md-selected-item="vm.selectedItem"
+                                                                    md-search-text="vm.searchText"
+                                                                    md-items="item in vm.querySearch(vm.locations, vm.searchText)"
+                                                                    md-item-text="item"
+                                                                    md-min-length="0"
+                                                                    md-search-text-change="vm.isLocationValid(vm.searchText)"
+                                                                    md-selected-item-change="vm.isLocationValid(vm.searchText)"
+                                                                    placeholder="Select a resource">
+                                                                <md-item-template>
                                         <span md-highlight-text="vm.searchText"
                                               md-highlight-flags="^i">{{item}}</span>
-                                                        </md-item-template>
-                                                        <md-not-found>
-                                                            No matching item for search "{{vm.searchText}}" was
-                                                            found.
-                                                        </md-not-found>
-                                                    </md-autocomplete>
-                                                    <br/>
+                                                                </md-item-template>
+                                                                <md-not-found>
+                                                                    No matching item for search "{{vm.searchText}}" was
+                                                                    found.
+                                                                </md-not-found>
+                                                            </md-autocomplete>
+                                                            <br/>
 
-                                                    <md-button class="md-raised"
-                                                               ng-click="vm.addToSelectedLocations(vm.searchText)"
-                                                               style="float: right">Add
-                                                    </md-button>
-                                                    <br/>
-                                                    <br/>
-                                                    <br/>
+                                                            <md-button class="md-raised"
+                                                                       ng-click="vm.addToSelectedLocations(vm.searchText)"
+                                                                       style="float: right">Add
+                                                            </md-button>
+                                                            <br/>
+                                                            <br/>
+                                                            <br/>
+
+                                                            <hr/>
+
+
+                                                        </form>
+                                                    </div>
+
+
+                                                    <div class="row">
+
+                                                        <div class="col-sm-3">
+                                                            <h4 class="proof-of-play-label">Start Date</h4>
+                                                            <md-datepicker ng-model="vm.dateTimeSelection.start"
+                                                                           ng-change="vm.isStartDateValid(vm.dateTimeSelection.start)"
+                                                                           required
+                                                                           md-placeholder="Enter date"></md-datepicker>
+                                                        </div>
+                                                        <div class="col-sm-3 col-sm-offset-4">
+
+                                                            <h4 class="proof-of-play-label">End Date</h4>
+                                                            <md-datepicker ng-model="vm.dateTimeSelection.end"
+                                                                           ng-change="vm.isEndDateValid(vm.dateTimeSelection.end)"
+                                                                           required
+                                                                           md-placeholder="Enter date"></md-datepicker>
+                                                        </div>
+                                                    </div>
+                                                    <hr/>
+
+                                                    <md-input-container class="md-block">
+                                                        <h4 class="proof-of-play-label">Report Type</h4>
+                                                        <md-radio-group
+                                                                ng-model="vm.radioButtonChoices.selection"
+                                                                ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
+                                                            <md-radio-button value="1">
+                                                                {{vm.radioButtonChoices.group1}}
+                                                            </md-radio-button>
+                                                            <md-radio-button value="2">
+                                                                {{vm.radioButtonChoices.group2}}
+                                                            </md-radio-button>
+                                                        </md-radio-group>
+
+                                                    </md-input-container>
 
                                                     <hr/>
 
-
-                                                </form>
-                                            </div>
-
-
-                                            <div class="row">
-
-                                                <div class="col-sm-3">
-                                                    <h4 class="proof-of-play-label">Start Date</h4>
-                                                    <md-datepicker ng-model="vm.dateTimeSelection.start"
-                                                                   ng-change="vm.isStartDateValid(vm.dateTimeSelection.start)"
-                                                                   required
-                                                                   md-placeholder="Enter date"></md-datepicker>
-                                                </div>
-                                                <div class="col-sm-3 col-sm-offset-4">
-
-                                                    <h4 class="proof-of-play-label">End Date</h4>
-                                                    <md-datepicker ng-model="vm.dateTimeSelection.end"
-                                                                   ng-change="vm.isEndDateValid(vm.dateTimeSelection.end)"
-                                                                   required
-                                                                   md-placeholder="Enter date"></md-datepicker>
-                                                </div>
-                                            </div>
-                                            <hr/>
-
-                                            <md-input-container class="md-block">
-                                                <h4 class="proof-of-play-label">Report Type</h4>
-                                                <md-radio-group
-                                                        ng-model="vm.radioButtonChoices.selection"
-                                                        ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
-                                                    <md-radio-button style="margin-left: 20px" value="1">
-                                                        {{vm.radioButtonChoices.group1}}
-                                                    </md-radio-button>
-                                                    <md-radio-button style="margin-left: 20px" value="2">
-                                                        {{vm.radioButtonChoices.group2}}
-                                                    </md-radio-button>
-                                                </md-radio-group>
-
-                                            </md-input-container>
-
-                                            <hr/>
-
-                                            <md-button class="md-raised" ng-click="vm.submit()"
-                                                       ng-disabled="vm.disabled"
-                                                       style="margin-top: 25px; float: right; margin-bottom: 50px">
-                                                Submit
-                                            </md-button>
-                                        </div>
-                                        <div ng-if="!vm.had_some_items && !vm.loading">
-                                            <h3>This tenant has no locations logged. Make sure your devices have
-                                                proof of play activated.</h3>
-                                        </div>
-                                    </md-content>
-
-                                </md-card-content>
-                            </md-card>
-                        </div>
-                        <div style="padding-top: 25px; text-align: left"
-                             class="col-md-4 col-sm-6">
-                            <md-card>
-                                <md-card-content>
-                                    <md-content class="md-padding">
-                                        <h3>Selected Locations</h3>
-                                        <hr/>
-                                        <div ng-show="vm.selected_locations.length > 0">
-                                            <md-list>
-                                                <ol>
-                                                    <li ng-repeat="item in vm.selected_locations">
-                                                        <md-button md-no-ink class="md-primary"
-                                                                   id="proofplay-selected-items"
-                                                                   ng-click="vm.removeFromSelectedLocation(item)">X
-                                                        </md-button>
-                                                        {{ item }}
-
-
-                                                    </li>
-                                                </ol>
-                                            </md-list>
-                                        </div>
-                                        <div ng-hide="vm.selected_locations.length > 0">
-                                            <h5>You have no selected locations</h5>
-                                        </div>
-                                    </md-content>
-
-                                </md-card-content>
-                            </md-card>
-                        </div>
-                        <div style="padding-top: 25px; margin-left: -1em;"
-                             class="col-md-2 col-sm-6" ng-init="vm.initialize_tenant_select()">
-                            <md-card>
-                                <md-card-content>
-                                    <div class="center-block">
-                                        <h4 class="proof-of-play-tenant-name">{{vm.currentTenant}}</h4>
-                                        <hr/>
-                                        <div>
-                                            <div ng-hide="vm.tenants">
-                                                <h5>Loading tenants...</h5>
-
-                                            </div>
-                                            <div ng-show="vm.tenants">
-                                                <h5>Change Tenant</h5>
-                                                <hr/>
-
-
-                                                <md-input-container>
-                                                    <label class="center-block">Tenant</label>
-                                                    <md-select ng-model="vm.which_tenant">
-                                                        <md-option ng-repeat="tenant in vm.tenants | orderBy:'tenant'"
-                                                                   value="{{tenant}}" class="proof-of-play-tenant-name">
-                                                            {{tenant}}
-                                                        </md-option>
-                                                    </md-select>
-                                                </md-input-container>
-                                                <div>
-                                                    <md-button md-no-ink class="md-primary"
-                                                               ng-click="vm.submitTenant(vm.which_tenant)">
+                                                    <md-button class="md-raised" ng-click="vm.submit()"
+                                                               ng-disabled="vm.disabled"
+                                                               style="margin-top: 25px; float: right; margin-bottom: 50px">
                                                         Submit
                                                     </md-button>
                                                 </div>
+                                                <div ng-if="!vm.had_some_items && !vm.loading">
+                                                    <h3>This tenant has no locations logged. Make sure your devices have
+                                                        proof of play activated.</h3>
+                                                </div>
+                                            </div>
+
+                                        </md-card-content>
+                                    </md-card>
+                                </div>
+                                <div style=" text-align: left"
+                                     class="col-md-6">
+                                    <md-card>
+                                        <md-card-content>
+                                            <div class="md-padding">
+                                                <h3>Selected Locations</h3>
+                                                <hr/>
+                                                <div ng-show="vm.selected_locations.length > 0">
+                                                    <md-list>
+                                                        <li ng-repeat="item in vm.selected_locations"
+                                                            class="proof-of-play-selected-item">
+                                                            <md-button md-no-ink class="md-primary"
+                                                                       id="proofplay-selected-items"
+                                                                       ng-click="vm.removeFromSelectedLocation(item)">X
+                                                            </md-button>
+                                                            {{ item }}
+
+
+                                                        </li>
+                                                    </md-list>
+                                                </div>
+                                                <div ng-hide="vm.selected_locations.length > 0">
+                                                    <h5>You have no selected locations</h5>
+                                                </div>
+                                            </div>
+
+                                        </md-card-content>
+                                    </md-card>
+                                </div>
+
+                            </div>
+                        </div>
+                    </md-tab>
+                    <md-tab label="{{vm.display.title}}" layout-align="center center">
+                        <div ng-controller="ProofOfPlayMultiDisplayCtrl as vm" layout="column" ng-cloak>
+                            <div ng-init="vm.initialize()" class="container">
+                                <md-card>
+                                    <div class="col-md-12" ng-init="vm.initialize_tenant_select()">
+                                        <div class="col-sm-3">
+                                            <h3>{{vm.currentTenant}}</h3>
+                                        </div>
+
+                                        <div class="col-md-3 col-md-offset-6 radio-horizontal" ng-show="vm.tenants">
+
+                                            <md-input-container>
+                                                <label class="center-block">Change Tenant</label>
+                                                <md-select ng-model="vm.which_tenant">
+                                                    <md-option ng-repeat="tenant in vm.tenants | orderBy:'tenant'"
+                                                               value="{{tenant}}" class="proof-of-play-tenant-name">
+                                                        {{tenant}}
+                                                    </md-option>
+                                                </md-select>
+                                            </md-input-container>
+                                            <div>
+                                                <md-button md-no-ink class="md-primary"
+                                                           ng-click="vm.submitTenant(vm.which_tenant)">
+                                                    Submit
+                                                </md-button>
                                             </div>
                                         </div>
                                     </div>
+                                </md-card>
+                                <div style=" text-align: left"
+                                     class="col-md-6">
+                                    <md-card>
+                                        <md-card-content>
+                                            <div class="md-padding">
+                                                <div ng-show="vm.loading">
+
+                                                    <md-content class="md-padding">
+                                                        <h3>Loading displays...</h3>
+                                                    </md-content>
+                                                    <hr/>
+
+                                                </div>
+                                                <div ng-if="vm.had_some_items && !vm.loading">
 
 
-                                </md-card-content>
-                            </md-card>
-                        </div>
-                    </div>
-                </div>
-            </md-tab>
-            <md-tab label="{{vm.display.title}}" layout-align="center center">
-                <div ng-controller="ProofOfPlayMultiDisplayCtrl as vm" layout="column" ng-cloak>
-                    <div class="row" ng-init="vm.initialize()">
-                        <div style="padding-top: 25px; padding-left: 50px; text-align: left"
-                             class="col-md-6 col-sm-12">
-                            <md-card>
-                                <md-card-content>
-                                    <md-content class="md-padding">
-                                        <div ng-show="vm.loading">
+                                                    <div ng-hide="vm.loading">
+                                                        <h4 class="proof-of-play-label">Display Selection</h4>
 
-                                            <md-content class="md-padding">
-                                                <h3>Loading displays...</h3>
-                                            </md-content>
-                                            <hr/>
-
-                                        </div>
-                                        <div ng-if="vm.had_some_items && !vm.loading">
-
-
-                                            <div ng-hide="vm.loading">
-                                                <h4 class="proof-of-play-label">Display Selection</h4>
-
-                                                <form ng-submit="$event.preventDefault()">
-                                                    <md-autocomplete
-                                                            md-no-cache="true"
-                                                            md-selected-item="vm.selectedItem"
-                                                            md-search-text="vm.searchText"
-                                                            md-items="item in vm.querySearch(vm.displays, vm.searchText)"
-                                                            md-item-text="item"
-                                                            md-min-length="0"
-                                                            md-search-text-change="vm.isDisplayValid(vm.searchText)"
-                                                            md-selected-item-change="vm.isDisplayValid(vm.searchText)"
-                                                            placeholder="Select a display">
-                                                        <md-item-template>
+                                                        <form ng-submit="$event.preventDefault()">
+                                                            <md-autocomplete
+                                                                    md-no-cache="true"
+                                                                    md-selected-item="vm.selectedItem"
+                                                                    md-search-text="vm.searchText"
+                                                                    md-items="item in vm.querySearch(vm.displays, vm.searchText)"
+                                                                    md-item-text="item"
+                                                                    md-min-length="0"
+                                                                    md-search-text-change="vm.isDisplayValid(vm.searchText)"
+                                                                    md-selected-item-change="vm.isDisplayValid(vm.searchText)"
+                                                                    placeholder="Select a display">
+                                                                <md-item-template>
                                                                 <span md-highlight-text="vm.searchText"
                                                                       md-highlight-flags="^i">{{item}}</span>
-                                                        </md-item-template>
-                                                        <md-not-found>
-                                                            No matching item for search "{{vm.searchText}}" was
-                                                            found.
-                                                        </md-not-found>
-                                                    </md-autocomplete>
-                                                    <br/>
+                                                                </md-item-template>
+                                                                <md-not-found>
+                                                                    No matching item for search "{{vm.searchText}}" was
+                                                                    found.
+                                                                </md-not-found>
+                                                            </md-autocomplete>
+                                                            <br/>
 
-                                                    <md-button class="md-raised"
-                                                               ng-click="vm.addToSelectedDisplays(vm.searchText)"
-                                                               style="float: right">Add
-                                                    </md-button>
-                                                    <br/>
-                                                    <br/>
-                                                    <br/>
+                                                            <md-button class="md-raised"
+                                                                       ng-click="vm.addToSelectedDisplays(vm.searchText)"
+                                                                       style="float: right">Add
+                                                            </md-button>
+                                                            <br/>
+                                                            <br/>
+                                                            <br/>
+
+                                                            <hr/>
+
+
+                                                        </form>
+                                                    </div>
+
+
+                                                    <div class="row">
+
+                                                        <div class="col-sm-3">
+                                                            <h4 class="proof-of-play-label">Start Date</h4>
+                                                            <md-datepicker ng-model="vm.dateTimeSelection.start"
+                                                                           ng-change="vm.isStartDateValid(vm.dateTimeSelection.start)"
+                                                                           required
+                                                                           md-placeholder="Enter date"></md-datepicker>
+                                                        </div>
+                                                        <div class="col-sm-3 col-sm-offset-4">
+
+                                                            <h4 class="proof-of-play-label">End Date</h4>
+                                                            <md-datepicker ng-model="vm.dateTimeSelection.end"
+                                                                           ng-change="vm.isEndDateValid(vm.dateTimeSelection.end)"
+                                                                           required
+                                                                           md-placeholder="Enter date"></md-datepicker>
+                                                        </div>
+                                                    </div>
+                                                    <hr/>
+
+                                                    <md-input-container class="md-block">
+                                                        <h4 class="proof-of-play-label">Report Type</h4>
+                                                        <md-radio-group
+                                                                ng-model="vm.radioButtonChoices.selection"
+                                                                ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
+                                                            <md-radio-button value="1">
+                                                                {{vm.radioButtonChoices.group1}}
+                                                            </md-radio-button>
+                                                            <md-radio-button value="2">
+                                                                {{vm.radioButtonChoices.group2}}
+                                                            </md-radio-button>
+                                                        </md-radio-group>
+
+                                                    </md-input-container>
 
                                                     <hr/>
 
-
-                                                </form>
-                                            </div>
-
-
-                                            <div class="row">
-
-                                                <div class="col-sm-3">
-                                                    <h4 class="proof-of-play-label">Start Date</h4>
-                                                    <md-datepicker ng-model="vm.dateTimeSelection.start"
-                                                                   ng-change="vm.isStartDateValid(vm.dateTimeSelection.start)"
-                                                                   required
-                                                                   md-placeholder="Enter date"></md-datepicker>
-                                                </div>
-                                                <div class="col-sm-3 col-sm-offset-4">
-
-                                                    <h4 class="proof-of-play-label">End Date</h4>
-                                                    <md-datepicker ng-model="vm.dateTimeSelection.end"
-                                                                   ng-change="vm.isEndDateValid(vm.dateTimeSelection.end)"
-                                                                   required
-                                                                   md-placeholder="Enter date"></md-datepicker>
-                                                </div>
-                                            </div>
-                                            <hr/>
-
-                                            <md-input-container class="md-block">
-                                                <h4 class="proof-of-play-label">Report Type</h4>
-                                                <md-radio-group
-                                                        ng-model="vm.radioButtonChoices.selection"
-                                                        ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
-                                                    <md-radio-button style="margin-left: 20px" value="1">
-                                                        {{vm.radioButtonChoices.group1}}
-                                                    </md-radio-button>
-                                                    <md-radio-button style="margin-left: 20px" value="2">
-                                                        {{vm.radioButtonChoices.group2}}
-                                                    </md-radio-button>
-                                                </md-radio-group>
-
-                                            </md-input-container>
-
-                                            <hr/>
-
-                                            <md-button class="md-raised" ng-click="vm.submit()"
-                                                       ng-disabled="vm.disabled"
-                                                       style="margin-top: 25px; float: right; margin-bottom: 50px">
-                                                Submit
-                                            </md-button>
-                                        </div>
-                                        <div ng-if="!vm.had_some_items && !vm.loading">
-                                            <h3>This tenant has no displays logged. Make sure your devices have
-                                                proof of play activated.</h3>
-                                        </div>
-                                    </md-content>
-
-                                </md-card-content>
-                            </md-card>
-                        </div>
-                        <div style="padding-top: 25px; text-align: left"
-                             class="col-md-4 col-sm-6">
-                            <md-card>
-                                <md-card-content>
-                                    <md-content class="md-padding">
-                                        <h3>Selected Displays</h3>
-                                        <hr/>
-                                        <div ng-show="vm.selected_displays.length > 0">
-                                            <md-list>
-                                                <ol>
-                                                    <li ng-repeat="item in vm.selected_displays">
-                                                        <md-button md-no-ink class="md-primary"
-                                                                   id="proofplay-selected-items"
-
-                                                                   ng-click="vm.removeFromSelectedDisplay(item)">X
-                                                        </md-button>
-                                                        {{ item }}
-
-
-                                                    </li>
-                                                </ol>
-                                            </md-list>
-                                        </div>
-                                        <div ng-hide="vm.selected_displays.length > 0">
-                                            <h5>You have no selected displays</h5>
-                                        </div>
-                                    </md-content>
-
-                                </md-card-content>
-                            </md-card>
-                        </div>
-                        <div style="padding-top: 25px; margin-left: -1em;"
-                             class="col-md-2 col-sm-6" ng-init="vm.initialize_tenant_select()">
-                            <md-card>
-                                <md-card-content>
-                                    <div class="center-block">
-                                        <h4 class="proof-of-play-tenant-name">{{vm.currentTenant}}</h4>
-                                        <hr/>
-                                        <div>
-                                            <div ng-hide="vm.tenants">
-                                                <h5>Loading tenants...</h5>
-
-                                            </div>
-                                            <div ng-show="vm.tenants">
-                                                <h5>Change Tenant</h5>
-                                                <hr/>
-
-
-                                                <md-input-container>
-                                                    <label class="center-block">Tenant</label>
-                                                    <md-select ng-model="vm.which_tenant">
-                                                        <md-option ng-repeat="tenant in vm.tenants | orderBy:'tenant'"
-                                                                   value="{{tenant}}">
-                                                            <p class="proof-of-play-tenant-name-option">
-                                                                {{tenant}}
-                                                            </p>
-                                                        </md-option>
-                                                    </md-select>
-                                                </md-input-container>
-                                                <div>
-                                                    <md-button md-no-ink class="md-primary"
-                                                               ng-click="vm.submitTenant(vm.which_tenant)">
+                                                    <md-button class="md-raised" ng-click="vm.submit()"
+                                                               ng-disabled="vm.disabled"
+                                                               style="margin-top: 25px; float: right; margin-bottom: 50px">
                                                         Submit
                                                     </md-button>
                                                 </div>
+                                                <div ng-if="!vm.had_some_items && !vm.loading">
+                                                    <h3>This tenant has no displays logged. Make sure your devices have
+                                                        proof of play activated.</h3>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </md-card-content>
-                            </md-card>
+
+                                        </md-card-content>
+                                    </md-card>
+                                </div>
+                                <div style=" text-align: left"
+                                     class="col-md-6">
+                                    <md-card>
+                                        <md-card-content>
+                                            <div class="md-padding">
+                                                <h3>Selected Displays</h3>
+                                                <hr/>
+                                                <div ng-show="vm.selected_displays.length > 0">
+                                                    <md-list>
+                                                        <li ng-repeat="item in vm.selected_displays"
+                                                            class="proof-of-play-selected-item">
+                                                            <md-button md-no-ink class="md-primary"
+                                                                       id="proofplay-selected-items"
+
+                                                                       ng-click="vm.removeFromSelectedDisplay(item)">X
+                                                            </md-button>
+                                                            {{ item }}
+                                                        </li>
+                                                    </md-list>
+                                                </div>
+                                                <div ng-hide="vm.selected_displays.length > 0">
+                                                    <h5>You have no selected displays</h5>
+                                                </div>
+                                            </div>
+
+                                        </md-card-content>
+                                    </md-card>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+
+                    </md-tab>
                 </div>
-            </md-tab>
-        </md-tabs>
+            </md-tabs>
+        </div>
     </md-content>
 </div>
