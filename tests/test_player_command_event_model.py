@@ -42,18 +42,24 @@ class TestPlayerCommandEventModel(BaseTest):
     def test_get_events_by_device_key_in_reverse_order_updated(self):
         self.__build_command_events(device_urlsafe_key='some-other-key', number_of_events=2)
         self.__build_command_events(device_urlsafe_key=self.DEVICE_URLSAFE_KEY,
-                                    number_of_events=27)
+                                    number_of_events=51)
 
         device_events_list = PlayerCommandEvent.get_events_by_device_key(self.DEVICE_URLSAFE_KEY)
         self.assertLength(25, device_events_list["objects"])
-        self.assertEqual(device_events_list["objects"][0].payload, 'payload-26')
-        self.assertEqual(device_events_list["objects"][1].payload, 'payload-25')
-        self.assertEqual(device_events_list["objects"][2].payload, 'payload-24')
+        self.assertEqual(device_events_list["objects"][0].payload, 'payload-50')
+        self.assertEqual(device_events_list["objects"][1].payload, 'payload-49')
+        self.assertEqual(device_events_list["objects"][2].payload, 'payload-48')
 
 
         next_device_events_list = PlayerCommandEvent.get_events_by_device_key(self.DEVICE_URLSAFE_KEY, next_cursor_str=device_events_list["next_cursor"])
-        self.assertLength(2, next_device_events_list["objects"])
-        self.assertEqual(next_device_events_list["objects"][0].payload, 'payload-1')
+        self.assertLength(25, next_device_events_list["objects"])
+        self.assertEqual(next_device_events_list["objects"][0].payload, 'payload-25')
+
+        prev_device_events_list = PlayerCommandEvent.get_events_by_device_key(self.DEVICE_URLSAFE_KEY,
+                                                                              prev_cursor_str=device_events_list[
+                                                                                  "prev_cursor"])
+        self.assertLength(25, prev_device_events_list["objects"])
+        self.assertEqual(prev_device_events_list["objects"][0].payload, 'payload-50')
 
     def __build_command_events(self, device_urlsafe_key, number_of_events):
         for i in range(number_of_events):
