@@ -24,7 +24,6 @@ appModule.controller "TenantsCtrl", ($state, $log, TenantsService, ProgressBarSe
     @total = response.total
     @is_first_page = response.is_first_page
     @is_last_page = response.is_last_page
-    console.log(response)
     ProgressBarService.complete()
     @loading = false
 

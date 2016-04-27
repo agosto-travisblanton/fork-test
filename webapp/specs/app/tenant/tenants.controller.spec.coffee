@@ -9,7 +9,6 @@ describe 'TenantsCtrl', ->
   ProgressBarService = undefined
   sweet = undefined
 
-
   beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _TenantsService_, _$state_, _ProgressBarService_, _sweet_) ->
@@ -30,49 +29,55 @@ describe 'TenantsCtrl', ->
       expect(angular.isArray(controller.tenants)).toBeTruthy()
 
   describe '.initialize', ->
-    tenants = [
-      {
-        key: 'dhjad897d987fadafg708fg7d',
-        name: 'Foobar1',
-        created: '2015-05-10 22:15:10',
-        updated: '2015-05-10 22:15:10'
-      }
-      {
-        key: 'dhjad897d987fadafg708y67d',
-        name: 'Foobar2',
-        created: '2015-05-10 22:15:10',
-        updated: '2015-05-10 22:15:10'
-      }
-      {
-        key: 'dhjad897d987fadafg708hb55',
-        name: 'Foobar3',
-        created: '2015-05-10 22:15:10',
-        updated: '2015-05-10 22:15:10'
-      }
-    ]
+    tenants = {
+      tenants: [
+        {
+          key: 'dhjad897d987fadafg708fg7d',
+          name: 'Foobar1',
+          created: '2015-05-10 22:15:10',
+          updated: '2015-05-10 22:15:10'
+        }
+        {
+          key: 'dhjad897d987fadafg708y67d',
+          name: 'Foobar2',
+          created: '2015-05-10 22:15:10',
+          updated: '2015-05-10 22:15:10'
+        }
+        {
+          key: 'dhjad897d987fadafg708hb55',
+          name: 'Foobar3',
+          created: '2015-05-10 22:15:10',
+          updated: '2015-05-10 22:15:10'
+        }
+      ],
+      total: 3,
+      is_first_page: true,
+      is_last_page: false
+    }
 
     beforeEach ->
       promise = new skykitProvisioning.q.Mock
-      spyOn(TenantsService, 'fetchAllTenants').and.returnValue promise
+      spyOn(TenantsService, 'fetchAllTenantsPaginated').and.returnValue promise
       spyOn(ProgressBarService, 'start')
       spyOn(ProgressBarService, 'complete')
 
-    it 'call TenantsService.fetchAllTenants to retrieve all tenants', ->
+    it 'call TenantsService.fetchAllTenantsPaginated to retrieve all tenants', ->
       controller.initialize()
       promise.resolve tenants
-      expect(TenantsService.fetchAllTenants).toHaveBeenCalled()
+      expect(TenantsService.fetchAllTenantsPaginated).toHaveBeenCalled()
 
     it "the 'then' handler caches the retrieved tenants in the controller", ->
       controller.initialize()
       promise.resolve tenants
-      expect(controller.tenants).toBe tenants
+      expect(controller.tenants).toBe tenants.tenants
 
   describe '.getFetchSuccess', ->
     beforeEach ->
       spyOn(ProgressBarService, 'complete')
 
     it 'stops the progress bar', ->
-      controller.getFetchSuccess()
+      response = {tenants: [], total: 1, is_first_page: false, is_last_page: false}
+      controller.getFetchSuccess(response)
       expect(ProgressBarService.complete).toHaveBeenCalled()
 
   describe '.getFetchFailure', ->
