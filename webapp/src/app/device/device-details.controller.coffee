@@ -11,8 +11,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   $cookies,
   ProgressBarService,
   $mdDialog,
-  ToastsService
-) ->
+  ToastsService) ->
   @tenantKey = $stateParams.tenantKey
   @deviceKey = $stateParams.deviceKey
   @fromDevices = $stateParams.fromDevices is "true"
@@ -67,7 +66,8 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @endTime = now.toLocaleString().replace(/,/g, "")
   today.setDate(now.getDate() - @dayRange)
   @startTime = today.toLocaleString().replace(/,/g, "")
-
+  
+  # event tab
   @getIssues = (device, epochStart, epochEnd, prev, next) =>
     ProgressBarService.start()
     issuesPromise = DevicesService.getIssuesByKey(device, epochStart, epochEnd, prev, next)
@@ -77,6 +77,17 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       @next_cursor = data.next
       ProgressBarService.complete()
 
+
+  # command history tab
+  @getEvents = (deviceKey, prev, next) =>
+    ProgressBarService.start()
+    commandEventsPromise = DevicesService.getCommandEventsByKey deviceKey, prev, next
+    commandEventsPromise.then (data) =>
+      @event_next_cursor = data.next_cursor
+      @event_prev_cursor = data.prev_cursor
+      @commandEvents = data.events
+      ProgressBarService.complete()
+
   @paginateCall = (forward) =>
     if forward
       @getIssues @deviceKey, @epochStart, @epochEnd, null, @next_cursor
@@ -84,26 +95,32 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     else
       @getIssues @deviceKey, @epochStart, @epochEnd, @prev_cursor, null
 
+
+  @paginateEventCall = (forward) =>
+    if forward
+      @getEvents @deviceKey, null, @event_next_cursor
+
+    else
+      @getEvents @deviceKey, @event_prev_cursor, null
+
   @initialize = () ->
     @epochStart = moment(new Date(@startTime)).unix()
     @epochEnd = moment(new Date(@endTime)).unix()
     timezonePromise = TimezonesService.getUsTimezones()
     timezonePromise.then (data) =>
       @timezones = data
+
     @panelModels = DevicesService.getPanelModels()
     @panelInputs = DevicesService.getPanelInputs()
+
     devicePromise = DevicesService.getDeviceByKey @deviceKey
     devicePromise.then ((response) =>
       @onGetDeviceSuccess(response)
-      return
     ), (response) =>
       @onGetDeviceFailure(response)
-      return
-    commandEventsPromise = DevicesService.getCommandEventsByKey @deviceKey
-    commandEventsPromise.then (data) =>
-      @commandEvents = data
 
-    @getIssues(@deviceKey, @epochStart, @epochEnd)
+    @getEvents @deviceKey
+    @getIssues @deviceKey, @epochStart, @epochEnd
 
   @onGetDeviceSuccess = (response) ->
     @currentDevice = response
@@ -218,7 +235,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     else
       @onSaveDevice()
 
-  @onUpdateLocation  = ->
+  @onUpdateLocation = ->
     @onSaveDevice()
 
   @autoGenerateCustomerDisplayCode = ->

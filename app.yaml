@@ -82,6 +82,9 @@ handlers:
   secure: always
   auth_fail_action: redirect
 
+- url: /webapp
+  static_dir: webapp
+
 - url: /dev/.*
   login: admin
   script: routes.application
@@ -103,7 +106,11 @@ skip_files:
 - ^images/readme.md
 - ^local/.*
 - ^tests/.*
-- ^webapp/.*
+- ^webapp/node_modules.*
+- ^webapp/bower_components.*
+- ^webapp/dist.*
+- ^webapp/specs.*
+- ^webapp/coverage.*
 - ^.git/.*
 - ^.idea/.*
 - ^.*~

@@ -8,9 +8,9 @@ describe 'DistributorSelectorCtrl', ->
   $rootScope = undefined
   $scope = undefined
   $log = undefined
+  ToastsService = undefined
   SessionsService = undefined
   DistributorsService = undefined
-
 
   beforeEach module('skykitProvisioning')
 
@@ -19,11 +19,13 @@ describe 'DistributorSelectorCtrl', ->
     _$rootScope_,
     _$log_,
     _DistributorsService_,
-    _SessionsService_) ->
+    _SessionsService_,
+    _ToastsService_) ->
     $controller = _$controller_
     $state = _$state_
     $rootScope = _$rootScope_
     $scope = _$rootScope_.$new()
+    ToastsService = _ToastsService_
     $log = _$log_
     DistributorsService = _DistributorsService_
     SessionsService = _SessionsService_
@@ -31,6 +33,7 @@ describe 'DistributorSelectorCtrl', ->
       $scope: $scope
       $log: $log
       $state: $state
+      ToastsService: ToastsService
       DistributorsService: DistributorsService
       SessionsService: SessionsService
     }
@@ -87,11 +90,13 @@ describe 'DistributorSelectorCtrl', ->
 
 
   describe '.selectDistributor', ->
-    distributor = {key: 'd78f9a0d89f7a0876ga7f6ga786g5a78df57d6f5a6dsf'}
+    distributor = {key: 'd78f9a0d89f7a0876ga7f6ga786g5a78df57d6f5a6dsf', name: 'some_distro'}
 
     beforeEach ->
       spyOn($state, 'go')
       controller.selectDistributor(distributor)
+      spyOn(ToastsService, 'showErrorToast')
+      spyOn(ToastsService, 'showSuccessToast')
 
     it 'sets the currentDistributor property', ->
       expect(controller.currentDistributor).toEqual distributor

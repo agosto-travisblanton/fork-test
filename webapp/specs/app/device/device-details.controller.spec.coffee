@@ -48,20 +48,22 @@ describe 'DeviceDetailsCtrl', ->
       }
     ]
   }
-  commandEvents = [
-    {
-      payload: 'skykit.com/skdchromeapp/reset'
-      gcmRegistrationId: 'asdfasdfasdfadfsa1'
-      updated: '2016-01-14 18:45:44'
-      confirmed: false
-    }
-    {
-      payload: 'skykit.com/skdchromeapp/stop'
-      gcmRegistrationId: 'asdfasdfasdfadfsa2'
-      updated: '2016-01-14 18:23:30'
-      confirmed: false
-    }
-  ]
+  commandEvents = {
+    events: [
+      {
+        payload: 'skykit.com/skdchromeapp/reset'
+        gcmRegistrationId: 'asdfasdfasdfadfsa1'
+        updated: '2016-01-14 18:45:44'
+        confirmed: false
+      }
+      {
+        payload: 'skykit.com/skdchromeapp/stop'
+        gcmRegistrationId: 'asdfasdfasdfadfsa2'
+        updated: '2016-01-14 18:23:30'
+        confirmed: false
+      }
+    ]
+  }
   tenants = [
     {key: 'dhjad897d987fadafg708fg7d', name: 'Foobar1', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
     {key: 'dhjad897d987fadafg708y67d', name: 'Foobar2', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
@@ -90,6 +92,7 @@ describe 'DeviceDetailsCtrl', ->
     scope = {}
     serviceInjection = {
       $scope: scope
+      ToastsService: ToastsService
       $stateParams: $stateParams
       ProgressBarService: progressBarService
       $mdDialog: $mdDialog
@@ -167,10 +170,12 @@ describe 'DeviceDetailsCtrl', ->
           $stateParams: $stateParams
           $state: $state
           ProgressBarService: progressBarService
+          ToastsService: ToastsService
           DevicesService: DevicesService
           TimezonesService: TimezonesService
           LocationsService: LocationsService
         }
+
         now = new Date()
         today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
         today.setDate(today.getDate() - 30)
@@ -178,6 +183,8 @@ describe 'DeviceDetailsCtrl', ->
         @epochStart = moment(today).unix()
         controller.epochEnd = @epochEnd
         controller.epochStart = @epochStart
+        spyOn(ToastsService, 'showErrorToast')
+        spyOn(ToastsService, 'showSuccessToast')
         controller.initialize()
 
       it 'should call TimezonesService.getTimezones', ->
@@ -196,7 +203,7 @@ describe 'DeviceDetailsCtrl', ->
         expect(DevicesService.getDeviceByKey).toHaveBeenCalledWith $stateParams.deviceKey
 
       it 'calls DevicesService.getCommandEventsByKey to retrieve command events for device', ->
-        expect(DevicesService.getCommandEventsByKey).toHaveBeenCalledWith $stateParams.deviceKey
+        expect(DevicesService.getCommandEventsByKey).toHaveBeenCalledWith $stateParams.deviceKey, undefined, undefined
 
       it 'calls DevicesService.getIssuesByKey to retrieve the issues for a given device and datetime range', ->
         expect(DevicesService.getIssuesByKey).toHaveBeenCalledWith($stateParams.deviceKey, @epochStart, @epochEnd, undefined, undefined)
@@ -207,7 +214,7 @@ describe 'DeviceDetailsCtrl', ->
 
       it "the 'then' handler caches the retrieved command events in the controller", ->
         getPlayerCommandEventsPromise.resolve commandEvents
-        expect(controller.commandEvents).toBe commandEvents
+        expect(controller.commandEvents).toBe commandEvents.events
 
   describe '.onGetDeviceSuccess', ->
     tenantKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWR3JvdXAiEXRlbmFudlbmFudBiAgICAgIDACAw'
@@ -286,6 +293,7 @@ describe 'DeviceDetailsCtrl', ->
       spyOn($log, 'error')
       spyOn($state, 'go')
       spyOn(ToastsService, 'showErrorToast')
+      spyOn(ToastsService, 'showSuccessToast')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.deviceKey = 'key'
       response = {status: 400, statusText: 'Bad Request'}

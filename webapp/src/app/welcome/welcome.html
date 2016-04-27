@@ -1,44 +1,59 @@
-<div ng-controller="WelcomeCtrl as welcomeCtrl" ng-init="welcomeCtrl.initialize()" layout="column" ng-cloak>
-  <md-toolbar class="md-hue-2">
-    <div class="md-toolbar-tools">
-      <h2 class="md-flex">{{ welcomeCtrl.identity.distributorName }}</h2>
-    </div>
-  </md-toolbar>
-  <md-content flex layout-padding>
-    <div flex="35" flex-sm="35" flex-xs="35" layout="column">
-      <md-card>
-        <md-card-title>
-          <md-card-title-text>
-            <span class="md-headline"><i class="fa fa-fw fa-tag ng-scope"></i> Version</span>
-          </md-card-title-text>
-        </md-card-title>
-        <md-card-content>
-          <table class="table">
-            <tbody>
-            <tr>
-              <td class="text-right col-md-3">Number:</td>
-              <td class="col-md-3">{{welcomeCtrl.version_data.number}}</td>
-            </tr>
-            <tr>
-              <td class="text-right col-md-3">Module:</td>
-              <td class="col-md-3">{{welcomeCtrl.version_data.web_module_name}}</td>
-            </tr>
-            <tr>
-              <td class="text-right col-md-3">Tag:</td>
-              <td class="col-md-3">{{welcomeCtrl.version_data.web_version_name}}</td>
-            </tr>
-            <tr>
-              <td class="text-right col-md-3">Hostname:</td>
-              <td class="col-md-3 hostname-word-break">
-                {{welcomeCtrl.version_data.hostname}}
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </md-card-content>
-      </md-card>
-    </div>
-  </md-content>
+<div ng-controller="WelcomeCtrl as vm" ng-init="vm.initialize()" layout="column" ng-cloak>
+    <md-toolbar class="md-hue-2">
+        <div class="md-toolbar-tools">
+            <h2 class="md-flex">{{ vm.identity.distributorName }}</h2>
+        </div>
+    </md-toolbar>
+    <md-content flex layout-padding>
+        <md-card>
+            <div class="container centered" style="text-align: center">
+                <h3>Welcome <b>{{ vm.identity.full_name }}</b>!</h3>
+                <h3>You are signed in under the <b>{{
+                    vm.identity.distributorName }}</b> distributor.</h3>
+                <p> Click on the hamburger icon in the top-left to get started.</p>
+                <h5>OR</h5>
+                <h4>Click
+                    <md-button class="md-raised" ng-click="vm.changeDistributor()">Here</md-button>
+                    to change your Distributor
+                </h4>
+
+
+            </div>
+        </md-card>
+        <div flex="35" flex-sm="35" flex-xs="35" layout="column">
+            <md-card>
+                <md-card-title>
+                    <md-card-title-text>
+                        <span class="md-headline"><i class="fa fa-fw fa-tag ng-scope"></i> Version</span>
+                    </md-card-title-text>
+                </md-card-title>
+                <md-card-content>
+                    <table class="table">
+                        <tbody>
+                        <tr>
+                            <td class="text-right col-md-3">Number:</td>
+                            <td class="col-md-3">{{vm.version_data.number}}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-right col-md-3">Module:</td>
+                            <td class="col-md-3">{{vm.version_data.web_module_name}}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-right col-md-3">Tag:</td>
+                            <td class="col-md-3">{{vm.version_data.web_version_name}}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-right col-md-3">Hostname:</td>
+                            <td class="col-md-3 hostname-word-break">
+                                {{vm.version_data.hostname}}
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </md-card-content>
+            </md-card>
+        </div>
+    </md-content>
 </div>
 
 

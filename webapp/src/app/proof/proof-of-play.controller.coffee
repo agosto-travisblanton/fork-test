@@ -23,7 +23,6 @@ appModule.controller "ProofOfPlayCtrl", (ProofPlayService, $stateParams, $state,
       $state.go 'proofDetail', {
         tenant: @chosen_tenant
       }
-      ToastsService.showSuccessToast "Proof of Play reporting set to " + tenant
 
 
 
