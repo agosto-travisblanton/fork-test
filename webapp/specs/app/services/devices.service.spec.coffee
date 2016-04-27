@@ -100,7 +100,7 @@ describe 'DevicesService', ->
       spyOn(Restangular, 'oneUrl').and.returnValue deviceRestangularService
       spyOn(deviceRestangularService, 'get').and.returnValue promise
       actual = DevicesService.getCommandEventsByKey(deviceKey)
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "/api/v1/player-command-events/#{deviceKey}"
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "/api/v1/player-command-events/null/null/#{deviceKey}"
       expect(deviceRestangularService.get).toHaveBeenCalled()
       expect(actual).toBe promise
 

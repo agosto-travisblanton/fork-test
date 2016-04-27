@@ -8,7 +8,7 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, $cookies) ->
     $state.go 'sign_in'
 
 
-  capitalizeFirstLetter = (string) =>
+  @capitalizeFirstLetter = (string) =>
     string.charAt(0).toUpperCase() + string.slice(1);
 
 
@@ -20,18 +20,17 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, $cookies) ->
       distributorName: $cookies.get('currentDistributorName')
     }
 
-    vm.identity.first_name = capitalizeFirstLetter(vm.identity.email.split("@")[0].split(".")[0])
-    vm.identity.last_name = capitalizeFirstLetter(vm.identity.email.split("@")[0].split(".")[1])
-    vm.identity.full_name = vm.identity.first_name + " " + vm.identity.last_name
-
 
     @changeDistributor = () =>
-        $state.go 'distributor_selection'
-    
+      $state.go 'distributor_selection'
+
     if !vm.identity.email
       $state.go "sign_in"
 
     else
+      vm.identity.first_name = @capitalizeFirstLetter(vm.identity.email.split("@")[0].split(".")[0])
+      vm.identity.last_name = @capitalizeFirstLetter(vm.identity.email.split("@")[0].split(".")[1])
+      vm.identity.full_name = vm.identity.first_name + " " + vm.identity.last_name
       promise = VersionsService.getVersions()
       promise.then (data) ->
         vm.version_data = data
