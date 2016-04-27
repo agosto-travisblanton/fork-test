@@ -869,8 +869,6 @@ class PlayerCommandEvent(ndb.Model):
                 start_cursor=cursor
             )
 
-            # needed because we are using a reverse cursor
-            objects.reverse()
 
             prev_cursor = next_cursor_str
             next_cursor = next_cursor.urlsafe() if more else None
@@ -883,6 +881,10 @@ class PlayerCommandEvent(ndb.Model):
                 page_size=fetch_size,
                 start_cursor=cursor.reversed()
             )
+
+            # needed because we are using a reverse cursor
+            objects.reverse()
+
             next_cursor = prev_cursor_str
             prev_cursor = prev.urlsafe() if more else None
 
