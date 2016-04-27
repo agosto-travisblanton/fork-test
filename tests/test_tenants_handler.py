@@ -81,6 +81,14 @@ class TestTenantsHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 5)
 
+    def test_get_returns_json_resources_paginated(self):
+        self.load_tenants(amount=100)
+        request_parameters = {}
+        uri = application.router.build(None, 'get_tenants_paginated', None, {'page_size': 100, 'offset': 0})
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response_json = json.loads(response.body)
+        self.assertEqual(len(response_json["tenants"]), 100)
+
     ##################################################################################################################
     ## post
     ##################################################################################################################
@@ -309,7 +317,6 @@ class TestTenantsHandler(BaseTest, WebTest):
         self.assertTrue('Bad response: 400 The active parameter is invalid.'
                         in context.exception.message)
 
-
     ##################################################################################################################
     ## put
     ##################################################################################################################
@@ -440,7 +447,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         self.app.put_json(uri, entity_body, headers=self.headers)
         self.assertEqual(expected.name, 'foobar')
         self.assertFalse(expected.active)
-        self.assertEqual(expected.default_timezone,'America/Denver')
+        self.assertEqual(expected.default_timezone, 'America/Denver')
         self.assertNotEqual(expected.notification_emails, self.ORIGINAL_NOTIFICATION_EMAILS)
         email_list = delimited_string_to_list(notification_email)
         self.assertEqual(expected.notification_emails, email_list)
@@ -548,7 +555,6 @@ class TestTenantsHandler(BaseTest, WebTest):
         self.assertTrue(device.proof_of_play_logging)
         self.assertTrue(device.proof_of_play_editable)
 
-
     ##################################################################################################################
     ## delete
     ##################################################################################################################
@@ -576,14 +582,14 @@ class TestTenantsHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertEqual(response_json.get('active'), False)
 
-    def load_tenants(self):
+    def load_tenants(self, amount=5):
         tenant_keys = []
         domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
                                distributor_key=self.distributor_key,
                                impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                active=True)
         domain_key = domain.put()
-        for x in range(5):
+        for x in range(amount):
             tenant = Tenant.create(tenant_code='acme',
                                    name="Testing tenant {0}".format(x),
                                    admin_email=self.ADMIN_EMAIL.format(x),

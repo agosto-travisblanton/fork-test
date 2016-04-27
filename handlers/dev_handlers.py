@@ -133,6 +133,17 @@ def make_data_for_a_distributor():
                                active=True)
         tenant.put()
         print 'Tenant ' + tenant.name + ' created'
+
+    for i in range(1, 500):
+        tenant = Tenant.create(tenant_code=TENANT_CODE + str(i),
+                               name=TENANT_NAME + str(i),
+                               admin_email=TENANT_ADMIN_EMAIL,
+                               content_server_url='https://skykit-contentmanager-int.appspot.com',
+                               content_manager_base_url='https://skykit-contentmanager-int.appspot.com/content',
+                               domain_key=domain.key,
+                               active=True)
+        tenant.put()
+        print 'Tenant ' + tenant.name + ' created'
     else:
         print 'Tenant ' + tenant.name + ' already exists, so did not create'
 
