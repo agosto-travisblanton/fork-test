@@ -237,7 +237,7 @@ application = WSGIApplication(
 
         Route(r'/api/v1/tenants/paginated/<page_size>/<offset>',
               handler='handlers.tenants_handler.TenantsHandler',
-              name='tenants',
+              name='get_tenants_paginated',
               handler_method='get_tenants_paginated',
               methods=['GET', 'POST']
               ),
