@@ -235,11 +235,19 @@ application = WSGIApplication(
               methods=['GET']
               ),
 
+        Route(r'/api/v1/tenants/paginated/<page_size>/<offset>',
+              handler='handlers.tenants_handler.TenantsHandler',
+              name='tenants',
+              handler_method='get_tenants_paginated',
+              methods=['GET', 'POST']
+              ),
+
         Route(r'/api/v1/tenants',
               handler='handlers.tenants_handler.TenantsHandler',
               name='tenants',
               methods=['GET', 'POST']
               ),
+
         Route(
             r'/api/v1/tenants/<tenant_key>',
             handler='handlers.tenants_handler.TenantsHandler',

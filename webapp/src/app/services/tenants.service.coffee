@@ -1,7 +1,5 @@
 'use strict'
-
 appModule = angular.module('skykitProvisioning')
-
 appModule.factory 'TenantsService', (Restangular) ->
 
   class TenantsService
@@ -15,6 +13,10 @@ appModule.factory 'TenantsService', (Restangular) ->
 
     fetchAllTenants: () ->
       promise = Restangular.all('tenants').getList()
+      promise
+      
+    fetchAllTenantsPaginated: (page_size, offset) ->
+      promise = Restangular.oneUrl('tenants', "api/v1/tenants/paginated/#{page_size}/#{offset}").get()
       promise
 
     getTenantByKey: (tenantKey) ->
