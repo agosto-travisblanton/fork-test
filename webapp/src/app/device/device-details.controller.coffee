@@ -120,7 +120,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       @onGetDeviceFailure(response)
 
     @getEvents @deviceKey
-    @getIssues(@deviceKey, @epochStart, @epochEnd)
+    @getIssues @deviceKey, @epochStart, @epochEnd
 
   @onGetDeviceSuccess = (response) ->
     @currentDevice = response
