@@ -20,10 +20,17 @@ include =
     settings.py
     strategy.py
     utils/*.py
+    migration/migration_models.py
 
 
 omit =
     proofplay/dev/*.py
+    handlers/dev_handlers.py
+    handlers/index.py
+    i18n_util.py
+    migration/*
+    utils/api_util.py
+    settings.py
 
 
 [report]
