@@ -869,6 +869,9 @@ class PlayerCommandEvent(ndb.Model):
                 start_cursor=cursor
             )
 
+            # needed because we are using a reverse cursor
+            objects.reverse()
+
             prev_cursor = next_cursor_str
             next_cursor = next_cursor.urlsafe() if more else None
 
