@@ -9,7 +9,7 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, $cookies) ->
 
 
   @capitalizeFirstLetter = (string) ->
-    string.charAt(0).toUpperCase() + string.slice(1);
+    string.charAt(0).toUpperCase() + string.slice(1)
 
 
   vm.initialize = ->
