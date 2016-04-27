@@ -232,8 +232,13 @@ appModule.controller 'DeviceDetailsCtrl', (
 
     @onProofOfPlayLoggingCheck = ->
       if @currentDevice.proofOfPlayLogging
-        if @currentDevice.locationKey == null
-          sweet.show('Oops...', "Must have a location for this device to enable Proof of Play.", 'error')
+        noLocation = @currentDevice.locationKey == null
+        noDisplayCode = @currentDevice.customerDisplayCode == null
+        if noLocation
+          sweet.show('Oops...', "You must have a Location to enable Proof of play.", 'error')
+          @currentDevice.proofOfPlayLogging = false
+        else if noDisplayCode
+          sweet.show('Oops...', "You must have a Display code to enable Proof of play.", 'error')
           @currentDevice.proofOfPlayLogging = false
         else
           @onSaveDevice()

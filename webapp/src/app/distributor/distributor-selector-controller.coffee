@@ -20,10 +20,10 @@ appModule.controller "DistributorSelectorCtrl", ($scope, $log, $state, $cookies,
     $cookies.put('currentDistributorName', @currentDistributor.name)
     $cookies.put('currentDistributorKey', @currentDistributor.key)
     if @distributors.length == 1
-      ToastsService.showSuccessToast distributor.name + " is the only distributor associated with this account." +
-          "Automatically choosing " + distributor.name + " as your distributor."
+      ToastsService.showSuccessToast "#{distributor.name} is the only distributor associated with this account.\
+          Automatically choosing #{distributor.name} as your distributor."
     else
-      ToastsService.showSuccessToast "Distributor " + distributor.name + " selected!"
+      ToastsService.showSuccessToast "Distributor #{distributor.name} selected!"
     $state.go 'welcome'
 
   @
