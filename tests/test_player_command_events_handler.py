@@ -33,13 +33,17 @@ class TestPlayerCommandEventsHandler(BaseTest, WebTest):
         self.__build_command_events(device_urlsafe_key='some-other-key', number_of_events=2)
         self.__build_command_events(device_urlsafe_key=self.DEVICE_URLSAFE_KEY,
                                     number_of_events=number_of_device_events)
-        uri = build_uri('player-command-events', params_dict={'device_urlsafe_key': self.DEVICE_URLSAFE_KEY})
+        uri = build_uri('player-command-events', params_dict={
+            'device_urlsafe_key': self.DEVICE_URLSAFE_KEY,
+            'prev_cursor_str': 'null',
+            'next_cursor_str': 'null'
+        })
         response = self.app.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
         self.assertLength(number_of_device_events, response_json)
-        self.assertEqual(response_json[0]['payload'], 'payload-2')
-        self.assertEqual(response_json[1]['payload'], 'payload-1')
-        self.assertEqual(response_json[2]['payload'], 'payload-0')
+        self.assertEqual(response_json["events"][0]['payload'], 'payload-2')
+        self.assertEqual(response_json["events"][1]['payload'], 'payload-1')
+        self.assertEqual(response_json["events"][2]['payload'], 'payload-0')
 
     def test_put_no_authorization_header_returns_forbidden(self):
         event_key = self.event.put()

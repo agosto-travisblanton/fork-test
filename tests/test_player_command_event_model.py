@@ -46,9 +46,9 @@ class TestPlayerCommandEventModel(BaseTest):
                                     number_of_events=number_of_device_events)
         device_events_list = PlayerCommandEvent.get_events_by_device_key(self.DEVICE_URLSAFE_KEY)
         self.assertLength(number_of_device_events, device_events_list)
-        self.assertEqual(device_events_list[0].payload, 'payload-2')
-        self.assertEqual(device_events_list[1].payload, 'payload-1')
-        self.assertEqual(device_events_list[2].payload, 'payload-0')
+        self.assertEqual(device_events_list["objects"][0].payload, 'payload-2')
+        self.assertEqual(device_events_list["objects"][1].payload, 'payload-1')
+        self.assertEqual(device_events_list["objects"][2].payload, 'payload-0')
 
     def __build_command_events(self, device_urlsafe_key, number_of_events):
         for i in range(number_of_events):
