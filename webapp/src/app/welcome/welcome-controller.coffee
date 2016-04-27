@@ -8,7 +8,7 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, $cookies) ->
     $state.go 'sign_in'
 
 
-  @capitalizeFirstLetter = (string) =>
+  @capitalizeFirstLetter = (string) ->
     string.charAt(0).toUpperCase() + string.slice(1);
 
 
@@ -21,7 +21,7 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, $cookies) ->
     }
 
 
-    @changeDistributor = () =>
+    @changeDistributor = () ->
       $state.go 'distributor_selection'
 
     if !vm.identity.email

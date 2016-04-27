@@ -1,6 +1,7 @@
 'use strict'
 appModule = angular.module('skykitProvisioning')
-appModule.controller 'DeviceDetailsCtrl', ($log,
+appModule.controller 'DeviceDetailsCtrl', (
+  $log,
   $stateParams,
   $state,
   DevicesService,
@@ -66,6 +67,10 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @endTime = now.toLocaleString().replace(/,/g, "")
   today.setDate(now.getDate() - @dayRange)
   @startTime = today.toLocaleString().replace(/,/g, "")
+
+
+  @copyDeviceKey = () ->
+    ToastsService.showSuccessToast 'Device key has been copied to your clipboard'
   
   # event tab
   @getIssues = (device, epochStart, epochEnd, prev, next) =>

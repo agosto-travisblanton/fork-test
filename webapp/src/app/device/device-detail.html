@@ -31,8 +31,9 @@
                     </div>
 
                     <div class="col-sm-2 col-sm-offset-4">
-                        <md-button ngclipboard data-clipboard-target="#hidden-device-key" class="md-raised">
-                            <i class="fa fa-fw fa-clipboard"></i> Copy Device key</a>
+                        <md-button ngclipboard data-clipboard-target="#hidden-device-key"
+                                   ng-click="deviceDetailsCtrl.copyDeviceKey()" class="md-raised">
+                            <i class="fa fa-fw fa-clipboard"></i> Copy Device key
                         </md-button>
                         <a href="{{deviceDetailsCtrl.backUrl}}" class="md-primary md-button md-ink-ripple">
                             <i class="fa fa-fw fa-backward"></i>Back</a>
