@@ -475,7 +475,7 @@ describe 'DeviceDetailsCtrl', ->
       it 'saves proof of play is true on the device entity', ->
         expect(controller.onSaveDevice).toHaveBeenCalled()
 
-    describe 'proof of play logging is true with no location specified', ->
+    describe 'proof of play logging is true with no Location specified', ->
       beforeEach ->
         spyOn(sweet, 'show')
         controller.currentDevice.proofOfPlayLogging = true
@@ -484,7 +484,22 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'displays a sweet alert indicating a location is needed to enable Proof of Play', ->
         expect(sweet.show).toHaveBeenCalledWith('Oops...',
-          "Must have a location for this device to enable Proof of Play.", 'error')
+          "You must have a Location to enable Proof of play.", 'error')
+
+      it 'set proofOfPlayLogging to false since the location pre-condition is not met', ->
+        expect(controller.currentDevice.proofOfPlayLogging).toBe false
+
+    describe 'proof of play logging is true with no Display code specified', ->
+      beforeEach ->
+        spyOn(sweet, 'show')
+        controller.currentDevice.proofOfPlayLogging = true
+        controller.currentDevice.locationKey = 'ah1kZXZ-c2t5a2l0LW'
+        controller.currentDevice.customerDisplayCode = null
+        controller.onProofOfPlayLoggingCheck()
+
+      it 'displays a sweet alert indicating a Display code is needed to enable Proof of Play', ->
+        expect(sweet.show).toHaveBeenCalledWith('Oops...',
+          "You must have a Display code to enable Proof of play.", 'error')
 
       it 'set proofOfPlayLogging to false since the location pre-condition is not met', ->
         expect(controller.currentDevice.proofOfPlayLogging).toBe false
