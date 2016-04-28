@@ -157,8 +157,6 @@ describe 'TenantDetailsCtrl', ->
       it 'stops the progress bar animation', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it "the 'then' handler routes navigation back to 'tenants'", ->
-        expect($state.go).toHaveBeenCalledWith('tenants')
 
     describe '.onFailureTenantSave 409 conflict', ->
       beforeEach ->
@@ -169,8 +167,6 @@ describe 'TenantDetailsCtrl', ->
       it 'stops the progress bar animation', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it "the 'then' handler routes navigation back to 'tenants'", ->
-        expect($state.go).toHaveBeenCalledWith('tenants')
 
       it "show the error dialog", ->
         expectedError = 'Tenant code unavailable. Please modify tenant name to generate a unique tenant code.'
@@ -184,9 +180,6 @@ describe 'TenantDetailsCtrl', ->
 
       it 'stops the progress bar animation', ->
         expect(progressBarService.complete).toHaveBeenCalled()
-
-      it "the 'then' handler routes navigation back to 'tenants'", ->
-        expect($state.go).toHaveBeenCalledWith('tenants')
 
       it "show the error dialog", ->
         expectedError = 'Unable to save the tenant.'
