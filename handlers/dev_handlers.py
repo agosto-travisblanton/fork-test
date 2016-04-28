@@ -122,6 +122,21 @@ def make_data_for_a_distributor():
     ##########################################################################################
     # CREATE TENANTS
     ##########################################################################################
+    for i in range(1, 300):
+        tenant_code = "AUTO_TENANT" + str(i)
+        tenant_code = tenant_code.lower()
+        tenant = Tenant.create(tenant_code=tenant_code,
+                               name="AUTO_TENANT" + str(i),
+                               admin_email=TENANT_ADMIN_EMAIL,
+                               content_server_url='https://skykit-contentmanager-int.appspot.com',
+                               content_manager_base_url='https://skykit-contentmanager-int.appspot.com/content',
+                               domain_key=domain.key,
+                               active=True)
+        tenant.put()
+        print 'Tenant ' + tenant.name + ' created'
+    else:
+        print 'Tenant ' + tenant.name + ' already exists, so did not create'
+
     tenant = Tenant.find_by_tenant_code(TENANT_CODE)
     if not tenant:
         tenant = Tenant.create(tenant_code=TENANT_CODE,
@@ -133,19 +148,6 @@ def make_data_for_a_distributor():
                                active=True)
         tenant.put()
         print 'Tenant ' + tenant.name + ' created'
-
-    for i in range(1, 300):
-        tenant = Tenant.create(tenant_code="AUTO_TENANT" + str(i),
-                               name="AUTO_TENANT" + str(i),
-                               admin_email=TENANT_ADMIN_EMAIL,
-                               content_server_url='https://skykit-contentmanager-int.appspot.com',
-                               content_manager_base_url='https://skykit-contentmanager-int.appspot.com/content',
-                               domain_key=domain.key,
-                               active=True)
-        tenant.put()
-        print 'Tenant ' + tenant.name + ' created'
-    else:
-        print 'Tenant ' + tenant.name + ' already exists, so did not create'
 
     ##########################################################################################
     # UNMANAGED DEVICES
