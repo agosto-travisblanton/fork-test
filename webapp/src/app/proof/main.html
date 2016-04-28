@@ -6,10 +6,22 @@
     </md-toolbar>
     <md-content>
         <div class="container">
-            <div ng-if="!vm.chosen_tenant" ng-init="vm.initialize()">
+            <div ng-init="vm.initialize()" style="margin-top: 1em;">
+
+
                 <div ng-hide="vm.tenants">
-                    <h3>Loading tenants...</h3>
+
+                    <div layout="row" layout-sm="column" layout-align="space-around">
+                        <div class="col-md-12">
+                            <h3>Loading Tenants...</h3>
+                        </div>
+                        <div class="col-md-1">
+                        <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+                        </div>
+                    </div>
+
                 </div>
+
                 <div ng-show="vm.tenants">
                     <h3>Please choose a tenant</h3>
                     <hr/>
