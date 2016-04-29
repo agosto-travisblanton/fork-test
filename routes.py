@@ -77,6 +77,12 @@ application = WSGIApplication(
               name='location-create',
               methods=['POST']
               ),
+        Route(r'/api/v1/tenants/<tenant_urlsafe_key>/<prev_cursor>/<next_cursor>/locations',
+              handler='handlers.locations_handler.LocationsHandler',
+              name='get_locations_by_tenant_paginated',
+              handler_method='get_locations_by_tenant_paginated',
+              methods=['GET']
+              ),
         Route(r'/api/v1/tenants/<tenant_urlsafe_key>/locations',
               handler='handlers.locations_handler.LocationsHandler',
               name='locations-list-retrieval',

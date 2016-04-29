@@ -466,7 +466,6 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
   text-overflow: ellipsis // This is where the magic happens
 }
 
-
 .proof-of-play-tenant-name-option {
   width: 7em;
   white-space: nowrap;
@@ -477,6 +476,19 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
 
 }
 
+.proof-of-play-horizontal-top-bar {
+  display: flex;
+  align-self: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  justify-content: center;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  align-items: center;
+  justify-content: center;
+
+}
 
 .my-flex {
   display: flex;

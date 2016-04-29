@@ -77,6 +77,42 @@ class TestLocationsHandler(BaseTest, WebTest):
             self.assertEqual(response_json[x].get('customerLocationCode'), 'store_{0}'.format(x))
             self.assertTrue(response_json[x].get('active'))
 
+    def test_get_locations_by_tenant_returns_location_list_paginated(self):
+        tenant = Tenant.create(tenant_code='acme_inc',
+                               name='Acme, Inc.',
+                               admin_email=self.ADMIN_EMAIL,
+                               content_server_url=self.CONTENT_SERVER_URL,
+                               content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                               domain_key=self.domain_key,
+                               active=True)
+        tenant_key = tenant.put()
+        number_of_locations = 101
+        self.load_tenant_locations(number_of_locations, tenant_key)
+        request_parameters = {}
+        uri = application.router.build(None, 'get_locations_by_tenant_paginated', None,
+                                       {'tenant_urlsafe_key': tenant_key.urlsafe(), 'prev_cursor': 'null',
+                                        'next_cursor': 'null'})
+        response = self.get(uri, params=request_parameters, headers=self.headers)
+        response_json = json.loads(response.body)
+        self.assertEqual(len(response_json["locations"]), 25)
+
+        next_uri = application.router.build(None, 'get_locations_by_tenant_paginated', None,
+                                            {'tenant_urlsafe_key': tenant_key.urlsafe(), 'prev_cursor': 'null',
+                                             'next_cursor': response_json["next_cursor"]})
+
+        next_response = self.get(next_uri, params=request_parameters, headers=self.headers)
+        next_response_json = json.loads(next_response.body)
+        self.assertEqual(len(next_response_json["locations"]), 25)
+
+        prev_uri = application.router.build(None, 'get_locations_by_tenant_paginated', None,
+                                            {'tenant_urlsafe_key': tenant_key.urlsafe(),
+                                             'prev_cursor': next_response_json["prev_cursor"],
+                                             'next_cursor': 'null'})
+
+        prev_response = self.get(prev_uri, params=request_parameters, headers=self.headers)
+        prev_response_json = json.loads(prev_response.body)
+        self.assertEqual(len(prev_response_json["locations"]), 25)
+
     ##################################################################################################################
     ## post
     ##################################################################################################################
@@ -222,7 +258,7 @@ class TestLocationsHandler(BaseTest, WebTest):
         entity_body = {
             'customerLocationName': customer_location_name,
             'active': True,
-            'latitude':44.98,
+            'latitude': 44.98,
             'longitude': -93.27
         }
         response = self.app.put_json(uri, entity_body, headers=self.headers)

@@ -56,7 +56,6 @@ appModule.controller 'TenantDetailsCtrl',
     @onSuccessTenantSave = ->
       ProgressBarService.complete()
       ToastsService.showSuccessToast 'We saved your tenant information.'
-      $state.go 'tenants'
 
     @onFailureTenantSave = (errorObject) ->
       ProgressBarService.complete()

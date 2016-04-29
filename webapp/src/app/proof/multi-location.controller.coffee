@@ -23,6 +23,7 @@ appModule.controller "ProofOfPlayMultiLocationCtrl", (ProofPlayService, $statePa
   @no_cache = true
   @loading = true
   @disabled = true
+  @disabledTenant = true
   @selected_locations = []
 
   @initialize = =>
@@ -112,6 +113,15 @@ appModule.controller "ProofOfPlayMultiLocationCtrl", (ProofPlayService, $statePa
     ProofPlayService.getAllTenants()
     .then (data) =>
       @tenants = data.data.tenants
+
+  @querySearch = (resources, searchText) ->
+    ProofPlayService.querySearch(resources, searchText)
+
+  @isSelectionValid = (search) =>
+    if search in @tenants
+      @disabledTenant = false
+    else
+      @disabledTenant = true
 
 
   @submitTenant = (tenant) =>
