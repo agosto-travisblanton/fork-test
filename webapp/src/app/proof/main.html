@@ -1,75 +1,62 @@
 <div ng-controller="ProofOfPlayCtrl as vm" layout="column" ng-cloak>
-    <md-toolbar class="md-hue-2">
-        <div class="md-toolbar-tools">
-            <h2 class="md-flex"><i class="fa fa-fw fa-film ng-scope"></i> Proof of Play</h2>
-        </div>
-    </md-toolbar>
-    <md-content>
-        <div class="container">
-            <div ng-init="vm.initialize()" style="margin-top: 1em;">
-
-
-                <div ng-hide="vm.tenants">
-
-                    <div layout="row" layout-sm="column" layout-align="space-around">
-                        <div class="col-md-12">
-                            <h3>Loading Tenants...</h3>
-                        </div>
-                        <div class="col-md-1">
-                        <md-progress-circular md-mode="indeterminate"></md-progress-circular>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div ng-show="vm.tenants">
-                    <h3>Please choose a tenant</h3>
-                    <hr/>
-                    <div class="col-md-12">
-
-                        <div class="col-md-6">
-                            <md-autocomplete
-                                    md-no-cache="true"
-                                    md-selected-item="vm.selectedItem"
-                                    md-search-text="vm.searchText"
-                                    md-items="item in vm.querySearch(vm.tenants, vm.searchText)"
-                                    md-item-text="item"
-                                    md-min-length="0"
-                                    md-search-text-change="vm.isSelectionValid( vm.searchText)"
-                                    md-selected-item-change="vm.isSelectionValid( vm.searchText)"
-                                    placeholder="Make A Search">
-
-                                <md-item-template>
-                                        <span md-highlight-text="vm.searchText"
-                                              md-highlight-flags="^i">{{item}}</span>
-                                </md-item-template>
-                                <md-not-found>
-                                    <div ng-if="vm.searchText !== '' && vm.searchText.length > 2">
-                                        No results for "{{vm.searchText}}" were
-                                        found.
-                                    </div>
-                                    <div
-                                            ng-if="vm.searchText !== '' && vm.searchText.length <= 2">
-                                        Please enter at least 3 characters.
-                                    </div>
-                                </md-not-found>
-                            </md-autocomplete>
-                        </div>
-
-                        <div class="col-md-3" style="margin-top: -3px">
-                            <md-button md-no-ink class="md-raised" ng-disabled="vm.disabled"
-                                       ng-click="vm.submitTenant(vm.searchText)">
-                                Submit
-                            </md-button>
-
-                        </div>
-
-
-                    </div>
-
-
-                </div>
+  <md-toolbar class="md-hue-2">
+    <div class="md-toolbar-tools">
+      <h2 class="md-flex"><i class="fa fa-fw fa-film ng-scope"></i> Proof of Play</h2>
+    </div>
+  </md-toolbar>
+  <md-content>
+    <div class="container">
+      <div ng-init="vm.initialize()" style="margin-top: 1em;">
+        <div ng-hide="vm.tenants">
+          <div layout="row" layout-sm="column" layout-align="space-around">
+            <div class="col-md-12">
+              <h3>Loading Tenants...</h3>
             </div>
+            <div class="col-md-1">
+              <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+            </div>
+          </div>
         </div>
-    </md-content>
+        <div ng-show="vm.tenants">
+          <h3>Please choose a tenant</h3>
+          <hr/>
+          <div class="col-md-12">
+            <div class="col-md-6">
+              <md-autocomplete
+                      md-no-cache="true"
+                      md-selected-item="vm.selectedItem"
+                      md-search-text="vm.searchText"
+                      md-items="item in vm.querySearch(vm.tenants, vm.searchText)"
+                      md-item-text="item"
+                      md-min-length="0"
+                      md-search-text-change="vm.isSelectionValid( vm.searchText)"
+                      md-selected-item-change="vm.isSelectionValid( vm.searchText)"
+                      placeholder="Make A Search">
+
+                <md-item-template>
+                    <span md-highlight-text="vm.searchText"
+                          md-highlight-flags="^i">{{item}}</span>
+                </md-item-template>
+                <md-not-found>
+                  <div ng-if="vm.searchText !== '' && vm.searchText.length > 2">
+                    No results for "{{vm.searchText}}" were
+                    found.
+                  </div>
+                  <div ng-if="vm.searchText !== '' && vm.searchText.length <= 2">
+                    Please enter at least 3 characters.
+                  </div>
+                </md-not-found>
+              </md-autocomplete>
+            </div>
+            <div class="col-md-3" style="margin-top: -3px">
+              <md-button md-no-ink class="md-raised" ng-disabled="vm.disabled"
+                         ng-click="vm.submitTenant(vm.searchText)">
+                Submit
+              </md-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </md-content>
 </div>
