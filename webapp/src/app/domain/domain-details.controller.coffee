@@ -3,13 +3,13 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'DomainDetailsCtrl', ($log,
-    $stateParams,
-    DistributorsService,
-    DomainsService,
-    $state,
-    sweet,
-    ProgressBarService,
-    $cookies) ->
+  $stateParams,
+  DistributorsService,
+  DomainsService,
+  $state,
+  sweet,
+  ProgressBarService,
+  $cookies) ->
   @currentDomain = {
     key: undefined,
     name: undefined,
