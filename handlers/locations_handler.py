@@ -6,7 +6,7 @@ from google.appengine.ext import ndb
 from webapp2 import RequestHandler
 
 from decorators import requires_api_token
-from models import Location
+from models import Location, Tenant
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import LOCATION_STRATEGY
@@ -24,10 +24,29 @@ class LocationsHandler(RequestHandler, KeyValidatorMixin):
         json_response(self.response, result, strategy=LOCATION_STRATEGY)
 
     @requires_api_token
-    def get_locations_by_tenant(self, tenant_urlsafe_key):
+    def get_locations_by_tenant(self, tenant_urlsafe_key, prev_cursor, next_cursor):
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
-        query_results = Location.query(Location.tenant_key == tenant_key).order(Location.customer_location_code).fetch()
-        json_response(self.response, query_results, strategy=LOCATION_STRATEGY)
+        next_cursor = next_cursor if next_cursor != "null" else None
+        prev_cursor = prev_cursor if prev_cursor != "null" else None
+
+        print next_cursor
+        print prev_cursor
+
+        query_results = Tenant.find_locations_of_tenant_paginated(
+            tenant_key=tenant_key,
+            next_cursor_str=next_cursor,
+            prev_cursor_str=prev_cursor
+        )
+
+        json_response(
+            self.response,
+            {
+                "locations": query_results["objects"],
+                "next_cursor": query_results["next_cursor"],
+                "prev_cursor": query_results["prev_cursor"]
+            },
+            strategy=LOCATION_STRATEGY
+        )
 
     @requires_api_token
     def post(self):
@@ -73,7 +92,7 @@ class LocationsHandler(RequestHandler, KeyValidatorMixin):
                 if re.match(self.LATITUDE_PATTERN, str(latitude)) is None or re.match(self.LONGITUDE_PATTERN,
                                                                                       str(longitude)) is None:
                     logging.warning(
-                            'Invalid latitude {0} or longitude {1} detected.'.format(str(latitude), str(longitude)))
+                        'Invalid latitude {0} or longitude {1} detected.'.format(str(latitude), str(longitude)))
                     geo_location = None
                 else:
                     geo_location = ndb.GeoPt(latitude, longitude)

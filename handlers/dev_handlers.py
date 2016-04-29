@@ -150,6 +150,16 @@ def make_data_for_a_distributor():
         print 'Tenant ' + tenant.name + ' created'
 
     ##########################################################################################
+    # CREATE LOCATIONS
+    ##########################################################################################
+    for i in range(1, 103):
+        location = Location.create(tenant_key=tenant.key,
+                                   customer_location_name="my_location" + str(i),
+                                   customer_location_code="my_location" + str(i))
+
+        location.put()
+
+    ##########################################################################################
     # UNMANAGED DEVICES
     ##########################################################################################
     unmanaged_device = ChromeOsDevice.get_unmanaged_device_by_mac_address(UNMANAGED_MAC_ADDRESS)
@@ -203,7 +213,7 @@ def make_data_for_a_distributor():
     devices = query.fetch(1000)
     print 'Device count = ' + str(len(devices))
     for device in devices:
-        for i in range(1, 100):
+        for i in range(1, 34):
             payload = 'reset content'.format(i)
             gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
             event = PlayerCommandEvent.create(device_urlsafe_key=device.key.urlsafe(),

@@ -340,6 +340,57 @@ class Tenant(ndb.Model):
         return to_return
 
     @classmethod
+    def find_locations_of_tenant_paginated(
+            cls,
+            tenant_key, fetch_size=25, prev_cursor_str=None,
+            next_cursor_str=None):
+
+        objects = None
+        next_cursor = None
+        prev_cursor = None
+
+        if not prev_cursor_str and not next_cursor_str:
+            objects, next_cursor, more = Location.query(Location.tenant_key == tenant_key).order(
+                Location.customer_location_code) \
+                .fetch_page(
+                page_size=fetch_size)
+
+            prev_cursor = None
+            next_cursor = next_cursor.urlsafe() if more else None
+
+        elif next_cursor_str:
+            cursor = Cursor(urlsafe=next_cursor_str)
+            objects, next_cursor, more = Location.query(Location.tenant_key == tenant_key).order(
+                Location.customer_location_code).fetch_page(
+                page_size=fetch_size,
+                start_cursor=cursor
+            )
+
+            prev_cursor = next_cursor_str
+            next_cursor = next_cursor.urlsafe() if more else None
+
+        elif prev_cursor_str:
+            cursor = Cursor(urlsafe=prev_cursor_str)
+            objects, prev, more = Location.query(Location.tenant_key == tenant_key).order(
+                Location.customer_location_code).fetch_page(
+                page_size=fetch_size,
+                start_cursor=cursor.reversed()
+            )
+
+            next_cursor = prev_cursor_str
+            prev_cursor = prev.urlsafe() if more else None
+
+
+        to_return = {
+            'objects': objects or [],
+            'next_cursor': next_cursor,
+            'prev_cursor': prev_cursor,
+
+        }
+
+        return to_return
+
+    @classmethod
     def get_impersonation_email(cls, urlsafe_tenant_key):
         if urlsafe_tenant_key:
             tenant = ndb.Key(urlsafe=urlsafe_tenant_key).get()
@@ -868,7 +919,6 @@ class PlayerCommandEvent(ndb.Model):
                 page_size=fetch_size,
                 start_cursor=cursor
             )
-
 
             prev_cursor = next_cursor_str
             next_cursor = next_cursor.urlsafe() if more else None
