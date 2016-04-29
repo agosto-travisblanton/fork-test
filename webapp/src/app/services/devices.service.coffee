@@ -26,9 +26,9 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($http, $log, Res
         "/api/v1/player-command-events/#{prev}/#{next}/#{deviceKey}").get()
       promise
 
-    ########################################################################
-    # TENANT VIEW
-    ########################################################################
+########################################################################
+# TENANT VIEW
+########################################################################
     getDevicesByTenant: (tenantKey, prev, next) ->
       unless tenantKey == undefined
         prev = if prev == undefined or null then null else prev
@@ -69,9 +69,9 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($http, $log, Res
         promise = Restangular.oneUrl(SERVICE_NAME, url).get()
         promise
 
-    ########################################################################
-    # DEVICES VIEW
-    ########################################################################
+########################################################################
+# DEVICES VIEW
+########################################################################
     searchDevicesByPartialSerial: (distributorKey, partial_serial, unmanaged) ->
       unless distributorKey == undefined
         url = "api/v1/distributors/search/serial/#{distributorKey}/#{partial_serial}/#{unmanaged}/devices"

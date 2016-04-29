@@ -1,10 +1,10 @@
 'use strict'
 
 angular.module('skykitProvisioning').factory 'SessionsService', ($http,
-                                                                            $log,
-                                                                            $cookies,
-                                                                            IdentityService,
-                                                                            Restangular) ->
+  $log,
+  $cookies,
+  IdentityService,
+  Restangular) ->
   new class SessionsService
 
     constructor: ->

@@ -3,7 +3,6 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.factory 'LocationsService', (Restangular) ->
-
   class LocationsService
 
     save: (location) ->
