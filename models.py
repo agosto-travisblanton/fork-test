@@ -106,9 +106,17 @@ class Domain(ndb.Model):
     @classmethod
     def create(cls, name, distributor_key, impersonation_admin_email_address, active):
         return cls(distributor_key=distributor_key,
-                   name=name,
+                   name=name.strip().lower(),
                    impersonation_admin_email_address=impersonation_admin_email_address,
                    active=active)
+
+    @classmethod
+    def already_exists(cls, name):
+        if Domain.query(
+            ndb.AND(Domain.active == True,
+                    Domain.name == name.strip().lower())).get(keys_only=True):
+            return True
+        return False
 
     def _pre_put_hook(self):
         self.class_version = 1
