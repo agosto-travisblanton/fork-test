@@ -289,7 +289,6 @@ class Tenant(ndb.Model):
                 'objects': objects or [],
                 'next_cursor': next_cursor,
                 'prev_cursor': prev_cursor,
-
             }
 
         if not prev_cursor_str and not next_cursor_str:
@@ -351,7 +350,7 @@ class Tenant(ndb.Model):
 
         if not prev_cursor_str and not next_cursor_str:
             objects, next_cursor, more = Location.query(Location.tenant_key == tenant_key).order(
-                Location.customer_location_name).fetch_page(
+                Location.customer_location_name).order(Location.key).fetch_page(
                 page_size=fetch_size
             )
 
@@ -361,7 +360,7 @@ class Tenant(ndb.Model):
         elif next_cursor_str:
             cursor = Cursor(urlsafe=next_cursor_str)
             objects, next_cursor, more = Location.query(Location.tenant_key == tenant_key).order(
-                Location.customer_location_name).fetch_page(
+                Location.customer_location_name).order(Location.key).fetch_page(
                 page_size=fetch_size,
                 start_cursor=cursor
             )
@@ -372,7 +371,7 @@ class Tenant(ndb.Model):
         elif prev_cursor_str:
             cursor = Cursor(urlsafe=prev_cursor_str)
             objects, prev, more = Location.query(Location.tenant_key == tenant_key).order(
-                Location.customer_location_name).fetch_page(
+                -Location.customer_location_name).order(-Location.key).fetch_page(
                 page_size=fetch_size,
                 start_cursor=cursor.reversed()
             )

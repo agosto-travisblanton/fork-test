@@ -23,9 +23,9 @@ appModule.controller 'TenantLocationsCtrl',
 
     @getLocations = (tenantKey, prev, next) =>
       ProgressBarService.start()
-      locationsPromise = LocationsService.getLocationsByTenantKey tenantKey, prev, next
+      locationsPromise = LocationsService.getLocationsByTenantKeyPaginated tenantKey, prev, next
       locationsPromise.then (data) =>
-        @locations = data
+        @locations = data.locations
         @next_cursor = data.next_cursor
         @prev_cursor = data.prev_cursor
         ProgressBarService.complete()

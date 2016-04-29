@@ -37,6 +37,14 @@ indexes:
 
 - kind: ChromeOsDevice
   properties:
+  - name: archived
+  - name: is_unmanaged_device
+  - name: tenant_key
+  - name: __key__
+    direction: desc
+
+- kind: ChromeOsDevice
+  properties:
   - name: is_unmanaged_device
   - name: tenant_key
   - name: __key__
@@ -62,7 +70,28 @@ indexes:
 - kind: Location
   properties:
   - name: tenant_key
+  - name: __key__
+    direction: desc
+
+- kind: Location
+  properties:
+  - name: tenant_key
   - name: customer_location_name
+
+- kind: Location
+  properties:
+  - name: tenant_key
+  - name: customer_location_name
+  - name: __key__
+    direction: desc
+
+- kind: Location
+  properties:
+  - name: tenant_key
+  - name: customer_location_name
+    direction: desc
+  - name: __key__
+    direction: desc
 
 - kind: PlayerCommandEvent
   properties:
