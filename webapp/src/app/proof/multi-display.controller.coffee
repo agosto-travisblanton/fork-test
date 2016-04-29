@@ -23,6 +23,7 @@ appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService, $statePar
   @no_cache = true
   @loading = true
   @disabled = true
+  @disabledTenant = true
   @selected_displays = []
 
   @initialize = =>
@@ -61,7 +62,6 @@ appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService, $statePar
         false
     else
       false
-
 
   @areDisplaysValid = () =>
     @formValidity.displays = (@selected_displays.length > 0)
@@ -114,17 +114,25 @@ appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService, $statePar
     .then (data) =>
       @tenants = data.data.tenants
 
-
   @submitTenant = (tenant) =>
     if tenant != @currentTenant
       $state.go 'proofDetail', {
         tenant: tenant
       }
-      
+
       ToastsService.showSuccessToast "Proof of Play reporting set to " + tenant
 
     else
       ToastsService.showErrorToast "Proof of Play reporting is already set to " + tenant
+
+  @querySearch = (resources, searchText) ->
+    ProofPlayService.querySearch(resources, searchText)
+
+  @isSelectionValid = (search) =>
+    if search in @tenants
+      @disabledTenant = false
+    else
+      @disabledTenant = true
 
 
   @

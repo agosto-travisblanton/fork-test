@@ -297,11 +297,11 @@
                 <div class="col-sm-5">
                   <label>Panel location</label>
                   <select
-                    id="customerLocationName"
-                    class="form-control"
-                    ng-model="deviceDetailsCtrl.currentDevice.location"
-                    ng-options="i.customerLocationName for i in deviceDetailsCtrl.locations track by i.key"
-                    ng-change="deviceDetailsCtrl.onUpdateLocation()">
+                          id="customerLocationName"
+                          class="form-control"
+                          ng-model="deviceDetailsCtrl.currentDevice.location"
+                          ng-options="i.customerLocationName for i in deviceDetailsCtrl.locations track by i.key"
+                          ng-change="deviceDetailsCtrl.onUpdateLocation()">
                   </select>
                 </div>
                 <div class="col-sm-2">
@@ -351,8 +351,8 @@
                            ng-model="deviceDetailsCtrl.currentDevice.customerDisplayCode"
                            ng-pattern="/^[a-z0-9_]*$/">
                     <p
-                      ng-show="deviceForm.customerDisplayCode.$invalid && !deviceForm.customerDisplayCode.$invalid.$pristine"
-                      class="help-block">
+                            ng-show="deviceForm.customerDisplayCode.$invalid && !deviceForm.customerDisplayCode.$invalid.$pristine"
+                            class="help-block">
                       Alphanumeric and underscore allowed.
                     </p>
                   </div>
@@ -366,20 +366,20 @@
                 <div class="col-sm-5">
                   <label>Panel model</label>
                   <select
-                    id="panelModel"
-                    class="form-control"
-                    ng-model="deviceDetailsCtrl.currentDevice.panelModel"
-                    ng-options="p.displayName for p in deviceDetailsCtrl.panelModels track by p.id">
+                          id="panelModel"
+                          class="form-control"
+                          ng-model="deviceDetailsCtrl.currentDevice.panelModel"
+                          ng-options="p.displayName for p in deviceDetailsCtrl.panelModels track by p.id">
                   </select>
                 </div>
                 <div class="col-sm-5">
                   <label>Panel input</label>
                   <select
-                    id="panelInput"
-                    class="form-control"
-                    ng-required="deviceDetailsCtrl.currentDevice.panelModel !== null"
-                    ng-model="deviceDetailsCtrl.currentDevice.panelInput"
-                    ng-options="c.id for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">
+                          id="panelInput"
+                          class="form-control"
+                          ng-required="deviceDetailsCtrl.currentDevice.panelModel !== null"
+                          ng-model="deviceDetailsCtrl.currentDevice.panelInput"
+                          ng-options="c.id for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">
                   </select>
                 </div>
               </div>

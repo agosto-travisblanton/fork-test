@@ -43,6 +43,32 @@ class TestLocationModel(BaseTest):
                                     active=True)
         self.tenant_key = self.tenant.put()
 
+    def test_find_locations_of_tenant_paginated(self):
+        self.load_tenant_locations(300, self.tenant_key)
+        r = Tenant.find_locations_of_tenant_paginated(self.tenant_key, prev_cursor_str=None, next_cursor_str=None)
+        self.assertTrue(r["next_cursor"])
+        self.assertFalse(r["prev_cursor"])
+        self.assertEqual(len(r["objects"]), 25)
+
+        new_r = Tenant.find_locations_of_tenant_paginated(self.tenant_key, prev_cursor_str=None, next_cursor_str=r["next_cursor"])
+        self.assertTrue(new_r["next_cursor"])
+        self.assertTrue(new_r["prev_cursor"])
+        self.assertEqual(len(new_r["objects"]), 25)
+
+        prev_r = Tenant.find_locations_of_tenant_paginated(self.tenant_key, prev_cursor_str=new_r["prev_cursor"], next_cursor_str=None)
+        self.assertTrue(prev_r["next_cursor"])
+        self.assertFalse(prev_r["prev_cursor"])
+        self.assertEqual(len(prev_r["objects"]), 25)
+
+    def load_tenant_locations(self, number_of_locations, tenant_key):
+        for x in range(number_of_locations):
+            customer_location_name = 'Store #{0}'.format(x)
+            customer_location_code = 'store_{0}'.format(x)
+            location = Location.create(tenant_key=tenant_key,
+                                       customer_location_name=customer_location_name,
+                                       customer_location_code=customer_location_code)
+            location.put()
+
     def test_find_by_customer_location_code_returns_expected_location(self):
         location = Location.create(tenant_key=self.tenant_key,
                                    customer_location_name=self.CUSTOMER_LOCATION_NAME,

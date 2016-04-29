@@ -6,8 +6,6 @@ angular.module('skykitProvisioning')
 
     constructor: ->
       @uriBase = 'proofplay/api/v1'
-      @cachedResources = null
-
 
     createFilterFor: (query) ->
       query = angular.lowercase(query)
@@ -25,42 +23,34 @@ angular.module('skykitProvisioning')
       )
 
     getAllResources: (tenant) ->
-      deferred = $q.defer()
-      if @cachedResources
-        deferred.resolve(@cachedResources)
-      else
-        r = @makeHTTPRequest("/retrieve_all_resources/", tenant)
-        r.then (data) =>
-          @cachedResource = data
-          deferred.resolve(data)
+      r = @makeHTTPRequest("/retrieve_all_resources/", tenant)
 
-        r.catch (err, data) ->
-          status = err.status
-          if status == 403
-            ToastsService.showErrorToast "You are not allowed to view this tenant!"
-            $state.go 'proof', {}
-          if status == 404
-            ToastsService.showErrorToast "You must select a tenant first!"
-            $state.go 'proof', {}
 
-      deferred.promise
+      r.catch (err, data) ->
+        status = err.status
+        if status == 403
+          ToastsService.showErrorToast "You are not allowed to view this tenant!"
+          $state.go 'proof', {}
+        if status == 404
+          ToastsService.showErrorToast "You must select a tenant first!"
+          $state.go 'proof', {}
+
+      r.then (data) ->
+        return data
 
 
     getAllDisplays: (tenant) ->
       @makeHTTPRequest("/retrieve_all_displays/", tenant)
 
-    
+
     getAllLocations: (tenant) ->
       @makeHTTPRequest("/retrieve_all_locations/", tenant)
 
-    
+
     getAllTenants: () ->
-      distributorKey = $cookies.get('currentDistributorKey')
-      $http.get(@uriBase + '/retrieve_my_tenants',
-        headers: {
-          'X-Provisioning-Distributor': distributorKey
-        }
-      )
+      @makeHTTPRequest("/retrieve_my_tenants", '')
+
+
 
     downloadCSVForMultipleResourcesByDate: (start_date, end_date, resources, tenant) ->
       allResources = ''

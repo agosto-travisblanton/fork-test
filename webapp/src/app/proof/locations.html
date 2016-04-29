@@ -1,149 +1,169 @@
 <md-tab label="{{vm.location.title}}" layout-align="center center">
-    <div ng-controller="ProofOfPlayMultiLocationCtrl as vm" layout="column" ng-cloak>
-        <div ng-init="vm.initialize()" class="container">
-            <md-card>
-                <div class="col-md-12" ng-init="vm.initialize_tenant_select()">
-                    <div class="col-sm-3">
-                        <h3>{{vm.currentTenant}}</h3>
-                    </div>
-                    <div class="col-md-3 col-md-offset-6 radio-horizontal" ng-show="vm.tenants">
-                        <md-input-container>
-                            <label class="center-block">Change Tenant</label>
-                            <md-select ng-model="vm.which_tenant">
-                                <md-option ng-repeat="tenant in vm.tenants | orderBy:'tenant'"
-                                           value="{{tenant}}" class="proof-of-play-tenant-name">
-                                    {{tenant}}
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-                        <div>
-                            <md-button md-no-ink class="md-primary"
-                                       ng-click="vm.submitTenant(vm.which_tenant)">
-                                Submit
-                            </md-button>
-                        </div>
-                    </div>
-                </div>
-            </md-card>
-            <div style="text-align: left"
-                 class="col-md-6">
-                <md-card>
-                    <md-card-content>
-                        <div class="md-padding">
-                            <div ng-show="vm.loading">
-                                <md-content class="md-padding">
-                                    <h3>Loading Locations...</h3>
-                                </md-content>
-                                <hr/>
-                            </div>
-                            <div ng-if="vm.had_some_items && !vm.loading">
-                                <div ng-hide="vm.loading">
-                                    <h4 class="proof-of-play-label">Location Selection</h4>
-
-                                    <form ng-submit="$event.preventDefault()">
-                                        <md-autocomplete
-                                                md-no-cache="true"
-
-                                                md-selected-item="vm.selectedItem"
-                                                md-search-text="vm.searchText"
-                                                md-items="item in vm.querySearch(vm.locations, vm.searchText)"
-                                                md-item-text="item"
-                                                md-min-length="0"
-                                                md-search-text-change="vm.isLocationValid(vm.searchText)"
-                                                md-selected-item-change="vm.isLocationValid(vm.searchText)"
-                                                placeholder="Select a resource">
-                                            <md-item-template>
-                                        <span md-highlight-text="vm.searchText"
-                                              md-highlight-flags="^i">{{item}}</span>
-                                            </md-item-template>
-                                            <md-not-found>
-                                                No matching item for search "{{vm.searchText}}" was
-                                                found.
-                                            </md-not-found>
-                                        </md-autocomplete>
-                                        <br/>
-
-                                        <md-button class="md-raised"
-                                                   ng-click="vm.addToSelectedLocations(vm.searchText)"
-                                                   style="float: right">Add
-                                        </md-button>
-                                        <br/>
-                                        <br/>
-                                        <br/>
-                                        <hr/>
-                                    </form>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-3">
-                                        <h4 class="proof-of-play-label">Start Date</h4>
-                                        <md-datepicker ng-model="vm.dateTimeSelection.start"
-                                                       ng-change="vm.isStartDateValid(vm.dateTimeSelection.start)"
-                                                       required
-                                                       md-placeholder="Enter date"></md-datepicker>
-                                    </div>
-                                    <div class="col-sm-3 col-sm-offset-4">
-
-                                        <h4 class="proof-of-play-label">End Date</h4>
-                                        <md-datepicker ng-model="vm.dateTimeSelection.end"
-                                                       ng-change="vm.isEndDateValid(vm.dateTimeSelection.end)"
-                                                       required
-                                                       md-placeholder="Enter date"></md-datepicker>
-                                    </div>
-                                </div>
-                                <hr/>
-                                <md-input-container class="md-block">
-                                    <h4 class="proof-of-play-label">Report Type</h4>
-                                    <md-radio-group
-                                            ng-model="vm.radioButtonChoices.selection"
-                                            ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
-                                        <md-radio-button value="1">
-                                            {{vm.radioButtonChoices.group1}}
-                                        </md-radio-button>
-                                        <md-radio-button value="2">
-                                            {{vm.radioButtonChoices.group2}}
-                                        </md-radio-button>
-                                    </md-radio-group>
-                                </md-input-container>
-                                <hr/>
-                                <md-button class="md-raised" ng-click="vm.submit()"
-                                           ng-disabled="vm.disabled"
-                                           style="margin-top: 25px; float: right; margin-bottom: 50px">
-                                    Submit
-                                </md-button>
-                            </div>
-                            <div ng-if="!vm.had_some_items && !vm.loading">
-                                <h3>This tenant has no locations logged. Make sure your devices have
-                                    proof of play activated.</h3>
-                            </div>
-                        </div>
-                    </md-card-content>
-                </md-card>
+  <div ng-controller="ProofOfPlayMultiLocationCtrl as vm" layout="column" ng-cloak>
+    <div ng-init="vm.initialize()" class="container">
+      <md-card>
+        <div class="col-md-12" ng-init="vm.initialize_tenant_select()">
+          <div class="col-md-1">
+            <h3>{{vm.currentTenant}}</h3>
+          </div>
+          <div ng-if="!vm.tenants" class="col-md-offset-9 proof-of-play-horizontal-top-bar">
+            <div layout="row" layout-sm="column" layout-align="space-around">
+              <md-progress-circular md-mode="indeterminate"></md-progress-circular>
             </div>
-            <div style=" text-align: left" class="col-md-6">
-                <md-card>
-                    <md-card-content>
-                        <div class="md-padding">
-                            <h3>Selected Locations</h3>
-                            <hr/>
-                            <div ng-show="vm.selected_locations.length > 0">
-                                <md-list>
-                                    <li ng-repeat="item in vm.selected_locations"
-                                        class="proof-of-play-selected-item">
-                                        <md-button md-no-ink class="md-primary"
-                                                   id="proofplay-selected-items"
-                                                   ng-click="vm.removeFromSelectedLocation(item)">X
-                                        </md-button>
-                                        {{ item }}
-                                    </li>
-                                </md-list>
-                            </div>
-                            <div ng-hide="vm.selected_locations.length > 0">
-                                <h5>You have no selected locations</h5>
-                            </div>
-                        </div>
-                    </md-card-content>
-                </md-card>
+          </div>
+          <div ng-if="vm.tenants" class="proof-of-play-horizontal-top-bar">
+            <div class="col-md-3 col-md-offset-7">
+              <md-autocomplete
+                      md-no-cache="true"
+                      md-selected-item="vm.tenantselectedItem"
+                      md-search-text="vm.tenantsearchText"
+                      md-items="item in vm.querySearch(vm.tenants, vm.tenantsearchText)"
+                      md-item-text="item"
+                      md-min-length="0"
+                      md-search-text-change="vm.isSelectionValid(vm.tenantsearchText)"
+                      md-selected-item-change="vm.isSelectionValid(vm.tenantsearchText)"
+                      placeholder="Switch Tenants">
+
+                <md-item-template>
+                    <span md-highlight-text="vm.searchText"
+                          md-highlight-flags="^i">{{item}}</span>
+                </md-item-template>
+                <md-not-found>
+                  <div ng-if="vm.searchText !== '' && vm.searchText.length > 2">
+                    No results for "{{vm.searchText}}" were
+                    found.
+                  </div>
+                  <div ng-if="vm.searchText !== '' && vm.searchText.length <= 2">
+                    Please enter at least 3 characters.
+                  </div>
+                </md-not-found>
+              </md-autocomplete>
             </div>
+            <div class="col-md-1">
+              <md-button md-no-ink class="md-raised" ng-disabled="vm.disabledTenant"
+                         ng-click="vm.submitTenant(vm.tenantsearchText)">
+                Submit
+              </md-button>
+            </div>
+          </div>
         </div>
+      </md-card>
+      <div style="text-align: left"
+           class="col-md-6">
+        <md-card>
+          <md-card-content>
+            <div class="md-padding">
+              <div ng-show="vm.loading">
+                <div layout="row" layout-sm="column" layout-align="space-around">
+                  <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+                </div>
+              </div>
+              <div ng-if="vm.had_some_items && !vm.loading">
+                <div ng-hide="vm.loading">
+                  <h4 class="proof-of-play-label">Location Selection</h4>
+                  <form ng-submit="$event.preventDefault()">
+                    <md-autocomplete
+                            md-no-cache="true"
+
+                            md-selected-item="vm.selectedItem"
+                            md-search-text="vm.searchText"
+                            md-items="item in vm.querySearch(vm.locations, vm.searchText)"
+                            md-item-text="item"
+                            md-min-length="0"
+                            md-search-text-change="vm.isLocationValid(vm.searchText)"
+                            md-selected-item-change="vm.isLocationValid(vm.searchText)"
+                            placeholder="Select a resource">
+                      <md-item-template>
+                        <span md-highlight-text="vm.searchText"
+                              md-highlight-flags="^i">{{item}}</span>
+                      </md-item-template>
+                      <md-not-found>
+                        No matching item for search "{{vm.searchText}}" was
+                        found.
+                      </md-not-found>
+                    </md-autocomplete>
+                    <br/>
+                    <md-button class="md-raised"
+                               ng-click="vm.addToSelectedLocations(vm.searchText)"
+                               style="float: right">Add
+                    </md-button>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <hr/>
+                  </form>
+                </div>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <h4 class="proof-of-play-label">Start Date</h4>
+                    <md-datepicker ng-model="vm.dateTimeSelection.start"
+                                   ng-change="vm.isStartDateValid(vm.dateTimeSelection.start)"
+                                   required
+                                   md-placeholder="Enter date"></md-datepicker>
+                  </div>
+                  <div class="col-sm-3 col-sm-offset-4">
+
+                    <h4 class="proof-of-play-label">End Date</h4>
+                    <md-datepicker ng-model="vm.dateTimeSelection.end"
+                                   ng-change="vm.isEndDateValid(vm.dateTimeSelection.end)"
+                                   required
+                                   md-placeholder="Enter date"></md-datepicker>
+                  </div>
+                </div>
+                <hr/>
+                <md-input-container class="md-block">
+                  <h4 class="proof-of-play-label">Report Type</h4>
+                  <md-radio-group
+                          ng-model="vm.radioButtonChoices.selection"
+                          ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
+                    <md-radio-button value="1">
+                      {{vm.radioButtonChoices.group1}}
+                    </md-radio-button>
+                    <md-radio-button value="2">
+                      {{vm.radioButtonChoices.group2}}
+                    </md-radio-button>
+                  </md-radio-group>
+                </md-input-container>
+                <hr/>
+                <md-button class="md-raised" ng-click="vm.submit()"
+                           ng-disabled="vm.disabled"
+                           style="margin-top: 25px; float: right; margin-bottom: 50px">
+                  Submit
+                </md-button>
+              </div>
+              <div ng-if="!vm.had_some_items && !vm.loading">
+                <h3>This tenant has no locations logged. Make sure your devices have
+                  proof of play activated.</h3>
+              </div>
+            </div>
+          </md-card-content>
+        </md-card>
+      </div>
+      <div style=" text-align: left" class="col-md-6">
+        <md-card>
+          <md-card-content>
+            <div class="md-padding">
+              <h3>Selected Locations</h3>
+              <hr/>
+              <div ng-show="vm.selected_locations.length > 0">
+                <md-list>
+                  <li ng-repeat="item in vm.selected_locations"
+                      class="proof-of-play-selected-item">
+                    <md-button md-no-ink class="md-primary"
+                               id="proofplay-selected-items"
+                               ng-click="vm.removeFromSelectedLocation(item)">X
+                    </md-button>
+                    {{ item }}
+                  </li>
+                </md-list>
+              </div>
+              <div ng-hide="vm.selected_locations.length > 0">
+                <h5>You have no selected locations</h5>
+              </div>
+            </div>
+          </md-card-content>
+        </md-card>
+      </div>
     </div>
+  </div>
 </md-tab>

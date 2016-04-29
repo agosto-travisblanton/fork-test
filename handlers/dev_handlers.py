@@ -122,6 +122,21 @@ def make_data_for_a_distributor():
     ##########################################################################################
     # CREATE TENANTS
     ##########################################################################################
+    for i in range(1, 300):
+        tenant_code = "AUTO_TENANT" + str(i)
+        tenant_code = tenant_code.lower()
+        tenant = Tenant.create(tenant_code=tenant_code,
+                               name="AUTO_TENANT" + str(i),
+                               admin_email=TENANT_ADMIN_EMAIL,
+                               content_server_url='https://skykit-contentmanager-int.appspot.com',
+                               content_manager_base_url='https://skykit-contentmanager-int.appspot.com/content',
+                               domain_key=domain.key,
+                               active=True)
+        tenant.put()
+        print 'Tenant ' + tenant.name + ' created'
+    else:
+        print 'Tenant ' + tenant.name + ' already exists, so did not create'
+
     tenant = Tenant.find_by_tenant_code(TENANT_CODE)
     if not tenant:
         tenant = Tenant.create(tenant_code=TENANT_CODE,
@@ -134,18 +149,21 @@ def make_data_for_a_distributor():
         tenant.put()
         print 'Tenant ' + tenant.name + ' created'
 
-    for i in range(1, 500):
-        tenant = Tenant.create(tenant_code=TENANT_CODE + str(i),
-                               name=TENANT_NAME + str(i),
-                               admin_email=TENANT_ADMIN_EMAIL,
-                               content_server_url='https://skykit-contentmanager-int.appspot.com',
-                               content_manager_base_url='https://skykit-contentmanager-int.appspot.com/content',
-                               domain_key=domain.key,
-                               active=True)
-        tenant.put()
-        print 'Tenant ' + tenant.name + ' created'
-    else:
-        print 'Tenant ' + tenant.name + ' already exists, so did not create'
+    ##########################################################################################
+    # CREATE LOCATIONS
+    ##########################################################################################
+    for i in range(1, 103):
+
+        location = Location.create(tenant_key=tenant.key,
+                                   customer_location_name="my_location" + str(i),
+                                   customer_location_code="my_location" + str(i))
+        location.address = None
+        location.city = None
+        location.state = None
+        location.postal_code = None
+        location.dma = None
+        location.active = True
+        location.put()
 
     ##########################################################################################
     # UNMANAGED DEVICES
@@ -201,7 +219,7 @@ def make_data_for_a_distributor():
     devices = query.fetch(1000)
     print 'Device count = ' + str(len(devices))
     for device in devices:
-        for i in range(1, 100):
+        for i in range(1, 34):
             payload = 'reset content'.format(i)
             gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
             event = PlayerCommandEvent.create(device_urlsafe_key=device.key.urlsafe(),

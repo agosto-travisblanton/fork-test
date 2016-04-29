@@ -3,9 +3,8 @@
 appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantLocationsCtrl',
-  ($scope, $stateParams, TenantsService, LocationsService, $state) ->
+  ($scope, $stateParams, TenantsService, LocationsService, $state, ProgressBarService) ->
     tenantKey = $stateParams.tenantKey
-    @locations = []
     @currentTenant = undefined
     $scope.tabIndex = 3
 
@@ -21,13 +20,31 @@ appModule.controller 'TenantLocationsCtrl',
           when 3
             $state.go 'tenantLocations', {tenantKey: tenantKey}
 
-    @initialize = ->
+
+    @getLocations = (tenantKey, prev, next) =>
+      ProgressBarService.start()
+      locationsPromise = LocationsService.getLocationsByTenantKeyPaginated tenantKey, prev, next
+      locationsPromise.then (data) =>
+        @locations = data.locations
+        @next_cursor = data.next_cursor
+        @prev_cursor = data.prev_cursor
+        ProgressBarService.complete()
+
+
+    @paginateCall = (forward) ->
+      if forward
+        @getLocations tenantKey, null, @next_cursor
+
+      else
+        @getLocations tenantKey, @prev_cursor, null
+
+
+    @initialize = =>
+      @locations = []
       tenantPromise = TenantsService.getTenantByKey tenantKey
       tenantPromise.then (data) =>
         @currentTenant = data
-      locationsPromise = LocationsService.getLocationsByTenantKey tenantKey
-      locationsPromise.then (data) =>
-        @locations = data
+      @getLocations tenantKey
 
     @editItem = (item) ->
       $state.go 'editLocation', {locationKey: item.key}

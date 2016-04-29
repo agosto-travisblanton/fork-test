@@ -40,6 +40,7 @@ appModule.controller "TenantsCtrl", ($state, $log, TenantsService, ProgressBarSe
       promise = TenantsService.delete item
       promise.then () =>
         @initialize()
+    
     sweet.show({
       title: "Are you sure?",
       text: "This will permanently remove the tenant from the system.",
