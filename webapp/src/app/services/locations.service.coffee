@@ -13,7 +13,11 @@ appModule.factory 'LocationsService', (Restangular) ->
         promise = Restangular.service('locations').post(location)
       promise
 
-    getLocationsByTenantKey: (tenantKey, prev, next) ->
+    getLocationsByTenantKey: (tenantKey) ->
+      promise = Restangular.oneUrl('tenants', "api/v1/tenants/#{tenantKey}/locations").get()
+      promise
+
+    getLocationsByTenantKeyPaginated: (tenantKey, prev, next) ->
       prev = if prev == undefined or null then null else prev
       next = if next == undefined or null then null else next
       promise = Restangular.oneUrl('tenants', "api/v1/tenants/#{tenantKey}/#{prev}/#{next}/locations").get()

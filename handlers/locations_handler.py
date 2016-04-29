@@ -24,13 +24,16 @@ class LocationsHandler(RequestHandler, KeyValidatorMixin):
         json_response(self.response, result, strategy=LOCATION_STRATEGY)
 
     @requires_api_token
-    def get_locations_by_tenant(self, tenant_urlsafe_key, prev_cursor, next_cursor):
+    def get_locations_by_tenant(self, tenant_urlsafe_key):
+        tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
+        query_results = Location.query(Location.tenant_key == tenant_key).order(Location.customer_location_code).fetch()
+        json_response(self.response, query_results, strategy=LOCATION_STRATEGY)
+
+    @requires_api_token
+    def get_locations_by_tenant_paginated(self, tenant_urlsafe_key, prev_cursor, next_cursor):
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
         next_cursor = next_cursor if next_cursor != "null" else None
         prev_cursor = prev_cursor if prev_cursor != "null" else None
-
-        print next_cursor
-        print prev_cursor
 
         query_results = Tenant.find_locations_of_tenant_paginated(
             tenant_key=tenant_key,
@@ -50,7 +53,7 @@ class LocationsHandler(RequestHandler, KeyValidatorMixin):
 
     @requires_api_token
     def post(self):
-        if self.request.body is not str('') and self.request.body is not None:
+        if self.request.body is not '' and self.request.body is not None:
             status = 201
             error_message = None
             request_json = json.loads(self.request.body)

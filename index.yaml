@@ -59,6 +59,11 @@ indexes:
   - name: device_key
   - name: created
 
+- kind: Location
+  properties:
+  - name: tenant_key
+  - name: customer_location_name
+
 - kind: PlayerCommandEvent
   properties:
   - name: device_urlsafe_key

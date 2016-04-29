@@ -153,10 +153,16 @@ def make_data_for_a_distributor():
     # CREATE LOCATIONS
     ##########################################################################################
     for i in range(1, 103):
+
         location = Location.create(tenant_key=tenant.key,
                                    customer_location_name="my_location" + str(i),
                                    customer_location_code="my_location" + str(i))
-
+        location.address = None
+        location.city = None
+        location.state = None
+        location.postal_code = None
+        location.dma = None
+        location.active = True
         location.put()
 
     ##########################################################################################
