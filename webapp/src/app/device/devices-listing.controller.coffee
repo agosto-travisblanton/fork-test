@@ -27,6 +27,14 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
   @unmanagedDevices = []
   @unmanagedMacDevices = {}
 
+  @refreshManagedDevices = () =>
+    @devicesPrev = null
+    @devicesNext = null
+    url = DevicesService.makeDevicesByDistributorURL @distributorKey, @devicesPrev, @devicesNext, false
+    DevicesService.deviceCache.remove(url)
+    @getManagedDevices(@distributorKey, @devicesPrev, @devicesNext)
+
+
   @changeRadio = (unmanaged) ->
     if unmanaged
       @unmanagedSearchText = ''

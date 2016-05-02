@@ -2,6 +2,8 @@
 appModule = angular.module('skykitProvisioning')
 appModule.factory 'TenantsService', (Restangular) ->
   class TenantsService
+    
+    cache = {}
 
     save: (tenant) ->
       if tenant.key != undefined
@@ -26,5 +28,8 @@ appModule.factory 'TenantsService', (Restangular) ->
       if tenant.key != undefined
         promise = Restangular.one("tenants", tenant.key).remove()
         promise
+        
+    cacheBust: () =>
+      cache = {}
 
   new TenantsService()

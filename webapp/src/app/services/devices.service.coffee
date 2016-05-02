@@ -1,30 +1,43 @@
 'use strict'
 
-angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangular, $q) ->
-  class DevicesService
-    SERVICE_NAME = 'devices'
-    @uriBase = 'v1/devices'
-    cache = {}
+angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangular, $q, CacheFactory, $http) ->
+  new class DevicesService
+
+    constructor: ->
+      @SERVICE_NAME = 'devices'
+      @uriBase = 'v1/devices'
+      @deviceCache = CacheFactory('@deviceCache',
+        maxAge: 60 * 60 * 1000
+        deleteOnExpire: 'aggressive'
+        storageMode: 'localStorage'
+        onExpire: (key, value) ->
+          $http.get(key).success (data) ->
+            profileCache.put key, data
+            return
+          return
+      )
 
     getDeviceByMacAddress: (macAddress) ->
-      Restangular.oneUrl('api/v1/devices', "api/v1/devices?mac_address=#{macAddress}").get()
+      url = "api/v1/devices?mac_address=#{macAddress}"
+      Restangular.oneUrl('api/v1/devices', url).get()
 
     getDeviceByKey: (deviceKey) ->
-      promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{deviceKey}").get()
+      url = "api/v1/devices/#{deviceKey}"
+      promise = Restangular.oneUrl(@SERVICE_NAME, url).get()
       promise
 
     getIssuesByKey: (deviceKey, startEpoch, endEpoch, prev, next) ->
       prev = if prev == undefined or null then null else prev
       next = if next == undefined or null then null else next
-      promise = Restangular.oneUrl(SERVICE_NAME,
-        "api/v1/devices/#{prev}/#{next}/#{deviceKey}/issues?start=#{startEpoch}&end=#{endEpoch}").get()
+      url = "/api/v1/devices/#{prev}/#{next}/#{deviceKey}/issues?start=#{startEpoch}&end=#{endEpoch}"
+      promise = Restangular.oneUrl(@SERVICE_NAME, url).get()
       promise
 
     getCommandEventsByKey: (deviceKey, prev, next) ->
       prev = if prev == undefined or null then null else prev
       next = if next == undefined or null then null else next
-      promise = Restangular.oneUrl(SERVICE_NAME,
-        "/api/v1/player-command-events/#{prev}/#{next}/#{deviceKey}").get()
+      url = "/api/v1/player-command-events/#{prev}/#{next}/#{deviceKey}"
+      promise = Restangular.oneUrl(@SERVICE_NAME, url).get()
       promise
 
 ########################################################################
@@ -33,14 +46,14 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangula
     getDevicesByTenant: (tenantKey, prev, next) ->
       unless tenantKey == undefined
         deferred = $q.defer()
-        url = "api/v1/tenants/#{prev}/#{next}/#{tenantKey}/devices?unmanaged=false"
-        if not cache[url]
-          promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        url = "/api/v1/tenants/#{prev}/#{next}/#{tenantKey}/devices?unmanaged=false"
+        if not @deviceCache.get(url)
+          promise = Restangular.oneUrl(@SERVICE_NAME, url).get()
           promise.then (data) =>
-            cache[url] = data
+            @deviceCache.put url, data
             deferred.resolve(data)
         else
-          deferred.resolve(cache[url])
+          deferred.resolve(@deviceCache.get(url))
 
         deferred.promise
 
@@ -48,38 +61,39 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangula
       unless tenantKey == undefined
         deferred = $q.defer()
         url = "api/v1/tenants/#{prev}/#{next}/#{tenantKey}/devices?unmanaged=true"
-        if not cache[url]
-          promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        if not @deviceCache.get(url)
+          promise = Restangular.oneUrl(@SERVICE_NAME, url).get()
           promise.then (data) =>
-            cache[url] = data
+            @deviceCache.put url, data
             deferred.resolve(data)
         else
-          deferred.resolve(cache[url])
+          deferred.resolve(@deviceCache.get(url))
 
         deferred.promise
+
 
     searchDevicesByPartialSerialByTenant: (tenantKey, partial_serial, unmanaged) ->
       unless tenantKey == undefined
         url = "api/v1/tenants/search/serial/#{tenantKey}/#{partial_serial}/#{unmanaged}/devices"
-        promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        promise = Restangular.oneUrl(@SERVICE_NAME, url).get()
         promise
 
     searchDevicesByPartialMacByTenant: (tenantKey, partial_mac, unmanaged) ->
       unless tenantKey == undefined
         url = "api/v1/tenants/search/mac/#{tenantKey}/#{partial_mac}/#{unmanaged}/devices"
-        promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        promise = Restangular.oneUrl(@SERVICE_NAME, url).get()
         promise
 
     matchDevicesByFullSerialByTenant: (tenantKey, full_serial, unmanaged) ->
       unless tenantKey == undefined
         url = "api/v1/tenants/match/serial/#{tenantKey}/#{full_serial}/#{unmanaged}/devices"
-        promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        promise = Restangular.oneUrl(@SERVICE_NAME, url).get()
         promise
 
     matchDevicesByFullMacByTenant: (tenantKey, full_mac, unmanaged) ->
       unless tenantKey == undefined
         url = "api/v1/tenants/match/mac/#{tenantKey}/#{full_mac}/#{unmanaged}/devices"
-        promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        promise = Restangular.oneUrl(@SERVICE_NAME, url).get()
         promise
 
 ########################################################################
@@ -88,58 +102,61 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangula
     searchDevicesByPartialSerial: (distributorKey, partial_serial, unmanaged) ->
       unless distributorKey == undefined
         url = "api/v1/distributors/search/serial/#{distributorKey}/#{partial_serial}/#{unmanaged}/devices"
-        promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        promise = Restangular.oneUrl(@SERVICE_NAME, url).get()
         promise
 
     searchDevicesByPartialMac: (distributorKey, partial_mac, unmanaged) ->
       unless distributorKey == undefined
         url = "api/v1/distributors/search/mac/#{distributorKey}/#{partial_mac}/#{unmanaged}/devices"
-        promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        promise = Restangular.oneUrl(@SERVICE_NAME, url).get()
         promise
 
     matchDevicesByFullSerial: (distributorKey, full_serial, unmanaged) ->
       unless distributorKey == undefined
         url = "api/v1/distributors/match/serial/#{distributorKey}/#{full_serial}/#{unmanaged}/devices"
-        promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        promise = Restangular.oneUrl(@SERVICE_NAME, url).get()
         promise
 
     matchDevicesByFullMac: (distributorKey, full_mac, unmanaged) ->
       unless distributorKey == undefined
         url = "api/v1/distributors/match/mac/#{distributorKey}/#{full_mac}/#{unmanaged}/devices"
-        promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        promise = Restangular.oneUrl(@SERVICE_NAME, url).get()
         promise
 
     getDevicesByDistributor: (distributorKey, prev, next) ->
       unless distributorKey == undefined
         deferred = $q.defer()
-        url = "api/v1/distributors/#{prev}/#{next}/#{distributorKey}/devices?unmanaged=false"
-        if not cache[url]
-          promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        url = @makeDevicesByDistributorURL distributorKey, prev, next, false
+        if not @deviceCache.get(url)
+          promise = Restangular.oneUrl(@SERVICE_NAME, url).get()
           promise.then (data) =>
-            cache[url] = data
+            @deviceCache.put url, data
             deferred.resolve(data)
         else
-          deferred.resolve(cache[url])
+          deferred.resolve(@deviceCache.get(url))
 
         deferred.promise
 
     getUnmanagedDevicesByDistributor: (distributorKey, prev, next) ->
       unless distributorKey == undefined
         deferred = $q.defer()
-        url = "api/v1/distributors/#{prev}/#{next}/#{distributorKey}/devices?unmanaged=true"
-        if not cache[url]
-          promise = Restangular.oneUrl(SERVICE_NAME, url).get()
+        url = @makeDevicesByDistributorURL distributorKey, prev, next, true
+        if not @deviceCache.get(url)
+          promise = Restangular.oneUrl(@SERVICE_NAME, url).get()
           promise.then (data) =>
-            cache[url] = data
+            @deviceCache.put url, data
             deferred.resolve(data)
         else
-          deferred.resolve(cache[url])
+          deferred.resolve(@deviceCache.get(url))
 
         deferred.promise
-
+        
+        
+    makeDevicesByDistributorURL: (distributorKey, prev, next, unmanaged) ->
+      url = "api/v1/distributors/#{prev}/#{next}/#{distributorKey}/devices?unmanaged=#{unmanaged}"
 
     getDevices: ->
-      promise = Restangular.all(SERVICE_NAME).getList()
+      promise = Restangular.all(@SERVICE_NAME).getList()
       promise
 
     save: (device) ->
@@ -150,7 +167,7 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangula
       promise
 
     delete: (deviceKey) ->
-      promise = Restangular.one(SERVICE_NAME, deviceKey).remove()
+      promise = Restangular.one(@SERVICE_NAME, deviceKey).remove()
       promise
 
     getPanelModels: () ->
@@ -241,4 +258,3 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangula
         }
       ]
 
-  new DevicesService()
