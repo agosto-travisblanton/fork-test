@@ -8,11 +8,10 @@ appModule.controller "DistributorSelectorCtrl", ($scope, $log, $state, $cookies,
 
   @initialize = ->
     distributorsPromise = DistributorsService.fetchAllByUser(SessionsService.currentUserKey)
-    if distributorsPromise
-      distributorsPromise.then (data) =>
-        @distributors = data
-        if @distributors.length == 1
-          @selectDistributor(@distributors[0])
+    distributorsPromise.then (data) =>
+      @distributors = data
+      if @distributors.length == 1
+        @selectDistributor(@distributors[0])
 
   @selectDistributor = (distributor) =>
     @currentDistributor = distributor

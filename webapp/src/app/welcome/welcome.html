@@ -42,15 +42,32 @@
       </div>
       <div flex="60" flex-sm="60" flex-xs="60" layout="column">
         <md-card>
-          <h3>Welcome <b>{{ vm.identity.full_name }}</b>!</h3>
-          <h3>You are signed in under the <b>{{
-            vm.identity.distributorName }}</b> distributor.</h3>
-          <p> Click on the hamburger icon in the top-left to get started.</p>
-          <h5>OR</h5>
-          <h4>Click
-            <md-button class="md-raised" ng-click="vm.changeDistributor()">Here</md-button>
-            to change your Distributor
-          </h4>
+          <md-card-title>
+            <md-card-title-text>
+              <h3>Welcome <b>{{ vm.identity.full_name }}</b>!</h3>
+            </md-card-title-text>
+          </md-card-title>
+          <md-card-content>
+            <div ng-if="vm.loading">
+              <div layout="row" layout-sm="column" layout-align="space-around">
+                <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+              </div>
+            </div>
+            <div ng-if="!vm.loading">
+              <h3>You are signed in under the <b>{{
+                vm.identity.distributorName }}</b> distributor.</h3>
+              <p> Click on the hamburger icon in the top-left to get started.</p>
+
+              <div ng-if="vm.has_multiple_distributors">
+                <h5>OR</h5>
+                <h4>Click
+                  <md-button class="md-raised" ng-click="vm.changeDistributor()">Here</md-button>
+                  to change your Distributor
+                </h4>
+              </div>
+            </div>
+
+          </md-card-content>
         </md-card>
       </div>
     </div>

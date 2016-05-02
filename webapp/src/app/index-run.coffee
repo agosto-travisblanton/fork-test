@@ -3,6 +3,7 @@
 app = angular.module 'skykitProvisioning'
 
 app.run ($cookies, Restangular, $location) ->
+  app.constant("moment", moment)
   Restangular.addRequestInterceptor (elem, operation) ->
     authToken = '6C346588BD4C6D722A1165B43C51C'
     if $location.host().indexOf('provisioning-gamestop') > -1
@@ -17,3 +18,6 @@ app.run ($cookies, Restangular, $location) ->
     if operation == 'remove'
       return undefined
     elem
+    
+    
+
