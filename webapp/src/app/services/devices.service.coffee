@@ -6,16 +6,17 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangula
     constructor: ->
       @SERVICE_NAME = 'devices'
       @uriBase = 'v1/devices'
-      @deviceCache = CacheFactory('@deviceCache',
-        maxAge: 60 * 60 * 1000
-        deleteOnExpire: 'aggressive'
-        storageMode: 'localStorage'
-        onExpire: (key, value) ->
-          $http.get(key).success (data) ->
-            profileCache.put key, data
+      if !CacheFactory.get('deviceCache')
+        @deviceCache = CacheFactory('deviceCache',
+          maxAge: 60 * 60 * 1000
+          deleteOnExpire: 'aggressive'
+          storageMode: 'localStorage'
+          onExpire: (key, value) ->
+            $http.get(key).success (data) ->
+              profileCache.put key, data
+              return
             return
-          return
-      )
+        )
 
     getDeviceByMacAddress: (macAddress) ->
       url = "api/v1/devices?mac_address=#{macAddress}"
