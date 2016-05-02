@@ -92,6 +92,11 @@ appModule.controller 'TenantManagedDevicesCtrl', ($scope, $stateParams, TenantsS
             @macDevices = @convertArrayToDictionary(result, true)
             return [each.mac for each in result][0]
 
+      else
+        return []
+    else
+      return []
+
   @paginateCall = (forward) ->
     if forward
       @getManagedDevices @tenantKey, null, @devicesNext

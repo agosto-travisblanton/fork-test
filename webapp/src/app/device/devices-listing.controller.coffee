@@ -112,7 +112,6 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
           DevicesService.searchDevicesByPartialSerial(@distributorKey, partial, unmanaged)
           .then (res) =>
             result = res["serial_number_matches"]
-
             if unmanaged
               @unmanagedSerialDevices = @convertArrayToDictionary(result, false)
             else
@@ -131,6 +130,10 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
               @macDevices = @convertArrayToDictionary(result, true)
 
             return [each.mac for each in result][0]
+      else
+        return []
+    else
+      return []
 
 
   @getManagedDevices = (key, prev, next) ->
