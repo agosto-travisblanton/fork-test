@@ -41,9 +41,15 @@
         </md-card-content>
       </md-card>
       <md-tabs md-dynamic-height md-border-bottom>
-        <div ng-include="'webapp/src/app/device/device-properties.html'"></div>
-        <div ng-include="'webapp/src/app/device/device-event.html'"></div>
-        <div ng-include="'webapp/src/app/device/device-command.html'"></div>
+        <md-tab label="Properties">
+          <div ng-include="'webapp/src/app/device/device-properties.html'"></div>
+        </md-tab>
+        <md-tab label="Events">
+          <div ng-include="'webapp/src/app/device/device-event.html'"></div>
+        </md-tab>
+        <md-tab label="Commands">
+          <div ng-include="'webapp/src/app/device/device-command.html'"></div>
+        </md-tab>
       </md-tabs>
     </div>
   </md-content>
