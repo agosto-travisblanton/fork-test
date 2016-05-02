@@ -106,9 +106,17 @@ class Domain(ndb.Model):
     @classmethod
     def create(cls, name, distributor_key, impersonation_admin_email_address, active):
         return cls(distributor_key=distributor_key,
-                   name=name,
+                   name=name.strip().lower(),
                    impersonation_admin_email_address=impersonation_admin_email_address,
                    active=active)
+
+    @classmethod
+    def already_exists(cls, name):
+        if Domain.query(
+            ndb.AND(Domain.active == True,
+                    Domain.name == name.strip().lower())).get(keys_only=True):
+            return True
+        return False
 
     def _pre_put_hook(self):
         self.class_version = 1
@@ -417,15 +425,15 @@ class Tenant(ndb.Model):
                    default_timezone=default_timezone)
 
     @classmethod
-    def toggle_proof_of_play(cls, tenant_code, enable):
+    def toggle_proof_of_play(cls, tenant_code, should_be_enabled):
         tenant = Tenant.find_by_tenant_code(tenant_code)
         managed_devices = Tenant.find_devices(tenant.key, unmanaged=False)
         for device in managed_devices:
-            if not enable:
-                device.proof_of_play_logging = enable
-            device.proof_of_play_editable = enable
+            if not should_be_enabled:
+                device.proof_of_play_logging = False
+            device.proof_of_play_editable = should_be_enabled
             device.put()
-        tenant.proof_of_play_logging = enable
+        tenant.proof_of_play_logging = should_be_enabled
         tenant.put()
 
     def _pre_put_hook(self):

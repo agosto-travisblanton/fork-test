@@ -258,8 +258,7 @@
           <form name="deviceForm" class="form-horizontal"
                 ng-submit="deviceDetailsCtrl.onSaveDevice()"
                 novalidate>
-            <section name="proofOfPlay"
-                     ng-hide="!deviceDetailsCtrl.currentDevice.proofOfPlayEditable">
+            <section name="proofOfPlay" ng-show="deviceDetailsCtrl.currentDevice.proofOfPlayEditable">
               <h3>Proof of play</h3>
               <div class="form-group">
                 <div class="col-sm-2">
