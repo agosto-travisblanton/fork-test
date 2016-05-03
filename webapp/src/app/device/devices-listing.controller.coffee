@@ -4,7 +4,6 @@ appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, $state, $cookies, ProgressBarService, sweet) ->
   @distributorKey = undefined
-
   #####################################
   # Managed
   #####################################
@@ -33,6 +32,13 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
     url = DevicesService.makeDevicesByDistributorURL @distributorKey, @devicesPrev, @devicesNext, false
     DevicesService.deviceCache.remove(url)
     @getManagedDevices(@distributorKey, @devicesPrev, @devicesNext)
+    
+  @refreshUnmanagedDevices = () =>
+    @unmanagedDevicesPrev = null
+    @unmanagedDevicesNext = null
+    url = DevicesService.makeDevicesByDistributorURL @distributorKey, @unmanagedDevicesPrev, @unmanagedDevicesNext, true
+    DevicesService.deviceCache.remove(url)
+    @getUnmanagedDevices(@distributorKey, @unmanagedDevicesPrev, @unmanagedDevicesNext)
 
 
   @changeRadio = (unmanaged) ->

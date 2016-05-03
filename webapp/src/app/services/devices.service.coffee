@@ -49,7 +49,7 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangula
     getDevicesByTenant: (tenantKey, prev, next) ->
       unless tenantKey == undefined
         deferred = $q.defer()
-        url = "/api/v1/tenants/#{prev}/#{next}/#{tenantKey}/devices?unmanaged=false"
+        url = @makeDevicesByTenantURL tenantKey, prev, next, false
         if not @deviceCache.get(url)
           promise = Restangular.oneUrl(@SERVICE_NAME, url).get()
           promise.then (data) =>
@@ -63,7 +63,7 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangula
     getUnmanagedDevicesByTenant: (tenantKey, prev, next) ->
       unless tenantKey == undefined
         deferred = $q.defer()
-        url = "api/v1/tenants/#{prev}/#{next}/#{tenantKey}/devices?unmanaged=true"
+        url = @makeDevicesByTenantURL tenantKey, prev, next, true
         if not @deviceCache.get(url)
           promise = Restangular.oneUrl(@SERVICE_NAME, url).get()
           promise.then (data) =>
@@ -153,10 +153,6 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangula
           deferred.resolve(@deviceCache.get(url))
 
         deferred.promise
-
-
-    makeDevicesByDistributorURL: (distributorKey, prev, next, unmanaged) ->
-      url = "api/v1/distributors/#{prev}/#{next}/#{distributorKey}/devices?unmanaged=#{unmanaged}"
 
     getDevices: ->
       promise = Restangular.all(@SERVICE_NAME).getList()
@@ -260,4 +256,10 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangula
           'parentId': 'NEC-LCD4215'
         }
       ]
+
+    makeDevicesByDistributorURL: (distributorKey, prev, next, unmanaged) ->
+      url = "/api/v1/distributors/#{prev}/#{next}/#{distributorKey}/devices?unmanaged=#{unmanaged}"
+
+    makeDevicesByTenantURL: (tenantKey, prev, next, unmanaged) ->
+      url = "/api/v1/tenants/#{prev}/#{next}/#{tenantKey}/devices?unmanaged=#{unmanaged}"
 
