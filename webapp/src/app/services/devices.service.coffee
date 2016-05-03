@@ -1,19 +1,23 @@
 'use strict'
 
-angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangular, $q, CacheFactory, $http) ->
+angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangular, $q, CacheFactory, $http, $cookies) ->
   new class DevicesService
 
     constructor: ->
       @SERVICE_NAME = 'devices'
       @uriBase = 'v1/devices'
       if !CacheFactory.get('deviceCache')
+        distributorKey = $cookies.get('currentDistributorKey')
+
         @deviceCache = CacheFactory('deviceCache',
           maxAge: 60 * 60 * 1000
           deleteOnExpire: 'aggressive'
           storageMode: 'localStorage'
           onExpire: (key, value) ->
-            $http.get(key).success (data) ->
-              profileCache.put key, data
+            $http.get(key, headers: {
+              'X-Provisioning-Distributor': distributorKey
+            }).success (data) ->
+              @deviceCache.put key, data
               return
             return
         )
@@ -151,8 +155,8 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangula
           deferred.resolve(@deviceCache.get(url))
 
         deferred.promise
-        
-        
+
+
     makeDevicesByDistributorURL: (distributorKey, prev, next, unmanaged) ->
       url = "api/v1/distributors/#{prev}/#{next}/#{distributorKey}/devices?unmanaged=#{unmanaged}"
 

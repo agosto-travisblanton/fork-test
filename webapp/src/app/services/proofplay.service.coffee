@@ -1,11 +1,25 @@
 'use strict'
 
 angular.module('skykitProvisioning')
-.factory 'ProofPlayService', ($http, $q, $window, $cookies, $stateParams, $state, ToastsService) ->
+.factory 'ProofPlayService', ($http, $q, $window, $cookies, $stateParams, $state, ToastsService, CacheFactory) ->
   new class ProofPlayService
 
     constructor: ->
       @uriBase = 'proofplay/api/v1'
+      if !CacheFactory.get('proofplayCache')
+        distributorKey = $cookies.get('currentDistributorKey')
+        @proofplayCache = CacheFactory('proofplayCache',
+          maxAge: 60 * 60 * 1000
+          deleteOnExpire: 'aggressive'
+          storageMode: 'localStorage'
+          onExpire: (key, value) ->
+            $http.get(key, headers: {
+              'X-Provisioning-Distributor': distributorKey
+            }).success (data) ->
+              @proofplayCache.put key, data
+              return
+            return
+        )
 
     createFilterFor: (query) ->
       query = angular.lowercase(query)
@@ -15,12 +29,25 @@ angular.module('skykitProvisioning')
 
 
     makeHTTPRequest: (where_to_go, tenant) =>
+      deferred = $q.defer()
       distributorKey = $cookies.get('currentDistributorKey')
-      $http.get(@uriBase + where_to_go + tenant,
-        headers: {
-          'X-Provisioning-Distributor': distributorKey
-        }
-      )
+      url = @uriBase + where_to_go + tenant
+      
+      if not @proofplayCache.get(url)
+        res = $http.get(url,
+          headers: {
+            'X-Provisioning-Distributor': distributorKey
+          }
+        )
+
+        res.then (data) =>
+          @proofplayCache.put(url, data)
+          deferred.resolve(data)
+
+      else
+        deferred.resolve(@proofplayCache.get(url))
+
+      deferred.promise
 
     getAllResources: (tenant) ->
       r = @makeHTTPRequest("/retrieve_all_resources/", tenant)
@@ -49,7 +76,6 @@ angular.module('skykitProvisioning')
 
     getAllTenants: () ->
       @makeHTTPRequest("/retrieve_my_tenants", '')
-
 
 
     downloadCSVForMultipleResourcesByDate: (start_date, end_date, resources, tenant) ->

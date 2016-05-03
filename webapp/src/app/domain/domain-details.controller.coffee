@@ -1,7 +1,5 @@
 'use strict'
-
 appModule = angular.module('skykitProvisioning')
-
 appModule.controller 'DomainDetailsCtrl', ($log,
   $stateParams,
   DistributorsService,
@@ -43,6 +41,5 @@ appModule.controller 'DomainDetailsCtrl', ($log,
 
   @editItem = (item) ->
     $state.go 'editDomain', {domainKey: item.key}
-
-
+    
   @
