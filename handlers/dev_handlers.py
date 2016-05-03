@@ -5,7 +5,6 @@ from app_config import config
 from models import User, Distributor, Domain, Tenant, ChromeOsDevice, PlayerCommandEvent, TenantEntityGroup, \
     DeviceIssueLog, DistributorEntityGroup, Location, DistributorUser
 import time
-import random
 
 USER_EMAIL = 'daniel.ternyak@agosto.com'
 DISTRIBUTOR_NAME = 'Agosto'
@@ -19,6 +18,7 @@ MAC_ADDRESS = '54271e619346'
 UNMANAGED_MAC_ADDRESS = '04271e61934b'
 UNMANAGED_GCM_REGISTRATION_ID = '3c70a8d70a6dfa6df76dfas2'
 SERIAL_NUMBER = 'E6MSCX057790'
+import random
 
 
 def create_email(first, last):
@@ -123,10 +123,10 @@ def make_data_for_a_distributor():
     # CREATE TENANTS
     ##########################################################################################
     for i in range(1, 300):
-        tenant_code = "AUTO_TENANT" + str(i)
+        tenant_code = "my_tenant" + str(i)
         tenant_code = tenant_code.lower()
         tenant = Tenant.create(tenant_code=tenant_code,
-                               name="AUTO_TENANT" + str(i),
+                               name="my_tenant" + str(i),
                                admin_email=TENANT_ADMIN_EMAIL,
                                content_server_url='https://skykit-contentmanager-int.appspot.com',
                                content_manager_base_url='https://skykit-contentmanager-int.appspot.com/content',
@@ -153,7 +153,6 @@ def make_data_for_a_distributor():
     # CREATE LOCATIONS
     ##########################################################################################
     for i in range(1, 103):
-
         location = Location.create(tenant_key=tenant.key,
                                    customer_location_name="my_location" + str(i),
                                    customer_location_code="my_location" + str(i))
@@ -183,7 +182,7 @@ def make_data_for_a_distributor():
     ##########################################################################################
     # MANAGED DEVICES
     ##########################################################################################
-    for i in range(1, 26):
+    for i in range(1, 225):
         managed_device = ChromeOsDevice.get_by_device_id(DEVICE_ID + str(i))
         if not managed_device:
             managed_device = ChromeOsDevice.create_managed(
@@ -197,51 +196,46 @@ def make_data_for_a_distributor():
             managed_device.put()
             print 'Managed device created with MAC ' + str(i) + MAC_ADDRESS
 
-            for z in range(1, 101):
-                issue = DeviceIssueLog.create(device_key=managed_device.key,
-                                              category=config.DEVICE_ISSUE_PLAYER_DOWN,
-                                              up=False,
-                                              storage_utilization=random.randint(1, 100),
-                                              memory_utilization=random.randint(1, 100),
-                                              program=str(random.randint(1, 100)),
-                                              program_id=managed_device.program_id,
-                                              last_error=managed_device.last_error,
-                                              )
-                issue.put()
+            if random.randint(1, 10) == 1:
+
+                for z in range(1, 101):
+                    issue = DeviceIssueLog.create(device_key=managed_device.key,
+                                                  category=config.DEVICE_ISSUE_PLAYER_DOWN,
+                                                  up=False,
+                                                  storage_utilization=random.randint(1, 100),
+                                                  memory_utilization=random.randint(1, 100),
+                                                  program=str(random.randint(1, 100)),
+                                                  program_id=managed_device.program_id,
+                                                  last_error=managed_device.last_error,
+                                                  )
+                    issue.put()
+
+                    payload = 'reset content'.format(i)
+                    gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
+                    event = PlayerCommandEvent.create(device_urlsafe_key=managed_device.key.urlsafe(),
+                                                      payload=payload, gcm_registration_id=gcm_registration_id)
+
+                    event.put()
+                    print 'Added ' + payload + ' event to ' + managed_device.key.urlsafe()
+                    payload = 'reset player'.format(i)
+                    gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
+                    event = PlayerCommandEvent.create(device_urlsafe_key=managed_device.key.urlsafe(),
+                                                      payload=payload, gcm_registration_id=gcm_registration_id)
+                    event.player_has_confirmed = True
+                    event.put()
+                    print 'Added ' + payload + ' event to ' + managed_device.key.urlsafe()
+                    payload = 'panel on'.format(i)
+                    gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
+                    event = PlayerCommandEvent.create(device_urlsafe_key=managed_device.key.urlsafe(),
+                                                      payload=payload, gcm_registration_id=gcm_registration_id)
+
+                    event.player_has_confirmed = True
+                    event.put()
+                    print 'Added ' + payload + ' event to ' + managed_device.key.urlsafe()
+
         else:
             print 'Managed device with Device ID ' + managed_device.device_id + ' already exists, so did not create'
 
-    ##########################################################################################
-    # COMMAND EVENTS
-    ##########################################################################################
-    time.sleep(2)
-    query = ChromeOsDevice.query().order(ChromeOsDevice.created)
-    devices = query.fetch(1000)
-    print 'Device count = ' + str(len(devices))
-    for device in devices:
-        for i in range(1, 34):
-            payload = 'reset content'.format(i)
-            gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
-            event = PlayerCommandEvent.create(device_urlsafe_key=device.key.urlsafe(),
-                                              payload=payload, gcm_registration_id=gcm_registration_id)
-
-            event.put()
-            print 'Added ' + payload + ' event to ' + device.key.urlsafe()
-            payload = 'reset player'.format(i)
-            gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
-            event = PlayerCommandEvent.create(device_urlsafe_key=device.key.urlsafe(),
-                                              payload=payload, gcm_registration_id=gcm_registration_id)
-            event.player_has_confirmed = True
-            event.put()
-            print 'Added ' + payload + ' event to ' + device.key.urlsafe()
-            payload = 'panel on'.format(i)
-            gcm_registration_id = 'gcm-registration-id-{0}'.format(i)
-            event = PlayerCommandEvent.create(device_urlsafe_key=device.key.urlsafe(),
-                                              payload=payload, gcm_registration_id=gcm_registration_id)
-
-            event.player_has_confirmed = True
-            event.put()
-            print 'Added ' + payload + ' event to ' + device.key.urlsafe()
 
     ##########################################################################################
     # PROOF OF PLAY

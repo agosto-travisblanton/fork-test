@@ -283,8 +283,11 @@ class Tenant(ndb.Model):
 
         return to_return
 
+
+
+
     @classmethod
-    def find_devices_paginated(cls, tenant_keys, fetch_size=200, unmanaged=False, prev_cursor_str=None,
+    def find_devices_paginated(cls, tenant_keys, fetch_size=25, unmanaged=False, prev_cursor_str=None,
                                next_cursor_str=None):
 
         objects = None
@@ -334,6 +337,8 @@ class Tenant(ndb.Model):
                 page_size=fetch_size,
                 start_cursor=cursor.reversed()
             )
+
+            objects.reverse()
             next_cursor = prev_cursor_str
             prev_cursor = prev.urlsafe() if more else None
 
