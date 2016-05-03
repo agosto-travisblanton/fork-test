@@ -495,6 +495,17 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
   justify-content: center;
 }
 
+
+.bigger-buttons {
+  padding: 0.4em;
+  min-width: 88px;
+  border-radius: 5px;
+  font-size: 16px;
+  text-align: center;
+  text-decoration:none;
+  border: none;
+  outline: none;}
+
 //.distributor-selection {
 //  font-size: 20pt;
 //  border: solid 1px #c9c9c9;

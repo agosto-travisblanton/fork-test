@@ -2,24 +2,22 @@
 appModule = angular.module('skykitProvisioning')
 appModule.factory 'TenantsService', (Restangular, CacheFactory, $cookies) ->
   new class TenantsService
-
+    
     constructor: ->
       if !CacheFactory.get('tenantCache')
         distributorKey = $cookies.get('currentDistributorKey')
-        @tenantCache = CacheFactory 'tenantCache',
+        @tenantCache = CacheFactory('tenantCache',
           maxAge: 60 * 60 * 1000
           deleteOnExpire: 'aggressive'
           storageMode: 'localStorage'
           onExpire: (key, value) ->
-            $http.get(key, headers: {
-              'X-Provisioning-Distributor': distributorKey
-            }).success (data) ->
+            $http.get(key).success (data) ->
               @tenantCache.put key, data
               return
             return
-        
+        )
 
-
+    
     save: (tenant) ->
       if tenant.key != undefined
         promise = tenant.put()

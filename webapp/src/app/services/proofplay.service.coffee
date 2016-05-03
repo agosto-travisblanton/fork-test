@@ -13,9 +13,7 @@ angular.module('skykitProvisioning')
           deleteOnExpire: 'aggressive'
           storageMode: 'localStorage'
           onExpire: (key, value) ->
-            $http.get(key, headers: {
-              'X-Provisioning-Distributor': distributorKey
-            }).success (data) ->
+            $http.get(key).success (data) ->
               @proofplayCache.put key, data
               return
             return
@@ -32,13 +30,9 @@ angular.module('skykitProvisioning')
       deferred = $q.defer()
       distributorKey = $cookies.get('currentDistributorKey')
       url = @uriBase + where_to_go + tenant
-      
+
       if not @proofplayCache.get(url)
-        res = $http.get(url,
-          headers: {
-            'X-Provisioning-Distributor': distributorKey
-          }
-        )
+        res = $http.get(url)
 
         res.then (data) =>
           @proofplayCache.put(url, data)

@@ -41,5 +41,6 @@ appModule.controller 'DomainDetailsCtrl', ($log,
 
   @editItem = (item) ->
     $state.go 'editDomain', {domainKey: item.key}
-    
+
+
   @
