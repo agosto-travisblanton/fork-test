@@ -397,7 +397,8 @@ def get_tenant_list_from_distributor_key(distributor_key):
     tenant_list = Tenant.query(ancestor=TenantEntityGroup.singleton().key)
     tenant_list = filter(lambda x: x.active is True, tenant_list)
     result = filter(lambda x: x.domain_key in domain_keys, tenant_list)
-    return result
+    sorted_result = sorted(result, key=lambda k: k.tenant_code)
+    return sorted_result
 
 
 def get_tenant_names_for_distributor(distributor_key):

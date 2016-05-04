@@ -6,6 +6,7 @@
           <div class="col-md-1">
             <h3>{{vm.currentTenant}}</h3>
           </div>
+
           <div ng-if="!vm.tenants" class="col-md-offset-9 proof-of-play-horizontal-top-bar">
             <div layout="row" layout-sm="column" layout-align="space-around">
               <md-progress-circular md-mode="indeterminate"></md-progress-circular>
@@ -90,6 +91,11 @@
                                ng-click="vm.addToSelectedDisplays(vm.searchText)"
                                style="float: right">Add
                     </md-button>
+                    <md-button class="md-raised  md-primary"
+                               ng-click="vm.refreshDisplays()" style="float: right">
+                      Refresh
+                    </md-button>
+
                     <br/>
                     <br/>
                     <br/>

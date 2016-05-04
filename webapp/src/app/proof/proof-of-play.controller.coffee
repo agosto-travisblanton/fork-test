@@ -34,6 +34,12 @@ appModule.controller "ProofOfPlayCtrl", (ProofPlayService, $stateParams, $state,
       $state.go 'proofDetail', {
         tenant: @chosen_tenant
       }
+      
+  @refreshTenants = () =>
+    @tenants = null
+    url = ProofPlayService.makeHTTPURL "/retrieve_my_tenants", ''
+    ProofPlayService.proofplayCache.remove(url)
+    @initialize()
 
 
   @
