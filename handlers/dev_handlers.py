@@ -4,7 +4,8 @@ from google.appengine.ext import ndb
 from app_config import config
 from models import User, Distributor, Domain, Tenant, ChromeOsDevice, PlayerCommandEvent, TenantEntityGroup, \
     DeviceIssueLog, DistributorEntityGroup, Location, DistributorUser
-import time
+import random
+
 
 USER_EMAIL = 'daniel.ternyak@agosto.com'
 DISTRIBUTOR_NAME = 'Agosto'
@@ -18,7 +19,6 @@ MAC_ADDRESS = '54271e619346'
 UNMANAGED_MAC_ADDRESS = '04271e61934b'
 UNMANAGED_GCM_REGISTRATION_ID = '3c70a8d70a6dfa6df76dfas2'
 SERIAL_NUMBER = 'E6MSCX057790'
-import random
 
 
 def create_email(first, last):
