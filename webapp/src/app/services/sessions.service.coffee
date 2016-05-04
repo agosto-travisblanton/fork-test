@@ -1,6 +1,7 @@
 'use strict'
 
-angular.module('skykitProvisioning').factory 'SessionsService', ($http,
+angular.module('skykitProvisioning').factory 'SessionsService', (
+  $http,
   $log,
   $cookies,
   IdentityService,
@@ -32,7 +33,7 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
       promise = $http.post('/login', authenticationPayload)
       promise.success (data) =>
         @currentUserKey = data.user.key
-        a = @setIdentity(@currentUserKey)
+        @setIdentity(@currentUserKey)
         .then ->
           deferred.resolve(data)
 

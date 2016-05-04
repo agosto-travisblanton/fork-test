@@ -3,56 +3,80 @@
 describe 'DevicesService', ->
   DevicesService = undefined
   Restangular = undefined
+  $http = undefined
   promise = undefined
-
+  CacheFactory = undefined
+  $q = undefined
+  deferred = undefined
+  
   beforeEach module('skykitProvisioning')
 
-  beforeEach inject (_DevicesService_, _Restangular_) ->
+  beforeEach inject (_DevicesService_, _Restangular_, _CacheFactory_, _$http_, _$q_) ->
     DevicesService = _DevicesService_
     Restangular = _Restangular_
+    CacheFactory = _CacheFactory_
+    $http = _$http_
+    $q = _$q_
     promise = new skykitProvisioning.q.Mock
+
+  beforeEach ->
+    DevicesService.deviceCache = {
+      get: () ->
+
+      put: () ->
+
+    }
+    deferred = $q.defer()
 
   describe '.getDevicesByTenant', ->
     it 'retrieve all devices associated to a tenant, returning a promise', ->
+      deferred.resolve promise
       restangularServiceStub = {get: ->}
       spyOn(Restangular, 'oneUrl').and.returnValue restangularServiceStub
       spyOn(restangularServiceStub, 'get').and.returnValue promise
       tenantKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFud'
       actual = DevicesService.getDevicesByTenant tenantKey, null, null
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/tenants/null/null/#{tenantKey}/devices?unmanaged=false"
-      expect(actual).toBe promise
+      actual.then () =>
+        expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "/api/v1/tenants/null/null/#{tenantKey}/devices?unmanaged=false"
+        expect(actual).toBe promise
 
   describe '.getUnmanagedDevicesByTenant', ->
     it 'retrieve all unmanaged devices associated to a tenant, returning a promise', ->
+      deferred.resolve promise
       restangularServiceStub = {get: ->}
       spyOn(Restangular, 'oneUrl').and.returnValue restangularServiceStub
       spyOn(restangularServiceStub, 'get').and.returnValue promise
       tenantKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFud'
       actual = DevicesService.getUnmanagedDevicesByTenant tenantKey, null, null
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/tenants/null/null/#{tenantKey}/devices?unmanaged=true"
-      expect(actual).toBe promise
+      actual.then () =>
+        expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "/api/v1/tenants/null/null/#{tenantKey}/devices?unmanaged=true"
+        expect(actual).toBe promise
 
   describe '.getDevicesByDistributor', ->
     it 'retrieve all devices associated with a distributor, returning a promise', ->
+      deferred.resolve promise
       restangularServiceStub = {get: ->}
       spyOn(Restangular, 'oneUrl').and.returnValue restangularServiceStub
       spyOn(restangularServiceStub, 'get').and.returnValue promise
       distributorKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFud'
       actual = DevicesService.getDevicesByDistributor distributorKey, null, null
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices',
-        "api/v1/distributors/null/null/#{distributorKey}/devices?unmanaged=false")
-      expect(actual).toBe promise
+      actual.then () =>
+        expect(Restangular.oneUrl).toHaveBeenCalledWith('devices',
+          "/api/v1/distributors/null/null/#{distributorKey}/devices?unmanaged=false")
+        expect(actual).toBe promise
 
   describe '.getUnmanagedDevicesByDistributor', ->
     it 'retrieve all unmanaged devices associated with a distributor, returning a promise', ->
+      deferred.resolve promise
       restangularServiceStub = {get: ->}
       spyOn(Restangular, 'oneUrl').and.returnValue restangularServiceStub
       spyOn(restangularServiceStub, 'get').and.returnValue promise
       distributorKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFud'
       actual = DevicesService.getUnmanagedDevicesByDistributor distributorKey, null, null
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices',
-        "api/v1/distributors/null/null/#{distributorKey}/devices?unmanaged=true")
-      expect(actual).toBe promise
+      actual.then () =>
+        expect(Restangular.oneUrl).toHaveBeenCalledWith('devices',
+          "/api/v1/distributors/null/null/#{distributorKey}/devices?unmanaged=true")
+        expect(actual).toBe promise
 
   describe '.getDeviceByKey', ->
     it 'retrieve device associated with supplied key, returning a promise', ->
@@ -156,8 +180,8 @@ describe 'DevicesService', ->
       expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/distributors/match/serial/#{distributorKey}/#{partialMac}/#{unmanaged}/devices"
       expect(deviceRestangularService.get).toHaveBeenCalled()
       expect(actual).toBe promise
-      
-      
+
+
   describe '.searchDevicesByPartialMacByTenant', ->
     it 'search devices with a partial mac address returns an http promise', ->
       tenantKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw'

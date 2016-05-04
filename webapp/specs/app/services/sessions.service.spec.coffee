@@ -6,15 +6,17 @@ describe 'SessionsService', ->
   $http = undefined
   $httpBackend = undefined
   q = undefined
+  $cookies = undefined 
 
   beforeEach module('skykitProvisioning')
 
-  beforeEach inject (_$httpBackend_, _$q_, _SessionsService_, _$http_, _Restangular_) ->
+  beforeEach inject (_$httpBackend_, _$q_, _SessionsService_, _$http_, _Restangular_, _$cookies_) ->
     SessionsService = _SessionsService_
     Restangular = _Restangular_
     $http = _$http_
     $httpBackend = _$httpBackend_
     q = _$q_
+    $cookies = _$cookies_
 
 
   describe 'initialization', ->
@@ -52,9 +54,12 @@ describe 'SessionsService', ->
       $httpBackend.verifyNoOutstandingExpectation()
       $httpBackend.verifyNoOutstandingRequest()
 
-    it 'logs in to Stormpath', ->
+    it 'logs in to Stormpath and sets identity', ->
       deferred.resolve expectedCallbackResponse
       $httpBackend.expectPOST('/login', expectedCredentials).respond(expectedCallbackResponse)
+      identityResponse = {email: "dwight.schrute@agosto.com"}
+      $httpBackend.expectGET('/api/v1/identity').respond(identityResponse)
       result = SessionsService.login expectedCredentials
       $httpBackend.flush()
-      expect(SessionsService.currentUserKey).toEqual expectedCallbackResponse.user.key
+      result.then (data) =>
+        expect(SessionsService.currentUserKey).toEqual expectedCallbackResponse.user.key
