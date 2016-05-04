@@ -26,7 +26,7 @@ appModule.controller 'TenantUnmanagedDevicesCtrl',
     @editMode = !!$stateParams.tenantKey
     @tenantKey = $stateParams.tenantKey
 
-    @getManagedDevices = (tenantKey, prev_cursor, next_cursor) ->
+    @getUnmanagedDevices = (tenantKey, prev_cursor, next_cursor) ->
       ProgressBarService.start()
       devicesPromise = DevicesService.getUnmanagedDevicesByTenant tenantKey, prev_cursor, next_cursor
       devicesPromise.then (data) =>
@@ -35,12 +35,19 @@ appModule.controller 'TenantUnmanagedDevicesCtrl',
         @tenantDevices = data["devices"]
         ProgressBarService.complete()
 
+    @refreshDevices = () =>
+      @devicesPrev = null
+      @devicesNext = null
+      @tenantDevices = null
+      DevicesService.deviceByTenantCache.removeAll()
+      @getUnmanagedDevices @tenantKey, @devicesPrev, @devicesNext
+
     if @editMode
       tenantPromise = TenantsService.getTenantByKey @tenantKey
       tenantPromise.then (tenant) =>
         @currentTenant = tenant
 
-      @getManagedDevices @tenantKey, null, null
+      @getUnmanagedDevices @tenantKey, null, null
 
     $scope.tabIndex = 2
 
@@ -94,9 +101,9 @@ appModule.controller 'TenantUnmanagedDevicesCtrl',
               return [each.mac for each in result][0]
         else
           return []
-      else 
+      else
         return []
-        
+
     @paginateCall = (forward) ->
       if forward
         @getManagedDevices @tenantKey, null, @devicesNext

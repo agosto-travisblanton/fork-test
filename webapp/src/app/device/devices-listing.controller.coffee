@@ -29,15 +29,13 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
   @refreshManagedDevices = () =>
     @devicesPrev = null
     @devicesNext = null
-    url = DevicesService.makeDevicesByDistributorURL @distributorKey, @devicesPrev, @devicesNext, false
-    DevicesService.deviceCache.remove(url)
+    DevicesService.deviceCache.removeAll()
     @getManagedDevices(@distributorKey, @devicesPrev, @devicesNext)
     
   @refreshUnmanagedDevices = () =>
     @unmanagedDevicesPrev = null
     @unmanagedDevicesNext = null
-    url = DevicesService.makeDevicesByDistributorURL @distributorKey, @unmanagedDevicesPrev, @unmanagedDevicesNext, true
-    DevicesService.deviceCache.remove(url)
+    DevicesService.deviceCache.removeAll()
     @getUnmanagedDevices(@distributorKey, @unmanagedDevicesPrev, @unmanagedDevicesNext)
 
 

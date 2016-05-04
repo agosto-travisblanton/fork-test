@@ -42,8 +42,7 @@ appModule.controller "ProofOfPlayMultiLocationCtrl", (ProofPlayService, $statePa
     @loading = true
     @disabled = true
     @selected_locations = []
-    url = ProofPlayService.makeHTTPURL "/retrieve_all_locations/", @tenant
-    ProofPlayService.proofplayCache.remove(url)
+    ProofPlayService.proofplayCache.removeAll()
     @initialize()
 
   @addToSelectedLocations = (searchText) =>

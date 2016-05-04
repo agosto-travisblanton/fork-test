@@ -43,8 +43,7 @@ appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService, $statePar
     @loading = true
     @disabled = true
     @selected_displays = []
-    url = ProofPlayService.makeHTTPURL "/retrieve_all_displays/", @tenant
-    ProofPlayService.proofplayCache.remove(url)
+    ProofPlayService.proofplayCache.removeAll()
     @initialize()
 
   @addToSelectedDisplays = (searchText) =>

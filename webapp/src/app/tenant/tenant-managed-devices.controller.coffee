@@ -24,7 +24,7 @@ appModule.controller 'TenantManagedDevicesCtrl', ($scope, $stateParams, TenantsS
   @macDevices = {}
   @editMode = !!$stateParams.tenantKey
   @tenantKey = $stateParams.tenantKey
-  
+
   @getManagedDevices = (tenantKey, prev_cursor, next_cursor) ->
     ProgressBarService.start()
     devicesPromise = DevicesService.getDevicesByTenant tenantKey, prev_cursor, next_cursor
@@ -33,6 +33,14 @@ appModule.controller 'TenantManagedDevicesCtrl', ($scope, $stateParams, TenantsS
       @devicesNext = data["next_cursor"]
       @tenantDevices = data["devices"]
       ProgressBarService.complete()
+
+
+  @refreshDevices = () =>
+    @devicesPrev = null
+    @devicesNext = null
+    @tenantDevices = null
+    DevicesService.deviceByTenantCache.removeAll()
+    @getManagedDevices @tenantKey, @devicesPrev, @devicesNext
 
   if @editMode
     tenantPromise = TenantsService.getTenantByKey @tenantKey

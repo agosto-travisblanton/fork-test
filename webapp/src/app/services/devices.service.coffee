@@ -19,6 +19,17 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangula
               return
             return
         )
+        
+        @deviceByTenantCache = CacheFactory('eviceByTenantCache',
+          maxAge: 60 * 60 * 1000
+          deleteOnExpire: 'aggressive'
+          storageMode: 'localStorage'
+          onExpire: (key, value) ->
+            $http.get(key).success (data) ->
+              @deviceCache.put key, data
+              return
+            return
+        )
 
     getDeviceByMacAddress: (macAddress) ->
       url = "api/v1/devices?mac_address=#{macAddress}"
@@ -50,13 +61,13 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangula
       unless tenantKey == undefined
         deferred = $q.defer()
         url = @makeDevicesByTenantURL tenantKey, prev, next, false
-        if not @deviceCache.get(url)
+        if not @deviceByTenantCache.get(url)
           promise = Restangular.oneUrl(@SERVICE_NAME, url).get()
           promise.then (data) =>
-            @deviceCache.put url, data
+            @deviceByTenantCache.put url, data
             deferred.resolve(data)
         else
-          deferred.resolve(@deviceCache.get(url))
+          deferred.resolve(@deviceByTenantCache.get(url))
 
         deferred.promise
 
@@ -64,13 +75,13 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangula
       unless tenantKey == undefined
         deferred = $q.defer()
         url = @makeDevicesByTenantURL tenantKey, prev, next, true
-        if not @deviceCache.get(url)
+        if not @deviceByTenantCache.get(url)
           promise = Restangular.oneUrl(@SERVICE_NAME, url).get()
           promise.then (data) =>
-            @deviceCache.put url, data
+            @deviceByTenantCache.put url, data
             deferred.resolve(data)
         else
-          deferred.resolve(@deviceCache.get(url))
+          deferred.resolve(@deviceByTenantCache.get(url))
 
         deferred.promise
 

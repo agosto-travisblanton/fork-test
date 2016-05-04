@@ -43,8 +43,7 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService, $statePa
     @loading = true
     @disabled = true
     @selected_resources = []
-    url = ProofPlayService.makeHTTPURL "/retrieve_all_resources/", @tenant
-    ProofPlayService.proofplayCache.remove(url)
+    ProofPlayService.proofplayCache.removeAll()
     @initialize()
 
   @addToSelectedResources = (searchText) =>
