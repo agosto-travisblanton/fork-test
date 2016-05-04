@@ -88,17 +88,10 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
             return self.response.set_status(status, message)
         else:
             request_json = json.loads(self.request.body)
-            domain_name = request_json.get('name')
-            if Domain.already_exists(domain_name):
-                error_message = "Conflict. Domain name \"{0}\" is in use.".format(domain_name)
-                return self.response.set_status(409, error_message)
-            else:
-                domain.name = domain_name
-                domain.impersonation_admin_email_address = request_json.get('impersonation_admin_email_address')
-                domain.active = request_json.get('active')
-                domain.put()
-                self.response.headers.pop('Content-Type', None)
-                self.response.set_status(status, message)
+            domain.active = request_json.get('active')
+            domain.put()
+            self.response.headers.pop('Content-Type', None)
+            self.response.set_status(status, message)
 
     @requires_api_token
     def delete(self, domain_key):

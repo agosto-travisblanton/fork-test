@@ -5,7 +5,9 @@ describe 'DomainDetailsCtrl', ->
   controller = undefined
   $stateParams = undefined
   $state = undefined
+  $log = undefined
   DomainsService = undefined
+  ToastsService = undefined
   domainsServicePromise = undefined
   DistributorsService = undefined
   distributorsServicePromise = undefined
@@ -23,10 +25,11 @@ describe 'DomainDetailsCtrl', ->
 
   beforeEach module('skykitProvisioning')
 
-  beforeEach inject (_$controller_, _DomainsService_, _DistributorsService_, _sweet_) ->
+  beforeEach inject (_$controller_, _DomainsService_, _DistributorsService_, _sweet_, _ToastsService_, _$log_) ->
     $controller = _$controller_
     $stateParams = {}
     $state = {}
+    $log = _$log_
     DomainsService = _DomainsService_
     DistributorsService = _DistributorsService_
     progressBarService = {
@@ -34,6 +37,7 @@ describe 'DomainDetailsCtrl', ->
       complete: ->
     }
     sweet = _sweet_
+    ToastsService = _ToastsService_
     scope = {}
     serviceInjection = {
       $scope: scope
@@ -41,6 +45,7 @@ describe 'DomainDetailsCtrl', ->
       ProgressBarService: progressBarService
       DomainsService: DomainsService
       DistributorsService: DistributorsService
+      ToastsService: ToastsService
     }
 
   describe 'initialization', ->
@@ -72,21 +77,68 @@ describe 'DomainDetailsCtrl', ->
         domainsServicePromise.resolve domain
         expect(controller.currentDomain).toBe domain
 
-  describe '.onClickSaveButton', ->
+  describe '.onSaveDomain', ->
     beforeEach ->
       domainsServicePromise = new skykitProvisioning.q.Mock
       spyOn(DomainsService, 'save').and.returnValue domainsServicePromise
-      $stateParams = {}
       spyOn(progressBarService, 'start')
-      spyOn(progressBarService, 'complete')
       controller = $controller 'DomainDetailsCtrl', serviceInjection
+      controller.onSaveDomain()
 
-    it 'start the progress bar animation', ->
-      controller.onClickSaveButton()
-      domainsServicePromise.resolve()
+    it 'starts the progress bar', ->
       expect(progressBarService.start).toHaveBeenCalled()
 
-    it 'call DomainsService.save, pass the current domain', ->
-      controller.onClickSaveButton()
-      domainsServicePromise.resolve()
-      expect(DomainsService.save).toHaveBeenCalledWith(controller.currentDomain)
+    it 'call DevicesService.save with the current device', ->
+      expect(DomainsService.save).toHaveBeenCalledWith controller.currentDomain
+
+    describe '.onSuccessSaveDomain', ->
+      beforeEach ->
+        spyOn(progressBarService, 'complete')
+        spyOn(ToastsService, 'showSuccessToast')
+        controller.onSuccessSaveDomain()
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it "displays a success toast", ->
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith 'We saved your update.'
+
+    describe '.onFailureSaveDomain', ->
+      errorObject = {status: 409, statusText: 'Conflict'}
+
+      beforeEach ->
+        spyOn(progressBarService, 'complete')
+
+      it 'stops the progress bar', ->
+        controller.onFailureSaveDomain errorObject
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      describe '409 conflict returned from server', ->
+        beforeEach ->
+          spyOn(sweet, 'show')
+          spyOn($log, 'info')
+          controller.onFailureSaveDomain errorObject
+
+        it 'displays a sweet alert when domain conflicts with existing domain', ->
+          expect(sweet.show).toHaveBeenCalledWith('Oops...',
+            'This domain name already exist. Please enter a unique domain name.', 'error')
+
+        it 'logs info to the console when domain conflicts with existing domain', ->
+          infoMessage = "Failure saving domain. Domain already exists: #{errorObject.status} #{errorObject.statusText}"
+          expect($log.info).toHaveBeenCalledWith infoMessage
+
+      describe 'general error returned from server', ->
+        generalError = {status: 400, statusText: 'Some error'}
+
+        beforeEach ->
+          spyOn($log, 'error')
+          spyOn(ToastsService, 'showErrorToast')
+          controller.onFailureSaveDomain generalError
+
+        it 'logs error to the console', ->
+          errorMessage = "Failure saving domain: #{generalError.status} #{generalError.statusText}"
+          expect($log.error).toHaveBeenCalledWith errorMessage
+
+        it 'displays a toast regarding failure to save the domain', ->
+          toastMessage = 'Oops. We were unable to save your updates at this time.'
+          expect(ToastsService.showErrorToast).toHaveBeenCalledWith toastMessage
