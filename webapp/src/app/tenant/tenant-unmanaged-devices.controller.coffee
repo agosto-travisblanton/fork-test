@@ -106,10 +106,10 @@ appModule.controller 'TenantUnmanagedDevicesCtrl',
 
     @paginateCall = (forward) ->
       if forward
-        @getManagedDevices @tenantKey, null, @devicesNext
+        @getUnmanagedDevices @tenantKey, null, @devicesNext
 
       else
-        @getManagedDevices @tenantKey, @devicesPrev, null
+        @getUnmanagedDevices @tenantKey, @devicesPrev, null
 
 
     @prepareForEditView = (searchText) ->

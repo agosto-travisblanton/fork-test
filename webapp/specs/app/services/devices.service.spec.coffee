@@ -26,6 +26,12 @@ describe 'DevicesService', ->
       put: () ->
 
     }
+    DevicesService.deviceByTenantCache = {
+      get: () ->
+
+      put: () ->
+
+    }
     deferred = $q.defer()
 
   describe '.getDevicesByTenant', ->
