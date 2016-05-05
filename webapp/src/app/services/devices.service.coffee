@@ -26,7 +26,7 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangula
           storageMode: 'localStorage'
           onExpire: (key, value) ->
             $http.get(key).success (data) ->
-              @deviceCache.put key, data
+              @deviceByTenantCache.put key, data
               return
             return
         )
