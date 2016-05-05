@@ -6,9 +6,9 @@ from models import User, Distributor, Domain, Tenant, ChromeOsDevice, PlayerComm
     DeviceIssueLog, DistributorEntityGroup, Location, DistributorUser
 import random
 
-
 USER_EMAIL = 'daniel.ternyak@agosto.com'
 DISTRIBUTOR_NAME = 'Agosto'
+SECOND_DISTRIBUTOR = "SkyKit"
 DOMAIN = 'local.skykit.com'
 TENANT_NAME = 'Acme, Inc.'
 TENANT_CODE = 'acme_inc'
@@ -83,6 +83,14 @@ def make_data_for_a_distributor():
     ##########################################################################################
     # DISTRIBUTORS
     ##########################################################################################
+    first_distributor = Distributor.query(Distributor.name == SECOND_DISTRIBUTOR).get()
+    if not first_distributor:
+        first_distributor = Distributor.create(name=SECOND_DISTRIBUTOR, active=True)
+        first_distributor.put()
+        print 'Distributor ' + first_distributor.name + ' created'
+    else:
+        print 'Distributor ' + first_distributor.name + ' already exists, so did not create'
+
     distributor = Distributor.query(Distributor.name == DISTRIBUTOR_NAME).get()
     if not distributor:
         distributor = Distributor.create(name=DISTRIBUTOR_NAME, active=True)
@@ -104,7 +112,8 @@ def make_data_for_a_distributor():
         else:
             user.add_distributor(distributor.key)
             print 'SUCCESS! ' + user.email + ' is linked to ' + distributor.name
-
+            user.add_distributor(first_distributor.key)
+            print 'SUCCESS! ' + user.email + ' is linked to ' + first_distributor.name
     ##########################################################################################
     # DOMAINS
     ##########################################################################################
@@ -197,7 +206,8 @@ def make_data_for_a_distributor():
             print 'Managed device created with MAC ' + str(i) + MAC_ADDRESS
 
             if random.randint(1, 10) == 1:
-
+                with open('devices_with_events', 'w') as f:
+                    f.write(str(managed_device.serial_number) + "\n")
                 for z in range(1, 101):
                     issue = DeviceIssueLog.create(device_key=managed_device.key,
                                                   category=config.DEVICE_ISSUE_PLAYER_DOWN,
@@ -235,7 +245,6 @@ def make_data_for_a_distributor():
 
         else:
             print 'Managed device with Device ID ' + managed_device.device_id + ' already exists, so did not create'
-
 
     ##########################################################################################
     # PROOF OF PLAY
