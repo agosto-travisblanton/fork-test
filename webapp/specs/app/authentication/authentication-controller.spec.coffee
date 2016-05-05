@@ -193,9 +193,6 @@ describe 'AuthenticationCtrl', ->
       spyOn($state, 'go').and.callFake (name) ->
       controller.loginSuccess(response)
 
-    it "calls SessionsService.setIdentity ", ->
-      expect(SessionsService.setIdentity).toHaveBeenCalledWith(response)
-
     it "completes the progress bar", ->
       expect(ProgressBarService.complete).toHaveBeenCalled()
 

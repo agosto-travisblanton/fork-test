@@ -7,6 +7,7 @@ app.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
     sweet,
     SessionsService,
     ProgressBarService) ->
+  
   @onGooglePlusSignInSuccess = (event, authResult) =>
     unless @googlePlusSignInButtonClicked
       ProgressBarService.start()
@@ -32,7 +33,6 @@ app.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
     $timeout @proceedToSignedOut, 1500
 
   @loginSuccess = (response) ->
-    SessionsService.setIdentity(response)
     ProgressBarService.complete()
     $state.go 'distributor_selection'
 

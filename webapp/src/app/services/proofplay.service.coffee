@@ -1,31 +1,49 @@
 'use strict'
 
 angular.module('skykitProvisioning')
-.factory 'ProofPlayService', ($http, $q, $window, $cookies, $stateParams, $state, ToastsService) ->
+.factory 'ProofPlayService', ($http, $q, $window, $cookies, $stateParams, $state, ToastsService, CacheFactory) ->
   new class ProofPlayService
 
     constructor: ->
       @uriBase = 'proofplay/api/v1'
+      if !CacheFactory.get('proofplayCache')
+        distributorKey = $cookies.get('currentDistributorKey')
+        @proofplayCache = CacheFactory 'proofplayCache',
+          maxAge: 60 * 60 * 1000
+          deleteOnExpire: 'aggressive'
+          storageMode: 'localStorage'
+          onExpire: (key, value) ->
+            $http.get(key).success (data) ->
+              @proofplayCache.put key, data
+              return
+            return
 
-    createFilterFor: (query) ->
-      query = angular.lowercase(query)
-      (resource) ->
-        resource = angular.lowercase(resource)
-        return (resource.indexOf(query) == 0)
-
+    makeHTTPURL: (where_to_go, tenant) ->
+      url = @uriBase + where_to_go + tenant
 
     makeHTTPRequest: (where_to_go, tenant) =>
-      distributorKey = $cookies.get('currentDistributorKey')
-      $http.get(@uriBase + where_to_go + tenant,
-        headers: {
-          'X-Provisioning-Distributor': distributorKey
-        }
-      )
+      deferred = $q.defer()
+      url = @makeHTTPURL where_to_go, tenant
+
+      if not @proofplayCache.get(url)
+        res = $http.get(url)
+
+        res.then (data) =>
+          @proofplayCache.put(url, data)
+          deferred.resolve(data)
+
+        res.catch (err) =>
+          deferred.reject(err)
+
+      else
+        deferred.resolve(@proofplayCache.get(url))
+
+      deferred.promise
 
     getAllResources: (tenant) ->
+# the catch is only done here because 3 proof of play views are initilized at the same time
+# so this catch will be done 3 times with 3 error messages if we add it to getAllDisplays and getAllLocations
       r = @makeHTTPRequest("/retrieve_all_resources/", tenant)
-
-
       r.catch (err, data) ->
         status = err.status
         if status == 403
@@ -36,7 +54,7 @@ angular.module('skykitProvisioning')
           $state.go 'proof', {}
 
       r.then (data) ->
-        return data
+        data
 
 
     getAllDisplays: (tenant) ->
@@ -49,7 +67,6 @@ angular.module('skykitProvisioning')
 
     getAllTenants: () ->
       @makeHTTPRequest("/retrieve_my_tenants", '')
-
 
 
     downloadCSVForMultipleResourcesByDate: (start_date, end_date, resources, tenant) ->
@@ -122,6 +139,13 @@ angular.module('skykitProvisioning')
           tenant + "/" + $cookies.get('currentDistributorKey')
       , '_blank')
       return true
+
+
+    createFilterFor: (query) ->
+      query = angular.lowercase(query)
+      (resource) ->
+        resource = angular.lowercase(resource)
+        return (resource.indexOf(query) == 0)
 
 
     querySearch: (resources, searchText) ->

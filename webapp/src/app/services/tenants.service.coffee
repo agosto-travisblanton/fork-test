@@ -1,8 +1,23 @@
 'use strict'
 appModule = angular.module('skykitProvisioning')
-appModule.factory 'TenantsService', (Restangular) ->
-  class TenantsService
+appModule.factory 'TenantsService', (Restangular, CacheFactory, $cookies) ->
+  new class TenantsService
+    
+    constructor: ->
+      if !CacheFactory.get('tenantCache')
+        distributorKey = $cookies.get('currentDistributorKey')
+        @tenantCache = CacheFactory('tenantCache',
+          maxAge: 60 * 60 * 1000
+          deleteOnExpire: 'aggressive'
+          storageMode: 'localStorage'
+          onExpire: (key, value) ->
+            $http.get(key).success (data) ->
+              @tenantCache.put key, data
+              return
+            return
+        )
 
+    
     save: (tenant) ->
       if tenant.key != undefined
         promise = tenant.put()
@@ -15,11 +30,13 @@ appModule.factory 'TenantsService', (Restangular) ->
       promise
 
     fetchAllTenantsPaginated: (page_size, offset) ->
-      promise = Restangular.oneUrl('tenants', "api/v1/tenants/paginated/#{page_size}/#{offset}").get()
+      url = "api/v1/tenants/paginated/#{page_size}/#{offset}"
+      promise = Restangular.oneUrl('tenants', url).get()
       promise
 
     getTenantByKey: (tenantKey) ->
-      promise = Restangular.oneUrl('tenants', "api/v1/tenants/#{tenantKey}").get()
+      url = "api/v1/tenants/#{tenantKey}"
+      promise = Restangular.oneUrl('tenants', url).get()
       promise
 
     delete: (tenant) ->
@@ -27,4 +44,4 @@ appModule.factory 'TenantsService', (Restangular) ->
         promise = Restangular.one("tenants", tenant.key).remove()
         promise
 
-  new TenantsService()
+

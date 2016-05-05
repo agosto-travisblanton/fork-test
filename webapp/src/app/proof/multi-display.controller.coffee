@@ -25,6 +25,7 @@ appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService, $statePar
   @disabled = true
   @disabledTenant = true
   @selected_displays = []
+  
 
   @initialize = =>
     ProofPlayService.getAllDisplays(@tenant)
@@ -35,6 +36,15 @@ appModule.controller "ProofOfPlayMultiDisplayCtrl", (ProofPlayService, $statePar
         @had_some_items = true
       else
         @had_some_items = false
+        
+  @refreshDisplays = () =>
+    @searchText = ''
+    @selectedItem = ''
+    @loading = true
+    @disabled = true
+    @selected_displays = []
+    ProofPlayService.proofplayCache.removeAll()
+    @initialize()
 
   @addToSelectedDisplays = (searchText) =>
     if @isDisplayValid(searchText)

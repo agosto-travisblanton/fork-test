@@ -35,6 +35,15 @@ appModule.controller "ProofOfPlayMultiLocationCtrl", (ProofPlayService, $statePa
         @had_some_items = true
       else
         @had_some_items = false
+        
+  @refreshLocations = () =>
+    @searchText = ''
+    @selectedItem = ''
+    @loading = true
+    @disabled = true
+    @selected_locations = []
+    ProofPlayService.proofplayCache.removeAll()
+    @initialize()
 
   @addToSelectedLocations = (searchText) =>
     if @isLocationValid(searchText)

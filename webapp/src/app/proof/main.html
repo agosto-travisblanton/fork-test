@@ -48,10 +48,14 @@
                 </md-not-found>
               </md-autocomplete>
             </div>
-            <div class="col-md-3" style="margin-top: -3px">
+            <div class="col-md-5" style="margin-top: -3px">
               <md-button md-no-ink class="md-raised" ng-disabled="vm.disabled"
                          ng-click="vm.submitTenant(vm.searchText)">
                 Submit
+              </md-button>
+              <md-button class="md-raised"
+                         ng-click="vm.refreshTenants()">
+                Refresh
               </md-button>
             </div>
           </div>

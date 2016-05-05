@@ -18,7 +18,7 @@
       <md-card>
         <md-card-content>
           <div class="col-md-12">
-            <div class="col-sm-3">
+            <div class="col-sm-4">
               <md-button class="md-raised"
                          ng-disabled="!vm.devicesPrev"
                          ng-click="vm.paginateCall(false)">
@@ -29,8 +29,12 @@
                          ng-click="vm.paginateCall(true)">
                 Next
               </md-button>
+              <md-button class="md-raised "
+                         ng-click="vm.refreshDevices()">
+                Refresh
+              </md-button>
             </div>
-            <div class="col-md-3 col-md-offset-2">
+            <div class="col-md-3 col-md-offset-1">
               <md-radio-group ng-model="vm.selectedButton"
                               ng-change="vm.changeRadio()"
                               class="radio-horizontal">

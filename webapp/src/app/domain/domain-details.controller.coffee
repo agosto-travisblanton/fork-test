@@ -1,7 +1,5 @@
 'use strict'
-
 appModule = angular.module('skykitProvisioning')
-
 appModule.controller 'DomainDetailsCtrl', ($log,
   $stateParams,
   DistributorsService,

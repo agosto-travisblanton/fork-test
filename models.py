@@ -263,7 +263,7 @@ class Tenant(ndb.Model):
                 ndb.AND(DeviceIssueLog.created > start),
                 ndb.AND(DeviceIssueLog.created <= end)
             ).order(
-                DeviceIssueLog.created  # notice that this is sorted forward due to cursor being reversed
+                DeviceIssueLog.created
             ).fetch_page(
                 page_size=fetch_size,
                 start_cursor=cursor.reversed()
@@ -282,6 +282,9 @@ class Tenant(ndb.Model):
         }
 
         return to_return
+
+
+
 
     @classmethod
     def find_devices_paginated(cls, tenant_keys, fetch_size=200, unmanaged=False, prev_cursor_str=None,
@@ -334,6 +337,8 @@ class Tenant(ndb.Model):
                 page_size=fetch_size,
                 start_cursor=cursor.reversed()
             )
+
+            objects.reverse()
             next_cursor = prev_cursor_str
             prev_cursor = prev.urlsafe() if more else None
 
@@ -383,6 +388,8 @@ class Tenant(ndb.Model):
                 page_size=fetch_size,
                 start_cursor=cursor.reversed()
             )
+
+            objects.reverse()
 
             next_cursor = prev_cursor_str
             prev_cursor = prev.urlsafe() if more else None

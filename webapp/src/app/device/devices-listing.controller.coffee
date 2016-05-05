@@ -4,7 +4,6 @@ appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, $state, $cookies, ProgressBarService, sweet) ->
   @distributorKey = undefined
-
   #####################################
   # Managed
   #####################################
@@ -26,6 +25,19 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
   @unmanagedDevicesNext = null
   @unmanagedDevices = []
   @unmanagedMacDevices = {}
+
+  @refreshManagedDevices = () =>
+    @devicesPrev = null
+    @devicesNext = null
+    DevicesService.deviceCache.removeAll()
+    @getManagedDevices(@distributorKey, @devicesPrev, @devicesNext)
+    
+  @refreshUnmanagedDevices = () =>
+    @unmanagedDevicesPrev = null
+    @unmanagedDevicesNext = null
+    DevicesService.deviceCache.removeAll()
+    @getUnmanagedDevices(@distributorKey, @unmanagedDevicesPrev, @unmanagedDevicesNext)
+
 
   @changeRadio = (unmanaged) ->
     if unmanaged
@@ -104,7 +116,6 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
           DevicesService.searchDevicesByPartialSerial(@distributorKey, partial, unmanaged)
           .then (res) =>
             result = res["serial_number_matches"]
-
             if unmanaged
               @unmanagedSerialDevices = @convertArrayToDictionary(result, false)
             else
@@ -123,6 +134,10 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
               @macDevices = @convertArrayToDictionary(result, true)
 
             return [each.mac for each in result][0]
+      else
+        return []
+    else
+      return []
 
 
   @getManagedDevices = (key, prev, next) ->
