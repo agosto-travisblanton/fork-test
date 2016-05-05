@@ -478,7 +478,13 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 device.heartbeat_interval_minutes = heartbeat_interval_minutes
             check_for_content_interval_minutes = request_json.get('checkContentInterval')
             if check_for_content_interval_minutes is not None and check_for_content_interval_minutes > -1:
-                device.check_for_content_interval_minutes = check_for_content_interval_minutes
+                if device.check_for_content_interval_minutes != check_for_content_interval_minutes:
+                    device.check_for_content_interval_minutes = check_for_content_interval_minutes
+                    change_intent(
+                        gcm_registration_id=device.gcm_registration_id,
+                        payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                        device_urlsafe_key=device_urlsafe_key,
+                        host=self.request.host_url)
             customer_display_name = request_json.get('customerDisplayName')
             if customer_display_name:
                 device.customer_display_name = customer_display_name
