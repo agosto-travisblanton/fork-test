@@ -97,12 +97,3 @@ indexes:
   properties:
   - name: device_urlsafe_key
   - name: posted
-
-- kind: ChromeOsDevice
-  properties:
-  - name: archived
-  - name: is_unmanaged_device
-  - name: tenant_key
-  - name: __key__
-    direction: desc
-
