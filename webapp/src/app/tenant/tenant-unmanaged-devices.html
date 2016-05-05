@@ -42,8 +42,7 @@
                 <div class="col-md-4">
                   <md-radio-button value="Serial Number"
                                    class="md-primary"
-                                   ng-disabled="true"
-                  >
+                                   ng-disabled="true">
                     Serial Number
                   </md-radio-button>
                 </div>
@@ -91,8 +90,16 @@
               <md-button class="md-raised md-primary"
                          ng-disabled="vm.disabled"
                          ng-click="vm.prepareForEditView(vm.searchText)">
-                OPEN
+
+                <div ng-if="!vm.loadingDisabled">
+                  OPEN
+
+                </div>
+                <div ng-if="vm.loadingDisabled">
+                  Loading...
+                </div>
               </md-button>
+
             </div>
           </div>
         </md-card-content>

@@ -89,14 +89,20 @@
               <md-button class="md-raised md-primary"
                          ng-disabled="vm.disabled"
                          ng-click="vm.prepareForEditView(vm.searchText)">
-                OPEN
+
+                <div ng-if="!vm.loadingDisabled">
+                  OPEN
+
+                </div>
+                <div ng-if="vm.loadingDisabled">
+                  Loading...
+                </div>
               </md-button>
             </div>
           </div>
         </md-card-content>
       </md-card>
       <md-card>
-
         <md-card-content>
           <table class="table table-responsive table-striped">
             <thead>
@@ -157,8 +163,6 @@
                          ng-click="vm.paginateCall(true)">Next
               </md-button>
             </div>
-
-
           </div>
         </md-card-content>
       </md-card>
