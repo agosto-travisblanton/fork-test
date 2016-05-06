@@ -11,9 +11,9 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, $cookies, Distribu
   @capitalizeFirstLetter = (string) ->
     string.charAt(0).toUpperCase() + string.slice(1)
 
-  vm.giveOptionToChangeDistributor = () =>
+  vm.giveOptionToChangeDistributor = () ->
     distributorsPromise = DistributorsService.fetchAllByUser(SessionsService.currentUserKey)
-    distributorsPromise.then (data) =>
+    distributorsPromise.then (data) ->
       vm.has_multiple_distributors = data.length > 1
       vm.loading = false
 
