@@ -19,8 +19,8 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangula
               return
             return
         )
-        
-        @deviceByTenantCache = CacheFactory('eviceByTenantCache',
+      if !CacheFactory.get('deviceByTenantCache')
+        @deviceByTenantCache = CacheFactory('deviceByTenantCache',
           maxAge: 60 * 60 * 1000
           deleteOnExpire: 'aggressive'
           storageMode: 'localStorage'
