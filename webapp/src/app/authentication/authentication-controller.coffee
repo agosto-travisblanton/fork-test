@@ -3,11 +3,13 @@
 app = angular.module 'skykitProvisioning'
 
 app.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
-    identity,
-    sweet,
-    SessionsService,
-    ProgressBarService) ->
-  
+  identity,
+  sweet,
+  SessionsService,
+  ProgressBarService,
+  ProofPlayService,
+  DevicesService,
+  TenantsService) ->
   @onGooglePlusSignInSuccess = (event, authResult) =>
     unless @googlePlusSignInButtonClicked
       ProgressBarService.start()
@@ -34,6 +36,10 @@ app.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
 
   @loginSuccess = (response) ->
     ProgressBarService.complete()
+    ProofPlayService.proofplayCache.removeAll()
+    TenantsService.tenantCache.removeAll()
+    DevicesService.deviceCache.removeAll()
+    DevicesService.deviceByTenantCache.removeAll()
     $state.go 'distributor_selection'
 
   @loginFailure = () ->

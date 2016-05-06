@@ -2,7 +2,16 @@
 
 appModule = angular.module 'skykitProvisioning'
 
-appModule.controller "DistributorSelectorCtrl", ($scope, $log, $state, $cookies, DistributorsService, SessionsService, ToastsService) ->
+appModule.controller "DistributorSelectorCtrl", (
+  $scope, 
+  $log, 
+  $state, 
+  DistributorsService, 
+  SessionsService, 
+  ProofPlayService,
+  TenantsService,
+  DevicesService,
+  ToastsService) ->
   @distributors = []
   @currentDistributor = undefined
   @loading = true
@@ -19,6 +28,10 @@ appModule.controller "DistributorSelectorCtrl", ($scope, $log, $state, $cookies,
 
 
   @selectDistributor = (distributor) =>
+    ProofPlayService.proofplayCache.removeAll()
+    TenantsService.tenantCache.removeAll()
+    DevicesService.deviceCache.removeAll()
+    DevicesService.deviceByTenantCache.removeAll()
     @currentDistributor = distributor
     DistributorsService.currentDistributor = @currentDistributor
     $cookies.put('currentDistributorName', @currentDistributor.name)

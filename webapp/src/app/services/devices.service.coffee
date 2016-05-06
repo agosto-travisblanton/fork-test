@@ -7,8 +7,6 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangula
       @SERVICE_NAME = 'devices'
       @uriBase = 'v1/devices'
       if !CacheFactory.get('deviceCache')
-        distributorKey = $cookies.get('currentDistributorKey')
-
         @deviceCache = CacheFactory('deviceCache',
           maxAge:  60 * 60 * 1000
           deleteOnExpire: 'aggressive'
@@ -19,6 +17,7 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangula
               return
             return
         )
+
       if !CacheFactory.get('deviceByTenantCache')
         @deviceByTenantCache = CacheFactory('deviceByTenantCache',
           maxAge: 60 * 60 * 1000
