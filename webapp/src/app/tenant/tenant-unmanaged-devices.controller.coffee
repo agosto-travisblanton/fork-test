@@ -122,12 +122,13 @@ appModule.controller 'TenantUnmanagedDevicesCtrl',
 
     @controlOpenButton = (isMatch) =>
       @disabled = !isMatch
-
+      @loadingDisabled = false
 
     @isResourceValid = (resource) ->
       if resource
         if resource.length > 2
           mac = @selectedButton == "MAC"
+          @loadingDisabled = true
 
           if mac
             DevicesService.matchDevicesByFullMacByTenant(@tenantKey, resource, true)
