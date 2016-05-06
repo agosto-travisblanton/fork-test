@@ -169,13 +169,18 @@ application = WSGIApplication(
               handler_method='content_delete',
               methods=['POST']
               ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/content-update',
+              handler='handlers.device_commands_handler.DeviceCommandsHandler',
+              name='device-update-content-command',
+              handler_method='content_update',
+              methods=['POST']
+              ),
         Route(r'/api/v1/devices/<device_urlsafe_key>/commands/refresh-device-representation',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
               name='refresh-device-representation-command',
               handler_method='refresh_device_representation',
               methods=['POST']
               ),
-
 
         ############################################################
         # DISTRIBUTOR DEVICE ROUTES

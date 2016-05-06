@@ -294,6 +294,8 @@ app_PLAYER_POWER_OFF_COMMAND = 'skykit.com/skdchromeapp/tv/off'
 
 app_PLAYER_DELETE_CONTENT_COMMAND = 'skykit.com/skdchromeapp/content/delete'
 
+app_PLAYER_UPDATE_CONTENT_COMMAND = 'skykit.com/skdchromeapp/update/content'
+
 app_PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND = 'skykit.com/skdchromeapp/update/provisioning'
 
 app_PLAYER_HEARTBEAT_INTERVAL_MINUTES = 2
