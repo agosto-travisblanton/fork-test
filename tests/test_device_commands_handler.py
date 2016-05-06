@@ -1,4 +1,5 @@
 from env_setup import setup_test_paths
+from handlers.device_commands_handler import DeviceCommandsHandler
 
 setup_test_paths()
 
@@ -80,19 +81,22 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         request_body = {}
         with self.assertRaises(AppError) as context:
             self.app.post(self.post_uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        self.assertTrue('400 DeviceCommandsHandler: Invalid intent' in context.exception.message)
+        message = '400 DeviceCommandsHandler.post: Invalid intent.'
+        self.assertTrue(message in context.exception.message)
 
     def test_post_empty_string_intent_returns_bad_request(self):
         request_body = {'intent': ''}
         with self.assertRaises(AppError) as context:
             self.app.post(self.post_uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        self.assertTrue('400 DeviceCommandsHandler: Invalid intent' in context.exception.message)
+        message = '400 DeviceCommandsHandler.post: Invalid intent.'
+        self.assertTrue(message in context.exception.message)
 
     def test_post_wrong_payload_returns_bad_request(self):
         request_body = {'wrong_intent': self.some_intent}
         with self.assertRaises(AppError) as context:
             self.app.post(self.post_uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        self.assertTrue('400 DeviceCommandsHandler: Invalid intent' in context.exception.message)
+        message = '400 DeviceCommandsHandler.post: Invalid intent.'
+        self.assertTrue(message in context.exception.message)
 
     def test_post_bogus_key_returns_not_found(self):
         request_body = {'intent': self.some_intent}
@@ -103,14 +107,16 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
                                        {'device_urlsafe_key': bogus_key})
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        self.assertTrue("404 DeviceCommandsHandler: Device not found with key: {0}".format(bogus_key)
-                        in context.exception.message)
+        message = 'Bad response: 404 post command not executed because device not found with key: {0}'.format(
+            bogus_key
+        )
+        self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
-    ## device reset
+    ## reset
     ##################################################################################################################
 
-    def test_post_device_reset_returns_ok_status(self):
+    def test_reset_returns_ok_status(self):
         when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
                                                      config.PLAYER_RESET_COMMAND).thenReturn(None)
         uri = application.router.build(None,
@@ -121,7 +127,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         response = self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
         self.assertOK(response)
 
-    def test_post_device_reset_with_bogus_device_key_returns_not_found_status(self):
+    def test_reset_with_bogus_device_key_returns_not_found_status(self):
         when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
                                                      config.PLAYER_RESET_COMMAND).thenReturn(None)
         bogus_key = '0AXC19Z0DE'
@@ -132,14 +138,16 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         request_body = {}
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        self.assertTrue("404 DeviceCommandsHandler reset: Device not found with key: {0}".format(bogus_key)
-                        in context.exception.message)
+        message = 'Bad response: 404 reset command not executed because device not found with key: {0}'.format(
+            bogus_key
+        )
+        self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
-    ## device delete_content
+    ## delete_content
     ##################################################################################################################
 
-    def test_post_device_delete_content_returns_ok_status(self):
+    def test_delete_content_returns_ok_status(self):
         when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
                                                      config.PLAYER_DELETE_CONTENT_COMMAND).thenReturn(None)
         uri = application.router.build(None,
@@ -150,7 +158,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         response = self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
         self.assertOK(response)
 
-    def test_post_device_delete_content_with_bogus_device_key_returns_not_found_status(self):
+    def test_delete_content_with_bogus_device_key_returns_not_found_status(self):
         when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
                                                      config.PLAYER_DELETE_CONTENT_COMMAND).thenReturn(None)
         bogus_key = '0AXC19Z0DE'
@@ -161,15 +169,17 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         request_body = {}
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        self.assertTrue("404 DeviceCommandsHandler content_delete: Device not found with key: {0}".format(bogus_key)
-                        in context.exception.message)
 
+        message = 'Bad response: 404 content_delete command not executed because device not found with key: {0}'.format(
+            bogus_key
+        )
+        self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
-    ## device volume
+    ## volume
     ##################################################################################################################
 
-    def test_post_device_volume_returns_ok_status(self):
+    def test_volume_returns_ok_status(self):
         when(device_message_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
         uri = application.router.build(None,
                                        'device-volume-command',
@@ -182,7 +192,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         response = self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
         self.assertOK(response)
 
-    def test_post_device_volume_returns_bad_request_status_with_below_range_volume(self):
+    def test_volume_returns_bad_request_status_with_below_range_volume(self):
         when(device_message_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
         uri = application.router.build(None,
                                        'device-volume-command',
@@ -191,9 +201,10 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         request_body = {'volume': 0}
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        self.assertTrue('400 DeviceCommandsHandler: Invalid volume.' in context.exception.message)
+        message = 'DeviceCommandsHandler.volume: Invalid volume.'
+        self.assertTrue(message in context.exception.message)
 
-    def test_post_device_volume_returns_bad_request_status_with_above_range_volume(self):
+    def test_volume_returns_bad_request_status_with_above_range_volume(self):
         when(device_message_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
         uri = application.router.build(None,
                                        'device-volume-command',
@@ -202,9 +213,10 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         request_body = {'volume': 101}
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        self.assertTrue('400 DeviceCommandsHandler: Invalid volume.' in context.exception.message)
+        message = 'DeviceCommandsHandler.volume: Invalid volume.'
+        self.assertTrue(message in context.exception.message)
 
-    def test_post_device_volume_returns_bad_request_status_with_volume_none(self):
+    def test_volume_returns_bad_request_status_with_volume_none(self):
         when(device_message_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
         uri = application.router.build(None,
                                        'device-volume-command',
@@ -213,9 +225,10 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         request_body = {'volume': None}
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        self.assertTrue('400 DeviceCommandsHandler: Invalid volume.' in context.exception.message)
+        message = 'DeviceCommandsHandler.volume: Invalid volume.'
+        self.assertTrue(message in context.exception.message)
 
-    def test_post_device_volume_with_bogus_device_key_returns_not_found_status(self):
+    def test_volume_with_bogus_device_key_returns_not_found_status(self):
         when(device_message_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
         bogus_key = '0AXC19Z0DE'
         uri = application.router.build(None,
@@ -225,14 +238,16 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         request_body = {'volume': 5}
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        self.assertTrue("404 DeviceCommandsHandler volume: Device not found with key: {0}".format(bogus_key)
-                        in context.exception.message)
+        message = 'Bad response: 404 volume command not executed because device not found with key: {0}'.format(
+            bogus_key
+        )
+        self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
     ## device custom command
     ##################################################################################################################
 
-    def test_post_device_custom_command_returns_ok_status(self):
+    def test_custom_command_returns_ok_status(self):
         when(device_message_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
         uri = application.router.build(None,
                                        'device-custom-command',
@@ -242,7 +257,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         response = self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
         self.assertOK(response)
 
-    def test_post_device_volume_returns_bad_request_status_with_command_none(self):
+    def test_custom_returns_bad_request_status_with_command_none(self):
         when(device_message_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
         uri = application.router.build(None,
                                        'device-custom-command',
@@ -253,7 +268,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
         self.assertTrue('400 DeviceCommandsHandler: Invalid command.' in context.exception.message)
 
-    def test_post_device_custom_command_with_bogus_device_key_returns_not_found_status(self):
+    def test_custom_command_with_bogus_device_key_returns_not_found_status(self):
         when(device_message_processor).change_intent(any_matcher(str), any_matcher(str)).thenReturn(None)
         bogus_key = '0AXC19Z0DE'
         uri = application.router.build(None,
@@ -263,13 +278,16 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         request_body = {'command': 'skykit.com/skdchromeapp/update/content'}
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        self.assertTrue("404 DeviceCommandsHandler command: Device not found with key: {0}".format(bogus_key)
-                        in context.exception.message)
+        message = 'Bad response: 404 custom command not executed because device not found with key: {0}'.format(
+            bogus_key
+        )
+        self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
     ## power_on
     ##################################################################################################################
-    def test_post_device_power_on_returns_ok_status(self):
+
+    def test_power_on_returns_ok_status(self):
         when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
                                                      config.PLAYER_POWER_ON_COMMAND).thenReturn(None)
         uri = application.router.build(None,
@@ -280,7 +298,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         response = self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
         self.assertOK(response)
 
-    def test_post_device_power_on_with_bogus_device_key_returns_not_found_status(self):
+    def test_power_on_with_bogus_device_key_returns_not_found_status(self):
         when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
                                                      config.PLAYER_POWER_ON_COMMAND).thenReturn(None)
         bogus_key = '0AXC19Z0DE'
@@ -291,13 +309,16 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         request_body = {}
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        self.assertTrue("404 DeviceCommandsHandler power_on: Device not found with key: {0}".format(bogus_key)
-                        in context.exception.message)
+        message = 'Bad response: 404 power_on command not executed because device not found with key: {0}'.format(
+            bogus_key
+        )
+        self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
     ## power_off
     ##################################################################################################################
-    def test_post_device_power_off_returns_ok_status(self):
+
+    def test_power_off_returns_ok_status(self):
         when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
                                                      config.PLAYER_POWER_OFF_COMMAND).thenReturn(None)
         uri = application.router.build(None,
@@ -308,7 +329,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         response = self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
         self.assertOK(response)
 
-    def test_post_device_power_off_with_bogus_device_key_returns_not_found_status(self):
+    def test_power_off_with_bogus_device_key_returns_not_found_status(self):
         when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
                                                      config.PLAYER_POWER_OFF_COMMAND).thenReturn(None)
         bogus_key = '0AXC19Z0DE'
@@ -319,5 +340,60 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         request_body = {}
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        self.assertTrue("404 DeviceCommandsHandler power_off: Device not found with key: {0}".format(bogus_key)
-                        in context.exception.message)
+        message = 'Bad response: 404 power_off command not executed because device not found with key: {0}'.format(
+            bogus_key
+        )
+        self.assertTrue(message in context.exception.message)
+
+    ##################################################################################################################
+    ## refresh_device_representation
+    ##################################################################################################################
+
+    def test_refresh_device_representation_returns_ok_status(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND).thenReturn(
+            None)
+        uri = application.router.build(None,
+                                       'refresh-device-representation-command',
+                                       None,
+                                       {'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
+        request_body = {}
+        response = self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        self.assertOK(response)
+
+    def test_refresh_device_representation_with_bogus_device_key_returns_not_found_status(self):
+        command = 'refresh_device_representation'
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND).thenReturn(
+            None)
+        bogus_key = '0AXC19Z0DE'
+        uri = application.router.build(None,
+                                       'refresh-device-representation-command',
+                                       None,
+                                       {'device_urlsafe_key': bogus_key})
+        request_body = {}
+        with self.assertRaises(AppError) as context:
+            self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        message = 'Bad response: 404 {0} command not executed because device not found with key: {1}'.format(
+            command, bogus_key
+        )
+        self.assertTrue(message in context.exception.message)
+
+    ##################################################################################################################
+    ## resolve_device
+    ##################################################################################################################
+
+    def test_resolve_device_with_valid_device_key_returns_ok(self):
+        status, message, device = DeviceCommandsHandler.resolve_device(self.chrome_os_device_key.urlsafe())
+        self.assertEqual(status, 200)
+        self.assertEqual(message, 'OK')
+        self.assertEqual(device, self.chrome_os_device)
+
+    def test_resolve_device_with_invalid_device_key_returns_not_found(self):
+        bogus_key = 'ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgIDepYUKDA'
+        status, message, device = DeviceCommandsHandler.resolve_device(bogus_key)
+        expected_error_message = 'test_resolve_device_with_invalid_device_key_returns_not_found ' \
+                                 'command not executed because device not found with key: {0}'.format(bogus_key)
+        self.assertEqual(status, 404)
+        self.assertEqual(message, expected_error_message)
+        self.assertIsNone(device)
