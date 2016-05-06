@@ -315,33 +315,33 @@ appModule.controller 'DeviceDetailsCtrl', (
       $log.error "Update device command error: #{error.status } #{error.statusText}"
       sweet.show('Oops...', "We were unable to post your update device command into the player's queue.", 'error')
 
-    @onClickVolumeSendButton = () ->
+    @onVolumeChange = () ->
       ProgressBarService.start()
       promise = CommandsService.volume @deviceKey, @currentDevice.volume
-      promise.then @onVolumeSuccess(@currentDevice.volume), @onVolumeFailure
+      promise.then @onVolumeChangeSuccess(@currentDevice.volume), @onVolumeChangeFailure
 
-    @onVolumeSuccess = (level) ->
+    @onVolumeChangeSuccess = (level) ->
       ProgressBarService.complete()
-      ToastsService.showSuccessToast "We posted a volume level command of #{level} into the player's queue."
+      ToastsService.showSuccessToast "We posted a volume change command of #{level} into the player's queue."
 
-    @onVolumeFailure = (error) ->
+    @onVolumeChangeFailure = (error) ->
       ProgressBarService.complete()
-      $log.error "Volume level command error: #{error.status } #{error.statusText}"
-      sweet.show('Oops...', "We were unable to post your volume level command into the player's queue.", 'error')
+      $log.error "Volume change command error: #{error.status } #{error.statusText}"
+      sweet.show('Oops...', "We were unable to post your volume change command into the player's queue.", 'error')
 
-    @onClickCommandSendButton = () ->
+    @onCustomCommand = () ->
       ProgressBarService.start()
       promise = CommandsService.custom @deviceKey, @currentDevice.custom
-      promise.then @onCommandSuccess(@currentDevice.custom), @onCommandFailure
+      promise.then @onCustomCommandSuccess(@currentDevice.custom), @onCustomCommandFailure
 
-    @onCommandSuccess = (command) ->
+    @onCustomCommandSuccess = (command) ->
       ProgressBarService.complete()
-      ToastsService.showSuccessToast "We posted your command '#{command}' into the player's queue."
+      ToastsService.showSuccessToast "We posted your custom command '#{command}' into the player's queue."
 
-    @onCommandFailure = (error) ->
+    @onCustomCommandFailure = (error) ->
       ProgressBarService.complete()
-      $log.error "Command error: #{error.status } #{error.statusText}"
-      sweet.show('Oops...', "We were unable to post your command into the player's queue.", 'error')
+      $log.error "Custom command error: #{error.status } #{error.statusText}"
+      sweet.show('Oops...', "We were unable to post your custom command into the player's queue.", 'error')
 
     @onClickRefreshButton = () ->
       ProgressBarService.start()
