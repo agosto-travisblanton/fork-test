@@ -1,7 +1,6 @@
 'use strict'
 appModule = angular.module('skykitProvisioning')
-appModule.controller 'DeviceDetailsCtrl', (
-  $log,
+appModule.controller 'DeviceDetailsCtrl', ($log,
   $stateParams,
   $state,
   DevicesService,
@@ -23,10 +22,10 @@ appModule.controller 'DeviceDetailsCtrl', (
     @dayRange = 30
     @issues = []
     @pickerOptions = "{widgetPositioning: {vertical:'bottom'}, showTodayButton: true, sideBySide: true, icons:{
-        next:'glyphicon glyphicon-arrow-right',
-        previous:'glyphicon glyphicon-arrow-left',
-        up:'glyphicon glyphicon-arrow-up',
-        down:'glyphicon glyphicon-arrow-down'}}"
+          next:'glyphicon glyphicon-arrow-right',
+          previous:'glyphicon glyphicon-arrow-left',
+          up:'glyphicon glyphicon-arrow-up',
+          down:'glyphicon glyphicon-arrow-down'}}"
     @timezones = []
     @selectedTimezone = undefined
     now = new Date()
@@ -231,12 +230,12 @@ appModule.controller 'DeviceDetailsCtrl', (
     # Commands Tab
     #####################
 
-    @onResetContent = () ->
+    @onResetContent = ->
       ProgressBarService.start()
       promise = CommandsService.contentDelete @deviceKey
       promise.then @onResetContentSuccess, @onResetContentFailure
 
-    @onResetContentSuccess = () ->
+    @onResetContentSuccess = ->
       ProgressBarService.complete()
       ToastsService.showSuccessToast "We posted your reset content command into the player's queue."
 
@@ -245,12 +244,12 @@ appModule.controller 'DeviceDetailsCtrl', (
       $log.error "Reset content command error: #{error.status } #{error.statusText}"
       sweet.show('Oops...', "We were unable to post your reset content command into the player's queue.", 'error')
 
-    @onUpdateContent = () ->
+    @onUpdateContent = ->
       ProgressBarService.start()
       promise = CommandsService.contentUpdate @deviceKey
       promise.then @onUpdateContentSuccess, @onUpdateContentFailure
 
-    @onUpdateContentSuccess = () ->
+    @onUpdateContentSuccess = ->
       ProgressBarService.complete()
       ToastsService.showSuccessToast "We posted your update content command into the player's queue."
 
@@ -259,12 +258,12 @@ appModule.controller 'DeviceDetailsCtrl', (
       $log.error "Content update command error: #{error.status } #{error.statusText}"
       sweet.show('Oops...', "We were unable to post your update content command into the player's queue.", 'error')
 
-    @onResetPlayer = () ->
+    @onResetPlayer = ->
       ProgressBarService.start()
       promise = CommandsService.reset @deviceKey
       promise.then @onResetPlayerSuccess, @onResetPlayerFailure
 
-    @onResetPlayerSuccess = () ->
+    @onResetPlayerSuccess = ->
       ProgressBarService.complete()
       ToastsService.showSuccessToast "We posted your reset player command into the player's queue."
 
@@ -273,12 +272,12 @@ appModule.controller 'DeviceDetailsCtrl', (
       $log.error "Reset player command error: #{error.status } #{error.statusText}"
       sweet.show('Oops...', "We were unable to post your reset player command into the player's queue.", 'error')
 
-    @onPanelOn = () ->
+    @onPanelOn = ->
       ProgressBarService.start()
       promise = CommandsService.powerOn @deviceKey
       promise.then @onPanelOnSuccess, @onPanelOnFailure
 
-    @onPanelOnSuccess = () ->
+    @onPanelOnSuccess = ->
       ProgressBarService.complete()
       ToastsService.showSuccessToast "We posted a panel on command into the player's queue."
 
@@ -287,12 +286,12 @@ appModule.controller 'DeviceDetailsCtrl', (
       $log.error "Panel on command error: #{error.status } #{error.statusText}"
       sweet.show('Oops...', "We were unable to post your panel on command into the player's queue.", 'error')
 
-    @onPanelOff = () ->
+    @onPanelOff = ->
       ProgressBarService.start()
       promise = CommandsService.powerOff @deviceKey
       promise.then @onPanelOffSuccess, @onPanelOffFailure
 
-    @onPanelOffSuccess = () ->
+    @onPanelOffSuccess = ->
       ProgressBarService.complete()
       ToastsService.showSuccessToast "We posted a panel off command into the player's queue."
 
@@ -301,12 +300,12 @@ appModule.controller 'DeviceDetailsCtrl', (
       $log.error "Panel off command error: #{error.status } #{error.statusText}"
       sweet.show('Oops...', "We were unable to post your panel off command into the player's queue.", 'error')
 
-    @onUpdateDevice = () ->
+    @onUpdateDevice = ->
       ProgressBarService.start()
       promise = CommandsService.updateDevice @deviceKey
       promise.then @onUpdateDeviceSuccess, @onUpdateDeviceFailure
 
-    @onUpdateDeviceSuccess = () ->
+    @onUpdateDeviceSuccess = ->
       ProgressBarService.complete()
       ToastsService.showSuccessToast "We posted an update device command into the player's queue."
 
@@ -315,7 +314,7 @@ appModule.controller 'DeviceDetailsCtrl', (
       $log.error "Update device command error: #{error.status } #{error.statusText}"
       sweet.show('Oops...', "We were unable to post your update device command into the player's queue.", 'error')
 
-    @onVolumeChange = () ->
+    @onVolumeChange = ->
       ProgressBarService.start()
       promise = CommandsService.volume @deviceKey, @currentDevice.volume
       promise.then @onVolumeChangeSuccess(@currentDevice.volume), @onVolumeChangeFailure
@@ -329,7 +328,7 @@ appModule.controller 'DeviceDetailsCtrl', (
       $log.error "Volume change command error: #{error.status } #{error.statusText}"
       sweet.show('Oops...', "We were unable to post your volume change command into the player's queue.", 'error')
 
-    @onCustomCommand = () ->
+    @onCustomCommand = ->
       ProgressBarService.start()
       promise = CommandsService.custom @deviceKey, @currentDevice.custom
       promise.then @onCustomCommandSuccess(@currentDevice.custom), @onCustomCommandFailure
@@ -365,6 +364,5 @@ appModule.controller 'DeviceDetailsCtrl', (
       ProgressBarService.complete()
       ToastsService.showInfoToast 'We were unable to refresh the device issues list at this time.'
       $log.error "Failure to refresh device issues: #{error.status } #{error.statusText}"
-
 
     @
