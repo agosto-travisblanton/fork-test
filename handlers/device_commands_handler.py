@@ -117,9 +117,9 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
         if device:
             change_intent(
                 gcm_registration_id=device.gcm_registration_id,
-                    payload=config.PLAYER_UPDATE_CONTENT_COMMAND,
-                    device_urlsafe_key=device_urlsafe_key,
-                    host=self.request.host_url)
+                payload=config.PLAYER_UPDATE_CONTENT_COMMAND,
+                device_urlsafe_key=device_urlsafe_key,
+                host=self.request.host_url)
         self.response.set_status(status, message)
 
     @requires_api_token
