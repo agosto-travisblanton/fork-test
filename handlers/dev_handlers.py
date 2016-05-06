@@ -11,8 +11,8 @@ from provisioning_env import (
 )
 
 USER_EMAIL = 'daniel.ternyak@agosto.com'
-DISTRIBUTOR_NAME = 'Agosto'
-SECOND_DISTRIBUTOR = "SkyKit"
+DISTRIBUTOR_NAME = 'Dunder'
+SECOND_DISTRIBUTOR = "Mifflin"
 DOMAIN = 'local.skykit.com'
 TENANT_NAME = 'Acme, Inc.'
 TENANT_CODE = 'acme_inc'
