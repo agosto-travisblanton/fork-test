@@ -5,6 +5,10 @@ from app_config import config
 from models import User, Distributor, Domain, Tenant, ChromeOsDevice, PlayerCommandEvent, TenantEntityGroup, \
     DeviceIssueLog, DistributorEntityGroup, Location, DistributorUser
 import random
+from provisioning_env import (
+    on_development_server,
+    on_integration_server
+)
 
 USER_EMAIL = 'daniel.ternyak@agosto.com'
 DISTRIBUTOR_NAME = 'Agosto'
@@ -19,6 +23,7 @@ MAC_ADDRESS = '54271e619346'
 UNMANAGED_MAC_ADDRESS = '04271e61934b'
 UNMANAGED_GCM_REGISTRATION_ID = '3c70a8d70a6dfa6df76dfas2'
 SERIAL_NUMBER = 'E6MSCX057790'
+array_of_devices_with_values = []
 
 
 def create_email(first, last):
@@ -53,6 +58,9 @@ def kick_off(user_first, user_last):
     print "COMPLETED SEED SCRIPT"
     print "-------------------------------------------------------------------------------"
     print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    print "THESE ARE THE DEVICES WITH EVENTS AND COMMANDS"
+    global array_of_devices_with_values
+    print array_of_devices_with_values
 
 
 def run_delete_multi_on_model(model):
@@ -206,8 +214,9 @@ def make_data_for_a_distributor():
             print 'Managed device created with MAC ' + str(i) + MAC_ADDRESS
 
             if random.randint(1, 10) == 1:
-                with open('devices_with_events', 'w') as f:
-                    f.write(str(managed_device.serial_number) + "\n")
+                global array_of_devices_with_values
+                array_of_devices_with_values.append(str(managed_device.serial_number))
+
                 for z in range(1, 101):
                     issue = DeviceIssueLog.create(device_key=managed_device.key,
                                                   category=config.DEVICE_ISSUE_PLAYER_DOWN,

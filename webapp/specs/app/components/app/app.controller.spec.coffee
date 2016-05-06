@@ -5,8 +5,10 @@ describe 'AppController', ->
 
   $controller = undefined
   controller = undefined
+  $window = undefined
   $mdSidenav = undefined
   $state = undefined
+
   sideNavFunction = {
     toggle: ->
     close: ->
@@ -18,10 +20,12 @@ describe 'AppController', ->
       sideNavSpy = jasmine.createSpy($delegate).and.returnValue sideNavFunction
       sideNavSpy
 
-  beforeEach inject (_$controller_, _$state_, _$mdSidenav_) ->
+
+  beforeEach inject (_$controller_, _$state_, _$mdSidenav_, _$window_) ->
     $controller = _$controller_
     $state = _$state_
     $mdSidenav = _$mdSidenav_
+    $window = _$window_
 
   describe '.initialize', ->
     beforeEach ->
@@ -31,6 +35,11 @@ describe 'AppController', ->
 
     it 'calls getIdentity', ->
       expect(controller.getIdentity).toHaveBeenCalled()
+
+    it 'determines isCurrentURLDistributorSelector', ->
+      a = controller.isCurrentURLDistributorSelector()
+      expect(a).toBe false
+  
 
   describe '.toggleSidenav', ->
     beforeEach ->
