@@ -279,7 +279,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
     @onPanelOnSuccess = ->
       ProgressBarService.complete()
-      ToastsService.showSuccessToast "We posted a panel on command into the player's queue."
+      ToastsService.showSuccessToast "We posted your panel on command into the player's queue."
 
     @onPanelOnFailure = (error) ->
       ProgressBarService.complete()
@@ -293,7 +293,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
     @onPanelOffSuccess = ->
       ProgressBarService.complete()
-      ToastsService.showSuccessToast "We posted a panel off command into the player's queue."
+      ToastsService.showSuccessToast "We posted your panel off command into the player's queue."
 
     @onPanelOffFailure = (error) ->
       ProgressBarService.complete()
@@ -307,7 +307,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
     @onUpdateDeviceSuccess = ->
       ProgressBarService.complete()
-      ToastsService.showSuccessToast "We posted an update device command into the player's queue."
+      ToastsService.showSuccessToast "We posted your update device command into the player's queue."
 
     @onUpdateDeviceFailure = (error) ->
       ProgressBarService.complete()
@@ -321,7 +321,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
 
     @onVolumeChangeSuccess = (level) ->
       ProgressBarService.complete()
-      ToastsService.showSuccessToast "We posted a volume change command of #{level} into the player's queue."
+      ToastsService.showSuccessToast "We posted your volume change command of #{level} into the player's queue."
 
     @onVolumeChangeFailure = (error) ->
       ProgressBarService.complete()

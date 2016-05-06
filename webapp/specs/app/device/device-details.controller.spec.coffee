@@ -594,7 +594,7 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'displays a toast indicating command was sent to player', ->
         expect(ToastsService.showSuccessToast).toHaveBeenCalledWith(
-          "We posted a panel on command into the player's queue.")
+          "We posted your panel on command into the player's queue.")
 
     describe '.onPanelOnFailure', ->
       error = {status: 404, statusText: 'Not Found'}
@@ -640,7 +640,7 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'displays a toast indicating command was sent to player', ->
         expect(ToastsService.showSuccessToast).toHaveBeenCalledWith(
-          "We posted a panel off command into the player's queue.")
+          "We posted your panel off command into the player's queue.")
 
     describe '.onPanelOffFailure', ->
       error = {status: 404, statusText: 'Not Found'}
@@ -686,7 +686,7 @@ describe 'DeviceDetailsCtrl', ->
 
       it 'displays a toast indicating command was sent to player', ->
         expect(ToastsService.showSuccessToast).toHaveBeenCalledWith(
-          "We posted an update device command into the player's queue.")
+          "We posted your update device command into the player's queue.")
 
     describe '.onUpdateDeviceFailure', ->
       error = {status: 404, statusText: 'Not Found'}
@@ -732,7 +732,7 @@ describe 'DeviceDetailsCtrl', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
       it 'displays a toast indicating volume command was sent to the player queue', ->
-        message = "We posted a volume change command of #{controller.currentDevice.volume} into the player's queue."
+        message = "We posted your volume change command of #{controller.currentDevice.volume} into the player's queue."
         expect(ToastsService.showSuccessToast).toHaveBeenCalledWith message
 
     describe '.onVolumeChangeFailure', ->
