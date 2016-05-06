@@ -46,12 +46,11 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
 
     @requires_api_token
     def volume(self, device_urlsafe_key):
-        method_name = inspect.stack()[0][3]
         request_json = json.loads(self.request.body)
         volume = request_json.get('volume')
         if volume is None or volume == '' or self.is_valid_volume(volume) is False:
             status = 400
-            message = 'DeviceCommandsHandler.{0}: Invalid volume.'.format(method_name)
+            message = 'DeviceCommandsHandler.volume: Invalid volume.'
         else:
             status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
             if device:
@@ -109,6 +108,17 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
                     payload=config.PLAYER_DELETE_CONTENT_COMMAND,
                     device_urlsafe_key=device_urlsafe_key,
                     host=self.request.host_url)
+        self.response.set_status(status, message)
+
+    @requires_api_token
+    def content_update(self, device_urlsafe_key):
+        status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
+        if device:
+            change_intent(
+                gcm_registration_id=device.gcm_registration_id,
+                payload=config.PLAYER_UPDATE_CONTENT_COMMAND,
+                device_urlsafe_key=device_urlsafe_key,
+                host=self.request.host_url)
         self.response.set_status(status, message)
 
     @requires_api_token

@@ -32,7 +32,7 @@ angular.module('skykitProvisioning')
           @proofplayCache.put(url, data)
           deferred.resolve(data)
 
-        res.catch (err) =>
+        res.catch (err) ->
           deferred.reject(err)
 
       else
