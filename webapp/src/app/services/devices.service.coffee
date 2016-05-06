@@ -10,11 +10,11 @@ angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangula
         distributorKey = $cookies.get('currentDistributorKey')
 
         @deviceCache = CacheFactory('deviceCache',
-          maxAge: 60 * 60 * 1000
+          maxAge:  60 * 60 * 1000
           deleteOnExpire: 'aggressive'
           storageMode: 'localStorage'
-          onExpire: (key, value) ->
-            $http.get(key).success (data) ->
+          onExpire: (key, value) =>
+            $http.get(key).success (data) =>
               @deviceCache.put key, data
               return
             return

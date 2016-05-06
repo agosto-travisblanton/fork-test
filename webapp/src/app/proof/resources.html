@@ -137,6 +137,10 @@
               <div ng-if="!vm.had_some_items && !vm.loading">
                 <h3>This tenant has no resources logged. Make sure your devices have
                   proof of play activated.</h3>
+                <md-button class="md-raised  md-primary"
+                           ng-click="vm.refreshResources()" style="float: right">
+                  Refresh
+                </md-button>
               </div>
             </div>
           </md-card-content>
