@@ -1,6 +1,6 @@
-hash: fbed723dbc
+hash: 3550eaa3ce
 module_yaml_files:
 - app.yaml
 - migration.yaml
 - proofplay.yaml
-version: 34-21-1
+version: 34-22-1
