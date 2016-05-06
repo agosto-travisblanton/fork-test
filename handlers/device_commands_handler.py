@@ -112,6 +112,17 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
         self.response.set_status(status, message)
 
     @requires_api_token
+    def content_update(self, device_urlsafe_key):
+        status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
+        if device:
+            change_intent(
+                gcm_registration_id=device.gcm_registration_id,
+                    payload=config.PLAYER_UPDATE_CONTENT_COMMAND,
+                    device_urlsafe_key=device_urlsafe_key,
+                    host=self.request.host_url)
+        self.response.set_status(status, message)
+
+    @requires_api_token
     def refresh_device_representation(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:

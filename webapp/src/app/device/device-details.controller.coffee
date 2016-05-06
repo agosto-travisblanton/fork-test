@@ -231,33 +231,89 @@ appModule.controller 'DeviceDetailsCtrl', (
     # Commands Tab
     #####################
 
-    @onClickResetSendButton = () ->
-      ProgressBarService.start()
-      promise = CommandsService.reset @deviceKey
-      promise.then @onResetSuccess, @onResetFailure
-
-    @onResetSuccess = () ->
-      ProgressBarService.complete()
-      ToastsService.showSuccessToast "We posted your reset command into the player's queue."
-
-    @onResetFailure = (error) ->
-      ProgressBarService.complete()
-      $log.error "Reset command error: #{error.status } #{error.statusText}"
-      sweet.show('Oops...', "We were unable to post your reset command into the player's queue.", 'error')
-
-    @onClickContentDeleteSendButton = () ->
+    @onResetContent = () ->
       ProgressBarService.start()
       promise = CommandsService.contentDelete @deviceKey
-      promise.then @onContentDeleteSuccess, @onContentDeleteFailure
+      promise.then @onResetContentSuccess, @onResetContentFailure
 
-    @onContentDeleteSuccess = () ->
+    @onResetContentSuccess = () ->
       ProgressBarService.complete()
-      ToastsService.showSuccessToast "We posted your content delete command into the player's queue."
+      ToastsService.showSuccessToast "We posted your reset content command into the player's queue."
 
-    @onContentDeleteFailure = (error) ->
+    @onResetContentFailure = (error) ->
       ProgressBarService.complete()
-      $log.error "Content delete command error: #{error.status } #{error.statusText}"
-      sweet.show('Oops...', "We were unable to post your delete content command into the player's queue.", 'error')
+      $log.error "Reset content command error: #{error.status } #{error.statusText}"
+      sweet.show('Oops...', "We were unable to post your reset content command into the player's queue.", 'error')
+
+    @onUpdateContent = () ->
+      ProgressBarService.start()
+      promise = CommandsService.contentUpdate @deviceKey
+      promise.then @onUpdateContentSuccess, @onUpdateContentFailure
+
+    @onUpdateContentSuccess = () ->
+      ProgressBarService.complete()
+      ToastsService.showSuccessToast "We posted your update content command into the player's queue."
+
+    @onUpdateContentFailure = (error) ->
+      ProgressBarService.complete()
+      $log.error "Content update command error: #{error.status } #{error.statusText}"
+      sweet.show('Oops...', "We were unable to post your update content command into the player's queue.", 'error')
+
+    @onResetPlayer = () ->
+      ProgressBarService.start()
+      promise = CommandsService.reset @deviceKey
+      promise.then @onResetPlayerSuccess, @onResetPlayerFailure
+
+    @onResetPlayerSuccess = () ->
+      ProgressBarService.complete()
+      ToastsService.showSuccessToast "We posted your reset player command into the player's queue."
+
+    @onResetPlayerFailure = (error) ->
+      ProgressBarService.complete()
+      $log.error "Reset player command error: #{error.status } #{error.statusText}"
+      sweet.show('Oops...', "We were unable to post your reset player command into the player's queue.", 'error')
+
+    @onPanelOn = () ->
+      ProgressBarService.start()
+      promise = CommandsService.powerOn @deviceKey
+      promise.then @onPanelOnSuccess, @onPanelOnFailure
+
+    @onPanelOnSuccess = () ->
+      ProgressBarService.complete()
+      ToastsService.showSuccessToast "We posted a panel on command into the player's queue."
+
+    @onPanelOnFailure = (error) ->
+      ProgressBarService.complete()
+      $log.error "Panel on command error: #{error.status } #{error.statusText}"
+      sweet.show('Oops...', "We were unable to post your panel on command into the player's queue.", 'error')
+
+    @onPanelOff = () ->
+      ProgressBarService.start()
+      promise = CommandsService.powerOff @deviceKey
+      promise.then @onPanelOffSuccess, @onPanelOffFailure
+
+    @onPanelOffSuccess = () ->
+      ProgressBarService.complete()
+      ToastsService.showSuccessToast "We posted a panel off command into the player's queue."
+
+    @onPanelOffFailure = (error) ->
+      ProgressBarService.complete()
+      $log.error "Panel off command error: #{error.status } #{error.statusText}"
+      sweet.show('Oops...', "We were unable to post your panel off command into the player's queue.", 'error')
+
+    @onUpdateDevice = () ->
+      ProgressBarService.start()
+      promise = CommandsService.updateDevice @deviceKey
+      promise.then @onUpdateDeviceSuccess, @onUpdateDeviceFailure
+
+    @onUpdateDeviceSuccess = () ->
+      ProgressBarService.complete()
+      ToastsService.showSuccessToast "We posted an update device command into the player's queue."
+
+    @onUpdateDeviceFailure = (error) ->
+      ProgressBarService.complete()
+      $log.error "Update device command error: #{error.status } #{error.statusText}"
+      sweet.show('Oops...', "We were unable to post your update device command into the player's queue.", 'error')
 
     @onClickVolumeSendButton = () ->
       ProgressBarService.start()
@@ -310,32 +366,5 @@ appModule.controller 'DeviceDetailsCtrl', (
       ToastsService.showInfoToast 'We were unable to refresh the device issues list at this time.'
       $log.error "Failure to refresh device issues: #{error.status } #{error.statusText}"
 
-    @onClickPowerOnSendButton = () ->
-      ProgressBarService.start()
-      promise = CommandsService.powerOn @deviceKey
-      promise.then @onPowerOnSuccess, @onPowerOnFailure
-
-    @onPowerOnSuccess = () ->
-      ProgressBarService.complete()
-      ToastsService.showSuccessToast "We posted a power on command into the player's queue."
-
-    @onPowerOnFailure = (error) ->
-      ProgressBarService.complete()
-      $log.error "Power on command error: #{error.status } #{error.statusText}"
-      sweet.show('Oops...', "We were unable to post your power on command into the player's queue.", 'error')
-
-    @onClickPowerOffSendButton = () ->
-      ProgressBarService.start()
-      promise = CommandsService.powerOff @deviceKey
-      promise.then @onPowerOffSuccess, @onPowerOffFailure
-
-    @onPowerOffSuccess = () ->
-      ProgressBarService.complete()
-      ToastsService.showSuccessToast "We posted a power off command into the player's queue."
-
-    @onPowerOffFailure = (error) ->
-      ProgressBarService.complete()
-      $log.error "Power off command error: #{error.status } #{error.statusText}"
-      sweet.show('Oops...', "We were unable to post your power off command into the player's queue.", 'error')
 
     @
