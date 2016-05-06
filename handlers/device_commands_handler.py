@@ -46,12 +46,11 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
 
     @requires_api_token
     def volume(self, device_urlsafe_key):
-        method_name = inspect.stack()[0][3]
         request_json = json.loads(self.request.body)
         volume = request_json.get('volume')
         if volume is None or volume == '' or self.is_valid_volume(volume) is False:
             status = 400
-            message = 'DeviceCommandsHandler.{0}: Invalid volume.'.format(method_name)
+            message = 'DeviceCommandsHandler.volume: Invalid volume.'
         else:
             status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
             if device:
