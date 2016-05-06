@@ -6,36 +6,52 @@ describe 'DistributorSelectorCtrl', ->
   $state = undefined
   promise = undefined
   $rootScope = undefined
+  $cookies = undefined
   $scope = undefined
   $log = undefined
   ToastsService = undefined
   SessionsService = undefined
   DistributorsService = undefined
+  DevicesService = undefined
+  ProofPlayService = undefined
+  TenantsService = undefined
 
   beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_,
     _$state_,
+    _$cookies_
     _$rootScope_,
     _$log_,
     _DistributorsService_,
     _SessionsService_,
-    _ToastsService_) ->
+    _ToastsService_,
+    _DevicesService_
+    _ProofPlayService_
+    _TenantsService_) ->
     $controller = _$controller_
     $state = _$state_
+    $cookies = _$cookies_
     $rootScope = _$rootScope_
     $scope = _$rootScope_.$new()
     ToastsService = _ToastsService_
     $log = _$log_
     DistributorsService = _DistributorsService_
     SessionsService = _SessionsService_
+    DevicesService = _DevicesService_
+    ProofPlayService = _ProofPlayService_
+    TenantsService = _TenantsService_
     controller = $controller 'DistributorSelectorCtrl', {
       $scope: $scope
+      $cookies: $cookies
       $log: $log
       $state: $state
       ToastsService: ToastsService
       DistributorsService: DistributorsService
       SessionsService: SessionsService
+      DevicesService: DevicesService
+      ProofPlayService: ProofPlayService
+      TenantsService: TenantsService
     }
 
   describe 'initialization', ->
@@ -55,6 +71,37 @@ describe 'DistributorSelectorCtrl', ->
       SessionsService.currentUserKey = expectedCurrentUserKey
       spyOn(DistributorsService, 'fetchAllByUser').and.callFake (currentUserKey) -> return promise
       spyOn(controller, 'selectDistributor')
+      DevicesService.deviceCache = {
+        get: () ->
+
+        put: () ->
+
+        removeAll: () ->
+      }
+
+      DevicesService.deviceByTenantCache = {
+        get: () ->
+
+        put: () ->
+
+        removeAll: () ->
+      }
+
+      ProofPlayService.proofplayCache = {
+        get: () ->
+
+        put: () ->
+
+        removeAll: () ->
+      }
+
+      TenantsService.tenantCache = {
+        get: () ->
+
+        put: () ->
+
+        removeAll: () ->
+      }
       controller.initialize()
 
     describe 'when distributors array is not a length of 1', ->
@@ -93,6 +140,37 @@ describe 'DistributorSelectorCtrl', ->
     distributor = {key: 'd78f9a0d89f7a0876ga7f6ga786g5a78df57d6f5a6dsf', name: 'some_distro'}
 
     beforeEach ->
+      DevicesService.deviceCache = {
+        get: () ->
+
+        put: () ->
+
+        removeAll: () ->
+      }
+
+      DevicesService.deviceByTenantCache = {
+        get: () ->
+
+        put: () ->
+
+        removeAll: () ->
+      }
+
+      ProofPlayService.proofplayCache = {
+        get: () ->
+
+        put: () ->
+
+        removeAll: () ->
+      }
+
+      TenantsService.tenantCache = {
+        get: () ->
+
+        put: () ->
+
+        removeAll: () ->
+      }
       spyOn($state, 'go')
       controller.selectDistributor(distributor)
       spyOn(ToastsService, 'showErrorToast')

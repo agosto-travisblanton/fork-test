@@ -11,6 +11,7 @@ appModule.controller "DistributorSelectorCtrl", (
   ProofPlayService,
   TenantsService,
   DevicesService,
+  $cookies,
   ToastsService) ->
   @distributors = []
   @currentDistributor = undefined

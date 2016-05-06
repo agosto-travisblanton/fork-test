@@ -9,6 +9,9 @@ describe 'AuthenticationCtrl', ->
   $rootScope = undefined
   $scope = undefined
   $log = undefined
+  DevicesService = undefined
+  ProofPlayService = undefined
+  TenantsService = undefined
   $timeoutMock = {
     timeout: (callback, lapse) ->
       setTimeout(callback, lapse)
@@ -33,7 +36,10 @@ describe 'AuthenticationCtrl', ->
     _$log_,
     _sweet_,
     _SessionsService_,
-    _ProgressBarService_) ->
+    _ProgressBarService_,
+    _DevicesService_
+    _ProofPlayService_
+    _TenantsService_) ->
     $controller = _$controller_
     $state = _$state_
     $rootScope = _$rootScope_
@@ -42,6 +48,10 @@ describe 'AuthenticationCtrl', ->
     sweet = _sweet_
     SessionsService = _SessionsService_
     ProgressBarService = _ProgressBarService_
+    DevicesService = _DevicesService_
+    ProofPlayService = _ProofPlayService_
+    TenantsService = _TenantsService_
+    
     spyOn($scope, '$on')
     controller = $controller 'AuthenticationCtrl', {
       $scope: $scope
@@ -51,6 +61,9 @@ describe 'AuthenticationCtrl', ->
       sweet: sweet
       SessionsService: SessionsService
       ProgressBarService: ProgressBarService
+      DevicesService: DevicesService
+      ProofPlayService: ProofPlayService
+      TenantsService: TenantsService
     }
 
   describe 'initialization', ->
@@ -69,6 +82,39 @@ describe 'AuthenticationCtrl', ->
 
     beforeEach ->
       promise = new skykitProvisioning.q.Mock()
+    
+      DevicesService.deviceCache = {
+        get: () ->
+
+        put: () ->
+        
+        removeAll: () ->
+      }
+    
+      DevicesService.deviceByTenantCache = {
+        get: () ->
+
+        put: () ->
+          
+        removeAll: () ->
+      }
+
+      ProofPlayService.proofplayCache = {
+        get: () ->
+
+        put: () ->
+          
+        removeAll: () ->
+      }
+
+      TenantsService.tenantCache = {
+        get: () ->
+
+        put: () ->
+          
+        removeAll: () ->
+      }
+      
       spyOn(ProgressBarService, 'start')
       spyOn(SessionsService, 'login').and.callFake (authResult) -> return promise
       spyOn(controller, 'loginSuccess').and.callFake (response) ->
@@ -188,6 +234,37 @@ describe 'AuthenticationCtrl', ->
     response = {}
 
     beforeEach ->
+      DevicesService.deviceCache = {
+        get: () ->
+
+        put: () ->
+        
+        removeAll: () ->
+      }
+    
+      DevicesService.deviceByTenantCache = {
+        get: () ->
+
+        put: () ->
+          
+        removeAll: () ->
+      }
+
+      ProofPlayService.proofplayCache = {
+        get: () ->
+
+        put: () ->
+          
+        removeAll: () ->
+      }
+
+      TenantsService.tenantCache = {
+        get: () ->
+
+        put: () ->
+          
+        removeAll: () ->
+      }
       spyOn(ProgressBarService, 'complete')
       spyOn(SessionsService, 'setIdentity')
       spyOn($state, 'go').and.callFake (name) ->
