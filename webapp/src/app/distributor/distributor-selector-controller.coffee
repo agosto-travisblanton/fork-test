@@ -2,17 +2,17 @@
 
 appModule = angular.module 'skykitProvisioning'
 
-appModule.controller "DistributorSelectorCtrl", (
-  $scope, 
-  $log, 
-  $state, 
-  DistributorsService, 
-  SessionsService, 
+appModule.controller "DistributorSelectorCtrl", ($scope,
+  $log,
+  $state,
+  DistributorsService,
+  SessionsService,
   ProofPlayService,
   TenantsService,
   DevicesService,
   $cookies,
   ToastsService) ->
+  # I don't know how to fix the errors in the style guide here
   @distributors = []
   @currentDistributor = undefined
   @loading = true

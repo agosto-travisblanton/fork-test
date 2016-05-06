@@ -10,6 +10,7 @@ app.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
   ProofPlayService,
   DevicesService,
   TenantsService) ->
+  # I don't know how to fix the errors in the style guide here
   @onGooglePlusSignInSuccess = (event, authResult) =>
     unless @googlePlusSignInButtonClicked
       ProgressBarService.start()
