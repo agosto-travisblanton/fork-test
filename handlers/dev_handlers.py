@@ -46,10 +46,6 @@ def kick_off(user_first, user_last):
     print "SEED SCRIPT HAS BEGUN!!! "
     print "-------------------------------------------------------------------------------"
     print "-------------------------------------------------------------------------------"
-    print "DELETING CURRENT DATASTORE!!! "
-    print "-------------------------------------------------------------------------------"
-    delete_all()
-    print "-------------------------------------------------------------------------------"
     print "CREATE DATA FOR DATASTORE!!! "
     print "-------------------------------------------------------------------------------"
     make_data_for_a_distributor()
@@ -62,29 +58,6 @@ def kick_off(user_first, user_last):
     global array_of_devices_with_values
     print array_of_devices_with_values
 
-
-def run_delete_multi_on_model(model):
-    ndb.delete_multi(
-        model.query().fetch(keys_only=True),
-    )
-    return True
-
-
-def delete_all():
-    models_to_delete = [
-        DistributorEntityGroup,
-        Location,
-        DistributorUser,
-        ChromeOsDevice,
-        User,
-        Distributor,
-        Domain,
-        Tenant,
-        PlayerCommandEvent,
-        TenantEntityGroup,
-        DeviceIssueLog
-    ]
-    return [run_delete_multi_on_model(model) for model in models_to_delete]
 
 
 def make_data_for_a_distributor():
