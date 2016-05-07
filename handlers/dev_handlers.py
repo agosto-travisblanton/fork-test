@@ -1,14 +1,9 @@
 from webapp2 import RequestHandler
 from google.appengine.ext.deferred import deferred
-from google.appengine.ext import ndb
 from app_config import config
 from models import User, Distributor, Domain, Tenant, ChromeOsDevice, PlayerCommandEvent, TenantEntityGroup, \
     DeviceIssueLog, DistributorEntityGroup, Location, DistributorUser
 import random
-from provisioning_env import (
-    on_development_server,
-    on_integration_server
-)
 
 USER_EMAIL = 'daniel.ternyak@agosto.com'
 DISTRIBUTOR_NAME = 'Dunder'
@@ -115,14 +110,16 @@ def make_data_for_a_distributor():
     for i in range(1, 300):
         tenant_code = "my_tenant" + str(i)
         tenant_code = tenant_code.lower()
-        tenant = Tenant.create(tenant_code=tenant_code,
-                               name="my_tenant" + str(i),
-                               admin_email=TENANT_ADMIN_EMAIL,
-                               content_server_url='https://skykit-contentmanager-int.appspot.com',
-                               content_manager_base_url='https://skykit-contentmanager-int.appspot.com/content',
-                               domain_key=domain.key,
-                               active=True)
-        tenant.put()
+        tenant_code_datastore = Tenant.find_by_tenant_code(tenant_code)
+        if not tenant_code_datastore:
+            tenant = Tenant.create(tenant_code=tenant_code,
+                                   name="my_tenant" + str(i),
+                                   admin_email=TENANT_ADMIN_EMAIL,
+                                   content_server_url='https://skykit-contentmanager-int.appspot.com',
+                                   content_manager_base_url='https://skykit-contentmanager-int.appspot.com/content',
+                                   domain_key=domain.key,
+                                   active=True)
+            tenant.put()
         print 'Tenant ' + tenant.name + ' created'
     else:
         print 'Tenant ' + tenant.name + ' already exists, so did not create'
@@ -143,16 +140,17 @@ def make_data_for_a_distributor():
     # CREATE LOCATIONS
     ##########################################################################################
     for i in range(1, 103):
-        location = Location.create(tenant_key=tenant.key,
-                                   customer_location_name="my_location" + str(i),
-                                   customer_location_code="my_location" + str(i))
-        location.address = None
-        location.city = None
-        location.state = None
-        location.postal_code = None
-        location.dma = None
-        location.active = True
-        location.put()
+        if Location.is_customer_location_code_unique("my_location" + str(i), tenant.key):
+            location = Location.create(tenant_key=tenant.key,
+                                       customer_location_name="my_location" + str(i),
+                                       customer_location_code="my_location" + str(i))
+            location.address = None
+            location.city = None
+            location.state = None
+            location.postal_code = None
+            location.dma = None
+            location.active = True
+            location.put()
 
     ##########################################################################################
     # UNMANAGED DEVICES
