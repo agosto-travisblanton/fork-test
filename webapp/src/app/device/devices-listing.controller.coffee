@@ -4,7 +4,6 @@ appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, $state, $cookies, ProgressBarService, sweet) ->
   @distributorKey = undefined
-
   #####################################
   # Managed
   #####################################
@@ -26,6 +25,19 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
   @unmanagedDevicesNext = null
   @unmanagedDevices = []
   @unmanagedMacDevices = {}
+
+  @refreshManagedDevices = () =>
+    @devicesPrev = null
+    @devicesNext = null
+    DevicesService.deviceCache.removeAll()
+    @getManagedDevices(@distributorKey, @devicesPrev, @devicesNext)
+
+  @refreshUnmanagedDevices = () =>
+    @unmanagedDevicesPrev = null
+    @unmanagedDevicesNext = null
+    DevicesService.deviceCache.removeAll()
+    @getUnmanagedDevices(@distributorKey, @unmanagedDevicesPrev, @unmanagedDevicesNext)
+
 
   @changeRadio = (unmanaged) ->
     if unmanaged
@@ -69,14 +81,22 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
   @controlOpenButton = (unmanaged, isMatch) =>
     if not unmanaged
       @disabled = !isMatch
+      @disabledButtonLoading = false
 
     else
       @unmanagedDisabled = !isMatch
+      @unmanagedDisabledButtonLoading = false
 
   @isResourceValid = (unmanaged, resource) ->
     if resource
       if resource.length > 2
-        if unmanaged then mac = @unmanagedSelectedButton == "MAC" else mac = @selectedButton == "MAC"
+        if unmanaged
+          mac = @unmanagedSelectedButton == "MAC"
+          @unmanagedDisabledButtonLoading = true
+
+        else
+          mac = @selectedButton == "MAC"
+          @disabledButtonLoading = true
 
         if mac
           DevicesService.matchDevicesByFullMac(@distributorKey, resource, unmanaged)
@@ -104,7 +124,6 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
           DevicesService.searchDevicesByPartialSerial(@distributorKey, partial, unmanaged)
           .then (res) =>
             result = res["serial_number_matches"]
-
             if unmanaged
               @unmanagedSerialDevices = @convertArrayToDictionary(result, false)
             else
@@ -123,6 +142,10 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
               @macDevices = @convertArrayToDictionary(result, true)
 
             return [each.mac for each in result][0]
+      else
+        return []
+    else
+      return []
 
 
   @getManagedDevices = (key, prev, next) ->

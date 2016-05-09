@@ -9,13 +9,15 @@ describe 'TenantLocationCtrl', ->
   $stateParams = undefined
   TenantsService = undefined
   LocationsService = undefined
+  ToastsService = undefined
   serviceInjection = undefined
   tenantsServicePromise = undefined
   locationsServicePromise = undefined
 
   beforeEach module('skykitProvisioning')
 
-  beforeEach inject (_$controller_, _TenantsService_, _LocationsService_, _$state_, _$rootScope_, _sweet_) ->
+  beforeEach inject (_$controller_, _TenantsService_, _LocationsService_, _$state_, _$rootScope_, _sweet_,
+      _ToastsService_) ->
     $controller = _$controller_
     $state = _$state_
     sweet = _sweet_
@@ -23,6 +25,7 @@ describe 'TenantLocationCtrl', ->
     $rootScope = _$rootScope_
     TenantsService = _TenantsService_
     LocationsService = _LocationsService_
+    ToastsService = _ToastsService_
     scope = $rootScope.$new()
     serviceInjection = {
       $scope: scope
@@ -83,6 +86,7 @@ describe 'TenantLocationCtrl', ->
       serviceInjection = {
         ProgressBarService: progressBarService
         LocationsService: LocationsService
+        ToastsService: ToastsService
       }
       controller = $controller 'TenantLocationCtrl', serviceInjection
       controller.location = {}
@@ -96,13 +100,31 @@ describe 'TenantLocationCtrl', ->
 
     describe '.onSuccessSavingLocation', ->
       beforeEach ->
+        spyOn(ToastsService, 'showSuccessToast')
         controller.onSuccessSavingLocation()
 
       it 'stops the progress bar animation', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
+      it "displays a success toast", ->
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith 'We saved your location.'
+
+    describe '.onSuccessUpdatingLocation', ->
+      tenant_key = 'some key'
+      beforeEach ->
+        spyOn(ToastsService, 'showSuccessToast')
+        controller.editMode = true
+        controller.onSuccessUpdatingLocation tenant_key
+
+      it 'stops the progress bar animation', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it "displays a success toast", ->
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith 'We updated your location.'
+
     describe '.onFailureSavingLocation 409 conflict', ->
       beforeEach ->
+        spyOn(ToastsService, 'showErrorToast')
         spyOn(sweet, 'show')
         errorObject = {status: 409}
         controller.onFailureSavingLocation errorObject
@@ -110,23 +132,27 @@ describe 'TenantLocationCtrl', ->
       it 'stops the progress bar animation', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it "show the error dialog", ->
+      it 'displays an error toast', ->
+        error = 'Location code conflict. Unable to save your location.'
+        expect(ToastsService.showErrorToast).toHaveBeenCalledWith error
+
+      it "shows an error alert", ->
         expectedError =
-          'Location code unavailable. Please modify customer location name to generate a unique location code.'
+          'Please change your customer location name. Location name must generate a unique location code.'
         expect(sweet.show).toHaveBeenCalledWith 'Oops...', expectedError, 'error'
 
     describe '.onFailureSavingLocation general error', ->
       beforeEach ->
-        spyOn(sweet, 'show')
+        spyOn(ToastsService, 'showErrorToast')
         errorObject = {status: 400}
         controller.onFailureSavingLocation errorObject
 
       it 'stops the progress bar animation', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it "show the error dialog", ->
-        expectedError = 'Unable to save the location.'
-        expect(sweet.show).toHaveBeenCalledWith 'Oops...', expectedError, 'error'
+      it "display error toast", ->
+        expectedError = 'Unable to save your location.'
+        expect(ToastsService.showErrorToast).toHaveBeenCalledWith expectedError
 
   describe '.autoGenerateCustomerLocationCode', ->
     beforeEach ->

@@ -20,45 +20,50 @@ describe 'DeviceDetailsCtrl', ->
   progressBarService = undefined
   serviceInjection = undefined
   cookieMock = undefined
+
   device = {key: 'dhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
-  issues = [
-    {
-      category: "Player down"
-      created: "2015-12-15 18:05:52"
-      elapsed_time: "37.3 minutes"
-      level: 2
-      level_descriptor: "danger"
-      memory_utilization: 40
-      program: "Test Content"
-      storage_utilization: 44
-      up: false
-    }
-    {
-      category: "Player up"
-      created: "2015-12-15 18:05:52"
-      elapsed_time: "37.3 minutes"
-      level: 0
-      level_descriptor: "normal"
-      memory_utilization: 40
-      program: "Test Content"
-      storage_utilization: 44
-      up: true
-    }
-  ]
-  commandEvents = [
-    {
-      payload: 'skykit.com/skdchromeapp/reset'
-      gcmRegistrationId: 'asdfasdfasdfadfsa1'
-      updated: '2016-01-14 18:45:44'
-      confirmed: false
-    }
-    {
-      payload: 'skykit.com/skdchromeapp/stop'
-      gcmRegistrationId: 'asdfasdfasdfadfsa2'
-      updated: '2016-01-14 18:23:30'
-      confirmed: false
-    }
-  ]
+  issues = {
+    issues: [
+      {
+        category: "Player down"
+        created: "2015-12-15 18:05:52"
+        elapsed_time: "37.3 minutes"
+        level: 2
+        level_descriptor: "danger"
+        memory_utilization: 40
+        program: "Test Content"
+        storage_utilization: 44
+        up: false
+      }
+      {
+        category: "Player up"
+        created: "2015-12-15 18:05:52"
+        elapsed_time: "37.3 minutes"
+        level: 0
+        level_descriptor: "normal"
+        memory_utilization: 40
+        program: "Test Content"
+        storage_utilization: 44
+        up: true
+      }
+    ]
+  }
+  commandEvents = {
+    events: [
+      {
+        payload: 'skykit.com/skdchromeapp/reset'
+        gcmRegistrationId: 'asdfasdfasdfadfsa1'
+        updated: '2016-01-14 18:45:44'
+        confirmed: false
+      }
+      {
+        payload: 'skykit.com/skdchromeapp/stop'
+        gcmRegistrationId: 'asdfasdfasdfadfsa2'
+        updated: '2016-01-14 18:23:30'
+        confirmed: false
+      }
+    ]
+  }
   tenants = [
     {key: 'dhjad897d987fadafg708fg7d', name: 'Foobar1', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
     {key: 'dhjad897d987fadafg708y67d', name: 'Foobar2', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
@@ -71,7 +76,6 @@ describe 'DeviceDetailsCtrl', ->
     _sweet_, _ToastsService_, _$state_, _$mdDialog_, _$log_) ->
     $controller = _$controller_
     $stateParams = {}
-    $state = {}
     $state = _$state_
     $log = _$log_
     $mdDialog = _$mdDialog_
@@ -88,6 +92,7 @@ describe 'DeviceDetailsCtrl', ->
     scope = {}
     serviceInjection = {
       $scope: scope
+      ToastsService: ToastsService
       $stateParams: $stateParams
       ProgressBarService: progressBarService
       $mdDialog: $mdDialog
@@ -98,11 +103,14 @@ describe 'DeviceDetailsCtrl', ->
       getDevicePromise = new skykitProvisioning.q.Mock
       timezonesPromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getDeviceByKey').and.returnValue getDevicePromise
+      spyOn(progressBarService, 'start')
+      spyOn(progressBarService, 'complete')
       getPlayerCommandEventsPromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getCommandEventsByKey').and.returnValue getPlayerCommandEventsPromise
       getDeviceIssuesPromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'getIssuesByKey').and.returnValue getDeviceIssuesPromise
       spyOn(DevicesService, 'getPanelModels').and.returnValue [{'id': 'Sony–FXD40LX2F'}, {'id': 'NEC–LCD4215'}]
+
       inputs = [
         {
           'id': 'HDMI2'
@@ -117,6 +125,7 @@ describe 'DeviceDetailsCtrl', ->
           'parentId': 'NEC–LCD4215'
         }
       ]
+
       spyOn(DevicesService, 'getPanelInputs').and.returnValue inputs
       spyOn(TimezonesService, 'getUsTimezones').and.returnValue timezonesPromise
 
@@ -126,6 +135,7 @@ describe 'DeviceDetailsCtrl', ->
           $stateParams: $stateParams
           $state: $state
           DevicesService: DevicesService
+          ProgressBarService: progressBarService
           TimezonesService: TimezonesService
           LocationsService: LocationsService
         }
@@ -159,15 +169,22 @@ describe 'DeviceDetailsCtrl', ->
         controller = $controller 'DeviceDetailsCtrl', {
           $stateParams: $stateParams
           $state: $state
+          ProgressBarService: progressBarService
+          ToastsService: ToastsService
           DevicesService: DevicesService
           TimezonesService: TimezonesService
           LocationsService: LocationsService
         }
+
         now = new Date()
         today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-        @epochEnd = moment(new Date()).unix()
         today.setDate(today.getDate() - 30)
+        @epochEnd = moment(new Date()).unix()
         @epochStart = moment(today).unix()
+        controller.epochEnd = @epochEnd
+        controller.epochStart = @epochStart
+        spyOn(ToastsService, 'showErrorToast')
+        spyOn(ToastsService, 'showSuccessToast')
         controller.initialize()
 
       it 'should call TimezonesService.getTimezones', ->
@@ -186,18 +203,18 @@ describe 'DeviceDetailsCtrl', ->
         expect(DevicesService.getDeviceByKey).toHaveBeenCalledWith $stateParams.deviceKey
 
       it 'calls DevicesService.getCommandEventsByKey to retrieve command events for device', ->
-        expect(DevicesService.getCommandEventsByKey).toHaveBeenCalledWith $stateParams.deviceKey
+        expect(DevicesService.getCommandEventsByKey).toHaveBeenCalledWith $stateParams.deviceKey, undefined, undefined
 
       it 'calls DevicesService.getIssuesByKey to retrieve the issues for a given device and datetime range', ->
-        expect(DevicesService.getIssuesByKey).toHaveBeenCalledWith($stateParams.deviceKey, @epochStart, @epochEnd)
+        expect(DevicesService.getIssuesByKey).toHaveBeenCalledWith($stateParams.deviceKey, @epochStart, @epochEnd, undefined, undefined)
 
       it "the 'then' handler caches the retrieved issues for a given device key in the controller", ->
-        getDeviceIssuesPromise.resolve issues
+        getDeviceIssuesPromise.resolve {issues: issues}
         expect(controller.issues).toBe issues
 
       it "the 'then' handler caches the retrieved command events in the controller", ->
         getPlayerCommandEventsPromise.resolve commandEvents
-        expect(controller.commandEvents).toBe commandEvents
+        expect(controller.commandEvents).toBe commandEvents.events
 
   describe '.onGetDeviceSuccess', ->
     tenantKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWR3JvdXAiEXRlbmFudlbmFudBiAgICAgIDACAw'
@@ -240,14 +257,6 @@ describe 'DeviceDetailsCtrl', ->
       it 'sets the back button text according to previous context', ->
         expect(controller.backUrlText).toBe 'Back to devices'
 
-#      if @currentDevice.isUnmanagedDevice is true
-#        @backUrl = "/#/tenants/#{@tenantKey}/unmanaged"
-#        @backUrlText = 'Back to tenant unmanaged devices'
-#      else
-#        @backUrl = "/#/tenants/#{@tenantKey}/managed"
-#        @backUrlText = 'Back to tenant managed devices'
-
-
     describe 'coming from tenant unmanaged devices', ->
       beforeEach ->
         $stateParams = {fromDevices: "false"}
@@ -284,6 +293,7 @@ describe 'DeviceDetailsCtrl', ->
       spyOn($log, 'error')
       spyOn($state, 'go')
       spyOn(ToastsService, 'showErrorToast')
+      spyOn(ToastsService, 'showSuccessToast')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.deviceKey = 'key'
       response = {status: 400, statusText: 'Bad Request'}
@@ -301,7 +311,7 @@ describe 'DeviceDetailsCtrl', ->
       expect($state.go).toHaveBeenCalledWith 'devices'
 
 
-  describe '.onClickSaveDevice', ->
+  describe '.onSaveDevice', ->
     beforeEach ->
       devicesServicePromise = new skykitProvisioning.q.Mock
       spyOn(DevicesService, 'save').and.returnValue devicesServicePromise
@@ -312,7 +322,7 @@ describe 'DeviceDetailsCtrl', ->
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.currentDevice.panelModel = {id: 'Sony-112'}
       controller.currentDevice.panelInput = {id: 'HDMI1', parentId: 'Sony-112'}
-      controller.onClickSaveDevice()
+      controller.onSaveDevice()
       devicesServicePromise.resolve()
 
     it 'starts the progress bar', ->
@@ -329,8 +339,8 @@ describe 'DeviceDetailsCtrl', ->
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it "the 'then' handler shows a sweet", ->
-        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith 'We saved your updates to this device.'
+      it "displays a success toast", ->
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith 'We saved your update.'
 
     describe '.onFailureDeviceSave', ->
       beforeEach ->
@@ -451,7 +461,68 @@ describe 'DeviceDetailsCtrl', ->
     it 'displays a toast indicating delete request was canceled', ->
       expect(ToastsService.showInfoToast).toHaveBeenCalledWith 'We canceled your delete request.'
 
-  describe '.onClickResetSendButton', ->
+  describe '.onProofOfPlayLoggingCheck', ->
+    beforeEach ->
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+
+    describe 'proof of play logging is true with a location specified', ->
+      beforeEach ->
+        spyOn(controller, 'onSaveDevice')
+        controller.currentDevice.proofOfPlayLogging = true
+        controller.currentDevice.locationKey = 'ah1kZXZ-c2t5a2l0LW'
+        controller.onProofOfPlayLoggingCheck()
+
+      it 'saves proof of play is true on the device entity', ->
+        expect(controller.onSaveDevice).toHaveBeenCalled()
+
+    describe 'proof of play logging is true with no Location specified', ->
+      beforeEach ->
+        spyOn(sweet, 'show')
+        controller.currentDevice.proofOfPlayLogging = true
+        controller.currentDevice.locationKey = null
+        controller.onProofOfPlayLoggingCheck()
+
+      it 'displays a sweet alert indicating a location is needed to enable Proof of Play', ->
+        expect(sweet.show).toHaveBeenCalledWith('Oops...',
+          "You must have a Location to enable Proof of play.", 'error')
+
+      it 'set proofOfPlayLogging to false since the location pre-condition is not met', ->
+        expect(controller.currentDevice.proofOfPlayLogging).toBe false
+
+    describe 'proof of play logging is true with no Display code specified', ->
+      beforeEach ->
+        spyOn(sweet, 'show')
+        controller.currentDevice.proofOfPlayLogging = true
+        controller.currentDevice.locationKey = 'ah1kZXZ-c2t5a2l0LW'
+        controller.currentDevice.customerDisplayCode = null
+        controller.onProofOfPlayLoggingCheck()
+
+      it 'displays a sweet alert indicating a Display code is needed to enable Proof of Play', ->
+        expect(sweet.show).toHaveBeenCalledWith('Oops...',
+          "You must have a Display code to enable Proof of play.", 'error')
+
+      it 'set proofOfPlayLogging to false since the location pre-condition is not met', ->
+        expect(controller.currentDevice.proofOfPlayLogging).toBe false
+
+    describe 'proof of play logging is false', ->
+      beforeEach ->
+        spyOn(controller, 'onSaveDevice')
+        controller.currentDevice.proofOfPlayLogging = false
+        controller.onProofOfPlayLoggingCheck()
+
+      it 'saves proof of play is false on the device entity', ->
+        expect(controller.onSaveDevice).toHaveBeenCalled()
+
+  describe '.onUpdateLocation', ->
+    beforeEach ->
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+      spyOn(controller, 'onSaveDevice')
+      controller.onUpdateLocation()
+
+    it 'saves proof of play on the device entity', ->
+      expect(controller.onSaveDevice).toHaveBeenCalled()
+
+  describe '.onResetPlayer', ->
     beforeEach ->
       commandsServicePromise = new skykitProvisioning.q.Mock
       spyOn(CommandsService, 'reset').and.returnValue commandsServicePromise
@@ -459,7 +530,7 @@ describe 'DeviceDetailsCtrl', ->
       spyOn(progressBarService, 'complete')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.editMode = true
-      controller.onClickResetSendButton()
+      controller.onResetPlayer()
 
     it 'starts the progress bar', ->
       expect(progressBarService.start).toHaveBeenCalled()
@@ -467,36 +538,175 @@ describe 'DeviceDetailsCtrl', ->
     it 'call CommandsService.reset with the current device', ->
       expect(CommandsService.reset).toHaveBeenCalledWith controller.currentDevice.key
 
-    describe '.onResetSuccess', ->
+    describe '.onResetPlayerSuccess', ->
       beforeEach ->
         spyOn(ToastsService, 'showSuccessToast')
-        controller.onResetSuccess()
+        controller.onResetPlayerSuccess()
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it 'displays a toast indicating reset command was sent to the player queue', ->
-        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith "We posted your reset command into the player's queue."
+      it 'displays a toast indicating reset player command was sent to the player queue', ->
+        message = "We posted your reset player command into the player's queue."
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith message
 
-    describe '.onResetFailure', ->
+    describe '.onResetPlayerFailure', ->
       error = {status: 404, statusText: 'Not Found'}
 
       beforeEach ->
         spyOn($log, 'error')
         spyOn(sweet, 'show')
-        controller.onResetFailure error
+        controller.onResetPlayerFailure error
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it 'displays a sweet alert indicating unable to send reset command to the player queue', ->
+      it 'displays a sweet alert indicating unable to send reset player command to the player queue', ->
         expect(sweet.show).toHaveBeenCalledWith(
-          'Oops...', "We were unable to post your reset command into the player's queue.", 'error')
+          'Oops...', "We were unable to post your reset player command into the player's queue.", 'error')
 
       it 'logs a detailed error to the console', ->
-        expect($log.error).toHaveBeenCalledWith "Reset command error: #{error.status} #{error.statusText}"
+        expect($log.error).toHaveBeenCalledWith "Reset player command error: #{error.status} #{error.statusText}"
 
-  describe '.onClickVolumeSendButton', ->
+  describe '.onPanelOn', ->
+    beforeEach ->
+      commandsServicePromise = new skykitProvisioning.q.Mock
+      spyOn(CommandsService, 'powerOn').and.returnValue commandsServicePromise
+      spyOn(progressBarService, 'start')
+      spyOn(progressBarService, 'complete')
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+      controller.editMode = true
+      controller.onPanelOn()
+
+    it 'starts the progress bar', ->
+      expect(progressBarService.start).toHaveBeenCalled()
+
+    it 'call CommandsService.powerOn with the current device', ->
+      expect(CommandsService.powerOn).toHaveBeenCalledWith controller.currentDevice.key
+
+    describe '.onPanelOnSuccess', ->
+      beforeEach ->
+        spyOn(ToastsService, 'showSuccessToast')
+        controller.onPanelOnSuccess()
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a toast indicating command was sent to player', ->
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith(
+          "We posted your panel on command into the player's queue.")
+
+    describe '.onPanelOnFailure', ->
+      error = {status: 404, statusText: 'Not Found'}
+
+      beforeEach ->
+        spyOn(sweet, 'show')
+        spyOn($log, 'error')
+        controller.onPanelOnFailure error
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a sweet alert', ->
+        expect(sweet.show).toHaveBeenCalledWith(
+          'Oops...', "We were unable to post your panel on command into the player's queue.", 'error')
+
+      it 'logs a detailed error to the console', ->
+        expect($log.error).toHaveBeenCalledWith "Panel on command error: #{error.status} #{error.statusText}"
+
+  describe '.onPanelOff', ->
+    beforeEach ->
+      commandsServicePromise = new skykitProvisioning.q.Mock
+      spyOn(CommandsService, 'powerOff').and.returnValue commandsServicePromise
+      spyOn(progressBarService, 'start')
+      spyOn(progressBarService, 'complete')
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+      controller.editMode = true
+      controller.onPanelOff()
+
+    it 'starts the progress bar', ->
+      expect(progressBarService.start).toHaveBeenCalled()
+
+    it 'call CommandsService.powerOff with the current device', ->
+      expect(CommandsService.powerOff).toHaveBeenCalledWith controller.currentDevice.key
+
+    describe '.onPanelOffSuccess', ->
+      beforeEach ->
+        spyOn(ToastsService, 'showSuccessToast')
+        controller.onPanelOffSuccess()
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a toast indicating command was sent to player', ->
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith(
+          "We posted your panel off command into the player's queue.")
+
+    describe '.onPanelOffFailure', ->
+      error = {status: 404, statusText: 'Not Found'}
+
+      beforeEach ->
+        spyOn(sweet, 'show')
+        spyOn($log, 'error')
+        controller.onPanelOffFailure error
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a sweet alert', ->
+        expect(sweet.show).toHaveBeenCalledWith(
+          'Oops...', "We were unable to post your panel off command into the player's queue.", 'error')
+
+      it 'logs a detailed error to the console', ->
+        expect($log.error).toHaveBeenCalledWith "Panel off command error: #{error.status} #{error.statusText}"
+
+  describe '.onUpdateDevice', ->
+    beforeEach ->
+      commandsServicePromise = new skykitProvisioning.q.Mock
+      spyOn(CommandsService, 'updateDevice').and.returnValue commandsServicePromise
+      spyOn(progressBarService, 'start')
+      spyOn(progressBarService, 'complete')
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+      controller.editMode = true
+      controller.onUpdateDevice()
+
+    it 'starts the progress bar', ->
+      expect(progressBarService.start).toHaveBeenCalled()
+
+    it 'call CommandsService.updateDevice with the current device', ->
+      expect(CommandsService.updateDevice).toHaveBeenCalledWith controller.currentDevice.key
+
+    describe '.onUpdateDeviceSuccess', ->
+      beforeEach ->
+        spyOn(ToastsService, 'showSuccessToast')
+        controller.onUpdateDeviceSuccess()
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a toast indicating command was sent to player', ->
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith(
+          "We posted your update device command into the player's queue.")
+
+    describe '.onUpdateDeviceFailure', ->
+      error = {status: 404, statusText: 'Not Found'}
+
+      beforeEach ->
+        spyOn(sweet, 'show')
+        spyOn($log, 'error')
+        controller.onUpdateDeviceFailure error
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a sweet alert', ->
+        expect(sweet.show).toHaveBeenCalledWith(
+          'Oops...', "We were unable to post your update device command into the player's queue.", 'error')
+
+      it 'logs a detailed error to the console', ->
+        expect($log.error).toHaveBeenCalledWith "Update device command error: #{error.status} #{error.statusText}"
+
+  describe '.onVolumeChange', ->
     beforeEach ->
       commandsServicePromise = new skykitProvisioning.q.Mock
       spyOn(CommandsService, 'volume').and.returnValue commandsServicePromise
@@ -505,7 +715,7 @@ describe 'DeviceDetailsCtrl', ->
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.editMode = true
       controller.currentDevice.volume = 5
-      controller.onClickVolumeSendButton()
+      controller.onVolumeChange()
 
     it 'starts the progress bar', ->
       expect(progressBarService.start).toHaveBeenCalled()
@@ -513,37 +723,37 @@ describe 'DeviceDetailsCtrl', ->
     it 'calls CommandsService.volume with the current device', ->
       expect(CommandsService.volume).toHaveBeenCalledWith(controller.currentDevice.key, controller.currentDevice.volume)
 
-    describe '.onVolumeSuccess', ->
+    describe '.onVolumeChangeSuccess', ->
       beforeEach ->
         spyOn(ToastsService, 'showSuccessToast')
-        controller.onVolumeSuccess controller.currentDevice.volume
+        controller.onVolumeChangeSuccess controller.currentDevice.volume
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
       it 'displays a toast indicating volume command was sent to the player queue', ->
-        message = "We posted a volume level command of #{controller.currentDevice.volume} into the player's queue."
+        message = "We posted your volume change command of #{controller.currentDevice.volume} into the player's queue."
         expect(ToastsService.showSuccessToast).toHaveBeenCalledWith message
 
-    describe '.onVolumeFailure', ->
+    describe '.onVolumeChangeFailure', ->
       error = {status: 404, statusText: 'Not Found'}
 
       beforeEach ->
         spyOn($log, 'error')
         spyOn(sweet, 'show')
-        controller.onVolumeFailure error
+        controller.onVolumeChangeFailure error
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it 'displays a sweet alert indicating unable to send volume command to the player queue', ->
+      it 'displays a sweet alert indicating unable to send volume change command to the player queue', ->
         expect(sweet.show).toHaveBeenCalledWith(
-          'Oops...', "We were unable to post your volume level command into the player's queue.", 'error')
+          'Oops...', "We were unable to post your volume change command into the player's queue.", 'error')
 
       it 'logs a detailed error to the console', ->
-        expect($log.error).toHaveBeenCalledWith "Volume level command error: #{error.status} #{error.statusText}"
+        expect($log.error).toHaveBeenCalledWith "Volume change command error: #{error.status} #{error.statusText}"
 
-  describe '.onClickCommandSendButton', ->
+  describe '.onCustomCommand', ->
     beforeEach ->
       commandsServicePromise = new skykitProvisioning.q.Mock
       spyOn(CommandsService, 'custom').and.returnValue(commandsServicePromise)
@@ -552,7 +762,7 @@ describe 'DeviceDetailsCtrl', ->
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.editMode = true
       controller.currentDevice.custom = 'skykit.com/skdchromeapp/channel/2'
-      controller.onClickCommandSendButton()
+      controller.onCustomCommand()
 
     it 'starts the progress bar', ->
       expect(progressBarService.start).toHaveBeenCalled()
@@ -560,129 +770,37 @@ describe 'DeviceDetailsCtrl', ->
     it 'calls CommandsService.custom with the current device', ->
       expect(CommandsService.custom).toHaveBeenCalledWith(controller.currentDevice.key, controller.currentDevice.custom)
 
-    describe '.onCommandSuccess', ->
+    describe '.onCustomCommandSuccess', ->
       beforeEach ->
         spyOn(ToastsService, 'showSuccessToast')
-        controller.onCommandSuccess controller.currentDevice.custom
+        controller.onCustomCommandSuccess controller.currentDevice.custom
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it 'displays a toast indicating command was sent to the player queue', ->
-        message = "We posted your command '#{controller.currentDevice.custom}' into the player's queue."
+      it 'displays a toast indicating custom command was sent to the player queue', ->
+        message = "We posted your custom command '#{controller.currentDevice.custom}' into the player's queue."
         expect(ToastsService.showSuccessToast).toHaveBeenCalledWith message
 
-    describe '.onCommandFailure', ->
+    describe '.onCustomCommandFailure', ->
       error = {status: 404, statusText: 'Not Found'}
 
       beforeEach ->
         spyOn(sweet, 'show')
         spyOn($log, 'error')
-        controller.onCommandFailure error
+        controller.onCustomCommandFailure error
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
-      it 'displays a sweet alert indicating unable to command to the player queue', ->
+      it 'displays a sweet alert indicating unable to custom command to the player queue', ->
         expect(sweet.show).toHaveBeenCalledWith(
-          'Oops...', "We were unable to post your command into the player's queue.", 'error')
+          'Oops...', "We were unable to post your custom command into the player's queue.", 'error')
 
       it 'logs a detailed error to the console', ->
-        expect($log.error).toHaveBeenCalledWith "Command error: #{error.status} #{error.statusText}"
+        expect($log.error).toHaveBeenCalledWith "Custom command error: #{error.status} #{error.statusText}"
 
-  describe '.onClickPowerOnSendButton', ->
-    beforeEach ->
-      commandsServicePromise = new skykitProvisioning.q.Mock
-      spyOn(CommandsService, 'powerOn').and.returnValue commandsServicePromise
-      spyOn(progressBarService, 'start')
-      spyOn(progressBarService, 'complete')
-      controller = $controller 'DeviceDetailsCtrl', serviceInjection
-      controller.editMode = true
-      controller.onClickPowerOnSendButton()
-
-    it 'starts the progress bar', ->
-      expect(progressBarService.start).toHaveBeenCalled()
-
-    it 'call CommandsService.powerOn with the current device', ->
-      expect(CommandsService.powerOn).toHaveBeenCalledWith controller.currentDevice.key
-
-    describe '.onPowerOnSuccess', ->
-      beforeEach ->
-        spyOn(ToastsService, 'showSuccessToast')
-        controller.onPowerOnSuccess()
-
-      it 'stops the progress bar', ->
-        expect(progressBarService.complete).toHaveBeenCalled()
-
-      it 'displays a toast indicating command was sent to player', ->
-        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith(
-          "We posted a power on command into the player's queue.")
-
-    describe '.onPowerOnFailure', ->
-      error = {status: 404, statusText: 'Not Found'}
-
-      beforeEach ->
-        spyOn(sweet, 'show')
-        spyOn($log, 'error')
-        controller.onPowerOnFailure error
-
-      it 'stops the progress bar', ->
-        expect(progressBarService.complete).toHaveBeenCalled()
-
-      it 'displays a sweet alert', ->
-        expect(sweet.show).toHaveBeenCalledWith(
-          'Oops...', "We were unable to post your power on command into the player's queue.", 'error')
-
-      it 'logs a detailed error to the console', ->
-        expect($log.error).toHaveBeenCalledWith "Power on command error: #{error.status} #{error.statusText}"
-
-  describe '.onClickPowerOffSendButton', ->
-    beforeEach ->
-      commandsServicePromise = new skykitProvisioning.q.Mock
-      spyOn(CommandsService, 'powerOff').and.returnValue commandsServicePromise
-      spyOn(progressBarService, 'start')
-      spyOn(progressBarService, 'complete')
-      controller = $controller 'DeviceDetailsCtrl', serviceInjection
-      controller.editMode = true
-      controller.onClickPowerOffSendButton()
-
-    it 'starts the progress bar', ->
-      expect(progressBarService.start).toHaveBeenCalled()
-
-    it 'call CommandsService.powerOff with the current device', ->
-      expect(CommandsService.powerOff).toHaveBeenCalledWith controller.currentDevice.key
-
-    describe '.onPowerOffSuccess', ->
-      beforeEach ->
-        spyOn(ToastsService, 'showSuccessToast')
-        controller.onPowerOffSuccess()
-
-      it 'stops the progress bar', ->
-        expect(progressBarService.complete).toHaveBeenCalled()
-
-      it 'displays a toast indicating command was sent to player', ->
-        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith(
-          "We posted a power off command into the player's queue.")
-
-    describe '.onPowerOffFailure', ->
-      error = {status: 404, statusText: 'Not Found'}
-
-      beforeEach ->
-        spyOn(sweet, 'show')
-        spyOn($log, 'error')
-        controller.onPowerOffFailure error
-
-      it 'stops the progress bar', ->
-        expect(progressBarService.complete).toHaveBeenCalled()
-
-      it 'displays a sweet alert', ->
-        expect(sweet.show).toHaveBeenCalledWith(
-          'Oops...', "We were unable to post your power off command into the player's queue.", 'error')
-
-      it 'logs a detailed error to the console', ->
-        expect($log.error).toHaveBeenCalledWith "Power off command error: #{error.status} #{error.statusText}"
-
-  describe '.onClickContentDeleteSendButton', ->
+  describe '.onResetContent', ->
     beforeEach ->
       commandsServicePromise = new skykitProvisioning.q.Mock
       spyOn(CommandsService, 'contentDelete').and.returnValue commandsServicePromise
@@ -690,7 +808,7 @@ describe 'DeviceDetailsCtrl', ->
       spyOn(progressBarService, 'complete')
       controller = $controller 'DeviceDetailsCtrl', serviceInjection
       controller.editMode = true
-      controller.onClickContentDeleteSendButton()
+      controller.onResetContent()
 
     it 'starts the progress bar', ->
       expect(progressBarService.start).toHaveBeenCalled()
@@ -698,35 +816,81 @@ describe 'DeviceDetailsCtrl', ->
     it 'calls CommandsService.contentDelete with the current device', ->
       expect(CommandsService.contentDelete).toHaveBeenCalledWith controller.currentDevice.key
 
-    describe '.onContentDeleteSuccess', ->
+    describe '.onResetContentSuccess', ->
       beforeEach ->
         spyOn(ToastsService, 'showSuccessToast')
-        controller.onContentDeleteSuccess()
+        controller.onResetContentSuccess()
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
       it 'displays a toast indicating command was sent to player', ->
         expect(ToastsService.showSuccessToast).toHaveBeenCalledWith(
-          "We posted your content delete command into the player's queue.")
+          "We posted your reset content command into the player's queue.")
 
-    describe '.onContentDeleteFailure', ->
+    describe '.onResetContentFailure', ->
       error = {status: 404, statusText: 'Not Found'}
 
       beforeEach ->
         spyOn(sweet, 'show')
         spyOn($log, 'error')
-        controller.onContentDeleteFailure error
+        controller.onResetContentFailure error
 
       it 'stops the progress bar', ->
         expect(progressBarService.complete).toHaveBeenCalled()
 
       it 'displays a sweet alert', ->
         expect(sweet.show).toHaveBeenCalledWith(
-          'Oops...', "We were unable to post your delete content command into the player's queue.", 'error')
+          'Oops...', "We were unable to post your reset content command into the player's queue.", 'error')
 
       it 'logs a detailed error to the console', ->
-        expect($log.error).toHaveBeenCalledWith "Content delete command error: #{error.status} #{error.statusText}"
+        expect($log.error).toHaveBeenCalledWith "Reset content command error: #{error.status} #{error.statusText}"
+
+  describe '.onUpdateContent', ->
+    beforeEach ->
+      commandsServicePromise = new skykitProvisioning.q.Mock
+      spyOn(CommandsService, 'contentUpdate').and.returnValue commandsServicePromise
+      spyOn(progressBarService, 'start')
+      spyOn(progressBarService, 'complete')
+      controller = $controller 'DeviceDetailsCtrl', serviceInjection
+      controller.editMode = true
+      controller.onUpdateContent()
+
+    it 'starts the progress bar', ->
+      expect(progressBarService.start).toHaveBeenCalled()
+
+    it 'calls CommandsService.contentUpdate with the current device', ->
+      expect(CommandsService.contentUpdate).toHaveBeenCalledWith controller.currentDevice.key
+
+    describe '.onUpdateContentSuccess', ->
+      beforeEach ->
+        spyOn(ToastsService, 'showSuccessToast')
+        controller.onUpdateContentSuccess()
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a toast indicating command was sent to player', ->
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith(
+          "We posted your update content command into the player's queue.")
+
+    describe '.onUpdateContentFailure', ->
+      error = {status: 404, statusText: 'Not Found'}
+
+      beforeEach ->
+        spyOn(sweet, 'show')
+        spyOn($log, 'error')
+        controller.onUpdateContentFailure error
+
+      it 'stops the progress bar', ->
+        expect(progressBarService.complete).toHaveBeenCalled()
+
+      it 'displays a sweet alert', ->
+        expect(sweet.show).toHaveBeenCalledWith(
+          'Oops...', "We were unable to post your update content command into the player's queue.", 'error')
+
+      it 'logs a detailed error to the console', ->
+        expect($log.error).toHaveBeenCalledWith "Content update command error: #{error.status} #{error.statusText}"
 
   describe '.onClickRefreshButton', ->
     beforeEach ->
@@ -740,6 +904,8 @@ describe 'DeviceDetailsCtrl', ->
         DevicesService: DevicesService
         ProgressBarService: progressBarService
       }
+      controller.prev_cursor = null
+      controller.next_cursor = null
       controller.onClickRefreshButton()
 
     it 'starts the progress bar', ->
@@ -751,9 +917,10 @@ describe 'DeviceDetailsCtrl', ->
     it 'defines epochEnd', ->
       expect(controller.epochEnd).toBeDefined()
 
+
     it 'calls service to refresh issues for a given device within a specified datetime range', ->
       expect(DevicesService.getIssuesByKey).toHaveBeenCalledWith(
-        $stateParams.deviceKey, controller.epochStart, controller.epochEnd)
+        $stateParams.deviceKey, controller.epochStart, controller.epochEnd, controller.prev_cursor, controller.next_cursor)
 
     describe '.onRefreshIssuesSuccess', ->
       beforeEach ->

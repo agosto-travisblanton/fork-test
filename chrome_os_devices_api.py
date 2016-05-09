@@ -3,10 +3,11 @@ import logging
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
-from oauth2client.client import SignedJwtAssertionCredentials
+from app_config import config
+from content_manager_api import ContentManagerApi
 from googleapiclient import discovery
 from httplib2 import Http
-from app_config import config
+from oauth2client.client import SignedJwtAssertionCredentials
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
@@ -148,6 +149,66 @@ class ChromeOsDevicesApi(object):
                                                        body=resource_json)
                 request.execute()
 
+
+def register_device(device_urlsafe_key=None, device_mac_address=None, page_token=None):
+    """
+    A function that is meant to be run asynchronously to update the device entity
+    with ChromeOsDevice information from Directory API using the MAC address to match.
+    """
+    if not device_urlsafe_key:
+        raise deferred.PermanentTaskFailure(
+            'register_device: The device URL-safe key parameter is None. It is required.')
+    if not device_mac_address:
+        raise deferred.PermanentTaskFailure(
+            'register_device: The device MAC address parameter is None. It is required.')
+    impersonation_admin_email_address = get_impersonation_email_from_device_key(device_urlsafe_key)
+    if not impersonation_admin_email_address:
+        logging.info('register_device: Impersonation email not found for device with device key {0}.'.
+                     format(device_urlsafe_key))
+        return
+    chrome_os_devices_api = ChromeOsDevicesApi(impersonation_admin_email_address)
+    chrome_os_devices, new_page_token = chrome_os_devices_api.cursor_list(customer_id=config.GOOGLE_CUSTOMER_ID,
+                                                                          next_page_token=page_token)
+    if chrome_os_devices and len(chrome_os_devices) > 0:
+        lowercase_device_mac_address = device_mac_address.lower()
+        loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == lowercase_device_mac_address or
+                              x.get('ethernetMacAddress') == lowercase_device_mac_address)
+        chrome_os_device = next(loop_comprehension, None)
+        if chrome_os_device:
+            device_key = ndb.Key(urlsafe=device_urlsafe_key)
+            device = device_key.get()
+            device.device_id = chrome_os_device.get('deviceId')
+            device.mac_address = chrome_os_device.get('macAddress')
+            device.serial_number = chrome_os_device.get('serialNumber')
+            device.status = chrome_os_device.get('status')
+            device.last_sync = chrome_os_device.get('lastSync')
+            device.kind = chrome_os_device.get('kind')
+            device.ethernet_mac_address = chrome_os_device.get('ethernetMacAddress')
+            device.org_unit_path = chrome_os_device.get('orgUnitPath')
+            device.annotated_user = chrome_os_device.get('annotatedUser')
+            device.annotated_location = chrome_os_device.get('annotatedLocation')
+            device.notes = chrome_os_device.get('notes')
+            device.boot_mode = chrome_os_device.get('bootMode')
+            device.last_enrollment_time = chrome_os_device.get('lastEnrollmentTime')
+            device.platform_version = chrome_os_device.get('platformVersion')
+            device.model = chrome_os_device.get('model')
+            device.os_version = chrome_os_device.get('osVersion')
+            device.firmware_version = chrome_os_device.get('firmwareVersion')
+            device.etag = chrome_os_device.get('etag')
+            device.put()
+            logging.info('register_device: retrieved directory API for MAC address = {0}. Notifying Content Manager.'.
+                         format(lowercase_device_mac_address))
+            deferred.defer(ContentManagerApi().create_device,
+                           device_urlsafe_key=device_urlsafe_key,
+                           _queue='content-server',
+                           _countdown=5)
+            return device
+        else:
+            if new_page_token:
+                deferred.defer(refresh_device_by_mac_address,
+                               device_urlsafe_key=device_urlsafe_key,
+                               device_mac_address=device_mac_address,
+                               page_token=new_page_token)
 
 def refresh_device_by_mac_address(device_urlsafe_key=None, device_mac_address=None, page_token=None):
     """

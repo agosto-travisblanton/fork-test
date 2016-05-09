@@ -4,7 +4,7 @@ appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantDetailsCtrl',
   ($stateParams, TenantsService, DomainsService, TimezonesService, DistributorsService, $state, sweet,
-    ProgressBarService, $cookies, $scope, $location) ->
+    ProgressBarService, ToastsService, $cookies, $scope, $location) ->
     @gameStopServer = $location.host().indexOf('provisioning-gamestop') > -1
     @currentTenant = {
       key: undefined,
@@ -55,7 +55,7 @@ appModule.controller 'TenantDetailsCtrl',
 
     @onSuccessTenantSave = ->
       ProgressBarService.complete()
-      $state.go 'tenants'
+      ToastsService.showSuccessToast 'We saved your tenant information.'
 
     @onFailureTenantSave = (errorObject) ->
       ProgressBarService.complete()

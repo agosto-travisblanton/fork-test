@@ -106,9 +106,17 @@ class Domain(ndb.Model):
     @classmethod
     def create(cls, name, distributor_key, impersonation_admin_email_address, active):
         return cls(distributor_key=distributor_key,
-                   name=name,
+                   name=name.strip().lower(),
                    impersonation_admin_email_address=impersonation_admin_email_address,
                    active=active)
+
+    @classmethod
+    def already_exists(cls, name):
+        if Domain.query(
+            ndb.AND(Domain.active == True,
+                    Domain.name == name.strip().lower())).get(keys_only=True):
+            return True
+        return False
 
     def _pre_put_hook(self):
         self.class_version = 1
@@ -165,8 +173,8 @@ class Tenant(ndb.Model):
     @classmethod
     def match_device_with_full_mac(cls, tenant_keys, unmanaged, full_mac):
         return ChromeOsDevice.query(ChromeOsDevice.archived == False,
-            ndb.OR(ChromeOsDevice.mac_address == full_mac,
-                   ChromeOsDevice.ethernet_mac_address == full_mac)).filter(
+                                    ndb.OR(ChromeOsDevice.mac_address == full_mac,
+                                           ChromeOsDevice.ethernet_mac_address == full_mac)).filter(
             ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
             ChromeOsDevice.is_unmanaged_device == unmanaged).count() > 0
 
@@ -179,7 +187,8 @@ class Tenant(ndb.Model):
 
     @classmethod
     def find_devices_with_partial_serial(cls, tenant_keys, unmanaged, partial_serial):
-        q = ChromeOsDevice.query(ChromeOsDevice.archived == False).filter(ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
+        q = ChromeOsDevice.query(ChromeOsDevice.archived == False).filter(
+            ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
             ChromeOsDevice.is_unmanaged_device == unmanaged).fetch()
 
         to_return = []
@@ -192,7 +201,7 @@ class Tenant(ndb.Model):
 
     @classmethod
     def find_devices_with_partial_mac(cls, tenant_keys, unmanaged, partial_mac):
-        q = ChromeOsDevice.query(ChromeOsDevice.archived == False).\
+        q = ChromeOsDevice.query(ChromeOsDevice.archived == False). \
             filter(ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
             ChromeOsDevice.is_unmanaged_device == unmanaged).fetch()
 
@@ -213,18 +222,92 @@ class Tenant(ndb.Model):
         return filtered_results
 
     @classmethod
-    def find_devices_paginated(cls, tenant_keys, fetch_size=200, unmanaged=False, prev_cursor_str=None,
-                               next_cursor_str=None):
+    def find_issues_paginated(cls, start, end, device, fetch_size=25, prev_cursor_str=None,
+                              next_cursor_str=None):
         objects = None
         next_cursor = None
         prev_cursor = None
 
         if not prev_cursor_str and not next_cursor_str:
+            objects, next_cursor, more = DeviceIssueLog.query(
+                DeviceIssueLog.device_key == device.key,
+                ndb.AND(DeviceIssueLog.created > start),
+                ndb.AND(DeviceIssueLog.created <= end)
+            ).order(
+                -DeviceIssueLog.created
+            ).fetch_page(fetch_size)
+
+            prev_cursor = None
+            next_cursor = next_cursor.urlsafe() if more else None
+
+        elif next_cursor_str:
+            cursor = Cursor(urlsafe=next_cursor_str)
+            objects, next_cursor, more = DeviceIssueLog.query(
+                DeviceIssueLog.device_key == device.key,
+                ndb.AND(DeviceIssueLog.created > start),
+                ndb.AND(DeviceIssueLog.created <= end)
+            ).order(
+                -DeviceIssueLog.created
+            ).fetch_page(
+                page_size=fetch_size,
+                start_cursor=cursor
+            )
+
+            prev_cursor = next_cursor_str
+            next_cursor = next_cursor.urlsafe() if more else None
+
+        elif prev_cursor_str:
+            cursor = Cursor(urlsafe=prev_cursor_str)
+            objects, prev, more = DeviceIssueLog.query(
+                DeviceIssueLog.device_key == device.key,
+                ndb.AND(DeviceIssueLog.created > start),
+                ndb.AND(DeviceIssueLog.created <= end)
+            ).order(
+                DeviceIssueLog.created
+            ).fetch_page(
+                page_size=fetch_size,
+                start_cursor=cursor.reversed()
+            )
+
+            # needed because we are using a reverse cursor
+            objects.reverse()
+
+            next_cursor = prev_cursor_str
+            prev_cursor = prev.urlsafe() if more else None
+
+        to_return = {
+            'objects': objects or [],
+            'next_cursor': next_cursor,
+            'prev_cursor': prev_cursor,
+        }
+
+        return to_return
+
+
+
+
+    @classmethod
+    def find_devices_paginated(cls, tenant_keys, fetch_size=200, unmanaged=False, prev_cursor_str=None,
+                               next_cursor_str=None):
+
+        objects = None
+        next_cursor = None
+        prev_cursor = None
+
+        no_tenant_keys = len(tenant_keys) == 0
+        if no_tenant_keys:
+            return {
+                'objects': objects or [],
+                'next_cursor': next_cursor,
+                'prev_cursor': prev_cursor,
+            }
+
+        if not prev_cursor_str and not next_cursor_str:
             objects, next_cursor, more = ChromeOsDevice.query(
                 ndb.OR(ChromeOsDevice.archived == None, ChromeOsDevice.archived == False),
                 ndb.AND(
-                        ChromeOsDevice.tenant_key.IN(tenant_keys),
-                        ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(
+                    ChromeOsDevice.tenant_key.IN(tenant_keys),
+                    ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(
                 page_size=fetch_size)
 
             prev_cursor = None
@@ -235,8 +318,8 @@ class Tenant(ndb.Model):
             objects, next_cursor, more = ChromeOsDevice.query(
                 ndb.OR(ChromeOsDevice.archived == None, ChromeOsDevice.archived == False),
                 ndb.AND(
-                        ChromeOsDevice.tenant_key.IN(tenant_keys),
-                        ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(
+                    ChromeOsDevice.tenant_key.IN(tenant_keys),
+                    ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(
                 page_size=fetch_size,
                 start_cursor=cursor
             )
@@ -249,11 +332,65 @@ class Tenant(ndb.Model):
             objects, prev, more = ChromeOsDevice.query(
                 ndb.OR(ChromeOsDevice.archived == None, ChromeOsDevice.archived == False),
                 ndb.AND(
-                        ChromeOsDevice.tenant_key.IN(tenant_keys),
-                        ChromeOsDevice.is_unmanaged_device == unmanaged)).order(-ChromeOsDevice.key).fetch_page(
+                    ChromeOsDevice.tenant_key.IN(tenant_keys),
+                    ChromeOsDevice.is_unmanaged_device == unmanaged)).order(-ChromeOsDevice.key).fetch_page(
                 page_size=fetch_size,
                 start_cursor=cursor.reversed()
             )
+
+            objects.reverse()
+            next_cursor = prev_cursor_str
+            prev_cursor = prev.urlsafe() if more else None
+
+        to_return = {
+            'objects': objects or [],
+            'next_cursor': next_cursor,
+            'prev_cursor': prev_cursor,
+
+        }
+
+        return to_return
+
+    @classmethod
+    def find_locations_of_tenant_paginated(cls,
+                                           tenant_key,
+                                           fetch_size=25,
+                                           prev_cursor_str=None,
+                                           next_cursor_str=None):
+        objects = None
+        next_cursor = None
+        prev_cursor = None
+
+        if not prev_cursor_str and not next_cursor_str:
+            objects, next_cursor, more = Location.query(Location.tenant_key == tenant_key).order(
+                Location.customer_location_name).order(Location.key).fetch_page(
+                page_size=fetch_size
+            )
+
+            prev_cursor = None
+            next_cursor = next_cursor.urlsafe() if more else None
+
+        elif next_cursor_str:
+            cursor = Cursor(urlsafe=next_cursor_str)
+            objects, next_cursor, more = Location.query(Location.tenant_key == tenant_key).order(
+                Location.customer_location_name).order(Location.key).fetch_page(
+                page_size=fetch_size,
+                start_cursor=cursor
+            )
+
+            prev_cursor = next_cursor_str
+            next_cursor = next_cursor.urlsafe() if more else None
+
+        elif prev_cursor_str:
+            cursor = Cursor(urlsafe=prev_cursor_str)
+            objects, prev, more = Location.query(Location.tenant_key == tenant_key).order(
+                -Location.customer_location_name).order(-Location.key).fetch_page(
+                page_size=fetch_size,
+                start_cursor=cursor.reversed()
+            )
+
+            objects.reverse()
+
             next_cursor = prev_cursor_str
             prev_cursor = prev.urlsafe() if more else None
 
@@ -278,7 +415,9 @@ class Tenant(ndb.Model):
     def create(cls, tenant_code, name, admin_email, content_server_url, domain_key, active,
                content_manager_base_url, notification_emails=[], proof_of_play_logging=False,
                proof_of_play_url=config.DEFAULT_PROOF_OF_PLAY_URL, default_timezone='America/Chicago'):
+
         tenant_entity_group = TenantEntityGroup.singleton()
+
         return cls(parent=tenant_entity_group.key,
                    tenant_code=tenant_code,
                    name=name,
@@ -293,15 +432,15 @@ class Tenant(ndb.Model):
                    default_timezone=default_timezone)
 
     @classmethod
-    def toggle_proof_of_play(cls, tenant_code, enable):
+    def toggle_proof_of_play(cls, tenant_code, should_be_enabled):
         tenant = Tenant.find_by_tenant_code(tenant_code)
         managed_devices = Tenant.find_devices(tenant.key, unmanaged=False)
         for device in managed_devices:
-            if not enable:
-                device.proof_of_play_logging = enable
-            device.proof_of_play_editable = enable
+            if not should_be_enabled:
+                device.proof_of_play_logging = False
+            device.proof_of_play_editable = should_be_enabled
             device.put()
-        tenant.proof_of_play_logging = enable
+        tenant.proof_of_play_logging = should_be_enabled
         tenant.put()
 
     def _pre_put_hook(self):
@@ -419,11 +558,12 @@ class ChromeOsDevice(ndb.Model):
 
     @classmethod
     def create_managed(cls, tenant_key, gcm_registration_id, mac_address, ethernet_mac_address=None, device_id=None,
-                       serial_number=None,
+                       serial_number=None, archived=False,
                        model=None, timezone='America/Chicago'):
         timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
         device = cls(
             device_id=device_id,
+            archived=archived,
             tenant_key=tenant_key,
             gcm_registration_id=gcm_registration_id,
             mac_address=mac_address,
@@ -770,10 +910,57 @@ class PlayerCommandEvent(ndb.Model):
                    posted=datetime.utcnow())
 
     @classmethod
-    def get_events_by_device_key(self, device_urlsafe_key, last_number=100):
-        query = PlayerCommandEvent.query(PlayerCommandEvent.device_urlsafe_key == device_urlsafe_key).order(
-            -PlayerCommandEvent.posted)
-        return query.fetch(last_number)
+    def get_events_by_device_key(self, device_urlsafe_key, fetch_size=25, prev_cursor_str=None,
+                                 next_cursor_str=None):
+
+        objects = None
+        next_cursor = None
+        prev_cursor = None
+
+        if not prev_cursor_str and not next_cursor_str:
+            objects, next_cursor, more = PlayerCommandEvent.query(
+                PlayerCommandEvent.device_urlsafe_key == device_urlsafe_key).order(
+                -PlayerCommandEvent.posted).fetch_page(
+                page_size=fetch_size)
+
+            prev_cursor = None
+            next_cursor = next_cursor.urlsafe() if more else None
+
+        elif next_cursor_str:
+            cursor = Cursor(urlsafe=next_cursor_str)
+            objects, next_cursor, more = PlayerCommandEvent.query(
+                PlayerCommandEvent.device_urlsafe_key == device_urlsafe_key).order(
+                -PlayerCommandEvent.posted).fetch_page(
+                page_size=fetch_size,
+                start_cursor=cursor
+            )
+
+            prev_cursor = next_cursor_str
+            next_cursor = next_cursor.urlsafe() if more else None
+
+        elif prev_cursor_str:
+            cursor = Cursor(urlsafe=prev_cursor_str)
+            objects, prev, more = PlayerCommandEvent.query(
+                PlayerCommandEvent.device_urlsafe_key == device_urlsafe_key).order(
+                PlayerCommandEvent.posted).fetch_page(
+                page_size=fetch_size,
+                start_cursor=cursor.reversed()
+            )
+
+            # needed because we are using a reverse cursor
+            objects.reverse()
+
+            next_cursor = prev_cursor_str
+            prev_cursor = prev.urlsafe() if more else None
+
+        to_return = {
+            'objects': objects or [],
+            'next_cursor': next_cursor,
+            'prev_cursor': prev_cursor,
+
+        }
+
+        return to_return
 
     def _pre_put_hook(self):
         self.class_version = 1

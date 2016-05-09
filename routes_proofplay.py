@@ -111,12 +111,6 @@ application = WSGIApplication([
         name="ManageRawPayloadTable"
     ),
 
-    Route(
-        BASE_URI + '/0730578567129494/make_migration',
-        handler="proofplay.main.MakeMigration",
-        name="MakeMigration"
-    ),
-
 ])
 
 if on_development_server:
@@ -125,6 +119,11 @@ if on_development_server:
             BASE_URI + '/seed/<days>/<amount_a_day>',
             handler="proofplay.main.Seed",
             name="Seed"
+        ),
+        Route(
+            BASE_URI + '/0730578567129494/make_migration',
+            handler="proofplay.main.MakeMigration",
+            name="MakeMigration"
         ),
     ]
 

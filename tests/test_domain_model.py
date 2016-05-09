@@ -62,3 +62,26 @@ class TestDomainModel(BaseTest):
         self.domain.class_version = 47
         self.domain.put()
         self.assertEqual(self.domain.class_version, self.CURRENT_CLASS_VERSION)
+
+    def test_already_exists_for_existing_active(self):
+        name = 'existing-active.skykit.com'
+        domain = Domain.create(name=name,
+                               distributor_key=self.distributor_key,
+                               impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
+                               active=True)
+        domain.put()
+        self.assertTrue(Domain.already_exists(name))
+
+    def test_already_exists_for_existing_active_false(self):
+        name = 'existing-non-active.skykit.com'
+        domain = Domain.create(name=name,
+                               distributor_key=self.distributor_key,
+                               impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
+                               active=False)
+        domain.put()
+        self.assertFalse(Domain.already_exists(name))
+
+    def test_already_exists_for_non_existing(self):
+        name = 'non-existing.skykit.com'
+        self.assertFalse(Domain.already_exists(name))
+

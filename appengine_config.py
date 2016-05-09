@@ -3,7 +3,6 @@ The configuration file used by :py:mod:`agar.config` implementations and other l
 `google.appengine.api.lib_config`_ configuration library. Configuration overrides go in this file.
 """
 from env_setup import setup
-
 setup()
 
 import os
@@ -16,12 +15,13 @@ from provisioning_env import (
     on_server,
     on_test_harness)
 from agar.env import appid
+from os import path
+
+basedir = path.abspath(path.dirname(__file__))
 
 ##############################################################################
 # APPLICATION SETTINGS
 ##############################################################################
-
-
 app_APP_ROOT = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
@@ -294,6 +294,8 @@ app_PLAYER_POWER_OFF_COMMAND = 'skykit.com/skdchromeapp/tv/off'
 
 app_PLAYER_DELETE_CONTENT_COMMAND = 'skykit.com/skdchromeapp/content/delete'
 
+app_PLAYER_UPDATE_CONTENT_COMMAND = 'skykit.com/skdchromeapp/update/content'
+
 app_PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND = 'skykit.com/skdchromeapp/update/provisioning'
 
 app_PLAYER_HEARTBEAT_INTERVAL_MINUTES = 2
@@ -446,16 +448,24 @@ def _DEFAULT_PROOF_OF_PLAY_URL():
 
 
 app_DEFAULT_PROOF_OF_PLAY_URL = _DEFAULT_PROOF_OF_PLAY_URL()
-
 proofplay_SQLALCHEMY_DATABASE_URI = _SQLALCHEMY_DATABASE_URI()
-
 proofplay_DAYS_TO_KEEP_RAW_EVENTS = 30
+
 
 ##############################################################################
 # VERSION  sprint_number.deployment_increment.hotfix_increment e.g., 33.3.0
 ##############################################################################
-app_SPRINT_NUMBER = 34
+def _return_yaml_data():
+    with open(os.path.join(basedir, 'snapdeploy.yaml'), 'r') as f:
+        data = f.readlines()
+        version = data[-1]
+        version_without_newlines = version.rstrip()
+        only_numbers = version_without_newlines[9:]
+        array_of_versions = only_numbers.split('-')
+        array_of_versions_as_int = [int(each) for each in array_of_versions]
+        return array_of_versions_as_int[0], array_of_versions_as_int[1], array_of_versions_as_int[2]
 
-app_DEPLOYMENT_COUNTER = 4
-
-app_PRODUCTION_HOTFIX_COUNTER = 0
+snapdeploy_yaml_data = _return_yaml_data()
+app_SPRINT_NUMBER = snapdeploy_yaml_data[0]
+app_DEPLOYMENT_COUNTER = snapdeploy_yaml_data[1]
+app_PRODUCTION_HOTFIX_COUNTER = snapdeploy_yaml_data[2]

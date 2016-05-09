@@ -403,6 +403,8 @@ ul.alert-dropdown {
 
 #proofplay-selected-items {
   min-width: 0px !important;
+  margin: 0 auto;
+  padding: 0 auto;
 }
 
 .radio-button {
@@ -455,6 +457,54 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
 .center-block {
   text-align: center;
 }
+
+.proof-of-play-selected-item {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis // This is where the magic happens
+}
+
+.proof-of-play-tenant-name-option {
+  width: 7em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: center;
+  positition: absolute;
+  text-overflow: ellipsis // This is where the magic happens
+
+}
+
+.proof-of-play-horizontal-top-bar {
+  display: flex;
+  align-self: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  justify-content: center;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.my-flex {
+  display: flex;
+  justify-content: center;
+}
+
+
+.bigger-buttons {
+  padding: 0.4em;
+  min-width: 88px;
+  border-radius: 5px;
+  font-size: 16px;
+  text-align: center;
+  text-decoration:none;
+  border: none;
+  outline: none;}
 
 //.distributor-selection {
 //  font-size: 20pt;

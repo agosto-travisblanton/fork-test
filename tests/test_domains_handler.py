@@ -1,14 +1,15 @@
 from env_setup import setup_test_paths
+from utils.web_util import build_uri
 from webtest import AppError
 
 setup_test_paths()
 
 import json
 from agar.test import BaseTest, WebTest
-from models import Distributor, Domain
 from routes import application
-from utils.web_util import build_uri
+from models import Distributor, Domain
 from app_config import config
+
 
 class TestDomainsHandler(BaseTest, WebTest):
     APPLICATION = application
@@ -46,7 +47,7 @@ class TestDomainsHandler(BaseTest, WebTest):
     ## post
     ##################################################################################################################
     def test_post_returns_created_status(self):
-        request_parameters = {'name': self.CHROME_DEVICE_DOMAIN,
+        request_parameters = {'name': 'dev1.agosto.com',
                               'active': True,
                               'impersonation_admin_email_address': self.IMPERSONATION_EMAIL,
                               'distributor_key': self.distributor_key.urlsafe()}
@@ -55,7 +56,7 @@ class TestDomainsHandler(BaseTest, WebTest):
         self.assertEqual(201, response.status_int)
 
     def test_post_create_new_domain_persists_object(self):
-        request_parameters = {'name': self.CHROME_DEVICE_DOMAIN,
+        request_parameters = {'name': 'dev2.agosto.com',
                               'active': True,
                               'impersonation_admin_email_address': self.IMPERSONATION_EMAIL,
                               'distributor_key': self.distributor_key.urlsafe()}
@@ -90,7 +91,7 @@ class TestDomainsHandler(BaseTest, WebTest):
             'X-Provisioning-Distributor': ''
         }
 
-        request_body = {'name': self.CHROME_DEVICE_DOMAIN,
+        request_body = {'name': 'dev3.agosto.com',
                         'active': True,
                         'impersonation_admin_email_address': self.IMPERSONATION_EMAIL}
         with self.assertRaises(AppError) as context:
@@ -109,7 +110,7 @@ class TestDomainsHandler(BaseTest, WebTest):
                         in context.exception.message)
 
     def test_post_fails_without_active_parameter(self):
-        request_body = {'name': self.CHROME_DEVICE_DOMAIN,
+        request_body = {'name': 'dev4.agosto.com',
                         'active': None,
                         'impersonation_admin_email_address': self.IMPERSONATION_EMAIL,
                         'distributor_key': self.distributor_key.urlsafe()}
@@ -119,7 +120,7 @@ class TestDomainsHandler(BaseTest, WebTest):
                         in context.exception.message)
 
     def test_post_fails_without_impersonation_admin_email_address_parameter(self):
-        request_body = {'name': self.CHROME_DEVICE_DOMAIN,
+        request_body = {'name': 'dev5.agosto.com',
                         'active': True,
                         'impersonation_admin_email_address': None,
                         'distributor_key': self.distributor_key.urlsafe()}
@@ -132,6 +133,17 @@ class TestDomainsHandler(BaseTest, WebTest):
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/domains', {}, headers=self.headers)
         self.assertTrue('Bad response: 400 Did not receive request body.'
+                        in context.exception.message)
+
+    def test_post_fails_with_existing_domain(self):
+        request_parameters = {'name': self.CHROME_DEVICE_DOMAIN,
+                              'active': True,
+                              'impersonation_admin_email_address': self.IMPERSONATION_EMAIL,
+                              'distributor_key': self.distributor_key.urlsafe()}
+        uri = application.router.build(None, 'domains', None, {})
+        with self.assertRaises(AppError) as context:
+            self.app.post_json(uri, params=request_parameters, headers=self.headers)
+        self.assertTrue('409 Conflict. Domain name "{0}" is in use.'.format(self.CHROME_DEVICE_DOMAIN)
                         in context.exception.message)
 
     ##################################################################################################################
@@ -182,51 +194,20 @@ class TestDomainsHandler(BaseTest, WebTest):
     ##################################################################################################################
 
     def test_device_resource_put_no_authorization_header_returns_forbidden(self):
-        request_body = {'name': self.CHROME_DEVICE_DOMAIN,
-                        'active': True,
-                        'impersonation_admin_email_address': self.IMPERSONATION_EMAIL,
-                        'distributor_key': self.distributor_key.urlsafe()}
+        request_body = {'active': True}
         uri = build_uri('manage-domain', params_dict={'domain_key': self.domain_key.urlsafe()})
         response = self.put(uri, params=request_body, headers=self.bad_authorization_header)
         self.assertForbidden(response)
 
     def test_put_http_status_no_content(self):
-        request_body = {'name': self.CHROME_DEVICE_DOMAIN,
-                        'active': True,
-                        'impersonation_admin_email_address': self.IMPERSONATION_EMAIL,
-                        'distributor_key': self.distributor_key.urlsafe()}
+        request_body = {'active': True}
         uri = build_uri('manage-domain', params_dict={'domain_key': self.domain_key.urlsafe()})
         response = self.put(uri, params=json.dumps(request_body), headers=self.headers)
         self.assertEqual('204 No Content', response.status)
 
-    def test_put_updates_domain_entity_name(self):
-        updated_domain_name = 'foobar.agosto.com'
-        request_body = {'name': updated_domain_name,
-                        'active': True,
-                        'impersonation_admin_email_address': self.IMPERSONATION_EMAIL,
-                        'distributor_key': self.distributor_key.urlsafe()}
-        uri = build_uri('manage-domain', params_dict={'domain_key': self.domain_key.urlsafe()})
-        self.put(uri, params=json.dumps(request_body), headers=self.headers)
-        updated_domain = self.domain_key.get()
-        self.assertEqual(updated_domain_name, updated_domain.name)
-
-    def test_put_updates_domain_entity_impersonation_admin_email_address(self):
-        impersonation_admin_email_address = 'bob.macneal@agosto.com'
-        request_body = {'name': self.CHROME_DEVICE_DOMAIN,
-                        'active': True,
-                        'impersonation_admin_email_address': impersonation_admin_email_address,
-                        'distributor_key': self.distributor_key.urlsafe()}
-        uri = build_uri('manage-domain', params_dict={'domain_key': self.domain_key.urlsafe()})
-        self.put(uri, params=json.dumps(request_body), headers=self.headers)
-        updated_domain = self.domain_key.get()
-        self.assertEqual(impersonation_admin_email_address, updated_domain.impersonation_admin_email_address)
-
     def test_put_updates_domain_entity_active_to_false(self):
         active = False
-        request_body = {'name': self.CHROME_DEVICE_DOMAIN,
-                        'active': active,
-                        'impersonation_admin_email_address': self.IMPERSONATION_EMAIL,
-                        'distributor_key': self.distributor_key.urlsafe()}
+        request_body = {'active': active}
         uri = build_uri('manage-domain', params_dict={'domain_key': self.domain_key.urlsafe()})
         self.put(uri, params=json.dumps(request_body), headers=self.headers)
         updated_domain = self.domain_key.get()

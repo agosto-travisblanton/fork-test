@@ -5,19 +5,27 @@ appModule = angular.module 'skykitProvisioning'
 appModule.controller "TenantsCtrl", ($state, $log, TenantsService, ProgressBarService, sweet) ->
   @tenants = []
 
-  @initialize = ->
+  @getTenants = (page_size, offset) =>
+    @offset = offset
+    @loading = true
     ProgressBarService.start()
-    promise = TenantsService.fetchAllTenants()
+    promise = TenantsService.fetchAllTenantsPaginated(page_size, offset)
     promise.then ((response) =>
       @getFetchSuccess(response)
-      return
     ), (response) =>
       @getFetchFailure(response)
-      return
+
+  @initialize = ->
+    @offset = 0
+    @getTenants(100, @offset)
 
   @getFetchSuccess = (response) ->
-    @tenants = response
+    @tenants = response.tenants
+    @total = response.total
+    @is_first_page = response.is_first_page
+    @is_last_page = response.is_last_page
     ProgressBarService.complete()
+    @loading = false
 
   @getFetchFailure = (response) ->
     ProgressBarService.complete()
@@ -32,6 +40,7 @@ appModule.controller "TenantsCtrl", ($state, $log, TenantsService, ProgressBarSe
       promise = TenantsService.delete item
       promise.then () =>
         @initialize()
+    
     sweet.show({
       title: "Are you sure?",
       text: "This will permanently remove the tenant from the system.",

@@ -1,13 +1,13 @@
 import json
 import logging
-
 from google.appengine.ext import ndb
 from webapp2 import RequestHandler
 
 from app_config import config
 from content_manager_api import ContentManagerApi
 from decorators import requires_api_token
-from models import Tenant, TenantEntityGroup, Domain
+from models import Tenant
+from proofplay.database_calls import get_tenant_list_from_distributor_key
 from restler.serializers import json_response
 from strategy import TENANT_STRATEGY
 from utils.iterable_util import delimited_string_to_list
@@ -16,21 +16,38 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 
 class TenantsHandler(RequestHandler):
+    @requires_api_token
+    def get_tenants_paginated(self, offset, page_size):
+        offset = int(offset)
+        page_size = int(page_size)
+        distributor_key = self.request.headers.get('X-Provisioning-Distributor')
+        result = get_tenant_list_from_distributor_key(distributor_key=distributor_key)
+        paginated_result = result[offset:page_size + offset]
+
+        is_first_page = offset == 0
+        is_last_page = paginated_result[-1] == result[-1]
+
+        json_response(
+            self.response,
+            {
+                "tenants": paginated_result,
+                "is_first_page": is_first_page,
+                "is_last_page": is_last_page,
+                "total": len(result)
+            },
+            strategy=TENANT_STRATEGY)
 
     @requires_api_token
     def get(self, tenant_key=None):
         if not tenant_key:
             distributor_key = self.request.headers.get('X-Provisioning-Distributor')
-            distributor = ndb.Key(urlsafe=distributor_key)
-            domain_keys = Domain.query(Domain.distributor_key == distributor).fetch(100, keys_only=True)
-            tenant_list = Tenant.query(ancestor=TenantEntityGroup.singleton().key)
-            tenant_list = filter(lambda x: x.active is True, tenant_list)
-            result = filter(lambda x: x.domain_key in domain_keys, tenant_list)
+            result = get_tenant_list_from_distributor_key(distributor_key=distributor_key)
+
         else:
             tenant_key = ndb.Key(urlsafe=tenant_key)
             tenant = tenant_key.get()
             if tenant.proof_of_play_url is None:
-                tenant.proof_of_play_url= config.DEFAULT_PROOF_OF_PLAY_URL
+                tenant.proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
                 tenant.put()
             result = tenant
         json_response(self.response, result, strategy=TENANT_STRATEGY)
@@ -90,7 +107,9 @@ class TenantsHandler(RequestHandler):
             else:
                 active = bool(active)
             proof_of_play_logging = request_json.get('proof_of_play_logging')
-            if proof_of_play_logging is None or active == '' or (str(proof_of_play_logging).lower() != 'true' and str(proof_of_play_logging).lower() != 'false'):
+            if proof_of_play_logging is None or active == '' or (
+                            str(proof_of_play_logging).lower() != 'true' and str(
+                        proof_of_play_logging).lower() != 'false'):
                 status = 400
                 error_message = 'The proof_of_play_logging parameter is invalid.'
             else:
@@ -115,7 +134,7 @@ class TenantsHandler(RequestHandler):
                                            content_manager_base_url=content_manager_base_url,
                                            domain_key=domain_key,
                                            active=active,
-                                           notification_emails = notification_emails,
+                                           notification_emails=notification_emails,
                                            proof_of_play_logging=proof_of_play_logging,
                                            proof_of_play_url=proof_of_play_url,
                                            default_timezone=default_timezone)
@@ -188,14 +207,10 @@ class TenantsHandler(RequestHandler):
         domain_key_input = request_json.get('domain_key')
         tenant.active = request_json.get('active')
         proof_of_play_logging = request_json.get('proof_of_play_logging')
-        if str(proof_of_play_logging).lower() == 'true' or str(proof_of_play_logging).lower() == 'false':
-            tenant.proof_of_play_logging = bool(proof_of_play_logging)
-            Tenant.toggle_proof_of_play(tenant_code=tenant.tenant_code, enable=tenant.proof_of_play_logging)
         proof_of_play_url = request_json.get('proof_of_play_url')
-        if proof_of_play_url is None or proof_of_play_url == '':
-            tenant.proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
-        else:
-            tenant.proof_of_play_url = proof_of_play_url.strip().lower()
+        TenantsHandler.proof_of_play_options(proof_of_play_logging=proof_of_play_logging,
+                                             proof_of_play_url=proof_of_play_url,
+                                             tenant=tenant)
         try:
             domain_key = ndb.Key(urlsafe=domain_key_input)
         except Exception, e:
@@ -204,7 +219,7 @@ class TenantsHandler(RequestHandler):
             tenant.domain_key = domain_key
         else:
             status = 400
-            error_message = 'Error retrieving domain.'
+            error_message = 'Error resolving domain from domain key.'
         if status == 204:
             tenant.put()
             self.response.headers.pop('Content-Type', None)
@@ -221,3 +236,14 @@ class TenantsHandler(RequestHandler):
             tenant.put()
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
+
+    @staticmethod
+    def proof_of_play_options(proof_of_play_logging, tenant, proof_of_play_url):
+        if proof_of_play_logging is not None:
+            tenant.proof_of_play_logging = proof_of_play_logging
+            Tenant.toggle_proof_of_play(tenant_code=tenant.tenant_code, should_be_enabled=tenant.proof_of_play_logging)
+        if proof_of_play_url is None or proof_of_play_url == '':
+            tenant.proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
+        else:
+            tenant.proof_of_play_url = proof_of_play_url.strip().lower()
+

@@ -24,7 +24,7 @@ appModule.controller 'TenantManagedDevicesCtrl', ($scope, $stateParams, TenantsS
   @macDevices = {}
   @editMode = !!$stateParams.tenantKey
   @tenantKey = $stateParams.tenantKey
-  
+
   @getManagedDevices = (tenantKey, prev_cursor, next_cursor) ->
     ProgressBarService.start()
     devicesPromise = DevicesService.getDevicesByTenant tenantKey, prev_cursor, next_cursor
@@ -33,6 +33,14 @@ appModule.controller 'TenantManagedDevicesCtrl', ($scope, $stateParams, TenantsS
       @devicesNext = data["next_cursor"]
       @tenantDevices = data["devices"]
       ProgressBarService.complete()
+
+
+  @refreshDevices = () =>
+    @devicesPrev = null
+    @devicesNext = null
+    @tenantDevices = null
+    DevicesService.deviceByTenantCache.removeAll()
+    @getManagedDevices @tenantKey, @devicesPrev, @devicesNext
 
   if @editMode
     tenantPromise = TenantsService.getTenantByKey @tenantKey
@@ -92,6 +100,11 @@ appModule.controller 'TenantManagedDevicesCtrl', ($scope, $stateParams, TenantsS
             @macDevices = @convertArrayToDictionary(result, true)
             return [each.mac for each in result][0]
 
+      else
+        return []
+    else
+      return []
+
   @paginateCall = (forward) ->
     if forward
       @getManagedDevices @tenantKey, null, @devicesNext
@@ -110,12 +123,14 @@ appModule.controller 'TenantManagedDevicesCtrl', ($scope, $stateParams, TenantsS
 
   @controlOpenButton = (isMatch) =>
     @disabled = !isMatch
+    @loadingDisabled = false
 
 
   @isResourceValid = (resource) ->
     if resource
       if resource.length > 2
         mac = @selectedButton == "MAC"
+        @loadingDisabled = true
 
         if mac
           DevicesService.matchDevicesByFullMacByTenant(@tenantKey, resource, false)

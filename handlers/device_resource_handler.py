@@ -7,7 +7,8 @@ from google.appengine.ext.deferred import deferred
 from webapp2 import RequestHandler
 
 from app_config import config
-from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address, update_chrome_os_device)
+from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address, register_device,
+                                   update_chrome_os_device)
 from content_manager_api import ContentManagerApi
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from device_message_processor import post_unmanaged_device_info, change_intent
@@ -63,7 +64,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             },
         )
 
-    # @requires_api_token
+    @requires_api_token
     def search_for_device_by_mac_by_tenant(self, tenant_urlsafe_key, partial_mac, unmanaged):
         unmanaged = unmanaged == "true"
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
@@ -86,7 +87,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             },
         )
 
-    # @requires_api_token
+    @requires_api_token
     def search_for_device_by_serial_by_tenant(self, tenant_urlsafe_key, partial_serial, unmanaged):
         unmanaged = unmanaged == "true"
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
@@ -348,7 +349,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @requires_registration_token
     def post(self):
-        if self.request.body is not str('') and self.request.body is not None:
+        if self.request.body is not '' and self.request.body is not None:
             status = 201
             error_message = None
             request_json = json.loads(self.request.body)
@@ -423,15 +424,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                            mac_address=device_mac_address,
                                                            timezone=timezone)
                     key = device.put()
-                    deferred.defer(refresh_device_by_mac_address,
+                    deferred.defer(register_device,
                                    device_urlsafe_key=key.urlsafe(),
                                    device_mac_address=device_mac_address,
                                    _queue='directory-api',
-                                   _countdown=30)
-                    deferred.defer(ContentManagerApi().create_device,
-                                   device_urlsafe_key=key.urlsafe(),
-                                   _queue='content-server',
-                                   _countdown=5)
+                                   _countdown=3)
                     device_uri = self.request.app.router.build(None,
                                                                'device',
                                                                None,
@@ -481,7 +478,13 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 device.heartbeat_interval_minutes = heartbeat_interval_minutes
             check_for_content_interval_minutes = request_json.get('checkContentInterval')
             if check_for_content_interval_minutes is not None and check_for_content_interval_minutes > -1:
-                device.check_for_content_interval_minutes = check_for_content_interval_minutes
+                if device.check_for_content_interval_minutes != check_for_content_interval_minutes:
+                    device.check_for_content_interval_minutes = check_for_content_interval_minutes
+                    change_intent(
+                        gcm_registration_id=device.gcm_registration_id,
+                        payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                        device_urlsafe_key=device_urlsafe_key,
+                        host=self.request.host_url)
             customer_display_name = request_json.get('customerDisplayName')
             if customer_display_name:
                 device.customer_display_name = customer_display_name
@@ -768,18 +771,21 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         self.response.set_status(status, message)
 
     @requires_api_token
-    def get_latest_issues(self, device_urlsafe_key):
+    def get_latest_issues(self, device_urlsafe_key, prev_cursor_str, next_cursor_str):
         start_epoch = int(self.request.params['start'])
         end_epoch = int(self.request.params['end'])
+        next_cursor_str = next_cursor_str if next_cursor_str != "null" else None
+        prev_cursor_str = prev_cursor_str if prev_cursor_str != "null" else None
         start = datetime.utcfromtimestamp(start_epoch)
         end = datetime.utcfromtimestamp(end_epoch)
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
-        query = DeviceIssueLog.query(DeviceIssueLog.device_key == device.key,
-                                     ndb.AND(DeviceIssueLog.created > start),
-                                     ndb.AND(DeviceIssueLog.created <= end)).order(-DeviceIssueLog.created)
-
-        latest_issues = query.fetch(config.LATEST_DEVICE_ISSUES_FETCH_COUNT)
-        return json_response(self.response, latest_issues, strategy=DEVICE_ISSUE_LOG_STRATEGY)
+        paginated_results = Tenant.find_issues_paginated(start, end, device, prev_cursor_str=prev_cursor_str,
+                                                         next_cursor_str=next_cursor_str)
+        return json_response(self.response, {
+            "issues": paginated_results["objects"],
+            "prev": paginated_results["prev_cursor"],
+            "next": paginated_results["next_cursor"]
+        }, strategy=DEVICE_ISSUE_LOG_STRATEGY)
 
     @requires_api_token
     def delete(self, device_urlsafe_key):

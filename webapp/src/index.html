@@ -67,6 +67,10 @@
             <md-button ng-click="appController.goTo('tenants')"><i class="fa fa-fw fa-group"></i> Tenants</md-button>
         </md-list-item>
         <md-list-item>
+            <md-button ng-click="appController.goTo('welcome')"><i class="fa fa-fw fa fa-play"></i> Welcome
+            </md-button>
+        </md-list-item>
+        <md-list-item>
             <md-button ng-click="appController.goTo('sign_out')"><i class="fa fa-fw fa-sign-out"></i> Sign out
             </md-button>
         </md-list-item>
@@ -75,7 +79,7 @@
 
 <div flex layout="column" tabIndex="-1" role="main" class="md-whiteframe-z2" style="margin-top:-50px">
     <md-toolbar layout="row" class="md-whiteframe-z1">
-        <md-button class="menu" ng-disabled="!appController.getIdentity().email"
+        <md-button class="menu" ng-disabled="!appController.getIdentity().email || appController.isCurrentURLDistributorSelector() == true"
                    ng-click="appController.toggleSidenav('left')" hide-gt-lg aria-label="Menu">
             <md-icon md-font-set="material-icons" class="md-light md-48">menu</md-icon>
         </md-button>

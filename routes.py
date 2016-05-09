@@ -1,4 +1,8 @@
 from env_setup import setup
+from provisioning_env import (
+    on_development_server,
+    on_integration_server
+)
 
 setup()
 
@@ -74,6 +78,12 @@ application = WSGIApplication(
               name='location-create',
               methods=['POST']
               ),
+        Route(r'/api/v1/tenants/<tenant_urlsafe_key>/<prev_cursor>/<next_cursor>/locations',
+              handler='handlers.locations_handler.LocationsHandler',
+              name='get_locations_by_tenant_paginated',
+              handler_method='get_locations_by_tenant_paginated',
+              methods=['GET']
+              ),
         Route(r'/api/v1/tenants/<tenant_urlsafe_key>/locations',
               handler='handlers.locations_handler.LocationsHandler',
               name='locations-list-retrieval',
@@ -114,7 +124,7 @@ application = WSGIApplication(
               handler_method='get_pairing_code',
               methods=['GET']
               ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>/issues',
+        Route(r'/api/v1/devices/<prev_cursor_str>/<next_cursor_str>/<device_urlsafe_key>/issues',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='device-issues',
               handler_method='get_latest_issues',
@@ -158,6 +168,18 @@ application = WSGIApplication(
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
               name='device-delete-content-command',
               handler_method='content_delete',
+              methods=['POST']
+              ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/content-update',
+              handler='handlers.device_commands_handler.DeviceCommandsHandler',
+              name='device-update-content-command',
+              handler_method='content_update',
+              methods=['POST']
+              ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/refresh-device-representation',
+              handler='handlers.device_commands_handler.DeviceCommandsHandler',
+              name='refresh-device-representation-command',
+              handler_method='refresh_device_representation',
               methods=['POST']
               ),
 
@@ -232,11 +254,19 @@ application = WSGIApplication(
               methods=['GET']
               ),
 
+        Route(r'/api/v1/tenants/paginated/<page_size>/<offset>',
+              handler='handlers.tenants_handler.TenantsHandler',
+              name='get_tenants_paginated',
+              handler_method='get_tenants_paginated',
+              methods=['GET', 'POST']
+              ),
+
         Route(r'/api/v1/tenants',
               handler='handlers.tenants_handler.TenantsHandler',
               name='tenants',
               methods=['GET', 'POST']
               ),
+
         Route(
             r'/api/v1/tenants/<tenant_key>',
             handler='handlers.tenants_handler.TenantsHandler',
@@ -315,7 +345,7 @@ application = WSGIApplication(
               methods=['PUT']
               ),
 
-        Route(r'/api/v1/player-command-events/<device_urlsafe_key>',
+        Route(r'/api/v1/player-command-events/<prev_cursor_str>/<next_cursor_str>/<device_urlsafe_key>',
               handler='handlers.player_command_events_handler.PlayerCommandEventsHandler',
               name='player-command-events',
               handler_method='get_player_command_events',
@@ -354,3 +384,15 @@ application = WSGIApplication(
     ],
     debug=not on_production_server
 )
+
+if on_development_server or on_integration_server:
+    dev_routes = [
+        Route(r'/api/v1/seed/<user_first>/<user_last>',
+              handler="handlers.dev_handlers.SeedScript",
+              name="Seed",
+              methods=["GET"]
+              ),
+    ]
+
+    for route in dev_routes:
+        application.router.add(route)

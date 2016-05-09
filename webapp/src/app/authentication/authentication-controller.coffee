@@ -3,52 +3,59 @@
 app = angular.module 'skykitProvisioning'
 
 app.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
-    identity,
-    sweet,
-    SessionsService,
-    ProgressBarService) ->
-  @onGooglePlusSignInSuccess = (event, authResult) =>
-    unless @googlePlusSignInButtonClicked
-      ProgressBarService.start()
-    promise = SessionsService.login(authResult)
-    promise.then @loginSuccess, @loginFailure
+  identity,
+  sweet,
+  SessionsService,
+  ProgressBarService,
+  ProofPlayService,
+  DevicesService,
+  TenantsService) ->
+
+    @onGooglePlusSignInSuccess = (event, authResult) =>
+      unless @googlePlusSignInButtonClicked
+        ProgressBarService.start()
+      promise = SessionsService.login(authResult)
+      promise.then @loginSuccess, @loginFailure
 
 
-  @onGooglePlusSignInFailure = (event, authResult) =>
-    if @googlePlusSignInButtonClicked
+    @onGooglePlusSignInFailure = (event, authResult) =>
+      if @googlePlusSignInButtonClicked
+        ProgressBarService.complete()
+        sweet.show('Oops...', 'Unable to authenticate to Google+.', 'error')
+
+    $scope.$on 'event:google-plus-signin-success', @onGooglePlusSignInSuccess
+    $scope.$on 'event:google-plus-signin-failure', @onGooglePlusSignInFailure
+
+    @initializeSignIn = ->
+      @clientId = identity.OAUTH_CLIENT_ID
+      @state = identity.STATE
+      @googlePlusSignInButtonClicked = false
+
+    @initializeSignOut = ->
+      SessionsService.removeUserInfo()
+      $timeout @proceedToSignedOut, 1500
+
+    @loginSuccess = (response) ->
       ProgressBarService.complete()
-      sweet.show('Oops...', 'Unable to authenticate to Google+.', 'error')
+      ProofPlayService.proofplayCache.removeAll()
+      TenantsService.tenantCache.removeAll()
+      DevicesService.deviceCache.removeAll()
+      DevicesService.deviceByTenantCache.removeAll()
+      $state.go 'distributor_selection'
 
-  $scope.$on 'event:google-plus-signin-success', @onGooglePlusSignInSuccess
-  $scope.$on 'event:google-plus-signin-failure', @onGooglePlusSignInFailure
-
-  @initializeSignIn = ->
-    @clientId = identity.OAUTH_CLIENT_ID
-    @state = identity.STATE
-    @googlePlusSignInButtonClicked = false
-
-  @initializeSignOut = ->
-    SessionsService.removeUserInfo()
-    $timeout @proceedToSignedOut, 1500
-
-  @loginSuccess = (response) ->
-    SessionsService.setIdentity(response)
-    ProgressBarService.complete()
-    $state.go 'distributor_selection'
-
-  @loginFailure = () ->
-    ProgressBarService.complete()
-    sweet.show('Oops...', 'Unable to authenticate to Stormpath.', 'error')
+    @loginFailure = () ->
+      ProgressBarService.complete()
+      sweet.show('Oops...', 'Unable to authenticate to Stormpath.', 'error')
 
 
-  @proceedToSignedOut = ->
-    $state.go 'signed_out'
+    @proceedToSignedOut = ->
+      $state.go 'signed_out'
 
-  @proceedToSignIn = ->
-    $state.go 'sign_in'
+    @proceedToSignIn = ->
+      $state.go 'sign_in'
 
-  @onClickGooglePlusSignIn = =>
-    @googlePlusSignInButtonClicked = true
-    ProgressBarService.start()
+    @onClickGooglePlusSignIn = =>
+      @googlePlusSignInButtonClicked = true
+      ProgressBarService.start()
 
-  @
+    @

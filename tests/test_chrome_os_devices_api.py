@@ -5,7 +5,7 @@ setup_test_paths()
 from models import Tenant, ChromeOsDevice, Distributor, Domain
 from agar.test import BaseTest
 from chrome_os_devices_api import ChromeOsDevicesApi, refresh_device_by_mac_address, \
-    get_impersonation_email_from_device_key, get_impersonation_email_from_device
+    get_impersonation_email_from_device_key, get_impersonation_email_from_device, register_device
 from app_config import config
 
 
@@ -118,6 +118,11 @@ class TestChromeOsDevicesApi(BaseTest):
     def test_refresh_device_by_mac_address(self):
         """ Tests the live connection to Admin SDK Directory API. """
         result = refresh_device_by_mac_address(self.device_key.urlsafe(), self.mac_address)
+        self.assertEqual(result.device_id, self.TESTING_DEVICE_ID)
+
+    def test_register_device(self):
+        """ Tests the live connection to Admin SDK Directory API. """
+        result = register_device(self.device_key.urlsafe(), self.mac_address)
         self.assertEqual(result.device_id, self.TESTING_DEVICE_ID)
 
     def test_get_impersonation_email_from_device_key(self):
