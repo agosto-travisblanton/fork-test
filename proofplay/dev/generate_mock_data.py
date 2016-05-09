@@ -3,11 +3,12 @@ import json
 import datetime
 import random
 from app_config import config
+from handlers.dev_handlers import TENANT_CODE, SECOND_TENANT_CODE
 
 analytics = {}
 
 information_to_post = {
-    "acme_inc": {
+    TENANT_CODE: {
         "resource_choices": [
             {"name": "ACME_6051_DARK_SOULS_III_SHADOWS_AHEAD_CUTDOWN_AVAILABLE_NOW", "id": "086b8e3df6a211e5b4256003088f14f4"},
             {"name": "ACME_5447", "id": "11ff1887f6a211e585a16003088f14f4"},
@@ -54,7 +55,7 @@ information_to_post = {
         }
 
     },
-    "davedistribution": {
+    SECOND_TENANT_CODE: {
         "resource_choices": [
             {"name": "DILB_5553", "id": "5ae556f3f6a211e5b21a6003088f14f4"},
             {"name": "DILB_5447", "id": "5fccaba1f6a211e5bd5d6003088f14f4"},

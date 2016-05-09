@@ -2,7 +2,7 @@ from webapp2 import RequestHandler
 from google.appengine.ext.deferred import deferred
 from app_config import config
 from models import User, Distributor, Domain, Tenant, ChromeOsDevice, PlayerCommandEvent, TenantEntityGroup, \
-    DeviceIssueLog, DistributorEntityGroup, Location, DistributorUser
+    DeviceIssueLog, Location
 import random
 
 USER_EMAIL = 'daniel.ternyak@agosto.com'
@@ -12,6 +12,9 @@ DOMAIN = 'local.skykit.com'
 TENANT_NAME = 'Acme, Inc.'
 TENANT_CODE = 'acme_inc'
 TENANT_ADMIN_EMAIL = 'admin@acme.com'
+SECOND_TENANT_NAME = 'DaveDistribution'
+SECOND_TENANT_CODE = 'davedistribution'
+SECOND_TENANT_ADMIN_EMAIL = 'dave@dave.com'
 DEVICE_ID = '132e235a-b346-4a37-a100-de49fa753a2a'
 GCM_REGISTRATION_ID = '8d70a8d78a6dfa6df76dfasd'
 MAC_ADDRESS = '54271e619346'
@@ -124,6 +127,20 @@ def make_data_for_a_distributor():
     else:
         print 'Tenant ' + tenant.name + ' already exists, so did not create'
 
+    ##########################################################################################
+    tenant = Tenant.find_by_tenant_code(SECOND_TENANT_CODE)
+    if not tenant:
+        tenant = Tenant.create(tenant_code=SECOND_TENANT_CODE,
+                               name=SECOND_TENANT_NAME,
+                               admin_email=SECOND_TENANT_ADMIN_EMAIL,
+                               content_server_url='https://skykit-contentmanager-int.appspot.com',
+                               content_manager_base_url='https://skykit-contentmanager-int.appspot.com/content',
+                               domain_key=domain.key,
+                               active=True)
+        tenant.put()
+        print 'Tenant ' + tenant.name + ' created'
+
+    ##########################################################################################
     tenant = Tenant.find_by_tenant_code(TENANT_CODE)
     if not tenant:
         tenant = Tenant.create(tenant_code=TENANT_CODE,
