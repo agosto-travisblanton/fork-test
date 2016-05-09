@@ -123,12 +123,14 @@ appModule.controller 'TenantManagedDevicesCtrl', ($scope, $stateParams, TenantsS
 
   @controlOpenButton = (isMatch) =>
     @disabled = !isMatch
+    @loadingDisabled = false
 
 
   @isResourceValid = (resource) ->
     if resource
       if resource.length > 2
         mac = @selectedButton == "MAC"
+        @loadingDisabled = true
 
         if mac
           DevicesService.matchDevicesByFullMacByTenant(@tenantKey, resource, false)

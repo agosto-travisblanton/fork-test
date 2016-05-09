@@ -79,7 +79,7 @@
 
 <div flex layout="column" tabIndex="-1" role="main" class="md-whiteframe-z2" style="margin-top:-50px">
     <md-toolbar layout="row" class="md-whiteframe-z1">
-        <md-button class="menu" ng-disabled="!appController.getIdentity().email"
+        <md-button class="menu" ng-disabled="!appController.getIdentity().email || appController.isCurrentURLDistributorSelector() == true"
                    ng-click="appController.toggleSidenav('left')" hide-gt-lg aria-label="Menu">
             <md-icon md-font-set="material-icons" class="md-light md-48">menu</md-icon>
         </md-button>

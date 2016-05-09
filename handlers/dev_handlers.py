@@ -1,14 +1,13 @@
 from webapp2 import RequestHandler
 from google.appengine.ext.deferred import deferred
-from google.appengine.ext import ndb
 from app_config import config
 from models import User, Distributor, Domain, Tenant, ChromeOsDevice, PlayerCommandEvent, TenantEntityGroup, \
     DeviceIssueLog, DistributorEntityGroup, Location, DistributorUser
 import random
 
-
 USER_EMAIL = 'daniel.ternyak@agosto.com'
-DISTRIBUTOR_NAME = 'Agosto'
+DISTRIBUTOR_NAME = 'Dunder'
+SECOND_DISTRIBUTOR = "Mifflin"
 DOMAIN = 'local.skykit.com'
 TENANT_NAME = 'Acme, Inc.'
 TENANT_CODE = 'acme_inc'
@@ -19,6 +18,7 @@ MAC_ADDRESS = '54271e619346'
 UNMANAGED_MAC_ADDRESS = '04271e61934b'
 UNMANAGED_GCM_REGISTRATION_ID = '3c70a8d70a6dfa6df76dfas2'
 SERIAL_NUMBER = 'E6MSCX057790'
+array_of_devices_with_values = []
 
 
 def create_email(first, last):
@@ -41,10 +41,6 @@ def kick_off(user_first, user_last):
     print "SEED SCRIPT HAS BEGUN!!! "
     print "-------------------------------------------------------------------------------"
     print "-------------------------------------------------------------------------------"
-    print "DELETING CURRENT DATASTORE!!! "
-    print "-------------------------------------------------------------------------------"
-    delete_all()
-    print "-------------------------------------------------------------------------------"
     print "CREATE DATA FOR DATASTORE!!! "
     print "-------------------------------------------------------------------------------"
     make_data_for_a_distributor()
@@ -53,36 +49,24 @@ def kick_off(user_first, user_last):
     print "COMPLETED SEED SCRIPT"
     print "-------------------------------------------------------------------------------"
     print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    print "THESE ARE THE DEVICES WITH EVENTS AND COMMANDS"
+    global array_of_devices_with_values
+    print array_of_devices_with_values
 
-
-def run_delete_multi_on_model(model):
-    ndb.delete_multi(
-        model.query().fetch(keys_only=True),
-    )
-    return True
-
-
-def delete_all():
-    models_to_delete = [
-        DistributorEntityGroup,
-        Location,
-        DistributorUser,
-        ChromeOsDevice,
-        User,
-        Distributor,
-        Domain,
-        Tenant,
-        PlayerCommandEvent,
-        TenantEntityGroup,
-        DeviceIssueLog
-    ]
-    return [run_delete_multi_on_model(model) for model in models_to_delete]
 
 
 def make_data_for_a_distributor():
     ##########################################################################################
     # DISTRIBUTORS
     ##########################################################################################
+    first_distributor = Distributor.query(Distributor.name == SECOND_DISTRIBUTOR).get()
+    if not first_distributor:
+        first_distributor = Distributor.create(name=SECOND_DISTRIBUTOR, active=True)
+        first_distributor.put()
+        print 'Distributor ' + first_distributor.name + ' created'
+    else:
+        print 'Distributor ' + first_distributor.name + ' already exists, so did not create'
+
     distributor = Distributor.query(Distributor.name == DISTRIBUTOR_NAME).get()
     if not distributor:
         distributor = Distributor.create(name=DISTRIBUTOR_NAME, active=True)
@@ -104,7 +88,8 @@ def make_data_for_a_distributor():
         else:
             user.add_distributor(distributor.key)
             print 'SUCCESS! ' + user.email + ' is linked to ' + distributor.name
-
+            user.add_distributor(first_distributor.key)
+            print 'SUCCESS! ' + user.email + ' is linked to ' + first_distributor.name
     ##########################################################################################
     # DOMAINS
     ##########################################################################################
@@ -125,14 +110,16 @@ def make_data_for_a_distributor():
     for i in range(1, 300):
         tenant_code = "my_tenant" + str(i)
         tenant_code = tenant_code.lower()
-        tenant = Tenant.create(tenant_code=tenant_code,
-                               name="my_tenant" + str(i),
-                               admin_email=TENANT_ADMIN_EMAIL,
-                               content_server_url='https://skykit-contentmanager-int.appspot.com',
-                               content_manager_base_url='https://skykit-contentmanager-int.appspot.com/content',
-                               domain_key=domain.key,
-                               active=True)
-        tenant.put()
+        tenant_code_datastore = Tenant.find_by_tenant_code(tenant_code)
+        if not tenant_code_datastore:
+            tenant = Tenant.create(tenant_code=tenant_code,
+                                   name="my_tenant" + str(i),
+                                   admin_email=TENANT_ADMIN_EMAIL,
+                                   content_server_url='https://skykit-contentmanager-int.appspot.com',
+                                   content_manager_base_url='https://skykit-contentmanager-int.appspot.com/content',
+                                   domain_key=domain.key,
+                                   active=True)
+            tenant.put()
         print 'Tenant ' + tenant.name + ' created'
     else:
         print 'Tenant ' + tenant.name + ' already exists, so did not create'
@@ -153,16 +140,17 @@ def make_data_for_a_distributor():
     # CREATE LOCATIONS
     ##########################################################################################
     for i in range(1, 103):
-        location = Location.create(tenant_key=tenant.key,
-                                   customer_location_name="my_location" + str(i),
-                                   customer_location_code="my_location" + str(i))
-        location.address = None
-        location.city = None
-        location.state = None
-        location.postal_code = None
-        location.dma = None
-        location.active = True
-        location.put()
+        if Location.is_customer_location_code_unique("my_location" + str(i), tenant.key):
+            location = Location.create(tenant_key=tenant.key,
+                                       customer_location_name="my_location" + str(i),
+                                       customer_location_code="my_location" + str(i))
+            location.address = None
+            location.city = None
+            location.state = None
+            location.postal_code = None
+            location.dma = None
+            location.active = True
+            location.put()
 
     ##########################################################################################
     # UNMANAGED DEVICES
@@ -197,6 +185,8 @@ def make_data_for_a_distributor():
             print 'Managed device created with MAC ' + str(i) + MAC_ADDRESS
 
             if random.randint(1, 10) == 1:
+                global array_of_devices_with_values
+                array_of_devices_with_values.append(str(managed_device.serial_number))
 
                 for z in range(1, 101):
                     issue = DeviceIssueLog.create(device_key=managed_device.key,
@@ -235,7 +225,6 @@ def make_data_for_a_distributor():
 
         else:
             print 'Managed device with Device ID ' + managed_device.device_id + ' already exists, so did not create'
-
 
     ##########################################################################################
     # PROOF OF PLAY
