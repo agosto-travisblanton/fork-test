@@ -21,7 +21,7 @@ def unique_tenant_resource_identifier(resource_identifier, tenant_code):
 ####################################################################################
 # Maintenance
 ####################################################################################
-def delete_raw_event_entries_older_than_thirty_days(retries=0):
+def delete_raw_event_entries_older_than_thirty_days():
     session = Session()
     now = datetime.datetime.now()
     midnight_now = datetime.datetime.combine(now.date(), datetime.time())
@@ -34,7 +34,7 @@ def delete_raw_event_entries_older_than_thirty_days(retries=0):
 ####################################################################################
 # REST Queries
 ####################################################################################
-def retrieve_all_devices_of_tenant(tenant, retries=0):
+def retrieve_all_devices_of_tenant(tenant):
     session = Session()
     tenant = session.query(TenantCode).filter_by(tenant_code=tenant).first()
     if tenant:
@@ -52,7 +52,7 @@ def retrieve_all_devices_of_tenant(tenant, retries=0):
         return []
 
 
-def retrieve_all_locations_of_tenant(tenant, retries=0):
+def retrieve_all_locations_of_tenant(tenant):
     session = Session()
     tenant = session.query(TenantCode).filter_by(tenant_code=tenant).first()
 
@@ -70,14 +70,14 @@ def retrieve_all_locations_of_tenant(tenant, retries=0):
         return []
 
 
-def retrieve_customer_location_code_from_location_id(location_id, retries=0):
+def retrieve_customer_location_code_from_location_id(location_id):
     session = Session()
     search = session.query(Location).filter_by(id=location_id).first().customer_location_code
     session.close()
     return search
 
 
-def retrieve_all_resources_of_tenant(tenant, retries=0):
+def retrieve_all_resources_of_tenant(tenant):
     session = Session()
     tenant = session.query(TenantCode).filter_by(tenant_code=tenant).first()
     if tenant:
@@ -94,7 +94,7 @@ def retrieve_all_resources_of_tenant(tenant, retries=0):
         return []
 
 
-def retrieve_resource_name_from_resource_identifier(modified_resource_identifier, retries=0):
+def retrieve_resource_name_from_resource_identifier(modified_resource_identifier):
     session = Session()
     resource_name = session.query(Resource).filter_by(
         resource_identifier=modified_resource_identifier).first().resource_name
@@ -102,7 +102,7 @@ def retrieve_resource_name_from_resource_identifier(modified_resource_identifier
     return resource_name
 
 
-def retrieve_all_resources(retries=0):
+def retrieve_all_resources():
     session = Session()
     search = session.query(Resource).all()
     session.close()
@@ -112,7 +112,7 @@ def retrieve_all_resources(retries=0):
 ####################################################################################
 # Inserts / updates
 ####################################################################################
-def insert_raw_program_play_event_data(each_log, retries=0):
+def insert_raw_program_play_event_data(each_log):
     session = Session()
     new_raw_event = ProgramPlayEvent(
         resource_name=each_log["resource_name"],
@@ -129,7 +129,7 @@ def insert_raw_program_play_event_data(each_log, retries=0):
     return new_raw_event.id
 
 
-def mark_raw_event_complete(raw_event_id, retries=0):
+def mark_raw_event_complete(raw_event_id):
     session = Session()
 
     entry = session.query(ProgramPlayEvent).filter_by(id=raw_event_id).first()
@@ -139,7 +139,7 @@ def mark_raw_event_complete(raw_event_id, retries=0):
     session.close()
 
 
-def insert_new_program_record(location_id, device_id, resource_id, started_at, ended_at, retries=0):
+def insert_new_program_record(location_id, device_id, resource_id, started_at, ended_at):
     session = Session()
 
     new_program_record = ProgramRecord(
@@ -156,7 +156,7 @@ def insert_new_program_record(location_id, device_id, resource_id, started_at, e
 
 
 
-def insert_new_resource_or_get_existing(resource_name, resource_identifier, tenant_code, retries=0):
+def insert_new_resource_or_get_existing(resource_name, resource_identifier, tenant_code):
     session = Session()
     unique_resource_identifier = unique_tenant_resource_identifier(
         resource_identifier=resource_identifier,
@@ -187,7 +187,7 @@ def insert_new_resource_or_get_existing(resource_name, resource_identifier, tena
         return resource_exists.id
 
 
-def insert_new_tenant_code_or_get_existing(tenant_code, retries=0):
+def insert_new_tenant_code_or_get_existing(tenant_code):
     session = Session()
 
     tenant_exists = session.query(TenantCode).filter_by(tenant_code=tenant_code).first()
@@ -206,7 +206,7 @@ def insert_new_tenant_code_or_get_existing(tenant_code, retries=0):
         return tenant_exists.id
 
 
-def insert_new_location_or_get_existing(customer_location_code, tenant_id, retries=0):
+def insert_new_location_or_get_existing(customer_location_code, tenant_id):
     session = Session()
 
     location_exists = session.query(Location).filter_by(customer_location_code=customer_location_code).filter_by(
@@ -227,7 +227,7 @@ def insert_new_location_or_get_existing(customer_location_code, tenant_id, retri
 
 
 def insert_new_device_or_get_existing(location_id, serial_number, device_key, customer_display_code, tenant_code,
-                                      retries=0):
+                                      ):
     session = Session()
 
     device_exists = session.query(Device).filter_by(device_key=device_key).filter_by(
@@ -272,7 +272,7 @@ def program_record_for_resource_by_date(start_date, end_date, resource, tenant_c
     return all_results
 
 
-def get_raw_program_record_data_by_resource(start_date, end_date, resource_identifier, tenant_code, retries=0):
+def get_raw_program_record_data_by_resource(start_date, end_date, resource_identifier, tenant_code):
     session = Session()
 
     resource_id = session.query(Resource).filter_by(resource_identifier=resource_identifier).first().id
@@ -313,7 +313,7 @@ def program_record_for_device_summarized(start_date, end_date, customer_display_
     return transform_db_data_to_by_device(from_db)
 
 
-def get_raw_program_record_data_by_device(start_date, end_date, customer_display_code, tenant_code, retries=0):
+def get_raw_program_record_data_by_device(start_date, end_date, customer_display_code, tenant_code):
     session = Session()
     device_id = session.query(Device).filter_by(customer_display_code=customer_display_code).first().id
     tenant_id = session.query(TenantCode).filter_by(tenant_code=tenant_code).first().id
@@ -351,7 +351,7 @@ def program_record_for_location_summarized(start_date, end_date, customer_locati
     return transform_db_data_to_by_location_then_resource(from_db)
 
 
-def get_raw_program_record_data_by_location(start_date, end_date, customer_location_code, tenant_code, retries=0):
+def get_raw_program_record_data_by_location(start_date, end_date, customer_location_code, tenant_code):
     session = Session()
     location_id = session.query(Location).filter_by(customer_location_code=customer_location_code).first().id
     tenant_id = session.query(TenantCode).filter_by(tenant_code=tenant_code).first().id
