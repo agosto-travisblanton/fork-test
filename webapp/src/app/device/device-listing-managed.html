@@ -14,7 +14,7 @@
                        ng-click="vm.paginateCall(true, true)">
               Next
             </md-button>
-            <md-button class="md-raised"
+            <md-button class="md-raised  md-primary"
                        ng-click="vm.refreshManagedDevices()">
               Refresh
             </md-button>
@@ -54,8 +54,8 @@
                     placeholder="Make A Search">
 
               <md-item-template>
-                                                        <span md-highlight-text="vm.searchText"
-                                                              md-highlight-flags="^i">{{item}}</span>
+                  <span md-highlight-text="vm.searchText"
+                        md-highlight-flags="^i">{{item}}</span>
               </md-item-template>
               <md-not-found>
                 <div ng-if="vm.searchText !== '' && vm.searchText.length > 2">
@@ -69,13 +69,21 @@
               </md-not-found>
             </md-autocomplete>
           </div>
-          <div class="col-md-1"
-               style="margin-left: -20px !important; margin-top: -4px !important">
-            <md-button class="md-raised md-primary"
-                       ng-disabled="vm.disabled"
-                       ng-click="vm.prepareForEditView(false, vm.searchText)">
-              OPEN
-            </md-button>
+          <div class="col-md-1">
+            <div style="margin-left: -20px !important; margin-top: -4px !important">
+              <md-button class="md-raised md-primary" aria-label="OPEN"
+                         ng-disabled="vm.disabled"
+                         ng-click="vm.prepareForEditView(false, vm.searchText)">
+                <div ng-if="!vm.disabledButtonLoading">
+                  OPEN
+
+                </div>
+                <div ng-if="vm.disabledButtonLoading">
+                  Loading...
+
+                </div>
+              </md-button>
+            </div>
           </div>
         </div>
       </md-card-content>

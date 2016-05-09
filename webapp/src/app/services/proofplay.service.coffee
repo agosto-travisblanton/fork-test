@@ -12,8 +12,8 @@ angular.module('skykitProvisioning')
           maxAge: 60 * 60 * 1000
           deleteOnExpire: 'aggressive'
           storageMode: 'localStorage'
-          onExpire: (key, value) ->
-            $http.get(key).success (data) ->
+          onExpire: (key, value) =>
+            $http.get(key).success (data) =>
               @proofplayCache.put key, data
               return
             return

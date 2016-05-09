@@ -31,7 +31,7 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
     @devicesNext = null
     DevicesService.deviceCache.removeAll()
     @getManagedDevices(@distributorKey, @devicesPrev, @devicesNext)
-    
+
   @refreshUnmanagedDevices = () =>
     @unmanagedDevicesPrev = null
     @unmanagedDevicesNext = null
@@ -81,14 +81,22 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
   @controlOpenButton = (unmanaged, isMatch) =>
     if not unmanaged
       @disabled = !isMatch
+      @disabledButtonLoading = false
 
     else
       @unmanagedDisabled = !isMatch
+      @unmanagedDisabledButtonLoading = false
 
   @isResourceValid = (unmanaged, resource) ->
     if resource
       if resource.length > 2
-        if unmanaged then mac = @unmanagedSelectedButton == "MAC" else mac = @selectedButton == "MAC"
+        if unmanaged
+          mac = @unmanagedSelectedButton == "MAC"
+          @unmanagedDisabledButtonLoading = true
+
+        else
+          mac = @selectedButton == "MAC"
+          @disabledButtonLoading = true
 
         if mac
           DevicesService.matchDevicesByFullMac(@distributorKey, resource, unmanaged)
