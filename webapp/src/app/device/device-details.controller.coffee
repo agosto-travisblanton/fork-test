@@ -12,6 +12,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   ProgressBarService,
   $mdDialog,
   ToastsService) ->
+
   @tenantKey = $stateParams.tenantKey
   @deviceKey = $stateParams.deviceKey
   @fromDevices = $stateParams.fromDevices is "true"
@@ -35,9 +36,9 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   @startTime = today.toLocaleString().replace(/,/g, "")
 
 
-  @generateLocalFromUTC = (UTCTime) =>
-    localTime = moment.utc(UTCTime).toDate();
-    localTime = moment(localTime).format('YYYY-MM-DD hh:mm:ss A');
+  @generateLocalFromUTC = (UTCTime) ->
+    localTime = moment.utc(UTCTime).toDate()
+    localTime = moment(localTime).format('YYYY-MM-DD hh:mm:ss A')
 
 
   @replaceIssueTime = (issues) =>
