@@ -35,6 +35,16 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     @startTime = today.toLocaleString().replace(/,/g, "")
 
 
+    @generateLocalFromUTC = (UTCTime) =>
+      localTime  = moment.utc(UTCTime).toDate();
+      localTime = moment(localTime).format('YYYY-MM-DD hh:mm:ss A');
+
+
+    @replaceIssueCreationTime = (issues) =>
+      for each in issues
+        each.created = @generateLocalFromUTC(each.created)
+        each.updated = @generateLocalFromUTC(each.updated)
+
     @copyDeviceKey = () ->
       ToastsService.showSuccessToast 'Device key has been copied to your clipboard'
 
@@ -43,6 +53,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       ProgressBarService.start()
       issuesPromise = DevicesService.getIssuesByKey(device, epochStart, epochEnd, prev, next)
       issuesPromise.then (data) =>
+        @replaceIssueCreationTime(data.issues)
         @issues = data.issues
         @prev_cursor = data.prev
         @next_cursor = data.next
@@ -355,6 +366,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
         @onRefreshIssuesFailure(error)
 
     @onRefreshIssuesSuccess = (data) ->
+      @replaceIssueCreationTime(data.issues)
       @issues = data.issues
       @prev_cursor = data.prev
       @next_cursor = data.next
