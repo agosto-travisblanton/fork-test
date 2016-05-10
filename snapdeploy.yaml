@@ -5,6 +5,6 @@ module_yaml_files:
 - proofplay.yaml
 version: 34-29-0
 pre-deploy-script: (echo '\n++++++++ RUNNING DEPLOYJS.PY ++++++++\n'
-  && python deployjs.py) && (echo '\n++++++++ STARTING DEPLOY ++++++++\n'))
-pre-serve-script: (echo '\n++++++++ RUNNING DEPLOYJS.PY ++++++++\n'
+  && python deployjs.py && (echo '\n++++++++ STARTING DEPLOY ++++++++\n'))
+pre-serve-script: (echo '\n++++++++ RUNNING DEPLOYJS.PY ++++++++\n' && echo '\n++++++++ YOU SHOULD HAVE BOWER AND NPM PACKAGES INSTALLED BEFORE THIS STEP ++++++++\n'
   && python deployjs.py)

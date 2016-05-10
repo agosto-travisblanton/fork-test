@@ -45,15 +45,23 @@ def read_new_index_file():
 
 def delete_files(files_to_keep, dir_path):
     for subdir, dirs, files in os.walk(dir_path):
+        # for each file
         for file in files:
-            # print os.path.join(subdir, file)
             filepath = subdir + os.sep + file
 
-            for item in files_to_keep:
-                if item not in filepath:
-                    os.remove(filepath)
+            # for each file to keep
+            found_one_match = False
+            for file_to_keep in files_to_keep:
+                if file_to_keep in filepath:
+                    found_one_match = True
+            if not found_one_match:
+                os.remove(filepath)
 
 
 def kick_off():
     build_with_gulp()
     read_new_index_file()
+
+
+if __name__ == "__main__":
+    kick_off()
