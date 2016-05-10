@@ -4,3 +4,7 @@ module_yaml_files:
 - migration.yaml
 - proofplay.yaml
 version: 34-29-0
+pre-deploy-script: (echo '\n++++++++ RUNNING DEPLOYJS.PY ++++++++\n'
+  && python deployjs.py) && (echo '\n++++++++ STARTING DEPLOY ++++++++\n'))
+pre-serve-script: (echo '\n++++++++ RUNNING DEPLOYJS.PY ++++++++\n'
+  && python deployjs.py)
