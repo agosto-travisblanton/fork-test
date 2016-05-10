@@ -68,7 +68,6 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       @next_cursor = data.next
       ProgressBarService.complete()
 
-
   # command history tab
   @getEvents = (deviceKey, prev, next) =>
     ProgressBarService.start()
