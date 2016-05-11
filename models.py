@@ -287,7 +287,7 @@ class Tenant(ndb.Model):
 
 
     @classmethod
-    def find_devices_paginated(cls, tenant_keys, fetch_size=200, unmanaged=False, prev_cursor_str=None,
+    def find_devices_paginated(cls, tenant_keys, fetch_size=25, unmanaged=False, prev_cursor_str=None,
                                next_cursor_str=None):
 
         objects = None
