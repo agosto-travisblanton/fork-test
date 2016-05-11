@@ -12,6 +12,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
   ProgressBarService,
   $mdDialog,
   ToastsService) ->
+
     @tenantKey = $stateParams.tenantKey
     @deviceKey = $stateParams.deviceKey
     @fromDevices = $stateParams.fromDevices is "true"
@@ -22,10 +23,10 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     @dayRange = 30
     @issues = []
     @pickerOptions = "{widgetPositioning: {vertical:'bottom'}, showTodayButton: true, sideBySide: true, icons:{
-          next:'glyphicon glyphicon-arrow-right',
-          previous:'glyphicon glyphicon-arrow-left',
-          up:'glyphicon glyphicon-arrow-up',
-          down:'glyphicon glyphicon-arrow-down'}}"
+            next:'glyphicon glyphicon-arrow-right',
+            previous:'glyphicon glyphicon-arrow-left',
+            up:'glyphicon glyphicon-arrow-up',
+            down:'glyphicon glyphicon-arrow-down'}}"
     @timezones = []
     @selectedTimezone = undefined
     now = new Date()
@@ -35,6 +36,25 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     @startTime = today.toLocaleString().replace(/,/g, "")
 
 
+    @generateLocalFromUTC = (UTCTime) ->
+      localTime = moment.utc(UTCTime).toDate()
+      localTime = moment(localTime).format('YYYY-MM-DD hh:mm:ss A')
+
+
+    @replaceIssueTime = (issues) =>
+      for each in issues
+        if each.created
+          each.created = @generateLocalFromUTC(each.created)
+        if each.updated
+          each.updated = @generateLocalFromUTC(each.updated)
+
+    @replaceCommandTime = (issues) =>
+      for each in issues
+        if each.postedTime
+          each.postedTime = @generateLocalFromUTC(each.postedTime)
+        if each.confirmedTime
+          each.confirmedTime = @generateLocalFromUTC(each.confirmedTime)
+
     @copyDeviceKey = () ->
       ToastsService.showSuccessToast 'Device key has been copied to your clipboard'
 
@@ -43,17 +63,18 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       ProgressBarService.start()
       issuesPromise = DevicesService.getIssuesByKey(device, epochStart, epochEnd, prev, next)
       issuesPromise.then (data) =>
+        @replaceIssueTime(data.issues)
         @issues = data.issues
         @prev_cursor = data.prev
         @next_cursor = data.next
         ProgressBarService.complete()
-
 
     # command history tab
     @getEvents = (deviceKey, prev, next) =>
       ProgressBarService.start()
       commandEventsPromise = DevicesService.getCommandEventsByKey deviceKey, prev, next
       commandEventsPromise.then (data) =>
+        @replaceCommandTime(data.events)
         @event_next_cursor = data.next_cursor
         @event_prev_cursor = data.prev_cursor
         @commandEvents = data.events
@@ -355,6 +376,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
         @onRefreshIssuesFailure(error)
 
     @onRefreshIssuesSuccess = (data) ->
+      @replaceIssueTime(data.issues)
       @issues = data.issues
       @prev_cursor = data.prev
       @next_cursor = data.next

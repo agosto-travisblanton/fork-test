@@ -458,7 +458,7 @@ proofplay_DAYS_TO_KEEP_RAW_EVENTS = 30
 def _return_yaml_data():
     with open(os.path.join(basedir, 'snapdeploy.yaml'), 'r') as f:
         data = f.readlines()
-        version = data[-1]
+        version = data[5]
         version_without_newlines = version.rstrip()
         only_numbers = version_without_newlines[9:]
         array_of_versions = only_numbers.split('-')
