@@ -608,7 +608,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
         next_response = self.app.get(next_uri, params=request_parameters, headers=self.api_token_authorization_header)
         next_response_json = json.loads(next_response.body)
-        self.assertLength(2, next_response_json["devices"])
+        self.assertLength(25, next_response_json["devices"])
         self.assertTrue(next_response_json["prev_cursor"])
 
     def test_get_filter_unmanaged_devices_by_tenant_entity_body_json(self):
