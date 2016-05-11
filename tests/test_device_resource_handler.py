@@ -600,7 +600,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertLength(200, response_json["devices"])
+        self.assertLength(25, response_json["devices"])
 
         next_uri = application.router.build(None, 'devices-by-tenant', None,
                                             {'tenant_urlsafe_key': self.tenant_key.urlsafe(), 'cur_prev_cursor': "null",
