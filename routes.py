@@ -53,6 +53,16 @@ application = WSGIApplication(
               handler='handlers.identity_handler.IdentityHandler',
               name='identity'
               ),
+        Route(r'/api/v1/make_admins',
+              handler='handlers.identity_handler.IdentityHandler',
+              name='identity',
+              handler_method="make_admins"
+              ),
+        Route(r'/api/v1/apply_admins',
+              handler='handlers.identity_handler.IdentityHandler',
+              name='identity',
+              handler_method="apply_admins"
+              ),
 
         Route(r'/login',
               handler='handlers.login_handler.LoginHandler',

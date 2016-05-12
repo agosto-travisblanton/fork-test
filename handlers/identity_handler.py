@@ -4,7 +4,7 @@ import os
 
 from agar.sessions import SessionRequestHandler
 from app_config import config
-from models import User, Distributor
+from models import User, Distributor, UserAdmin
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
 
@@ -33,11 +33,14 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
 
         if user:
             session_distributor = self.session.get('distributor')
+
             if self.session.get('is_administrator') is True:
                 user_info['administrator'] = True
                 distributors = Distributor.query().fetch()
+
             else:
                 distributors = user.distributors
+
             if session_distributor is None and len(distributors) == 1:
                 session_distributor = distributors[0].name
 
@@ -48,7 +51,24 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
                 'distributors': distributor_names,
                 'distributor': session_distributor
             })
+
         else:
             user_info['is_logged_in'] = False
 
         json_response(self.response, user_info)
+
+    def make_admins(self):
+        default_admins = ["daniel.ternyak@agosto.com"]
+        [UserAdmin.insert_email_if_not_exist(email) for email in default_admins]
+
+        json_response(self.response, {
+            "admins_created": [user.email for user in UserAdmin.get_all()]
+        })
+
+    def apply_admins(self):
+        all_admin_emails = [admin.email for admin in UserAdmin.get_all()]
+        [User.migrate_user_to_admin(admin_email) for admin_email in all_admin_emails]
+
+        json_response(self.response, {
+            "admins_applied": all_admin_emails
+        })
