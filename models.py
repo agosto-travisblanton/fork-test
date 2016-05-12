@@ -795,26 +795,6 @@ class DeviceIssueLog(ndb.Model):
         self.class_version = 1
 
 
-class UserAdmin(ndb.Model):
-    email = ndb.StringProperty(required=True)
-
-    @classmethod
-    def get_all(cls):
-        return UserAdmin.query().fetch()
-
-    @classmethod
-    def insert_email_if_not_exist(self, email):
-        exists = UserAdmin.query(UserAdmin.email == email).count() > 0
-        if not exists:
-            new = UserAdmin(
-                email=email
-            )
-
-            new.put()
-            return new
-        return False
-
-
 @ae_ndb_serializer
 class User(ndb.Model):
     class_version = ndb.IntegerProperty()
@@ -857,21 +837,6 @@ class User(ndb.Model):
             if user.stormpath_account_href != stormpath_account_href and stormpath_account_href is not None:
                 user.stormpath_account_href = stormpath_account_href
                 user.put()
-        return user
-
-
-    @classmethod
-    def migrate_user_to_admin(cls, email):
-        user = cls.get_by_email(email)
-
-        if not user:
-            return False
-
-        if not user.is_administrator:
-            user.is_administrator = True
-            user.put()
-            return True
-
         return user
 
     @classmethod

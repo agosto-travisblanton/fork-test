@@ -60,22 +60,6 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
 
         json_response(self.response, user_info)
 
-    def make_admins(self):
-        default_admins = ["daniel.ternyak@agosto.com"]
-        [UserAdmin.insert_email_if_not_exist(email) for email in default_admins]
-
-        json_response(self.response, {
-            "admins_created": [user.email for user in UserAdmin.get_all()]
-        })
-
-    def apply_admins(self):
-        all_admin_emails = [admin.email for admin in UserAdmin.get_all()]
-        [User.migrate_user_to_admin(admin_email) for admin_email in all_admin_emails]
-
-        json_response(self.response, {
-            "admins_applied": all_admin_emails
-        })
-
     @has_admin_user_key
     def make_user(self):
         incoming = json.loads(self.request.body)
@@ -104,6 +88,7 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
                 "message": 'SUCCESS! ' + user.email + ' is linked to ' + distributor.name
             })
 
+    @has_admin_user_key
     def create_distributor(self):
         incoming = json.loads(self.request.body)
         distributor_name = incoming["distributor"]
