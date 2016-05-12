@@ -5,6 +5,7 @@ from google.appengine.ext import ndb
 from app_config import config
 from restler.serializers import json_response
 from proofplay.database_calls import get_tenant_names_for_distributor
+from models import User
 
 
 def identity_required(handler_method):
@@ -115,6 +116,18 @@ def requires_api_token(handler_method):
     return authorize
 
 
+def has_admin_user_key(handler_method):
+    def authorize(self, *args, **kwargs):
+        user_key = self.request.headers.get('X-Provisioning-User') or self.request.cookies.get('userKey')
+        valid_key = User.get_user_from_urlsafe_key(user_key)
+
+        if valid_key:
+            kwargs["current_user_email"] = valid_key.email
+            handler_method(self, *args, **kwargs)
+
+    return authorize
+
+
 def has_tenant_in_distributor_header(handler_method):
     def authorize(self, *args, **kwargs):
         distributor_key = self.request.headers.get('X-Provisioning-Distributor')
@@ -212,6 +225,7 @@ def _token_invalid(api_token, for_unmanaged_registration_token=False, for_regist
         valid_api_token = api_token == config.API_TOKEN
         unmanaged_api_token = api_token == config.UNMANAGED_API_TOKEN
         if not valid_api_token and not unmanaged_api_token:
-            logging.error('HTTP request API token {0} is invalid. Expected token = {1}'.format(api_token, config.API_TOKEN))
+            logging.error(
+                'HTTP request API token {0} is invalid. Expected token = {1}'.format(api_token, config.API_TOKEN))
             return True
     return False

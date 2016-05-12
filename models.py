@@ -832,6 +832,16 @@ class User(ndb.Model):
             self.key = ndb.Key(User, self.email.lower())
 
     @classmethod
+    def get_user_from_urlsafe_key(cls, key):
+        try:
+            user = ndb.Key(urlsafe=key).get()
+            return user
+        except TypeError as e:
+            logging.error(e)
+            return False
+
+
+    @classmethod
     def _build_key(cls, email):
         key = ndb.Key(User, email.lower())
         return key

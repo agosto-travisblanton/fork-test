@@ -7,6 +7,8 @@ from app_config import config
 from models import User, Distributor, UserAdmin
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
+from decorators import has_admin_user_key
+import json
 
 
 class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
@@ -73,3 +75,50 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
         json_response(self.response, {
             "admins_applied": all_admin_emails
         })
+
+    @has_admin_user_key
+    def make_user(self):
+        incoming = json.loads(self.request.body)
+        user_email = incoming["user_email"]
+        user = User.get_or_insert_by_email(email=user_email)
+
+        json_response(self.response, {
+            "success": True,
+            "user_created": user.email
+        })
+
+    @has_admin_user_key
+    def add_user_to_distributor(self):
+        incoming = json.loads(self.request.body)
+        user_email = incoming["user_email"]
+        user = User.get_or_insert_by_email(email=user_email)
+        distributor_name = incoming["distributor"]
+        distributor = Distributor.find_by_name(name=distributor_name)
+        if not distributor:
+            self.abort()
+
+        else:
+            user.add_distributor(distributor.key)
+            json_response(self.response, {
+                "success": True,
+                "message": 'SUCCESS! ' + user.email + ' is linked to ' + distributor.name
+            })
+
+    def create_distributor(self):
+        incoming = json.loads(self.request.body)
+        distributor_name = incoming["distributor"]
+        admin_email = incoming["admin_email"]
+        distributor = Distributor.query(Distributor.name == distributor_name).get()
+
+        if not distributor:
+            distributor = Distributor.create(name=distributor_name, active=True)
+            distributor.admin_email = admin_email
+            distributor.put()
+            json_response(
+                self.response, {
+                    "success": True,
+                    "message": 'Distributor ' + distributor.name + ' created.'
+                }
+            )
+        else:
+            self.abort()
