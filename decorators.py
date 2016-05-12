@@ -122,7 +122,6 @@ def has_admin_user_key(handler_method):
         valid_key = User.get_user_from_urlsafe_key(user_key)
 
         if valid_key:
-            kwargs["current_user_email"] = valid_key.email
             handler_method(self, *args, **kwargs)
 
     return authorize
