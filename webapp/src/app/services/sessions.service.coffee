@@ -45,12 +45,14 @@ angular.module('skykitProvisioning').factory 'SessionsService', (
         identityPromise = IdentityService.getIdentity()
         identityPromise.then (data) ->
           $cookies.put('userEmail', data['email'])
+          $cookies.put('userAdmin', data["is_admin"])
           deferred.resolve()
         deferred.promise
 
       removeUserInfo: ()->
         $cookies.remove('userKey')
         $cookies.remove('userEmail')
+        $cookies.remove('userAdmin')
         $cookies.remove('currentDistributorKey')
         $cookies.remove('currentDistributorName')
 

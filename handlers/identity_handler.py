@@ -47,6 +47,7 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
             distributor_names = [distributor.name for distributor in distributors]
             user_info.update({
                 'email': user.email,
+                'is_admin': user.is_administrator,
                 'is_logged_in': True,
                 'distributors': distributor_names,
                 'distributor': session_distributor

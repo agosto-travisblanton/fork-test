@@ -11,6 +11,7 @@ appModule.controller 'AppController', ($mdSidenav, $state, $cookies, $window) ->
     vm.identity = {
       key: $cookies.get('userKey')
       email: $cookies.get('userEmail')
+      admin: $cookies.get('userAdmin')
       distributorKey: $cookies.get('currentDistributorKey')
       distributorName: $cookies.get('currentDistributorName')
     }
