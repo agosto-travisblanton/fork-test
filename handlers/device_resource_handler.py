@@ -320,6 +320,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             device.timezone_offset = TimezoneUtil.get_timezone_offset(device.timezone)
         else:
             device.timezone_offset = TimezoneUtil.get_timezone_offset('America/Chicago')
+        device.put()
         if self.is_unmanaged_device is False:
             if not device.device_id:
                 deferred.defer(refresh_device_by_mac_address,
