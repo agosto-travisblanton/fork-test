@@ -31,6 +31,11 @@ class TestTimezoneUtil(BaseTest):
         timezone_offset = TimezoneUtil.get_timezone_offset('America/Phoenix')
         self.assertLessEqual(timezone_offset, self.PHOENIX_OFFSET_MST)
 
+    def test_get_timezone_offset_returns_expected_offset_for_athens(self):
+        timezone_offset = TimezoneUtil.get_timezone_offset('Europe/Athens')
+        self.assertGreaterEqual(timezone_offset, 2)
+        self.assertLessEqual(timezone_offset, 3)
+
     def test_get_us_timezones_returns_array(self):
         timezones = TimezoneUtil.get_us_timezones()
         self.assertGreaterEqual(30,len(timezones))
