@@ -8,7 +8,8 @@ from provisioning_base_test import ProvisioningBaseTest
 from utils.web_util import build_uri
 
 
-class IdentityHandlerTest(ProvisioningBaseTest, WebTest):
+
+class IdentityHandlerTest(ProvisioningBaseTest):
     def setUp(self):
         super(IdentityHandlerTest, self).setUp()
         self.distributor_admin_user = self.create_platform_admin(email='john.jones@demo.agosto.com')
@@ -199,3 +200,10 @@ class IdentityHandlerTest(ProvisioningBaseTest, WebTest):
         self.assertTrue(response_json["success"])
         a = User.query(User.email == email_to_insert).fetch()
         self.assertTrue(a)
+
+    def test_create_user_as_regular_user(self):
+        email_to_insert = "some_user@gmail.com"
+        r = self.post('/api/v1/make_user', json.dumps({
+            "user_email": email_to_insert
+        }), headers={"X-Provisioning-User": self.user.key.urlsafe()})
+        self.assertForbidden(r)
