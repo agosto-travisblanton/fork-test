@@ -41,39 +41,6 @@ def distributor_required(handler_method):
 
     return distributor
 
-
-#
-# def gae_supported_numpy(test_method):
-#     import numpy
-#     from utils.print_utils import StderrLogger
-#
-#     def check_numpy(self, *args, **kwargs):
-#         npv = numpy.version.full_version
-#         if npv != '1.6.1':
-#             logger = StderrLogger()
-#             logger.warning("Found local numpy version {}. App engine only supports version 1.6.1. "
-#                            "You may falsely green bar!".format(npv))
-#         test_method(self, *args, **kwargs)
-#
-#     return check_numpy
-#
-#
-# def no_in_context_cache(function):
-#     """
-#     Disables in-context caching. NOTE: Will not work on functions that get pickled.
-#     :param function:
-#     :return: function that wraps the existing function which disables ndb in-context caching.
-#     """
-#     from google.appengine.ext import ndb
-#
-#     def disable_cache(*args, **kwargs):
-#         ctx = ndb.get_context()
-#         ctx.set_cache_policy(lambda key: False)
-#         return function(*args, **kwargs)
-#
-#     return disable_cache
-#
-
 def log_memory(function):
     """
     Decorator that prints memory usage of a function before and after it runs to logging.debug.
@@ -116,13 +83,29 @@ def requires_api_token(handler_method):
     return authorize
 
 
+def has_distributor_admin_user_key(handler_method):
+    def authorize(self, *args, **kwargs):
+        user_key = self.request.headers.get('X-Provisioning-User') or self.request.cookies.get('userKey')
+        valid_user = User.get_user_from_urlsafe_key(user_key)
+
+        if valid_user.is_administrator or valid_user.is_distributor_administrator:
+            handler_method(self, *args, **kwargs)
+
+        else:
+            json_response(self.response, {'error': 'You do not have the required permissions.'}, status_code=403)
+
+    return authorize
+
 def has_admin_user_key(handler_method):
     def authorize(self, *args, **kwargs):
         user_key = self.request.headers.get('X-Provisioning-User') or self.request.cookies.get('userKey')
-        valid_key = User.get_user_from_urlsafe_key(user_key)
+        valid_user = User.get_user_from_urlsafe_key(user_key)
 
-        if valid_key:
+        if valid_user.is_administrator:
             handler_method(self, *args, **kwargs)
+
+        else:
+            json_response(self.response, {'error': 'You do not have the required permissions.'}, status_code=403)
 
     return authorize
 

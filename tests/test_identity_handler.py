@@ -11,10 +11,13 @@ from utils.web_util import build_uri
 class IdentityHandlerTest(ProvisioningBaseTest, WebTest):
     def setUp(self):
         super(IdentityHandlerTest, self).setUp()
+        self.distributor_admin_user = self.create_platform_admin(email='john.jones@demo.agosto.com')
+        self.admin_user = self.create_platform_admin(email='jim.bob@demo.agosto.com')
         self.user = self.create_user(email='dwight.schrute@demo.agosto.com')
         self.login_url = build_uri('login')
         self.logout_url = build_uri('logout')
         self.identity_url = build_uri('identity')
+
         for _ in range(3):
             build(Distributor)
 
@@ -161,16 +164,38 @@ class IdentityHandlerTest(ProvisioningBaseTest, WebTest):
         self.assertEqual(new_distributor.name, data.get('distributor'))
         self.assertEqual([new_distributor.name], data.get('distributors'))
 
-    # def test_logged_in_no_session_distributor(self):
-    #     user = build(User).key.urlsafe()
-    #     uri = build_uri('make_user')
-    #     email_to_insert = "some_user@gmail.com"
-    #     r = self.app.post(uri, params=json.dumps({
-    #         "user_email": email_to_insert
-    #     }), headers={"'X-Provisioning-User'": user})
-    #     self.assertEqual(200, r.status_int)
-    #     response_json = json.loads(r.body)
-    #     self.assertLength(0, response_json["devices"])
+    def test_create_user_as_admin(self):
+        uri = build_uri('make_user')
+        email_to_insert = "some_user@gmail.com"
+        r = self.app.post(uri, params=json.dumps({
+            "user_email": email_to_insert
+        }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
+        self.assertEqual(200, r.status_int)
+        response_json = json.loads(r.body)
+        self.assertTrue(response_json["success"])
+        a = User.query(User.email == email_to_insert).fetch()
+        self.assertTrue(a)
 
-        # a = User.query(User.email == email_to_insert).fetch()
-        # self.assertTrue(a)
+    def test_create_user_as_admin(self):
+        uri = build_uri('make_user')
+        email_to_insert = "some_user@gmail.com"
+        r = self.app.post(uri, params=json.dumps({
+            "user_email": email_to_insert
+        }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
+        self.assertEqual(200, r.status_int)
+        response_json = json.loads(r.body)
+        self.assertTrue(response_json["success"])
+        a = User.query(User.email == email_to_insert).fetch()
+        self.assertTrue(a)
+
+    def test_create_user_as_distributor_admin(self):
+        uri = build_uri('make_user')
+        email_to_insert = "some_user@gmail.com"
+        r = self.app.post(uri, params=json.dumps({
+            "user_email": email_to_insert
+        }), headers={"X-Provisioning-User": self.distributor_admin_user.key.urlsafe()})
+        self.assertEqual(200, r.status_int)
+        response_json = json.loads(r.body)
+        self.assertTrue(response_json["success"])
+        a = User.query(User.email == email_to_insert).fetch()
+        self.assertTrue(a)

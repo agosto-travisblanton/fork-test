@@ -43,6 +43,28 @@ class ProvisioningBaseTest(BaseTest, WebTest, KeyValidatorMixin):
         user.add_distributor(distributor.key)
         return user
 
+    def create_platform_admin(self, email, distributor_name=None):
+        if distributor_name:
+            distributor = Distributor.get_or_insert_by_name(distributor_name)
+        else:
+            distributor = build(Distributor)
+
+        user = User.update_or_create_with_api_account(MockStormpathResponse(email))
+        user.is_administrator = True
+        user.add_distributor(distributor.key)
+        return user
+
+    def create_distributor_admin(self, email, distributor_name=None):
+        if distributor_name:
+            distributor = Distributor.get_or_insert_by_name(distributor_name)
+        else:
+            distributor = build(Distributor)
+
+        user = User.update_or_create_with_api_account(MockStormpathResponse(email))
+        user.is_distributor_administrator = True
+        user.add_distributor(distributor.key)
+        return user
+
     def login(self, email, administrator=False):
 
         identity_url = build_uri('identity')

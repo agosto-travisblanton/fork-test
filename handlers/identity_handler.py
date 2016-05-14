@@ -7,7 +7,7 @@ from app_config import config
 from models import User, Distributor
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
-from decorators import has_admin_user_key
+from decorators import has_admin_user_key, has_distributor_admin_user_key
 import json
 
 
@@ -16,7 +16,8 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
         app_version = os.environ['CURRENT_VERSION_ID']
 
         state = self.session.get('state')
-        if state is None:
+
+        if not state:
             state = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in xrange(32))
             self.session['state'] = state
 
@@ -43,10 +44,11 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
             else:
                 distributors = user.distributors
 
-            if session_distributor is None and len(distributors) == 1:
+            if not session_distributor and len(distributors) == 1:
                 session_distributor = distributors[0].name
 
             distributor_names = [distributor.name for distributor in distributors]
+
             user_info.update({
                 'email': user.email,
                 'is_admin': user.is_administrator,
@@ -60,7 +62,7 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
 
         json_response(self.response, user_info)
 
-    @has_admin_user_key
+    @has_distributor_admin_user_key
     def make_user(self):
         incoming = json.loads(self.request.body)
         user_email = incoming["user_email"]
@@ -72,13 +74,14 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
         })
 
 
-    @has_admin_user_key
+    @has_distributor_admin_user_key
     def add_user_to_distributor(self):
         incoming = json.loads(self.request.body)
         user_email = incoming["user_email"]
         user = User.get_or_insert_by_email(email=user_email)
         distributor_name = incoming["distributor"]
         distributor = Distributor.find_by_name(name=distributor_name)
+
         if not distributor:
             self.abort()
 

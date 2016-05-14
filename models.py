@@ -801,7 +801,8 @@ class User(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     email = ndb.StringProperty(required=True)
-    is_administrator = ndb.BooleanProperty(default=False)
+    is_administrator = ndb.BooleanProperty(default=False) # platform administrator
+    is_distributor_administrator = ndb.BooleanProperty(default=False)
     stormpath_account_href = ndb.StringProperty()
     last_login = ndb.DateTimeProperty()
     enabled = ndb.BooleanProperty(default=True)
