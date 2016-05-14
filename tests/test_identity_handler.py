@@ -23,8 +23,10 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         self.logout_url = build_uri('logout')
         self.identity_url = build_uri('identity')
 
-        for _ in range(3):
-            build(Distributor)
+        for i in range(3):
+            distributor = build(Distributor)
+            distributor.name = "default_distro" + str(i)
+            distributor.put()
 
     def test_anonymous_identity(self):
         self.get(self.logout_url)
@@ -170,7 +172,7 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         self.assertEqual([new_distributor.name], data.get('distributors'))
 
     ###########################################################################
-    # ROLES/USER TESTS
+    # CREATE USER
     ###########################################################################
     def test_create_user_as_admin(self):
         uri = build_uri('make_user')
@@ -203,6 +205,9 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         }), headers={"X-Provisioning-User": self.user.key.urlsafe()})
         self.assertForbidden(r)
 
+    ###########################################################################
+    # ADD USER TO DISTRIBUTOR
+    ###########################################################################
     def test_add_user_to_distributor_that_does_not_exist(self):
         r = self.post('/api/v1/add_user_to_distributor', json.dumps({
             "user_email": 'dwight.schrute@demo.agosto.com',
@@ -222,3 +227,19 @@ class IdentityHandlerTest(ProvisioningBaseTest):
                 u'message': u'my_distributor is already linked to jim.bob@demo.agosto.com',
                 u'success': False
             }, json.loads(r.body))
+
+    def test_add_user_to_distributor(self):
+        distro_to_add = "default_distro0"
+        r = self.post('/api/v1/add_user_to_distributor', json.dumps({
+            "user_email": self.user.email,
+            "distributor": distro_to_add
+        }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
+
+        self.assertEqual(200, r.status_int)
+        self.assertEqual(True, json.loads(r.body)["success"])
+
+        u = User.get_or_insert_by_email(self.user.email)
+        user_distributors = [distributor.name for distributor in u.distributors]
+        self.assertIn(distro_to_add, user_distributors)
+        self.assertIn(self.default_distributor_name,user_distributors)
+        self.assertLength(2, user_distributors)
