@@ -90,7 +90,7 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
 
         else:
             if current_user.is_distributor_administrator:
-                if not distributor in current_user_distributors:
+                if not distributor.name in current_user_distributors:
                     return json_response(self.response, {'error': 'User not allowed to modify this distributor.'}, status_code=403)
 
             if not distributor.name in user_distributors:

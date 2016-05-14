@@ -55,6 +55,7 @@ class Distributor(ndb.Model):
     def find_by_name(cls, name):
         if name:
             key = Distributor.query(Distributor.name == name).get(keys_only=True)
+
             if key:
                 return key.get()
             else:
@@ -819,6 +820,7 @@ class User(ndb.Model):
         try:
             user = ndb.Key(urlsafe=key).get()
             return user
+
         except TypeError as e:
             logging.error(e)
             return False

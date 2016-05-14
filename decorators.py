@@ -88,12 +88,13 @@ def has_distributor_admin_user_key(handler_method):
         user_key = self.request.headers.get('X-Provisioning-User') or self.request.cookies.get('userKey')
         valid_user = User.get_user_from_urlsafe_key(user_key)
 
-        if valid_user.is_administrator or valid_user.is_distributor_administrator:
-            kwargs["current_user"] = valid_user
-            handler_method(self, *args, **kwargs)
+        if valid_user:
+            if valid_user.is_administrator or valid_user.is_distributor_administrator:
+                kwargs["current_user"] = valid_user
+                return handler_method(self, *args, **kwargs)
 
-        else:
-            json_response(self.response, {'error': 'You do not have the required permissions.'}, status_code=403)
+
+        json_response(self.response, {'error': 'You do not have the required permissions.'}, status_code=403)
 
     return authorize
 
@@ -102,12 +103,12 @@ def has_admin_user_key(handler_method):
         user_key = self.request.headers.get('X-Provisioning-User') or self.request.cookies.get('userKey')
         valid_user = User.get_user_from_urlsafe_key(user_key)
 
-        if valid_user.is_administrator:
-            kwargs["current_user"] = valid_user
-            handler_method(self, *args, **kwargs)
+        if valid_user:
+            if valid_user.is_administrator:
+                kwargs["current_user"] = valid_user
+                return handler_method(self, *args, **kwargs)
 
-        else:
-            json_response(self.response, {'error': 'You do not have the required permissions.'}, status_code=403)
+        json_response(self.response, {'error': 'You do not have the required permissions.'}, status_code=403)
 
     return authorize
 
