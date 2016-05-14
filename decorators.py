@@ -89,6 +89,7 @@ def has_distributor_admin_user_key(handler_method):
         valid_user = User.get_user_from_urlsafe_key(user_key)
 
         if valid_user.is_administrator or valid_user.is_distributor_administrator:
+            kwargs["current_user"] = valid_user
             handler_method(self, *args, **kwargs)
 
         else:
@@ -102,6 +103,7 @@ def has_admin_user_key(handler_method):
         valid_user = User.get_user_from_urlsafe_key(user_key)
 
         if valid_user.is_administrator:
+            kwargs["current_user"] = valid_user
             handler_method(self, *args, **kwargs)
 
         else:

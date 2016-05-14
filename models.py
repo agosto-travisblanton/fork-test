@@ -57,11 +57,13 @@ class Distributor(ndb.Model):
             key = Distributor.query(Distributor.name == name).get(keys_only=True)
             if key:
                 return key.get()
+            else:
+                return None
 
     @classmethod
     def is_unique(cls, name):
         distributor = cls.find_by_name(name)
-        if distributor is not None and name == name:
+        if distributor and distributor.name == name:
             return False
         else:
             return True

@@ -8,13 +8,17 @@ from provisioning_base_test import ProvisioningBaseTest
 from utils.web_util import build_uri
 
 
-
 class IdentityHandlerTest(ProvisioningBaseTest):
     def setUp(self):
         super(IdentityHandlerTest, self).setUp()
-        self.distributor_admin_user = self.create_platform_admin(email='john.jones@demo.agosto.com')
-        self.admin_user = self.create_platform_admin(email='jim.bob@demo.agosto.com')
-        self.user = self.create_user(email='dwight.schrute@demo.agosto.com')
+        self.default_distributor_name = "my_distributor"
+        self.distributor_admin_user = self.create_platform_admin(email='john.jones@demo.agosto.com',
+                                                                 distributor_name=self.default_distributor_name)
+        self.admin_user = self.create_platform_admin(email='jim.bob@demo.agosto.com',
+                                                     distributor_name=self.default_distributor_name)
+        self.user = self.create_user(email='dwight.schrute@demo.agosto.com',
+                                     distributor_name=self.default_distributor_name)
+
         self.login_url = build_uri('login')
         self.logout_url = build_uri('logout')
         self.identity_url = build_uri('identity')
@@ -165,18 +169,9 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         self.assertEqual(new_distributor.name, data.get('distributor'))
         self.assertEqual([new_distributor.name], data.get('distributors'))
 
-    def test_create_user_as_admin(self):
-        uri = build_uri('make_user')
-        email_to_insert = "some_user@gmail.com"
-        r = self.app.post(uri, params=json.dumps({
-            "user_email": email_to_insert
-        }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
-        self.assertEqual(200, r.status_int)
-        response_json = json.loads(r.body)
-        self.assertTrue(response_json["success"])
-        a = User.query(User.email == email_to_insert).fetch()
-        self.assertTrue(a)
-
+    ###########################################################################
+    # ROLES/USER TESTS
+    ###########################################################################
     def test_create_user_as_admin(self):
         uri = build_uri('make_user')
         email_to_insert = "some_user@gmail.com"
@@ -207,3 +202,23 @@ class IdentityHandlerTest(ProvisioningBaseTest):
             "user_email": email_to_insert
         }), headers={"X-Provisioning-User": self.user.key.urlsafe()})
         self.assertForbidden(r)
+
+    def test_add_user_to_distributor_that_does_not_exist(self):
+        r = self.post('/api/v1/add_user_to_distributor', json.dumps({
+            "user_email": 'dwight.schrute@demo.agosto.com',
+            "distributor": "asdf"
+        }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
+        self.assertEqual(403, r.status_int)
+        self.assertEqual('Not a valid distributor', json.loads(r.body)["error"])
+
+    def test_add_user_to_distributor_that_already_is_linked(self):
+        r = self.post('/api/v1/add_user_to_distributor', json.dumps({
+            "user_email": 'dwight.schrute@demo.agosto.com',
+            "distributor": self.default_distributor_name
+        }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
+        self.assertEqual(409, r.status_int)
+        self.assertEqual(
+            {
+                u'message': u'my_distributor is already linked to jim.bob@demo.agosto.com',
+                u'success': False
+            }, json.loads(r.body))
