@@ -1,13 +1,14 @@
 import json
 
 from ae_test_data import build
+from agar.test import WebTest
 from app_config import config
 from models import User, Distributor, DistributorEntityGroup
 from provisioning_base_test import ProvisioningBaseTest
 from utils.web_util import build_uri
 
 
-class IdentityHandlerTest(ProvisioningBaseTest):
+class IdentityHandlerTest(ProvisioningBaseTest, WebTest):
     def setUp(self):
         super(IdentityHandlerTest, self).setUp()
         self.user = self.create_user(email='dwight.schrute@demo.agosto.com')
@@ -159,3 +160,17 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         data = json.loads(response.body)
         self.assertEqual(new_distributor.name, data.get('distributor'))
         self.assertEqual([new_distributor.name], data.get('distributors'))
+
+    # def test_logged_in_no_session_distributor(self):
+    #     user = build(User).key.urlsafe()
+    #     uri = build_uri('make_user')
+    #     email_to_insert = "some_user@gmail.com"
+    #     r = self.app.post(uri, params=json.dumps({
+    #         "user_email": email_to_insert
+    #     }), headers={"'X-Provisioning-User'": user})
+    #     self.assertEqual(200, r.status_int)
+    #     response_json = json.loads(r.body)
+    #     self.assertLength(0, response_json["devices"])
+
+        # a = User.query(User.email == email_to_insert).fetch()
+        # self.assertTrue(a)

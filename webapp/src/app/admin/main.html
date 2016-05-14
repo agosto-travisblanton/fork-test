@@ -3,6 +3,54 @@
     <h2 class="md-flex"><i class="fa fa-fw fa-lock ng-scope"></i> Admin</h2>
   </div>
 </md-toolbar>
-<div class="container">
-  <h1>Good luck</h1>
-</div>
+<md-content layout-padding>
+  <div class="col-md-12">
+
+    <div class="col-md-4">
+      <md-card>
+        <md-card-title>
+              <md-card-title-text>
+                <span class="md-headline">Create a User</span>
+              </md-card-title-text>
+            </md-card-title>
+        <md-card-content>
+          <form name="userForm"
+                ng-submit="vm.createUser(vm.user)"
+                novalidate>
+            <md-input-container class="md-block">
+              <label>Email</label>
+              <input ng-model="vm.user.email" type="email">
+            </md-input-container>
+            <md-button class="md-raised" type="submit"
+                       ng-disabled="userForm.$pristine || userForm.$invalid">
+              Submit
+            </md-button>
+          </form>
+        </md-card-content>
+      </md-card>
+    </div>
+    <div class="col-md-4">
+      <md-card>
+        <md-card-title>
+              <md-card-title-text>
+                <span class="md-headline">Create a Distributor</span>
+              </md-card-title-text>
+            </md-card-title>
+        <md-card-content>
+          <form name="distributorForm"
+                ng-submit="vm.createUser(vm.user)"
+                novalidate>
+            <md-input-container class="md-block">
+              <label>Name</label>
+              <input ng-model="vm.distributor.name" type="text">
+            </md-input-container>
+            <md-button class="md-raised" type="submit"
+                       ng-disabled="distributorForm.$pristine || distributorForm.$invalid">
+              Submit
+            </md-button>
+          </form>
+        </md-card-content>
+      </md-card>
+    </div>
+  </div>
+</md-content>

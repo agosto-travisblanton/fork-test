@@ -4,7 +4,7 @@ import os
 
 from agar.sessions import SessionRequestHandler
 from app_config import config
-from models import User, Distributor, UserAdmin
+from models import User, Distributor
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
 from decorators import has_admin_user_key
@@ -71,6 +71,7 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
             "user_created": user.email
         })
 
+
     @has_admin_user_key
     def add_user_to_distributor(self):
         incoming = json.loads(self.request.body)
@@ -89,7 +90,7 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
             })
 
     @has_admin_user_key
-    def create_distributor(self):
+    def make_distributor(self):
         incoming = json.loads(self.request.body)
         distributor_name = incoming["distributor"]
         admin_email = incoming["admin_email"]

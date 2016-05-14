@@ -246,8 +246,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   $stateProvider.state("admin", {
     url: "/admin",
     templateUrl: "app/admin/main.html",
-#    controller: "ProofOfPlayCtrl",
-#    controllerAs: 'vm',
+    controller: "AdminCtrl",
+    controllerAs: 'vm',
     ncyBreadcrumb: {
       label: 'Admin'
     }
