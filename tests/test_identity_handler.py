@@ -278,3 +278,9 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         self.assertIn(distro_to_add, user_distributors)
         self.assertIn(self.default_distributor_name,user_distributors)
         self.assertLength(2, user_distributors)
+
+
+    ###########################################################################
+    # MAKE DISTRIBUTOR
+    ###########################################################################
+    # def test_make_distributor_that_is_new(self):

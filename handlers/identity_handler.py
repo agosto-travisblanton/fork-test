@@ -66,13 +66,17 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
     def make_user(self, **kwargs):
         incoming = json.loads(self.request.body)
         user_email = incoming["user_email"]
+        current_user = kwargs["current_user"]
         user = User.get_or_insert_by_email(email=user_email)
+
+        # if current_user.is_administrator:
+        #     user.is_distributor_administrator = incoming["is_distributor_admin"]
+        #     user.put()
 
         json_response(self.response, {
             "success": True,
             "user_created": user.email
         })
-
 
     @has_distributor_admin_user_key
     def add_user_to_distributor(self, **kwargs):
@@ -91,7 +95,8 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
         else:
             if current_user.is_distributor_administrator:
                 if not distributor.name in current_user_distributors:
-                    return json_response(self.response, {'error': 'User not allowed to modify this distributor.'}, status_code=403)
+                    return json_response(self.response, {'error': 'User not allowed to modify this distributor.'},
+                                         status_code=403)
 
             if not distributor.name in user_distributors:
                 user.add_distributor(distributor.key)
@@ -105,7 +110,6 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
                     "success": False,
                     "message": distributor.name + " is already linked to " + current_user.email
                 }, status_code=409)
-
 
     @has_admin_user_key
     def make_distributor(self):
@@ -125,4 +129,7 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
                 }
             )
         else:
-            self.abort()
+            json_response(self.response, {
+                "success": False,
+                "message": "Distributor already exists"
+            }, status_code=409)

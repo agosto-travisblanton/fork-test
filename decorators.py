@@ -93,7 +93,6 @@ def has_distributor_admin_user_key(handler_method):
                 kwargs["current_user"] = valid_user
                 return handler_method(self, *args, **kwargs)
 
-
         json_response(self.response, {'error': 'You do not have the required permissions.'}, status_code=403)
 
     return authorize
