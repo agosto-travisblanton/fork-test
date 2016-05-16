@@ -11,9 +11,8 @@ class TimezoneUtil(object):
 
     @staticmethod
     def get_timezone_offset(timezone):
-        zone = pytz.timezone(timezone)
-        now = datetime.datetime.utcnow()
-        timezone_offset = int(zone.utcoffset(now).total_seconds()/3600)
+        offset = datetime.datetime.now(pytz.timezone(timezone)).strftime('%z').replace('0', '')
+        timezone_offset = int(offset)
         return timezone_offset
 
     @staticmethod
