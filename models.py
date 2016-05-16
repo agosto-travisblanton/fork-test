@@ -804,8 +804,7 @@ class User(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     email = ndb.StringProperty(required=True)
-    is_administrator = ndb.BooleanProperty(default=False) # platform administrator
-    is_distributor_administrator = ndb.BooleanProperty(default=False)
+    is_administrator = ndb.BooleanProperty(default=False)  # platform administrator
     stormpath_account_href = ndb.StringProperty()
     last_login = ndb.DateTimeProperty()
     enabled = ndb.BooleanProperty(default=True)
@@ -824,7 +823,6 @@ class User(ndb.Model):
         except TypeError as e:
             logging.error(e)
             return False
-
 
     @classmethod
     def _build_key(cls, email):
@@ -873,9 +871,22 @@ class User(ndb.Model):
     def distributors(self):
         return ndb.get_multi(self.distributor_keys)
 
-    def add_distributor(self, distributor_key):
+    @property
+    def is_distributor_administrator(self):
+        return DistributorUser.query(DistributorUser.user_key == self.key).filter(
+            DistributorUser.is_distributor_administrator == True).count() > 0
+
+    def is_distributor_administrator_of_distributor(self, distributor_key):
+        return DistributorUser.query(DistributorUser.user_key == self.key).filter(
+            DistributorUser.is_distributor_administrator == True).filter(
+            DistributorUser.distributor_key == distributor_key).count() == 1
+
+    def add_distributor(self, distributor_key, is_distributor_administrator=False):
         if distributor_key not in self.distributor_keys:
-            dist_user = DistributorUser(user_key=self.key, distributor_key=distributor_key)
+            dist_user = DistributorUser(
+                user_key=self.key,
+                distributor_key=distributor_key,
+                is_distributor_administrator=is_distributor_administrator)
             dist_user.put()
 
 
@@ -887,12 +898,14 @@ class DistributorUser(ndb.Model):
     """
     class_version = ndb.IntegerProperty()
     distributor_key = ndb.KeyProperty(kind=Distributor, required=True)
+    is_distributor_administrator = ndb.BooleanProperty(default=False)
     user_key = ndb.KeyProperty(kind=User, required=True)
 
     @classmethod
-    def create(cls, distributor_key, user_key):
+    def create(cls, distributor_key, user_key, is_distributor_administrator=False):
         distributor_user = cls(
             user_key=user_key,
+            is_distributor_administrator=is_distributor_administrator,
             distributor_key=distributor_key)
         return distributor_user
 

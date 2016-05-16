@@ -70,17 +70,17 @@
       <md-button ng-click="appController.goTo('welcome')"><i class="fa fa-fw fa fa-play"></i> Welcome
       </md-button>
     </md-list-item>
-    <div ng-show="appController.getIdentity().admin">
-      <md-list-item>
-        <md-button ng-click="appController.goTo('admin')"><i class="fa fa-fw fa-lock"></i> Admin
+     <md-list-item ng-if="appController.getIdentity().admin == 'true'">
+        <md-button ng-click="appController.goTo('admin')"><i
+                class="fa fa-fw fa-lock"></i> Admin
         </md-button>
       </md-list-item>
-    </div>
     <md-list-item>
       <md-button ng-click="appController.goTo('sign_out')"><i class="fa fa-fw fa-sign-out"></i> Sign out
       </md-button>
     </md-list-item>
   </md-list>
+
 </md-sidenav>
 
 <div flex layout="column" tabIndex="-1" role="main" class="md-whiteframe-z2" style="margin-top:-50px">

@@ -11,6 +11,18 @@ from decorators import has_admin_user_key, has_distributor_admin_user_key
 import json
 
 
+def is_distributor_admin_associated_with_this_distributor(current_user, distributor_name):
+    current_user_distributors = [each_distributor.name for each_distributor in current_user.distributors]
+    distributor = Distributor.find_by_name(name=distributor_name)
+    return_value = False
+    if distributor:
+        if current_user.is_distributor_administrator:
+            if distributor.name in current_user_distributors:
+                return_value = True
+
+    return return_value
+
+
 class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
     def get(self):
         app_version = os.environ['CURRENT_VERSION_ID']
@@ -66,7 +78,12 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
     def make_user(self, **kwargs):
         incoming = json.loads(self.request.body)
         user_email = incoming["user_email"]
+        distributor_admin = incoming["distributor_admin"]  # boolean
         current_user = kwargs["current_user"]
+        #
+        # if distributor_admin:
+        #     if current_user.is_distributor_administrator:
+
         user = User.get_or_insert_by_email(email=user_email)
 
         # if current_user.is_administrator:
@@ -87,16 +104,19 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
         distributor_name = incoming["distributor"]
         distributor = Distributor.find_by_name(name=distributor_name)
         current_user = kwargs["current_user"]
-        current_user_distributors = [each_distributor.name for each_distributor in current_user.distributors]
 
         if not distributor:
             return json_response(self.response, {'error': 'Not a valid distributor'}, status_code=403)
 
         else:
-            if current_user.is_distributor_administrator:
-                if not distributor.name in current_user_distributors:
-                    return json_response(self.response, {'error': 'User not allowed to modify this distributor.'},
-                                         status_code=403)
+            distributor_admin_associated_with_distributor = is_distributor_admin_associated_with_this_distributor(
+                current_user, distributor_name)
+            if not distributor_admin_associated_with_distributor:
+                return json_response(
+                    self.response, {
+                        'error': 'User not allowed to modify this distributor.'
+                    },
+                    status_code=403)
 
             if not distributor.name in user_distributors:
                 user.add_distributor(distributor.key)
