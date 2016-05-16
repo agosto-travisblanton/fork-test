@@ -88,37 +88,13 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
         else:
             print "NO DISTRIBUTOR BY THIS NAME"
 
-    @has_distributor_admin_user_key
-    def make_user(self, **kwargs):
-        incoming = json.loads(self.request.body)
-        user_email = incoming["user_email"]
-        distributor_admin = incoming["distributor_admin"]  # boolean
-        current_user = kwargs["current_user"]
-        user = User.get_or_insert_by_email(email=user_email)
-
-        if distributor_admin:
-            if current_user.is_distributor_administrator:
-                IdentityHandler.add_user_to_distributor_as_distributor_admin(
-                    incoming["distributor_name"],
-                    user,
-                    current_user
-                )
-
-            elif current_user.is_administrator:
-                distributor = Distributor.find_by_name(incoming["distributor_name"])
-                user.add_distributor(distributor.key, is_distributor_administrator=True)
-
-        json_response(self.response, {
-            "success": True,
-            "user_created": user.email
-        })
 
     @has_distributor_admin_user_key
     def add_user_to_distributor(self, **kwargs):
         incoming = json.loads(self.request.body)
         user_email = incoming["user_email"]
         user = User.get_or_insert_by_email(email=user_email)
-        user_distributors = [distributor.name for distributor in user.distributors]
+        user_distributors = [each_distro.name for each_distro in user.distributors]
         distributor_name = incoming["distributor"]
         distributor_admin = incoming["distributor_admin"]
         distributor = Distributor.find_by_name(name=distributor_name)
@@ -132,15 +108,17 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
                     current_user,
                     distributor
             ) and not current_user.is_administrator:
-
                 return json_response(
-                    self.response, {
+                    self.response,
+                    {
                         'error': 'User not allowed to modify this distributor.'
                     },
-                    status_code=403)
+                    status_code=403
+                )
 
             if not distributor.name in user_distributors:
                 user.add_distributor(distributor.key, is_distributor_administrator=distributor_admin)
+
                 json_response(self.response, {
                     "success": True,
                     "message": 'SUCCESS! ' + user.email + ' is linked to ' + distributor.name
@@ -157,9 +135,9 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
         incoming = json.loads(self.request.body)
         distributor_name = incoming["distributor"]
         admin_email = incoming["admin_email"]
-        distributor = Distributor.query(Distributor.name == distributor_name).get()
+        distributor_name_unique = Distributor.is_unique(distributor_name)
 
-        if not distributor:
+        if distributor_name_unique:
             distributor = Distributor.create(name=distributor_name, active=True)
             distributor.admin_email = admin_email
             distributor.put()

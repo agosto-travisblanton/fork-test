@@ -172,43 +172,6 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         self.assertEqual([new_distributor.name], data.get('distributors'))
 
     ###########################################################################
-    # CREATE USER
-    ###########################################################################
-    def test_create_user_as_admin(self):
-        uri = build_uri('make_user')
-        email_to_insert = "some_user@gmail.com"
-        r = self.app.post(uri, params=json.dumps({
-            "user_email": email_to_insert,
-            "distributor_admin": False
-        }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
-        self.assertEqual(200, r.status_int)
-        response_json = json.loads(r.body)
-        self.assertTrue(response_json["success"])
-        a = User.query(User.email == email_to_insert).fetch()
-        self.assertTrue(a)
-
-    def test_create_user_as_distributor_admin(self):
-        uri = build_uri('make_user')
-        email_to_insert = "some_user@gmail.com"
-        r = self.app.post(uri, params=json.dumps({
-            "user_email": email_to_insert,
-            "distributor_admin": False
-        }), headers={"X-Provisioning-User": self.distributor_admin_user.key.urlsafe()})
-        self.assertEqual(200, r.status_int)
-        response_json = json.loads(r.body)
-        self.assertTrue(response_json["success"])
-        a = User.query(User.email == email_to_insert).fetch()
-        self.assertTrue(a)
-
-    def test_create_user_as_regular_user(self):
-        email_to_insert = "some_user@gmail.com"
-        r = self.post('/api/v1/make_user', json.dumps({
-            "user_email": email_to_insert,
-            "distributor_admin": False
-        }), headers={"X-Provisioning-User": self.user.key.urlsafe()})
-        self.assertForbidden(r)
-
-    ###########################################################################
     # ADD USER TO DISTRIBUTOR
     ###########################################################################
     def test_add_user_to_distributor_as_no_user(self):
