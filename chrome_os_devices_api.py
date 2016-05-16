@@ -198,14 +198,14 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, page_token
             device.put()
             logging.info('register_device: retrieved directory API for MAC address = {0}. Notifying Content Manager.'.
                          format(lowercase_device_mac_address))
-            deferred.defer(ContentManagerApi().create_device,
-                           device_urlsafe_key=device_urlsafe_key,
-                           _queue='content-server',
-                           _countdown=5)
+            if ContentManagerApi().create_device(device_urlsafe_key):
+                logging.info('CM returned 201 of create_device')
+            else:
+                logging.error('Error notifying CM of create_device')
             return device
         else:
             if new_page_token:
-                deferred.defer(refresh_device_by_mac_address,
+                deferred.defer(register_device,
                                device_urlsafe_key=device_urlsafe_key,
                                device_mac_address=device_mac_address,
                                page_token=new_page_token)

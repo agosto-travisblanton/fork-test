@@ -75,20 +75,15 @@ class TestContentManagerApi(BaseTest):
     ## create_device
     ##################################################################################################################
 
-    def test_create_device_success(self):
+    def test_create_device_success_returns_true(self):
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=201))
         result = self.content_manager_api.create_device(device_urlsafe_key=self.device_key.urlsafe())
         self.assertTrue(result)
 
-    def test_unsuccessful_create_device_raises_error(self):
-        error_code = 400
-        when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=error_code))
-        with self.assertRaises(RuntimeError) as context:
-            self.content_manager_api.create_device(device_urlsafe_key=self.device_key.urlsafe())
-        error_message = 'Unable to create device in Content Manager with tenant code {0}. Status code: {1}, ' \
-                        'url={2}/provisioning/v1/displays'.format(self.TENANT_CODE, error_code,
-                                                                  self.CONTENT_MANAGER_BASE_URL)
-        self.assertEqual(error_message, str(context.exception))
+    def test_create_device_failure_returns_false(self):
+        when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=400))
+        result = self.content_manager_api.create_device(device_urlsafe_key=self.device_key.urlsafe())
+        self.assertFalse(result)
 
     ##################################################################################################################
     ## update_device
