@@ -73,22 +73,6 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
 
         json_response(self.response, user_info)
 
-    @staticmethod
-    def add_user_to_distributor_as_distributor_admin(distributor_name, user, current_user):
-        distributor = Distributor.find_by_name(distributor_name)
-        if distributor:
-            if is_distributor_admin_associated_with_this_distributor(
-                    current_user=current_user,
-                    distributor=distributor):
-                user.add_distributor(distributor.key, is_distributor_administrator=True)
-
-            else:
-                print current_user.name + "IS NOT ALLOWED TO MAKE " + user.email + " A DISTRIBUTOR ADMIN OF " + \
-                      distributor_name
-        else:
-            print "NO DISTRIBUTOR BY THIS NAME"
-
-
     @has_distributor_admin_user_key
     def add_user_to_distributor(self, **kwargs):
         incoming = json.loads(self.request.body)
@@ -104,10 +88,11 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
             return json_response(self.response, {'error': 'Not a valid distributor'}, status_code=403)
 
         else:
-            if not is_distributor_admin_associated_with_this_distributor(
-                    current_user,
-                    distributor
-            ) and not current_user.is_administrator:
+            distributor_admin_associated_with_distributor = is_distributor_admin_associated_with_this_distributor(
+                current_user,
+                distributor
+            )
+            if not distributor_admin_associated_with_distributor and not current_user.is_administrator:
                 return json_response(
                     self.response,
                     {
