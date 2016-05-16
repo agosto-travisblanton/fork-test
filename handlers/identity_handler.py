@@ -11,9 +11,8 @@ from decorators import has_admin_user_key, has_distributor_admin_user_key
 import json
 
 
-def is_distributor_admin_associated_with_this_distributor(current_user, distributor_name):
+def is_distributor_admin_associated_with_this_distributor(current_user, distributor):
     current_user_distributors = [each_distributor.name for each_distributor in current_user.distributors]
-    distributor = Distributor.find_by_name(name=distributor_name)
     return_value = False
     if distributor:
         if current_user.is_distributor_administrator:
@@ -74,21 +73,40 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
 
         json_response(self.response, user_info)
 
+    @staticmethod
+    def add_user_to_distributor_as_distributor_admin(distributor_name, user, current_user):
+        distributor = Distributor.find_by_name(distributor_name)
+        if distributor:
+            if is_distributor_admin_associated_with_this_distributor(
+                    current_user=current_user,
+                    distributor=distributor):
+                user.add_distributor(distributor.key, is_distributor_administrator=True)
+
+            else:
+                print current_user.name + "IS NOT ALLOWED TO MAKE " + user.email + " A DISTRIBUTOR ADMIN OF " + \
+                      distributor_name
+        else:
+            print "NO DISTRIBUTOR BY THIS NAME"
+
     @has_distributor_admin_user_key
     def make_user(self, **kwargs):
         incoming = json.loads(self.request.body)
         user_email = incoming["user_email"]
         distributor_admin = incoming["distributor_admin"]  # boolean
         current_user = kwargs["current_user"]
-        #
-        # if distributor_admin:
-        #     if current_user.is_distributor_administrator:
-
         user = User.get_or_insert_by_email(email=user_email)
 
-        # if current_user.is_administrator:
-        #     user.is_distributor_administrator = incoming["is_distributor_admin"]
-        #     user.put()
+        if distributor_admin:
+            if current_user.is_distributor_administrator:
+                IdentityHandler.add_user_to_distributor_as_distributor_admin(
+                    incoming["distributor_name"],
+                    user,
+                    current_user
+                )
+
+            elif current_user.is_administrator:
+                distributor = Distributor.find_by_name(incoming["distributor_name"])
+                user.add_distributor(distributor.key, is_distributor_administrator=True)
 
         json_response(self.response, {
             "success": True,
@@ -109,9 +127,11 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
             return json_response(self.response, {'error': 'Not a valid distributor'}, status_code=403)
 
         else:
-            distributor_admin_associated_with_distributor = is_distributor_admin_associated_with_this_distributor(
-                current_user, distributor_name)
-            if not distributor_admin_associated_with_distributor:
+            if not is_distributor_admin_associated_with_this_distributor(
+                    current_user,
+                    distributor
+            ) and not current_user.is_administrator:
+
                 return json_response(
                     self.response, {
                         'error': 'User not allowed to modify this distributor.'

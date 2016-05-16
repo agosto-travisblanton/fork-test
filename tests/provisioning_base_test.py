@@ -66,8 +66,7 @@ class ProvisioningBaseTest(BaseTest, WebTest, KeyValidatorMixin):
         distributor.put()
 
         user = User.update_or_create_with_api_account(MockStormpathResponse(email))
-        user.is_distributor_administrator = True
-        user.add_distributor(distributor.key)
+        user.add_distributor(distributor.key, is_distributor_administrator=True)
         user.put()
         return user
 

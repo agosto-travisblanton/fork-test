@@ -178,7 +178,8 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         uri = build_uri('make_user')
         email_to_insert = "some_user@gmail.com"
         r = self.app.post(uri, params=json.dumps({
-            "user_email": email_to_insert
+            "user_email": email_to_insert,
+            "distributor_admin": False
         }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
         self.assertEqual(200, r.status_int)
         response_json = json.loads(r.body)
@@ -190,7 +191,8 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         uri = build_uri('make_user')
         email_to_insert = "some_user@gmail.com"
         r = self.app.post(uri, params=json.dumps({
-            "user_email": email_to_insert
+            "user_email": email_to_insert,
+            "distributor_admin": False
         }), headers={"X-Provisioning-User": self.distributor_admin_user.key.urlsafe()})
         self.assertEqual(200, r.status_int)
         response_json = json.loads(r.body)
@@ -201,7 +203,8 @@ class IdentityHandlerTest(ProvisioningBaseTest):
     def test_create_user_as_regular_user(self):
         email_to_insert = "some_user@gmail.com"
         r = self.post('/api/v1/make_user', json.dumps({
-            "user_email": email_to_insert
+            "user_email": email_to_insert,
+            "distributor_admin": False
         }), headers={"X-Provisioning-User": self.user.key.urlsafe()})
         self.assertForbidden(r)
 
