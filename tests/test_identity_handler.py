@@ -214,21 +214,24 @@ class IdentityHandlerTest(ProvisioningBaseTest):
     def test_add_user_to_distributor_as_no_user(self):
         r = self.post('/api/v1/add_user_to_distributor', json.dumps({
             "user_email": 'dwight.schrute@demo.agosto.com',
-            "distributor": "asdf"
+            "distributor": "asdf",
+            "distributor_admin": False
         }), headers={"X-Provisioning-User": "qwerqwerw"})
         self.assertEqual(403, r.status_int)
 
     def test_add_user_to_distributor_as_unprivileged_user(self):
         r = self.post('/api/v1/add_user_to_distributor', json.dumps({
             "user_email": 'dwight.schrute@demo.agosto.com',
-            "distributor": "asdf"
+            "distributor": "asdf",
+            "distributor_admin": False
         }), headers={"X-Provisioning-User": self.user.key.urlsafe()})
         self.assertEqual(403, r.status_int)
 
     def test_add_user_to_distributor_of_distributor_admin_as_distributor_admin(self):
         r = self.post('/api/v1/add_user_to_distributor', json.dumps({
             "user_email": self.user.email,
-            "distributor": "distributor_admin_name"
+            "distributor": "distributor_admin_name",
+            "distributor_admin": False
         }), headers={"X-Provisioning-User": self.distributor_admin_user.key.urlsafe()})
         self.assertEqual(200, r.status_int)
 
@@ -241,7 +244,8 @@ class IdentityHandlerTest(ProvisioningBaseTest):
     def test_add_user_to_different_distributor_as_distributor_admin(self):
         r = self.post('/api/v1/add_user_to_distributor', json.dumps({
             "user_email": self.user.email,
-            "distributor": "default_distro0"
+            "distributor": "default_distro0",
+            "distributor_admin": False
         }), headers={"X-Provisioning-User": self.distributor_admin_user.key.urlsafe()})
         self.assertEqual(403, r.status_int)
 
@@ -249,7 +253,8 @@ class IdentityHandlerTest(ProvisioningBaseTest):
     def test_add_user_to_distributor_that_does_not_exist_as_admin(self):
         r = self.post('/api/v1/add_user_to_distributor', json.dumps({
             "user_email": 'dwight.schrute@demo.agosto.com',
-            "distributor": "asdf"
+            "distributor": "asdf",
+            "distributor_admin": False
         }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
         self.assertEqual(403, r.status_int)
         self.assertEqual('Not a valid distributor', json.loads(r.body)["error"])
@@ -257,7 +262,8 @@ class IdentityHandlerTest(ProvisioningBaseTest):
     def test_add_user_to_distributor_that_already_is_linked_as_admin(self):
         r = self.post('/api/v1/add_user_to_distributor', json.dumps({
             "user_email": 'dwight.schrute@demo.agosto.com',
-            "distributor": self.default_distributor_name
+            "distributor": self.default_distributor_name,
+            "distributor_admin": False
         }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
         self.assertEqual(409, r.status_int)
         self.assertEqual(
@@ -270,7 +276,8 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         distro_to_add = "default_distro0"
         r = self.post('/api/v1/add_user_to_distributor', json.dumps({
             "user_email": self.user.email,
-            "distributor": distro_to_add
+            "distributor": distro_to_add,
+            "distributor_admin": False
         }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
 
         self.assertEqual(200, r.status_int)

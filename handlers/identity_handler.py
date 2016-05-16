@@ -120,6 +120,7 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
         user = User.get_or_insert_by_email(email=user_email)
         user_distributors = [distributor.name for distributor in user.distributors]
         distributor_name = incoming["distributor"]
+        distributor_admin = incoming["distributor_admin"]
         distributor = Distributor.find_by_name(name=distributor_name)
         current_user = kwargs["current_user"]
 
@@ -139,7 +140,7 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
                     status_code=403)
 
             if not distributor.name in user_distributors:
-                user.add_distributor(distributor.key)
+                user.add_distributor(distributor.key, is_distributor_administrator=distributor_admin)
                 json_response(self.response, {
                     "success": True,
                     "message": 'SUCCESS! ' + user.email + ' is linked to ' + distributor.name
