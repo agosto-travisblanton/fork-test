@@ -74,7 +74,7 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         self.assertEqual(self.logout_url, data.get('logout_url'))
         self.assertTrue(data.get('is_logged_in'))
         self.assertEqual('testbed-version', data.get('version'))
-        self.assertTrue(data.get('administrator'))
+        self.assertTrue(data.get('is_admin'))
         distributor_names = sorted([distributor.name for distributor in Distributor.query().fetch()])
         self.assertEqual(distributor_names, sorted(data.get('distributors')))
         self.assertEqual(self.user.distributors[0].name, data.get('distributor'))

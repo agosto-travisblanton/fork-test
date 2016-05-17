@@ -13,8 +13,6 @@ import json
 
 class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
     def get(self):
-        app_version = os.environ['CURRENT_VERSION_ID']
-
         state = self.session.get('state')
 
         if not state:
@@ -24,7 +22,7 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
         user_info = {
             'login_url': self.uri_for('login'),
             'logout_url': self.uri_for('logout'),
-            'version': app_version,
+            'version': os.environ['CURRENT_VERSION_ID'],
             'CLIENT_ID': config.CLIENT_ID,
             'OAUTH_CLIENT_ID': config.OAUTH_CLIENT_ID,
             'BROWSER_API_KEY': config.PUBLIC_API_SERVER_KEY,
@@ -48,8 +46,8 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
                 'email': user.email,
                 'is_admin': user.is_administrator,
                 'is_logged_in': True,
-                'distributors': distributor_names,
-                'distributors_as_admin': distributors_as_admin,
+                'distributors': [distributor.name for distributor in Distributor.query().fetch()] if user.is_administrator else distributor_names,
+                'distributors_as_admin': [distributor.name for distributor in Distributor.query().fetch()] if user.is_administrator else distributors_as_admin,
                 'distributor': session_distributor
             })
 
