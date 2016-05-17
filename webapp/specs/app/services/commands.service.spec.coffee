@@ -22,42 +22,42 @@ describe 'CommandsService', ->
 
   describe '.reset', ->
     it 'prepares a device reset command, returning a promise', ->
-      commandsRestangularService = {customPOST: ->}
+      commandsRestangularService = {post: ->}
       spyOn(Restangular, 'oneUrl').and.returnValue commandsRestangularService
-      spyOn(commandsRestangularService, 'customPOST').and.returnValue promise
+      spyOn(commandsRestangularService, 'post').and.returnValue promise
       actual = CommandsService.reset key
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}"
-      expect(commandsRestangularService.customPOST).toHaveBeenCalledWith(payload, 'commands/reset')
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}/commands/reset"
+      expect(commandsRestangularService.post).toHaveBeenCalled()
       expect(actual).toBe promise
 
   describe '.powerOn', ->
     it 'prepares a power on command, returning a promise', ->
-      commandsRestangularService = {customPOST: ->}
+      commandsRestangularService = {post: ->}
       spyOn(Restangular, 'oneUrl').and.returnValue commandsRestangularService
-      spyOn(commandsRestangularService, 'customPOST').and.returnValue promise
+      spyOn(commandsRestangularService, 'post').and.returnValue promise
       actual = CommandsService.powerOn key
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}"
-      expect(commandsRestangularService.customPOST).toHaveBeenCalledWith(payload, 'commands/power-on')
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}/commands/power-on"
+      expect(commandsRestangularService.post).toHaveBeenCalled()
       expect(actual).toBe promise
 
   describe '.powerOff', ->
     it 'prepares a power on command, returning a promise', ->
-      commandsRestangularService = {customPOST: ->}
+      commandsRestangularService = {post: ->}
       spyOn(Restangular, 'oneUrl').and.returnValue commandsRestangularService
-      spyOn(commandsRestangularService, 'customPOST').and.returnValue promise
+      spyOn(commandsRestangularService, 'post').and.returnValue promise
       actual = CommandsService.powerOff key
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}"
-      expect(commandsRestangularService.customPOST).toHaveBeenCalledWith(payload, 'commands/power-off')
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}/commands/power-off"
+      expect(commandsRestangularService.post).toHaveBeenCalled()
       expect(actual).toBe promise
 
   describe '.contentDelete', ->
     it 'prepares a content delete command, returning a promise', ->
-      commandsRestangularService = {customPOST: ->}
+      commandsRestangularService = {post: ->}
       spyOn(Restangular, 'oneUrl').and.returnValue commandsRestangularService
-      spyOn(commandsRestangularService, 'customPOST').and.returnValue promise
+      spyOn(commandsRestangularService, 'post').and.returnValue promise
       actual = CommandsService.contentDelete key
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}"
-      expect(commandsRestangularService.customPOST).toHaveBeenCalledWith(payload, 'commands/content-delete')
+      expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}/commands/content-delete"
+      expect(commandsRestangularService.post).toHaveBeenCalled()
       expect(actual).toBe promise
 
   describe '.volume', ->
@@ -67,9 +67,7 @@ describe 'CommandsService', ->
       spyOn(commandsRestangularService, 'customPOST').and.returnValue promise
       volume = 6
       payload = {
-        volume: volume,
-        userIdentifier: userEmail
-      }
+        volume: volume      }
       actual = CommandsService.volume key, volume
       expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}"
       expect(commandsRestangularService.customPOST).toHaveBeenCalledWith(payload, 'commands/volume')
@@ -82,8 +80,7 @@ describe 'CommandsService', ->
       spyOn(commandsRestangularService, 'customPOST').and.returnValue promise
       update_something = 'skykit.com/skdchromeapp/update/something'
       payload = {
-        command: update_something,
-        userIdentifier: userEmail
+        command: update_something
       }
       actual = CommandsService.custom key, update_something
       expect(Restangular.oneUrl).toHaveBeenCalledWith 'devices', "api/v1/devices/#{key}"
