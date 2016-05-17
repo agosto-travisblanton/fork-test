@@ -5,7 +5,6 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
   $cookies,
   IdentityService,
   Restangular,
-  AdminService,
   $q) ->
   new class SessionsService
 
@@ -16,31 +15,24 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
       @distributorsAsAdmin = undefined
       @isAdmin = undefined
 
-    deSerialize: (data) ->
-      if "," in data
-        data.split ","
-
-      else
-        data
-
-    setDistributors: (distributors) ->
+    setDistributors: (distributors) =>
       $cookies.put('distributors', distributors)
       @distributors = distributors
 
-    setDistributorsAsAdmin: (distributorsAsAdmin) ->
+    setDistributorsAsAdmin: (distributorsAsAdmin) =>
       $cookies.put('distributorsAsAdmin', distributorsAsAdmin)
       @distributorsAsAdmin = distributorsAsAdmin
 
-    setIsAdmin: (isAdmin) ->
+    setIsAdmin: (isAdmin) =>
       @isAdmin = isAdmin
 
-    getDistributors: (distributors) ->
+    getDistributors: (distributors) =>
       if @distributors then @distributors else @deSerialize $cookies.get('distributors')
 
-    getDistributorsAsAdmin: (distributorsAsAdmin) ->
+    getDistributorsAsAdmin: (distributorsAsAdmin) =>
       if @distributorsAsAdmin then @distributorsAsAdmin else @deSerialize $cookies.get('distributorsAsAdmin')
 
-    getIsAdmin: (isAdmin) ->
+    getIsAdmin: (isAdmin) =>
       if @isAdmin then @isAdmin else @deSerialize $cookies.get('isAdmin')
 
     login: (credentials) ->
@@ -69,11 +61,11 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
 
       deferred.promise
 
-    setIdentity: (userKey)->
+    setIdentity: (userKey) =>
       deferred = $q.defer()
       $cookies.put('userKey', userKey)
       identityPromise = IdentityService.getIdentity()
-      identityPromise.then (data) ->
+      identityPromise.then (data) =>
         @setDistributors(data['distributors'])
         @setDistributorsAsAdmin(data['distributors_as_admin'])
         @setIsAdmin(data['is_admin'])
@@ -83,10 +75,17 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
         deferred.resolve()
       deferred.promise
 
-    removeUserInfo: ()->
+    removeUserInfo: () ->
       $cookies.remove('userKey')
       $cookies.remove('userEmail')
       $cookies.remove('userAdmin')
       $cookies.remove('currentDistributorKey')
       $cookies.remove('currentDistributorName')
+
+    deSerialize: (data) ->
+      if "," in data
+        data.split ","
+
+      else
+        data
 

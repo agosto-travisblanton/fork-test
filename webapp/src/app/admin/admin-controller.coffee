@@ -8,9 +8,9 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService) ->
   @distributors = SessionsService.getDistributors()
   @distributorsAsAdmin = SessionsService.getDistributorsAsAdmin()
 
-  @makeUser = (user_email) ->
+  @addUserToDistributor = (userEmail, distributor, distributorAdmin) ->
 
-    res = AdminService.makeUser "asdf@gmail.com"
+    res = AdminService.addUserToDistributor(userEmail, distributor, distributorAdmin)
 
     res.then (data) ->
       console.log("asdf")
