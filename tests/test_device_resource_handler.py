@@ -1384,19 +1384,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(device.customer_display_code, customer_display_code)
         self.assertEqual(device.customer_display_name, new_display_name)
 
-    def test_put_updates_valid_heartbeat_interval(self):
-        interval = 3
-        request_body = {
-            'heartbeatInterval': interval
-        }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
-        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
-                     json.dumps(request_body),
-                     headers=self.api_token_authorization_header)
-        updated_display = self.managed_device_key.get()
-        self.assertNotEqual(config.PLAYER_HEARTBEAT_INTERVAL_MINUTES, updated_display.heartbeat_interval_minutes)
-
     def test_put_does_not_update_invalid_heartbeat_interval(self):
         interval = 0
         request_body = {
