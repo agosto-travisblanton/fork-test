@@ -70,12 +70,11 @@
       <md-button ng-click="appController.goTo('welcome')"><i class="fa fa-fw fa fa-play"></i> Welcome
       </md-button>
     </md-list-item>
-    <!-- UNCOMMENT THIS ONCE THE VIEW IS COMPLETE -->
-    <!-- <md-list-item ng-if="appController.getIdentity().admin == 'true'">
-        <md-button ng-click="appController.goTo('admin')"><i
-                class="fa fa-fw fa-lock"></i> Admin
-        </md-button>
-      </md-list-item> -->
+    <md-list-item ng-if="appController.getIdentity().admin == 'true'">
+      <md-button ng-click="appController.goTo('admin')"><i
+              class="fa fa-fw fa-lock"></i> Admin
+      </md-button>
+    </md-list-item>
     <md-list-item>
       <md-button ng-click="appController.goTo('sign_out')"><i class="fa fa-fw fa-sign-out"></i> Sign out
       </md-button>

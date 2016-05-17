@@ -2,12 +2,19 @@
 
 app = angular.module 'skykitProvisioning'
 
-app.controller "AdminCtrl", (AdminService) ->
+app.controller "AdminCtrl", (AdminService, SessionsService) ->
 
-  @createUser = (user_email) =>
+  @isAdmin = SessionsService.getIsAdmin()
+
+  @distributors = SessionsService.getDistributors()
+
+  @distributorsAsAdmin = SessionsService.getDistributorsAsAdmin()
+
+  @createUser = (user_email) ->
+
     res = AdminService.makeUser "asdf@gmail.com"
 
-    res.then = (data) =>
+    res.then = (data) ->
       console.log("asdf")
 
 
