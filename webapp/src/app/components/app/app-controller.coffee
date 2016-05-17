@@ -2,7 +2,7 @@
 
 appModule = angular.module 'skykitProvisioning'
 
-appModule.controller 'AppController', ($mdSidenav, $state, $cookies, $window) ->
+appModule.controller 'AppController', ($mdSidenav, $state, $cookies, $window, SessionsService) ->
   vm = @
 
   vm.identity = {}
@@ -11,17 +11,16 @@ appModule.controller 'AppController', ($mdSidenav, $state, $cookies, $window) ->
     vm.identity = {
       key: $cookies.get('userKey')
       email: $cookies.get('userEmail')
-      admin: $cookies.get('userAdmin')
+      admin: SessionsService.getIsAdmin()
+      distributor_admin: SessionsService.getDistributorsAsAdmin()
       distributorKey: $cookies.get('currentDistributorKey')
       distributorName: $cookies.get('currentDistributorName')
     }
-    return vm.identity
 
 
   @isCurrentURLDistributorSelector = () ->
     test = $window.location.href.search /distributor_selection/
     result = test >= 0
-
 
   vm.initialize = ->
     @getIdentity()

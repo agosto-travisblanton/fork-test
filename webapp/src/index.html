@@ -70,7 +70,7 @@
       <md-button ng-click="appController.goTo('welcome')"><i class="fa fa-fw fa fa-play"></i> Welcome
       </md-button>
     </md-list-item>
-    <md-list-item ng-if="appController.getIdentity().admin == 'true'">
+    <md-list-item ng-if="appController.getIdentity().admin || appController.getIdentity().distributor_admin.length > 0">
       <md-button ng-click="appController.goTo('admin')"><i
               class="fa fa-fw fa-lock"></i> Admin
       </md-button>
