@@ -23,7 +23,6 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
       else
         data
 
-
     setDistributors: (distributors) ->
       $cookies.put('distributors', distributors)
       @distributors = distributors
