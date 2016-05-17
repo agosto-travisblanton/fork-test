@@ -163,6 +163,7 @@ PLAYER_COMMAND_EVENT_STRATEGY += [
     {'deviceKey': lambda o, field_name, context: o.key.get().device_urlsafe_key},
     {'payload': lambda o, field_name, context: o.key.get().payload},
     {'gcmRegistrationId': lambda o, field_name, context: o.key.get().gcm_registration_id},
+    {'userIdentifier': lambda o, field_name, context: o.key.get().user_identifier},
     {'postedTime': lambda o, field_name, context: o.key.get().posted},
     {'confirmedTime': lambda o, field_name, context: o.key.get().confirmed},
     {'confirmed': lambda o, field_name, context: o.key.get().player_has_confirmed}

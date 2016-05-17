@@ -26,22 +26,27 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
         else:
             status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
             if device:
+                user_identifier = request_json.get('userIdentifier')
                 change_intent(
                     gcm_registration_id=device.gcm_registration_id,
-                        payload=intent,
-                        device_urlsafe_key=device_urlsafe_key,
-                        host=self.request.host_url)
+                    payload=intent,
+                    device_urlsafe_key=device_urlsafe_key,
+                    host=self.request.host_url,
+                    user_identifier=user_identifier)
         self.response.set_status(status, message)
 
     @requires_api_token
     def reset(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
+            request_json = json.loads(self.request.body)
+            user_identifier = request_json.get('userIdentifier')
             change_intent(
                 gcm_registration_id=device.gcm_registration_id,
-                    payload=config.PLAYER_RESET_COMMAND,
-                    device_urlsafe_key=device_urlsafe_key,
-                    host=self.request.host_url)
+                payload=config.PLAYER_RESET_COMMAND,
+                device_urlsafe_key=device_urlsafe_key,
+                host=self.request.host_url,
+                user_identifier=user_identifier)
         self.response.set_status(status, message)
 
     @requires_api_token
@@ -54,11 +59,13 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
         else:
             status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
             if device:
+                user_identifier = request_json.get('userIdentifier')
                 intent = "{0}{1}".format(config.PLAYER_VOLUME_COMMAND, int(volume))
                 change_intent(gcm_registration_id=device.gcm_registration_id,
                               payload=intent,
                               device_urlsafe_key=device_urlsafe_key,
-                              host=self.request.host_url)
+                              host=self.request.host_url,
+                              user_identifier=user_identifier)
         self.response.set_status(status, message)
 
     @requires_api_token
@@ -71,65 +78,82 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
         else:
             status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
             if device:
+                user_identifier = request_json.get('userIdentifier')
                 change_intent(gcm_registration_id=device.gcm_registration_id,
                               payload=intent,
                               device_urlsafe_key=device_urlsafe_key,
-                              host=self.request.host_url)
+                              host=self.request.host_url,
+                              user_identifier=user_identifier)
         self.response.set_status(status, message)
 
     @requires_api_token
     def power_on(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
+            request_json = json.loads(self.request.body)
+            user_identifier = request_json.get('userIdentifier')
             change_intent(
                 gcm_registration_id=device.gcm_registration_id,
-                    payload=config.PLAYER_POWER_ON_COMMAND,
-                    device_urlsafe_key=device_urlsafe_key,
-                    host=self.request.host_url)
+                payload=config.PLAYER_POWER_ON_COMMAND,
+                device_urlsafe_key=device_urlsafe_key,
+                host=self.request.host_url,
+                user_identifier=user_identifier)
         self.response.set_status(status, message)
 
     @requires_api_token
     def power_off(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
+            request_json = json.loads(self.request.body)
+            user_identifier = request_json.get('userIdentifier')
             change_intent(
                 gcm_registration_id=device.gcm_registration_id,
-                    payload=config.PLAYER_POWER_OFF_COMMAND,
-                    device_urlsafe_key=device_urlsafe_key,
-                    host=self.request.host_url)
+                payload=config.PLAYER_POWER_OFF_COMMAND,
+                device_urlsafe_key=device_urlsafe_key,
+                host=self.request.host_url,
+                user_identifier=user_identifier)
         self.response.set_status(status, message)
 
     @requires_api_token
     def content_delete(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
+            request_json = json.loads(self.request.body)
+            user_identifier = request_json.get('userIdentifier')
             change_intent(
                 gcm_registration_id=device.gcm_registration_id,
-                    payload=config.PLAYER_DELETE_CONTENT_COMMAND,
-                    device_urlsafe_key=device_urlsafe_key,
-                    host=self.request.host_url)
+                payload=config.PLAYER_DELETE_CONTENT_COMMAND,
+                device_urlsafe_key=device_urlsafe_key,
+                host=self.request.host_url,
+                user_identifier=user_identifier)
         self.response.set_status(status, message)
 
     @requires_api_token
     def content_update(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
+            request_json = json.loads(self.request.body)
+            user_identifier = request_json.get('userIdentifier')
             change_intent(
                 gcm_registration_id=device.gcm_registration_id,
                 payload=config.PLAYER_UPDATE_CONTENT_COMMAND,
                 device_urlsafe_key=device_urlsafe_key,
-                host=self.request.host_url)
+                host=self.request.host_url,
+                user_identifier=user_identifier)
         self.response.set_status(status, message)
 
     @requires_api_token
     def refresh_device_representation(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
+            request_json = json.loads(self.request.body)
+            user_identifier = request_json.get('userIdentifier')
             change_intent(
                 gcm_registration_id=device.gcm_registration_id,
                 payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
                 device_urlsafe_key=device_urlsafe_key,
-                host=self.request.host_url)
+                host=self.request.host_url,
+                user_identifier=user_identifier)
         self.response.set_status(status, message)
 
     @staticmethod

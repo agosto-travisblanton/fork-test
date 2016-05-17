@@ -894,6 +894,7 @@ class PlayerCommandEvent(ndb.Model):
     payload = ndb.StringProperty(required=True, indexed=True)
     gcm_registration_id = ndb.StringProperty(required=True, indexed=True)
     gcm_message_id = ndb.StringProperty(required=False, indexed=True)
+    user_identifier = ndb.StringProperty(required=False, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     posted = ndb.DateTimeProperty(required=True, indexed=True)
@@ -902,12 +903,13 @@ class PlayerCommandEvent(ndb.Model):
     class_version = ndb.IntegerProperty()
 
     @classmethod
-    def create(cls, device_urlsafe_key, payload, gcm_registration_id, player_has_confirmed=False):
+    def create(cls, device_urlsafe_key, payload, gcm_registration_id, player_has_confirmed=False, user_identifier='NA'):
         return cls(device_urlsafe_key=device_urlsafe_key,
                    payload=payload,
                    gcm_registration_id=gcm_registration_id,
                    player_has_confirmed=player_has_confirmed,
-                   posted=datetime.utcnow())
+                   posted=datetime.utcnow(),
+                   user_identifier=user_identifier)
 
     @classmethod
     def get_events_by_device_key(self, device_urlsafe_key, fetch_size=25, prev_cursor_str=None,

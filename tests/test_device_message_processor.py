@@ -28,7 +28,8 @@ class TestDeviceMessageProcessor(BaseTest):
                 gcm_registration_id=gcm_registration_id,
                 payload=payload,
                 device_urlsafe_key='asdlkfjadksfj',
-                host='http://localhost:3000')
+                host='http://localhost:3000',
+                user_identifier='bob.macneal@agosto.com')
 
     def test_send_unmanaged_device_info_invokes_google_cloud_messaging_notify_method(self):
         gcm_registration_id = self.TEST_GCM_REGISTRATION_ID
