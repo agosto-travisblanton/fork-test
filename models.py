@@ -876,7 +876,8 @@ class User(ndb.Model):
         return DistributorUser.query(DistributorUser.user_key == self.key).filter(
             DistributorUser.is_distributor_administrator == True).count() > 0
 
-    def is_distributor_administrator_of_distributor(self, distributor_key):
+    def is_distributor_administrator_of_distributor(self, distributor_name):
+        distributor_key = Distributor.find_by_name(name=distributor_name).key
         return DistributorUser.query(DistributorUser.user_key == self.key).filter(
             DistributorUser.is_distributor_administrator == True).filter(
             DistributorUser.distributor_key == distributor_key).count() == 1

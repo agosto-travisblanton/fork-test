@@ -11,17 +11,6 @@ from decorators import has_admin_user_key, has_distributor_admin_user_key
 import json
 
 
-def is_distributor_admin_associated_with_this_distributor(current_user, distributor):
-    current_user_distributors = [each_distributor.name for each_distributor in current_user.distributors]
-    return_value = False
-    if distributor:
-        if current_user.is_distributor_administrator:
-            if distributor.name in current_user_distributors:
-                return_value = True
-
-    return return_value
-
-
 class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
     def get(self):
         app_version = os.environ['CURRENT_VERSION_ID']
@@ -88,11 +77,8 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
             return json_response(self.response, {'error': 'Not a valid distributor'}, status_code=403)
 
         else:
-            distributor_admin_associated_with_distributor = is_distributor_admin_associated_with_this_distributor(
-                current_user,
-                distributor
-            )
-            if not distributor_admin_associated_with_distributor and not current_user.is_administrator:
+            distro_admin_of_distributor = current_user.is_distributor_administrator_of_distributor(distributor_name)
+            if not distro_admin_of_distributor and not current_user.is_administrator:
                 return json_response(
                     self.response,
                     {

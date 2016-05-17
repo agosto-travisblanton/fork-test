@@ -172,7 +172,7 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         self.assertEqual([new_distributor.name], data.get('distributors'))
 
     ###########################################################################
-    # ADD USER TO DISTRIBUTOR
+    # ADD REGULAR USER TO DISTRIBUTOR
     ###########################################################################
     def test_add_user_to_distributor_as_no_user(self):
         r = self.post('/api/v1/add_user_to_distributor', json.dumps({
@@ -250,6 +250,50 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         self.assertIn(distro_to_add, user_distributors)
         self.assertIn(self.default_distributor_name, user_distributors)
         self.assertLength(2, user_distributors)
+
+    ###########################################################################
+    # ADD DISTRIBUTOR-ADMIN USER TO DISTRIBUTOR
+    ###########################################################################
+    def test_add_user_as_distributor_admin_to_distributor_of_distributor_admin_as_distributor_admin(self):
+        d = "distributor_admin_name"
+        r = self.post('/api/v1/add_user_to_distributor', json.dumps({
+            "user_email": self.user.email,
+            "distributor": d,
+            "distributor_admin": True
+        }), headers={"X-Provisioning-User": self.distributor_admin_user.key.urlsafe()})
+        self.assertEqual(200, r.status_int)
+
+        u = User.get_or_insert_by_email(self.user.email)
+        user_distributors = [distributor.name for distributor in u.distributors]
+        self.assertIn(d, user_distributors)
+        self.assertIn(self.default_distributor_name, user_distributors)
+        self.assertLength(2, user_distributors)
+        self.assertTrue(u.is_distributor_administrator_of_distributor(d))
+
+    def test_add_user_as_distributor_admin_to_distributor_as_platform_admin(self):
+        d = "distributor_admin_name"
+        r = self.post('/api/v1/add_user_to_distributor', json.dumps({
+            "user_email": self.user.email,
+            "distributor": d,
+            "distributor_admin": True
+        }), headers={"X-Provisioning-User": self.distributor_admin_user.key.urlsafe()})
+        self.assertEqual(200, r.status_int)
+
+        u = User.get_or_insert_by_email(self.user.email)
+        user_distributors = [distributor.name for distributor in u.distributors]
+        self.assertIn(d, user_distributors)
+        self.assertIn(self.default_distributor_name, user_distributors)
+        self.assertLength(2, user_distributors)
+        self.assertTrue(u.is_distributor_administrator_of_distributor(d))
+
+    def test_add_user_as_distributor_admin_to_different_distributor_as_distributor_admin(self):
+        d = "default_distro0"
+        r = self.post('/api/v1/add_user_to_distributor', json.dumps({
+            "user_email": self.user.email,
+            "distributor": d,
+            "distributor_admin": True
+        }), headers={"X-Provisioning-User": self.distributor_admin_user.key.urlsafe()})
+        self.assertEqual(403, r.status_int)
 
     ###########################################################################
     # MAKE DISTRIBUTOR
