@@ -36,13 +36,8 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
 
         if user:
             session_distributor = self.session.get('distributor')
-
-            if self.session.get('is_administrator') is True:
-                user_info['administrator'] = True
-                distributors = Distributor.query().fetch()
-
-            else:
-                distributors = user.distributors
+            distributors_as_admin = [a.distributor_key.get().name for a in user.distributors_as_admin]
+            distributors = user.distributors
 
             if not session_distributor and len(distributors) == 1:
                 session_distributor = distributors[0].name
@@ -54,6 +49,7 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
                 'is_admin': user.is_administrator,
                 'is_logged_in': True,
                 'distributors': distributor_names,
+                'distributors_as_admin': distributors_as_admin,
                 'distributor': session_distributor
             })
 

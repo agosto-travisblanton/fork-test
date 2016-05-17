@@ -872,6 +872,11 @@ class User(ndb.Model):
         return ndb.get_multi(self.distributor_keys)
 
     @property
+    def distributors_as_admin(self):
+        return DistributorUser.query(DistributorUser.user_key == self.key).filter(
+            DistributorUser.is_distributor_administrator == True).fetch()
+
+    @property
     def is_distributor_administrator(self):
         return DistributorUser.query(DistributorUser.user_key == self.key).filter(
             DistributorUser.is_distributor_administrator == True).count() > 0
