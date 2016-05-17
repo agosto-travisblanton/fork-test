@@ -104,7 +104,6 @@ def has_admin_user_key(handler_method):
 
         if valid_user:
             if valid_user.is_administrator:
-                kwargs["current_user"] = valid_user
                 return handler_method(self, *args, **kwargs)
 
         json_response(self.response, {'error': 'You do not have the required permissions.'}, status_code=403)

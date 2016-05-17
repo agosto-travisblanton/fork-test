@@ -120,9 +120,8 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
         incoming = json.loads(self.request.body)
         distributor_name = incoming["distributor"]
         admin_email = incoming["admin_email"]
-        distributor_name_unique = Distributor.is_unique(distributor_name)
 
-        if distributor_name_unique:
+        if Distributor.is_unique(distributor_name):
             distributor = Distributor.create(name=distributor_name, active=True)
             distributor.admin_email = admin_email
             distributor.put()
