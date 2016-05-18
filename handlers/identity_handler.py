@@ -46,8 +46,10 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
                 'email': user.email,
                 'is_admin': user.is_administrator,
                 'is_logged_in': True,
-                'distributors': [distributor.name for distributor in Distributor.query().fetch()] if user.is_administrator else distributor_names,
-                'distributors_as_admin': [distributor.name for distributor in Distributor.query().fetch()] if user.is_administrator else distributors_as_admin,
+                'distributors': [distributor.name for distributor in
+                                 Distributor.query().fetch()] if user.is_administrator else distributor_names,
+                'distributors_as_admin': [distributor.name for distributor in
+                                          Distributor.query().fetch()] if user.is_administrator else distributors_as_admin,
                 'distributor': session_distributor
             })
 
@@ -73,7 +75,6 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
         else:
             distro_admin_of_distributor = current_user.is_distributor_administrator_of_distributor(distributor_name)
             if not distro_admin_of_distributor and not current_user.is_administrator:
-                print "A"
                 return json_response(
                     self.response,
                     {
