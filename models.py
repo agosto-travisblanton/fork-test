@@ -874,7 +874,7 @@ class User(ndb.Model):
     @property
     def distributors_as_admin(self):
         d = DistributorUser.query(DistributorUser.user_key == self.key).fetch()
-        return list(filter(lambda x: x.is_distributor_administrator, d))
+        return [each for each in d if x.is_distributor_administrator]
 
     @property
     def is_distributor_administrator(self):
