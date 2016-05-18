@@ -58,27 +58,42 @@ class ContentManagerApi(object):
                                                         headers=self.HEADERS)
                 http_client_response = HttpClient().post(http_client_request)
                 if http_client_response.status_code == 201:
-                    logging.info(
-                        'create_device to CM: url={0}, device_key={1}, api_key={2}, tenant_code={3}, SN = {4}'.format(
-                            url,
-                            device_urlsafe_key,
-                            chrome_os_device.api_key,
-                            tenant.tenant_code,
-                            chrome_os_device.serial_number))
+                    message = 'ContentManagerApi.create_device: http_status={0}, url={1}, device_key={2}, \
+                    api_key={3}, tenant_code={4}, SN={5}'.format(
+                        http_client_response.status_code,
+                        url,
+                        device_urlsafe_key,
+                        chrome_os_device.api_key,
+                        tenant.tenant_code,
+                        chrome_os_device.serial_number)
+                    logging.info(message)
                     return True
                 else:
-                    error_message = 'Unable to create device in Content Manager with tenant code {0}. Status code: {1}, ' \
-                                    'url={2}'.format(tenant.tenant_code, http_client_response.status_code, url)
-                    logging.error(error_message)
-                    raise RuntimeError(error_message)
+                    message = 'ContentManagerApi.create_device: http_status={0}, url={1}, device_key={2}, \
+                    api_key={3}, tenant_code={4}, SN={5}'.format(
+                        http_client_response.status_code,
+                        url,
+                        device_urlsafe_key,
+                        chrome_os_device.api_key,
+                        tenant.tenant_code,
+                        chrome_os_device.serial_number)
+                    logging.error(message)
             else:
-                error_message = 'Unable to resolve tenant'
-                logging.error(error_message)
-                raise RuntimeError(error_message)
+                message = 'ContentManagerApi.create_device unable to resolve tenant: device_key={0}, \
+                    api_key={1}, tenant_code={2}, SN={3}'.format(
+                        device_urlsafe_key,
+                        chrome_os_device.api_key,
+                        tenant.tenant_code,
+                        chrome_os_device.serial_number)
+                logging.error(message)
         else:
-            error_message = 'No tenant_key for device'
-            logging.error(error_message)
-            raise RuntimeError(error_message)
+            message = 'Error: ContentManagerApi.create_device no tenant key: device_key={0}, \
+                    api_key={1}, SN={3}'.format(
+                        device_urlsafe_key,
+                        chrome_os_device.api_key,
+                        chrome_os_device.serial_number)
+            logging.error(message)
+        return False
 
     def delete_device(self, device_urlsafe_key):
         key = ndb.Key(urlsafe=device_urlsafe_key)

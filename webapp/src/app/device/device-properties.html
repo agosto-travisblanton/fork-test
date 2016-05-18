@@ -404,16 +404,6 @@
               <h3>Intervals</h3>
               <div class="form-group">
                 <div class="col-sm-4">
-                  <label>Heartbeat</label>
-                  <input type="number"
-                         class="form-control"
-                         name="heartbeatInterval"
-                         id="heartbeatInterval"
-                         ng-model="deviceDetailsCtrl.currentDevice.heartbeatInterval"
-                         min="1"
-                         ng-required="true">minutes
-                </div>
-                <div class="col-sm-4">
                   <label>Check content</label>
                   <input type="number"
                          class="form-control"
@@ -422,6 +412,11 @@
                          ng-model="deviceDetailsCtrl.currentDevice.checkContentInterval"
                          min="0"
                          ng-required="true">minutes
+                </div>
+                <div class="col-sm-4">
+                  <label>Player heartbeat</label>
+                  <br>
+                  {{deviceDetailsCtrl.currentDevice.heartbeatInterval}} minutes
                 </div>
               </div>
               <hr>

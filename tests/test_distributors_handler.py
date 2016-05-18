@@ -14,7 +14,7 @@ from app_config import config
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>, Christopher Bartling <chris.bartling@agosto.com>'
 
 
-class TestDistributorsHandler(BaseTest, WebTest, ProvisioningBaseTest):
+class TestDistributorsHandler(ProvisioningBaseTest):
     APPLICATION = application
     AGOSTO = 'Agosto'
     TIERNEY_BROS = 'Tierney Bros'
