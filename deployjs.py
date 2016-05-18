@@ -9,12 +9,18 @@ styles_index_path = path.join(basedir, 'static/styles')
 
 
 def build_with_gulp():
-    output = subprocess.check_output(
-        'cd webapp && gulp deploy && cd ..',
-        shell=True,
-    )
-    print output
+    try:
+        output = subprocess.check_output(
+            'cd webapp && gulp deploy && cd ..',
+            shell=True,
+        )
+        print output
 
+    except subprocess.CalledProcessError as e:
+        print e
+        print "!!!"
+        print "Run the command in '' from root manually, and fix the error"
+        print "!!!"
 
 def js_processing(all_lines):
     for each_line in all_lines:

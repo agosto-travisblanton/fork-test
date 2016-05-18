@@ -8,7 +8,6 @@ from decorators import requires_api_token
 from models import Distributor, DistributorEntityGroup, DistributorUser
 from models import Distributor, DistributorEntityGroup, Domain
 from restler.serializers import json_response
-from decorators import has_admin_user_key, has_distributor_admin_user_key
 from strategy import DISTRIBUTOR_STRATEGY, DOMAIN_STRATEGY
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>, Christopher Bartling <chris.bartling@agosto.com>'
@@ -46,27 +45,38 @@ class DistributorsHandler(RequestHandler):
         result = Domain.query(Domain.distributor_key == distributor_key, True == Domain.active).fetch(100)
         json_response(self.response, result, strategy=DOMAIN_STRATEGY)
 
-    @has_admin_user_key
+    @requires_api_token
     def post(self):
-        incoming = json.loads(self.request.body)
-        distributor_name = incoming["distributor"]
-        admin_email = incoming["admin_email"]
-
-        if Distributor.is_unique(distributor_name):
-            distributor = Distributor.create(name=distributor_name, active=True)
-            distributor.admin_email = admin_email
-            distributor.put()
-            json_response(
-                self.response, {
-                    "success": True,
-                    "message": 'Distributor ' + distributor.name + ' created.'
-                }
-            )
+        if self.request.body is not str('') and self.request.body is not None:
+            status = 201
+            error_message = None
+            request_json = json.loads(self.request.body)
+            name = request_json.get('name')
+            if name is None or name == '':
+                status = 400
+                error_message = 'The name parameter is invalid.'
+            active = request_json.get('active')
+            if active is None or active == '' or (str(active).lower() != 'true' and str(active).lower() != 'false'):
+                status = 400
+                error_message = 'The active parameter is invalid.'
+            else:
+                active = bool(active)
+            if status == 201:
+                distributor = Distributor.create(name=name,
+                                                 active=active)
+                distributor_key = distributor.put()
+                distributor_uri = self.request.app.router.build(None,
+                                                                'manage-distributor',
+                                                                None,
+                                                                {'distributor_key': distributor_key.urlsafe()})
+                self.response.headers['Location'] = distributor_uri
+                self.response.headers.pop('Content-Type', None)
+                self.response.set_status(status)
+            else:
+                self.response.set_status(status, error_message)
         else:
-            json_response(self.response, {
-                "success": False,
-                "message": "Distributor already exists"
-            }, status_code=409)
+            logging.info("Problem creating Distributor. No request body.")
+            self.response.set_status(400, 'Did not receive request body.')
 
     @requires_api_token
     def put(self, distributor_key):
