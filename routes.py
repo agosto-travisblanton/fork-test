@@ -307,6 +307,11 @@ application = WSGIApplication(
               name='manage-distributor',
               methods=['GET', 'PUT', 'DELETE']
               ),
+        Route(r'/api/v1/distributors/get_users/<distributor_key>',
+              handler='handlers.distributors_handler.DistributorsHandler',
+              handler_method='get_users',
+
+              ),
         Route(r'/api/v1/distributors/<distributor_key>/domains',
               handler='handlers.distributors_handler.DistributorsHandler',
               name='distributor-domains',

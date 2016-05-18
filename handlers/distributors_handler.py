@@ -41,6 +41,20 @@ class DistributorsHandler(RequestHandler):
         json_response(self.response, result, strategy=DISTRIBUTOR_STRATEGY)
 
     @requires_api_token
+    def get_users(self, distributor_key):
+        distributor_key = ndb.Key(urlsafe=distributor_key)
+        all_results = DistributorUser.users_of_distributer(distributor_key)
+        if all_results:
+            filtered = [
+                {
+                    "email": e.user_key.get().email,
+                    "distributer_admin": e.role.get().role == 1
+                } for e in all_results]
+        else:
+            return []
+        json_response(self.response, filtered)
+
+    @requires_api_token
     def get_domains(self, distributor_key):
         distributor_key = ndb.Key(urlsafe=distributor_key)
         result = Domain.query(Domain.distributor_key == distributor_key, True == Domain.active).fetch(100)

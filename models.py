@@ -948,6 +948,12 @@ class DistributorUser(ndb.Model):
             distributor_key=distributor_key)
         return distributor_user
 
+    @staticmethod
+    def users_of_distributer(distributer_key):
+        q =  DistributorUser.query(DistributorUser.distributor_key == distributer_key).fetch()
+        return q
+
+
     @property
     def is_distributor_administrator(self):
         return self.role.get().role == 1
