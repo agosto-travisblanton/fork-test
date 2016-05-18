@@ -57,7 +57,6 @@ def kick_off(user_first, user_last):
     print array_of_devices_with_values
 
 
-
 def make_data_for_a_distributor():
     ##########################################################################################
     # DISTRIBUTORS
@@ -89,7 +88,7 @@ def make_data_for_a_distributor():
         if not user:
             print 'User with email ' + USER_EMAIL + ' not found. Could not add ' + USER_EMAIL + ' to ' + DISTRIBUTOR_NAME
         else:
-            user.add_distributor(distributor.key, is_distributor_administrator=True)
+            user.add_distributor(distributor.key, role=1)
             print 'SUCCESS! ' + user.email + ' is linked to ' + distributor.name
             user.add_distributor(first_distributor.key)
             print 'SUCCESS! ' + user.email + ' is linked to ' + first_distributor.name

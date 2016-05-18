@@ -873,27 +873,60 @@ class User(ndb.Model):
 
     @property
     def distributors_as_admin(self):
-        return DistributorUser.query(DistributorUser.user_key == self.key).filter(
-            DistributorUser.is_distributor_administrator == True).fetch()
+        d = DistributorUser.query(DistributorUser.user_key == self.key).fetch()
+        return_list = []
+        for item in d:
+            if item.is_distributor_administrator:
+                return_list.append(item)
+
+        return return_list
 
     @property
     def is_distributor_administrator(self):
-        return DistributorUser.query(DistributorUser.user_key == self.key).filter(
-            DistributorUser.is_distributor_administrator == True).count() > 0
+        role = UserRole.create_or_get_user_role(1)
+        d = DistributorUser.query(DistributorUser.user_key == self.key).filter(DistributorUser.role == role.key).fetch()
+
+        return len(d) > 0
+
 
     def is_distributor_administrator_of_distributor(self, distributor_name):
         distributor_key = Distributor.find_by_name(name=distributor_name).key
-        return DistributorUser.query(DistributorUser.user_key == self.key).filter(
-            DistributorUser.is_distributor_administrator == True).filter(
-            DistributorUser.distributor_key == distributor_key).count() == 1
+        d = DistributorUser.query(DistributorUser.user_key == self.key).filter(
+            DistributorUser.distributor_key == distributor_key).fetch()
+        if d:
+            return d[0].is_distributor_administrator
 
-    def add_distributor(self, distributor_key, is_distributor_administrator=False):
+    def add_distributor(self, distributor_key, role=0):
         if distributor_key not in self.distributor_keys:
-            dist_user = DistributorUser(
+            dist_user = DistributorUser.create(
                 user_key=self.key,
                 distributor_key=distributor_key,
-                is_distributor_administrator=is_distributor_administrator)
+                role=role)
             dist_user.put()
+
+
+class UserRole(ndb.Model):
+    """
+    0 == regular user
+    1 == distributerAdmin
+    """
+    role = ndb.IntegerProperty()
+
+    @staticmethod
+    def create_or_get_user_role(role):
+        u = UserRole.query(UserRole.role == role).fetch()
+
+        if u:
+            return u[0]
+
+        else:
+            u = UserRole(
+                role=role
+            )
+
+            u.put()
+
+            return u
 
 
 @ae_ndb_serializer
@@ -904,16 +937,21 @@ class DistributorUser(ndb.Model):
     """
     class_version = ndb.IntegerProperty()
     distributor_key = ndb.KeyProperty(kind=Distributor, required=True)
-    is_distributor_administrator = ndb.BooleanProperty(default=False)
     user_key = ndb.KeyProperty(kind=User, required=True)
+    role = ndb.KeyProperty(kind=UserRole, required=True)
 
     @classmethod
-    def create(cls, distributor_key, user_key, is_distributor_administrator=False):
+    def create(cls, distributor_key, user_key, role=0):
+        user_role = UserRole.create_or_get_user_role(role)
         distributor_user = cls(
             user_key=user_key,
-            is_distributor_administrator=is_distributor_administrator,
+            role=user_role.key,
             distributor_key=distributor_key)
         return distributor_user
+
+    @property
+    def is_distributor_administrator(self):
+        return self.role.get().role == 1
 
     def _pre_put_hook(self):
         self.class_version = 1

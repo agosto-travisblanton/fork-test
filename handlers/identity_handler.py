@@ -73,6 +73,7 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
         else:
             distro_admin_of_distributor = current_user.is_distributor_administrator_of_distributor(distributor_name)
             if not distro_admin_of_distributor and not current_user.is_administrator:
+                print "A"
                 return json_response(
                     self.response,
                     {
@@ -82,7 +83,9 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
                 )
 
             if not distributor.name in user_distributors:
-                user.add_distributor(distributor.key, is_distributor_administrator=distributor_admin)
+                if distributor_admin:
+                    distributor_admin = 1
+                user.add_distributor(distributor.key, role=distributor_admin)
 
                 json_response(self.response, {
                     "success": True,
