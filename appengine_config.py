@@ -15,13 +15,16 @@ from provisioning_env import (
     on_server,
     on_test_harness)
 from agar.env import appid
-from os import path
 
-basedir = path.abspath(path.dirname(__file__))
 
 ##############################################################################
 # APPLICATION SETTINGS
 ##############################################################################
+
+on_continuous_integration_server = on_server and appid.lower().endswith('-ci')
+on_qa_server = on_server and appid.lower().endswith('-qa')
+
+
 app_APP_ROOT = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
@@ -49,6 +52,10 @@ app_PRIVATE_KEY = _PRIVATE_KEY()
 def _SERVICE_ACCOUNT_EMAIL():
     if on_development_server or on_integration_server or not on_server:
         return '390010375778-87capuus77kispm64q27iah4kl0rorv4@developer.gserviceaccount.com'
+    elif on_continuous_integration_server:
+        return '133313126637-compute@developer.gserviceaccount.com'
+    elif on_qa_server:
+        return '465572156911-compute@developer.gserviceaccount.com'
     elif on_stage_server:
         return 'service-247@skykit-provisioning-stage.iam.gserviceaccount.com'
     elif on_gamestop_server:
@@ -79,6 +86,10 @@ def _CLIENT_ID():
         return '390010375778-87capuus77kispm64q27iah4kl0rorv4.apps.googleusercontent.com'
     elif on_integration_server:
         return '390010375778-87capuus77kispm64q27iah4kl0rorv4.apps.googleusercontent.com'
+    elif on_continuous_integration_server:
+        return '100882018913058557387'
+    elif on_qa_server:
+        return '117032486283237201955'
     elif on_stage_server:
         return '106935685560101973796'
     elif on_gamestop_server:
@@ -98,6 +109,10 @@ def _OAUTH_CLIENT_ID():
         return '390010375778-gidaqujfhgkqrc5lat9t890mhc0nhutt.apps.googleusercontent.com'
     elif on_integration_server:
         return '390010375778-gidaqujfhgkqrc5lat9t890mhc0nhutt.apps.googleusercontent.com'
+    elif on_continuous_integration_server:
+        return '133313126637-u5ibnd3a4chjkhlva9i1asfi21vbbb1k.apps.googleusercontent.com'
+    elif on_qa_server:
+        return '465572156911-g1n43vdlpi3h225k1s1n3r7aiopucmvq.apps.googleusercontent.com'
     elif on_stage_server:
         return '1087929808190-q8s9bhpu79ju7fkqblnl3nn2th0efv57.apps.googleusercontent.com'
     elif on_gamestop_server:
@@ -116,6 +131,10 @@ app_OAUTH_CLIENT_ID = _OAUTH_CLIENT_ID()
 #         return '5uw_Cj78Iygf3rfnJKZ_SVVO'
 #     if on_integration_server:
 #         return 'h-PGaqnkAfRhjVTtbxcgSLD5'
+#     if on_continuous_integration_server:
+#         return 'DaHz9u5ldHlLkseLTxJvWYj0'
+#     if on_qa_server:
+#         return 'U5dxJM6B6rXG57l4ZSPCxnVk'
 #     if on_stage_server:
 #         return 'SkT2kDa3nViHTJXLuUYbSbzE'
 #     if on_gamestop_server:
@@ -130,6 +149,10 @@ def _PUBLIC_API_SERVER_KEY():
         return 'AIzaSyAzS-hwl5dV-Wn4g5opG_34gGYplgJT1Fc'
     elif on_integration_server:
         return 'AIzaSyAzS-hwl5dV-Wn4g5opG_34gGYplgJT1Fc'
+    elif on_continuous_integration_server:
+        return 'AIzaSyBkqqGLYZUUdOXQ1yte7S27R-nY5h3BSgM'
+    elif on_qa_server:
+        return 'AIzaSyDpUtlntmN0AxPXvZo-wvnkWo6-fwN6AN0'
     elif on_stage_server:
         return 'AIzaSyB0mE3DWNt8iFFvZ60TQyTgl3NpKK6-BQA'
     elif on_gamestop_server:
@@ -147,6 +170,10 @@ def _API_TOKEN():
     if on_development_server or not on_server:
         return '6C346588BD4C6D722A1165B43C51C'
     elif on_integration_server:
+        return '6C346588BD4C6D722A1165B43C51C'
+    elif on_continuous_integration_server:
+        return '6C346588BD4C6D722A1165B43C51C'
+    elif on_qa_server:
         return '6C346588BD4C6D722A1165B43C51C'
     elif on_stage_server:
         return '6C346588BD4C6D722A1165B43C51C'
@@ -166,6 +193,10 @@ def _UNMANAGED_API_TOKEN():
         return 'A1365B43C51C46588BD4C6D5016C0'
     elif on_integration_server:
         return 'A1365B43C51C46588BD4C6D5016C0'
+    elif on_continuous_integration_server:
+        return 'A1365B43C51C46588BD4C6D5016C0'
+    elif on_qa_server:
+        return 'A1365B43C51C46588BD4C6D5016C0'
     elif on_stage_server:
         return 'A1365B43C51C46588BD4C6D5016C0'
     elif on_gamestop_server:
@@ -183,6 +214,10 @@ def _UNMANAGED_REGISTRATION_TOKEN():
     if on_development_server or not on_server:
         return '43C51C8BD4C6D723A1365B6C34658'
     elif on_integration_server:
+        return '43C51C8BD4C6D723A1365B6C34658'
+    elif on_continuous_integration_server:
+        return '43C51C8BD4C6D723A1365B6C34658'
+    elif on_qa_server:
         return '43C51C8BD4C6D723A1365B6C34658'
     elif on_stage_server:
         return '43C51C8BD4C6D723A1365B6C34658'
@@ -202,6 +237,10 @@ def _CONTENT_MANAGER_API_SERVER_KEY():
         return 'EqwbumxWrJzybkDerDbm9yLBteJqZi7X'
     elif on_integration_server:
         return 'EqwbumxWrJzybkDerDbm9yLBteJqZi7X'
+    elif on_continuous_integration_server:
+        return 'o2EnT5qJ1q07w1DQxVfuafUYiUcJbeYJ'
+    elif on_qa_server:
+        return '2jI6eUVRZcvf9l5u3yxO4GAh4fnlAVhb'
     elif on_stage_server:
         return 'OTJkMGNjMmYzMmZlNjI4MDVmNGVlMjEx'
     elif on_gamestop_server:
@@ -220,6 +259,10 @@ def _DEFAULT_AGOSTO_DEVICE_DOMAIN():
         return 'local.agosto.com'
     elif on_integration_server:
         return 'dev.agosto.com'
+    elif on_continuous_integration_server:
+        return 'devci.skykit.com'
+    elif on_qa_server:
+        return 'devqa.skykit.com'
     elif on_stage_server:
         return 'devstaging.skykit.com'
     elif on_gamestop_server:
@@ -237,6 +280,10 @@ def _GOOGLE_CUSTOMER_ID():
     if on_development_server or not on_server:
         return 'my_customer'
     elif on_integration_server:
+        return 'my_customer'
+    elif on_continuous_integration_server:
+        return 'my_customer'
+    elif on_qa_server:
         return 'my_customer'
     elif on_stage_server:
         return 'my_customer'
@@ -312,6 +359,10 @@ def _DEFAULT_CONTENT_MANAGER_URL():
         return 'https://skykit-contentmanager-int.appspot.com'
     elif on_integration_server:
         return 'https://skykit-contentmanager-int.appspot.com'
+    elif on_continuous_integration_server:
+        return 'https://skykit-contentmanager-ci.appspot.com'
+    elif on_qa_server:
+        return 'https://skykit-contentmanager-qa.appspot.com'
     elif on_stage_server:
         return 'https://skykit-contentmanager-stage.appspot.com'
     elif on_gamestop_server:
@@ -336,7 +387,8 @@ def _STORMPATH_CLIENT():
     """
     http://docs.stormpath.com/python/quickstart/#create-a-client
     """
-    if on_test_harness or on_development_server or on_integration_server or on_stage_server:
+    if (on_test_harness or on_development_server or on_integration_server or on_continuous_integration_server or
+            on_qa_server or on_stage_server):
         id = '6VYRY6TL26YRBJOAOO533W6DO'
         secret = 'oc4u1Nm0M5p3vJSOENhPZzAhNfzifAxMQS0v3J/kG/U'
     elif on_production_server or on_gamestop_server:
@@ -388,6 +440,10 @@ app_MAIL_SERVER_QUEUED_RESPONSE_MESSAGE = _MAIL_SERVER_QUEUED_RESPONSE_MESSAGE()
 def _EMAIL_SUPPORT():
     if on_development_server or not on_server:
         return True
+    elif on_continuous_integration_server:
+        return True
+    elif on_qa_server:
+        return True
     elif on_integration_server:
         return True
     elif on_stage_server:
@@ -416,6 +472,10 @@ def _SQLALCHEMY_DATABASE_URI():
     else:
         if on_integration_server:
             instance_name = 'provisioning-int-v2'
+        elif on_continuous_integration_server:
+            instance_name = 'provisioning-ci'
+        elif on_qa_server:
+            instance_name = 'provisioning-qa'
         elif on_stage_server:
             instance_name = 'provisioning-stage'
         elif on_gamestop_server:
