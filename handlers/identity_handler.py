@@ -86,6 +86,8 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
             if not distributor.name in user_distributors:
                 if distributor_admin:
                     distributor_admin = 1
+                else:
+                    distributor_admin = 0
                 user.add_distributor(distributor.key, role=distributor_admin)
 
                 json_response(self.response, {
