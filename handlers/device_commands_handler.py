@@ -26,7 +26,9 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
         else:
             status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
             if device:
-                user_identifier = request_json.get('userIdentifier')
+                user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
+                if user_identifier is None or user_identifier == '':
+                    user_identifier = 'system'
                 change_intent(
                     gcm_registration_id=device.gcm_registration_id,
                     payload=intent,
@@ -39,8 +41,9 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
     def reset(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
-            request_json = json.loads(self.request.body)
-            user_identifier = request_json.get('userIdentifier')
+            user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
+            if user_identifier is None or user_identifier == '':
+                user_identifier = 'system'
             change_intent(
                 gcm_registration_id=device.gcm_registration_id,
                 payload=config.PLAYER_RESET_COMMAND,
@@ -59,7 +62,9 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
         else:
             status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
             if device:
-                user_identifier = request_json.get('userIdentifier')
+                user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
+                if user_identifier is None or user_identifier == '':
+                    user_identifier = 'system'
                 intent = "{0}{1}".format(config.PLAYER_VOLUME_COMMAND, int(volume))
                 change_intent(gcm_registration_id=device.gcm_registration_id,
                               payload=intent,
@@ -78,7 +83,9 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
         else:
             status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
             if device:
-                user_identifier = request_json.get('userIdentifier')
+                user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
+                if user_identifier is None or user_identifier == '':
+                    user_identifier = 'system'
                 change_intent(gcm_registration_id=device.gcm_registration_id,
                               payload=intent,
                               device_urlsafe_key=device_urlsafe_key,
@@ -90,8 +97,9 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
     def power_on(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
-            request_json = json.loads(self.request.body)
-            user_identifier = request_json.get('userIdentifier')
+            user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
+            if user_identifier is None or user_identifier == '':
+                user_identifier = 'system'
             change_intent(
                 gcm_registration_id=device.gcm_registration_id,
                 payload=config.PLAYER_POWER_ON_COMMAND,
@@ -104,8 +112,9 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
     def power_off(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
-            request_json = json.loads(self.request.body)
-            user_identifier = request_json.get('userIdentifier')
+            user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
+            if user_identifier is None or user_identifier == '':
+                user_identifier = 'system'
             change_intent(
                 gcm_registration_id=device.gcm_registration_id,
                 payload=config.PLAYER_POWER_OFF_COMMAND,
@@ -118,8 +127,9 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
     def content_delete(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
-            request_json = json.loads(self.request.body)
-            user_identifier = request_json.get('userIdentifier')
+            user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
+            if user_identifier is None or user_identifier == '':
+                user_identifier = 'system'
             change_intent(
                 gcm_registration_id=device.gcm_registration_id,
                 payload=config.PLAYER_DELETE_CONTENT_COMMAND,
@@ -132,8 +142,9 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
     def content_update(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
-            request_json = json.loads(self.request.body)
-            user_identifier = request_json.get('userIdentifier')
+            user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
+            if user_identifier is None or user_identifier == '':
+                user_identifier = 'system'
             change_intent(
                 gcm_registration_id=device.gcm_registration_id,
                 payload=config.PLAYER_UPDATE_CONTENT_COMMAND,
@@ -146,8 +157,9 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
     def refresh_device_representation(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
-            request_json = json.loads(self.request.body)
-            user_identifier = request_json.get('userIdentifier')
+            user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
+            if user_identifier is None or user_identifier == '':
+                user_identifier = 'system'
             change_intent(
                 gcm_registration_id=device.gcm_registration_id,
                 payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,

@@ -33,6 +33,7 @@ app.factory 'RequestInterceptor', ($cookies, $location) ->
         'Accept': 'application/json'
         'Authorization': if $location.host().indexOf('provisioning-gamestop') > -1 then gs else prod
         'X-Provisioning-User': $cookies.get('userKey')
+        'X-Provisioning-User-Identifier': $cookies.get('userEmail')
         'X-Provisioning-Distributor': $cookies.get('currentDistributorKey')
       }
       config
