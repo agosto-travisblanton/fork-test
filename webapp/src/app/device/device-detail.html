@@ -1,0 +1,59 @@
+<div ng-controller="DeviceDetailsCtrl" ng-init="deviceDetailsCtrl.initialize()" layout="column" ng-cloak>
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <h2 class="md-flex"><i class="fa fa-fw fa-desktop ng-scope"></i> Devices</h2>
+    </div>
+  </md-toolbar>
+  <md-content flex layout-padding>
+    <div flex="100" flex-xs="100" layout="column">
+      <div ncy-breadcrumb></div>
+      <md-card>
+        <md-card-content>
+          <div class="col-sm-5">
+            <div ng-show="deviceDetailsCtrl.currentDevice.macAddress">
+              <h5>
+                <i class="fa fa-fw fa-wifi"></i> Wifi Mac Address:
+                {{deviceDetailsCtrl.currentDevice.macAddress}}
+              </h5>
+            </div>
+            <div ng-show="deviceDetailsCtrl.currentDevice.ethernetMacAddress">
+              <h5>
+                <i class="fa fa-fw fa-plug"></i> Ethernet Mac Address:
+                {{deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
+              </h5>
+            </div>
+            <div ng-show="deviceDetailsCtrl.currentDevice.serialNumber">
+              <h5>
+                <i class="fa fa-hashtag"></i> Serial Number:
+                {{deviceDetailsCtrl.currentDevice.serialNumber}}
+              </h5>
+            </div>
+          </div>
+
+          <div class="col-sm-2 col-sm-offset-4">
+            <md-button ngclipboard data-clipboard-target="#hidden-device-key"
+                       ng-click="deviceDetailsCtrl.copyDeviceKey()" class="md-raised">
+              <i class="fa fa-fw fa-clipboard"></i> Copy Device key
+            </md-button>
+            <a href="{{deviceDetailsCtrl.backUrl}}" class="md-primary md-button md-ink-ripple">
+              <i class="fa fa-fw fa-backward"></i>Back</a>
+          </div>
+        </md-card-content>
+      </md-card>
+      <md-tabs md-dynamic-height md-border-bottom>
+        <md-tab label="Properties">
+          <div ng-include="'webapp/src/app/device/device-properties.html'"></div>
+        </md-tab>
+        <md-tab label="Events">
+          <div ng-include="'webapp/src/app/device/device-event.html'"></div>
+        </md-tab>
+        <md-tab label="Commands">
+          <div ng-include="'webapp/src/app/device/device-command.html'"></div>
+        </md-tab>
+      </md-tabs>
+    </div>
+  </md-content>
+  <div id="hidden-device-key" class="copy-ready-device-key">
+    {{deviceDetailsCtrl.currentDevice.key}}
+  </div>
+</div>
