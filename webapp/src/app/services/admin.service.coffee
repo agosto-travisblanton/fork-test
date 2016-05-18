@@ -7,7 +7,7 @@ angular.module('skykitProvisioning')
     constructor: ->
 
     makeDistributor: (distributor, admin_email) ->
-      url = '/api/v1/identity/make_distributor'
+      url = '/api/v1/distributors'
       res = $http.post(url, {
         distributor: distributor,
         admin_email: admin_email

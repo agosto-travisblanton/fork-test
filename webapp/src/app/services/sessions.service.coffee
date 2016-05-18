@@ -83,9 +83,10 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
       $cookies.remove('currentDistributorName')
 
     deSerialize: (data) ->
-      if "," in data
-        data.split ","
-
-      else
-        data
+      if data
+        if "," in data
+          data.split ","
+  
+        else
+          data
 
