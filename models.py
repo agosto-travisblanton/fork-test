@@ -906,6 +906,7 @@ class UserRole(ndb.Model):
     1 == distributerAdmin
     """
     role = ndb.IntegerProperty()
+    class_version = ndb.IntegerProperty()
 
     @staticmethod
     def create_or_get_user_role(role):
@@ -922,6 +923,9 @@ class UserRole(ndb.Model):
             u.put()
 
             return u
+
+    def _pre_put_hook(self):
+        self.class_version = 1
 
 
 @ae_ndb_serializer
