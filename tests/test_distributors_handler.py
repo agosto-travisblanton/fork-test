@@ -338,7 +338,7 @@ class TestDistributorsHandler(ProvisioningBaseTest):
     ###########################################################################
     def test_create_new_distributor_as_admin(self):
         distro_to_add = "new"
-        r = self.post('/api/v1/distributors/make_distributor', json.dumps({
+        r = self.post('/api/v1/distributors', json.dumps({
             "admin_email": self.user.email,
             "distributor": distro_to_add,
         }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
@@ -350,7 +350,7 @@ class TestDistributorsHandler(ProvisioningBaseTest):
     def test_create_same_distributor_as_admin(self):
         self.test_create_new_distributor_as_admin()
         distro_to_add = "new"
-        r = self.post('/api/v1/distributors/make_distributor', json.dumps({
+        r = self.post('/api/v1/distributors', json.dumps({
             "admin_email": self.user.email,
             "distributor": distro_to_add,
         }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
@@ -359,7 +359,7 @@ class TestDistributorsHandler(ProvisioningBaseTest):
 
     def test_create_new_distributor_as_distributor_admin(self):
         distro_to_add = "new"
-        r = self.post('/api/v1/distributors/make_distributor', json.dumps({
+        r = self.post('/api/v1/distributors', json.dumps({
             "admin_email": self.user.email,
             "distributor": distro_to_add,
         }), headers={"X-Provisioning-User": self.distributor_admin_user.key.urlsafe()})
