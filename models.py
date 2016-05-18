@@ -874,20 +874,13 @@ class User(ndb.Model):
     @property
     def distributors_as_admin(self):
         d = DistributorUser.query(DistributorUser.user_key == self.key).fetch()
-        return_list = []
-        for item in d:
-            if item.is_distributor_administrator:
-                return_list.append(item)
-
-        return return_list
+        return list(filter(lambda x: x.is_distributor_administrator, d))
 
     @property
     def is_distributor_administrator(self):
         role = UserRole.create_or_get_user_role(1)
-        d = DistributorUser.query(DistributorUser.user_key == self.key).filter(DistributorUser.role == role.key).fetch()
-
-        return len(d) > 0
-
+        return DistributorUser.query(DistributorUser.user_key == self.key).filter(
+            DistributorUser.role == role.key).count() > 0
 
     def is_distributor_administrator_of_distributor(self, distributor_name):
         distributor_key = Distributor.find_by_name(name=distributor_name).key
@@ -895,6 +888,8 @@ class User(ndb.Model):
             DistributorUser.distributor_key == distributor_key).fetch()
         if d:
             return d[0].is_distributor_administrator
+        else:
+            return False
 
     def add_distributor(self, distributor_key, role=0):
         if distributor_key not in self.distributor_keys:
