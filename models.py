@@ -832,7 +832,7 @@ class User(ndb.Model):
     @classmethod
     def get_or_insert_by_email(cls, email, stormpath_account_href=None):
         user = cls.get_by_email(email)
-        if user is None:
+        if not user:
             key = cls._build_key(email)
             user = User(key=key, email=email, stormpath_account_href=stormpath_account_href)
             user.put()
@@ -852,7 +852,7 @@ class User(ndb.Model):
         user = None
         if account and account.href:
             user = cls.query(cls.stormpath_account_href == account.href).get()
-            if user is None:
+            if not user:
                 user = cls.get_or_insert_by_email(account.email, stormpath_account_href=account.href)
         return user
 
