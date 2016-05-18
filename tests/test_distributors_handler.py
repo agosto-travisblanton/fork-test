@@ -2,16 +2,19 @@ from env_setup import setup_test_paths
 setup_test_paths()
 
 import json
+from ae_test_data import build
+from utils.web_util import build_uri
 from agar.test import BaseTest, WebTest
 from webtest import AppError
 from models import Distributor, DISTRIBUTOR_ENTITY_GROUP_NAME, Domain, User, DistributorUser
 from routes import application
+from provisioning_base_test import ProvisioningBaseTest
 from app_config import config
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>, Christopher Bartling <chris.bartling@agosto.com>'
 
 
-class TestDistributorsHandler(BaseTest, WebTest):
+class TestDistributorsHandler(BaseTest, WebTest, ProvisioningBaseTest):
     APPLICATION = application
     AGOSTO = 'Agosto'
     TIERNEY_BROS = 'Tierney Bros'
@@ -56,6 +59,22 @@ class TestDistributorsHandler(BaseTest, WebTest):
                                              impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                              active=False)
         self.domain_inactive.put()
+        self.default_distributor_name = "my_distributor"
+        self.distributor_admin_user = self.create_distributor_admin(email='john.jones@demo.agosto.com',
+                                                                    distributor_name="distributor_admin_name")
+        self.admin_user = self.create_platform_admin(email='jim.bob@demo.agosto.com',
+                                                     distributor_name=self.default_distributor_name)
+        self.user = self.create_user(email='dwight.schrute@demo.agosto.com',
+                                     distributor_name=self.default_distributor_name)
+
+        self.login_url = build_uri('login')
+        self.logout_url = build_uri('logout')
+        self.identity_url = build_uri('identity')
+
+        for i in range(3):
+            distributor = build(Distributor)
+            distributor.name = "default_distro" + str(i)
+            distributor.put()
 
     ##################################################################################################################
     ## get
@@ -388,3 +407,36 @@ class TestDistributorsHandler(BaseTest, WebTest):
         distributor_user1.put()
         distributor_user2 = DistributorUser(user_key=self.user_key, distributor_key=self.tierney_bros_key)
         distributor_user2.put()
+
+    ###########################################################################
+    # MAKE DISTRIBUTOR
+    ###########################################################################
+    def test_create_new_distributor_as_admin(self):
+        distro_to_add = "new"
+        r = self.post('/api/v1/distributors/make_distributor', json.dumps({
+            "admin_email": self.user.email,
+            "distributor": distro_to_add,
+        }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
+
+        self.assertEqual(200, r.status_int)
+        self.assertTrue(json.loads(r.body)["success"])
+        self.assertFalse(Distributor.is_unique(distro_to_add))
+
+    def test_create_same_distributor_as_admin(self):
+        self.test_create_new_distributor_as_admin()
+        distro_to_add = "new"
+        r = self.post('/api/v1/distributors/make_distributor', json.dumps({
+            "admin_email": self.user.email,
+            "distributor": distro_to_add,
+        }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
+
+        self.assertEqual(409, r.status_int)
+
+    def test_create_new_distributor_as_distributor_admin(self):
+        distro_to_add = "new"
+        r = self.post('/api/v1/distributors/make_distributor', json.dumps({
+            "admin_email": self.user.email,
+            "distributor": distro_to_add,
+        }), headers={"X-Provisioning-User": self.distributor_admin_user.key.urlsafe()})
+
+        self.assertEqual(403, r.status_int)

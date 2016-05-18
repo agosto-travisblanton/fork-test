@@ -101,24 +101,3 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
                     "message": distributor.name + " is already linked to " + current_user.email
                 }, status_code=409)
 
-    @has_admin_user_key
-    def make_distributor(self):
-        incoming = json.loads(self.request.body)
-        distributor_name = incoming["distributor"]
-        admin_email = incoming["admin_email"]
-
-        if Distributor.is_unique(distributor_name):
-            distributor = Distributor.create(name=distributor_name, active=True)
-            distributor.admin_email = admin_email
-            distributor.put()
-            json_response(
-                self.response, {
-                    "success": True,
-                    "message": 'Distributor ' + distributor.name + ' created.'
-                }
-            )
-        else:
-            json_response(self.response, {
-                "success": False,
-                "message": "Distributor already exists"
-            }, status_code=409)

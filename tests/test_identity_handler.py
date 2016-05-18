@@ -295,35 +295,3 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         }), headers={"X-Provisioning-User": self.distributor_admin_user.key.urlsafe()})
         self.assertEqual(403, r.status_int)
 
-    ###########################################################################
-    # MAKE DISTRIBUTOR
-    ###########################################################################
-    def test_create_new_distributor_as_admin(self):
-        distro_to_add = "new"
-        r = self.post('/api/v1/identity/make_distributor', json.dumps({
-            "admin_email": self.user.email,
-            "distributor": distro_to_add,
-        }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
-
-        self.assertEqual(200, r.status_int)
-        self.assertTrue(json.loads(r.body)["success"])
-        self.assertFalse(Distributor.is_unique(distro_to_add))
-
-    def test_create_same_distributor_as_admin(self):
-        self.test_create_new_distributor_as_admin()
-        distro_to_add = "new"
-        r = self.post('/api/v1/identity/make_distributor', json.dumps({
-            "admin_email": self.user.email,
-            "distributor": distro_to_add,
-        }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
-
-        self.assertEqual(409, r.status_int)
-
-    def test_create_new_distributor_as_distributor_admin(self):
-        distro_to_add = "new"
-        r = self.post('/api/v1/identity/make_distributor', json.dumps({
-            "admin_email": self.user.email,
-            "distributor": distro_to_add,
-        }), headers={"X-Provisioning-User": self.distributor_admin_user.key.urlsafe()})
-
-        self.assertEqual(403, r.status_int)
