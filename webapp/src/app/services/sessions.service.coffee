@@ -16,24 +16,47 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
       @isAdmin = undefined
 
     setDistributors: (distributors) =>
-      $cookies.put('distributors', distributors)
+      $cookies.put('distributors', JSON.stringify distributors)
       @distributors = distributors
 
     setDistributorsAsAdmin: (distributorsAsAdmin) =>
-      $cookies.put('distributorsAsAdmin', distributorsAsAdmin)
+      $cookies.put('distributorsAsAdmin', JSON.stringify distributorsAsAdmin)
       @distributorsAsAdmin = distributorsAsAdmin
 
     setIsAdmin: (isAdmin) =>
+      $cookies.put('distributorsAsAdmin', isAdmin)
       @isAdmin = isAdmin
 
     getDistributors: (distributors) =>
-      if @distributors then @distributors else @deSerialize $cookies.get('distributors')
+      if @distributors
+        @distributors
+
+      else
+        d = $cookies.get('distributors')
+        if d
+          JSON.parse d
+
+        else false
+
 
     getDistributorsAsAdmin: (distributorsAsAdmin) =>
-      if @distributorsAsAdmin then @distributorsAsAdmin else @deSerialize $cookies.get('distributorsAsAdmin')
+      if @distributorsAsAdmin
+        @distributorsAsAdmin
+      else
+        d = $cookies.get('distributorsAsAdmin')
+        if d
+          JSON.parse d
+        else false
 
     getIsAdmin: (isAdmin) =>
-      if @isAdmin then @isAdmin else @deSerialize $cookies.get('isAdmin')
+      if @isAdmin
+        @isAdmin
+      else
+        d = $cookies.get('isAdmin')
+        if d
+          true
+        else
+          false
 
     login: (credentials) ->
       deferred = $q.defer()
@@ -77,16 +100,12 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
 
     removeUserInfo: () ->
       $cookies.remove('userKey')
+      $cookies.remove('distributors')
+      $cookies.remove('distributorsAsAdmin')
+      $cookies.remove('isAdmin')
       $cookies.remove('userEmail')
       $cookies.remove('userAdmin')
       $cookies.remove('currentDistributorKey')
       $cookies.remove('currentDistributorName')
 
-    deSerialize: (data) ->
-      if data
-        if "," in data
-          data.split ","
-  
-        else
-          data
 
