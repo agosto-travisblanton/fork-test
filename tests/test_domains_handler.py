@@ -5,13 +5,13 @@ from webtest import AppError
 setup_test_paths()
 
 import json
-from agar.test import BaseTest, WebTest
+from tests.provisioning_base_test import ProvisioningBaseTest
 from routes import application
 from models import Distributor, Domain
 from app_config import config
 
 
-class TestDomainsHandler(BaseTest, WebTest):
+class TestDomainsHandler(ProvisioningBaseTest):
     APPLICATION = application
     DISTRIBUTOR_NAME = 'agosto'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'

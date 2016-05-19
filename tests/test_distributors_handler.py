@@ -384,7 +384,7 @@ class TestDistributorsHandler(BaseTest, WebTest):
 
 
     def _create_distributor_user_associations(self):
-        distributor_user1 = DistributorUser(user_key=self.user_key, distributor_key=self.agosto_key)
+        distributor_user1 = DistributorUser.create(user_key=self.user_key, distributor_key=self.agosto_key)
         distributor_user1.put()
-        distributor_user2 = DistributorUser(user_key=self.user_key, distributor_key=self.tierney_bros_key)
+        distributor_user2 = DistributorUser.create(user_key=self.user_key, distributor_key=self.tierney_bros_key)
         distributor_user2.put()
