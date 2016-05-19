@@ -16,6 +16,7 @@ from provisioning_env import (
     on_test_harness)
 from agar.env import appid
 from os import path
+import yaml
 
 basedir = path.abspath(path.dirname(__file__))
 
@@ -457,11 +458,8 @@ proofplay_DAYS_TO_KEEP_RAW_EVENTS = 30
 ##############################################################################
 def _return_yaml_data():
     with open(os.path.join(basedir, 'snapdeploy.yaml'), 'r') as f:
-        data = f.readlines()
-        version = data[5]
-        version_without_newlines = version.rstrip()
-        only_numbers = version_without_newlines[9:]
-        array_of_versions = only_numbers.split('-')
+        data = yaml.load(f.read())["version"]
+        array_of_versions = data.split('-')
         array_of_versions_as_int = [int(each) for each in array_of_versions]
         return array_of_versions_as_int[0], array_of_versions_as_int[1], array_of_versions_as_int[2]
 
