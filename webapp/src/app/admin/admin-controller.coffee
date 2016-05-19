@@ -2,27 +2,54 @@
 
 app = angular.module 'skykitProvisioning'
 
-app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService) ->
+app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDialog) ->
   @isAdmin = SessionsService.getIsAdmin()
   @distributors = SessionsService.getDistributors()
   @distributorsAsAdmin = SessionsService.getDistributorsAsAdmin()
   @currentDistributorName = SessionsService.getCurrentDistributerName()
-  console.log @currentDistributorName
 
-  @addUserToDistributor = (userEmail, distributor, distributorAdmin) ->
-    res = AdminService.addUserToDistributor(userEmail, distributor, distributorAdmin)
+  @addUserToDistributor = (ev, userEmail, distributorAdmin) =>
+    if not distributorAdmin
+      distributorAdmin = false
+    withOrWithout = if distributorAdmin then "with" else "without"
+    confirm = $mdDialog.confirm()
+    confirm.title('Are you sure?')
+    confirm.textContent("#{userEmail.email} will be added to #{@currentDistributorName}
+      #{withOrWithout} administrator priviledges"
+    )
+    confirm.ariaLabel('Create a User')
+    confirm.targetEvent(ev)
+    confirm.ok('Of course!')
+    confirm.cancel('Oops, nevermind.')
 
-    res.then (data) ->
-      console.log("asdf")
+    $mdDialog.show(confirm).then (=>
+      res = AdminService.addUserToDistributor(userEmail.email, @currentDistributorName, distributorAdmin)
+      res.then (data) =>
+        ToastsService.showSuccessToast data.data.message
+        @user = {}
+      res.catch (data) =>
+        ToastsService.showErrorToast data.data.message
+      return
+    )
 
-  @makeDistributor = (distributorName, adminEmail) ->
-    res = AdminService.makeDistributor distributorName, adminEmail
-    res.then (data) ->
-      ToastsService.showSuccessToast data.data.message
 
-    res.catch (data) ->
-      ToastsService.showErrorToast data.data.message
 
+  @makeDistributor = ($event, distributorName, adminEmail) ->
+#    confirm = $mdDialog.confirm()
+#    confirm.title('Would you like to delete your debt?')
+#    confirm.textContent('All of the banks have agreed to forgive you your debts.')
+#    confirm.ariaLabel('Lucky day')
+#    confirm.targetEvent(ev)
+#    confirm.ok('Please do it!')
+#    confirm.cancel('Sounds like a scam')
+    $mdDialog.show(confirm).then (->
+      res = AdminService.makeDistributor distributorName, adminEmail
+      res.then (data) ->
+        ToastsService.showSuccessToast data.data.message
+
+      res.catch (data) ->
+        ToastsService.showErrorToast data.data.message
+    )
 
   @getUsersOfDistributer = () ->
     @loadingUsersOfDistributer = true

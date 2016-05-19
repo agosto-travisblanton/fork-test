@@ -15,11 +15,13 @@ angular.module('skykitProvisioning')
 
     addUserToDistributor: (userEmail, distributor, distributorAdmin) ->
       url = '/api/v1/identity/add_user_to_distributor'
-      res = $http.post(url, {
+      params =  {
         user_email: userEmail,
         distributor: distributor,
         distributor_admin: distributorAdmin
-      })
+      }
+      console.log params
+      res = $http.post(url, params)
 
     getUsersOfDistributor: (distributerKey) ->
       url = 'api/v1/distributors/analytics/users/' + distributerKey

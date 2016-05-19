@@ -15,7 +15,7 @@
         </md-card-title>
         <md-card-content>
           <form name="userForm"
-                ng-submit="vm.createUser(vm.user)"
+                ng-submit="vm.addUserToDistributor($event, vm.user, vm.user.cb1)"
                 novalidate>
             <md-input-container class="md-block">
               <label>Email</label>
@@ -48,7 +48,7 @@
         </md-card-title>
         <md-card-content>
           <form name="distributorForm"
-                ng-submit="vm.makeDistributor(vm.distributor.name, vm.distributor.adminEmail)"
+                ng-submit="vm.makeDistributor($event, vm.distributor.name, vm.distributor.adminEmail)"
                 novalidate>
 
             <md-input-container class="md-block">
