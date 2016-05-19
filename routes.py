@@ -310,7 +310,7 @@ application = WSGIApplication(
         Route(r'/api/v1/distributors/get_users/<distributor_key>',
               handler='handlers.distributors_handler.DistributorsHandler',
               handler_method='get_users',
-
+              methods=['GET']
               ),
         Route(r'/api/v1/distributors/<distributor_key>/domains',
               handler='handlers.distributors_handler.DistributorsHandler',

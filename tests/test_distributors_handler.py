@@ -1,4 +1,5 @@
 from env_setup import setup_test_paths
+
 setup_test_paths()
 
 import json
@@ -59,13 +60,16 @@ class TestDistributorsHandler(ProvisioningBaseTest):
                                              impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                              active=False)
         self.domain_inactive.put()
-        self.default_distributor_name = "my_distributor"
+        self.default_distributor = self.agosto_key.get()
+
         self.distributor_admin_user = self.create_distributor_admin(email='john.jones@demo.agosto.com',
                                                                     distributor_name="distributor_admin_name")
+
         self.admin_user = self.create_platform_admin(email='jim.bob@demo.agosto.com',
-                                                     distributor_name=self.default_distributor_name)
+                                                     distributor_name=self.default_distributor.name)
+
         self.user = self.create_user(email='dwight.schrute@demo.agosto.com',
-                                     distributor_name=self.default_distributor_name)
+                                     distributor_name=self.default_distributor.name)
 
         self.login_url = build_uri('login')
         self.logout_url = build_uri('logout')
@@ -197,7 +201,6 @@ class TestDistributorsHandler(ProvisioningBaseTest):
             self.app.get(uri, params=request_parameters, headers=self.bad_authorization_header)
         self.assertTrue(self.FORBIDDEN in context.exception.message)
 
-
     ##################################################################################################################
     ## put
     ##################################################################################################################
@@ -326,7 +329,6 @@ class TestDistributorsHandler(ProvisioningBaseTest):
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 0)
 
-
     def _create_distributor_user_associations(self):
         distributor_user1 = DistributorUser.create(user_key=self.user_key, distributor_key=self.agosto_key)
         distributor_user1.put()
@@ -365,3 +367,15 @@ class TestDistributorsHandler(ProvisioningBaseTest):
         }), headers={"X-Provisioning-User": self.distributor_admin_user.key.urlsafe()})
 
         self.assertEqual(403, r.status_int)
+
+    ###########################################################################
+    # MAKE DISTRIBUTOR
+    ###########################################################################
+    def test_get_users_of_users(self):
+        self.create_user_of_distributer(self.user, self.agosto)
+        url = '/api/v1/distributors/get_users/' + self.agosto_key.urlsafe()
+        r = self.get(url, headers=self.headers)
+        r_json = json.loads(r.body)
+        self.assertEqual(200, r.status_int)
+        self.assertEqual(1, len(r_json))
+        self.assertEqual(self.user.email, r_json[0]["email"])

@@ -70,6 +70,9 @@ class ProvisioningBaseTest(BaseTest, WebTest, KeyValidatorMixin):
         user.put()
         return user
 
+    def create_user_of_distributer(self, user, distributer, role=0):
+        user.add_distributor(distributer.key, role=role)
+
     def login(self, email, administrator=False):
 
         identity_url = build_uri('identity')

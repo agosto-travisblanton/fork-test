@@ -51,7 +51,8 @@ class DistributorsHandler(RequestHandler):
                     "distributer_admin": e.role.get().role == 1
                 } for e in all_results]
         else:
-            return []
+            filtered = []
+
         json_response(self.response, filtered)
 
     @requires_api_token
