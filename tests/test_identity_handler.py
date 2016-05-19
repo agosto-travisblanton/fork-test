@@ -230,7 +230,7 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         self.assertEqual(409, r.status_int)
         self.assertEqual(
             {
-                u'message': u'my_distributor is already linked to jim.bob@demo.agosto.com',
+                u'message': u'my_distributor is already linked to dwight.schrute@demo.agosto.com',
                 u'success': False
             }, json.loads(r.body))
 

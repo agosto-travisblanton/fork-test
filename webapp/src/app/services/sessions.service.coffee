@@ -15,6 +15,15 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
       @distributorsAsAdmin = undefined
       @isAdmin = undefined
 
+
+    typeIsArray = ( value ) ->
+      value and
+          typeof value is 'object' and
+          value instanceof Array and
+          typeof value.length is 'number' and
+          typeof value.splice is 'function' and
+          not ( value.propertyIsEnumerable 'length' )
+
     setDistributors: (distributors) =>
       $cookies.put('distributors', JSON.stringify distributors)
       @distributors = distributors
@@ -44,8 +53,7 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
     getCurrentDistributerKey: () ->
       $cookies.get('currentDistributorKey')
 
-
-    getDistributorsAsAdmin: (distributorsAsAdmin) =>
+    getDistributorsAsAdmin: () =>
       if @distributorsAsAdmin
         @distributorsAsAdmin
       else
@@ -54,7 +62,7 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
           JSON.parse d
         else false
 
-    getIsAdmin: (isAdmin) =>
+    getIsAdmin: () =>
       if @isAdmin
         @isAdmin
       else

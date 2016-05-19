@@ -4,8 +4,10 @@ app = angular.module 'skykitProvisioning'
 
 app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDialog) ->
   @isAdmin = SessionsService.getIsAdmin()
+  console.log @isAdmin
   @distributors = SessionsService.getDistributors()
   @distributorsAsAdmin = SessionsService.getDistributorsAsAdmin()
+  console.log @distributorsAsAdmin
   @currentDistributorName = SessionsService.getCurrentDistributerName()
 
   @addUserToDistributor = (ev, userEmail, distributorAdmin) =>
@@ -29,29 +31,26 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
         @user = {}
       res.catch (data) =>
         ToastsService.showErrorToast data.data.message
-      return
     )
 
-
-
-  @makeDistributor = ($event, distributorName, adminEmail) ->
-#    confirm = $mdDialog.confirm()
-#    confirm.title('Would you like to delete your debt?')
-#    confirm.textContent('All of the banks have agreed to forgive you your debts.')
-#    confirm.ariaLabel('Lucky day')
-#    confirm.targetEvent(ev)
-#    confirm.ok('Please do it!')
-#    confirm.cancel('Sounds like a scam')
-    $mdDialog.show(confirm).then (->
+  @makeDistributor = (ev, distributorName, adminEmail) =>
+    confirm = $mdDialog.confirm()
+    confirm.title('Are you sure?')
+    confirm.textContent("If you proceed, #{distributorName} will be created.")
+    confirm.ariaLabel('Lucky day')
+    confirm.targetEvent(ev)
+    confirm.ok('Yeah!')
+    confirm.cancel('Forget it.')
+    $mdDialog.show(confirm).then (=>
       res = AdminService.makeDistributor distributorName, adminEmail
-      res.then (data) ->
+      res.then (data) =>
         ToastsService.showSuccessToast data.data.message
 
-      res.catch (data) ->
+      res.catch (data) =>
         ToastsService.showErrorToast data.data.message
     )
 
-  @getUsersOfDistributer = () ->
+  @getUsersOfDistributer = () =>
     @loadingUsersOfDistributer = true
     u = AdminService.getUsersOfDistributor(SessionsService.getCurrentDistributerKey())
     u.then (data) =>
