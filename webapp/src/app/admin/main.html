@@ -1,6 +1,6 @@
 <md-toolbar class="md-hue-2">
   <div class="md-toolbar-tools">
-    <h2 class="md-flex"><i class="fa fa-fw fa-lock ng-scope"></i> Admin</h2>
+    <h2 class="md-flex"><i class="fa fa-fw fa-lock ng-scope"></i> Admin ({{vm.currentDistributorName}})</h2>
   </div>
 </md-toolbar>
 <md-content layout-padding>
@@ -26,17 +26,6 @@
               <md-checkbox ng-model="vm.user.cb1" aria-label="Distributor Admin">
                 Distributor Admin
               </md-checkbox>
-            </md-input-container>
-
-            <br/>
-
-            <md-input-container ng-if="vm.user.cb1">
-              <label>Distributor</label>
-              <md-select ng-model="vm.user.chosenDistributor">
-                <md-option ng-repeat="distributor in vm.distributorsAsAdmin" value="{{distributor}}">
-                  {{distributor}}
-                </md-option>
-              </md-select>
             </md-input-container>
 
             <md-card-actions layout="row" layout-align="end center">
@@ -82,6 +71,28 @@
           </form>
         </md-card-content>
       </md-card>
+    </div>
+    <div class="col-md-4">
+      <md-card>
+        <md-card-title>
+          <md-card-title-text>
+            <span class="md-headline">Distributor Users</span>
+          </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+
+          <md-list ng-if="!vm.loadingUsersOfDistributer">
+            <md-list-item ng-repeat="item in vm.usersOfDistributer track by $index">
+              <p>{{$index + 1}}. {{ item.email }}</p>
+              <md-divider></md-divider>
+            </md-list-item>
+          </md-list>
+          <h5 ng-if="vm.loadingUsersOfDistributer">Loading...</h5>
+
+        </md-card-content>
+      </md-card>
+
+
     </div>
   </div>
 </md-content>

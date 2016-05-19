@@ -20,6 +20,14 @@ angular.module('skykitProvisioning')
         distributor: distributor,
         distributor_admin: distributorAdmin
       })
+
+    getUsersOfDistributor: (distributerKey) ->
+      url = 'api/v1/distributors/analytics/users/' + distributerKey
+      res = $http.get(url)
+
+    getAllDistributers: () ->
+      url = '/api/v1/distributors/analytics/all'
+      res = $http.get(url)
     
       
       

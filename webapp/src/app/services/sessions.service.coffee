@@ -37,6 +37,12 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
           JSON.parse d
 
         else false
+          
+    getCurrentDistributerName: () ->
+      $cookies.get('currentDistributorName')
+      
+    getCurrentDistributerKey: () ->
+      $cookies.get('currentDistributorKey')
 
 
     getDistributorsAsAdmin: (distributorsAsAdmin) =>
