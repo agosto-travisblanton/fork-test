@@ -60,7 +60,6 @@
     "node": ">=4.1.0"
   },
   "dependencies": {
-    "fs-extra": "^0.30.0",
     "moment": "^2.13.0"
   }
 }
