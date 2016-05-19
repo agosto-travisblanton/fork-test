@@ -4,11 +4,9 @@ app = angular.module 'skykitProvisioning'
 
 app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDialog) ->
   @isAdmin = SessionsService.getIsAdmin()
-  console.log @isAdmin
   @distributors = SessionsService.getDistributors()
   @distributorsAsAdmin = SessionsService.getDistributorsAsAdmin()
-  console.log @distributorsAsAdmin
-  @currentDistributorName = SessionsService.getCurrentDistributerName()
+  @currentDistributorName = SessionsService.getCurrentDistributorName()
 
   @addUserToDistributor = (ev, userEmail, distributorAdmin) =>
     if not distributorAdmin
@@ -50,14 +48,25 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
         ToastsService.showErrorToast data.data.message
     )
 
-  @getUsersOfDistributer = () =>
-    @loadingUsersOfDistributer = true
-    u = AdminService.getUsersOfDistributor(SessionsService.getCurrentDistributerKey())
+  @getUsersOfDistributor = () =>
+    @loadingUsersOfDistributor = true
+    u = AdminService.getUsersOfDistributor(SessionsService.getCurrentDistributorKey())
     u.then (data) =>
-      @loadingUsersOfDistributer = false
-      @usersOfDistributer = data.data
+      @loadingUsersOfDistributor = false
+      @usersOfDistributor = data.data
 
-  @getUsersOfDistributer()
+
+  @getUsersOfDistributor()
+
+  @getAllDistributors = () =>
+    @loadingAllDistributors = true
+    d = AdminService.getAllDistributors()
+    d.then (data) =>
+      @loadingAllDistributors = false
+      @allDistributors = data.data
+
+  if @isAdmin
+    @getAllDistributors()
 
 
   @

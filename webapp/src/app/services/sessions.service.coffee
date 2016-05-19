@@ -11,66 +11,41 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
     constructor: ->
       @uriBase = 'v1/sessions'
       @currentUserKey = undefined or $cookies.get('userKey')
-      @distributors = undefined
-      @distributorsAsAdmin = undefined
-      @isAdmin = undefined
-
-
-    typeIsArray = ( value ) ->
-      value and
-          typeof value is 'object' and
-          value instanceof Array and
-          typeof value.length is 'number' and
-          typeof value.splice is 'function' and
-          not ( value.propertyIsEnumerable 'length' )
 
     setDistributors: (distributors) =>
       $cookies.put('distributors', JSON.stringify distributors)
-      @distributors = distributors
 
     setDistributorsAsAdmin: (distributorsAsAdmin) =>
       $cookies.put('distributorsAsAdmin', JSON.stringify distributorsAsAdmin)
-      @distributorsAsAdmin = distributorsAsAdmin
 
     setIsAdmin: (isAdmin) =>
-      $cookies.put('distributorsAsAdmin', isAdmin)
-      @isAdmin = isAdmin
+      $cookies.put('distributorsAsAdmin', JSON.stringify isAdmin)
 
     getDistributors: (distributors) =>
-      if @distributors
-        @distributors
+      d = $cookies.get('distributors')
+      if d
+        JSON.parse d
 
-      else
-        d = $cookies.get('distributors')
-        if d
-          JSON.parse d
+      else false
 
-        else false
-          
-    getCurrentDistributerName: () ->
+    getCurrentDistributorName: () ->
       $cookies.get('currentDistributorName')
-      
-    getCurrentDistributerKey: () ->
+
+    getCurrentDistributorKey: () ->
       $cookies.get('currentDistributorKey')
 
     getDistributorsAsAdmin: () =>
-      if @distributorsAsAdmin
-        @distributorsAsAdmin
-      else
-        d = $cookies.get('distributorsAsAdmin')
-        if d
-          JSON.parse d
-        else false
+      d = $cookies.get('distributorsAsAdmin')
+      if d
+        JSON.parse d
+      else false
 
     getIsAdmin: () =>
-      if @isAdmin
-        @isAdmin
+      d = $cookies.get('userAdmin')
+      if JSON.parse d
+        true
       else
-        d = $cookies.get('isAdmin')
-        if d
-          true
-        else
-          false
+        false
 
     login: (credentials) ->
       deferred = $q.defer()

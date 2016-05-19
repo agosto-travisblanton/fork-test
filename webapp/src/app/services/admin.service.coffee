@@ -23,11 +23,11 @@ angular.module('skykitProvisioning')
       console.log params
       res = $http.post(url, params)
 
-    getUsersOfDistributor: (distributerKey) ->
-      url = 'api/v1/distributors/analytics/users/' + distributerKey
+    getUsersOfDistributor: (distributorKey) ->
+      url = 'api/v1/distributors/analytics/users/' + distributorKey
       res = $http.get(url)
 
-    getAllDistributers: () ->
+    getAllDistributors: () ->
       url = '/api/v1/distributors/analytics/all'
       res = $http.get(url)
     
