@@ -953,7 +953,6 @@ class DistributorUser(ndb.Model):
         q =  DistributorUser.query(DistributorUser.distributor_key == distributer_key).fetch()
         return q
 
-
     @property
     def is_distributor_administrator(self):
         return self.role.get().role == 1

@@ -371,11 +371,44 @@ class TestDistributorsHandler(ProvisioningBaseTest):
     ###########################################################################
     # MAKE DISTRIBUTOR
     ###########################################################################
-    def test_get_users_of_users(self):
-        self.create_user_of_distributer(self.user, self.agosto)
-        url = '/api/v1/distributors/get_users/' + self.agosto_key.urlsafe()
+    def test_get_users_of_distributer(self):
+        self.create_user_of_distributer(self.user, self.agosto, role=1)
+        url = '/api/v1/distributors/analytics/users/' + self.agosto_key.urlsafe()
         r = self.get(url, headers=self.headers)
         r_json = json.loads(r.body)
         self.assertEqual(200, r.status_int)
         self.assertEqual(1, len(r_json))
         self.assertEqual(self.user.email, r_json[0]["email"])
+
+    def test_get_users_of_distributer_multiple(self):
+        self.create_user_of_distributer(self.user, self.agosto, role=1)
+        self.create_user_of_distributer(self.admin_user, self.agosto, role=0)
+        url = '/api/v1/distributors/analytics/users/' + self.agosto_key.urlsafe()
+        r = self.get(url, headers=self.headers)
+        r_json = json.loads(r.body)
+        self.assertEqual(200, r.status_int)
+        self.assertEqual(2, len(r_json))
+        self.assertTrue(len([d for d in r_json if d["email"] == self.user.email]) == 1)
+        self.assertTrue(len([d for d in r_json if d["email"] == self.admin_user.email]) == 1)
+
+    ##########################################################################
+    # GET ALL DISTRIBUTORS
+    ##########################################################################
+    def test_get_all_distributors(self):
+        results = [u'distributor_admin_name', u'Agosto', u'Agosto', u'default_distro0', u'default_distro1',
+                   u'default_distro2', u'Agosto', u'Tierney Bros', u'Inactive Distributor']
+        url = '/api/v1/distributors/analytics/all'
+        r = self.get(url, headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
+        r_json = json.loads(r.body)
+        self.assertEqual(200, r.status_int)
+        self.assertEqual(results, r_json)
+
+        new_distributor_name = "NEW"
+        Distributor.create(name=new_distributor_name,
+                           active=True).put()
+        r = self.get(url, headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
+        r_json = json.loads(r.body)
+        self.assertEqual(200, r.status_int)
+        self.assertTrue(new_distributor_name in r_json)
+        r_json.remove(new_distributor_name)
+        self.assertEqual(results, r_json)

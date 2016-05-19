@@ -1,14 +1,10 @@
 import json
-import logging
 
 from google.appengine.ext import ndb
 from webapp2 import RequestHandler
-
-from decorators import requires_api_token
-from models import Distributor, DistributorEntityGroup, DistributorUser
-from models import Distributor, DistributorEntityGroup, Domain
+from models import Distributor, DistributorEntityGroup, Domain, DistributorUser
 from restler.serializers import json_response
-from decorators import has_admin_user_key, has_distributor_admin_user_key
+from decorators import has_admin_user_key, requires_api_token
 from strategy import DISTRIBUTOR_STRATEGY, DOMAIN_STRATEGY
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>, Christopher Bartling <chris.bartling@agosto.com>'
@@ -54,6 +50,12 @@ class DistributorsHandler(RequestHandler):
             filtered = []
 
         json_response(self.response, filtered)
+
+    @has_admin_user_key
+    def get_all_distributors(self, **kwargs):
+        distributors = Distributor.query().fetch()
+        distributor_names = [e.name for e in distributors]
+        json_response(self.response, distributor_names)
 
     @requires_api_token
     def get_domains(self, distributor_key):
