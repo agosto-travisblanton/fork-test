@@ -8,7 +8,6 @@ describe 'AppController', ->
   $window = undefined
   $mdSidenav = undefined
   $state = undefined
-  SessionsService = undefined
 
   sideNavFunction = {
     toggle: ->
@@ -22,16 +21,15 @@ describe 'AppController', ->
       sideNavSpy
 
 
-  beforeEach inject (_$controller_, _$state_, _$mdSidenav_, _$window_, _SessionsService_) ->
+  beforeEach inject (_$controller_, _$state_, _$mdSidenav_, _$window_) ->
     $controller = _$controller_
     $state = _$state_
     $mdSidenav = _$mdSidenav_
     $window = _$window_
-    SessionsService = _SessionsService_
 
   describe '.initialize', ->
     beforeEach ->
-      controller = $controller 'AppController', {SessionsService: SessionsService}
+      controller = $controller 'AppController'
       spyOn(controller, 'getIdentity')
       controller.initialize()
 
@@ -41,7 +39,7 @@ describe 'AppController', ->
     it 'determines isCurrentURLDistributorSelector', ->
       a = controller.isCurrentURLDistributorSelector()
       expect(a).toBe false
-
+  
 
   describe '.toggleSidenav', ->
     beforeEach ->
