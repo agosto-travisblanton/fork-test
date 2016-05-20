@@ -19,6 +19,16 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, StorageService, Di
   @changeDistributor = () ->
     $state.go 'distributor_selection'
 
+  @setIdentity = () =>
+    @identity.first_name = @capitalizeFirstLetter(@identity.email.split("@")[0].split(".")[0])
+    @identity.last_name = @capitalizeFirstLetter(@identity.email.split("@")[0].split(".")[1])
+    @identity.full_name = @identity.first_name + " " + @identity.last_name
+
+  @getVersion = () =>
+    promise = VersionsService.getVersions()
+    promise.then (data) ->
+      @version_data = data
+
   @initialize = ->
     @identity = {
       key: StorageService.get('userKey')
@@ -33,11 +43,6 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, StorageService, Di
       $state.go "sign_in"
 
     else
-      @identity.first_name = @capitalizeFirstLetter(@identity.email.split("@")[0].split(".")[0])
-      @identity.last_name = @capitalizeFirstLetter(@identity.email.split("@")[0].split(".")[1])
-      @identity.full_name = @identity.first_name + " " + @identity.last_name
-      promise = VersionsService.getVersions()
-      promise.then (data) ->
-        @version_data = data
-
+      @setIdentity()
+      @getVersion()
   @

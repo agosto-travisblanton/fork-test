@@ -12,16 +12,16 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
       @uriBase = 'v1/sessions'
       @currentUserKey = StorageService.get('userKey')
 
-    setDistributors: (distributors) =>
+    setDistributors: (distributors) ->
       StorageService.set('distributors', distributors)
 
-    setDistributorsAsAdmin: (distributorsAsAdmin) =>
+    setDistributorsAsAdmin: (distributorsAsAdmin)->
       StorageService.set('distributorsAsAdmin', distributorsAsAdmin)
 
-    setIsAdmin: (isAdmin) =>
+    setIsAdmin: (isAdmin) ->
       StorageService.set('isAdmin', isAdmin)
 
-    getDistributors: () =>
+    getDistributors: ()->
       StorageService.get('distributors')
 
     getCurrentDistributorName: () ->
@@ -30,10 +30,10 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
     getCurrentDistributorKey: () ->
       StorageService.get('currentDistributorKey')
 
-    getDistributorsAsAdmin: () =>
+    getDistributorsAsAdmin: () ->
       StorageService.get('distributorsAsAdmin')
 
-    getIsAdmin: () =>
+    getIsAdmin: () ->
       StorageService.get('isAdmin')
 
     login: (credentials) ->
