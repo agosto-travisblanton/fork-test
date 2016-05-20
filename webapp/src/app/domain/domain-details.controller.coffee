@@ -24,7 +24,7 @@ appModule.controller 'DomainDetailsCtrl', ($log,
       domainPromise.then (data) =>
         @currentDomain = data
     else
-      @currentDomain.distributor_key = $cookies.get('currentDistributorKey')
+      @currentDomain.distributor_key = Lockr.get('currentDistributorKey')
 
     @onSaveDomain = ->
       ProgressBarService.start()

@@ -172,7 +172,7 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
       @getFetchFailure(response)
 
   @initialize = () ->
-    @distributorKey = $cookies.get('currentDistributorKey')
+    @distributorKey = Lockr.get('currentDistributorKey')
     @getManagedDevices(@distributorKey, @devicesPrev, @devicesNext)
     @getUnmanagedDevices(@distributorKey, @unmanagedDevicesPrev, @unmanagedDevicesNext)
 

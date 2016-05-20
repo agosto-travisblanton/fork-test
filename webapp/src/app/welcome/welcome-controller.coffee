@@ -24,10 +24,10 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, $cookies, Distribu
 
   vm.initialize = ->
     vm.identity = {
-      key: $cookies.get('userKey')
-      email: $cookies.get('userEmail')
-      distributorKey: $cookies.get('currentDistributorKey')
-      distributorName: $cookies.get('currentDistributorName')
+      key: Lockr.get('userKey')
+      email: Lockr.get('userEmail')
+      distributorKey: Lockr.get('currentDistributorKey')
+      distributorName: Lockr.get('currentDistributorName')
     }
 
     vm.giveOptionToChangeDistributor()

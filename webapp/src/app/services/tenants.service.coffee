@@ -5,7 +5,7 @@ appModule.factory 'TenantsService', (Restangular, CacheFactory, $cookies) ->
     
     constructor: ->
       if !CacheFactory.get('tenantCache')
-        distributorKey = $cookies.get('currentDistributorKey')
+        distributorKey = Lockr.get('currentDistributorKey')
         @tenantCache = CacheFactory('tenantCache',
           maxAge: 60 * 60 * 1000
           deleteOnExpire: 'aggressive'

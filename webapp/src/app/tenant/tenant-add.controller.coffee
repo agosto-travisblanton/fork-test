@@ -28,7 +28,7 @@ appModule.controller 'TenantAddCtrl',
       timezonePromise = TimezonesService.getUsTimezones()
       timezonePromise.then (data) =>
         @timezones = data
-      @currentDistributorKey = $cookies.get('currentDistributorKey')
+      @currentDistributorKey = Lockr.get('currentDistributorKey')
       distributorPromise = DistributorsService.getByKey @currentDistributorKey
       distributorPromise.then (data) =>
         @currentTenant.content_manager_base_url = data.content_manager_url

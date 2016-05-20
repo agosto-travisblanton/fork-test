@@ -13,10 +13,10 @@ app.run ($cookies, Restangular, $location) ->
       'Content-Type': 'application/json'
       'Accept': 'application/json'
       'Authorization': authToken
-      'X-Provisioning-User': $cookies.get('userKey')
-      'X-Provisioning-Distributor': $cookies.get('currentDistributorKey')
+      'X-Provisioning-User': Lockr.get('userKey')
+      'X-Provisioning-Distributor': Lockr.get('currentDistributorKey')
     }
-    distributorKey = $cookies.get('currentDistributorKey')
+    distributorKey = Lockr.get('currentDistributorKey')
     if operation == 'remove'
       return undefined
 
@@ -32,9 +32,9 @@ app.factory 'RequestInterceptor', ($cookies, $location) ->
         'Content-Type': 'application/json'
         'Accept': 'application/json'
         'Authorization': if $location.host().indexOf('provisioning-gamestop') > -1 then gs else prod
-        'X-Provisioning-User': $cookies.get('userKey')
-        'X-Provisioning-User-Identifier': $cookies.get('userEmail')
-        'X-Provisioning-Distributor': $cookies.get('currentDistributorKey')
+        'X-Provisioning-User': Lockr.get('userKey')
+        'X-Provisioning-User-Identifier': Lockr.get('userEmail')
+        'X-Provisioning-Distributor': Lockr.get('currentDistributorKey')
       }
       config
   }

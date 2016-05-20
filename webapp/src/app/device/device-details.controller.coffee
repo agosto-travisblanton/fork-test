@@ -244,7 +244,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       @currentDevice.customerDisplayCode = newDisplayCode
 
     @logglyForUser = () ->
-      userDomain = $cookies.get('userEmail').split("@")[1]
+      userDomain = Lockr.get('userEmail').split("@")[1]
       return  userDomain == "demo.agosto.com" || userDomain == "agosto.com"
 
     #####################

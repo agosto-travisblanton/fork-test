@@ -10,42 +10,31 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
 
     constructor: ->
       @uriBase = 'v1/sessions'
-      @currentUserKey = undefined or $cookies.get('userKey')
+      @currentUserKey = undefined or Lockr.get('userKey')
 
     setDistributors: (distributors) =>
-      $cookies.put('distributors', JSON.stringify distributors)
+      Lockr.set('distributors', distributors)
 
     setDistributorsAsAdmin: (distributorsAsAdmin) =>
-      $cookies.put('distributorsAsAdmin', JSON.stringify distributorsAsAdmin)
+      Lockr.set('distributorsAsAdmin', distributorsAsAdmin)
 
     setIsAdmin: (isAdmin) =>
-      $cookies.put('distributorsAsAdmin', JSON.stringify isAdmin)
+      Lockr.set('isAdmin', isAdmin)
 
-    getDistributors: (distributors) =>
-      d = $cookies.get('distributors')
-      if d
-        JSON.parse d
-
-      else false
+    getDistributors: () =>
+      Lockr.get('distributors')
 
     getCurrentDistributorName: () ->
-      $cookies.get('currentDistributorName')
+      Lockr.get('currentDistributorName')
 
     getCurrentDistributorKey: () ->
-      $cookies.get('currentDistributorKey')
+      Lockr.get('currentDistributorKey')
 
     getDistributorsAsAdmin: () =>
-      d = $cookies.get('distributorsAsAdmin')
-      if d
-        JSON.parse d
-      else false
+      Lockr.get('distributorsAsAdmin')
 
     getIsAdmin: () =>
-      d = $cookies.get('userAdmin')
-      if JSON.parse d
-        true
-      else
-        false
+      Lockr.get('isAdmin')
 
     login: (credentials) ->
       deferred = $q.defer()
@@ -75,26 +64,26 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
 
     setIdentity: (userKey) =>
       deferred = $q.defer()
-      $cookies.put('userKey', userKey)
+      Lockr.set('userKey', userKey)
       identityPromise = IdentityService.getIdentity()
       identityPromise.then (data) =>
+        console.log data
         @setDistributors(data['distributors'])
         @setDistributorsAsAdmin(data['distributors_as_admin'])
         @setIsAdmin(data['is_admin'])
 
-        $cookies.put('userEmail', data['email'])
-        $cookies.put('userAdmin', data["is_admin"])
+        Lockr.set('userEmail', data['email'])
+        Lockr.set('userAdmin', data["is_admin"])
         deferred.resolve()
       deferred.promise
 
     removeUserInfo: () ->
-      $cookies.remove('userKey')
-      $cookies.remove('distributors')
-      $cookies.remove('distributorsAsAdmin')
-      $cookies.remove('isAdmin')
-      $cookies.remove('userEmail')
-      $cookies.remove('userAdmin')
-      $cookies.remove('currentDistributorKey')
-      $cookies.remove('currentDistributorName')
+      Lockr.rm('userKey')
+      Lockr.rm('distributors')
+      Lockr.rm('distributorsAsAdmin')
+      Lockr.rm('isAdmin')
+      Lockr.rm('userEmail')
+      Lockr.rm('currentDistributorKey')
+      Lockr.rm('currentDistributorName')
 
 

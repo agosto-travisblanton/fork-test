@@ -35,7 +35,7 @@ appModule.controller 'TenantDetailsCtrl',
       timezonePromise = TimezonesService.getUsTimezones()
       timezonePromise.then (data) =>
         @timezones = data
-      @currentDistributorKey = $cookies.get('currentDistributorKey')
+      @currentDistributorKey = Lockr.get('currentDistributorKey')
       distributorDomainPromise = DistributorsService.getDomainsByKey @currentDistributorKey
       distributorDomainPromise.then (domains) =>
         @distributorDomains = domains

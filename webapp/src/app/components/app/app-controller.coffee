@@ -9,12 +9,12 @@ appModule.controller 'AppController', ($mdSidenav, $state, $cookies, $window, Se
 
   @getIdentity = () ->
     vm.identity = {
-      key: $cookies.get('userKey')
-      email: $cookies.get('userEmail')
+      key: Lockr.get('userKey')
+      email: Lockr.get('userEmail')
       admin: SessionsService.getIsAdmin()
       distributor_admin: SessionsService.getDistributorsAsAdmin()
-      distributorKey: $cookies.get('currentDistributorKey')
-      distributorName: $cookies.get('currentDistributorName')
+      distributorKey: Lockr.get('currentDistributorKey')
+      distributorName: Lockr.get('currentDistributorName')
     }
 
 

@@ -20,7 +20,6 @@ angular.module('skykitProvisioning')
         distributor: distributor,
         distributor_admin: distributorAdmin
       }
-      console.log params
       res = $http.post(url, params)
 
     getUsersOfDistributor: (distributorKey) ->

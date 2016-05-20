@@ -35,8 +35,8 @@ appModule.controller "DistributorSelectorCtrl", ($scope,
       DevicesService.deviceByTenantCache.removeAll()
       @currentDistributor = distributor
       DistributorsService.currentDistributor = @currentDistributor
-      $cookies.put('currentDistributorName', @currentDistributor.name)
-      $cookies.put('currentDistributorKey', @currentDistributor.key)
+      Lockr.set('currentDistributorName', @currentDistributor.name)
+      Lockr.set('currentDistributorKey', @currentDistributor.key)
       if not @distributors.length == 1
         ToastsService.showSuccessToast "Distributor #{distributor.name} selected!"
       $state.go 'welcome'
