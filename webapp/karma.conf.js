@@ -30,6 +30,7 @@ module.exports = function (config) {
       'bower_components/moment/min/moment.min.js',
       'bower_components/angular-material/angular-material.js', 
       'bower_components/angular-cache/dist/angular-cache.js',
+      'bower_components/lockr/lockr.js',
       'bower_components/angular-aria/angular-aria.js',
       'bower_components/ngclipboard/src/ngclipboard.js',
       'src/app/index.coffee',
@@ -51,10 +52,10 @@ module.exports = function (config) {
 
     reporters: ['progress', 'coverage'],
 
-    browsers: ['PhantomJS'],
+    browsers: ['PhantomJS2', 'PhantomJS2_custom'],
 
     plugins: [
-      'karma-phantomjs-launcher',
+      'karma-phantomjs2-launcher',
       'karma-chrome-launcher',
       'karma-jasmine',
       'karma-coverage',
