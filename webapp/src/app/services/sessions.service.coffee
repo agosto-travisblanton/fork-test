@@ -67,7 +67,6 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
       StorageService.set('userKey', userKey)
       identityPromise = IdentityService.getIdentity()
       identityPromise.then (data) =>
-        console.log data
         @setDistributors(data['distributors'])
         @setDistributorsAsAdmin(data['distributors_as_admin'])
         @setIsAdmin(data['is_admin'])

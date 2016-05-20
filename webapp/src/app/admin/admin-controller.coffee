@@ -8,12 +8,6 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
   @distributorsAsAdmin = SessionsService.getDistributorsAsAdmin()
   @currentDistributorName = SessionsService.getCurrentDistributorName()
 
-  console.log @isAdmin
-  console.log @distributors
-  console.log @distributorsAsAdmin
-  console.log @currentDistributorName
-
-
   @addUserToDistributor = (ev, userEmail, distributorAdmin) =>
     if not distributorAdmin
       distributorAdmin = false
