@@ -213,6 +213,8 @@ class TenantsHandler(RequestHandler):
         tenant.active = request_json.get('active')
         proof_of_play_logging = request_json.get('proof_of_play_logging')
         proof_of_play_url = request_json.get('proof_of_play_url')
+
+        Tenant.set_proof_of_play_options()
         TenantsHandler.proof_of_play_options(proof_of_play_logging=proof_of_play_logging,
                                              proof_of_play_url=proof_of_play_url,
                                              tenant=tenant)

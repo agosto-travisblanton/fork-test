@@ -443,6 +443,22 @@ class Tenant(ndb.Model):
         tenant.proof_of_play_logging = should_be_enabled
         tenant.put()
 
+    @classmethod
+    def set_proof_of_play_options(cls, tenant_code, proof_of_play_logging, proof_of_play_url, tenant_key=None):
+        if tenant_key:
+            tenant = tenant_key.get()
+        else:
+            tenant = Tenant.find_by_tenant_code(tenant_code)
+        if proof_of_play_logging is not None:
+            tenant.proof_of_play_logging = proof_of_play_logging
+            Tenant.toggle_proof_of_play(tenant_code=tenant.tenant_code, should_be_enabled=tenant.proof_of_play_logging)
+
+
+        if proof_of_play_url is None or proof_of_play_url == '':
+            tenant.proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
+        else:
+            tenant.proof_of_play_url = proof_of_play_url.strip().lower()
+
     def _pre_put_hook(self):
         self.class_version = 1
 
