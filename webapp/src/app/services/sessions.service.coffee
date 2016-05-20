@@ -10,7 +10,7 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
 
     constructor: ->
       @uriBase = 'v1/sessions'
-      @currentUserKey = undefined or StorageService.get('userKey')
+      @currentUserKey = StorageService.get('userKey')
 
     setDistributors: (distributors) =>
       StorageService.set('distributors', distributors)
