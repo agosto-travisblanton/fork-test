@@ -10,7 +10,7 @@ appModule.controller "DistributorSelectorCtrl", ($scope,
   ProofPlayService,
   TenantsService,
   DevicesService,
-  $cookies,
+  StorageService,
   ToastsService) ->
   # I don't know how to fix the errors in the style guide here
     @distributors = []
@@ -35,8 +35,8 @@ appModule.controller "DistributorSelectorCtrl", ($scope,
       DevicesService.deviceByTenantCache.removeAll()
       @currentDistributor = distributor
       DistributorsService.currentDistributor = @currentDistributor
-      Lockr.set('currentDistributorName', @currentDistributor.name)
-      Lockr.set('currentDistributorKey', @currentDistributor.key)
+      StorageService.set('currentDistributorName', @currentDistributor.name)
+      StorageService.set('currentDistributorKey', @currentDistributor.key)
       if not @distributors.length == 1
         ToastsService.showSuccessToast "Distributor #{distributor.name} selected!"
       $state.go 'welcome'

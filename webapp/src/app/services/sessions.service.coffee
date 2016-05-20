@@ -2,7 +2,7 @@
 
 angular.module('skykitProvisioning').factory 'SessionsService', ($http,
   $log,
-  $cookies,
+  StorageService,
   IdentityService,
   Restangular,
   $q) ->
@@ -10,31 +10,31 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
 
     constructor: ->
       @uriBase = 'v1/sessions'
-      @currentUserKey = undefined or Lockr.get('userKey')
+      @currentUserKey = undefined or StorageService.get('userKey')
 
     setDistributors: (distributors) =>
-      Lockr.set('distributors', distributors)
+      StorageService.set('distributors', distributors)
 
     setDistributorsAsAdmin: (distributorsAsAdmin) =>
-      Lockr.set('distributorsAsAdmin', distributorsAsAdmin)
+      StorageService.set('distributorsAsAdmin', distributorsAsAdmin)
 
     setIsAdmin: (isAdmin) =>
-      Lockr.set('isAdmin', isAdmin)
+      StorageService.set('isAdmin', isAdmin)
 
     getDistributors: () =>
-      Lockr.get('distributors')
+      StorageService.get('distributors')
 
     getCurrentDistributorName: () ->
-      Lockr.get('currentDistributorName')
+      StorageService.get('currentDistributorName')
 
     getCurrentDistributorKey: () ->
-      Lockr.get('currentDistributorKey')
+      StorageService.get('currentDistributorKey')
 
     getDistributorsAsAdmin: () =>
-      Lockr.get('distributorsAsAdmin')
+      StorageService.get('distributorsAsAdmin')
 
     getIsAdmin: () =>
-      Lockr.get('isAdmin')
+      StorageService.get('isAdmin')
 
     login: (credentials) ->
       deferred = $q.defer()
@@ -64,7 +64,7 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
 
     setIdentity: (userKey) =>
       deferred = $q.defer()
-      Lockr.set('userKey', userKey)
+      StorageService.set('userKey', userKey)
       identityPromise = IdentityService.getIdentity()
       identityPromise.then (data) =>
         console.log data
@@ -72,18 +72,18 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
         @setDistributorsAsAdmin(data['distributors_as_admin'])
         @setIsAdmin(data['is_admin'])
 
-        Lockr.set('userEmail', data['email'])
-        Lockr.set('userAdmin', data["is_admin"])
+        StorageService.set('userEmail', data['email'])
+        StorageService.set('userAdmin', data["is_admin"])
         deferred.resolve()
       deferred.promise
 
     removeUserInfo: () ->
-      Lockr.rm('userKey')
-      Lockr.rm('distributors')
-      Lockr.rm('distributorsAsAdmin')
-      Lockr.rm('isAdmin')
-      Lockr.rm('userEmail')
-      Lockr.rm('currentDistributorKey')
-      Lockr.rm('currentDistributorName')
+      StorageService.rm('userKey')
+      StorageService.rm('distributors')
+      StorageService.rm('distributorsAsAdmin')
+      StorageService.rm('isAdmin')
+      StorageService.rm('userEmail')
+      StorageService.rm('currentDistributorKey')
+      StorageService.rm('currentDistributorName')
 
 

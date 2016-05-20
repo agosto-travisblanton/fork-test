@@ -2,7 +2,7 @@
 
 appModule = angular.module('skykitProvisioning')
 
-appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, $state, $cookies, ProgressBarService, sweet) ->
+appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, $state, StorageService, ProgressBarService, sweet) ->
   @distributorKey = undefined
   #####################################
   # Managed
@@ -172,7 +172,7 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
       @getFetchFailure(response)
 
   @initialize = () ->
-    @distributorKey = Lockr.get('currentDistributorKey')
+    @distributorKey = StorageService.get('currentDistributorKey')
     @getManagedDevices(@distributorKey, @devicesPrev, @devicesNext)
     @getUnmanagedDevices(@distributorKey, @unmanagedDevicesPrev, @unmanagedDevicesNext)
 

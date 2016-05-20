@@ -1,6 +1,6 @@
 'use strict'
 appModule = angular.module 'skykitProvisioning'
-appModule.controller "WelcomeCtrl", (VersionsService, $state, $cookies, DistributorsService, SessionsService) ->
+appModule.controller "WelcomeCtrl", (VersionsService, $state, StorageService, DistributorsService, SessionsService) ->
   vm = @
   vm.version_data = []
   vm.loading = true
@@ -24,10 +24,10 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, $cookies, Distribu
 
   vm.initialize = ->
     vm.identity = {
-      key: Lockr.get('userKey')
-      email: Lockr.get('userEmail')
-      distributorKey: Lockr.get('currentDistributorKey')
-      distributorName: Lockr.get('currentDistributorName')
+      key: StorageService.get('userKey')
+      email: StorageService.get('userEmail')
+      distributorKey: StorageService.get('currentDistributorKey')
+      distributorName: StorageService.get('currentDistributorName')
     }
 
     vm.giveOptionToChangeDistributor()

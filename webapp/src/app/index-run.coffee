@@ -2,7 +2,7 @@
 
 app = angular.module 'skykitProvisioning'
 
-app.run ($cookies, Restangular, $location) ->
+app.run (StorageService, Restangular, $location) ->
   app.constant("moment", moment)
 
   Restangular.addRequestInterceptor (elem, operation, what, url) ->
@@ -13,17 +13,17 @@ app.run ($cookies, Restangular, $location) ->
       'Content-Type': 'application/json'
       'Accept': 'application/json'
       'Authorization': authToken
-      'X-Provisioning-User': Lockr.get('userKey')
-      'X-Provisioning-Distributor': Lockr.get('currentDistributorKey')
+      'X-Provisioning-User': StorageService.get('userKey')
+      'X-Provisioning-Distributor': StorageService.get('currentDistributorKey')
     }
-    distributorKey = Lockr.get('currentDistributorKey')
+    distributorKey = StorageService.get('currentDistributorKey')
     if operation == 'remove'
       return undefined
 
     elem
 
 
-app.factory 'RequestInterceptor', ($cookies, $location) ->
+app.factory 'RequestInterceptor', (StorageService, $location) ->
   interceptor = {
     request: (config) ->
       gs = '5XZHBF3mOwqJlYAlG1NeeWX0Cb72g'
@@ -32,9 +32,9 @@ app.factory 'RequestInterceptor', ($cookies, $location) ->
         'Content-Type': 'application/json'
         'Accept': 'application/json'
         'Authorization': if $location.host().indexOf('provisioning-gamestop') > -1 then gs else prod
-        'X-Provisioning-User': Lockr.get('userKey')
-        'X-Provisioning-User-Identifier': Lockr.get('userEmail')
-        'X-Provisioning-Distributor': Lockr.get('currentDistributorKey')
+        'X-Provisioning-User': StorageService.get('userKey')
+        'X-Provisioning-User-Identifier': StorageService.get('userEmail')
+        'X-Provisioning-Distributor': StorageService.get('currentDistributorKey')
       }
       config
   }

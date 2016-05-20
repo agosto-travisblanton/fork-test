@@ -8,7 +8,7 @@ appModule.controller 'DomainDetailsCtrl', ($log,
   sweet,
   ProgressBarService,
   ToastsService,
-  $cookies) ->
+  StorageService) ->
     @currentDomain = {
       key: undefined,
       name: undefined,
@@ -24,7 +24,7 @@ appModule.controller 'DomainDetailsCtrl', ($log,
       domainPromise.then (data) =>
         @currentDomain = data
     else
-      @currentDomain.distributor_key = Lockr.get('currentDistributorKey')
+      @currentDomain.distributor_key = StorageService.get('currentDistributorKey')
 
     @onSaveDomain = ->
       ProgressBarService.start()

@@ -3,12 +3,12 @@ appModule = angular.module('skykitProvisioning')
 appModule.controller 'DeviceDetailsCtrl', ($log,
   $stateParams,
   $state,
+  StorageService,
   DevicesService,
   LocationsService,
   CommandsService,
   TimezonesService,
   sweet,
-  $cookies,
   ProgressBarService,
   $mdDialog,
   ToastsService) ->
@@ -244,7 +244,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       @currentDevice.customerDisplayCode = newDisplayCode
 
     @logglyForUser = () ->
-      userDomain = Lockr.get('userEmail').split("@")[1]
+      userDomain = StorageService.get('userEmail').split("@")[1]
       return  userDomain == "demo.agosto.com" || userDomain == "agosto.com"
 
     #####################

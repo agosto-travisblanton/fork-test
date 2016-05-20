@@ -2,19 +2,19 @@
 
 appModule = angular.module 'skykitProvisioning'
 
-appModule.controller 'AppController', ($mdSidenav, $state, $cookies, $window, SessionsService) ->
+appModule.controller 'AppController', ($mdSidenav, $state, StorageService, $window, SessionsService) ->
   vm = @
 
   vm.identity = {}
 
   @getIdentity = () ->
     vm.identity = {
-      key: Lockr.get('userKey')
-      email: Lockr.get('userEmail')
+      key: StorageService.get('userKey')
+      email: StorageService.get('userEmail')
       admin: SessionsService.getIsAdmin()
       distributor_admin: SessionsService.getDistributorsAsAdmin()
-      distributorKey: Lockr.get('currentDistributorKey')
-      distributorName: Lockr.get('currentDistributorName')
+      distributorKey: StorageService.get('currentDistributorKey')
+      distributorName: StorageService.get('currentDistributorName')
     }
 
 

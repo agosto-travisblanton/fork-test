@@ -4,7 +4,7 @@ appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantAddCtrl',
   ($log, $location, TenantsService, DistributorsService, TimezonesService, $state, sweet, ProgressBarService,
-    $cookies) ->
+    StorageService) ->
     @gameStopServer = $location.host().indexOf('provisioning-gamestop') > -1
     @currentTenant = {
       key: undefined,
@@ -28,7 +28,7 @@ appModule.controller 'TenantAddCtrl',
       timezonePromise = TimezonesService.getUsTimezones()
       timezonePromise.then (data) =>
         @timezones = data
-      @currentDistributorKey = Lockr.get('currentDistributorKey')
+      @currentDistributorKey = StorageService.get('currentDistributorKey')
       distributorPromise = DistributorsService.getByKey @currentDistributorKey
       distributorPromise.then (data) =>
         @currentTenant.content_manager_base_url = data.content_manager_url

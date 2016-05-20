@@ -1,11 +1,11 @@
 'use strict'
 appModule = angular.module('skykitProvisioning')
-appModule.factory 'TenantsService', (Restangular, CacheFactory, $cookies) ->
+appModule.factory 'TenantsService', (Restangular, CacheFactory, StorageService) ->
   new class TenantsService
     
     constructor: ->
       if !CacheFactory.get('tenantCache')
-        distributorKey = Lockr.get('currentDistributorKey')
+        distributorKey = StorageService.get('currentDistributorKey')
         @tenantCache = CacheFactory('tenantCache',
           maxAge: 60 * 60 * 1000
           deleteOnExpire: 'aggressive'
