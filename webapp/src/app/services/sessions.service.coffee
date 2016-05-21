@@ -10,8 +10,7 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
 
     constructor: ->
       @uriBase = 'v1/sessions'
-      @currentUserKey = StorageService.get('userKey')
-
+    
     setDistributors: (distributors) ->
       StorageService.set('distributors', distributors)
 
@@ -64,7 +63,6 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
 
     setIdentity: (userKey) =>
       deferred = $q.defer()
-      StorageService.set('userKey', userKey)
       identityPromise = IdentityService.getIdentity()
       identityPromise.then (data) =>
         @setDistributors(data['distributors'])

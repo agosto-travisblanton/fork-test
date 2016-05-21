@@ -19,7 +19,7 @@ appModule.controller "DistributorSelectorCtrl", ($scope,
 
     @initialize = ->
       @loading = true
-      distributorsPromise = DistributorsService.fetchAllByUser(SessionsService.currentUserKey)
+      distributorsPromise = DistributorsService.fetchAllByUser(StorageService.get('userKey'))
       distributorsPromise.then (data) =>
         @distributors = data
         if @distributors.length == 1

@@ -10,9 +10,9 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, StorageService, Di
   @capitalizeFirstLetter = (string) ->
     string.charAt(0).toUpperCase() + string.slice(1)
 
-  @giveOptionToChangeDistributor = () ->
-    distributorsPromise = DistributorsService.fetchAllByUser(SessionsService.currentUserKey)
-    distributorsPromise.then (data) ->
+  @giveOptionToChangeDistributor = () =>
+    distributorsPromise = DistributorsService.fetchAllByUser(StorageService.get('userKey'))
+    distributorsPromise.then (data) =>
       @has_multiple_distributors = data.length > 1
       @loading = false
 
@@ -26,7 +26,7 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, StorageService, Di
 
   @getVersion = () =>
     promise = VersionsService.getVersions()
-    promise.then (data) ->
+    promise.then (data) =>
       @version_data = data
 
   @initialize = ->
