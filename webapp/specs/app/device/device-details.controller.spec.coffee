@@ -19,7 +19,7 @@ describe 'DeviceDetailsCtrl', ->
   sweet = undefined
   progressBarService = undefined
   serviceInjection = undefined
-  cookieMock = undefined
+  StorageService = undefined
 
   device = {key: 'dhjad897d987fadafg708fg7d', created: '2015-05-10 22:15:10', updated: '2015-05-10 22:15:10'}
   issues = {
@@ -73,7 +73,7 @@ describe 'DeviceDetailsCtrl', ->
   beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _DevicesService_, _TimezonesService_, _LocationsService_, _CommandsService_,
-    _sweet_, _ToastsService_, _$state_, _$mdDialog_, _$log_) ->
+    _sweet_, _ToastsService_, _$state_, _$mdDialog_, _$log_, _StorageService_) ->
     $controller = _$controller_
     $stateParams = {}
     $state = _$state_
@@ -84,6 +84,7 @@ describe 'DeviceDetailsCtrl', ->
     LocationsService = _LocationsService_
     CommandsService = _CommandsService_
     ToastsService = _ToastsService_
+    StorageService = _StorageService_
     progressBarService = {
       start: ->
       complete: ->
@@ -179,10 +180,8 @@ describe 'DeviceDetailsCtrl', ->
         now = new Date()
         today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
         today.setDate(today.getDate() - 30)
-        @epochEnd = moment(new Date()).unix()
-        @epochStart = moment(today).unix()
-        controller.epochEnd = @epochEnd
-        controller.epochStart = @epochStart
+        controller.epochEnd = moment(new Date()).unix()
+        controller.epochStart = moment(today).unix()
         spyOn(ToastsService, 'showErrorToast')
         spyOn(ToastsService, 'showSuccessToast')
         controller.initialize()
@@ -206,7 +205,7 @@ describe 'DeviceDetailsCtrl', ->
         expect(DevicesService.getCommandEventsByKey).toHaveBeenCalledWith $stateParams.deviceKey, undefined, undefined
 
       it 'calls DevicesService.getIssuesByKey to retrieve the issues for a given device and datetime range', ->
-        expect(DevicesService.getIssuesByKey).toHaveBeenCalledWith($stateParams.deviceKey, @epochStart, @epochEnd, undefined, undefined)
+        expect(DevicesService.getIssuesByKey).toHaveBeenCalledWith($stateParams.deviceKey, controller.epochStart, controller.epochEnd, undefined, undefined)
 
       it "the 'then' handler caches the retrieved issues for a given device key in the controller", ->
         getDeviceIssuesPromise.resolve {issues: issues}
@@ -964,26 +963,18 @@ describe 'DeviceDetailsCtrl', ->
 
   describe 'isAgostoDomain', ->
     beforeEach ->
-      cookieMock = {
-        storage: {},
-        put: (key, value) ->
-          this.storage[key] = value
-        get: (key) ->
-          return this.storage[key]
-      }
-      controller = $controller 'DeviceDetailsCtrl', {$cookies: cookieMock}
-
+      controller = $controller 'DeviceDetailsCtrl', {StorageService: StorageService}
 
     it 'is a valid domain if @demo.agosto.com', ->
-      cookieMock.put("userEmail", "some.user@demo.agosto.com")
+      StorageService.set("userEmail", "some.user@demo.agosto.com")
       expect(controller.logglyForUser()).toBeTruthy()
 
     it 'is a valid domain if @agosto.com', ->
-      cookieMock.put("userEmail", "some.user@agosto.com")
+      StorageService.set("userEmail", "some.user@agosto.com")
       expect(controller.logglyForUser()).toBeTruthy()
 
     it 'is not if anything else', ->
-      cookieMock.put("userEmail", "some.user@123.com")
+      StorageService.set("userEmail", "some.user@123.com")
       expect(controller.logglyForUser()).toBeFalsy()
       
   
