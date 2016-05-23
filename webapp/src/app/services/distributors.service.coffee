@@ -5,7 +5,6 @@ appModule = angular.module('skykitProvisioning')
 appModule.factory 'DistributorsService', (Restangular) ->
   new class DistributorsService
     SERVICE_NAME = 'distributors'
-    @currentDistributor = undefined
 
     save: (tenant) ->
       if tenant.key != undefined

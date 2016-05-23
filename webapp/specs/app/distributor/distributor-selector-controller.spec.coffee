@@ -68,7 +68,7 @@ describe 'DistributorSelectorCtrl', ->
 
     beforeEach ->
       promise = new skykitProvisioning.q.Mock()
-      SessionsService.currentUserKey = expectedCurrentUserKey
+      SessionsService.setUserKey(expectedCurrentUserKey)
       spyOn(DistributorsService, 'fetchAllByUser').and.callFake (currentUserKey) -> return promise
       spyOn(controller, 'selectDistributor')
       DevicesService.deviceCache = {
@@ -178,9 +178,6 @@ describe 'DistributorSelectorCtrl', ->
 
     it 'sets the currentDistributor property', ->
       expect(controller.currentDistributor).toEqual distributor
-
-    it 'sets the currentDistributor property on DistributorService', ->
-      expect(DistributorsService.currentDistributor).toEqual distributor
-
+      
     it 'calls $state.go to route to the welcome view', ->
       expect($state.go).toHaveBeenCalledWith 'welcome'
