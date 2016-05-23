@@ -950,8 +950,7 @@ class DistributorUser(ndb.Model):
 
     @staticmethod
     def users_of_distributer(distributer_key):
-        q =  DistributorUser.query(DistributorUser.distributor_key == distributer_key).fetch()
-        return q
+        return DistributorUser.query(DistributorUser.distributor_key == distributer_key).fetch()
 
     @property
     def is_distributor_administrator(self):
