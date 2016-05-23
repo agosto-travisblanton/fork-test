@@ -4,7 +4,7 @@ appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantDetailsCtrl',
   ($stateParams, TenantsService, DomainsService, TimezonesService, DistributorsService, $state, sweet,
-    ProgressBarService, ToastsService, StorageService, $scope, $location) ->
+    ProgressBarService, ToastsService, SessionsService, $scope, $location) ->
     @gameStopServer = $location.host().indexOf('provisioning-gamestop') > -1
     @currentTenant = {
       key: undefined,
@@ -35,7 +35,7 @@ appModule.controller 'TenantDetailsCtrl',
       timezonePromise = TimezonesService.getUsTimezones()
       timezonePromise.then (data) =>
         @timezones = data
-      @currentDistributorKey = StorageService.get('currentDistributorKey')
+      @currentDistributorKey = SessionsService.getCurrentDistributorKey()
       distributorDomainPromise = DistributorsService.getDomainsByKey @currentDistributorKey
       distributorDomainPromise.then (domains) =>
         @distributorDomains = domains

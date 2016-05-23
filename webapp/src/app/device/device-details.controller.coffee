@@ -3,7 +3,7 @@ appModule = angular.module('skykitProvisioning')
 appModule.controller 'DeviceDetailsCtrl', ($log,
   $stateParams,
   $state,
-  StorageService,
+  SessionsService,
   DevicesService,
   LocationsService,
   CommandsService,
@@ -244,7 +244,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       @currentDevice.customerDisplayCode = newDisplayCode
 
     @logglyForUser = () ->
-      userDomain = StorageService.get('userEmail').split("@")[1]
+      userDomain = SessionsService.getUserEmail().split("@")[1]
       return  userDomain == "demo.agosto.com" || userDomain == "agosto.com"
 
     #####################

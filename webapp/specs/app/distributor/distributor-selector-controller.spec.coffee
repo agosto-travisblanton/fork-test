@@ -6,7 +6,7 @@ describe 'DistributorSelectorCtrl', ->
   $state = undefined
   promise = undefined
   $rootScope = undefined
-  $cookies = undefined
+  StorageService = undefined
   $scope = undefined
   $log = undefined
   ToastsService = undefined
@@ -20,7 +20,7 @@ describe 'DistributorSelectorCtrl', ->
 
   beforeEach inject (_$controller_,
     _$state_,
-    _$cookies_
+    _StorageService_
     _$rootScope_,
     _$log_,
     _DistributorsService_,
@@ -31,7 +31,7 @@ describe 'DistributorSelectorCtrl', ->
     _TenantsService_) ->
     $controller = _$controller_
     $state = _$state_
-    $cookies = _$cookies_
+    StorageService = _StorageService_
     $rootScope = _$rootScope_
     $scope = _$rootScope_.$new()
     ToastsService = _ToastsService_
@@ -43,7 +43,7 @@ describe 'DistributorSelectorCtrl', ->
     TenantsService = _TenantsService_
     controller = $controller 'DistributorSelectorCtrl', {
       $scope: $scope
-      $cookies: $cookies
+      StorageService: _StorageService_
       $log: $log
       $state: $state
       ToastsService: ToastsService

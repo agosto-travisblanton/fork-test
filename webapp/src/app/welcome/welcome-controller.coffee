@@ -1,6 +1,6 @@
 'use strict'
 appModule = angular.module 'skykitProvisioning'
-appModule.controller "WelcomeCtrl", (VersionsService, $state, StorageService, DistributorsService, SessionsService) ->
+appModule.controller "WelcomeCtrl", (VersionsService, $state, DistributorsService, SessionsService) ->
   @version_data = []
   @loading = true
 
@@ -11,7 +11,7 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, StorageService, Di
     string.charAt(0).toUpperCase() + string.slice(1)
 
   @giveOptionToChangeDistributor = () =>
-    distributorsPromise = DistributorsService.fetchAllByUser(StorageService.get('userKey'))
+    distributorsPromise = DistributorsService.fetchAllByUser(SessionsService.getUserKey())
     distributorsPromise.then (data) =>
       @has_multiple_distributors = data.length > 1
       @loading = false
@@ -31,10 +31,10 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, StorageService, Di
 
   @initialize = ->
     @identity = {
-      key: StorageService.get('userKey')
-      email: StorageService.get('userEmail')
-      distributorKey: StorageService.get('currentDistributorKey')
-      distributorName: StorageService.get('currentDistributorName')
+      key: SessionsService.getUserKey()
+      email: SessionsService.getUserEmail()
+      distributorKey: SessionsService.getCurrentDistributorKey()
+      distributorName: SessionsService.getCurrentDistributorName()
     }
 
     @giveOptionToChangeDistributor()

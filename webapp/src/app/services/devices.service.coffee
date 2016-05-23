@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangular, $q, CacheFactory, $http, StorageService) ->
+angular.module('skykitProvisioning').factory 'DevicesService', ($log, Restangular, $q, CacheFactory, $http) ->
   new class DevicesService
 
     constructor: ->

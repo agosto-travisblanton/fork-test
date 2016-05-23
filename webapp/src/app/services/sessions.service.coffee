@@ -10,7 +10,7 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
 
     constructor: ->
       @uriBase = 'v1/sessions'
-    
+
     setDistributors: (distributors) ->
       StorageService.set('distributors', distributors)
 
@@ -20,7 +20,25 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
     setIsAdmin: (isAdmin) ->
       StorageService.set('isAdmin', isAdmin)
 
-    getDistributors: ()->
+    setUserKey: (value) ->
+      StorageService.set('userKey', value)
+
+    setUserEmail: (value) ->
+      StorageService.set('userEmail', value)
+
+    setCurrentDistributerKey: (value) ->
+      StorageService.set('currentDistributorKey', value)
+
+    setCurrentDistributerName: (value) ->
+      StorageService.set('currentDistributorName', value)
+
+    getUserKey: () ->
+      StorageService.get('userKey')
+
+    getUserEmail: () ->
+      StorageService.get('userEmail')
+
+    getDistributors: () ->
       StorageService.get('distributors')
 
     getCurrentDistributorName: () ->
@@ -54,33 +72,25 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
 
       promise = $http.post('/login', authenticationPayload)
       promise.success (data) =>
-        @currentUserKey = data.user.key
-        @setIdentity(@currentUserKey)
+        @setUserKey(data.user.key)
+        @setIdentity()
         .then ->
           deferred.resolve(data)
 
       deferred.promise
 
-    setIdentity: (userKey) =>
+    setIdentity: () =>
       deferred = $q.defer()
       identityPromise = IdentityService.getIdentity()
       identityPromise.then (data) =>
         @setDistributors(data['distributors'])
         @setDistributorsAsAdmin(data['distributors_as_admin'])
         @setIsAdmin(data['is_admin'])
-
-        StorageService.set('userEmail', data['email'])
-        StorageService.set('userAdmin', data["is_admin"])
+        @setUserEmail data['email']
+        @setIsAdmin data["is_admin"]
+        
         deferred.resolve()
       deferred.promise
 
     removeUserInfo: () ->
-      StorageService.rm('userKey')
-      StorageService.rm('distributors')
-      StorageService.rm('distributorsAsAdmin')
-      StorageService.rm('isAdmin')
-      StorageService.rm('userEmail')
-      StorageService.rm('currentDistributorKey')
-      StorageService.rm('currentDistributorName')
-
-
+      StorageService.removeAll()

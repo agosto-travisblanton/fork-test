@@ -1,38 +1,19 @@
 'use strict'
 
 describe 'WelcomeCtrl', ->
-  $controller = undefined
   controller = undefined
-  VersionsService = undefined
   promise = undefined
-  versionData = undefined
-  cookieMock = undefined
-  $stateParams = undefined
-  $state = undefined
-  StorageService = undefined 
-  SessionsService = undefined
   otherPromise = undefined
-  DistributorsService = undefined
-  
   beforeEach module('skykitProvisioning')
 
   beforeEach inject (_$controller_, _VersionsService_, _$state_, _StorageService_, _SessionsService_, _DistributorsService_) ->
-    $controller = _$controller_
-    VersionsService = _VersionsService_
-    $stateParams = {}
-    $state = {}
-    $state = _$state_
-    DistributorsService = _DistributorsService_
-    StorageService = _StorageService_
-    SessionsService = _SessionsService_
-    
-    controller = $controller 'WelcomeCtrl', {
-      VersionsService: VersionsService,
-      StorageService: StorageService,
-      SessionsService: SessionsService
-      $stateParams: $stateParams,
-      $state: $state,
-      DistributorsService: DistributorsService
+    controller = _$controller_ 'WelcomeCtrl', {
+      VersionsService: _VersionsService_,
+      StorageService: _StorageService_,
+      SessionsService: _SessionsService_,
+      $stateParams: {},
+      $state: _$state_,
+      DistributorsService: _DistributorsService_
     }
 
   describe 'initialization', ->
