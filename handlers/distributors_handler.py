@@ -39,13 +39,13 @@ class DistributorsHandler(RequestHandler):
     @requires_api_token
     def get_users(self, distributor_key):
         distributor_key = ndb.Key(urlsafe=distributor_key)
-        all_results = DistributorUser.users_of_distributer(distributor_key)
-        if all_results:
+        all_users_of_distributer = DistributorUser.users_of_distributer(distributor_key)
+        if all_users_of_distributer:
             filtered = [
                 {
                     "email": e.user_key.get().email,
                     "distributer_admin": e.role.get().role == 1
-                } for e in all_results]
+                } for e in all_users_of_distributer]
         else:
             filtered = []
 
