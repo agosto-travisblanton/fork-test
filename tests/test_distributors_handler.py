@@ -1,4 +1,5 @@
 from env_setup import setup_test_paths
+
 setup_test_paths()
 
 import json
@@ -59,13 +60,16 @@ class TestDistributorsHandler(ProvisioningBaseTest):
                                              impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                              active=False)
         self.domain_inactive.put()
-        self.default_distributor_name = "my_distributor"
+        self.default_distributor = self.agosto_key.get()
+
         self.distributor_admin_user = self.create_distributor_admin(email='john.jones@demo.agosto.com',
                                                                     distributor_name="distributor_admin_name")
+
         self.admin_user = self.create_platform_admin(email='jim.bob@demo.agosto.com',
-                                                     distributor_name=self.default_distributor_name)
+                                                     distributor_name=self.default_distributor.name)
+
         self.user = self.create_user(email='dwight.schrute@demo.agosto.com',
-                                     distributor_name=self.default_distributor_name)
+                                     distributor_name=self.default_distributor.name)
 
         self.login_url = build_uri('login')
         self.logout_url = build_uri('logout')
@@ -197,7 +201,6 @@ class TestDistributorsHandler(ProvisioningBaseTest):
             self.app.get(uri, params=request_parameters, headers=self.bad_authorization_header)
         self.assertTrue(self.FORBIDDEN in context.exception.message)
 
-
     ##################################################################################################################
     ## put
     ##################################################################################################################
@@ -326,7 +329,6 @@ class TestDistributorsHandler(ProvisioningBaseTest):
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 0)
 
-
     def _create_distributor_user_associations(self):
         distributor_user1 = DistributorUser.create(user_key=self.user_key, distributor_key=self.agosto_key)
         distributor_user1.put()
@@ -365,3 +367,48 @@ class TestDistributorsHandler(ProvisioningBaseTest):
         }), headers={"X-Provisioning-User": self.distributor_admin_user.key.urlsafe()})
 
         self.assertEqual(403, r.status_int)
+
+    ###########################################################################
+    # MAKE DISTRIBUTOR
+    ###########################################################################
+    def test_get_users_of_distributer(self):
+        self.create_user_of_distributer(self.user, self.agosto, role=1)
+        url = '/api/v1/distributors/analytics/users/' + self.agosto_key.urlsafe()
+        request = self.get(url, headers=self.headers)
+        request_json = json.loads(request.body)
+        self.assertEqual(200, request.status_int)
+        self.assertEqual(1, len(request_json))
+        self.assertEqual(self.user.email, request_json[0]["email"])
+
+    def test_get_users_of_distributer_multiple(self):
+        self.create_user_of_distributer(self.user, self.agosto, role=1)
+        self.create_user_of_distributer(self.admin_user, self.agosto, role=0)
+        url = '/api/v1/distributors/analytics/users/' + self.agosto_key.urlsafe()
+        request = self.get(url, headers=self.headers)
+        request_json = json.loads(request.body)
+        self.assertEqual(200, request.status_int)
+        self.assertEqual(2, len(request_json))
+        self.assertTrue(len([d for d in request_json if d["email"] == self.user.email]) == 1)
+        self.assertTrue(len([d for d in request_json if d["email"] == self.admin_user.email]) == 1)
+
+    ##########################################################################
+    # GET ALL DISTRIBUTORS
+    ##########################################################################
+    def test_get_all_distributors(self):
+        results = [u'distributor_admin_name', u'Agosto', u'Agosto', u'default_distro0', u'default_distro1',
+                   u'default_distro2', u'Agosto', u'Tierney Bros', u'Inactive Distributor']
+        url = '/api/v1/distributors/analytics/all'
+        r = self.get(url, headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
+        r_json = json.loads(r.body)
+        self.assertEqual(200, r.status_int)
+        self.assertEqual(results, r_json)
+
+        new_distributor_name = "NEW"
+        Distributor.create(name=new_distributor_name,
+                           active=True).put()
+        r = self.get(url, headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
+        r_json = json.loads(r.body)
+        self.assertEqual(200, r.status_int)
+        self.assertTrue(new_distributor_name in r_json)
+        r_json.remove(new_distributor_name)
+        self.assertEqual(results, r_json)

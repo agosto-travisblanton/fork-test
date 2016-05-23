@@ -302,11 +302,23 @@ application = WSGIApplication(
               name='distributor-creator',
               methods=['POST']
               ),
+        Route(r'/api/v1/distributors/analytics/all',
+              handler='handlers.distributors_handler.DistributorsHandler',
+              handler_method='get_all_distributors',
+              methods=['GET']
+              ),
+        Route(r'/api/v1/distributors/analytics/users/<distributor_key>',
+              handler='handlers.distributors_handler.DistributorsHandler',
+              handler_method='get_users',
+              methods=['GET']
+              ),
+
         Route(r'/api/v1/distributors/<distributor_key>',
               handler='handlers.distributors_handler.DistributorsHandler',
               name='manage-distributor',
               methods=['GET', 'PUT', 'DELETE']
               ),
+
         Route(r'/api/v1/distributors/<distributor_key>/domains',
               handler='handlers.distributors_handler.DistributorsHandler',
               name='distributor-domains',
