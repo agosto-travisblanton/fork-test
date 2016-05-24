@@ -62,7 +62,6 @@
     "fs-extra": "^0.30.0",
     "karma-phantomjs-launcher": "^1.0.0",
     "lockr": "^0.8.4",
-    "moment": "^2.13.0",
-    "phantomjs2": "^2.2.0"
+    "moment": "^2.13.0"
   }
 }
