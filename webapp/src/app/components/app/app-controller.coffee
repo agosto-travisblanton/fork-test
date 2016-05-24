@@ -3,38 +3,40 @@
 appModule = angular.module 'skykitProvisioning'
 
 appModule.controller 'AppController', ($mdSidenav, $state, $window, SessionsService) ->
-  @identity = {}
+  vm = @
   
-  @currentDistributerInDistributerAdminList = () ->
+  vm.identity = {}
+  
+  vm.currentDistributerInDistributerAdminList = () ->
   currentDistributorName = SessionsService.getCurrentDistributorName()
   distributorsAsAdmin = SessionsService.getDistributorsAsAdmin()
   _.contains(distributorsAsAdmin, currentDistributorName)
 
-  @getIdentity = () =>
-    @identity = {
+  vm.getIdentity = () =>
+    vm.identity = {
       key: SessionsService.getUserKey()
       email: SessionsService.getUserEmail()
       admin: SessionsService.getIsAdmin()
       distributor_admin: SessionsService.getDistributorsAsAdmin()
-      admin_of_current_distributor: @currentDistributerInDistributerAdminList()
+      admin_of_current_distributor: vm.currentDistributerInDistributerAdminList()
       distributorKey: SessionsService.getCurrentDistributorKey()
       distributorName: SessionsService.getCurrentDistributorName()
     }
-    @identity  
+    vm.identity  
 
 
-  @isCurrentURLDistributorSelector = () ->
+  vm.isCurrentURLDistributorSelector = () ->
     test = $window.location.href.search /distributor_selection/
     result = test >= 0
 
-  @initialize = =>
-    @getIdentity()
+  vm.initialize = =>
+    vm.getIdentity()
 
-  @toggleSidenav = ->
+  vm.toggleSidenav = ->
     $mdSidenav('left').toggle()
 
-  @goTo = (stateName, id) ->
+  vm.goTo = (stateName, id) ->
     $state.go stateName, {id: id}
     $mdSidenav('left').close() if $mdSidenav('left').isOpen()
 
-  @
+  vm

@@ -12,33 +12,34 @@ appModule.controller "DistributorSelectorCtrl", ($scope,
   DevicesService,
   ToastsService) ->
 # I don't know how to fix the errors in the style guide here
-  @distributors = []
-  @currentDistributor = undefined
-  @loading = true
+  vm = @
+  vm.distributors = []
+  vm.currentDistributor = undefined
+  vm.loading = true
 
-  @initialize = ->
-    @loading = true
+  vm.initialize = ->
+    vm.loading = true
     distributorsPromise = DistributorsService.fetchAllByUser(SessionsService.getUserKey())
     distributorsPromise.then (data) =>
-      @distributors = data
-      if @distributors.length == 1
-        @selectDistributor(@distributors[0])
+      vm.distributors = data
+      if vm.distributors.length == 1
+        vm.selectDistributor(vm.distributors[0])
       else
-        @loading = false
+        vm.loading = false
 
 
-  @selectDistributor = (distributor) =>
+  vm.selectDistributor = (distributor) =>
     ProofPlayService.proofplayCache.removeAll()
     TenantsService.tenantCache.removeAll()
     DevicesService.deviceCache.removeAll()
     DevicesService.deviceByTenantCache.removeAll()
-    @currentDistributor = distributor
+    vm.currentDistributor = distributor
 
-    SessionsService.setCurrentDistributorName @currentDistributor.name
-    SessionsService.setCurrentDistributorKey @currentDistributor.key
+    SessionsService.setCurrentDistributorName vm.currentDistributor.name
+    SessionsService.setCurrentDistributorKey vm.currentDistributor.key
 
-    if not @distributors.length == 1
+    if not vm.distributors.length == 1
       ToastsService.showSuccessToast "Distributor #{distributor.name} selected!"
     $state.go 'welcome'
 
-  @
+  vm
