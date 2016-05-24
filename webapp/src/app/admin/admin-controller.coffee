@@ -13,6 +13,7 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
     if not distributorAdmin
       distributorAdmin = false
     withOrWithoutString = if distributorAdmin then "with" else "without"
+
     confirm = $mdDialog.confirm()
     confirm.title('Are you sure?')
     confirm.textContent("#{userEmail.email} will be added to #{vm.currentDistributorName}
@@ -23,7 +24,7 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
     confirm.ok('Of course!')
     confirm.cancel('Oops, nevermind.')
 
-    $mdDialog.show(confirm).then (->
+    $mdDialog.show(confirm).then ->
       res = AdminService.addUserToDistributor(userEmail.email, vm.currentDistributorName, distributorAdmin)
       res.then (data) ->
         ToastsService.showSuccessToast data.data.message
@@ -34,7 +35,6 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
 
       res.catch (data) ->
         ToastsService.showErrorToast data.data.message
-    )
 
   vm.makeDistributor = (ev, distributorName, adminEmail) ->
     confirm = $mdDialog.confirm()
@@ -72,12 +72,10 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
       vm.loadingAllDistributors = false
       vm.allDistributors = (each.name for each in vm.loadedData)
 
-  vm.initilize = () ->
+  vm.initialize = () ->
     vm.getUsersOfDistributor()
 
     if vm.isAdmin
       vm.getAllDistributors()
 
-  vm.initilize()
-  
   vm

@@ -11,7 +11,6 @@ appModule.controller "DistributorSelectorCtrl", ($scope,
   TenantsService,
   DevicesService,
   ToastsService) ->
-# I don't know how to fix the errors in the style guide here
   vm = @
   vm.distributors = []
   vm.currentDistributor = undefined
