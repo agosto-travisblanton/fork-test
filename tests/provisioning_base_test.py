@@ -70,8 +70,8 @@ class ProvisioningBaseTest(BaseTest, WebTest, KeyValidatorMixin):
         user.put()
         return user
 
-    def create_user_of_distributer(self, user, distributer, role=0):
-        user.add_distributor(distributer.key, role=role)
+    def create_user_of_distributor(self, user, distributor, role=0):
+        user.add_distributor(distributor.key, role=role)
 
     def login(self, email, administrator=False):
 

@@ -371,8 +371,8 @@ class TestDistributorsHandler(ProvisioningBaseTest):
     ###########################################################################
     # MAKE DISTRIBUTOR
     ###########################################################################
-    def test_get_users_of_distributer(self):
-        self.create_user_of_distributer(self.user, self.agosto, role=1)
+    def test_get_users_of_distributor(self):
+        self.create_user_of_distributor(self.user, self.agosto, role=1)
         url = '/api/v1/distributors/analytics/users/' + self.agosto_key.urlsafe()
         request = self.get(url, headers=self.headers)
         request_json = json.loads(request.body)
@@ -380,9 +380,9 @@ class TestDistributorsHandler(ProvisioningBaseTest):
         self.assertEqual(1, len(request_json))
         self.assertEqual(self.user.email, request_json[0]["email"])
 
-    def test_get_users_of_distributer_multiple(self):
-        self.create_user_of_distributer(self.user, self.agosto, role=1)
-        self.create_user_of_distributer(self.admin_user, self.agosto, role=0)
+    def test_get_users_of_distributor_multiple(self):
+        self.create_user_of_distributor(self.user, self.agosto, role=1)
+        self.create_user_of_distributor(self.admin_user, self.agosto, role=0)
         url = '/api/v1/distributors/analytics/users/' + self.agosto_key.urlsafe()
         request = self.get(url, headers=self.headers)
         request_json = json.loads(request.body)

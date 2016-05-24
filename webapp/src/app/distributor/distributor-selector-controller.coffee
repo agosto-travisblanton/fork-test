@@ -34,8 +34,8 @@ appModule.controller "DistributorSelectorCtrl", ($scope,
     DevicesService.deviceByTenantCache.removeAll()
     @currentDistributor = distributor
 
-    SessionsService.setCurrentDistributerName @currentDistributor.name
-    SessionsService.setCurrentDistributerKey @currentDistributor.key
+    SessionsService.setCurrentDistributorName @currentDistributor.name
+    SessionsService.setCurrentDistributorKey @currentDistributor.key
 
     if not @distributors.length == 1
       ToastsService.showSuccessToast "Distributor #{distributor.name} selected!"

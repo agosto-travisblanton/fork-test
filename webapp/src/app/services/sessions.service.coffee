@@ -26,10 +26,10 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
     setUserEmail: (value) ->
       StorageService.set('userEmail', value)
 
-    setCurrentDistributerKey: (value) ->
+    setCurrentDistributorKey: (value) ->
       StorageService.set('currentDistributorKey', value)
 
-    setCurrentDistributerName: (value) ->
+    setCurrentDistributorName: (value) ->
       StorageService.set('currentDistributorName', value)
 
     getUserKey: () ->

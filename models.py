@@ -903,7 +903,7 @@ class User(ndb.Model):
 class UserRole(ndb.Model):
     """
     0 == regular user
-    1 == distributerAdmin
+    1 == distributorAdmin
     """
     role = ndb.IntegerProperty()
     class_version = ndb.IntegerProperty()
@@ -949,8 +949,8 @@ class DistributorUser(ndb.Model):
         return distributor_user
 
     @staticmethod
-    def users_of_distributer(distributer_key):
-        return DistributorUser.query(DistributorUser.distributor_key == distributer_key).fetch()
+    def users_of_distributor(distributor_key):
+        return DistributorUser.query(DistributorUser.distributor_key == distributor_key).fetch()
 
     @property
     def is_distributor_administrator(self):
