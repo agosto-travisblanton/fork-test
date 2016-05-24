@@ -20,7 +20,7 @@ appModule.controller "DistributorSelectorCtrl", ($scope,
   vm.initialize = ->
     vm.loading = true
     distributorsPromise = DistributorsService.fetchAllByUser(SessionsService.getUserKey())
-    distributorsPromise.then (data) =>
+    distributorsPromise.then (data) ->
       vm.distributors = data
       if vm.distributors.length == 1
         vm.selectDistributor(vm.distributors[0])
@@ -28,7 +28,7 @@ appModule.controller "DistributorSelectorCtrl", ($scope,
         vm.loading = false
 
 
-  vm.selectDistributor = (distributor) =>
+  vm.selectDistributor = (distributor) ->
     ProofPlayService.proofplayCache.removeAll()
     TenantsService.tenantCache.removeAll()
     DevicesService.deviceCache.removeAll()

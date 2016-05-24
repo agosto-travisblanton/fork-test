@@ -12,7 +12,7 @@ appModule.controller 'AppController', ($mdSidenav, $state, $window, SessionsServ
   distributorsAsAdmin = SessionsService.getDistributorsAsAdmin()
   _.contains(distributorsAsAdmin, currentDistributorName)
 
-  vm.getIdentity = () =>
+  vm.getIdentity = () ->
     vm.identity = {
       key: SessionsService.getUserKey()
       email: SessionsService.getUserEmail()
@@ -29,7 +29,7 @@ appModule.controller 'AppController', ($mdSidenav, $state, $window, SessionsServ
     test = $window.location.href.search /distributor_selection/
     result = test >= 0
 
-  vm.initialize = =>
+  vm.initialize = ->
     vm.getIdentity()
 
   vm.toggleSidenav = ->

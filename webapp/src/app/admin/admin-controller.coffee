@@ -9,7 +9,7 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
   vm.distributorsAsAdmin = SessionsService.getDistributorsAsAdmin()
   vm.currentDistributorName = SessionsService.getCurrentDistributorName()
 
-  vm.addUserToDistributor = (ev, userEmail, distributorAdmin) =>
+  vm.addUserToDistributor = (ev, userEmail, distributorAdmin) ->
     if not distributorAdmin
       distributorAdmin = false
     withOrWithout = if distributorAdmin then "with" else "without"
@@ -23,20 +23,20 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
     confirm.ok('Of course!')
     confirm.cancel('Oops, nevermind.')
 
-    $mdDialog.show(confirm).then (=>
+    $mdDialog.show(confirm).then (->
       res = AdminService.addUserToDistributor(userEmail.email, vm.currentDistributorName, distributorAdmin)
-      res.then (data) =>
+      res.then (data) ->
         ToastsService.showSuccessToast data.data.message
         vm.user = {}
-        setTimeout (=>
+        setTimeout (->
           vm.getUsersOfDistributor()
         ), 1000
 
-      res.catch (data) =>
+      res.catch (data) ->
         ToastsService.showErrorToast data.data.message
     )
 
-  vm.makeDistributor = (ev, distributorName, adminEmail) =>
+  vm.makeDistributor = (ev, distributorName, adminEmail) ->
     confirm = $mdDialog.confirm()
     confirm.title('Are you sure?')
     confirm.textContent("If you proceed, #{distributorName} will be created.")
@@ -44,35 +44,35 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
     confirm.targetEvent(ev)
     confirm.ok('Yeah!')
     confirm.cancel('Forget it.')
-    $mdDialog.show(confirm).then (=>
+    $mdDialog.show(confirm).then (->
       res = AdminService.makeDistributor distributorName, adminEmail
-      res.then (data) =>
+      res.then (data) ->
         ToastsService.showSuccessToast data.data.message
-        setTimeout (=>
+        setTimeout (->
           vm.getAllDistributors()
         ), 1000
 
-      res.catch (data) =>
+      res.catch (data) ->
         ToastsService.showErrorToast data.data.message
     )
 
-  vm.getUsersOfDistributor = () =>
+  vm.getUsersOfDistributor = () ->
     vm.loadingUsersOfDistributor = true
     u = AdminService.getUsersOfDistributor(SessionsService.getCurrentDistributorKey())
-    u.then (data) =>
+    u.then (data) ->
       vm.loadingUsersOfDistributor = false
       vm.usersOfDistributor = data.data
 
 
-  vm.getAllDistributors = () =>
+  vm.getAllDistributors = () ->
     vm.loadingAllDistributors = true
     d = AdminService.getAllDistributors()
-    d.then (data) =>
+    d.then (data) ->
       vm.loadedData = data.data
       vm.loadingAllDistributors = false
       vm.allDistributors = (each.name for each in vm.loadedData)
 
-  vm.initilize = () =>
+  vm.initilize = () ->
     vm.getUsersOfDistributor()
 
     if vm.isAdmin
