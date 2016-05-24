@@ -54,7 +54,6 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
       StorageService.get('isAdmin')
 
     login: (credentials) ->
-      deferred = $q.defer()
       authenticationPayload = {
         access_token: _.clone(credentials.access_token)
         authuser: _.clone(credentials.authuser)
@@ -75,9 +74,7 @@ angular.module('skykitProvisioning').factory 'SessionsService', ($http,
         @setUserKey(data.user.key)
         @setIdentity()
         .then ->
-          deferred.resolve(data)
-
-      deferred.promise
+          data
 
     setIdentity: () =>
       deferred = $q.defer()

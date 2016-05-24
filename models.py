@@ -954,7 +954,10 @@ class DistributorUser(ndb.Model):
 
     @property
     def is_distributor_administrator(self):
-        return self.role.get().role == 1
+        if self.role:
+            return self.role.get().role == 1
+        else:
+            return False
 
     def _pre_put_hook(self):
         self.class_version = 1
