@@ -18,11 +18,9 @@ printf "\n${COLOR_LIGHT_GREEN}===> Installing installing the latest version of b
 npm install -g bower@latest
 
 printf "\n${COLOR_LIGHT_GREEN}===> Installing node packages via npm...${COLOR_OFF}\n"
-npm install
-
 printf "\n${COLOR_LIGHT_GREEN}===> Installing web packages via bower...${COLOR_OFF}\n"
 
-bower install
+npm install & bower install
 
 printf "\n${COLOR_LIGHT_GREEN}===> Running Jasmine tests in gulp build...${COLOR_OFF}\n"
 
