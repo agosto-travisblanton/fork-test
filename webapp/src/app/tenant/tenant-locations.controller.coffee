@@ -4,8 +4,9 @@ appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantLocationsCtrl',
   ($scope, $stateParams, TenantsService, LocationsService, $state, ProgressBarService) ->
+    vm = @
     tenantKey = $stateParams.tenantKey
-    @currentTenant = undefined
+    vm.currentTenant = undefined
     $scope.tabIndex = 3
 
     $scope.$watch 'tabIndex', (selectedIndex) ->
@@ -21,33 +22,33 @@ appModule.controller 'TenantLocationsCtrl',
             $state.go 'tenantLocations', {tenantKey: tenantKey}
 
 
-    @getLocations = (tenantKey, prev, next) =>
+    vm.getLocations = (tenantKey, prev, next) ->
       ProgressBarService.start()
       locationsPromise = LocationsService.getLocationsByTenantKeyPaginated tenantKey, prev, next
-      locationsPromise.then (data) =>
-        @locations = data.locations
-        @next_cursor = data.next_cursor
-        @prev_cursor = data.prev_cursor
+      locationsPromise.then (data) ->
+        vm.locations = data.locations
+        vm.next_cursor = data.next_cursor
+        vm.prev_cursor = data.prev_cursor
         ProgressBarService.complete()
 
 
-    @paginateCall = (forward) ->
+    vm.paginateCall = (forward) ->
       if forward
-        @getLocations tenantKey, null, @next_cursor
+        vm.getLocations tenantKey, null, vm.next_cursor
 
       else
-        @getLocations tenantKey, @prev_cursor, null
+        vm.getLocations tenantKey, vm.prev_cursor, null
 
 
-    @initialize = =>
-      @locations = []
+    vm.initialize = ->
+      vm.locations = []
       tenantPromise = TenantsService.getTenantByKey tenantKey
-      tenantPromise.then (data) =>
-        @currentTenant = data
-      @getLocations tenantKey
+      tenantPromise.then (data) ->
+        vm.currentTenant = data
+      vm.getLocations tenantKey
 
-    @editItem = (item) ->
+    vm.editItem = (item) ->
       $state.go 'editLocation', {locationKey: item.key}
 
 
-    @
+    vm

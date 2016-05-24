@@ -337,7 +337,7 @@ def generate_resource_csv_by_device(start_date, end_date, resources, array_of_da
     writer = csv.writer(tmp)
 
     writer.writerow(["Creation Date", "Start Date", "End Date", "Content"])
-    writer.writerow([str(created_time), str(start_date), str(end_date), ', '.join(resources)])
+    writer.writerow([str(created_time)[:10], str(start_date)[:10], str(end_date)[:10], ', '.join(resources)])
     writer.writerow(["Content", "Display", "Location", "Play Count"])
 
     from proofplay.database_calls import retrieve_resource_name_from_resource_identifier
@@ -358,7 +358,7 @@ def generate_resource_csv_by_date(start_date, end_date, resources, dictionary, n
 
     all_resources_as_string = ', '.join(resources)
     writer.writerow(["Creation Date", "Start Date", "End Date", "Start Time", "End Time", "All Content"])
-    writer.writerow([str(now), str(start_date), str(end_date), "12:00 AM", "11:59 PM",
+    writer.writerow([str(now)[:10], str(start_date)[:10], str(end_date)[:10], "12:00 AM", "11:59 PM",
                      all_resources_as_string])
     writer.writerow(["Content", "Date", "Location Count", "Display Count", "Play Count"])
 
@@ -367,7 +367,7 @@ def generate_resource_csv_by_date(start_date, end_date, resources, dictionary, n
     for key, value in dictionary.iteritems():
         for sub_key, sub_value in dictionary[key].iteritems():
             writer.writerow(
-                [retrieve_resource_name_from_resource_identifier(key), str(sub_key), sub_value["LocationCount"],
+                [retrieve_resource_name_from_resource_identifier(key), str(sub_key)[:10], sub_value["LocationCount"],
                  sub_value["PlayerCount"], sub_value["PlayCount"]])
 
     tmp.seek(0)
@@ -379,7 +379,7 @@ def generate_device_csv_summarized(start_date, end_date, displays, array_of_data
     writer = csv.writer(tmp)
 
     writer.writerow(["Creation Date", "Start Date", "End Date", "Displays"])
-    writer.writerow([str(created_time), str(start_date), str(end_date), ', '.join(displays)])
+    writer.writerow([str(created_time)[:10], str(start_date)[:10], str(end_date)[:10], ', '.join(displays)])
     writer.writerow(["Display", "Location", "Content", "Play Count"])
 
     for item in array_of_data:
@@ -394,13 +394,13 @@ def generate_device_csv_by_date(created_time, start_date, end_date, displays, di
     writer = csv.writer(tmp)
 
     writer.writerow(["Creation Date", "Start Date", "End Date", "Displays"])
-    writer.writerow([str(created_time), str(start_date), str(end_date), ', '.join(displays)])
+    writer.writerow([str(created_time)[:10], str(start_date)[:10], str(end_date)[:10], ', '.join(displays)])
     writer.writerow(["Display", "Location", "Date", "Content", "Play Count"])
 
     for key, value in dictionary_of_data.iteritems():
         for another_key, another_value in dictionary_of_data[key].iteritems():
             for guess_what_another_key, guess_what_another_value in dictionary_of_data[key][another_key].iteritems():
-                writer.writerow([key, guess_what_another_value["location"], another_key, guess_what_another_key,
+                writer.writerow([key, guess_what_another_value["location"], another_key[:10], guess_what_another_key,
                                  guess_what_another_value["playcount"]])
 
     tmp.seek(0)
@@ -434,7 +434,7 @@ def generate_location_csv_summarized(created_time, start_date, end_date, locatio
     tmp = StringIO.StringIO()
     writer = csv.writer(tmp)
     writer.writerow(["Creation Date", "Start Date", "End Date", "Locations"])
-    writer.writerow([str(created_time), str(start_date), str(end_date), ', '.join(locations)])
+    writer.writerow([str(created_time)[:10], str(start_date)[:10], str(end_date)[:10], ', '.join(locations)])
     writer.writerow(["Location", "Content", "Play Count"])
 
     for location, resources in dictionary_of_data.iteritems():
@@ -470,7 +470,7 @@ def generate_location_csv_by_device(created_time, start_date, end_date, location
     tmp = StringIO.StringIO()
     writer = csv.writer(tmp)
     writer.writerow(["Creation Date", "Start Date", "End Date", "Locations"])
-    writer.writerow([str(created_time), str(start_date), str(end_date), ', '.join(locations)])
+    writer.writerow([str(created_time)[:10], str(start_date)[:10], str(end_date)[:10], ', '.join(locations)])
     writer.writerow(["Location", "Device", "Content", "Play Count"])
 
     for location, resources in dictionary_of_data.iteritems():

@@ -600,7 +600,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertLength(200, response_json["devices"])
+        self.assertLength(25, response_json["devices"])
 
         next_uri = application.router.build(None, 'devices-by-tenant', None,
                                             {'tenant_urlsafe_key': self.tenant_key.urlsafe(), 'cur_prev_cursor': "null",
@@ -608,7 +608,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
         next_response = self.app.get(next_uri, params=request_parameters, headers=self.api_token_authorization_header)
         next_response_json = json.loads(next_response.body)
-        self.assertLength(2, next_response_json["devices"])
+        self.assertLength(25, next_response_json["devices"])
         self.assertTrue(next_response_json["prev_cursor"])
 
     def test_get_filter_unmanaged_devices_by_tenant_entity_body_json(self):
@@ -1383,19 +1383,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual('204 No Content', response.status)
         self.assertEqual(device.customer_display_code, customer_display_code)
         self.assertEqual(device.customer_display_name, new_display_name)
-
-    def test_put_updates_valid_heartbeat_interval(self):
-        interval = 3
-        request_body = {
-            'heartbeatInterval': interval
-        }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
-        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
-                     json.dumps(request_body),
-                     headers=self.api_token_authorization_header)
-        updated_display = self.managed_device_key.get()
-        self.assertNotEqual(config.PLAYER_HEARTBEAT_INTERVAL_MINUTES, updated_display.heartbeat_interval_minutes)
 
     def test_put_does_not_update_invalid_heartbeat_interval(self):
         interval = 0

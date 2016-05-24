@@ -24,8 +24,13 @@ class TenantsHandler(RequestHandler):
         result = get_tenant_list_from_distributor_key(distributor_key=distributor_key)
         paginated_result = result[offset:page_size + offset]
 
-        is_first_page = offset == 0
-        is_last_page = paginated_result[-1] == result[-1]
+        if paginated_result:
+            is_first_page = offset == 0
+            is_last_page = paginated_result[-1] == result[-1]
+
+        else:
+            is_first_page = True
+            is_last_page = True
 
         json_response(
             self.response,
@@ -246,4 +251,3 @@ class TenantsHandler(RequestHandler):
             tenant.proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
         else:
             tenant.proof_of_play_url = proof_of_play_url.strip().lower()
-

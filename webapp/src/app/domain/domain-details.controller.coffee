@@ -8,44 +8,45 @@ appModule.controller 'DomainDetailsCtrl', ($log,
   sweet,
   ProgressBarService,
   ToastsService,
-  $cookies) ->
-    @currentDomain = {
-      key: undefined,
-      name: undefined,
-      impersonation_admin_email_address: undefined,
-      distributor_key: undefined,
-      active: true
-    }
-    @currentDomains = []
-    @editMode = !!$stateParams.domainKey
+  SessionsService) ->
+  vm = @
+  vm.currentDomain = {
+    key: undefined,
+    name: undefined,
+    impersonation_admin_email_address: undefined,
+    distributor_key: undefined,
+    active: true
+  }
+  vm.currentDomains = []
+  vm.editMode = !!$stateParams.domainKey
 
-    if @editMode
-      domainPromise = DomainsService.getDomainByKey($stateParams.domainKey)
-      domainPromise.then (data) =>
-        @currentDomain = data
+  if vm.editMode
+    domainPromise = DomainsService.getDomainByKey($stateParams.domainKey)
+    domainPromise.then (data) ->
+      vm.currentDomain = data
+  else
+    vm.currentDomain.distributor_key = SessionsService.getCurrentDistributorKey()
+
+  vm.onSaveDomain = ->
+    ProgressBarService.start()
+    promise = DomainsService.save vm.currentDomain
+    promise.then vm.onSuccessSaveDomain, vm.onFailureSaveDomain
+
+  vm.onSuccessSaveDomain = ->
+    ProgressBarService.complete()
+    ToastsService.showSuccessToast 'We saved your update.'
+
+  vm.onFailureSaveDomain = (error) ->
+    ProgressBarService.complete()
+    if error.status == 409
+      $log.info("Failure saving domain. Domain already exists: #{error.status} #{error.statusText}")
+      sweet.show('Oops...', 'This domain name already exist. Please enter a unique domain name.', 'error')
     else
-      @currentDomain.distributor_key = $cookies.get('currentDistributorKey')
+      $log.error "Failure saving domain: #{error.status } #{error.statusText}"
+      ToastsService.showErrorToast 'Oops. We were unable to save your updates at this time.'
 
-    @onSaveDomain = ->
-      ProgressBarService.start()
-      promise = DomainsService.save @currentDomain
-      promise.then @onSuccessSaveDomain, @onFailureSaveDomain
-
-    @onSuccessSaveDomain = ->
-      ProgressBarService.complete()
-      ToastsService.showSuccessToast 'We saved your update.'
-
-    @onFailureSaveDomain = (error) ->
-      ProgressBarService.complete()
-      if error.status == 409
-        $log.info( "Failure saving domain. Domain already exists: #{error.status} #{error.statusText}")
-        sweet.show('Oops...', 'This domain name already exist. Please enter a unique domain name.', 'error')
-      else
-        $log.error "Failure saving domain: #{error.status } #{error.statusText}"
-        ToastsService.showErrorToast 'Oops. We were unable to save your updates at this time.'
-
-    @editItem = (item) ->
-      $state.go 'editDomain', {domainKey: item.key}
+  vm.editItem = (item) ->
+    $state.go 'editDomain', {domainKey: item.key}
 
 
-    @
+  vm

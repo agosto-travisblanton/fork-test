@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime
 from google.appengine.datastore.datastore_query import Cursor
 from google.appengine.ext import ndb
-
+import logging
 from app_config import config
 from restler.decorators import ae_ndb_serializer
 from utils.timezone_util import TimezoneUtil
@@ -55,13 +55,16 @@ class Distributor(ndb.Model):
     def find_by_name(cls, name):
         if name:
             key = Distributor.query(Distributor.name == name).get(keys_only=True)
+
             if key:
                 return key.get()
+            else:
+                return None
 
     @classmethod
     def is_unique(cls, name):
         distributor = cls.find_by_name(name)
-        if distributor is not None and name == name:
+        if distributor and distributor.name == name:
             return False
         else:
             return True
@@ -113,8 +116,8 @@ class Domain(ndb.Model):
     @classmethod
     def already_exists(cls, name):
         if Domain.query(
-            ndb.AND(Domain.active == True,
-                    Domain.name == name.strip().lower())).get(keys_only=True):
+                ndb.AND(Domain.active == True,
+                        Domain.name == name.strip().lower())).get(keys_only=True):
             return True
         return False
 
@@ -283,11 +286,8 @@ class Tenant(ndb.Model):
 
         return to_return
 
-
-
-
     @classmethod
-    def find_devices_paginated(cls, tenant_keys, fetch_size=200, unmanaged=False, prev_cursor_str=None,
+    def find_devices_paginated(cls, tenant_keys, fetch_size=25, unmanaged=False, prev_cursor_str=None,
                                next_cursor_str=None):
 
         objects = None
@@ -804,7 +804,7 @@ class User(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     email = ndb.StringProperty(required=True)
-    is_administrator = ndb.BooleanProperty(default=False)
+    is_administrator = ndb.BooleanProperty(default=False)  # platform administrator
     stormpath_account_href = ndb.StringProperty()
     last_login = ndb.DateTimeProperty()
     enabled = ndb.BooleanProperty(default=True)
@@ -815,6 +815,16 @@ class User(ndb.Model):
             self.key = ndb.Key(User, self.email.lower())
 
     @classmethod
+    def get_user_from_urlsafe_key(cls, key):
+        try:
+            user = ndb.Key(urlsafe=key).get()
+            return user
+
+        except TypeError as e:
+            logging.error(e)
+            return False
+
+    @classmethod
     def _build_key(cls, email):
         key = ndb.Key(User, email.lower())
         return key
@@ -822,7 +832,7 @@ class User(ndb.Model):
     @classmethod
     def get_or_insert_by_email(cls, email, stormpath_account_href=None):
         user = cls.get_by_email(email)
-        if user is None:
+        if not user:
             key = cls._build_key(email)
             user = User(key=key, email=email, stormpath_account_href=stormpath_account_href)
             user.put()
@@ -842,7 +852,7 @@ class User(ndb.Model):
         user = None
         if account and account.href:
             user = cls.query(cls.stormpath_account_href == account.href).get()
-            if user is None:
+            if not user:
                 user = cls.get_or_insert_by_email(account.email, stormpath_account_href=account.href)
         return user
 
@@ -861,10 +871,61 @@ class User(ndb.Model):
     def distributors(self):
         return ndb.get_multi(self.distributor_keys)
 
-    def add_distributor(self, distributor_key):
+    @property
+    def distributors_as_admin(self):
+        d = DistributorUser.query(DistributorUser.user_key == self.key).fetch()
+        return [each for each in d if each.is_distributor_administrator]
+
+    @property
+    def is_distributor_administrator(self):
+        role = UserRole.create_or_get_user_role(1)
+        return DistributorUser.query(DistributorUser.user_key == self.key).filter(
+            DistributorUser.role == role.key).count() > 0
+
+    def is_distributor_administrator_of_distributor(self, distributor_name):
+        distributor_key = Distributor.find_by_name(name=distributor_name).key
+        d = DistributorUser.query(DistributorUser.user_key == self.key).filter(
+            DistributorUser.distributor_key == distributor_key).fetch()
+        if d:
+            return d[0].is_distributor_administrator
+        else:
+            return False
+
+    def add_distributor(self, distributor_key, role=0):
         if distributor_key not in self.distributor_keys:
-            dist_user = DistributorUser(user_key=self.key, distributor_key=distributor_key)
+            dist_user = DistributorUser.create(
+                user_key=self.key,
+                distributor_key=distributor_key,
+                role=role)
             dist_user.put()
+
+
+class UserRole(ndb.Model):
+    """
+    0 == regular user
+    1 == distributorAdmin
+    """
+    role = ndb.IntegerProperty()
+    class_version = ndb.IntegerProperty()
+
+    @staticmethod
+    def create_or_get_user_role(role):
+        u = UserRole.query(UserRole.role == role).fetch()
+
+        if u:
+            return u[0]
+
+        else:
+            u = UserRole(
+                role=role
+            )
+
+            u.put()
+
+            return u
+
+    def _pre_put_hook(self):
+        self.class_version = 1
 
 
 @ae_ndb_serializer
@@ -876,13 +937,27 @@ class DistributorUser(ndb.Model):
     class_version = ndb.IntegerProperty()
     distributor_key = ndb.KeyProperty(kind=Distributor, required=True)
     user_key = ndb.KeyProperty(kind=User, required=True)
+    role = ndb.KeyProperty(kind=UserRole, required=True)
 
     @classmethod
-    def create(cls, distributor_key, user_key):
+    def create(cls, distributor_key, user_key, role=0):
+        user_role = UserRole.create_or_get_user_role(role)
         distributor_user = cls(
             user_key=user_key,
+            role=user_role.key,
             distributor_key=distributor_key)
         return distributor_user
+
+    @staticmethod
+    def users_of_distributor(distributor_key):
+        return DistributorUser.query(DistributorUser.distributor_key == distributor_key).fetch()
+
+    @property
+    def is_distributor_administrator(self):
+        if self.role:
+            return self.role.get().role == 1
+        else:
+            return False
 
     def _pre_put_hook(self):
         self.class_version = 1
@@ -894,6 +969,7 @@ class PlayerCommandEvent(ndb.Model):
     payload = ndb.StringProperty(required=True, indexed=True)
     gcm_registration_id = ndb.StringProperty(required=True, indexed=True)
     gcm_message_id = ndb.StringProperty(required=False, indexed=True)
+    user_identifier = ndb.StringProperty(required=False, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     posted = ndb.DateTimeProperty(required=True, indexed=True)
@@ -902,12 +978,13 @@ class PlayerCommandEvent(ndb.Model):
     class_version = ndb.IntegerProperty()
 
     @classmethod
-    def create(cls, device_urlsafe_key, payload, gcm_registration_id, player_has_confirmed=False):
+    def create(cls, device_urlsafe_key, payload, gcm_registration_id, player_has_confirmed=False, user_identifier='NA'):
         return cls(device_urlsafe_key=device_urlsafe_key,
                    payload=payload,
                    gcm_registration_id=gcm_registration_id,
                    player_has_confirmed=player_has_confirmed,
-                   posted=datetime.utcnow())
+                   posted=datetime.utcnow(),
+                   user_identifier=user_identifier)
 
     @classmethod
     def get_events_by_device_key(self, device_urlsafe_key, fetch_size=25, prev_cursor_str=None,

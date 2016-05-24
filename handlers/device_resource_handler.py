@@ -474,18 +474,19 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     device.location_key = location.key
                 except Exception, e:
                     logging.exception(e)
-            heartbeat_interval_minutes = request_json.get('heartbeatInterval')
-            if heartbeat_interval_minutes is not None and heartbeat_interval_minutes > 0:
-                device.heartbeat_interval_minutes = heartbeat_interval_minutes
             check_for_content_interval_minutes = request_json.get('checkContentInterval')
             if check_for_content_interval_minutes is not None and check_for_content_interval_minutes > -1:
                 if device.check_for_content_interval_minutes != check_for_content_interval_minutes:
                     device.check_for_content_interval_minutes = check_for_content_interval_minutes
+                    user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
+                    if user_identifier is None or user_identifier == '':
+                        user_identifier = 'system'
                     change_intent(
                         gcm_registration_id=device.gcm_registration_id,
                         payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
                         device_urlsafe_key=device_urlsafe_key,
-                        host=self.request.host_url)
+                        host=self.request.host_url,
+                        user_identifier=user_identifier)
             customer_display_name = request_json.get('customerDisplayName')
             if customer_display_name:
                 device.customer_display_name = customer_display_name
@@ -633,14 +634,14 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     new_log_entry.put()
 
             timezone_offset = request_json.get('timezoneOffset')
-
             if timezone_offset and timezone:
                 if timezone_offset != TimezoneUtil.get_timezone_offset(timezone):
                     change_intent(
                         gcm_registration_id=device.gcm_registration_id,
                         payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
                         device_urlsafe_key=device_urlsafe_key,
-                        host=self.request.host_url)
+                        host=self.request.host_url,
+                        user_identifier='system (player heartbeat)')
                     new_log_entry = DeviceIssueLog.create(device_key=device.key,
                                                           category=config.DEVICE_ISSUE_TIMEZONE_OFFSET_CHANGE,
                                                           up=True,
@@ -804,11 +805,15 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             status = 404
             message = 'Device with key: {0} archived.'.format(device_urlsafe_key)
         else:
+            user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
+            if user_identifier is None or user_identifier == '':
+                user_identifier = 'system'
             change_intent(
                 gcm_registration_id=device.gcm_registration_id,
                 payload=config.PLAYER_RESET_COMMAND,
                 device_urlsafe_key=device_urlsafe_key,
-                host=self.request.host_url)
+                host=self.request.host_url,
+                user_identifier=user_identifier)
             device.archived = True
             device.put()
             self.response.headers.pop('Content-Type', None)
