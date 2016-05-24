@@ -98,5 +98,5 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
             else:
                 json_response(self.response, {
                     "success": False,
-                    "message": distributor.name + " is already linked to " + current_user.email
+                    "message": distributor.name + " is already linked to " + user_email
                 }, status_code=409)

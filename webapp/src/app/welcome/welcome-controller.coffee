@@ -1,33 +1,41 @@
 'use strict'
 appModule = angular.module 'skykitProvisioning'
-appModule.controller "WelcomeCtrl", (VersionsService, $state, $cookies, DistributorsService, SessionsService) ->
+appModule.controller "WelcomeCtrl", (VersionsService, $state, DistributorsService, SessionsService) ->
   vm = @
   vm.version_data = []
   vm.loading = true
 
-  @proceedToSignIn = ->
+  vm.proceedToSignIn = ->
     $state.go 'sign_in'
 
-  @capitalizeFirstLetter = (string) ->
+  vm.capitalizeFirstLetter = (string) ->
     string.charAt(0).toUpperCase() + string.slice(1)
 
   vm.giveOptionToChangeDistributor = () ->
-    distributorsPromise = DistributorsService.fetchAllByUser(SessionsService.currentUserKey)
+    distributorsPromise = DistributorsService.fetchAllByUser(SessionsService.getUserKey())
     distributorsPromise.then (data) ->
       vm.has_multiple_distributors = data.length > 1
       vm.loading = false
 
-
-
-  @changeDistributor = () ->
+  vm.changeDistributor = () ->
     $state.go 'distributor_selection'
+
+  vm.setIdentity = () ->
+    vm.identity.first_name = vm.capitalizeFirstLetter(vm.identity.email.split("vm.")[0].split(".")[0])
+    vm.identity.last_name = vm.capitalizeFirstLetter(vm.identity.email.split("vm.")[0].split(".")[1])
+    vm.identity.full_name = vm.identity.first_name + " " + vm.identity.last_name
+
+  vm.getVersion = () ->
+    promise = VersionsService.getVersions()
+    promise.then (data) ->
+      vm.version_data = data
 
   vm.initialize = ->
     vm.identity = {
-      key: $cookies.get('userKey')
-      email: $cookies.get('userEmail')
-      distributorKey: $cookies.get('currentDistributorKey')
-      distributorName: $cookies.get('currentDistributorName')
+      key: SessionsService.getUserKey()
+      email: SessionsService.getUserEmail()
+      distributorKey: SessionsService.getCurrentDistributorKey()
+      distributorName: SessionsService.getCurrentDistributorName()
     }
 
     vm.giveOptionToChangeDistributor()
@@ -36,11 +44,6 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, $cookies, Distribu
       $state.go "sign_in"
 
     else
-      vm.identity.first_name = @capitalizeFirstLetter(vm.identity.email.split("@")[0].split(".")[0])
-      vm.identity.last_name = @capitalizeFirstLetter(vm.identity.email.split("@")[0].split(".")[1])
-      vm.identity.full_name = vm.identity.first_name + " " + vm.identity.last_name
-      promise = VersionsService.getVersions()
-      promise.then (data) ->
-        vm.version_data = data
-
+      vm.setIdentity()
+      vm.getVersion()
   vm

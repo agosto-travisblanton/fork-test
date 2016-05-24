@@ -1,13 +1,13 @@
 'use strict'
 
 angular.module('skykitProvisioning')
-.factory 'ProofPlayService', ($http, $q, $window, $cookies, $stateParams, $state, ToastsService, CacheFactory) ->
+.factory 'ProofPlayService', ($http, $q, $window, SessionsService, $stateParams, $state, ToastsService, CacheFactory) ->
   new class ProofPlayService
 
     constructor: ->
       @uriBase = 'proofplay/api/v1'
       if !CacheFactory.get('proofplayCache')
-        distributorKey = $cookies.get('currentDistributorKey')
+        distributorKey = SessionsService.getCurrentDistributorKey()
         @proofplayCache = CacheFactory 'proofplayCache',
           maxAge: 60 * 60 * 1000
           deleteOnExpire: 'aggressive'
@@ -76,7 +76,7 @@ angular.module('skykitProvisioning')
         allResources = allResources + "|" + each
 
       $window.open(@uriBase + '/multi_resource_by_date/' + start_date + '/' + end_date + '/' + allResources + '/' +
-          tenant + "/" + $cookies.get('currentDistributorKey')
+          tenant + "/" + SessionsService.getCurrentDistributorKey()
 
       , '_blank')
       return true
@@ -89,7 +89,7 @@ angular.module('skykitProvisioning')
         allResources = allResources + "|" + each
 
       $window.open(@uriBase + '/multi_resource_by_device/' + start_date + '/' + end_date + '/' + allResources + '/' +
-          tenant + "/" + $cookies.get('currentDistributorKey')
+          tenant + "/" + SessionsService.getCurrentDistributorKey()
       , '_blank')
       return true
 
@@ -102,7 +102,7 @@ angular.module('skykitProvisioning')
         allDevices = allDevices + "|" + each
 
       $window.open(@uriBase + '/multi_device_summarized/' + start_date + '/' + end_date + '/' + allDevices + '/' +
-          tenant + "/" + $cookies.get('currentDistributorKey')
+          tenant + "/" + SessionsService.getCurrentDistributorKey()
       , '_blank')
       return true
 
@@ -114,7 +114,7 @@ angular.module('skykitProvisioning')
         allDevices = allDevices + "|" + each
 
       $window.open(@uriBase + '/multi_device_by_date/' + start_date + '/' + end_date + '/' + allDevices + '/' +
-          tenant + "/" + $cookies.get('currentDistributorKey')
+          tenant + "/" + SessionsService.getCurrentDistributorKey()
       , '_blank')
       return true
 
@@ -125,7 +125,7 @@ angular.module('skykitProvisioning')
         allLocations = allLocations + "|" + each
 
       $window.open(@uriBase + '/multi_location_by_device/' + start_date + '/' + end_date + '/' + allLocations + '/' +
-          tenant + "/" + $cookies.get('currentDistributorKey')
+          tenant + "/" + SessionsService.getCurrentDistributorKey()
       , '_blank')
       return true
 
@@ -136,7 +136,7 @@ angular.module('skykitProvisioning')
         allLocations = allLocations + "|" + each
 
       $window.open(@uriBase + '/multi_location_summarized/' + start_date + '/' + end_date + '/' + allLocations + '/' +
-          tenant + "/" + $cookies.get('currentDistributorKey')
+          tenant + "/" + SessionsService.getCurrentDistributorKey()
       , '_blank')
       return true
 

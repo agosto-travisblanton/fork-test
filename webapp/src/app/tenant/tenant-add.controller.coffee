@@ -4,9 +4,10 @@ appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantAddCtrl',
   ($log, $location, TenantsService, DistributorsService, TimezonesService, $state, sweet, ProgressBarService,
-    $cookies) ->
-    @gameStopServer = $location.host().indexOf('provisioning-gamestop') > -1
-    @currentTenant = {
+    SessionsService) ->
+    vm = @
+    vm.gameStopServer = $location.host().indexOf('provisioning-gamestop') > -1
+    vm.currentTenant = {
       key: undefined,
       name: undefined,
       tenant_code: undefined,
@@ -19,36 +20,36 @@ appModule.controller 'TenantAddCtrl',
       proof_of_play_url: undefined,
       active: true
     }
-    @selectedDomain = undefined
-    @distributorDomains = []
-    @timezones = []
-    @selectedTimezone = 'America/Chicago'
+    vm.selectedDomain = undefined
+    vm.distributorDomains = []
+    vm.timezones = []
+    vm.selectedTimezone = 'America/Chicago'
 
-    @initialize = ->
+    vm.initialize = ->
       timezonePromise = TimezonesService.getUsTimezones()
-      timezonePromise.then (data) =>
-        @timezones = data
-      @currentDistributorKey = $cookies.get('currentDistributorKey')
-      distributorPromise = DistributorsService.getByKey @currentDistributorKey
-      distributorPromise.then (data) =>
-        @currentTenant.content_manager_base_url = data.content_manager_url
-        @currentTenant.content_server_url = data.player_content_url
-      distributorDomainPromise = DistributorsService.getDomainsByKey @currentDistributorKey
-      distributorDomainPromise.then (domains) =>
-        @distributorDomains = domains
+      timezonePromise.then (data) ->
+        vm.timezones = data
+      vm.currentDistributorKey = SessionsService.getCurrentDistributorKey()
+      distributorPromise = DistributorsService.getByKey vm.currentDistributorKey
+      distributorPromise.then (data) ->
+        vm.currentTenant.content_manager_base_url = data.content_manager_url
+        vm.currentTenant.content_server_url = data.player_content_url
+      distributorDomainPromise = DistributorsService.getDomainsByKey vm.currentDistributorKey
+      distributorDomainPromise.then (domains) ->
+        vm.distributorDomains = domains
 
-    @onClickSaveButton = ->
+    vm.onClickSaveButton = ->
       ProgressBarService.start()
-      @currentTenant.default_timezone = @selectedTimezone
-      @currentTenant.domain_key = @selectedDomain.key
-      promise = TenantsService.save @currentTenant
-      promise.then @onSuccessTenantSave, @onFailureTenantSave
+      vm.currentTenant.default_timezone = vm.selectedTimezone
+      vm.currentTenant.domain_key = vm.selectedDomain.key
+      promise = TenantsService.save vm.currentTenant
+      promise.then vm.onSuccessTenantSave, vm.onFailureTenantSave
 
-    @onSuccessTenantSave = ->
+    vm.onSuccessTenantSave = ->
       ProgressBarService.complete()
       $state.go 'tenants'
 
-    @onFailureTenantSave = (errorObject) ->
+    vm.onFailureTenantSave = (errorObject) ->
       ProgressBarService.complete()
       if errorObject.status is 409
         sweet.show('Oops...',
@@ -57,13 +58,13 @@ appModule.controller 'TenantAddCtrl',
         $log.error errorObject
         sweet.show('Oops...', 'Unable to save the tenant.', 'error')
 
-    @autoGenerateTenantCode = ->
-      unless @currentTenant.key
+    vm.autoGenerateTenantCode = ->
+      unless vm.currentTenant.key
         newTenantCode = ''
-        if @currentTenant.name
-          newTenantCode = @currentTenant.name.toLowerCase()
+        if vm.currentTenant.name
+          newTenantCode = vm.currentTenant.name.toLowerCase()
           newTenantCode = newTenantCode.replace(/\s+/g, '_')
           newTenantCode = newTenantCode.replace(/\W+/g, '')
-        @currentTenant.tenant_code = newTenantCode
+        vm.currentTenant.tenant_code = newTenantCode
 
-    @
+    vm

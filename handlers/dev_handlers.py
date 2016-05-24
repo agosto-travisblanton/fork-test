@@ -81,6 +81,12 @@ def make_data_for_a_distributor():
     ##########################################################################################
     # USERS
     ##########################################################################################
+    default_users_to_add = ["a@gmail.com", "b@gmail.com", "c@gmail.com"]
+    for item in default_users_to_add:
+        u = User.get_or_insert_by_email(email=item)
+        u.add_distributor(distributor.key)
+        u.add_distributor(first_distributor.key)
+
     user = User.get_or_insert_by_email(email=USER_EMAIL)
     if not distributor:
         print 'Distributor ' + DISTRIBUTOR_NAME + ' not found'

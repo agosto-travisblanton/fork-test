@@ -2,28 +2,35 @@
 
 appModule = angular.module 'skykitProvisioning'
 
-appModule.controller 'AppController', ($mdSidenav, $state, $cookies, $window) ->
+appModule.controller 'AppController', ($mdSidenav, $state, $window, SessionsService) ->
   vm = @
-
+  
   vm.identity = {}
+  
+  vm.currentDistributerInDistributerAdminList = () ->
+  currentDistributorName = SessionsService.getCurrentDistributorName()
+  distributorsAsAdmin = SessionsService.getDistributorsAsAdmin()
+  _.contains(distributorsAsAdmin, currentDistributorName)
 
-  @getIdentity = () ->
+  vm.getIdentity = () ->
     vm.identity = {
-      key: $cookies.get('userKey')
-      email: $cookies.get('userEmail')
-      distributorKey: $cookies.get('currentDistributorKey')
-      distributorName: $cookies.get('currentDistributorName')
+      key: SessionsService.getUserKey()
+      email: SessionsService.getUserEmail()
+      admin: SessionsService.getIsAdmin()
+      distributor_admin: SessionsService.getDistributorsAsAdmin()
+      admin_of_current_distributor: vm.currentDistributerInDistributerAdminList()
+      distributorKey: SessionsService.getCurrentDistributorKey()
+      distributorName: SessionsService.getCurrentDistributorName()
     }
-    return vm.identity
+    vm.identity  
 
 
-  @isCurrentURLDistributorSelector = () ->
+  vm.isCurrentURLDistributorSelector = () ->
     test = $window.location.href.search /distributor_selection/
     result = test >= 0
 
-
   vm.initialize = ->
-    @getIdentity()
+    vm.getIdentity()
 
   vm.toggleSidenav = ->
     $mdSidenav('left').toggle()

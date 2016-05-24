@@ -243,6 +243,15 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
       label: 'Proof of Play'
     }
   })
+  $stateProvider.state("admin", {
+    url: "/admin",
+    templateUrl: "app/admin/main.html",
+    controller: "AdminCtrl",
+    controllerAs: 'vm',
+    ncyBreadcrumb: {
+      label: 'Admin'
+    }
+  })
 
   $urlRouterProvider.otherwise '/sign_in'
 

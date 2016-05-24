@@ -5,9 +5,9 @@ from tests.provisioning_base_test import ProvisioningBaseTest
 from models import DistributorUser, User, Distributor
 
 
-class TestDistributerUserModel(ProvisioningBaseTest):
+class TestDistributorUserModel(ProvisioningBaseTest):
     def setUp(self):
-        super(TestDistributerUserModel, self).setUp()
+        super(TestDistributorUserModel, self).setUp()
 
         self.user = User(email="chris@mycompany.com")
         self.user_key = self.user.put()

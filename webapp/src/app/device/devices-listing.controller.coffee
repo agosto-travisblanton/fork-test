@@ -2,57 +2,58 @@
 
 appModule = angular.module('skykitProvisioning')
 
-appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, $state, $cookies, ProgressBarService, sweet) ->
-  @distributorKey = undefined
+appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, $state, SessionsService, ProgressBarService, sweet) ->
+  vm = @
+  vm.distributorKey = undefined
   #####################################
   # Managed
   #####################################
-  @devices = []
-  @devicesPrev = null
-  @devicesNext = null
-  @selectedButton = "Serial Number"
-  @serialDevices = {}
-  @disabled = true
-  @macDevices = {}
+  vm.devices = []
+  vm.devicesPrev = null
+  vm.devicesNext = null
+  vm.selectedButton = "Serial Number"
+  vm.serialDevices = {}
+  vm.disabled = true
+  vm.macDevices = {}
 
   #####################################
   # Unmanaged
   #####################################
-  @unmanagedSelectedButton = "MAC"
-  @unmanagedSerialDevices = {}
-  @unmanagedDisabled = true
-  @unmanagedDevicesPrev = null
-  @unmanagedDevicesNext = null
-  @unmanagedDevices = []
-  @unmanagedMacDevices = {}
+  vm.unmanagedSelectedButton = "MAC"
+  vm.unmanagedSerialDevices = {}
+  vm.unmanagedDisabled = true
+  vm.unmanagedDevicesPrev = null
+  vm.unmanagedDevicesNext = null
+  vm.unmanagedDevices = []
+  vm.unmanagedMacDevices = {}
 
-  @refreshManagedDevices = () =>
-    @devicesPrev = null
-    @devicesNext = null
+  vm.refreshManagedDevices = () ->
+    vm.devicesPrev = null
+    vm.devicesNext = null
     DevicesService.deviceCache.removeAll()
-    @getManagedDevices(@distributorKey, @devicesPrev, @devicesNext)
+    vm.getManagedDevices(vm.distributorKey, vm.devicesPrev, vm.devicesNext)
 
-  @refreshUnmanagedDevices = () =>
-    @unmanagedDevicesPrev = null
-    @unmanagedDevicesNext = null
+  vm.refreshUnmanagedDevices = () ->
+    vm.unmanagedDevicesPrev = null
+    vm.unmanagedDevicesNext = null
     DevicesService.deviceCache.removeAll()
-    @getUnmanagedDevices(@distributorKey, @unmanagedDevicesPrev, @unmanagedDevicesNext)
+    vm.getUnmanagedDevices(vm.distributorKey, vm.unmanagedDevicesPrev, vm.unmanagedDevicesNext)
 
 
-  @changeRadio = (unmanaged) ->
+  vm.changeRadio = (unmanaged) ->
     if unmanaged
-      @unmanagedSearchText = ''
-      @unmanagedDisabled = true
-      @unmanagedSerialDevices = {}
-      @unmanagedMacDevices = {}
+      vm.unmanagedSearchText = ''
+      vm.unmanagedDisabled = true
+      vm.unmanagedSerialDevices = {}
+      vm.unmanagedMacDevices = {}
 
     else
-      @searchText = ''
-      @disabled = true
-      @serialDevices = {}
-      @macDevices = {}
+      vm.searchText = ''
+      vm.disabled = true
+      vm.serialDevices = {}
+      vm.macDevices = {}
 
-  @convertArrayToDictionary = (theArray, mac) ->
+  vm.convertArrayToDictionary = (theArray, mac) ->
     Devices = {}
     for item in theArray
       if mac
@@ -62,84 +63,84 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
 
     return Devices
 
-  @prepareForEditView = (unmanaged, searchText) ->
+  vm.prepareForEditView = (unmanaged, searchText) ->
     if unmanaged
-      mac = @unmanagedSelectedButton == "MAC"
+      mac = vm.unmanagedSelectedButton == "MAC"
       if mac
-        @editItem @unmanagedMacDevices[searchText]
+        vm.editItem vm.unmanagedMacDevices[searchText]
       else
-        @editItem @unmanagedSerialDevices[searchText]
+        vm.editItem vm.unmanagedSerialDevices[searchText]
 
     else
-      mac = @selectedButton == "MAC"
+      mac = vm.selectedButton == "MAC"
       if mac
-        @editItem @macDevices[searchText]
+        vm.editItem vm.macDevices[searchText]
       else
-        @editItem @serialDevices[searchText]
+        vm.editItem vm.serialDevices[searchText]
 
 
-  @controlOpenButton = (unmanaged, isMatch) =>
+  vm.controlOpenButton = (unmanaged, isMatch) ->
     if not unmanaged
-      @disabled = !isMatch
-      @disabledButtonLoading = false
+      vm.disabled = !isMatch
+      vm.disabledButtonLoading = false
 
     else
-      @unmanagedDisabled = !isMatch
-      @unmanagedDisabledButtonLoading = false
+      vm.unmanagedDisabled = !isMatch
+      vm.unmanagedDisabledButtonLoading = false
 
-  @isResourceValid = (unmanaged, resource) ->
+  vm.isResourceValid = (unmanaged, resource) ->
     if resource
       if resource.length > 2
         if unmanaged
-          mac = @unmanagedSelectedButton == "MAC"
-          @unmanagedDisabledButtonLoading = true
+          mac = vm.unmanagedSelectedButton == "MAC"
+          vm.unmanagedDisabledButtonLoading = true
 
         else
-          mac = @selectedButton == "MAC"
-          @disabledButtonLoading = true
+          mac = vm.selectedButton == "MAC"
+          vm.disabledButtonLoading = true
 
         if mac
-          DevicesService.matchDevicesByFullMac(@distributorKey, resource, unmanaged)
-          .then (res) =>
-            @controlOpenButton(unmanaged, res["is_match"])
+          DevicesService.matchDevicesByFullMac(vm.distributorKey, resource, unmanaged)
+          .then (res) ->
+            vm.controlOpenButton(unmanaged, res["is_match"])
 
         else
-          DevicesService.matchDevicesByFullSerial(@distributorKey, resource, unmanaged)
-          .then (res) =>
-            @controlOpenButton(unmanaged, res["is_match"])
+          DevicesService.matchDevicesByFullSerial(vm.distributorKey, resource, unmanaged)
+          .then (res) ->
+            vm.controlOpenButton(unmanaged, res["is_match"])
 
       else
-        @controlOpenButton(unmanaged, false)
+        vm.controlOpenButton(unmanaged, false)
 
     else
-      @controlOpenButton(unmanaged, false)
+      vm.controlOpenButton(unmanaged, false)
 
 
-  @searchDevices = (unmanaged, partial) =>
+  vm.searchDevices = (unmanaged, partial) ->
     if partial
       if partial.length > 2
-        if unmanaged then button = @unmanagedSelectedButton else button = @selectedButton
+        if unmanaged then button = vm.unmanagedSelectedButton else button = vm.selectedButton
 
         if button == "Serial Number"
-          DevicesService.searchDevicesByPartialSerial(@distributorKey, partial, unmanaged)
-          .then (res) =>
+          DevicesService.searchDevicesByPartialSerial(vm.distributorKey, partial, unmanaged)
+          .then (res) ->
             result = res["serial_number_matches"]
             if unmanaged
-              @unmanagedSerialDevices = @convertArrayToDictionary(result, false)
+              vm.unmanagedSerialDevices = vm.convertArrayToDictionary(result, false)
             else
-              @serialDevices = @convertArrayToDictionary(result, false)
+              vm.serialDevices = vm.convertArrayToDictionary(result, false)
 
             return [each.serial for each in result][0]
 
         else
-          DevicesService.searchDevicesByPartialMac(@distributorKey, partial, unmanaged)
-          .then (res) =>
+          DevicesService.searchDevicesByPartialMac(vm.distributorKey, partial, unmanaged)
+          .then (res) ->
             result = res["mac_matches"]
 
             if unmanaged
-              @unmanagedMacDevices = @convertArrayToDictionary(result, true)
+              vm.unmanagedMacDevices = vm.convertArrayToDictionary(result, true)
             else
-              @macDevices = @convertArrayToDictionary(result, true)
+              vm.macDevices = vm.convertArrayToDictionary(result, true)
 
             return [each.mac for each in result][0]
       else
@@ -148,62 +149,62 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
       return []
 
 
-  @getManagedDevices = (key, prev, next) ->
+  vm.getManagedDevices = (key, prev, next) ->
     ProgressBarService.start()
     devicesPromise = DevicesService.getDevicesByDistributor key, prev, next
-    devicesPromise.then ((response) =>
-      @devices = response.devices
-      @devicesNext = response.next_cursor
-      @devicesPrev = response.prev_cursor
-      @getFetchSuccess()
-    ), (response) =>
-      @getFetchFailure(response)
+    devicesPromise.then ((response) ->
+      vm.devices = response.devices
+      vm.devicesNext = response.next_cursor
+      vm.devicesPrev = response.prev_cursor
+      vm.getFetchSuccess()
+    ), (response) ->
+      vm.getFetchFailure(response)
 
 
-  @getUnmanagedDevices = (key, prev, next) ->
+  vm.getUnmanagedDevices = (key, prev, next) ->
     ProgressBarService.start()
     unmanagedDevicesPromise = DevicesService.getUnmanagedDevicesByDistributor key, prev, next
-    unmanagedDevicesPromise.then ((response) =>
-      @unmanagedDevices = response.devices
-      @unmanagedDevicesPrev = response.prev_cursor
-      @unmanagedDevicesNext = response.next_cursor
-      @getFetchSuccess()
-    ), (response) =>
-      @getFetchFailure(response)
+    unmanagedDevicesPromise.then ((response) ->
+      vm.unmanagedDevices = response.devices
+      vm.unmanagedDevicesPrev = response.prev_cursor
+      vm.unmanagedDevicesNext = response.next_cursor
+      vm.getFetchSuccess()
+    ), (response) ->
+      vm.getFetchFailure(response)
 
-  @initialize = () ->
-    @distributorKey = $cookies.get('currentDistributorKey')
-    @getManagedDevices(@distributorKey, @devicesPrev, @devicesNext)
-    @getUnmanagedDevices(@distributorKey, @unmanagedDevicesPrev, @unmanagedDevicesNext)
+  vm.initialize = () ->
+    vm.distributorKey = SessionsService.getCurrentDistributorKey()
+    vm.getManagedDevices(vm.distributorKey, vm.devicesPrev, vm.devicesNext)
+    vm.getUnmanagedDevices(vm.distributorKey, vm.unmanagedDevicesPrev, vm.unmanagedDevicesNext)
 
-  @getFetchSuccess = () ->
+  vm.getFetchSuccess = () ->
     ProgressBarService.complete()
 
-  @getFetchFailure = (response) ->
+  vm.getFetchFailure = (response) ->
     ProgressBarService.complete()
     errorMessage = "Unable to fetch devices. Error: #{response.status} #{response.statusText}."
     sweet.show('Oops...', errorMessage, 'error')
 
-  @editItem = (item) ->
+  vm.editItem = (item) ->
     $state.go 'editDevice', {
       deviceKey: item.key,
       tenantKey: item.tenantKey,
       fromDevices: true
     }
 
-  @paginateCall = (forward, managed) ->
+  vm.paginateCall = (forward, managed) ->
     if forward
       if managed
-        @getManagedDevices @distributorKey, null, @devicesNext
+        vm.getManagedDevices vm.distributorKey, null, vm.devicesNext
 
       if not managed
-        @getUnmanagedDevices @distributorKey, null, @unmanagedDevicesNext
+        vm.getUnmanagedDevices vm.distributorKey, null, vm.unmanagedDevicesNext
 
     if not forward
       if managed
-        @getManagedDevices @distributorKey, @devicesPrev, null
+        vm.getManagedDevices vm.distributorKey, vm.devicesPrev, null
 
       if not managed
-        @getUnmanagedDevices @distributorKey, @unmanagedDevicesPrev, null
+        vm.getUnmanagedDevices vm.distributorKey, vm.unmanagedDevicesPrev, null
 
-  @
+  vm
