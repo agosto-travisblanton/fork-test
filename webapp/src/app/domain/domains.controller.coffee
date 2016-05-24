@@ -3,21 +3,22 @@
 appModule = angular.module 'skykitProvisioning'
 
 appModule.controller "DomainsCtrl", ($state, $log, DomainsService, sweet) ->
-  @domains = []
+  vm = @
+  vm.domains = []
 
-  @initialize = ->
+  vm.initialize = ->
     promise = DomainsService.fetchAllDomains()
-    promise.then (data) =>
-      @domains = data
+    promise.then (data) ->
+      vm.domains = data
 
-  @editItem = (item) ->
+  vm.editItem = (item) ->
     $state.go 'editDomain', {domainKey: item.key}
 
-  @deleteItem = (item) =>
-    callback = () =>
+  vm.deleteItem = (item) ->
+    callback = () ->
       promise = DomainsService.delete item
-      promise.then () =>
-        @initialize()
+      promise.then () ->
+        vm.initialize()
     sweet.show({
       title: "Are you sure?",
       text: "This will permanently remove the domain from the distributor and disconnect from tenants.",
@@ -28,5 +29,4 @@ appModule.controller "DomainsCtrl", ($state, $log, DomainsService, sweet) ->
       closeOnConfirm: true
     }, callback)
 
-
-  @
+  vm

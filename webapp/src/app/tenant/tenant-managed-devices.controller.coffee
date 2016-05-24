@@ -28,14 +28,14 @@ appModule.controller 'TenantManagedDevicesCtrl', ($scope, $stateParams, TenantsS
   @getManagedDevices = (tenantKey, prev_cursor, next_cursor) ->
     ProgressBarService.start()
     devicesPromise = DevicesService.getDevicesByTenant tenantKey, prev_cursor, next_cursor
-    devicesPromise.then (data) =>
+    devicesPromise.then (data) ->
       @devicesPrev = data["prev_cursor"]
       @devicesNext = data["next_cursor"]
       @tenantDevices = data["devices"]
       ProgressBarService.complete()
 
 
-  @refreshDevices = () =>
+  @refreshDevices = () ->
     @devicesPrev = null
     @devicesNext = null
     @tenantDevices = null
@@ -44,14 +44,14 @@ appModule.controller 'TenantManagedDevicesCtrl', ($scope, $stateParams, TenantsS
 
   if @editMode
     tenantPromise = TenantsService.getTenantByKey @tenantKey
-    tenantPromise.then (tenant) =>
+    tenantPromise.then (tenant) ->
       @currentTenant = tenant
 
     @getManagedDevices @tenantKey, null, null
 
   $scope.tabIndex = 1
 
-  $scope.$watch 'tabIndex', (toTab, fromTab) =>
+  $scope.$watch 'tabIndex', (toTab, fromTab) ->
     if toTab != undefined
       switch toTab
         when 0
@@ -76,26 +76,26 @@ appModule.controller 'TenantManagedDevicesCtrl', ($scope, $stateParams, TenantsS
         Devices[item.serial] = item
     return Devices
 
-  @changeRadio = () =>
+  @changeRadio = () ->
     @searchText = ''
     @disabled = true
     @serialDevices = {}
     @macDevices = {}
 
 
-  @searchDevices = (partial_search) =>
+  @searchDevices = (partial_search) ->
     if partial_search
       if partial_search.length > 2
         if @selectedButton == "Serial Number"
           DevicesService.searchDevicesByPartialSerialByTenant(@tenantKey, partial_search, false)
-          .then (res) =>
+          .then (res) ->
             result = res["serial_number_matches"]
             @serialDevices = @convertArrayToDictionary(result, false)
             return [each.serial for each in result][0]
 
         else
           DevicesService.searchDevicesByPartialMacByTenant(@tenantKey, partial_search, false)
-          .then (res) =>
+          .then (res) ->
             result = res["mac_matches"]
             @macDevices = @convertArrayToDictionary(result, true)
             return [each.mac for each in result][0]
@@ -121,7 +121,7 @@ appModule.controller 'TenantManagedDevicesCtrl', ($scope, $stateParams, TenantsS
       @editItem @serialDevices[searchText]
 
 
-  @controlOpenButton = (isMatch) =>
+  @controlOpenButton = (isMatch) ->
     @disabled = !isMatch
     @loadingDisabled = false
 
@@ -134,12 +134,12 @@ appModule.controller 'TenantManagedDevicesCtrl', ($scope, $stateParams, TenantsS
 
         if mac
           DevicesService.matchDevicesByFullMacByTenant(@tenantKey, resource, false)
-          .then (res) =>
+          .then (res) ->
             @controlOpenButton(res["is_match"])
 
         else
           DevicesService.matchDevicesByFullSerialByTenant(@tenantKey, resource, false)
-          .then (res) =>
+          .then (res) ->
             @controlOpenButton(res["is_match"])
 
       else

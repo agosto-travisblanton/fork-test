@@ -1,48 +1,49 @@
 'use strict'
 appModule = angular.module 'skykitProvisioning'
 appModule.controller "WelcomeCtrl", (VersionsService, $state, DistributorsService, SessionsService) ->
-  @version_data = []
-  @loading = true
+  vm = @
+  vm.version_data = []
+  vm.loading = true
 
-  @proceedToSignIn = ->
+  vm.proceedToSignIn = ->
     $state.go 'sign_in'
 
-  @capitalizeFirstLetter = (string) ->
+  vm.capitalizeFirstLetter = (string) ->
     string.charAt(0).toUpperCase() + string.slice(1)
 
-  @giveOptionToChangeDistributor = () =>
+  vm.giveOptionToChangeDistributor = () ->
     distributorsPromise = DistributorsService.fetchAllByUser(SessionsService.getUserKey())
-    distributorsPromise.then (data) =>
-      @has_multiple_distributors = data.length > 1
-      @loading = false
+    distributorsPromise.then (data) ->
+      vm.has_multiple_distributors = data.length > 1
+      vm.loading = false
 
-  @changeDistributor = () ->
+  vm.changeDistributor = () ->
     $state.go 'distributor_selection'
 
-  @setIdentity = () =>
-    @identity.first_name = @capitalizeFirstLetter(@identity.email.split("@")[0].split(".")[0])
-    @identity.last_name = @capitalizeFirstLetter(@identity.email.split("@")[0].split(".")[1])
-    @identity.full_name = @identity.first_name + " " + @identity.last_name
+  vm.setIdentity = () ->
+    vm.identity.first_name = vm.capitalizeFirstLetter(vm.identity.email.split("vm.")[0].split(".")[0])
+    vm.identity.last_name = vm.capitalizeFirstLetter(vm.identity.email.split("vm.")[0].split(".")[1])
+    vm.identity.full_name = vm.identity.first_name + " " + vm.identity.last_name
 
-  @getVersion = () =>
+  vm.getVersion = () ->
     promise = VersionsService.getVersions()
-    promise.then (data) =>
-      @version_data = data
+    promise.then (data) ->
+      vm.version_data = data
 
-  @initialize = ->
-    @identity = {
+  vm.initialize = ->
+    vm.identity = {
       key: SessionsService.getUserKey()
       email: SessionsService.getUserEmail()
       distributorKey: SessionsService.getCurrentDistributorKey()
       distributorName: SessionsService.getCurrentDistributorName()
     }
 
-    @giveOptionToChangeDistributor()
+    vm.giveOptionToChangeDistributor()
 
-    if !@identity.email
+    if !vm.identity.email
       $state.go "sign_in"
 
     else
-      @setIdentity()
-      @getVersion()
-  @
+      vm.setIdentity()
+      vm.getVersion()
+  vm

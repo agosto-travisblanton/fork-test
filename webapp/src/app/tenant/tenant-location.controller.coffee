@@ -11,7 +11,7 @@ appModule.controller 'TenantLocationCtrl',
     @editMode = !!$stateParams.locationKey
     if @editMode
       locationPromise = LocationsService.getLocationByKey $stateParams.locationKey
-      locationPromise.then (data) =>
+      locationPromise.then (data) ->
         @location = data
         @tenantKey = data.tenantKey
         @locationName = data.customerLocationName
@@ -59,9 +59,9 @@ appModule.controller 'TenantLocationCtrl',
       else
         ToastsService.showErrorToast 'Unable to save your location.'
 
-    @fetchTenantName = (tenantKey) =>
+    @fetchTenantName = (tenantKey) ->
       tenantPromise = TenantsService.getTenantByKey tenantKey
-      tenantPromise.then (tenant) =>
+      tenantPromise.then (tenant) ->
         @tenantName = tenant.name
 
     @autoGenerateCustomerLocationCode = ->

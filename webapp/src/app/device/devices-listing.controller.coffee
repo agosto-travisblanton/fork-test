@@ -26,13 +26,13 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
   @unmanagedDevices = []
   @unmanagedMacDevices = {}
 
-  @refreshManagedDevices = () =>
+  @refreshManagedDevices = () ->
     @devicesPrev = null
     @devicesNext = null
     DevicesService.deviceCache.removeAll()
     @getManagedDevices(@distributorKey, @devicesPrev, @devicesNext)
 
-  @refreshUnmanagedDevices = () =>
+  @refreshUnmanagedDevices = () ->
     @unmanagedDevicesPrev = null
     @unmanagedDevicesNext = null
     DevicesService.deviceCache.removeAll()
@@ -78,7 +78,7 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
         @editItem @serialDevices[searchText]
 
 
-  @controlOpenButton = (unmanaged, isMatch) =>
+  @controlOpenButton = (unmanaged, isMatch) ->
     if not unmanaged
       @disabled = !isMatch
       @disabledButtonLoading = false
@@ -100,12 +100,12 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
 
         if mac
           DevicesService.matchDevicesByFullMac(@distributorKey, resource, unmanaged)
-          .then (res) =>
+          .then (res) ->
             @controlOpenButton(unmanaged, res["is_match"])
 
         else
           DevicesService.matchDevicesByFullSerial(@distributorKey, resource, unmanaged)
-          .then (res) =>
+          .then (res) ->
             @controlOpenButton(unmanaged, res["is_match"])
 
       else
@@ -115,14 +115,14 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
       @controlOpenButton(unmanaged, false)
 
 
-  @searchDevices = (unmanaged, partial) =>
+  @searchDevices = (unmanaged, partial) ->
     if partial
       if partial.length > 2
         if unmanaged then button = @unmanagedSelectedButton else button = @selectedButton
 
         if button == "Serial Number"
           DevicesService.searchDevicesByPartialSerial(@distributorKey, partial, unmanaged)
-          .then (res) =>
+          .then (res) ->
             result = res["serial_number_matches"]
             if unmanaged
               @unmanagedSerialDevices = @convertArrayToDictionary(result, false)
@@ -133,7 +133,7 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
 
         else
           DevicesService.searchDevicesByPartialMac(@distributorKey, partial, unmanaged)
-          .then (res) =>
+          .then (res) ->
             result = res["mac_matches"]
 
             if unmanaged
@@ -151,24 +151,24 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
   @getManagedDevices = (key, prev, next) ->
     ProgressBarService.start()
     devicesPromise = DevicesService.getDevicesByDistributor key, prev, next
-    devicesPromise.then ((response) =>
+    devicesPromise.then ((response) ->
       @devices = response.devices
       @devicesNext = response.next_cursor
       @devicesPrev = response.prev_cursor
       @getFetchSuccess()
-    ), (response) =>
+    ), (response) ->
       @getFetchFailure(response)
 
 
   @getUnmanagedDevices = (key, prev, next) ->
     ProgressBarService.start()
     unmanagedDevicesPromise = DevicesService.getUnmanagedDevicesByDistributor key, prev, next
-    unmanagedDevicesPromise.then ((response) =>
+    unmanagedDevicesPromise.then ((response) ->
       @unmanagedDevices = response.devices
       @unmanagedDevicesPrev = response.prev_cursor
       @unmanagedDevicesNext = response.next_cursor
       @getFetchSuccess()
-    ), (response) =>
+    ), (response) ->
       @getFetchFailure(response)
 
   @initialize = () ->
