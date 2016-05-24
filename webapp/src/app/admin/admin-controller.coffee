@@ -3,18 +3,19 @@
 app = angular.module 'skykitProvisioning'
 
 app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDialog) ->
-  @isAdmin = SessionsService.getIsAdmin()
-  @distributors = SessionsService.getDistributors()
-  @distributorsAsAdmin = SessionsService.getDistributorsAsAdmin()
-  @currentDistributorName = SessionsService.getCurrentDistributorName()
+  vm = @
+  vm.isAdmin = SessionsService.getIsAdmin()
+  vm.distributors = SessionsService.getDistributors()
+  vm.distributorsAsAdmin = SessionsService.getDistributorsAsAdmin()
+  vm.currentDistributorName = SessionsService.getCurrentDistributorName()
 
-  @addUserToDistributor = (ev, userEmail, distributorAdmin) =>
+  vm.addUserToDistributor = (ev, userEmail, distributorAdmin) =>
     if not distributorAdmin
       distributorAdmin = false
     withOrWithout = if distributorAdmin then "with" else "without"
     confirm = $mdDialog.confirm()
     confirm.title('Are you sure?')
-    confirm.textContent("#{userEmail.email} will be added to #{@currentDistributorName}
+    confirm.textContent("#{userEmail.email} will be added to #{vm.currentDistributorName}
       #{withOrWithout} administrator priviledges"
     )
     confirm.ariaLabel('Create a User')
@@ -23,19 +24,19 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
     confirm.cancel('Oops, nevermind.')
 
     $mdDialog.show(confirm).then (=>
-      res = AdminService.addUserToDistributor(userEmail.email, @currentDistributorName, distributorAdmin)
+      res = AdminService.addUserToDistributor(userEmail.email, vm.currentDistributorName, distributorAdmin)
       res.then (data) =>
         ToastsService.showSuccessToast data.data.message
-        @user = {}
+        vm.user = {}
         setTimeout (=>
-          @getUsersOfDistributor()
+          vm.getUsersOfDistributor()
         ), 1000
 
       res.catch (data) =>
         ToastsService.showErrorToast data.data.message
     )
 
-  @makeDistributor = (ev, distributorName, adminEmail) =>
+  vm.makeDistributor = (ev, distributorName, adminEmail) =>
     confirm = $mdDialog.confirm()
     confirm.title('Are you sure?')
     confirm.textContent("If you proceed, #{distributorName} will be created.")
@@ -48,37 +49,35 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
       res.then (data) =>
         ToastsService.showSuccessToast data.data.message
         setTimeout (=>
-          @getAllDistributors()
+          vm.getAllDistributors()
         ), 1000
 
       res.catch (data) =>
         ToastsService.showErrorToast data.data.message
     )
 
-  @getUsersOfDistributor = () =>
-    @loadingUsersOfDistributor = true
+  vm.getUsersOfDistributor = () =>
+    vm.loadingUsersOfDistributor = true
     u = AdminService.getUsersOfDistributor(SessionsService.getCurrentDistributorKey())
     u.then (data) =>
-      @loadingUsersOfDistributor = false
-      @usersOfDistributor = data.data
+      vm.loadingUsersOfDistributor = false
+      vm.usersOfDistributor = data.data
 
 
-  @getAllDistributors = () =>
-    @loadingAllDistributors = true
+  vm.getAllDistributors = () =>
+    vm.loadingAllDistributors = true
     d = AdminService.getAllDistributors()
     d.then (data) =>
-      @loadedData = data.data
-      @loadingAllDistributors = false
-      @allDistributors = (each.name for each in @loadedData)
+      vm.loadedData = data.data
+      vm.loadingAllDistributors = false
+      vm.allDistributors = (each.name for each in vm.loadedData)
 
-  @initilize = () =>
-    @getUsersOfDistributor()
+  vm.initilize = () =>
+    vm.getUsersOfDistributor()
 
-    if @isAdmin
-      @getAllDistributors()
+    if vm.isAdmin
+      vm.getAllDistributors()
 
-
-  @initilize()
-
-
-  @
+  vm.initilize()
+  
+  vm
