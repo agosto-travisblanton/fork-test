@@ -307,7 +307,7 @@ application = WSGIApplication(
               handler_method='get_all_distributors',
               methods=['GET']
               ),
-        Route(r'/api/v1/distributors/analytics/users/<distributor_key>',
+        Route(r'/api/v1/distributors/<distributor_key>/analytics/users',
               handler='handlers.distributors_handler.DistributorsHandler',
               handler_method='get_users',
               methods=['GET']

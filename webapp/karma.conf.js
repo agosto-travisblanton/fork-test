@@ -52,10 +52,10 @@ module.exports = function (config) {
 
     reporters: ['progress', 'coverage'],
 
-    browsers: ['PhantomJS2', 'PhantomJS2_custom'],
+    browsers: ['PhantomJS'],
 
     plugins: [
-      'karma-phantomjs2-launcher',
+      'karma-phantomjs-launcher',
       'karma-chrome-launcher',
       'karma-jasmine',
       'karma-coverage',
