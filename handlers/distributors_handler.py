@@ -44,7 +44,7 @@ class DistributorsHandler(RequestHandler):
             filtered_data_about_user = [
                 {
                     "email": each.user_key.get().email,
-                    "distributor_admin": each.role.get().role == 1
+                    "distributor_admin": each.role.get().role == 1 if each.role else False
                 } for each in all_users_of_distributor]
         else:
             filtered_data_about_user = []

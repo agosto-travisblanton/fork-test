@@ -67,8 +67,9 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
     @loadingAllDistributors = true
     d = AdminService.getAllDistributors()
     d.then (data) =>
+      @loadedData = data.data
       @loadingAllDistributors = false
-      @allDistributors = data.data
+      @allDistributors = (each.name for each in @loadedData)
 
   @initilize = () =>
     @getUsersOfDistributor()

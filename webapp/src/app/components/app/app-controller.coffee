@@ -4,6 +4,11 @@ appModule = angular.module 'skykitProvisioning'
 
 appModule.controller 'AppController', ($mdSidenav, $state, $window, SessionsService) ->
   @identity = {}
+  
+  @currentDistributerInDistributerAdminList = () ->
+  currentDistributorName = SessionsService.getCurrentDistributorName()
+  distributorsAsAdmin = SessionsService.getDistributorsAsAdmin()
+  _.contains(distributorsAsAdmin, currentDistributorName)
 
   @getIdentity = () =>
     @identity = {
@@ -11,9 +16,12 @@ appModule.controller 'AppController', ($mdSidenav, $state, $window, SessionsServ
       email: SessionsService.getUserEmail()
       admin: SessionsService.getIsAdmin()
       distributor_admin: SessionsService.getDistributorsAsAdmin()
+      admin_of_current_distributor: @currentDistributerInDistributerAdminList()
       distributorKey: SessionsService.getCurrentDistributorKey()
       distributorName: SessionsService.getCurrentDistributorName()
     }
+    @identity  
+
 
   @isCurrentURLDistributorSelector = () ->
     test = $window.location.href.search /distributor_selection/
