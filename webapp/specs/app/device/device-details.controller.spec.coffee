@@ -969,9 +969,6 @@ describe 'DeviceDetailsCtrl', ->
       StorageService.set("userEmail", "some.user@demo.agosto.com")
       expect(controller.logglyForUser()).toBeTruthy()
 
-    it 'is a valid domain if @agosto.com', ->
-      StorageService.set("userEmail", "some.user@agosto.com")
-      expect(controller.logglyForUser()).toBeTruthy()
 
     it 'is not if anything else', ->
       StorageService.set("userEmail", "some.user@123.com")

@@ -4,36 +4,37 @@ appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantLocationCtrl',
   ($stateParams, TenantsService, LocationsService, $state, sweet, ProgressBarService, ToastsService) ->
-    @location = {
+    vm = @
+    vm.location = {
       key: undefined
     }
-    @tenantKey = $stateParams.tenantKey
-    @editMode = !!$stateParams.locationKey
-    if @editMode
+    vm.tenantKey = $stateParams.tenantKey
+    vm.editMode = !!$stateParams.locationKey
+    if vm.editMode
       locationPromise = LocationsService.getLocationByKey $stateParams.locationKey
       locationPromise.then (data) ->
-        @location = data
-        @tenantKey = data.tenantKey
-        @locationName = data.customerLocationName
-        @fetchTenantName @tenantKey
+        vm.location = data
+        vm.tenantKey = data.tenantKey
+        vm.locationName = data.customerLocationName
+        vm.fetchTenantName vm.tenantKey
 
-    @initialize = ->
-      if not @editMode
-        @fetchTenantName @tenantKey
-        @location = {
-          tenantKey: @tenantKey
+    vm.initialize = ->
+      if not vm.editMode
+        vm.fetchTenantName vm.tenantKey
+        vm.location = {
+          tenantKey: vm.tenantKey
           active: true
         }
 
-    @onClickSaveButton = ->
+    vm.onClickSaveButton = ->
       ProgressBarService.start()
-      promise = LocationsService.save @location
-      if @editMode
-        promise.then @onSuccessUpdatingLocation(@tenantKey), @onFailureSavingLocation
+      promise = LocationsService.save vm.location
+      if vm.editMode
+        promise.then vm.onSuccessUpdatingLocation(vm.tenantKey), vm.onFailureSavingLocation
       else
-        promise.then @onSuccessSavingLocation, @onFailureSavingLocation
+        promise.then vm.onSuccessSavingLocation, vm.onFailureSavingLocation
 
-    @onSuccessSavingLocation = ()->
+    vm.onSuccessSavingLocation = ()->
       ProgressBarService.complete()
       ToastsService.showSuccessToast 'We saved your location.'
       setTimeout (->
@@ -41,7 +42,7 @@ appModule.controller 'TenantLocationCtrl',
         return
       ), 1000
 
-    @onSuccessUpdatingLocation = (tenant_key)->
+    vm.onSuccessUpdatingLocation = (tenant_key)->
       ProgressBarService.complete()
       ToastsService.showSuccessToast 'We updated your location.'
       setTimeout (->
@@ -49,7 +50,7 @@ appModule.controller 'TenantLocationCtrl',
         return
       ), 1000
 
-    @onFailureSavingLocation = (response) ->
+    vm.onFailureSavingLocation = (response) ->
       ProgressBarService.complete()
       if response.status is 409
         ToastsService.showErrorToast 'Location code conflict. Unable to save your location.'
@@ -59,19 +60,19 @@ appModule.controller 'TenantLocationCtrl',
       else
         ToastsService.showErrorToast 'Unable to save your location.'
 
-    @fetchTenantName = (tenantKey) ->
+    vm.fetchTenantName = (tenantKey) ->
       tenantPromise = TenantsService.getTenantByKey tenantKey
       tenantPromise.then (tenant) ->
-        @tenantName = tenant.name
+        vm.tenantName = tenant.name
 
-    @autoGenerateCustomerLocationCode = ->
-      unless @location.key
+    vm.autoGenerateCustomerLocationCode = ->
+      unless vm.location.key
         newCustomerLocationCode = ''
-        if @location.customerLocationName
-          newCustomerLocationCode = @location.customerLocationName.toLowerCase()
+        if vm.location.customerLocationName
+          newCustomerLocationCode = vm.location.customerLocationName.toLowerCase()
           newCustomerLocationCode = newCustomerLocationCode.replace(/\s+/g, '_')
           newCustomerLocationCode = newCustomerLocationCode.replace(/\W+/g, '')
-        @location.customerLocationCode = newCustomerLocationCode
+        vm.location.customerLocationCode = newCustomerLocationCode
 
-    @
+    vm
 
