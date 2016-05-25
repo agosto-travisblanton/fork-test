@@ -25,14 +25,19 @@
                 Distributor Admin
               </md-checkbox>
             </md-input-container>
+            <md-input-container class="md-block">
             <md-select ng-model="vm.user.distributor" required aria-label="distribuor select">
+
               <div ng-if="vm.isAdmin">
+                <label>Distributer</label>
                 <md-option ng-repeat="distributor in vm.allDistributors" value="{{distributor}}">{{distributor}}</md-option>
               </div>
               <div ng-if="!vm.isAdmin">
+                <label>Distributer</label>
                 <md-option ng-repeat="distributor in vm.distributorsAsAdmin" value="{{distributor}}">{{distributor}}</md-option>
               </div>
             </md-select>
+              </md-input-container>
             <md-card-actions layout="row" layout-align="end center">
 
               <md-button class="md-raised" type="submit"
