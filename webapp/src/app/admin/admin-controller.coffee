@@ -12,7 +12,7 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
   vm.addUserToDistributor = (ev, userEmail, distributorAdmin) ->
     if not distributorAdmin
       distributorAdmin = false
-    withOrWithoutString = if distributorAdmin then "with" else "without"
+    withOrWithout = if distributorAdmin then "with" else "without"
 
     confirm = $mdDialog.confirm()
     confirm.title('Are you sure?')
