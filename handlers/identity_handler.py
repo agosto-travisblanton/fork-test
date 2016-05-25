@@ -61,6 +61,7 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
     @has_distributor_admin_user_key
     def add_user_to_distributor(self, **kwargs):
         incoming = json.loads(self.request.body)
+        print incoming
         user_email = incoming["user_email"]
         user = User.get_or_insert_by_email(email=user_email)
         user_distributors = [each_distro.name for each_distro in user.distributors]
@@ -83,7 +84,7 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
                     status_code=403
                 )
 
-            if not distributor.name in user_distributors:
+            if distributor.name not in user_distributors:
                 if distributor_admin:
                     distributor_admin = 1
                 else:
