@@ -19,12 +19,14 @@ from hydrate_tenant_key_on_devices import HydrateTenantKeyOnDevices
 from refresh_chrome_device_properties_from_directory_api import RefreshChromeDevicePropertiesFromDirectoryApi
 from set_content_manager_base_url_on_tenant import SetContentManagerBaseUrlOnTenant
 from hydrate_agosto_default_domain_key_on_tenant import HydrateAgostoDefaultDomainKeyOnTenant
+from hydrate_default_user_role_on_distributer_user import HydrateDefaultUserRoleOnDistributerUser
 
 MIGRATIONS = [
     HydrateTenantKeyOnDevices(),
     RefreshChromeDevicePropertiesFromDirectoryApi(),
     SetContentManagerBaseUrlOnTenant(),
-    HydrateAgostoDefaultDomainKeyOnTenant()
+    HydrateAgostoDefaultDomainKeyOnTenant(),
+    HydrateDefaultUserRoleOnDistributerUser()
 ]
 
 MIGRATIONS_MAP = {migration.name: migration for migration in MIGRATIONS}
