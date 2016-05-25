@@ -4,7 +4,6 @@ from models import UserRole, DistributorUser
 
 class HydrateDefaultUserRoleOnDistributerUser(MigrationBase):
     MIGRATION_NAME = 'hydrate_default_user_role_on_distributer_user'
-    AGOSTO_DISTRIBUTOR_NAME = 'Agosto'
 
     def __init__(self):
         super(HydrateDefaultUserRoleOnDistributerUser, self).__init__(self.MIGRATION_NAME)

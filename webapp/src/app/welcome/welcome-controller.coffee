@@ -22,7 +22,7 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, DistributorsServic
 
   vm.setIdentity = () ->
     vm.identity.first_name = vm.capitalizeFirstLetter(vm.identity.email.split("@")[0].split(".")[0])
-    vm.identity.last_name = vm.capitalizeFirstLetter(vm.identity.email.split("@g")[0].split(".")[1])
+    vm.identity.last_name = vm.capitalizeFirstLetter(vm.identity.email.split("@")[0].split(".")[1])
     vm.identity.full_name = vm.identity.first_name + " " + vm.identity.last_name
 
   vm.getVersion = () ->
