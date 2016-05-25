@@ -12,15 +12,6 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>, Christopher Bartling <chris.
 
 class DistributorsHandler(RequestHandler):
     @requires_api_token
-    def get_list_by_user(self, user_urlsafe_key):
-        key = ndb.Key(urlsafe=user_urlsafe_key)
-        distributor_user_associations = DistributorUser.query(DistributorUser.user_key == key).fetch(100)
-        distributors = []
-        for distributor_user_association in distributor_user_associations:
-            distributors.append(distributor_user_association.distributor_key.get())
-        json_response(self.response, distributors, strategy=DISTRIBUTOR_STRATEGY)
-
-    @requires_api_token
     def get_list(self):
         distributor_name = self.request.get('distributorName')
         result = Distributor.query(ancestor=DistributorEntityGroup.singleton().key).fetch(100)
@@ -51,12 +42,6 @@ class DistributorsHandler(RequestHandler):
 
         json_response(self.response, filtered_data_about_user)
 
-    @has_admin_user_key
-    def get_all_distributors(self, **kwargs):
-        distributors = Distributor.query().fetch()
-        distributor_names = [each.name for each in distributors]
-        json_response(self.response, distributor_names)
-
     @requires_api_token
     def get_domains(self, distributor_key):
         distributor_key = ndb.Key(urlsafe=distributor_key)
@@ -70,7 +55,7 @@ class DistributorsHandler(RequestHandler):
         admin_email = incoming["admin_email"]
 
         if Distributor.is_unique(distributor_name):
-            distributor = Distributor.create(name=distributor_name, active=True)
+            distributor = Distributor.create(name=distributor_name)
             distributor.admin_email = admin_email
             distributor.put()
             json_response(

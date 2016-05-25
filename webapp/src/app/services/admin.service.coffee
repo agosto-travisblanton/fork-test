@@ -14,7 +14,7 @@ angular.module('skykitProvisioning')
       })
 
     addUserToDistributor: (userEmail, distributor, distributorAdmin) ->
-      url = '/api/v1/identity/add_user_to_distributor'
+      url = '/api/v1/users'
       params = {
         user_email: userEmail,
         distributor: distributor,

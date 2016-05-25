@@ -281,16 +281,26 @@ application = WSGIApplication(
         ),
 
         ############################################################
-        # DISTRIBUTORS
+        # USERS
         ############################################################
-
+        Route(
+            r'/api/v1/users',
+            handler='handlers.users_handler.UsersHandler',
+            handler_method='add_user_to_distributor',
+            methods=['POST']
+        ),
         Route(
             r'/api/v1/users/<user_urlsafe_key>/distributors',
-            handler='handlers.distributors_handler.DistributorsHandler',
+            handler='handlers.users_handler.UsersHandler',
             handler_method='get_list_by_user',
             name='get-distributors-by-user',
             methods=['GET']
         ),
+
+        ############################################################
+        # DISTRIBUTORS
+        ############################################################
+
         Route(r'/api/v1/distributors',
               handler='handlers.distributors_handler.DistributorsHandler',
               name='distributors',

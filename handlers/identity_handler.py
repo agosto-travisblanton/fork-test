@@ -7,8 +7,6 @@ from app_config import config
 from models import User, Distributor
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
-from decorators import has_admin_user_key, has_distributor_admin_user_key
-import json
 
 
 class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
@@ -48,8 +46,9 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
                 'is_logged_in': True,
                 'distributors': [distributor.name for distributor in
                                  Distributor.query().fetch()] if user.is_administrator else distributor_names,
-                'distributors_as_admin': [distributor.name for distributor in
-                                          Distributor.query().fetch()] if user.is_administrator else distributors_as_admin,
+                'distributors_as_admin': [
+                    distributor.name for distributor in
+                    Distributor.query().fetch()] if user.is_administrator else distributors_as_admin,
                 'distributor': session_distributor
             })
 
@@ -57,47 +56,3 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
             user_info['is_logged_in'] = False
 
         json_response(self.response, user_info)
-
-    @has_distributor_admin_user_key
-    def add_user_to_distributor(self, **kwargs):
-        incoming = json.loads(self.request.body)
-        print incoming
-        user_email = incoming["user_email"]
-        user = User.get_or_insert_by_email(email=user_email)
-        user_distributors = [each_distro.name for each_distro in user.distributors]
-        distributor_name = incoming["distributor"]
-        distributor_admin = incoming["distributor_admin"]
-        distributor = Distributor.find_by_name(name=distributor_name)
-        current_user = kwargs["current_user"]
-
-        if not distributor:
-            return json_response(self.response, {'error': 'Not a valid distributor'}, status_code=403)
-
-        else:
-            distro_admin_of_distributor = current_user.is_distributor_administrator_of_distributor(distributor_name)
-            if not distro_admin_of_distributor and not current_user.is_administrator:
-                return json_response(
-                    self.response,
-                    {
-                        'error': 'User not allowed to modify this distributor.'
-                    },
-                    status_code=403
-                )
-
-            if distributor.name not in user_distributors:
-                if distributor_admin:
-                    distributor_admin = 1
-                else:
-                    distributor_admin = 0
-                user.add_distributor(distributor.key, role=distributor_admin)
-
-                json_response(self.response, {
-                    "success": True,
-                    "message": 'SUCCESS! ' + user.email + ' is linked to ' + distributor.name
-                })
-
-            else:
-                json_response(self.response, {
-                    "success": False,
-                    "message": distributor.name + " is already linked to " + user_email
-                }, status_code=409)
