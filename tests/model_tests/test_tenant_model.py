@@ -55,7 +55,6 @@ class TestTenantModel(BaseTest):
                                                                    mac_address='98d2247f2101')
         self.device_to_be_archived_key = self.device_to_be_archived.put()
 
-
     def test_create_sets_tenant_entity_group_as_parent(self):
         actual = Tenant.find_by_name(self.NAME)
         parent = actual.key.parent().get()
