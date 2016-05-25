@@ -1,14 +1,15 @@
 import json
 
 from google.appengine.ext import ndb
-from webapp2 import RequestHandler
-from models import Distributor, DistributorUser, User
-from restler.serializers import json_response
 from decorators import requires_api_token, has_distributor_admin_user_key
 from strategy import DISTRIBUTOR_STRATEGY
+from agar.sessions import SessionRequestHandler
+from models import User, Distributor, DistributorUser
+from ndb_mixins import KeyValidatorMixin
+from restler.serializers import json_response
 
 
-class UsersHandler(RequestHandler):
+class UsersHandler(SessionRequestHandler, KeyValidatorMixin):
     @requires_api_token
     def get_list_by_user(self, user_urlsafe_key):
         key = ndb.Key(urlsafe=user_urlsafe_key)
@@ -19,7 +20,7 @@ class UsersHandler(RequestHandler):
         json_response(self.response, distributors, strategy=DISTRIBUTOR_STRATEGY)
 
     @has_distributor_admin_user_key
-    def add_user_to_distributor(self, **kwargs):
+    def post(self, **kwargs):
         incoming = json.loads(self.request.body)
         user_email = incoming["user_email"]
         user = User.get_or_insert_by_email(email=user_email)

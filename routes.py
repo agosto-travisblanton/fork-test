@@ -286,7 +286,6 @@ application = WSGIApplication(
         Route(
             r'/api/v1/users',
             handler='handlers.users_handler.UsersHandler',
-            handler_method='add_user_to_distributor',
             methods=['POST']
         ),
         Route(
