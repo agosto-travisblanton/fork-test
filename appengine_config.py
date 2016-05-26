@@ -15,8 +15,10 @@ from provisioning_env import (
     on_server,
     on_test_harness)
 from agar.env import appid
+from os import path
 import yaml
 
+basedir = path.abspath(path.dirname(__file__))
 
 ##############################################################################
 # APPLICATION SETTINGS
@@ -24,7 +26,6 @@ import yaml
 
 on_continuous_integration_server = on_server and appid.lower().endswith('-ci')
 on_qa_server = on_server and appid.lower().endswith('-qa')
-
 
 app_APP_ROOT = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
