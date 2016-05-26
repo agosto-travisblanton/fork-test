@@ -873,8 +873,8 @@ class User(ndb.Model):
 
     @property
     def distributors_as_admin(self):
-        distributor_users = DistributorUser.query(DistributorUser.user_key == self.key).fetch()
-        return [each.distributor_key.get() for each in distributor_users if each.is_distributor_administrator]
+        d = DistributorUser.query(DistributorUser.user_key == self.key).fetch()
+        return [each for each in d if each.is_distributor_administrator]
 
     @property
     def is_distributor_administrator(self):
@@ -954,10 +954,10 @@ class DistributorUser(ndb.Model):
 
     @property
     def is_distributor_administrator(self):
-        if self.user_key.get().is_administrator:
-            return True
-        else:
+        if self.role:
             return self.role.get().role == 1
+        else:
+            return False
 
     def _pre_put_hook(self):
         self.class_version = 1

@@ -4,7 +4,7 @@ from google.appengine.ext import ndb
 from decorators import requires_api_token, has_distributor_admin_user_key
 from strategy import DISTRIBUTOR_STRATEGY
 from agar.sessions import SessionRequestHandler
-from models import User, Distributor
+from models import User, Distributor, DistributorUser
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
 
@@ -12,14 +12,11 @@ from restler.serializers import json_response
 class UsersHandler(SessionRequestHandler, KeyValidatorMixin):
     @requires_api_token
     def get_list_by_user(self, user_urlsafe_key):
-        user = ndb.Key(urlsafe=user_urlsafe_key).get()
-
-        if not user.is_administrator:
-            distributors = user.distributors
-
-        else:
-            distributors = Distributor.query().fetch()
-
+        key = ndb.Key(urlsafe=user_urlsafe_key)
+        distributor_user_associations = DistributorUser.query(DistributorUser.user_key == key).fetch(100)
+        distributors = []
+        for distributor_user_association in distributor_user_associations:
+            distributors.append(distributor_user_association.distributor_key.get())
         json_response(self.response, distributors, strategy=DISTRIBUTOR_STRATEGY)
 
     @has_distributor_admin_user_key
