@@ -896,10 +896,10 @@ class User(ndb.Model):
             return True
         else:
             distributor_key = Distributor.find_by_name(name=distributor_name).key
-            d = DistributorUser.query(DistributorUser.user_key == self.key).filter(
+            distributor_user_pair = DistributorUser.query(DistributorUser.user_key == self.key).filter(
                 DistributorUser.distributor_key == distributor_key).fetch()
-            if d:
-                return d[0].is_distributor_administrator
+            if distributor_user_pair:
+                return distributor_user_pair[0].is_distributor_administrator
             else:
                 return False
 
