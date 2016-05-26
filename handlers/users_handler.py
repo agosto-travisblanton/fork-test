@@ -59,7 +59,7 @@ class UsersHandler(SessionRequestHandler, KeyValidatorMixin):
 
                 json_response(self.response, {
                     "success": True,
-                    "message": 'SUCCESS! ' + user.email + ' is linked to ' + distributor.name
+                    "message": 'SUCCESS! {0} is linked to {1}'.format(user.email, distributor.name)
                 })
 
             else:

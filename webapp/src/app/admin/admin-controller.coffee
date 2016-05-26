@@ -9,9 +9,8 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
     vm.loadingAllDistributors = true
     d = AdminService.getAllDistributors()
     d.then (data) ->
-      vm.loadedData = data.data
       vm.loadingAllDistributors = false
-      vm.allDistributors = (each.name for each in vm.loadedData)
+      vm.allDistributors = (each.name for each in data)
 
   vm.getAllDistributors()
   vm.isAdmin = SessionsService.getIsAdmin()
@@ -75,7 +74,7 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
     u = AdminService.getUsersOfDistributor(SessionsService.getCurrentDistributorKey())
     u.then (data) ->
       vm.loadingUsersOfDistributor = false
-      vm.usersOfDistributor = data.data
+      vm.usersOfDistributor = data
 
 
   vm.initialize = () ->

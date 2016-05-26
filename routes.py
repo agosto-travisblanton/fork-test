@@ -53,12 +53,6 @@ application = WSGIApplication(
               handler='handlers.identity_handler.IdentityHandler',
               name='identity'
               ),
-        Route(r'/api/v1/identity/add_user_to_distributor',
-              handler='handlers.identity_handler.IdentityHandler',
-              name='add_user_to_distributor',
-              handler_method="add_user_to_distributor",
-              methods=['POST']
-              ),
 
         Route(r'/login',
               handler='handlers.login_handler.LoginHandler',
