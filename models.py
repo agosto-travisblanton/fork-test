@@ -462,6 +462,7 @@ class Tenant(ndb.Model):
             tenant.proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
         else:
             tenant.proof_of_play_url = proof_of_play_url.strip().lower()
+        tenant.put()
 
     def _pre_put_hook(self):
         self.class_version = 1
@@ -581,6 +582,11 @@ class ChromeOsDevice(ndb.Model):
                        serial_number=None, archived=False,
                        model=None, timezone='America/Chicago'):
         timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
+        proof_of_play_editable = False
+        tenant = tenant_key.get()
+        if tenant:
+            if tenant.proof_of_play_logging:
+                proof_of_play_editable = True
         device = cls(
             device_id=device_id,
             archived=archived,
@@ -600,7 +606,8 @@ class ChromeOsDevice(ndb.Model):
             program_id='****initial****',
             heartbeat_interval_minutes=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES,
             timezone=timezone,
-            timezone_offset=timezone_offset)
+            timezone_offset=timezone_offset,
+            proof_of_play_editable = proof_of_play_editable)
         return device
 
     @classmethod
