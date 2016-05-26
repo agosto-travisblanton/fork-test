@@ -213,11 +213,14 @@ class TenantsHandler(RequestHandler):
         tenant.active = request_json.get('active')
         proof_of_play_logging = request_json.get('proof_of_play_logging')
         proof_of_play_url = request_json.get('proof_of_play_url')
-
-        Tenant.set_proof_of_play_options()
-        TenantsHandler.proof_of_play_options(proof_of_play_logging=proof_of_play_logging,
-                                             proof_of_play_url=proof_of_play_url,
-                                             tenant=tenant)
+        Tenant.set_proof_of_play_options(
+            tenant_code=tenant.tenant_code,
+            proof_of_play_logging=proof_of_play_logging,
+            proof_of_play_url=proof_of_play_url,
+            tenant_key=key)
+        # TenantsHandler.proof_of_play_options(proof_of_play_logging=proof_of_play_logging,
+        #                                      proof_of_play_url=proof_of_play_url,
+        #                                      tenant=tenant)
         try:
             domain_key = ndb.Key(urlsafe=domain_key_input)
         except Exception, e:
@@ -244,12 +247,12 @@ class TenantsHandler(RequestHandler):
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
 
-    @staticmethod
-    def proof_of_play_options(proof_of_play_logging, tenant, proof_of_play_url):
-        if proof_of_play_logging is not None:
-            tenant.proof_of_play_logging = proof_of_play_logging
-            Tenant.toggle_proof_of_play(tenant_code=tenant.tenant_code, should_be_enabled=tenant.proof_of_play_logging)
-        if proof_of_play_url is None or proof_of_play_url == '':
-            tenant.proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
-        else:
-            tenant.proof_of_play_url = proof_of_play_url.strip().lower()
+    # @staticmethod
+    # def proof_of_play_options(proof_of_play_logging, tenant, proof_of_play_url):
+    #     if proof_of_play_logging is not None:
+    #         tenant.proof_of_play_logging = proof_of_play_logging
+    #         Tenant.toggle_proof_of_play(tenant_code=tenant.tenant_code, should_be_enabled=tenant.proof_of_play_logging)
+    #     if proof_of_play_url is None or proof_of_play_url == '':
+    #         tenant.proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
+    #     else:
+    #         tenant.proof_of_play_url = proof_of_play_url.strip().lower()

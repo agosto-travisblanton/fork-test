@@ -1,9 +1,10 @@
+import logging
 import uuid
 
 from datetime import datetime
 from google.appengine.datastore.datastore_query import Cursor
 from google.appengine.ext import ndb
-import logging
+
 from app_config import config
 from restler.decorators import ae_ndb_serializer
 from utils.timezone_util import TimezoneUtil
@@ -432,8 +433,11 @@ class Tenant(ndb.Model):
                    default_timezone=default_timezone)
 
     @classmethod
-    def toggle_proof_of_play(cls, tenant_code, should_be_enabled):
-        tenant = Tenant.find_by_tenant_code(tenant_code)
+    def toggle_proof_of_play_on_tenant_devices(cls, should_be_enabled, tenant_code, tenant_key=None):
+        if tenant_key:
+            tenant = tenant_key.get()
+        else:
+            tenant = Tenant.find_by_tenant_code(tenant_code)
         managed_devices = Tenant.find_devices(tenant.key, unmanaged=False)
         for device in managed_devices:
             if not should_be_enabled:
@@ -441,7 +445,6 @@ class Tenant(ndb.Model):
             device.proof_of_play_editable = should_be_enabled
             device.put()
         tenant.proof_of_play_logging = should_be_enabled
-        tenant.put()
 
     @classmethod
     def set_proof_of_play_options(cls, tenant_code, proof_of_play_logging, proof_of_play_url, tenant_key=None):
@@ -451,9 +454,10 @@ class Tenant(ndb.Model):
             tenant = Tenant.find_by_tenant_code(tenant_code)
         if proof_of_play_logging is not None:
             tenant.proof_of_play_logging = proof_of_play_logging
-            Tenant.toggle_proof_of_play(tenant_code=tenant.tenant_code, should_be_enabled=tenant.proof_of_play_logging)
-
-
+            Tenant.toggle_proof_of_play_on_tenant_devices(
+                should_be_enabled=tenant.proof_of_play_logging,
+                tenant_code=tenant.tenant_code,
+                tenant_key=tenant_key)
         if proof_of_play_url is None or proof_of_play_url == '':
             tenant.proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
         else:

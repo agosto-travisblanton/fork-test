@@ -175,7 +175,7 @@ class TestTenantModel(BaseTest):
             device.proof_of_play_logging = True
             device.proof_of_play_editable = True
             device.put()
-        Tenant.toggle_proof_of_play(tenant_code=self.TENANT_CODE, should_be_enabled=False)
+        Tenant.toggle_proof_of_play_on_tenant_devices(tenant_code=self.TENANT_CODE, should_be_enabled=False)
         self.assertFalse(self.tenant.proof_of_play_logging)
         for device in devices:
             self.assertFalse(device.proof_of_play_logging)
@@ -190,7 +190,7 @@ class TestTenantModel(BaseTest):
             device.proof_of_play_logging = False
             device.proof_of_play_editable = False
             device.put()
-        Tenant.toggle_proof_of_play(tenant_code=self.TENANT_CODE, should_be_enabled=True)
+        Tenant.toggle_proof_of_play_on_tenant_devices(tenant_code=self.TENANT_CODE, should_be_enabled=True)
         self.assertTrue(self.tenant.proof_of_play_logging)
         for device in devices:
             self.assertFalse(device.proof_of_play_logging)
