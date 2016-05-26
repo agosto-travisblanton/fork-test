@@ -43,7 +43,7 @@ class ProvisioningBaseTest(BaseTest, WebTest, KeyValidatorMixin):
 
         return distributor
 
-    def create_user(self, email, distributor_name):
+    def create_user(self, email, distributor_name="a distributor"):
         distributor = self.create_distributor_if_unique(distributor_name)
 
         user = User.update_or_create_with_api_account(MockStormpathResponse(email))
