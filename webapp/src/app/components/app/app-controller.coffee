@@ -8,9 +8,9 @@ appModule.controller 'AppController', ($mdSidenav, $state, $window, SessionsServ
   vm.identity = {}
   
   vm.currentDistributerInDistributerAdminList = () ->
-  currentDistributorName = SessionsService.getCurrentDistributorName()
-  distributorsAsAdmin = SessionsService.getDistributorsAsAdmin()
-  _.contains(distributorsAsAdmin, currentDistributorName)
+    currentDistributorName = SessionsService.getCurrentDistributorName()
+    distributorsAsAdmin = SessionsService.getDistributorsAsAdmin()
+    _.contains(distributorsAsAdmin, currentDistributorName)
 
   vm.getIdentity = () ->
     vm.identity = {
@@ -22,8 +22,6 @@ appModule.controller 'AppController', ($mdSidenav, $state, $window, SessionsServ
       distributorKey: SessionsService.getCurrentDistributorKey()
       distributorName: SessionsService.getCurrentDistributorName()
     }
-    vm.identity  
-
 
   vm.isCurrentURLDistributorSelector = () ->
     test = $window.location.href.search /distributor_selection/
