@@ -32,7 +32,7 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
 
         if user:
             session_distributor = self.session.get('distributor')
-            distributors_as_admin = [a.distributor_key.get().name for a in user.distributors_as_admin]
+            distributors_as_admin = [each_distributor.name for each_distributor in user.distributors_as_admin]
             distributors = user.distributors
 
             if not session_distributor and len(distributors) == 1:

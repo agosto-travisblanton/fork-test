@@ -3,85 +3,21 @@ from env_setup import setup_test_paths
 setup_test_paths()
 
 import json
-from ae_test_data import build
-from utils.web_util import build_uri
-from agar.test import BaseTest, WebTest
 from webtest import AppError
-from models import Distributor, DISTRIBUTOR_ENTITY_GROUP_NAME, Domain, User, DistributorUser
+from models import Distributor
 from routes import application
-from provisioning_base_test import ProvisioningBaseTest
 from app_config import config
+from provisioning_distributor_user_base_test import ProvisioningDistributerUserBase
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>, Christopher Bartling <chris.bartling@agosto.com>'
 
 
-class TestDistributorsHandler(ProvisioningBaseTest):
-    APPLICATION = application
-    AGOSTO = 'Agosto'
-    TIERNEY_BROS = 'Tierney Bros'
-    INACTIVE_DISTRIBUTOR = 'Inactive Distributor'
-    FORBIDDEN = '403 Forbidden'
-    CHROME_DEVICE_DOMAIN_BOB = 'bob.agosto.com'
-    CHROME_DEVICE_DOMAIN_FOO = 'foo.agosto.com'
-    IMPERSONATION_EMAIL = 'admin@skykit.com'
-
+class TestDistributorsHandler(ProvisioningDistributerUserBase):
     def setUp(self):
         super(TestDistributorsHandler, self).setUp()
-        self.headers = {
-            'Authorization': config.API_TOKEN
-        }
-        self.bad_authorization_header = {
-            'Authorization': 'Forget about it!'
-        }
-        self.user = User(email="chris@mycompany.com")
-        self.user_key = self.user.put()
-        self.agosto = Distributor.create(name=self.AGOSTO,
-                                         active=True)
-        self.agosto_key = self.agosto.put()
-        self.tierney_bros = Distributor.create(name=self.TIERNEY_BROS,
-                                               active=True)
-        self.tierney_bros_key = self.tierney_bros.put()
-        self.inactive_distributor = Distributor.create(name=self.INACTIVE_DISTRIBUTOR,
-                                                       active=False)
-        self.inactive_distributor_key = self.inactive_distributor.put()
-
-        self.domain_bob = Domain.create(name=self.CHROME_DEVICE_DOMAIN_BOB,
-                                        distributor_key=self.agosto_key,
-                                        impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
-                                        active=True)
-        self.domain_bob.put()
-        self.domain_foo = Domain.create(name=self.CHROME_DEVICE_DOMAIN_FOO,
-                                        distributor_key=self.agosto_key,
-                                        impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
-                                        active=True)
-        self.domain_foo.put()
-        self.domain_inactive = Domain.create(name=self.CHROME_DEVICE_DOMAIN_BOB,
-                                             distributor_key=self.agosto_key,
-                                             impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
-                                             active=False)
-        self.domain_inactive.put()
-        self.default_distributor = self.agosto_key.get()
-
-        self.distributor_admin_user = self.create_distributor_admin(email='john.jones@demo.agosto.com',
-                                                                    distributor_name="distributor_admin_name")
-
-        self.admin_user = self.create_platform_admin(email='jim.bob@demo.agosto.com',
-                                                     distributor_name=self.default_distributor.name)
-
-        self.user = self.create_user(email='dwight.schrute@demo.agosto.com',
-                                     distributor_name=self.default_distributor.name)
-
-        self.login_url = build_uri('login')
-        self.logout_url = build_uri('logout')
-        self.identity_url = build_uri('identity')
-
-        for i in range(3):
-            distributor = build(Distributor)
-            distributor.name = "default_distro" + str(i)
-            distributor.put()
 
     ##################################################################################################################
-    ## get
+    # get
     ##################################################################################################################
     def test_get_by_key_returns_ok_status(self):
         request_parameters = {}
@@ -115,7 +51,7 @@ class TestDistributorsHandler(ProvisioningBaseTest):
         self.assertFalse(response_json.get('active'))
 
     ##################################################################################################################
-    ## get_list
+    # get_list
     ##################################################################################################################
     def test_get_list_returns_ok_status(self):
         request_parameters = {}
@@ -166,10 +102,9 @@ class TestDistributorsHandler(ProvisioningBaseTest):
         self.assertEqual(response_json[0].get('name'), self.INACTIVE_DISTRIBUTOR)
 
     ##################################################################################################################
-    ## get_list_by_user
+    # get_list_by_user
     ##################################################################################################################
     def test_get_list_by_user_returns_ok_status(self):
-        self._create_distributor_user_associations()
         request_parameters = {}
         uri = application.router.build(None, 'get-distributors-by-user', None, {
             'user_urlsafe_key': self.user_key.urlsafe()
@@ -178,7 +113,6 @@ class TestDistributorsHandler(ProvisioningBaseTest):
         self.assertOK(response)
 
     def test_get_list_returns_distributors_associated_to_user(self):
-        self._create_distributor_user_associations()
         request_parameters = {}
         uri = application.router.build(None, 'get-distributors-by-user', None, {
             'user_urlsafe_key': self.user_key.urlsafe()
@@ -191,8 +125,7 @@ class TestDistributorsHandler(ProvisioningBaseTest):
         self.assertEqual(response_json[1].get('name'), self.TIERNEY_BROS)
         self.assertTrue(response_json[1].get('active'))
 
-    def test_get_list_fails_with_bad_authorization_token(self):
-        self._create_distributor_user_associations()
+    def test_get_list_fails_with_bad_authorization_token_v2(self):
         request_parameters = {}
         uri = application.router.build(None, 'get-distributors-by-user', None, {
             'user_urlsafe_key': self.user_key.urlsafe()
@@ -202,7 +135,7 @@ class TestDistributorsHandler(ProvisioningBaseTest):
         self.assertTrue(self.FORBIDDEN in context.exception.message)
 
     ##################################################################################################################
-    ## put
+    # put
     ##################################################################################################################
     def test_put_returns_no_content_status(self):
         uri = application.router.build(None, 'manage-distributor', None, {'distributor_key': self.agosto_key.urlsafe()})
@@ -250,7 +183,7 @@ class TestDistributorsHandler(ProvisioningBaseTest):
         self.assertTrue(self.FORBIDDEN in context.exception.message)
 
     ##################################################################################################################
-    ## delete
+    # delete
     ##################################################################################################################
     def test_delete_returns_no_content_status(self):
         url_safe_distributor_key = self.tierney_bros_key.urlsafe()
@@ -284,7 +217,7 @@ class TestDistributorsHandler(ProvisioningBaseTest):
         self.assertTrue(self.FORBIDDEN in context.exception.message)
 
     ##################################################################################################################
-    ## get_domains
+    # get_domains
     ##################################################################################################################
 
     def test_get_domains_returns_ok_status(self):
@@ -329,12 +262,6 @@ class TestDistributorsHandler(ProvisioningBaseTest):
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 0)
 
-    def _create_distributor_user_associations(self):
-        distributor_user1 = DistributorUser.create(user_key=self.user_key, distributor_key=self.agosto_key)
-        distributor_user1.put()
-        distributor_user2 = DistributorUser.create(user_key=self.user_key, distributor_key=self.tierney_bros_key)
-        distributor_user2.put()
-
     ###########################################################################
     # MAKE DISTRIBUTOR
     ###########################################################################
@@ -371,22 +298,13 @@ class TestDistributorsHandler(ProvisioningBaseTest):
     ###########################################################################
     # MAKE DISTRIBUTOR
     ###########################################################################
-    def test_get_users_of_distributor(self):
-        self.create_user_of_distributor(self.user, self.agosto, role=1)
-        url = '/api/v1/analytics/distributors/{}/users'.format(self.agosto_key.urlsafe())
-        request = self.get(url, headers=self.headers)
-        request_json = json.loads(request.body)
-        self.assertEqual(200, request.status_int)
-        self.assertEqual(1, len(request_json))
-        self.assertEqual(self.user.email, request_json[0]["email"])
-
     def test_get_users_of_distributor_multiple(self):
         self.create_user_of_distributor(self.user, self.agosto, role=1)
-        self.create_user_of_distributor(self.admin_user, self.agosto, role=0)
+        self.create_user_of_distributor(self.admin_user, self.agosto)
         url = '/api/v1/analytics/distributors/{}/users'.format(self.agosto_key.urlsafe())
         request = self.get(url, headers=self.headers)
         request_json = json.loads(request.body)
         self.assertEqual(200, request.status_int)
-        self.assertEqual(2, len(request_json))
+        self.assertEqual(3, len(request_json))
         self.assertTrue(len([d for d in request_json if d["email"] == self.user.email]) == 1)
         self.assertTrue(len([d for d in request_json if d["email"] == self.admin_user.email]) == 1)
