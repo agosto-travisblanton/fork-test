@@ -119,7 +119,6 @@ class TestDistributorsHandler(ProvisioningDistributerUserBase):
         })
         response = self.app.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
-        print response_json
         self.assertEqual(len(response_json), 2)
         self.assertEqual(response_json[0].get('name'), self.AGOSTO)
         self.assertTrue(response_json[0].get('active'))
