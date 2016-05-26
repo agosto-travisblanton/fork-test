@@ -1101,7 +1101,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         in context.exception.message)
 
     ##################################################################################################################
-    ## get pairing code
+    # get pairing code
     ##################################################################################################################
 
     def test_get_get_pairing_code_returns_status_ok(self):
@@ -1931,7 +1931,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual('404 Device with key: {0} archived.'.format(device_key.urlsafe()), response.status)
 
     ##################################################################################################################
-    ## device issues
+    # device issues
     ##################################################################################################################
 
     def test_get_latest_issues_without_token_returns_forbidden(self):
