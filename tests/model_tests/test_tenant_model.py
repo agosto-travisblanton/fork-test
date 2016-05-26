@@ -166,36 +166,6 @@ class TestTenantModel(BaseTest):
         domain = self.tenant.get_domain()
         self.assertEqual(domain, self.domain)
 
-    def test_toggle_proof_of_play_off(self):
-        self.tenant.proof_of_play_logging = True
-        self.tenant.put()
-        self.assertTrue(self.tenant.proof_of_play_logging)
-        devices = Tenant.find_devices(self.tenant_key, unmanaged=False)
-        for device in devices:
-            device.proof_of_play_logging = True
-            device.proof_of_play_editable = True
-            device.put()
-        Tenant.toggle_proof_of_play(tenant_code=self.TENANT_CODE, should_be_enabled=False)
-        self.assertFalse(self.tenant.proof_of_play_logging)
-        for device in devices:
-            self.assertFalse(device.proof_of_play_logging)
-            self.assertFalse(device.proof_of_play_editable)
-
-    def test_toggle_proof_of_play_on(self):
-        self.tenant.proof_of_play_logging = False
-        self.tenant.put()
-        self.assertFalse(self.tenant.proof_of_play_logging)
-        devices = Tenant.find_devices(self.tenant_key, unmanaged=False)
-        for device in devices:
-            device.proof_of_play_logging = False
-            device.proof_of_play_editable = False
-            device.put()
-        Tenant.toggle_proof_of_play(tenant_code=self.TENANT_CODE, should_be_enabled=True)
-        self.assertTrue(self.tenant.proof_of_play_logging)
-        for device in devices:
-            self.assertFalse(device.proof_of_play_logging)
-            self.assertTrue(device.proof_of_play_editable)
-
     def test_match_device_with_full_mac(self):
         mac_address = '1231233434'
         device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
@@ -370,3 +340,154 @@ class TestTenantModel(BaseTest):
         self.assertLength(25, next_devices["objects"])
         self.assertTrue(next_devices["next_cursor"])
         self.assertTrue(next_devices["prev_cursor"])
+
+    ##################################################################################################################
+    # toggle_proof_of_play_on_tenant_devices
+    ##################################################################################################################
+
+    def test_toggle_proof_of_play_on_tenant_devices_with_key_toggle_off(self):
+        self.tenant.proof_of_play_logging = True
+        self.tenant.put()
+        self.assertTrue(self.tenant.proof_of_play_logging)
+        devices = Tenant.find_devices(self.tenant_key, unmanaged=False)
+        for device in devices:
+            device.proof_of_play_logging = True
+            device.proof_of_play_editable = True
+            device.put()
+        Tenant.toggle_proof_of_play_on_tenant_devices(
+            should_be_enabled=False,
+            tenant_code=self.TENANT_CODE,
+            tenant_key=self.tenant_key)
+        self.assertFalse(self.tenant.proof_of_play_logging)
+        for device in devices:
+            self.assertFalse(device.proof_of_play_logging)
+            self.assertFalse(device.proof_of_play_editable)
+
+    def test_toggle_proof_of_play_on_tenant_devices_without_key_toggle_off(self):
+        self.tenant.proof_of_play_logging = True
+        self.tenant.put()
+        self.assertTrue(self.tenant.proof_of_play_logging)
+        devices = Tenant.find_devices(self.tenant_key, unmanaged=False)
+        for device in devices:
+            device.proof_of_play_logging = True
+            device.proof_of_play_editable = True
+            device.put()
+        Tenant.toggle_proof_of_play_on_tenant_devices(
+            should_be_enabled=False,
+            tenant_code=self.TENANT_CODE)
+        self.assertFalse(self.tenant.proof_of_play_logging)
+        for device in devices:
+            self.assertFalse(device.proof_of_play_logging)
+            self.assertFalse(device.proof_of_play_editable)
+
+    def test_toggle_proof_of_play_on_tenant_devices_with_key_toggle_on(self):
+        self.tenant.proof_of_play_logging = False
+        self.tenant.put()
+        self.assertFalse(self.tenant.proof_of_play_logging)
+        devices = Tenant.find_devices(self.tenant_key, unmanaged=False)
+        for device in devices:
+            device.proof_of_play_logging = False
+            device.proof_of_play_editable = False
+            device.put()
+        Tenant.toggle_proof_of_play_on_tenant_devices(
+            should_be_enabled=True,
+            tenant_code=self.TENANT_CODE,
+            tenant_key=self.tenant_key)
+        self.assertTrue(self.tenant.proof_of_play_logging)
+        for device in devices:
+            self.assertFalse(device.proof_of_play_logging)
+            self.assertTrue(device.proof_of_play_editable)
+
+    def test_toggle_proof_of_play_on_tenant_devices_without_key_toggle_on(self):
+        self.tenant.proof_of_play_logging = False
+        self.tenant.put()
+        self.assertFalse(self.tenant.proof_of_play_logging)
+        devices = Tenant.find_devices(self.tenant_key, unmanaged=False)
+        for device in devices:
+            device.proof_of_play_logging = False
+            device.proof_of_play_editable = False
+            device.put()
+        Tenant.toggle_proof_of_play_on_tenant_devices(
+            should_be_enabled=True,
+            tenant_code=self.TENANT_CODE)
+        self.assertTrue(self.tenant.proof_of_play_logging)
+        for device in devices:
+            self.assertFalse(device.proof_of_play_logging)
+            self.assertTrue(device.proof_of_play_editable)
+
+    ##################################################################################################################
+    # set_proof_of_play_options
+    ##################################################################################################################
+
+    def set_proof_of_play_options(cls, tenant_code, proof_of_play_logging, proof_of_play_url, tenant_key=None):
+        if tenant_key:
+            tenant = tenant_key.get()
+        else:
+            tenant = Tenant.find_by_tenant_code(tenant_code)
+        if proof_of_play_logging is not None:
+            tenant.proof_of_play_logging = proof_of_play_logging
+            Tenant.toggle_proof_of_play_on_tenant_devices(
+                should_be_enabled=tenant.proof_of_play_logging,
+                tenant_code=tenant.tenant_code,
+                tenant_key=tenant_key)
+        if proof_of_play_url is None or proof_of_play_url == '':
+            tenant.proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
+        else:
+            tenant.proof_of_play_url = proof_of_play_url.strip().lower()
+
+    def test_set_proof_of_play_options_with_key_pop_on_url_none(self):
+        self.tenant.proof_of_play_logging = True
+        self.tenant.put()
+        self.assertTrue(self.tenant.proof_of_play_logging)
+        devices = Tenant.find_devices(self.tenant_key, unmanaged=False)
+        for device in devices:
+            device.proof_of_play_logging = False
+            device.proof_of_play_editable = False
+            device.put()
+        Tenant.set_proof_of_play_options(
+            tenant_code=self.TENANT_CODE,
+            proof_of_play_logging=True,
+            proof_of_play_url=None,
+            tenant_key=self.tenant_key)
+        self.assertEqual(self.tenant.proof_of_play_url, config.DEFAULT_PROOF_OF_PLAY_URL)
+        for device in devices:
+            self.assertFalse(device.proof_of_play_logging)
+            self.assertTrue(device.proof_of_play_editable)
+
+    def test_set_proof_of_play_options_with_key_pop_on_url_specified(self):
+        self.tenant.proof_of_play_logging = True
+        self.tenant.put()
+        self.assertTrue(self.tenant.proof_of_play_logging)
+        devices = Tenant.find_devices(self.tenant_key, unmanaged=False)
+        for device in devices:
+            device.proof_of_play_logging = False
+            device.proof_of_play_editable = False
+            device.put()
+        Tenant.set_proof_of_play_options(
+            tenant_code=self.TENANT_CODE,
+            proof_of_play_logging=True,
+            proof_of_play_url='http://www.FOO.com',
+            tenant_key=self.tenant_key)
+        self.assertEqual(self.tenant.proof_of_play_url, 'http://www.foo.com')
+        for device in devices:
+            self.assertFalse(device.proof_of_play_logging)
+            self.assertTrue(device.proof_of_play_editable)
+
+    def test_set_proof_of_play_options_with_key_pop_off_url_none(self):
+        self.tenant.proof_of_play_logging = False
+        self.tenant.put()
+        self.assertFalse(self.tenant.proof_of_play_logging)
+        devices = Tenant.find_devices(self.tenant_key, unmanaged=False)
+        for device in devices:
+            device.proof_of_play_logging = True
+            device.proof_of_play_editable = True
+            device.put()
+        Tenant.set_proof_of_play_options(
+            tenant_code=self.TENANT_CODE,
+            proof_of_play_logging=False,
+            proof_of_play_url=None,
+            tenant_key=self.tenant_key)
+        self.assertEqual(self.tenant.proof_of_play_url, config.DEFAULT_PROOF_OF_PLAY_URL)
+        for device in devices:
+            self.assertFalse(device.proof_of_play_logging)
+            self.assertFalse(device.proof_of_play_editable)
