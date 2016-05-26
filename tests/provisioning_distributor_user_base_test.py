@@ -11,10 +11,8 @@ from routes import application
 from provisioning_base_test import ProvisioningBaseTest
 from app_config import config
 
-__author__ = 'Bob MacNeal <bob.macneal@agosto.com>, Christopher Bartling <chris.bartling@agosto.com>'
 
-
-class TestDistributorsHandler(ProvisioningBaseTest):
+class ProvisioningDistributerUserBase(ProvisioningBaseTest):
     APPLICATION = application
     AGOSTO = 'Agosto'
     TIERNEY_BROS = 'Tierney Bros'
@@ -25,7 +23,7 @@ class TestDistributorsHandler(ProvisioningBaseTest):
     IMPERSONATION_EMAIL = 'admin@skykit.com'
 
     def setUp(self):
-        super(TestDistributorsHandler, self).setUp()
+        super(ProvisioningDistributerUserBase, self).setUp()
         self.headers = {
             'Authorization': config.API_TOKEN
         }
@@ -80,7 +78,7 @@ class TestDistributorsHandler(ProvisioningBaseTest):
             distributor.put()
 
     ##################################################################################################################
-    # get
+    ## get
     ##################################################################################################################
     def test_get_by_key_returns_ok_status(self):
         request_parameters = {}
@@ -114,7 +112,7 @@ class TestDistributorsHandler(ProvisioningBaseTest):
         self.assertFalse(response_json.get('active'))
 
     ##################################################################################################################
-    # get_list
+    ## get_list
     ##################################################################################################################
     def test_get_list_returns_ok_status(self):
         request_parameters = {}
@@ -165,7 +163,7 @@ class TestDistributorsHandler(ProvisioningBaseTest):
         self.assertEqual(response_json[0].get('name'), self.INACTIVE_DISTRIBUTOR)
 
     ##################################################################################################################
-    # get_list_by_user
+    ## get_list_by_user
     ##################################################################################################################
     def test_get_list_by_user_returns_ok_status(self):
         self._create_distributor_user_associations()
@@ -201,7 +199,7 @@ class TestDistributorsHandler(ProvisioningBaseTest):
         self.assertTrue(self.FORBIDDEN in context.exception.message)
 
     ##################################################################################################################
-    # put
+    ## put
     ##################################################################################################################
     def test_put_returns_no_content_status(self):
         uri = application.router.build(None, 'manage-distributor', None, {'distributor_key': self.agosto_key.urlsafe()})
@@ -249,7 +247,7 @@ class TestDistributorsHandler(ProvisioningBaseTest):
         self.assertTrue(self.FORBIDDEN in context.exception.message)
 
     ##################################################################################################################
-    # delete
+    ## delete
     ##################################################################################################################
     def test_delete_returns_no_content_status(self):
         url_safe_distributor_key = self.tierney_bros_key.urlsafe()
@@ -283,7 +281,7 @@ class TestDistributorsHandler(ProvisioningBaseTest):
         self.assertTrue(self.FORBIDDEN in context.exception.message)
 
     ##################################################################################################################
-    # get_domains
+    ## get_domains
     ##################################################################################################################
 
     def test_get_domains_returns_ok_status(self):
