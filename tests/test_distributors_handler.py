@@ -2,16 +2,19 @@ from env_setup import setup_test_paths
 setup_test_paths()
 
 import json
+from ae_test_data import build
+from utils.web_util import build_uri
 from agar.test import BaseTest, WebTest
 from webtest import AppError
 from models import Distributor, DISTRIBUTOR_ENTITY_GROUP_NAME, Domain, User, DistributorUser
 from routes import application
+from provisioning_base_test import ProvisioningBaseTest
 from app_config import config
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>, Christopher Bartling <chris.bartling@agosto.com>'
 
 
-class TestDistributorsHandler(BaseTest, WebTest):
+class TestDistributorsHandler(ProvisioningBaseTest):
     APPLICATION = application
     AGOSTO = 'Agosto'
     TIERNEY_BROS = 'Tierney Bros'
@@ -56,6 +59,22 @@ class TestDistributorsHandler(BaseTest, WebTest):
                                              impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                              active=False)
         self.domain_inactive.put()
+        self.default_distributor_name = "my_distributor"
+        self.distributor_admin_user = self.create_distributor_admin(email='john.jones@demo.agosto.com',
+                                                                    distributor_name="distributor_admin_name")
+        self.admin_user = self.create_platform_admin(email='jim.bob@demo.agosto.com',
+                                                     distributor_name=self.default_distributor_name)
+        self.user = self.create_user(email='dwight.schrute@demo.agosto.com',
+                                     distributor_name=self.default_distributor_name)
+
+        self.login_url = build_uri('login')
+        self.logout_url = build_uri('logout')
+        self.identity_url = build_uri('identity')
+
+        for i in range(3):
+            distributor = build(Distributor)
+            distributor.name = "default_distro" + str(i)
+            distributor.put()
 
     ##################################################################################################################
     ## get
@@ -178,81 +197,6 @@ class TestDistributorsHandler(BaseTest, WebTest):
             self.app.get(uri, params=request_parameters, headers=self.bad_authorization_header)
         self.assertTrue(self.FORBIDDEN in context.exception.message)
 
-
-    ##################################################################################################################
-    ## post
-    ##################################################################################################################
-    def test_post_returns_created_status(self):
-        name = u'Acme'
-        request_parameters = {'name': name,
-                              'active': True}
-        uri = application.router.build(None, 'distributor-creator', None, {})
-        response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
-        self.assertEqual('201 Created', response.status)
-
-    def test_post_create_new_distributor_persists_object(self):
-        name = u'Acme'
-        request_parameters = {'name': name,
-                              'active': True}
-        uri = application.router.build(None, 'distributor-creator', None, {})
-        self.app.post_json(uri, params=request_parameters, headers=self.headers)
-        actual = Distributor.find_by_name(request_parameters['name'])
-        self.assertIsNotNone(actual)
-
-    def test_post_create_new_distributor_persists_object_with_string_boolean(self):
-        name = u'Acme'
-        request_parameters = {'name': name,
-                              'active': "true"}
-        uri = application.router.build(None, 'distributor-creator', None, {})
-        self.app.post_json(uri, params=request_parameters, headers=self.headers)
-        actual = Distributor.find_by_name(request_parameters['name'])
-        self.assertIsNotNone(actual)
-
-    def test_post_fails_without_bogus_active_parameter(self):
-        request_body = {'name': 'Acme',
-                        'active': 'bogus'}
-        with self.assertRaises(AppError) as context:
-            self.app.post('/api/v1/distributors', json.dumps(request_body), headers=self.headers)
-        self.assertTrue('Bad response: 400 The active parameter is invalid'
-                        in context.exception.message)
-
-    def test_post_fails_without_name_parameter(self):
-        request_body = {'name': '',
-                        'active': True}
-        with self.assertRaises(AppError) as context:
-            self.app.post('/api/v1/distributors', json.dumps(request_body), headers=self.headers)
-        self.assertTrue('Bad response: 400 The name parameter is invalid'
-                        in context.exception.message)
-
-    def test_post_create_new_distributor_sets_location_header(self):
-        name = u'Acme'
-        request_parameters = {'name': name,
-                              'active': True}
-        uri = application.router.build(None, 'distributor-creator', None, {})
-        response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
-        actual = Distributor.find_by_name(request_parameters['name'])
-        distributor_uri = application.router.build(None,
-                                                   'manage-distributor',
-                                                   None,
-                                                   {'distributor_key': actual.key.urlsafe()})
-        self.assertTrue(distributor_uri in response.headers.get('Location'))
-
-    def test_post_create_object_has_expected_parent(self):
-        name = u'Acme'
-        request_parameters = {'name': name,
-                              'active': True}
-        uri = application.router.build(None, 'distributor-creator', None, {})
-        self.app.post_json(uri, params=request_parameters, headers=self.headers)
-        actual = Distributor.find_by_name(request_parameters['name'])
-        parent = actual.key.parent().get()
-        self.assertEqual(parent.name, DISTRIBUTOR_ENTITY_GROUP_NAME)
-
-    def test_post_fails_with_bad_authorization_token(self):
-        request_parameters = {}
-        uri = application.router.build(None, 'distributor-creator', None, {})
-        with self.assertRaises(AppError) as context:
-            self.app.post_json(uri, params=request_parameters, headers=self.bad_authorization_header)
-        self.assertTrue(self.FORBIDDEN in context.exception.message)
 
     ##################################################################################################################
     ## put
@@ -384,7 +328,40 @@ class TestDistributorsHandler(BaseTest, WebTest):
 
 
     def _create_distributor_user_associations(self):
-        distributor_user1 = DistributorUser(user_key=self.user_key, distributor_key=self.agosto_key)
+        distributor_user1 = DistributorUser.create(user_key=self.user_key, distributor_key=self.agosto_key)
         distributor_user1.put()
-        distributor_user2 = DistributorUser(user_key=self.user_key, distributor_key=self.tierney_bros_key)
+        distributor_user2 = DistributorUser.create(user_key=self.user_key, distributor_key=self.tierney_bros_key)
         distributor_user2.put()
+
+    ###########################################################################
+    # MAKE DISTRIBUTOR
+    ###########################################################################
+    def test_create_new_distributor_as_admin(self):
+        distro_to_add = "new"
+        r = self.post('/api/v1/distributors', json.dumps({
+            "admin_email": self.user.email,
+            "distributor": distro_to_add,
+        }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
+
+        self.assertEqual(200, r.status_int)
+        self.assertTrue(json.loads(r.body)["success"])
+        self.assertFalse(Distributor.is_unique(distro_to_add))
+
+    def test_create_same_distributor_as_admin(self):
+        self.test_create_new_distributor_as_admin()
+        distro_to_add = "new"
+        r = self.post('/api/v1/distributors', json.dumps({
+            "admin_email": self.user.email,
+            "distributor": distro_to_add,
+        }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
+
+        self.assertEqual(409, r.status_int)
+
+    def test_create_new_distributor_as_distributor_admin(self):
+        distro_to_add = "new"
+        r = self.post('/api/v1/distributors', json.dumps({
+            "admin_email": self.user.email,
+            "distributor": distro_to_add,
+        }), headers={"X-Provisioning-User": self.distributor_admin_user.key.urlsafe()})
+
+        self.assertEqual(403, r.status_int)
