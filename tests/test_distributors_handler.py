@@ -7,12 +7,12 @@ from webtest import AppError
 from models import Distributor
 from routes import application
 from app_config import config
-from provisioning_distributor_user_base_test import ProvisioningDistributerUserBase
+from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>, Christopher Bartling <chris.bartling@agosto.com>'
 
 
-class TestDistributorsHandler(ProvisioningDistributerUserBase):
+class TestDistributorsHandler(ProvisioningDistributorUserBase):
     def setUp(self):
         super(TestDistributorsHandler, self).setUp()
 
@@ -67,7 +67,7 @@ class TestDistributorsHandler(ProvisioningDistributerUserBase):
         self.assertEqual(len(response_json), 2)
         self.assertEqual(response_json[0].get('name'), self.AGOSTO)
         self.assertTrue(response_json[0].get('active'))
-        self.assertEqual(response_json[1].get('name'), self.TIERNEY_BROS)
+        self.assertEqual(response_json[1].get('name'), self.DISTRIBUTOR)
         self.assertTrue(response_json[1].get('active'))
 
     def test_get_list_fails_with_bad_authorization_token(self):
@@ -86,12 +86,12 @@ class TestDistributorsHandler(ProvisioningDistributerUserBase):
         self.assertEqual(response_json[0].get('name'), self.AGOSTO)
 
     def test_get_list_by_name_returns_tierney(self):
-        request_parameters = {'distributorName': self.TIERNEY_BROS}
+        request_parameters = {'distributorName': self.DISTRIBUTOR}
         uri = application.router.build(None, 'distributors', None, {})
         response = self.app.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 1)
-        self.assertEqual(response_json[0].get('name'), self.TIERNEY_BROS)
+        self.assertEqual(response_json[0].get('name'), self.DISTRIBUTOR)
 
     def test_get_list_by_name_returns_inactive(self):
         request_parameters = {'distributorName': self.INACTIVE_DISTRIBUTOR}
@@ -122,7 +122,7 @@ class TestDistributorsHandler(ProvisioningDistributerUserBase):
         self.assertEqual(len(response_json), 2)
         self.assertEqual(response_json[0].get('name'), self.AGOSTO)
         self.assertTrue(response_json[0].get('active'))
-        self.assertEqual(response_json[1].get('name'), self.TIERNEY_BROS)
+        self.assertEqual(response_json[1].get('name'), self.DISTRIBUTOR)
         self.assertTrue(response_json[1].get('active'))
 
     def test_get_list_fails_with_bad_authorization_token_v2(self):
@@ -186,14 +186,14 @@ class TestDistributorsHandler(ProvisioningDistributerUserBase):
     # delete
     ##################################################################################################################
     def test_delete_returns_no_content_status(self):
-        url_safe_distributor_key = self.tierney_bros_key.urlsafe()
+        url_safe_distributor_key = self.distributor_key.urlsafe()
         uri = application.router.build(None, 'manage-distributor', None,
                                        {'distributor_key': url_safe_distributor_key})
         response = self.app.delete(uri, headers=self.headers)
         self.assertEqual(204, response.status_int)
 
     def test_delete_soft_deletes_distributor(self):
-        url_safe_distributor_key = self.tierney_bros_key.urlsafe()
+        url_safe_distributor_key = self.distributor_key.urlsafe()
         request_parameters = {}
         uri = application.router.build(None, 'manage-distributor', None, {'distributor_key': url_safe_distributor_key})
         response = self.app.get(uri, params=request_parameters, headers=self.headers)
@@ -209,7 +209,7 @@ class TestDistributorsHandler(ProvisioningDistributerUserBase):
         self.assertEqual(response_json.get('active'), False)
 
     def test_delete_fails_with_bad_authorization_token(self):
-        url_safe_distributor_key = self.tierney_bros_key.urlsafe()
+        url_safe_distributor_key = self.distributor_key.urlsafe()
         uri = application.router.build(None, 'manage-distributor', None,
                                        {'distributor_key': url_safe_distributor_key})
         with self.assertRaises(AppError) as context:
@@ -249,7 +249,7 @@ class TestDistributorsHandler(ProvisioningDistributerUserBase):
     def test_get_domains_returns_no_domains_associated_with_tierney_bros(self):
         request_parameters = {}
         uri = application.router.build(None, 'distributor-domains', None,
-                                       {'distributor_key': self.tierney_bros_key.urlsafe()})
+                                       {'distributor_key': self.distributor_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 0)

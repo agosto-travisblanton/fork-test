@@ -12,7 +12,7 @@ from app_config import config
 class ProvisioningDistributorUserBase(ProvisioningBaseTest):
     APPLICATION = application
     AGOSTO = 'agosto'
-    TIERNEY_BROS = 'Tierney Bros'
+    DISTRIBUTOR = 'Distributor'
     INACTIVE_DISTRIBUTOR = 'Inactive Distributor'
     FORBIDDEN = '403 Forbidden'
     CHROME_DEVICE_DOMAIN_BOB = 'bob.agosto.com'
@@ -43,10 +43,10 @@ class ProvisioningDistributorUserBase(ProvisioningBaseTest):
         self.agosto = Distributor.find_by_name(name=self.default_distributor_name)
         self.agosto_key = self.agosto.key
 
-        self.tierney_bros = Distributor.create(name=self.TIERNEY_BROS)
-        self.tierney_bros_key = self.tierney_bros.put()
+        self.distributor = Distributor.create(name=self.DISTRIBUTOR)
+        self.distributor_key = self.distributor.put()
 
-        self.user.add_distributor(self.tierney_bros_key)
+        self.user.add_distributor(self.distributor_key)
 
         self.inactive_distributor = Distributor.create(name=self.INACTIVE_DISTRIBUTOR, active=False)
         self.inactive_distributor_key = self.inactive_distributor.put()
