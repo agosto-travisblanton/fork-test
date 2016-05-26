@@ -521,14 +521,20 @@ proofplay_DAYS_TO_KEEP_RAW_EVENTS = 30
 ##############################################################################
 # VERSION  sprint_number.deployment_increment.hotfix_increment e.g., 33.3.0
 ##############################################################################
+def as_int(x):
+    try:
+        return int(x)
+    except:
+        return None
+
 def _return_yaml_data():
     with open(os.path.join(basedir, 'snapdeploy.yaml'), 'r') as f:
         data = yaml.load(f.read())["version"]
         array_of_versions = data.split('-')
-        array_of_versions_as_int = [int(each) for each in array_of_versions]
-        return array_of_versions_as_int[0], array_of_versions_as_int[1], array_of_versions_as_int[2]
+        array_of_versions_as_int = [as_int(each) for each in array_of_versions]
+        return array_of_versions_as_int 
 
 snapdeploy_yaml_data = _return_yaml_data()
-app_SPRINT_NUMBER = snapdeploy_yaml_data[0]
-app_DEPLOYMENT_COUNTER = snapdeploy_yaml_data[1]
-app_PRODUCTION_HOTFIX_COUNTER = snapdeploy_yaml_data[2]
+app_SPRINT_NUMBER = snapdeploy_yaml_data[0] if len(snapdeploy_yaml_data) > 0 else None
+app_DEPLOYMENT_COUNTER = snapdeploy_yaml_data[1] if len(snapdeploy_yaml_data) > 1 else None
+app_PRODUCTION_HOTFIX_COUNTER = snapdeploy_yaml_data[2] if len(snapdeploy_yaml_data) > 2 else None
