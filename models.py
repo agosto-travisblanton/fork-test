@@ -865,31 +865,43 @@ class User(ndb.Model):
     def distributor_keys(self):
         dist_user_keys = DistributorUser.query(DistributorUser.user_key == self.key).fetch(keys_only=True)
         dist_users = ndb.get_multi(dist_user_keys)
-        return [du.distributor_key for du in dist_users]
+        return [each.distributor_key for each in dist_users]
 
     @property
     def distributors(self):
-        return ndb.get_multi(self.distributor_keys)
+        if user.is_administrator:
+            return Distributor.query().fetch()
+        else:
+            return ndb.get_multi(self.distributor_keys)
 
     @property
     def distributors_as_admin(self):
-        distributor_users = DistributorUser.query(DistributorUser.user_key == self.key).fetch()
-        return [each.distributor_key.get() for each in distributor_users if each.is_distributor_administrator]
+        if user.is_administrator:
+            return Distributor.query().fetch()
+        else:
+            distributor_users = DistributorUser.query(DistributorUser.user_key == self.key).fetch()
+            return [each.distributor_key.get() for each in distributor_users if each.is_distributor_administrator]
 
     @property
     def is_distributor_administrator(self):
-        role = UserRole.create_or_get_user_role(1)
-        return DistributorUser.query(DistributorUser.user_key == self.key).filter(
-            DistributorUser.role == role.key).count() > 0
+        if user.is_administrator:
+            return True
+        else:
+            role = UserRole.create_or_get_user_role(1)
+            return DistributorUser.query(DistributorUser.user_key == self.key).filter(
+                DistributorUser.role == role.key).count() > 0
 
     def is_distributor_administrator_of_distributor(self, distributor_name):
-        distributor_key = Distributor.find_by_name(name=distributor_name).key
-        d = DistributorUser.query(DistributorUser.user_key == self.key).filter(
-            DistributorUser.distributor_key == distributor_key).fetch()
-        if d:
-            return d[0].is_distributor_administrator
+        if user.is_administrator:
+            return True
         else:
-            return False
+            distributor_key = Distributor.find_by_name(name=distributor_name).key
+            d = DistributorUser.query(DistributorUser.user_key == self.key).filter(
+                DistributorUser.distributor_key == distributor_key).fetch()
+            if d:
+                return d[0].is_distributor_administrator
+            else:
+                return False
 
     def add_distributor(self, distributor_key, role=0):
         if distributor_key not in self.distributor_keys:
