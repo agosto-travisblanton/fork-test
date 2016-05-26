@@ -39,6 +39,7 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
     DevicesService.deviceCache.removeAll()
     vm.getUnmanagedDevices(vm.distributorKey, vm.unmanagedDevicesPrev, vm.unmanagedDevicesNext)
 
+
   vm.changeRadio = (unmanaged) ->
     if unmanaged
       vm.unmanagedSearchText = ''
@@ -53,14 +54,14 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
       vm.macDevices = {}
 
   vm.convertArrayToDictionary = (theArray, mac) ->
-    devices = {}
+    Devices = {}
     for item in theArray
       if mac
-        devices[item.mac] = item
+        Devices[item.mac] = item
       else
-        devices[item.serial] = item
+        Devices[item.serial] = item
 
-    return devices
+    return Devices
 
   vm.prepareForEditView = (unmanaged, searchText) ->
     if unmanaged

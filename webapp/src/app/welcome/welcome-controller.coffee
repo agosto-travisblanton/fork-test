@@ -20,6 +20,11 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, DistributorsServic
   vm.changeDistributor = () ->
     $state.go 'distributor_selection'
 
+  vm.setIdentity = () ->
+    vm.identity.first_name = vm.capitalizeFirstLetter(vm.identity.email.split("vm.")[0].split(".")[0])
+    vm.identity.last_name = vm.capitalizeFirstLetter(vm.identity.email.split("vm.")[0].split(".")[1])
+    vm.identity.full_name = vm.identity.first_name + " " + vm.identity.last_name
+
   vm.getVersion = () ->
     promise = VersionsService.getVersions()
     promise.then (data) ->
@@ -39,5 +44,6 @@ appModule.controller "WelcomeCtrl", (VersionsService, $state, DistributorsServic
       $state.go "sign_in"
 
     else
+      vm.setIdentity()
       vm.getVersion()
   vm

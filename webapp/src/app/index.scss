@@ -508,6 +508,18 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
 
 .admin-container {
   display: flex;
-  flex-direction: row;
+  align-content: flex-start;
 }
 
+
+//.distributor-selection {
+//  font-size: 20pt;
+//  border: solid 1px #c9c9c9;
+//  padding: 6px;
+//  margin: 3px;
+//}
+//
+//.distributor-selection:hover {
+//  background-color: #00b3ee;
+//  cursor: pointer;
+//}
