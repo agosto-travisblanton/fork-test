@@ -39,6 +39,7 @@ def distributor_required(handler_method):
 
     return distributor
 
+
 def log_memory(function):
     """
     Decorator that prints memory usage of a function before and after it runs to logging.debug.
@@ -94,6 +95,7 @@ def has_distributor_admin_user_key(handler_method):
         json_response(self.response, {'error': 'You do not have the required permissions.'}, status_code=403)
 
     return authorize
+
 
 def has_admin_user_key(handler_method):
     def authorize(self, *args, **kwargs):

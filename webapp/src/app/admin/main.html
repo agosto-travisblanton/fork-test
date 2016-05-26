@@ -1,117 +1,121 @@
-<md-toolbar class="md-hue-2">
-  <div class="md-toolbar-tools">
-    <h2 class="md-flex"><i class="fa fa-fw fa-lock ng-scope"></i> Admin ({{vm.currentDistributorName}})</h2>
-  </div>
-</md-toolbar>
-<md-content layout-padding class="admin-container">
-  <div flex-xs flex-gt-xs="30">
-    <md-card>
-      <md-card-title>
-        <md-card-title-text>
-          <span class="md-headline">Create a User</span>
-        </md-card-title-text>
-      </md-card-title>
-      <md-card-content>
-        <form name="userForm"
-              ng-submit="vm.addUserToDistributor($event, vm.user, vm.user.cb1)"
-              novalidate>
-          <md-input-container class="md-block">
-            <label>Email</label>
-            <input ng-model="vm.user.email" type="email">
-          </md-input-container>
-          <md-input-container>
+<div ng-init="vm.initialize()">
+  <md-toolbar class="md-hue-2">
+    <div class="md-toolbar-tools">
+      <h2 class="md-flex"><i class="fa fa-fw fa-lock ng-scope"></i> Admin </h2>
+    </div>
+  </md-toolbar>
+  <md-content layout-padding class="admin-container">
+    <div flex-xs flex-gt-xs="30">
+      <md-card>
+        <md-card-title>
+          <md-card-title-text>
+            <span class="md-headline">Create a User</span>
+          </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+          <form name="userForm"
+                ng-submit="vm.addUserToDistributor($event, vm.user, vm.user.cb1, vm.user.distributor, userForm)"
+                novalidate>
+            <md-input-container class="md-block">
+              <label>Email</label>
+              <input ng-model="vm.user.email" type="email" required>
+            </md-input-container>
+            <md-input-container>
+              <md-checkbox ng-model="vm.user.cb1" aria-label="Distributor Admin">
+                Distributor Admin
+              </md-checkbox>
+            </md-input-container>
+            <md-input-container class="md-block">
+            <md-select ng-model="vm.user.distributor" required aria-label="distribuor select">
 
-            <md-checkbox ng-model="vm.user.cb1" aria-label="Distributor Admin">
-              Distributor Admin
-            </md-checkbox>
-          </md-input-container>
+              <div ng-if="vm.isAdmin">
+                <label>Distributer</label>
+                <md-option ng-repeat="distributor in vm.allDistributors" value="{{distributor}}">{{distributor}}</md-option>
+              </div>
+              <div ng-if="!vm.isAdmin">
+                <label>Distributer</label>
+                <md-option ng-repeat="distributor in vm.distributorsAsAdmin" value="{{distributor}}">{{distributor}}</md-option>
+              </div>
+            </md-select>
+              </md-input-container>
+            <md-card-actions layout="row" layout-align="end center">
 
-          <md-card-actions layout="row" layout-align="end center">
+              <md-button class="md-raised" type="submit"
+                         ng-disabled="userForm.$pristine || userForm.$invalid">
+                Submit
+              </md-button>
+            </md-card-actions>
+          </form>
+        </md-card-content>
+      </md-card>
+    </div>
+    <div ng-if="vm.isAdmin" flex-xs flex-gt-xs="30">
+      <md-card>
+        <md-card-title>
+          <md-card-title-text>
+            <span class="md-headline">Create a Distributor</span>
+          </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+          <form name="distributorForm"
+                ng-submit="vm.makeDistributor($event, vm.distributor.name, vm.distributor.adminEmail, distributorForm)"
+                novalidate>
+            <md-input-container class="md-block">
+              <label>Admin Email</label>
+              <input ng-model="vm.distributor.adminEmail" type="email" required>
+            </md-input-container>
 
-            <md-button class="md-raised" type="submit"
-                       ng-disabled="userForm.$pristine || userForm.$invalid">
-              Submit
-            </md-button>
-          </md-card-actions>
-        </form>
-      </md-card-content>
-    </md-card>
-  </div>
-  <div ng-if="vm.isAdmin" flex-xs flex-gt-xs="30">
-    <md-card>
-      <md-card-title>
-        <md-card-title-text>
-          <span class="md-headline">Create a Distributor</span>
-        </md-card-title-text>
-      </md-card-title>
-      <md-card-content>
-        <form name="distributorForm"
-              ng-submit="vm.makeDistributor($event, vm.distributor.name, vm.distributor.adminEmail)"
-              novalidate>
+            <md-input-container class="md-block">
+              <label>Name</label>
+              <input ng-model="vm.distributor.name" type="text" ng-minlength="3" required>
+            </md-input-container>
 
-          <md-input-container class="md-block">
-            <label>Admin Email</label>
-            <input ng-model="vm.distributor.adminEmail" type="email" required>
-          </md-input-container>
+            <md-card-actions layout="row" layout-align="end center">
+              <md-button class="md-raised" type="submit"
+                         ng-disabled="distributorForm.$pristine || distributorForm.$invalid">
+                Submit
+              </md-button>
+            </md-card-actions>
+          </form>
+        </md-card-content>
+      </md-card>
+    </div>
+    <div flex-xs flex-gt-xs="30" ng-if="vm.isAdmin">
+      <md-card>
+        <md-card-title>
+          <md-card-title-text>
+            <span class="md-headline">All Distributors</span>
+          </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
 
-          <md-input-container class="md-block">
-            <label>Name</label>
-            <input ng-model="vm.distributor.name" type="text" ng-minlength="3" required>
-          </md-input-container>
+          <md-list ng-if="!vm.loadingAllDistributors">
+            <md-list-item ng-repeat="item in vm.allDistributors | orderBy:'item' track by $index">
+              <p>{{$index + 1}}. {{ item }}</p>
 
-          <md-card-actions layout="row" layout-align="end center">
-            <md-button class="md-raised" type="submit"
-                       ng-disabled="distributorForm.$pristine || distributorForm.$invalid">
-              Submit
-            </md-button>
-          </md-card-actions>
+            </md-list-item>
+          </md-list>
+          <h5 ng-if="vm.loadingAllDistributors">Loading...</h5>
+        </md-card-content>
+      </md-card>
+    </div>
+    <div flex-xs flex-gt-xs="30">
+      <md-card>
+        <md-card-title>
+          <md-card-title-text>
+            <span class="md-headline">{{vm.currentDistributorName}} Users</span>
+          </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+          <md-list ng-if="!vm.loadingUsersOfDistributor">
+            <md-list-item ng-repeat="item in vm.usersOfDistributor | orderBy:'item' track by $index">
+              <p>{{$index + 1}}. {{ item.email }}</p>
 
-        </form>
-      </md-card-content>
-    </md-card>
-  </div>
-  <div flex-xs flex-gt-xs="30" ng-if="vm.isAdmin">
-    <md-card>
-      <md-card-title>
-        <md-card-title-text>
-          <span class="md-headline">All Distributors</span>
-        </md-card-title-text>
-      </md-card-title>
-      <md-card-content>
-
-        <md-list ng-if="!vm.loadingAllDistributors">
-          <md-list-item ng-repeat="item in vm.allDistributors | orderBy:'item' track by $index">
-            <p>{{$index + 1}}. {{ item }}</p>
-            <md-divider></md-divider>
-          </md-list-item>
-        </md-list>
-        <h5 ng-if="vm.loadingAllDistributors">Loading...</h5>
-
-      </md-card-content>
-    </md-card>
-  </div>
-
-  <div flex-xs flex-gt-xs="30">
-    <md-card>
-      <md-card-title>
-        <md-card-title-text>
-          <span class="md-headline">{{vm.currentDistributorName}} Users</span>
-        </md-card-title-text>
-      </md-card-title>
-      <md-card-content>
-
-        <md-list ng-if="!vm.loadingUsersOfDistributor">
-          <md-list-item ng-repeat="item in vm.usersOfDistributor | orderBy:'item' track by $index">
-            <p>{{$index + 1}}. {{ item.email }}</p>
-            <md-divider></md-divider>
-          </md-list-item>
-        </md-list>
-        <h5 ng-if="vm.loadingUsersOfDistributor">Loading...</h5>
-
-      </md-card-content>
-    </md-card>
-
-
-  </div>
-
-</md-content>
+            </md-list-item>
+          </md-list>
+          <h5 ng-if="vm.loadingUsersOfDistributor">Loading...</h5>
+        </md-card-content>
+      </md-card>
+    </div>
+  </md-content>
+</div>

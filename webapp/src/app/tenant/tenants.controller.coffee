@@ -4,6 +4,7 @@ appModule = angular.module 'skykitProvisioning'
 
 appModule.controller "TenantsCtrl", ($state, $log, TenantsService, ProgressBarService, sweet) ->
   vm = @
+  
   vm.tenants = []
 
   vm.getTenants = (page_size, offset) ->
