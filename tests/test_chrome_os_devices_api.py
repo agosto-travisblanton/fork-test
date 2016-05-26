@@ -59,7 +59,6 @@ class TestChromeOsDevicesApi(BaseTest):
                                           org_unit_path='/Not/used')
 
     # TODO: These tests run locally, but not on Codeship CI.
-
     # def test_update_org_unit_path(self):
     #     org_unit_path_changing_to = self.ORG_UNIT_DEPLOYED
     #     if self._find_by_device_id_and_org_unit(self.TESTING_DEVICE_ID, self.ORG_UNIT_DEPLOYED):

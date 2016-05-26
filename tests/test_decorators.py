@@ -19,7 +19,7 @@ class TestDecorators(BaseTest, WebTest):
         pass
 
     ##################################################################################################################
-    ## @requires_api_token on GET
+    # @requires_api_token on GET
     ##################################################################################################################
 
     def testApiTokenRequired_AuthorizationSuccessful(self):
@@ -51,7 +51,7 @@ class TestDecorators(BaseTest, WebTest):
         self.assertTrue('403 Forbidden' in cm.exception.message)
 
     ##################################################################################################################
-    ## @requires_registration_token on POST
+    # @requires_registration_token on POST
     ##################################################################################################################
 
     def testRequiresRegistrationToken_Unmanaged_AuthorizationSuccessful(self):
@@ -69,7 +69,7 @@ class TestDecorators(BaseTest, WebTest):
         self.assertOK(response)
 
     ##################################################################################################################
-    ## @requires_unmanaged_registration_token on PUT
+    # @requires_unmanaged_registration_token on PUT
     ##################################################################################################################
 
     def testRequiresUnmanagedRegistrationTokenOnly_AuthorizationSuccessful(self):
