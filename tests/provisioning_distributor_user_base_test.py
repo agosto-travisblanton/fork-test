@@ -9,7 +9,7 @@ from provisioning_base_test import ProvisioningBaseTest
 from app_config import config
 
 
-class ProvisioningDistributerUserBase(ProvisioningBaseTest):
+class ProvisioningDistributorUserBase(ProvisioningBaseTest):
     APPLICATION = application
     AGOSTO = 'agosto'
     TIERNEY_BROS = 'Tierney Bros'
@@ -20,7 +20,7 @@ class ProvisioningDistributerUserBase(ProvisioningBaseTest):
     IMPERSONATION_EMAIL = 'admin@skykit.com'
 
     def setUp(self):
-        super(ProvisioningDistributerUserBase, self).setUp()
+        super(ProvisioningDistributorUserBase, self).setUp()
         self.headers = {
             'Authorization': config.API_TOKEN
         }

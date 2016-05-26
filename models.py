@@ -865,7 +865,7 @@ class User(ndb.Model):
     def distributor_keys(self):
         dist_user_keys = DistributorUser.query(DistributorUser.user_key == self.key).fetch(keys_only=True)
         dist_users = ndb.get_multi(dist_user_keys)
-        return [each.distributor_key for each in dist_users]
+        return [dist_user.distributor_key for dist_user in dist_users]
 
     @property
     def distributors(self):
