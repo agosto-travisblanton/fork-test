@@ -20,7 +20,6 @@ class TestContentManagerApi(BaseTest):
     CONTENT_SERVER_URL = 'https://skykit-contentmanager-int.appspot.com/content'
     CONTENT_MANAGER_BASE_URL = 'https://skykit-contentmanager-int.appspot.com'
     CONTENT_SERVER_API_KEY = 'API KEY'
-    CHROME_DEVICE_DOMAIN = 'bar.com'
     TENANT_CODE = 'foobar'
     DISTRIBUTOR_NAME = 'agosto'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
@@ -29,8 +28,7 @@ class TestContentManagerApi(BaseTest):
     def setUp(self):
         super(TestContentManagerApi, self).setUp()
         self.content_manager_api = ContentManagerApi()
-        self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
-                                              active=True)
+        self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME)
         self.distributor_key = self.distributor.put()
         self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
                                     distributor_key=self.distributor_key,

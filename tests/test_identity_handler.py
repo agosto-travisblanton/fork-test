@@ -4,10 +4,10 @@ from ae_test_data import build
 from app_config import config
 from models import User, Distributor, DistributorEntityGroup
 from utils.web_util import build_uri
-from provisioning_distributor_user_base_test import ProvisioningDistributerUserBase
+from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
 
-class IdentityHandlerTest(ProvisioningDistributerUserBase):
+class IdentityHandlerTest(ProvisioningDistributorUserBase):
     def setUp(self):
         super(IdentityHandlerTest, self).setUp()
 
