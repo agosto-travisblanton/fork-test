@@ -869,14 +869,14 @@ class User(ndb.Model):
 
     @property
     def distributors(self):
-        if user.is_administrator:
+        if self.is_administrator:
             return Distributor.query().fetch()
         else:
             return ndb.get_multi(self.distributor_keys)
 
     @property
     def distributors_as_admin(self):
-        if user.is_administrator:
+        if self.is_administrator:
             return Distributor.query().fetch()
         else:
             distributor_users = DistributorUser.query(DistributorUser.user_key == self.key).fetch()
@@ -884,7 +884,7 @@ class User(ndb.Model):
 
     @property
     def is_distributor_administrator(self):
-        if user.is_administrator:
+        if self.is_administrator:
             return True
         else:
             role = UserRole.create_or_get_user_role(1)
@@ -892,7 +892,7 @@ class User(ndb.Model):
                 DistributorUser.role == role.key).count() > 0
 
     def is_distributor_administrator_of_distributor(self, distributor_name):
-        if user.is_administrator:
+        if self.is_administrator:
             return True
         else:
             distributor_key = Distributor.find_by_name(name=distributor_name).key
