@@ -74,6 +74,7 @@
                       </md-list-item>
                     </md-list>
                     <h5 ng-if="vm.loadingUsersOfDistributor">Loading...</h5>
+                    <h5 ng-if="!vm.loadingUsersOfDistributor && vm.usersOfDistributor.length < 1">Sorry, you have no users.</h5>
                   </md-card-content>
                 </md-card>
               </div>
