@@ -2,15 +2,11 @@
 
 appModule = angular.module 'skykitProvisioning'
 
-appModule.controller "DistributorSelectorCtrl", ($scope,
+appModule.controller "DistributorSelectorCtrl", (
   $log,
   $state,
   DistributorsService,
-  SessionsService,
-  ProofPlayService,
-  TenantsService,
-  DevicesService,
-  ToastsService) ->
+  SessionsService) ->
   vm = @
   vm.distributors = []
   vm.currentDistributor = undefined
@@ -28,17 +24,6 @@ appModule.controller "DistributorSelectorCtrl", ($scope,
 
 
   vm.selectDistributor = (distributor) ->
-    ProofPlayService.proofplayCache.removeAll()
-    TenantsService.tenantCache.removeAll()
-    DevicesService.deviceCache.removeAll()
-    DevicesService.deviceByTenantCache.removeAll()
-    vm.currentDistributor = distributor
-
-    SessionsService.setCurrentDistributorName vm.currentDistributor.name
-    SessionsService.setCurrentDistributorKey vm.currentDistributor.key
-
-    if not vm.distributors.length == 1
-      ToastsService.showSuccessToast "Distributor #{distributor.name} selected!"
-    $state.go 'welcome'
-
+    DistributorsService.switchDistributor(distributor)
+ 
   vm

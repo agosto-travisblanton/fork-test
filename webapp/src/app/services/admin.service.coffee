@@ -13,7 +13,6 @@ angular.module('skykitProvisioning')
       }
 
       SERVICE_NAME = "distributors"
-      promise = Restangular.one("api/v1/users").customPost(payload)
       promise = Restangular.oneUrl(SERVICE_NAME, '/api/v1/distributors').customPOST(payload)
       promise
 
@@ -25,8 +24,7 @@ angular.module('skykitProvisioning')
       }
 
       SERVICE_NAME = "users"
-      promise = Restangular.one("api/v1/users").customPost(payload)
-      promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}").customPOST(payload)
+      promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/users").customPOST(payload)
       promise
 
     getUsersOfDistributor: (distributorKey) ->

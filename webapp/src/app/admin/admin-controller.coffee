@@ -2,7 +2,7 @@
 
 app = angular.module 'skykitProvisioning'
 
-app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDialog) ->
+app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDialog, DistributorsService) ->
   vm = @
 
   vm.getAllDistributors = () ->
@@ -10,7 +10,7 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
     d = AdminService.getAllDistributors()
     d.then (data) ->
       vm.loadingAllDistributors = false
-      vm.allDistributors = (each.name for each in data)
+      vm.allDistributors = data
 
   vm.getAllDistributors()
   vm.isAdmin = SessionsService.getIsAdmin()
@@ -21,6 +21,10 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
     if not distributorAdmin
       distributorAdmin = false
     withOrWithout = if distributorAdmin then "with" else "without"
+
+    # no option to select distributor is given when there is only one option
+    if not whichDistributor
+      whichDistributor = vm.allDistributors[0]
 
     confirm = $mdDialog.confirm()
     confirm.title('Are you sure?')
@@ -35,16 +39,16 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
     $mdDialog.show(confirm).then ->
       res = AdminService.addUserToDistributor(userEmail.email, whichDistributor, distributorAdmin)
       res.then (data) ->
-        ToastsService.showSuccessToast data.data.message
+        ToastsService.showSuccessToast data.message
         vm.user = {}
         form.$setPristine()
         form.$setUntouched()
         setTimeout (->
           vm.getUsersOfDistributor()
-        ), 1000
+        ), 2000
 
       res.catch (data) ->
-        ToastsService.showErrorToast data.data.message
+        ToastsService.showErrorToast data.message
 
   vm.makeDistributor = (ev, distributorName, adminEmail, form) ->
     confirm = $mdDialog.confirm()
@@ -60,13 +64,13 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
         vm.distributor = {}
         form.$setPristine()
         form.$setUntouched()
-        ToastsService.showSuccessToast data.data.message
+        ToastsService.showSuccessToast data.message
         setTimeout (->
           vm.allDistributors = vm.getAllDistributors()
-        ), 1000
+        ), 2000
 
       res.catch (data) ->
-        ToastsService.showErrorToast data.data.message
+        ToastsService.showErrorToast data.message
     )
 
   vm.getUsersOfDistributor = () ->
@@ -76,7 +80,10 @@ app.controller "AdminCtrl", (AdminService, SessionsService, ToastsService, $mdDi
       vm.loadingUsersOfDistributor = false
       vm.usersOfDistributor = data
 
-
+  vm.switchDistributor = (distributor) ->
+    DistributorsService.switchDistributor(distributor)
+    ToastsService.showSuccessToast "Distributor #{distributor.name} selected!"
+  
   vm.initialize = () ->
     vm.getUsersOfDistributor()
 

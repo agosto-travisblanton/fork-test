@@ -2,7 +2,12 @@
 
 appModule = angular.module('skykitProvisioning')
 
-appModule.factory 'DistributorsService', (Restangular) ->
+appModule.factory 'DistributorsService', (Restangular,
+  $state,
+  SessionsService,
+  ProofPlayService,
+  TenantsService,
+  DevicesService) ->
   new class DistributorsService
     SERVICE_NAME = 'distributors'
 
@@ -38,3 +43,15 @@ appModule.factory 'DistributorsService', (Restangular) ->
     getDomainsByKey: (key) ->
       promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/distributors/#{key}/domains").get()
       promise
+
+    switchDistributor: (distributor) ->
+      ProofPlayService.proofplayCache.removeAll()
+      TenantsService.tenantCache.removeAll()
+      DevicesService.deviceCache.removeAll()
+      DevicesService.deviceByTenantCache.removeAll()
+
+      SessionsService.setCurrentDistributorName distributor.name
+      SessionsService.setCurrentDistributorKey distributor.key
+
+      $state.go 'welcome'
+        

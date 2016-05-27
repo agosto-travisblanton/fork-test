@@ -31,21 +31,22 @@
                         </md-checkbox>
                       </md-input-container>
                       <md-input-container class="md-block">
-                        <md-select ng-model="vm.user.distributor" required aria-label="distribuor select">
-
-                          <div ng-if="vm.isAdmin">
+                        <div ng-if="vm.isAdmin && vm.allDistributors.length > 1">
+                          <md-select ng-model="vm.user.distributor" required aria-label="distribuor select">
                             <label>Distributer</label>
                             <md-option ng-repeat="distributor in vm.allDistributors" value="{{distributor}}">
                               {{distributor}}
                             </md-option>
-                          </div>
-                          <div ng-if="!vm.isAdmin">
+                          </md-select>
+                        </div>
+                        <div ng-if="!vm.isAdmin && vm.distributorsAsAdmin.length > 1">
+                          <md-select ng-model="vm.user.distributor" required aria-label="distribuor select">
                             <label>Distributer</label>
                             <md-option ng-repeat="distributor in vm.distributorsAsAdmin" value="{{distributor}}">
                               {{distributor}}
                             </md-option>
-                          </div>
-                        </md-select>
+                          </md-select>
+                        </div>
                       </md-input-container>
                       <md-card-actions layout="row" layout-align="end center">
 
@@ -116,13 +117,16 @@
                   <md-card-title>
                     <md-card-title-text>
                       <span class="md-headline">All Distributors</span>
+                      <p>Click to switch to another Distributor.</p>
                     </md-card-title-text>
                   </md-card-title>
                   <md-card-content>
 
                     <md-list ng-if="!vm.loadingAllDistributors">
                       <md-list-item ng-repeat="item in vm.allDistributors | orderBy:'item' track by $index">
-                        <p>{{$index + 1}}. {{ item }}</p>
+                        {{$index + 1}}. <md-button class="md-raised" ng-click="vm.switchDistributor(item)">
+                          <p> {{ item.name }}</p>
+                        </md-button>
 
                       </md-list-item>
                     </md-list>
