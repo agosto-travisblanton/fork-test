@@ -3,21 +3,17 @@
 describe 'AdminService', ->
   beforeEach module 'skykitProvisioning'
   Restangular = undefined
-  key = undefined
   AdminService = undefined
-  value = undefined
   restangularService = undefined
   
   beforeEach inject (_AdminService_, _Restangular_) ->
     Restangular = _Restangular_
     AdminService = _AdminService_
-    key = "jim"
-    value = "dwight"
 
   describe 'Restangular API', ->
     beforeEach ->
       restangularService = {
-        customPOST: (payload) ->
+        customPOST: () ->
           
         get: () ->
       }
