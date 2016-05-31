@@ -172,12 +172,11 @@ describe 'DistributorSelectorCtrl', ->
         removeAll: () ->
       }
       spyOn($state, 'go')
-      controller.selectDistributor(distributor)
       spyOn(ToastsService, 'showErrorToast')
+      spyOn(DistributorsService, 'switchDistributor')
       spyOn(ToastsService, 'showSuccessToast')
+      controller.selectDistributor(distributor)
 
     it 'sets the currentDistributor property', ->
-      expect(controller.currentDistributor).toEqual distributor
+      expect(DistributorsService.switchDistributor).toHaveBeenCalledWith distributor
       
-    it 'calls $state.go to route to the welcome view', ->
-      expect($state.go).toHaveBeenCalledWith 'welcome'

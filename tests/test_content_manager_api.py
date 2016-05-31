@@ -52,7 +52,7 @@ class TestContentManagerApi(BaseTest):
         self.device_key = self.device.put()
 
     ##################################################################################################################
-    ## create_tenant
+    # create_tenant
     ##################################################################################################################
 
     def test_create_tenant_success(self):
@@ -70,7 +70,7 @@ class TestContentManagerApi(BaseTest):
         self.assertEqual(error_message, str(context.exception))
 
     ##################################################################################################################
-    ## create_device
+    # create_device
     ##################################################################################################################
 
     def test_create_device_success_returns_true(self):
@@ -84,7 +84,7 @@ class TestContentManagerApi(BaseTest):
         self.assertFalse(result)
 
     ##################################################################################################################
-    ## update_device
+    # update_device
     ##################################################################################################################
     def test_update_device_success(self):
         when(self.content_manager_api).delete_device(any_matcher()).thenReturn(True)
@@ -102,7 +102,7 @@ class TestContentManagerApi(BaseTest):
         self.assertTrue(error_message in context.exception.message)
 
     ##################################################################################################################
-    ## delete_device
+    # delete_device
     ##################################################################################################################
     def test_delete_device_success(self):
         when(HttpClient).delete(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=204))

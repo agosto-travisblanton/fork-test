@@ -1,0 +1,71 @@
+<div class="admin-container">
+  <div flex-xs flex-gt-xs="30">
+    <md-card>
+      <md-card-title>
+        <md-card-title-text>
+          <span class="md-headline">Create User</span>
+        </md-card-title-text>
+      </md-card-title>
+      <md-card-content>
+        <form name="userForm"
+              ng-submit="vm.addUserToDistributor($event, vm.user, vm.user.cb1, vm.user.distributor, userForm)"
+              novalidate>
+          <md-input-container class="md-block">
+            <label>Email</label>
+            <input ng-model="vm.user.email" type="email" required>
+          </md-input-container>
+          <md-input-container>
+            <md-checkbox ng-model="vm.user.cb1" aria-label="Distributor Admin">
+              Distributor Admin
+            </md-checkbox>
+          </md-input-container>
+          <md-input-container class="md-block">
+            <div ng-if="vm.isAdmin && vm.allDistributors.length > 1">
+              <md-select ng-model="vm.user.distributor" required aria-label="distribuor select">
+                <label>Distributer</label>
+                <md-option ng-repeat="distributor in vm.allDistributors" value="{{distributor}}">
+                  {{distributor.name}}
+                </md-option>
+              </md-select>
+            </div>
+            <div ng-if="!vm.isAdmin && vm.distributorsAsAdmin.length > 1">
+              <md-select ng-model="vm.user.distributor" required aria-label="distribuor select">
+                <label>Distributer</label>
+                <md-option ng-repeat="distributor in vm.distributorsAsAdmin" value="{{distributor}}">
+                  {{distributor.name}}
+                </md-option>
+              </md-select>
+            </div>
+          </md-input-container>
+          <md-card-actions layout="row" layout-align="end center">
+
+            <md-button class="md-raised" type="submit"
+                       ng-disabled="userForm.$pristine || userForm.$invalid">
+              Submit
+            </md-button>
+          </md-card-actions>
+        </form>
+      </md-card-content>
+    </md-card>
+  </div>
+  <div flex-xs flex-gt-xs="30">
+    <md-card>
+      <md-card-title>
+        <md-card-title-text>
+          <span class="md-headline">{{vm.currentDistributorName}} Users</span>
+        </md-card-title-text>
+      </md-card-title>
+      <md-card-content>
+        <md-list ng-if="!vm.loadingUsersOfDistributor">
+          <md-list-item ng-repeat="item in vm.usersOfDistributor | orderBy:'item' track by $index">
+            <p>{{$index + 1}}. {{ item.email }}</p>
+
+          </md-list-item>
+        </md-list>
+        <h5 ng-if="vm.loadingUsersOfDistributor">Loading...</h5>
+        <h5 ng-if="!vm.loadingUsersOfDistributor && vm.usersOfDistributor.length < 1">Sorry, you have no
+          users.</h5>
+      </md-card-content>
+    </md-card>
+  </div>
+</div>
