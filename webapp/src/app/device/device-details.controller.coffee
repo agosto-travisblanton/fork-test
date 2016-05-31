@@ -99,7 +99,7 @@ appModule.controller 'DeviceDetailsCtrl', (
   vm.initialize = () ->
     vm.epochStart = moment(new Date(vm.startTime)).unix()
     vm.epochEnd = moment(new Date(vm.endTime)).unix()
-    timezonePromise = TimezonesService.getUsTimezones()
+    timezonePromise = TimezonesService.getCustomTimezones()
     timezonePromise.then (data) ->
       vm.timezones = data
 

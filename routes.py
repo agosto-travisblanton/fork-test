@@ -386,6 +386,12 @@ application = WSGIApplication(
               methods=['GET']
               ),
 
+        Route(r'/api/v1/timezones/custom',
+              handler='handlers.timezones_handler.TimezonesHandler',
+              name='custom-timezones',
+              handler_method='get_custom_timezones',
+              methods=['GET']
+              ),
         ############################################################
         # /dev/ routes secured by admin:required
         ############################################################
