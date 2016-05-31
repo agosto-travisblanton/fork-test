@@ -2,7 +2,8 @@
 
 app = angular.module 'skykitProvisioning'
 
-app.controller "AdminCtrl", (AdminService,
+app.controller "AdminCtrl", (
+  AdminService,
   SessionsService,
   ToastsService,
   $mdDialog,
@@ -25,15 +26,16 @@ app.controller "AdminCtrl", (AdminService,
     if not whichDistributor
       whichDistributor = vm.allDistributors[0]
 
-    confirm = $mdDialog.confirm()
-    confirm.title('Are you sure?')
-    confirm.textContent("#{userEmail.email} will be added to #{whichDistributor}
+    confirm = $mdDialog.confirm(
+      {
+        title: 'Are you sure?'
+        textContent: "#{userEmail} will be added to #{whichDistributor}
       #{withOrWithout} administrator priviledges"
+        targetEvent: ev
+        ok: 'Of course!'
+        cancel: 'Oops, nevermind.'
+      }
     )
-    confirm.ariaLabel('Create a User')
-    confirm.targetEvent(ev)
-    confirm.ok('Of course!')
-    confirm.cancel('Oops, nevermind.')
 
     $mdDialog.show(confirm).then ->
       addUserToDistributorPromise = AdminService.addUserToDistributor(userEmail.email, whichDistributor, distributorAdmin)
@@ -50,13 +52,16 @@ app.controller "AdminCtrl", (AdminService,
         ToastsService.showErrorToast data.message
 
   vm.makeDistributor = (ev, distributorName, adminEmail, form) ->
-    confirm = $mdDialog.confirm()
-    confirm.title('Are you sure?')
-    confirm.textContent("If you proceed, #{distributorName} will be created.")
-    confirm.ariaLabel('Lucky day')
-    confirm.targetEvent(ev)
-    confirm.ok('Yeah!')
-    confirm.cancel('Forget it.')
+    confirm = $mdDialog.confirm(
+      {
+        title: 'Are you sure?'
+        textContent: "If you proceed, #{distributorName} will be created."
+        targetEvent: ev
+        ariaLabel: 'Lucky day'
+        ok: 'Yeah!'
+        cancel: 'Forget it.'
+      }
+    )
     $mdDialog.show(confirm).then (->
       makeDistributorPromise = AdminService.makeDistributor distributorName, adminEmail
       makeDistributorPromise.then (data) ->
@@ -74,7 +79,8 @@ app.controller "AdminCtrl", (AdminService,
 
   vm.getUsersOfDistributor = () ->
     vm.loadingUsersOfDistributor = true
-    usersofDistributorPromise = AdminService.getUsersOfDistributor(SessionsService.getCurrentDistributorKey())
+    currentDistributorKey = SessionsService.getCurrentDistributorKey()
+    usersofDistributorPromise = AdminService.getUsersOfDistributor(currentDistributorKey)
     usersofDistributorPromise.then (data) ->
       vm.loadingUsersOfDistributor = false
       vm.usersOfDistributor = data
