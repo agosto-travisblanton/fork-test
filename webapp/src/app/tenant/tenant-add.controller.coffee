@@ -25,7 +25,7 @@ appModule.controller 'TenantAddCtrl',
     @selectedTimezone = 'America/Chicago'
 
     @initialize = ->
-      timezonePromise = TimezonesService.getUsTimezones()
+      timezonePromise = TimezonesService.getCustomTimezones()
       timezonePromise.then (data) =>
         @timezones = data
       @currentDistributorKey = $cookies.get('currentDistributorKey')

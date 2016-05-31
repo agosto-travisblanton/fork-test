@@ -98,7 +98,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
     @initialize = () ->
       @epochStart = moment(new Date(@startTime)).unix()
       @epochEnd = moment(new Date(@endTime)).unix()
-      timezonePromise = TimezonesService.getUsTimezones()
+      timezonePromise = TimezonesService.getCustomTimezones()
       timezonePromise.then (data) =>
         @timezones = data
 

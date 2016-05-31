@@ -97,12 +97,12 @@ describe 'TenantAddCtrl', ->
       spyOn(DistributorsService, 'getByKey').and.returnValue distributorPromise
       distributorDomainsPromise = new skykitProvisioning.q.Mock
       spyOn(DistributorsService, 'getDomainsByKey').and.returnValue distributorDomainsPromise
-      spyOn(TimezonesService, 'getUsTimezones').and.returnValue timezonesPromise
+      spyOn(TimezonesService, 'getCustomTimezones').and.returnValue timezonesPromise
       controller.initialize()
 
     it 'calls TimezonesService.getUsTimezones to retrieve US timezones', ->
       controller.initialize()
-      expect(TimezonesService.getUsTimezones).toHaveBeenCalled()
+      expect(TimezonesService.getCustomTimezones).toHaveBeenCalled()
 
     it 'invokes $cookies to obtain the currentDistributorKey', ->
       expect($cookies.get).toHaveBeenCalledWith 'currentDistributorKey'
