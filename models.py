@@ -55,20 +55,18 @@ class Distributor(ndb.Model):
     @classmethod
     def find_by_name(cls, name):
         if name:
-            key = Distributor.query(Distributor.name == name).get(keys_only=True)
+            distributor_query = Distributor.query().fetch()
 
-            if key:
-                return key.get()
-            else:
-                return None
+            match = None
+
+            for item in distributor_query:
+                if item.name.lower() == name.lower():
+                    match = item
+            return match
 
     @classmethod
     def is_unique(cls, name):
-        distributor = cls.find_by_name(name)
-        if distributor and distributor.name == name:
-            return False
-        else:
-            return True
+        return not cls.find_by_name(name)
 
     @classmethod
     def create(cls,
@@ -607,7 +605,7 @@ class ChromeOsDevice(ndb.Model):
             heartbeat_interval_minutes=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES,
             timezone=timezone,
             timezone_offset=timezone_offset,
-            proof_of_play_editable = proof_of_play_editable)
+            proof_of_play_editable=proof_of_play_editable)
         return device
 
     @classmethod

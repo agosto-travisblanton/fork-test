@@ -38,7 +38,7 @@ app.controller "AdminCtrl", (
     )
 
     $mdDialog.show(confirm).then ->
-      addUserToDistributorPromise = AdminService.addUserToDistributor(userEmail.email, whichDistributor, distributorAdmin)
+      addUserToDistributorPromise = AdminService.addUserToDistributor(userEmail, whichDistributor, distributorAdmin)
       addUserToDistributorPromise.then (data) ->
         ToastsService.showSuccessToast data.message
         vm.user = {}
@@ -49,7 +49,7 @@ app.controller "AdminCtrl", (
         ), 2000
 
       addUserToDistributorPromise.catch (data) ->
-        ToastsService.showErrorToast data.message
+        ToastsService.showErrorToast data.data.message
 
   vm.makeDistributor = (ev, distributorName, adminEmail, form) ->
     confirm = $mdDialog.confirm(
@@ -74,7 +74,8 @@ app.controller "AdminCtrl", (
         ), 2000
 
       makeDistributorPromise.catch (data) ->
-        ToastsService.showErrorToast data.message
+        console.log data
+        ToastsService.showErrorToast data.data.message
     )
 
   vm.getUsersOfDistributor = () ->
