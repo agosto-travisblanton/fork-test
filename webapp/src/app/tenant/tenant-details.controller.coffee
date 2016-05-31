@@ -33,7 +33,7 @@ appModule.controller 'TenantDetailsCtrl',
         vm.onSuccessResolvingTenant tenant
 
     vm.initialize = ->
-      timezonePromise = TimezonesService.getUsTimezones()
+      timezonePromise = TimezonesService.getCustomTimezones()
       timezonePromise.then (data) ->
         vm.timezones = data
       vm.currentDistributorKey = SessionsService.getCurrentDistributorKey()

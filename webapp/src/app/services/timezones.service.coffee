@@ -11,4 +11,8 @@ angular.module('skykitProvisioning').factory 'TimezonesService', ($http, $log, R
       promise = Restangular.oneUrl('timezones', 'api/v1/timezones/all').get()
       promise
 
+    getCustomTimezones: () ->
+      promise = Restangular.oneUrl('timezones', 'api/v1/timezones/custom').get()
+      promise
+
   new TimezonesService()

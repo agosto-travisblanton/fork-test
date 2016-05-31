@@ -128,7 +128,7 @@ describe 'DeviceDetailsCtrl', ->
       ]
 
       spyOn(DevicesService, 'getPanelInputs').and.returnValue inputs
-      spyOn(TimezonesService, 'getUsTimezones').and.returnValue timezonesPromise
+      spyOn(TimezonesService, 'getCustomTimezones').and.returnValue timezonesPromise
 
     describe 'new mode', ->
       beforeEach ->
@@ -142,8 +142,8 @@ describe 'DeviceDetailsCtrl', ->
         }
         controller.initialize()
 
-      it 'should call TimezonesService.getUsTimezones', ->
-        expect(TimezonesService.getUsTimezones).toHaveBeenCalled()
+      it 'should call TimezonesService.getCustomTimezones', ->
+        expect(TimezonesService.getCustomTimezones).toHaveBeenCalled()
 
       it 'currentDevice property should be defined', ->
         expect(controller.currentDevice).toBeDefined()
@@ -186,8 +186,8 @@ describe 'DeviceDetailsCtrl', ->
         spyOn(ToastsService, 'showSuccessToast')
         controller.initialize()
 
-      it 'should call TimezonesService.getTimezones', ->
-        expect(TimezonesService.getUsTimezones).toHaveBeenCalled()
+      it 'should call TimezonesService.getCustomTimezones', ->
+        expect(TimezonesService.getCustomTimezones).toHaveBeenCalled()
 
       it 'defines currentDevice property', ->
         expect(controller.currentDevice).toBeDefined()
