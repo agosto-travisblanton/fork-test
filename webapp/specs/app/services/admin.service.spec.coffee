@@ -20,22 +20,21 @@ describe 'AdminService', ->
 
       spyOn(Restangular, 'oneUrl').and.returnValue restangularService
 
-
     it '.makeDistributor', ->
       AdminService.makeDistributor('distributor', 'admin@gmail.com')
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'distributors', "/api/v1/distributors"
+      expect(Restangular.oneUrl).toHaveBeenCalledWith AdminService.DISTRIBUTOR_SERVICE, "/api/v1/distributors"
 
       
     it '.addUserToDistributor', ->
       AdminService.addUserToDistributor('admin@gmail.com', 'distributor', true)
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'users', '/api/v1/users'
+      expect(Restangular.oneUrl).toHaveBeenCalledWith AdminService.USER_SERVICE, '/api/v1/users'
 
       
     it '.getUsersOfDistributor', ->
       distributorKey = 'distributorKey'
       AdminService.getUsersOfDistributor(distributorKey)
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'distributors', "/api/v1/analytics/distributors/#{distributorKey}/users"
+      expect(Restangular.oneUrl).toHaveBeenCalledWith AdminService.DISTRIBUTOR_SERVICE, "/api/v1/analytics/distributors/#{distributorKey}/users"
 
     it '.getUsersOfDistributor', ->
       AdminService.getAllDistributors()
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'distributors', "/api/v1/distributors"
+      expect(Restangular.oneUrl).toHaveBeenCalledWith AdminService.DISTRIBUTOR_SERVICE, "/api/v1/distributors"
