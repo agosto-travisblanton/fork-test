@@ -95,13 +95,13 @@ appModule.controller 'DeviceDetailsCtrl', (
 
     else
       vm.getEvents vm.deviceKey, vm.event_prev_cursor, null
-        
-    vm.initialize = () ->
-      vm.epochStart = moment(new Date(vm.startTime)).unix()
-      vm.epochEnd = moment(new Date(vm.endTime)).unix()
-      timezonePromise = TimezonesService.getCustomTimezones()
-      timezonePromise.then (data) ->
-        vm.timezones = data
+
+  vm.initialize = () ->
+    vm.epochStart = moment(new Date(vm.startTime)).unix()
+    vm.epochEnd = moment(new Date(vm.endTime)).unix()
+    timezonePromise = TimezonesService.getCustomTimezones()
+    timezonePromise.then (data) ->
+      vm.timezones = data
 
     vm.panelModels = DevicesService.getPanelModels()
     vm.panelInputs = DevicesService.getPanelInputs()
