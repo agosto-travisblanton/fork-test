@@ -57,3 +57,15 @@ class TestTimezonesHandler(BaseTest, WebTest):
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.bad_authorization_header)
         self.assertTrue(self.FORBIDDEN in context.exception.message)
+
+    def test_get_custom_timezones_returns_expected_list_of_timezones(self):
+        request_parameters = {}
+        uri = application.router.build(None, 'custom-timezones', None, {})
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response_json = json.loads(response.body)
+        self.assertEqual(len(response_json), 394)
+        self.assertEqual(response_json[0], 'US/Alaska')
+        self.assertEqual(response_json[393], 'Pacific/Wallis')
+
+
+
