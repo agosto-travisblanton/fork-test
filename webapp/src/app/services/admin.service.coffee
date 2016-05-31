@@ -1,7 +1,7 @@
 'use strict'
 
 angular.module('skykitProvisioning')
-.factory 'AdminService', ($http, Restangular) ->
+.factory 'AdminService', (Restangular) ->
   new class AdminService
 
     constructor: ->
@@ -24,7 +24,7 @@ angular.module('skykitProvisioning')
       }
 
       SERVICE_NAME = "users"
-      promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/users").customPOST(payload)
+      promise = Restangular.oneUrl(SERVICE_NAME, "/api/v1/users").customPOST(payload)
       promise
 
     getUsersOfDistributor: (distributorKey) ->
