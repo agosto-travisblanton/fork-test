@@ -4,7 +4,7 @@ setup_test_paths()
 
 import json
 from webtest import AppError
-from models import Distributor
+from models import Distributor, DistributorUser
 from routes import application
 from app_config import config
 from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
@@ -275,6 +275,10 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
         self.assertEqual(200, r.status_int)
         self.assertTrue(json.loads(r.body)["success"])
         self.assertFalse(Distributor.is_unique(distro_to_add))
+        distributor = Distributor.find_by_name(distro_to_add)
+        user_is_associated_with_distributor = DistributorUser.query(DistributorUser.user_key == self.user.key).filter(
+            DistributorUser.distributor_key == distributor.key).fetch()
+        self.assertTrue(user_is_associated_with_distributor)
 
     def test_create_same_distributor_as_admin(self):
         self.test_create_new_distributor_as_admin()

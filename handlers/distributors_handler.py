@@ -2,7 +2,7 @@ import json
 
 from google.appengine.ext import ndb
 from webapp2 import RequestHandler
-from models import Distributor, DistributorEntityGroup, Domain, DistributorUser
+from models import Distributor, DistributorEntityGroup, Domain, DistributorUser, User
 from restler.serializers import json_response
 from decorators import has_admin_user_key, requires_api_token
 from strategy import DISTRIBUTOR_STRATEGY, DOMAIN_STRATEGY
@@ -53,11 +53,14 @@ class DistributorsHandler(RequestHandler):
         incoming = json.loads(self.request.body)
         distributor_name = incoming["distributor"]
         admin_email = incoming["admin_email"]
+        user = User.get_or_insert_by_email(email=admin_email)
 
         if Distributor.is_unique(distributor_name):
             distributor = Distributor.create(name=distributor_name)
             distributor.admin_email = admin_email
             distributor.put()
+            user.add_distributor(distributor.key, role=1)
+
             json_response(
                 self.response, {
                     "success": True,
