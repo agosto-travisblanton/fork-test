@@ -1,10 +1,12 @@
 'use strict'
 
 angular.module('skykitProvisioning')
-.factory 'AdminService', ($http, Restangular) ->
+.factory 'AdminService', (Restangular) ->
   new class AdminService
 
     constructor: ->
+      @USER_SERVICE = "users"
+      @DISTRIBUTOR_SERVICE = "distributors"
 
     makeDistributor: (distributor, admin_email) ->
       payload = {
@@ -12,9 +14,7 @@ angular.module('skykitProvisioning')
         admin_email: admin_email
       }
 
-      SERVICE_NAME = "distributors"
-      promise = Restangular.one("api/v1/users").customPost(payload)
-      promise = Restangular.oneUrl(SERVICE_NAME, '/api/v1/distributors').customPOST(payload)
+      promise = Restangular.oneUrl(@DISTRIBUTOR_SERVICE, '/api/v1/distributors').customPOST(payload)
       promise
 
     addUserToDistributor: (userEmail, distributor, distributorAdmin) ->
@@ -24,19 +24,15 @@ angular.module('skykitProvisioning')
         distributor_admin: distributorAdmin
       }
 
-      SERVICE_NAME = "users"
-      promise = Restangular.one("api/v1/users").customPost(payload)
-      promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}").customPOST(payload)
+      promise = Restangular.oneUrl(@USER_SERVICE, "/api/v1/users").customPOST(payload)
       promise
 
     getUsersOfDistributor: (distributorKey) ->
-      SERVICE_NAME = "distributors"
-      promise = Restangular.oneUrl(SERVICE_NAME, "/api/v1/analytics/distributors/#{distributorKey}/users").get()
+      promise = Restangular.oneUrl(@DISTRIBUTOR_SERVICE, "/api/v1/analytics/distributors/#{distributorKey}/users").get()
       promise
 
     getAllDistributors: () ->
-      SERVICE_NAME = "distributors"
-      promise = Restangular.oneUrl(SERVICE_NAME, "/api/v1/distributors").get()
+      promise = Restangular.oneUrl(@DISTRIBUTOR_SERVICE, "/api/v1/distributors").get()
       promise
     
       
