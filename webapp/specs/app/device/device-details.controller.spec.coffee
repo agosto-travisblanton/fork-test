@@ -186,8 +186,8 @@ describe 'DeviceDetailsCtrl', ->
         spyOn(ToastsService, 'showSuccessToast')
         controller.initialize()
 
-      it 'should call TimezonesService.getTimezones', ->
-        expect(TimezonesService.getUsTimezones).toHaveBeenCalled()
+      it 'should call TimezonesService.getCustomTimezones', ->
+        expect(TimezonesService.getCustomTimezones).toHaveBeenCalled()
 
       it 'defines currentDevice property', ->
         expect(controller.currentDevice).toBeDefined()
