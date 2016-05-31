@@ -32,7 +32,7 @@ appModule.controller 'TenantDetailsCtrl',
         @onSuccessResolvingTenant tenant
 
     @initialize = ->
-      timezonePromise = TimezonesService.getUsTimezones()
+      timezonePromise = TimezonesService.getCustomTimezones()
       timezonePromise.then (data) =>
         @timezones = data
       @currentDistributorKey = $cookies.get('currentDistributorKey')
