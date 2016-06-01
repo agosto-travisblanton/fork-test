@@ -5,6 +5,7 @@ setup_test_paths()
 import json
 from webtest import AppError
 from routes import application
+from models import User
 from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>, Christopher Bartling <chris.bartling@agosto.com>'
@@ -122,7 +123,7 @@ class TestUsersHandler(ProvisioningDistributorUserBase):
         self.assertEqual(200, request.status_int)
         self.assertEqual(True, json.loads(request.body)["success"])
 
-        user = User.get_or_insert_by_email(self.user.email)
+        user = Users.get_or_insert_by_email(self.user.email)
         user_distributors = [distributor.name for distributor in user.distributors]
         self.assertIn(distro_to_add, user_distributors)
         self.assertIn(self.default_distributor_name, user_distributors)
