@@ -20,13 +20,15 @@ from refresh_chrome_device_properties_from_directory_api import RefreshChromeDev
 from set_content_manager_base_url_on_tenant import SetContentManagerBaseUrlOnTenant
 from hydrate_agosto_default_domain_key_on_tenant import HydrateAgostoDefaultDomainKeyOnTenant
 from hydrate_default_user_role_on_distributer_user import HydrateDefaultUserRoleOnDistributerUser
+from set_default_admin_users import SetDefaultAdminUsers
 
 MIGRATIONS = [
     HydrateTenantKeyOnDevices(),
     RefreshChromeDevicePropertiesFromDirectoryApi(),
     SetContentManagerBaseUrlOnTenant(),
     HydrateAgostoDefaultDomainKeyOnTenant(),
-    HydrateDefaultUserRoleOnDistributerUser()
+    HydrateDefaultUserRoleOnDistributerUser(),
+    SetDefaultAdminUsers()
 ]
 
 MIGRATIONS_MAP = {migration.name: migration for migration in MIGRATIONS}
@@ -100,7 +102,6 @@ class MigrationRunHandler(RequestHandler):
             if migration_operation is not None:
                 logging.info("'{0}' is set to run".format(migration_name))
                 _run_migration(migration_operation.key)
-                # deferred.defer(_run_migration, migration_operation.key, _queue='migrations', _target='migration')
             else:
                 logging.info("'{0}' is already running".format(migration_name))
         else:
