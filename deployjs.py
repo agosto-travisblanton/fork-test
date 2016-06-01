@@ -21,6 +21,7 @@ def build_with_gulp():
         print "!!!"
         print "Run the command in '' from root manually, and fix the error"
         print "!!!"
+        exit(1)
 
 def js_processing(all_lines):
     for each_line in all_lines:
