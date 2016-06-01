@@ -7,19 +7,12 @@ static_index_path = path.join(basedir, 'static/index.html')
 scripts_index_path = path.join(basedir, 'static/scripts')
 styles_index_path = path.join(basedir, 'static/styles')
 
+GULP_CMD = 'cd webapp && gulp deploy && cd ..'
 
 def build_with_gulp():
-    try:
-        output = subprocess.check_output(
-            'cd webapp && gulp deploy && cd ..',
-            shell=True,
-        )
-        print output
-
-    except subprocess.CalledProcessError as e:
-        print e
+    if subprocess.call(GULP_CMD, shell=True) != 0:
         print "!!!"
-        print "Run the command in '' from root manually, and fix the error"
+        print "Run the command '{}' from root manually, and fix the error".format(GULP_CMD)
         print "!!!"
         exit(1)
 
