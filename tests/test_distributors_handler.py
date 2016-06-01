@@ -102,39 +102,6 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
         self.assertEqual(response_json[0].get('name'), self.INACTIVE_DISTRIBUTOR)
 
     ##################################################################################################################
-    # get_list_by_user
-    ##################################################################################################################
-    def test_get_list_by_user_returns_ok_status(self):
-        request_parameters = {}
-        uri = application.router.build(None, 'get-distributors-by-user', None, {
-            'user_urlsafe_key': self.user_key.urlsafe()
-        })
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
-        self.assertOK(response)
-
-    def test_get_list_returns_distributors_associated_to_user(self):
-        request_parameters = {}
-        uri = application.router.build(None, 'get-distributors-by-user', None, {
-            'user_urlsafe_key': self.user_key.urlsafe()
-        })
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
-        response_json = json.loads(response.body)
-        self.assertEqual(len(response_json), 2)
-        self.assertEqual(response_json[0].get('name'), self.AGOSTO)
-        self.assertTrue(response_json[0].get('active'))
-        self.assertEqual(response_json[1].get('name'), self.DISTRIBUTOR)
-        self.assertTrue(response_json[1].get('active'))
-
-    def test_get_list_fails_with_bad_authorization_token_v2(self):
-        request_parameters = {}
-        uri = application.router.build(None, 'get-distributors-by-user', None, {
-            'user_urlsafe_key': self.user_key.urlsafe()
-        })
-        with self.assertRaises(AppError) as context:
-            self.app.get(uri, params=request_parameters, headers=self.bad_authorization_header)
-        self.assertTrue(self.FORBIDDEN in context.exception.message)
-
-    ##################################################################################################################
     # put
     ##################################################################################################################
     def test_put_returns_no_content_status(self):

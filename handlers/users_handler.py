@@ -12,11 +12,8 @@ from restler.serializers import json_response
 class UsersHandler(SessionRequestHandler, KeyValidatorMixin):
     @requires_api_token
     def get_list_by_user(self, user_urlsafe_key):
-        key = ndb.Key(urlsafe=user_urlsafe_key)
-        distributor_user_associations = DistributorUser.query(DistributorUser.user_key == key).fetch(100)
-        distributors = []
-        for distributor_user_association in distributor_user_associations:
-            distributors.append(distributor_user_association.distributor_key.get())
+        user = ndb.Key(urlsafe=user_urlsafe_key).get()
+        distributors = user.distributors
         json_response(self.response, distributors, strategy=DISTRIBUTOR_STRATEGY)
 
     @has_distributor_admin_user_key
