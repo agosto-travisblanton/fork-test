@@ -123,7 +123,7 @@ class TestUsersHandler(ProvisioningDistributorUserBase):
         self.assertEqual(200, request.status_int)
         self.assertEqual(True, json.loads(request.body)["success"])
 
-        user = Users.get_or_insert_by_email(self.user.email)
+        user = User.get_or_insert_by_email(self.user.email)
         user_distributors = [distributor.name for distributor in user.distributors]
         self.assertIn(distro_to_add, user_distributors)
         self.assertIn(self.default_distributor_name, user_distributors)
