@@ -12,6 +12,7 @@ describe 'TenantAddCtrl', ->
   distributorDomainsPromise = undefined
   timezonesPromise = undefined
   TenantsService = undefined
+  StorageService = undefined
   tenantsServicePromise = undefined
   progressBarService = undefined
   $state = undefined
@@ -22,16 +23,16 @@ describe 'TenantAddCtrl', ->
   beforeEach ->
     angular.mock.module 'skykitProvisioning'
 
-    inject (_$controller_, _$cookies_, _DistributorsService_, _TimezonesService_, _TenantsService_, _$state_, _sweet_,
+    inject (_$controller_, _DistributorsService_, _TimezonesService_, _StorageService_, _TenantsService_, _$state_, _sweet_,
       _$log_, _$location_) ->
       controllerFactory = _$controller_
-      $cookies = _$cookies_
       DistributorsService = _DistributorsService_
       TimezonesService = _TimezonesService_
       TenantsService = _TenantsService_
       $state = _$state_
       sweet = _sweet_
       $log = _$log_
+      StorageService = _StorageService_
       $location = _$location_
       progressBarService = {
         start: ->
@@ -39,7 +40,7 @@ describe 'TenantAddCtrl', ->
       }
       controller = controllerFactory('TenantAddCtrl',
         {
-          $cookies: $cookies,
+          StorageService: StorageService,
           DistributorsService: DistributorsService,
           TenantsService: TenantsService,
           ProgressBarService: progressBarService,
@@ -91,7 +92,7 @@ describe 'TenantAddCtrl', ->
 
   describe '.initialize', ->
     beforeEach ->
-      spyOn($cookies, 'get').and.returnValue distributorKey
+      spyOn(StorageService, 'get').and.returnValue distributorKey
       distributorPromise = new skykitProvisioning.q.Mock
       timezonesPromise = new skykitProvisioning.q.Mock
       spyOn(DistributorsService, 'getByKey').and.returnValue distributorPromise
@@ -104,10 +105,10 @@ describe 'TenantAddCtrl', ->
       controller.initialize()
       expect(TimezonesService.getCustomTimezones).toHaveBeenCalled()
 
-    it 'invokes $cookies to obtain the currentDistributorKey', ->
-      expect($cookies.get).toHaveBeenCalledWith 'currentDistributorKey'
+    it 'invokes StorageService to obtain the currentDistributorKey', ->
+      expect(StorageService.get).toHaveBeenCalledWith 'currentDistributorKey'
 
-    it 'sets the currentDistributorKey from $cookies', ->
+    it 'sets the currentDistributorKey from StorageService', ->
       expect(controller.currentDistributorKey).toBe distributorKey
 
     it 'calls DistributorsService with distributorKey to get the distributor', ->

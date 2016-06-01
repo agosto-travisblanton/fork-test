@@ -3,43 +3,45 @@
 appModule = angular.module 'skykitProvisioning'
 
 appModule.controller "TenantsCtrl", ($state, $log, TenantsService, ProgressBarService, sweet) ->
-  @tenants = []
+  vm = @
+  
+  vm.tenants = []
 
-  @getTenants = (page_size, offset) =>
-    @offset = offset
-    @loading = true
+  vm.getTenants = (page_size, offset) ->
+    vm.offset = offset
+    vm.loading = true
     ProgressBarService.start()
     promise = TenantsService.fetchAllTenantsPaginated(page_size, offset)
-    promise.then ((response) =>
-      @getFetchSuccess(response)
-    ), (response) =>
-      @getFetchFailure(response)
+    promise.then ((response) ->
+      vm.getFetchSuccess(response)
+    ), (response) ->
+      vm.getFetchFailure(response)
 
-  @initialize = ->
-    @offset = 0
-    @getTenants(100, @offset)
+  vm.initialize = ->
+    vm.offset = 0
+    vm.getTenants(100, vm.offset)
 
-  @getFetchSuccess = (response) ->
-    @tenants = response.tenants
-    @total = response.total
-    @is_first_page = response.is_first_page
-    @is_last_page = response.is_last_page
+  vm.getFetchSuccess = (response) ->
+    vm.tenants = response.tenants
+    vm.total = response.total
+    vm.is_first_page = response.is_first_page
+    vm.is_last_page = response.is_last_page
     ProgressBarService.complete()
-    @loading = false
+    vm.loading = false
 
-  @getFetchFailure = (response) ->
+  vm.getFetchFailure = (response) ->
     ProgressBarService.complete()
     errorMessage = "Unable to fetch tenants. Error: #{response.status} #{response.statusText}."
     sweet.show('Oops...', errorMessage, 'error')
 
-  @editItem = (item) ->
+  vm.editItem = (item) ->
     $state.go 'tenantDetails', {tenantKey: item.key}
 
-  @deleteItem = (item) =>
-    callback = () =>
+  vm.deleteItem = (item) ->
+    callback = () ->
       promise = TenantsService.delete item
-      promise.then () =>
-        @initialize()
+      promise.then () ->
+        vm.initialize()
     
     sweet.show({
       title: "Are you sure?",
@@ -51,4 +53,4 @@ appModule.controller "TenantsCtrl", ($state, $log, TenantsService, ProgressBarSe
       closeOnConfirm: true
     }, callback)
 
-  @
+  vm

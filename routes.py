@@ -53,12 +53,6 @@ application = WSGIApplication(
               handler='handlers.identity_handler.IdentityHandler',
               name='identity'
               ),
-        Route(r'/api/v1/identity/add_user_to_distributor',
-              handler='handlers.identity_handler.IdentityHandler',
-              name='add_user_to_distributor',
-              handler_method="add_user_to_distributor",
-              methods=['POST']
-              ),
 
         Route(r'/login',
               handler='handlers.login_handler.LoginHandler',
@@ -281,16 +275,25 @@ application = WSGIApplication(
         ),
 
         ############################################################
-        # DISTRIBUTORS
+        # USERS
         ############################################################
-
+        Route(
+            r'/api/v1/users',
+            handler='handlers.users_handler.UsersHandler',
+            methods=['POST']
+        ),
         Route(
             r'/api/v1/users/<user_urlsafe_key>/distributors',
-            handler='handlers.distributors_handler.DistributorsHandler',
+            handler='handlers.users_handler.UsersHandler',
             handler_method='get_list_by_user',
             name='get-distributors-by-user',
             methods=['GET']
         ),
+
+        ############################################################
+        # DISTRIBUTORS
+        ############################################################
+
         Route(r'/api/v1/distributors',
               handler='handlers.distributors_handler.DistributorsHandler',
               name='distributors',
@@ -302,11 +305,18 @@ application = WSGIApplication(
               name='distributor-creator',
               methods=['POST']
               ),
+        Route(r'/api/v1/analytics/distributors/<distributor_key>/users',
+              handler='handlers.distributors_handler.DistributorsHandler',
+              handler_method='get_users',
+              methods=['GET']
+              ),
+
         Route(r'/api/v1/distributors/<distributor_key>',
               handler='handlers.distributors_handler.DistributorsHandler',
               name='manage-distributor',
               methods=['GET', 'PUT', 'DELETE']
               ),
+
         Route(r'/api/v1/distributors/<distributor_key>/domains',
               handler='handlers.distributors_handler.DistributorsHandler',
               name='distributor-domains',

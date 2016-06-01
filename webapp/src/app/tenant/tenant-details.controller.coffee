@@ -4,9 +4,10 @@ appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantDetailsCtrl',
   ($stateParams, TenantsService, DomainsService, TimezonesService, DistributorsService, $state, sweet,
-    ProgressBarService, ToastsService, $cookies, $scope, $location) ->
-    @gameStopServer = $location.host().indexOf('provisioning-gamestop') > -1
-    @currentTenant = {
+    ProgressBarService, ToastsService, SessionsService, $scope, $location) ->
+    vm = @
+    vm.gameStopServer = $location.host().indexOf('provisioning-gamestop') > -1
+    vm.currentTenant = {
       key: undefined,
       name: undefined,
       tenant_code: undefined,
@@ -19,45 +20,45 @@ appModule.controller 'TenantDetailsCtrl',
       proof_of_play_url: undefined,
       active: true
     }
-    @selectedDomain = undefined
-    @distributorDomains = []
-    @timezones = []
-    @selectedTimezone = 'America/Chicago'
-    @editMode = !!$stateParams.tenantKey
+    vm.selectedDomain = undefined
+    vm.distributorDomains = []
+    vm.timezones = []
+    vm.selectedTimezone = 'America/Chicago'
+    vm.editMode = !!$stateParams.tenantKey
 
-    if @editMode
+    if vm.editMode
       tenantPromise = TenantsService.getTenantByKey $stateParams.tenantKey
-      tenantPromise.then (tenant) =>
-        @currentTenant = tenant
-        @onSuccessResolvingTenant tenant
+      tenantPromise.then (tenant) ->
+        vm.currentTenant = tenant
+        vm.onSuccessResolvingTenant tenant
 
-    @initialize = ->
+    vm.initialize = ->
       timezonePromise = TimezonesService.getCustomTimezones()
-      timezonePromise.then (data) =>
-        @timezones = data
-      @currentDistributorKey = $cookies.get('currentDistributorKey')
-      distributorDomainPromise = DistributorsService.getDomainsByKey @currentDistributorKey
-      distributorDomainPromise.then (domains) =>
-        @distributorDomains = domains
+      timezonePromise.then (data) ->
+        vm.timezones = data
+      vm.currentDistributorKey = SessionsService.getCurrentDistributorKey()
+      distributorDomainPromise = DistributorsService.getDomainsByKey vm.currentDistributorKey
+      distributorDomainPromise.then (domains) ->
+        vm.distributorDomains = domains
 
-    @onSuccessResolvingTenant = (tenant) =>
-      @selectedTimezone = tenant.default_timezone
+    vm.onSuccessResolvingTenant = (tenant) ->
+      vm.selectedTimezone = tenant.default_timezone
       domainPromise = DomainsService.getDomainByKey tenant.domain_key
-      domainPromise.then (data) =>
-        @selectedDomain = data
+      domainPromise.then (data) ->
+        vm.selectedDomain = data
 
-    @onClickSaveButton = ->
+    vm.onClickSaveButton = ->
       ProgressBarService.start()
-      @currentTenant.default_timezone = @selectedTimezone
-      @currentTenant.domain_key = @selectedDomain.key
-      promise = TenantsService.save @currentTenant
-      promise.then @onSuccessTenantSave, @onFailureTenantSave
+      vm.currentTenant.default_timezone = vm.selectedTimezone
+      vm.currentTenant.domain_key = vm.selectedDomain.key
+      promise = TenantsService.save vm.currentTenant
+      promise.then vm.onSuccessTenantSave, vm.onFailureTenantSave
 
-    @onSuccessTenantSave = ->
+    vm.onSuccessTenantSave = ->
       ProgressBarService.complete()
       ToastsService.showSuccessToast 'We saved your tenant information.'
 
-    @onFailureTenantSave = (errorObject) ->
+    vm.onFailureTenantSave = (errorObject) ->
       ProgressBarService.complete()
       if errorObject.status is 409
         sweet.show('Oops...',
@@ -65,17 +66,17 @@ appModule.controller 'TenantDetailsCtrl',
       else
         sweet.show('Oops...', 'Unable to save the tenant.', 'error')
 
-    @editItem = (item) ->
+    vm.editItem = (item) ->
       $state.go 'editDevice', {deviceKey: item.key, tenantKey: $stateParams.tenantKey}
 
-    @autoGenerateTenantCode = ->
-      unless @currentTenant.key
+    vm.autoGenerateTenantCode = ->
+      unless vm.currentTenant.key
         newTenantCode = ''
-        if @currentTenant.name
-          newTenantCode = @currentTenant.name.toLowerCase()
+        if vm.currentTenant.name
+          newTenantCode = vm.currentTenant.name.toLowerCase()
           newTenantCode = newTenantCode.replace(/\s+/g, '_')
           newTenantCode = newTenantCode.replace(/\W+/g, '')
-        @currentTenant.tenant_code = newTenantCode
+        vm.currentTenant.tenant_code = newTenantCode
 
     $scope.tabIndex = 0
 
@@ -91,4 +92,4 @@ appModule.controller 'TenantDetailsCtrl',
           when 3
             $state.go 'tenantLocations', {tenantKey: $stateParams.tenantKey}
 
-    @
+    vm

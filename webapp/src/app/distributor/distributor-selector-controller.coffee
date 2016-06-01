@@ -2,43 +2,28 @@
 
 appModule = angular.module 'skykitProvisioning'
 
-appModule.controller "DistributorSelectorCtrl", ($scope,
+appModule.controller "DistributorSelectorCtrl", (
   $log,
   $state,
   DistributorsService,
-  SessionsService,
-  ProofPlayService,
-  TenantsService,
-  DevicesService,
-  $cookies,
-  ToastsService) ->
-  # I don't know how to fix the errors in the style guide here
-    @distributors = []
-    @currentDistributor = undefined
-    @loading = true
+  SessionsService) ->
+  vm = @
+  vm.distributors = []
+  vm.currentDistributor = undefined
+  vm.loading = true
 
-    @initialize = ->
-      @loading = true
-      distributorsPromise = DistributorsService.fetchAllByUser(SessionsService.currentUserKey)
-      distributorsPromise.then (data) =>
-        @distributors = data
-        if @distributors.length == 1
-          @selectDistributor(@distributors[0])
-        else
-          @loading = false
+  vm.initialize = ->
+    vm.loading = true
+    distributorsPromise = DistributorsService.fetchAllByUser(SessionsService.getUserKey())
+    distributorsPromise.then (data) ->
+      vm.distributors = data
+      if vm.distributors.length == 1
+        vm.selectDistributor(vm.distributors[0])
+      else
+        vm.loading = false
 
 
-    @selectDistributor = (distributor) =>
-      ProofPlayService.proofplayCache.removeAll()
-      TenantsService.tenantCache.removeAll()
-      DevicesService.deviceCache.removeAll()
-      DevicesService.deviceByTenantCache.removeAll()
-      @currentDistributor = distributor
-      DistributorsService.currentDistributor = @currentDistributor
-      $cookies.put('currentDistributorName', @currentDistributor.name)
-      $cookies.put('currentDistributorKey', @currentDistributor.key)
-      if not @distributors.length == 1
-        ToastsService.showSuccessToast "Distributor #{distributor.name} selected!"
-      $state.go 'welcome'
-
-    @
+  vm.selectDistributor = (distributor) ->
+    DistributorsService.switchDistributor(distributor)
+ 
+  vm

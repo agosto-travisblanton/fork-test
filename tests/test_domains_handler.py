@@ -44,7 +44,7 @@ class TestDomainsHandler(ProvisioningBaseTest):
         }
 
     ##################################################################################################################
-    ## post
+    # post
     ##################################################################################################################
     def test_post_returns_created_status(self):
         request_parameters = {'name': 'dev1.agosto.com',
@@ -147,7 +147,7 @@ class TestDomainsHandler(ProvisioningBaseTest):
                         in context.exception.message)
 
     ##################################################################################################################
-    ## get
+    # get
     ##################################################################################################################
     def test_get_by_key_returns_ok_status(self):
         request_parameters = {}
@@ -190,7 +190,7 @@ class TestDomainsHandler(ProvisioningBaseTest):
         self.assertTrue(self.FORBIDDEN in context.exception.message)
 
     ##################################################################################################################
-    ## put
+    # put
     ##################################################################################################################
 
     def test_device_resource_put_no_authorization_header_returns_forbidden(self):
@@ -214,7 +214,7 @@ class TestDomainsHandler(ProvisioningBaseTest):
         self.assertFalse(updated_domain.active)
 
     ##################################################################################################################
-    ## delete
+    # delete
     ##################################################################################################################
 
     def test_delete_returns_no_content_status(self):

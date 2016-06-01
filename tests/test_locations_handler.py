@@ -53,7 +53,7 @@ class TestLocationsHandler(BaseTest, WebTest):
         }
 
     ##################################################################################################################
-    ## get_locations_by_tenant
+    # get_locations_by_tenant
     ##################################################################################################################
     def test_get_locations_by_tenant_returns_location_list(self):
         tenant = Tenant.create(tenant_code='acme_inc',
@@ -114,7 +114,7 @@ class TestLocationsHandler(BaseTest, WebTest):
         self.assertEqual(len(prev_response_json["locations"]), 25)
 
     ##################################################################################################################
-    ## post
+    # post
     ##################################################################################################################
     def test_post_returns_created_status(self):
         request_parameters = {'tenantKey': self.tenant_key.urlsafe(),
@@ -236,7 +236,7 @@ class TestLocationsHandler(BaseTest, WebTest):
         self.assertTrue(error_message in context.exception.message)
 
     ##################################################################################################################
-    ## get
+    # get
     ##################################################################################################################
     def test_get_location_representation(self):
         request_parameters = {}
@@ -249,7 +249,7 @@ class TestLocationsHandler(BaseTest, WebTest):
         self.assertTrue(response_json.get('active'))
 
     ##################################################################################################################
-    ## put
+    # put
     ##################################################################################################################
     def test_put_returns_no_content_status(self):
         uri = application.router.build(None, 'manage-location', None,

@@ -62,7 +62,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
                                                  {'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
 
     ##################################################################################################################
-    ## post
+    # post
     ##################################################################################################################
 
     def test_post_intent_returns_ok_status(self):
@@ -114,7 +114,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
-    ## reset
+    # reset
     ##################################################################################################################
 
     def test_reset_returns_ok_status(self):
@@ -147,7 +147,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
-    ## delete_content
+    # delete_content
     ##################################################################################################################
 
     def test_delete_content_returns_ok_status(self):
@@ -182,7 +182,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
 
 
     ##################################################################################################################
-    ## content_update
+    # content_update
     ##################################################################################################################
 
     def test_content_update_returns_ok_status(self):
@@ -216,7 +216,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
-    ## volume
+    # volume
     ##################################################################################################################
 
     def test_volume_returns_ok_status(self):
@@ -289,7 +289,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
-    ## device custom command
+    # device custom command
     ##################################################################################################################
 
     def test_custom_command_returns_ok_status(self):
@@ -332,7 +332,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
-    ## power_on
+    # power_on
     ##################################################################################################################
 
     def test_power_on_returns_ok_status(self):
@@ -365,7 +365,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
-    ## power_off
+    # power_off
     ##################################################################################################################
 
     def test_power_off_returns_ok_status(self):
@@ -398,7 +398,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
-    ## refresh_device_representation
+    # refresh_device_representation
     ##################################################################################################################
 
     def test_refresh_device_representation_returns_ok_status(self):
@@ -432,7 +432,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
-    ## resolve_device
+    # resolve_device
     ##################################################################################################################
 
     def test_resolve_device_with_valid_device_key_returns_ok(self):

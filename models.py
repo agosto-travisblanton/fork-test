@@ -55,20 +55,18 @@ class Distributor(ndb.Model):
     @classmethod
     def find_by_name(cls, name):
         if name:
-            key = Distributor.query(Distributor.name == name).get(keys_only=True)
+            distributor_query = Distributor.query().fetch()
 
-            if key:
-                return key.get()
-            else:
-                return None
+            match = None
+
+            for item in distributor_query:
+                if item.name.lower() == name.lower():
+                    match = item
+            return match
 
     @classmethod
     def is_unique(cls, name):
-        distributor = cls.find_by_name(name)
-        if distributor and distributor.name == name:
-            return False
-        else:
-            return True
+        return not cls.find_by_name(name)
 
     @classmethod
     def create(cls,
@@ -607,7 +605,7 @@ class ChromeOsDevice(ndb.Model):
             heartbeat_interval_minutes=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES,
             timezone=timezone,
             timezone_offset=timezone_offset,
-            proof_of_play_editable = proof_of_play_editable)
+            proof_of_play_editable=proof_of_play_editable)
         return device
 
     @classmethod
@@ -892,31 +890,43 @@ class User(ndb.Model):
     def distributor_keys(self):
         dist_user_keys = DistributorUser.query(DistributorUser.user_key == self.key).fetch(keys_only=True)
         dist_users = ndb.get_multi(dist_user_keys)
-        return [du.distributor_key for du in dist_users]
+        return [dist_user.distributor_key for dist_user in dist_users]
 
     @property
     def distributors(self):
-        return ndb.get_multi(self.distributor_keys)
+        if self.is_administrator:
+            return Distributor.query().fetch()
+        else:
+            return ndb.get_multi(self.distributor_keys)
 
     @property
     def distributors_as_admin(self):
-        d = DistributorUser.query(DistributorUser.user_key == self.key).fetch()
-        return [each for each in d if each.is_distributor_administrator]
+        if self.is_administrator:
+            return Distributor.query().fetch()
+        else:
+            distributor_users = DistributorUser.query(DistributorUser.user_key == self.key).fetch()
+            return [each.distributor_key.get() for each in distributor_users if each.is_distributor_administrator]
 
     @property
     def is_distributor_administrator(self):
-        role = UserRole.create_or_get_user_role(1)
-        return DistributorUser.query(DistributorUser.user_key == self.key).filter(
-            DistributorUser.role == role.key).count() > 0
+        if self.is_administrator:
+            return True
+        else:
+            role = UserRole.create_or_get_user_role(1)
+            return DistributorUser.query(DistributorUser.user_key == self.key).filter(
+                DistributorUser.role == role.key).count() > 0
 
     def is_distributor_administrator_of_distributor(self, distributor_name):
-        distributor_key = Distributor.find_by_name(name=distributor_name).key
-        d = DistributorUser.query(DistributorUser.user_key == self.key).filter(
-            DistributorUser.distributor_key == distributor_key).fetch()
-        if d:
-            return d[0].is_distributor_administrator
+        if self.is_administrator:
+            return True
         else:
-            return False
+            distributor_key = Distributor.find_by_name(name=distributor_name).key
+            distributor_user_pair = DistributorUser.query(DistributorUser.user_key == self.key).filter(
+                DistributorUser.distributor_key == distributor_key).fetch()
+            if distributor_user_pair:
+                return distributor_user_pair[0].is_distributor_administrator
+            else:
+                return False
 
     def add_distributor(self, distributor_key, role=0):
         if distributor_key not in self.distributor_keys:
@@ -930,7 +940,7 @@ class User(ndb.Model):
 class UserRole(ndb.Model):
     """
     0 == regular user
-    1 == distributerAdmin
+    1 == distributorAdmin
     """
     role = ndb.IntegerProperty()
     class_version = ndb.IntegerProperty()
@@ -975,9 +985,16 @@ class DistributorUser(ndb.Model):
             distributor_key=distributor_key)
         return distributor_user
 
+    @staticmethod
+    def users_of_distributor(distributor_key):
+        return DistributorUser.query(DistributorUser.distributor_key == distributor_key).fetch()
+
     @property
     def is_distributor_administrator(self):
-        return self.role.get().role == 1
+        if self.user_key.get().is_administrator:
+            return True
+        else:
+            return self.role.get().role == 1
 
     def _pre_put_hook(self):
         self.class_version = 1
