@@ -222,6 +222,13 @@ application = WSGIApplication(
         # TENANTS
         ############################################################
 
+        Route(r'/api/v1/tenants/player_content_update',
+              handler='handlers.tenants_handler.TenantsHandler',
+              name='trigger_cm_update',
+              handler_method='trigger_cm_update',
+              methods=['POST']
+              ),
+
         Route(r'/api/v1/tenants/search/serial/<tenant_urlsafe_key>/<partial_serial>/<unmanaged>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='search_for_device_by_serial_by_tenant',

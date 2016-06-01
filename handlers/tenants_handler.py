@@ -2,7 +2,7 @@ import json
 import logging
 from google.appengine.ext import ndb
 from webapp2 import RequestHandler
-
+from google.appengine.ext import deferred
 from app_config import config
 from content_manager_api import ContentManagerApi
 from decorators import requires_api_token
@@ -11,11 +11,36 @@ from proofplay.database_calls import get_tenant_list_from_distributor_key
 from restler.serializers import json_response
 from strategy import TENANT_STRATEGY
 from utils.iterable_util import delimited_string_to_list
+from device_message_processor import change_intent
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 
+def content_update_for_tenant(tenant_code, host_url):
+    tenant = Tenant.find_by_name(tenant_code)
+    tenant_devices = Tenant.find_devices(tenant.key, unmanaged=False)
+    user_identifier = "CM_CONTENT_UPDATE"
+    for device in tenant_devices:
+        change_intent(
+            gcm_registration_id=device.gcm_registration_id,
+            payload=config.PLAYER_UPDATE_CONTENT_COMMAND,
+            device_urlsafe_key=device.key,
+            host=host_url,
+            user_identifier=user_identifier)
+
+
 class TenantsHandler(RequestHandler):
+    @requires_api_token
+    def trigger_cm_update(self):
+        incoming = json.loads(self.request.body)
+        tenant_code = incoming["tenant_code"]
+        host_url = self.request.host_url
+        deferred.defer(
+            content_update_for_tenant,
+            tenant_code,
+            host_url
+        )
+
     @requires_api_token
     def get_tenants_paginated(self, offset, page_size):
         offset = int(offset)
@@ -222,6 +247,7 @@ class TenantsHandler(RequestHandler):
             domain_key = ndb.Key(urlsafe=domain_key_input)
         except Exception, e:
             logging.exception(e)
+
         if domain_key:
             tenant.domain_key = domain_key
         else:
