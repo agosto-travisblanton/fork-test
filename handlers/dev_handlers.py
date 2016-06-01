@@ -8,6 +8,7 @@ import random
 USER_EMAIL = 'daniel.ternyak@agosto.com'
 DISTRIBUTOR_NAME = 'Dunder'
 SECOND_DISTRIBUTOR = "Mifflin"
+THIRD_DISTRIBUTOR = "Scranton"
 DOMAIN = 'local.skykit.com'
 TENANT_NAME = 'Acme, Inc.'
 TENANT_CODE = 'acme_inc'
@@ -57,26 +58,33 @@ def kick_off(user_first, user_last):
     print array_of_devices_with_values
 
 
-
 def make_data_for_a_distributor():
     ##########################################################################################
     # DISTRIBUTORS
     ##########################################################################################
-    first_distributor = Distributor.query(Distributor.name == SECOND_DISTRIBUTOR).get()
-    if not first_distributor:
-        first_distributor = Distributor.create(name=SECOND_DISTRIBUTOR, active=True)
-        first_distributor.put()
-        print 'Distributor ' + first_distributor.name + ' created'
-    else:
-        print 'Distributor ' + first_distributor.name + ' already exists, so did not create'
-
     distributor = Distributor.query(Distributor.name == DISTRIBUTOR_NAME).get()
     if not distributor:
-        distributor = Distributor.create(name=DISTRIBUTOR_NAME, active=True)
+        distributor = Distributor.create(name=DISTRIBUTOR_NAME)
         distributor.put()
         print 'Distributor ' + distributor.name + ' created'
     else:
         print 'Distributor ' + distributor.name + ' already exists, so did not create'
+
+    second_distributor = Distributor.query(Distributor.name == SECOND_DISTRIBUTOR).get()
+    if not second_distributor:
+        second_distributor = Distributor.create(name=SECOND_DISTRIBUTOR)
+        second_distributor.put()
+        print 'Distributor ' + second_distributor.name + ' created'
+    else:
+        print 'Distributor ' + second_distributor.name + ' already exists, so did not create'
+
+    third_distributor = Distributor.query(Distributor.name == THIRD_DISTRIBUTOR).get()
+    if not third_distributor:
+        third_distributor = Distributor.create(name=THIRD_DISTRIBUTOR)
+        third_distributor.put()
+        print 'Distributor ' + third_distributor.name + ' created'
+    else:
+        print 'Distributor ' + third_distributor.name + ' already exists, so did not create'
 
     ##########################################################################################
     # USERS
