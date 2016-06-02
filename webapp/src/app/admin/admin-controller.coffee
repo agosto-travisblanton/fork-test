@@ -49,7 +49,6 @@ app.controller "AdminCtrl", (
         ), 2000
 
       addUserToDistributorPromise.catch (data) ->
-        console.log data
         ToastsService.showErrorToast data.data.message
 
   vm.makeDistributor = (ev, distributorName, adminEmail, form) ->
@@ -75,7 +74,6 @@ app.controller "AdminCtrl", (
         ), 2000
 
       makeDistributorPromise.catch (data) ->
-        console.log data
         ToastsService.showErrorToast data.data.message
     )
 
