@@ -24,7 +24,7 @@ app.controller "AdminCtrl", (
 
     # no option to select distributor is given when there is only one option
     if not whichDistributor
-      whichDistributor = vm.allDistributors[0]
+      whichDistributor = vm.currentDistributorName
 
     confirm = $mdDialog.confirm(
       {
@@ -49,6 +49,7 @@ app.controller "AdminCtrl", (
         ), 2000
 
       addUserToDistributorPromise.catch (data) ->
+        console.log data
         ToastsService.showErrorToast data.data.message
 
   vm.makeDistributor = (ev, distributorName, adminEmail, form) ->

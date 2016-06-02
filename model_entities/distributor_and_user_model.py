@@ -25,6 +25,8 @@ class Distributor(ndb.Model):
 
         match = None
 
+        print name
+
         for item in distributor_query:
             try:
                 if item.name.lower() == name.lower():

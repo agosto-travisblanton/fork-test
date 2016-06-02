@@ -28,7 +28,7 @@ class UsersHandler(SessionRequestHandler, KeyValidatorMixin):
         current_user = kwargs["current_user"]
 
         if not distributor:
-            return json_response(self.response, {'error': 'Not a valid distributor'}, status_code=403)
+            return json_response(self.response, {'message': 'Not a valid distributor'}, status_code=403)
 
         else:
             distro_admin_of_distributor = current_user.is_distributor_administrator_of_distributor(distributor_name)
@@ -37,7 +37,7 @@ class UsersHandler(SessionRequestHandler, KeyValidatorMixin):
                 return json_response(
                     self.response,
                     {
-                        'error': 'User not allowed to modify this distributor.'
+                        'message': 'User not allowed to modify this distributor.'
                     },
                     status_code=403
                 )
