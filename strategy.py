@@ -1,7 +1,14 @@
 from datetime import datetime
 from google.appengine.ext import ndb
 
-from models import (Tenant, ChromeOsDevice, Distributor, Domain, DeviceIssueLog, PlayerCommandEvent, Location)
+from models import (Tenant,
+                    ChromeOsDevice,
+                    Distributor,
+                    Domain,
+                    DeviceIssueLog,
+                    PlayerCommandEvent,
+                    Location,
+                    IntegrationEventLog)
 from restler.serializers import ModelStrategy
 from utils.datetime_util import elapsed_time_message, convert_timezone
 
@@ -168,3 +175,18 @@ PLAYER_COMMAND_EVENT_STRATEGY += [
     {'confirmedTime': lambda o, field_name, context: o.key.get().confirmed},
     {'confirmed': lambda o, field_name, context: o.key.get().player_has_confirmed}
 ]
+
+INTEGRATION_EVENT_LOG_STRATEGY = ModelStrategy(IntegrationEventLog)
+INTEGRATION_EVENT_LOG_STRATEGY += [
+    {'eventCategory': lambda o, field_name, context: o.key.get().event_category},
+    {'correlationIdentifier': lambda o, field_name, context: o.key.get().correlation_identifier},
+    {'componentName': lambda o, field_name, context: o.key.get().component_name},
+    {'workflowStep': lambda o, field_name, context: o.key.get().workflow_step},
+    {'utcTimestamp': lambda o, field_name, context: o.key.get().utc_timestamp},
+    {'deviceUrlSafeKey': lambda o, field_name, context: o.device_key.urlsafe() if o.device_key is not None else None},
+    {'tenantUrlSafeKey': lambda o, field_name, context: o.tenant_key.urlsafe() if o.tenant_key is not None else None},
+    {'gcmRegistrationId': lambda o, field_name, context: o.key.get().gcm_registration_id},
+    {'macAddress': lambda o, field_name, context: o.key.get().mac_address},
+    {'details': lambda o, field_name, context: o.key.get().detauls}
+]
+
