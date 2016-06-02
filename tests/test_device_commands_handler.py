@@ -1,5 +1,6 @@
 from env_setup import setup_test_paths
 from handlers.device_commands_handler import DeviceCommandsHandler
+import device_message_processor
 
 setup_test_paths()
 
@@ -8,7 +9,6 @@ from agar.test import BaseTest, WebTest
 from app_config import config
 from models import ChromeOsDevice, Tenant, Distributor, Domain
 from routes import application
-import device_message_processor
 from mockito import when, any as any_matcher
 from webtest import AppError
 
@@ -47,9 +47,9 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
                                     active=True)
         self.tenant_key = self.tenant.put()
         self.chrome_os_device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                                      device_id=self.DEVICE_ID,
-                                                      gcm_registration_id=self.GCM_REGISTRATION_ID,
-                                                      mac_address=self.MAC_ADDRESS)
+                                                              device_id=self.DEVICE_ID,
+                                                              gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                                              mac_address=self.MAC_ADDRESS)
         self.chrome_os_device_key = self.chrome_os_device.put()
         self.valid_authorization_header = {
             'Authorization': config.API_TOKEN
@@ -179,7 +179,6 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
             bogus_key
         )
         self.assertTrue(message in context.exception.message)
-
 
     ##################################################################################################################
     # content_update

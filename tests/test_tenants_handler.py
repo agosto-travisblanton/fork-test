@@ -3,8 +3,9 @@ from utils.iterable_util import delimited_string_to_list
 from webtest import AppError
 
 setup_test_paths()
-
+import device_message_processor
 import json
+
 from content_manager_api import ContentManagerApi
 from agar.test import BaseTest, WebTest
 from models import Tenant, TENANT_ENTITY_GROUP_NAME, Distributor, Domain, ChromeOsDevice
@@ -601,3 +602,32 @@ class TestTenantsHandler(BaseTest, WebTest):
             tenant_key = tenant.put()
             tenant_keys.append(tenant_key)
         return tenant_keys
+
+    def load_devices(self, tenant_code, amount=5):
+        tenant = Tenant.find_by_tenant_code(tenant_code)
+        devices = []
+        for x in xrange(amount):
+            device = ChromeOsDevice.create_managed(
+                tenant_key=tenant.key,
+                gcm_registration_id='gcm' + str(x),
+                mac_address='mac' + str(x))
+            device.put()
+            devices.append(device)
+        return devices
+
+    ##################################################################################################################
+    # trigger_cm_update
+    ##################################################################################################################
+
+    def test_trigger_cm_update(self):
+        self.load_tenants()
+        devices = self.load_devices('acme')
+        for each_device in devices:
+            when(device_message_processor).change_intent(each_device.gcm_registration_id,
+                                                         config.PLAYER_UPDATE_CONTENT_COMMAND, any_matcher(str),
+                                                         any_matcher(str)).thenReturn(None)
+
+        uri = application.router.build(None, 'trigger_cm_update', None, {})
+        response = self.app.post_json(uri, params={'tenant_code': 'acme'}, headers=self.headers)
+        self.assertRunAndClearTasksInQueue(1, queue_names="default")
+        self.assertOK(response)

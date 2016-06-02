@@ -17,14 +17,14 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 
 def content_update_for_tenant(tenant_code, host_url):
-    tenant = Tenant.find_by_name(tenant_code)
+    tenant = Tenant.find_by_tenant_code(tenant_code)
     tenant_devices = Tenant.find_devices(tenant.key, unmanaged=False)
     user_identifier = "CM_CONTENT_UPDATE"
     for device in tenant_devices:
         change_intent(
             gcm_registration_id=device.gcm_registration_id,
             payload=config.PLAYER_UPDATE_CONTENT_COMMAND,
-            device_urlsafe_key=device.key,
+            device_urlsafe_key=device.key.urlsafe(),
             host=host_url,
             user_identifier=user_identifier)
 
