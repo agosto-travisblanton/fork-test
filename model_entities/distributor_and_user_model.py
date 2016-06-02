@@ -28,13 +28,8 @@ class Distributor(ndb.Model):
         print name
 
         for item in distributor_query:
-            try:
-                if item.name.lower() == name.lower():
-                    match = item
-            except Exception as e:
-                print e
-                print item.name
-                raise Exception
+            if item.name.lower() == name.lower():
+                match = item
 
         return match
 
