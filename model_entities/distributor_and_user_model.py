@@ -21,15 +21,20 @@ class Distributor(ndb.Model):
 
     @classmethod
     def find_by_name(cls, name):
-        if name:
-            distributor_query = Distributor.query().fetch()
+        distributor_query = Distributor.query().fetch()
 
-            match = None
+        match = None
 
-            for item in distributor_query:
+        for item in distributor_query:
+            try:
                 if item.name.lower() == name.lower():
                     match = item
-            return match
+            except Exception as e:
+                print e
+                print item.name
+                raise Exception
+
+        return match
 
     @classmethod
     def is_unique(cls, name):

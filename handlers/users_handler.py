@@ -19,7 +19,7 @@ class UsersHandler(SessionRequestHandler, KeyValidatorMixin):
     @has_distributor_admin_user_key
     def post(self, **kwargs):
         incoming = json.loads(self.request.body)
-        user_email = incoming["user_email"]
+        user_email = incoming["user_email"].lower()
         user = User.get_or_insert_by_email(email=user_email)
         user_distributors = [each_distro.name for each_distro in user.distributors]
         distributor_name = incoming["distributor"]
@@ -33,6 +33,7 @@ class UsersHandler(SessionRequestHandler, KeyValidatorMixin):
         else:
             distro_admin_of_distributor = current_user.is_distributor_administrator_of_distributor(distributor_name)
             if not distro_admin_of_distributor and not current_user.is_administrator:
+
                 return json_response(
                     self.response,
                     {
