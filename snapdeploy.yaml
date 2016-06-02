@@ -1,4 +1,4 @@
-hash: 20b6bb3a73
+hash: 15f6fecdfc
 module_yaml_files:
 - app.yaml
 - migration.yaml
@@ -6,4 +6,4 @@ module_yaml_files:
 pre-deploy-script: (echo '\n++++++++ RUNNING DEPLOYJS.PY ++++++++\n' && echo '\n++++++++
   YOU SHOULD HAVE BOWER AND NPM PACKAGES INSTALLED BEFORE THIS STEPP ++++++++\n' &&
   python deployjs.py && (echo '\n++++++++ STARTING DEPLOY ++++++++\n'))
-version: 36-5-0
+version: 36-6-0

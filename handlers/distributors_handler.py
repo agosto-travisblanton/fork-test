@@ -51,7 +51,7 @@ class DistributorsHandler(RequestHandler):
     @has_admin_user_key
     def post(self):
         incoming = json.loads(self.request.body)
-        distributor_name = incoming["distributor"].lower()
+        distributor_name = incoming["distributor"]
         admin_email = incoming["admin_email"].lower()
         user = User.get_or_insert_by_email(email=admin_email)
 
