@@ -83,5 +83,8 @@ class AppConfig(Config):
     DEPLOYMENT_COUNTER = None
     PRODUCTION_HOTFIX_COUNTER = None
 
+    DEFAULT_INTEGRATION_EVENTS_CATEGORY = None
+    DEFAULT_INTEGRATION_EVENTS_FETCH_SIZE = None
+
 
 config = AppConfig.get_config()

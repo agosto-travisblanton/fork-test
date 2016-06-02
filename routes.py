@@ -392,6 +392,18 @@ application = WSGIApplication(
               handler_method='get_custom_timezones',
               methods=['GET']
               ),
+
+        ############################################################
+        # INTEGRATION EVENTS LOG
+        ############################################################
+
+        Route(r'/api/v1/integrations_events',
+              handler='handlers.integration_events_log_handler.IntegrationEventsLogHandler',
+              name='integration-events-list',
+              handler_method='get_list',
+              methods=['GET']
+              ),
+
         ############################################################
         # /dev/ routes secured by admin:required
         ############################################################

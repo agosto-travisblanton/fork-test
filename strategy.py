@@ -187,6 +187,6 @@ INTEGRATION_EVENT_LOG_STRATEGY += [
     {'tenantUrlSafeKey': lambda o, field_name, context: o.tenant_key.urlsafe() if o.tenant_key is not None else None},
     {'gcmRegistrationId': lambda o, field_name, context: o.key.get().gcm_registration_id},
     {'macAddress': lambda o, field_name, context: o.key.get().mac_address},
-    {'details': lambda o, field_name, context: o.key.get().detauls}
+    {'details': lambda o, field_name, context: o.key.get().details}
 ]
 

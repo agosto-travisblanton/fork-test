@@ -1,12 +1,11 @@
 from datetime import datetime
 
-from app_config import config
 from env_setup import setup_test_paths
 
 setup_test_paths()
 
 from agar.test import BaseTest
-from models import Domain, Distributor, DeviceIssueLog, ChromeOsDevice, Tenant, IssueLevel, IntegrationEventLog
+from models import Domain, Distributor, ChromeOsDevice, Tenant, IntegrationEventLog
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 

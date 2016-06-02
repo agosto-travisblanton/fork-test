@@ -1,6 +1,6 @@
 import uuid
-from datetime import datetime
 
+from datetime import datetime
 from google.appengine.ext import ndb
 
 from chrome_os_device_model import ChromeOsDevice
@@ -36,11 +36,16 @@ class IntegrationEventLog(ndb.Model):
                tenant_key=None,
                gcm_registration_id=None,
                mac_address=None,
-               details=None):
+               details=None,
+               utc_timestamp=None):
         if correlation_identifier:
             correlation_id = correlation_identifier
         else:
             correlation_id = str(uuid.uuid4().hex)
+        if utc_timestamp:
+            timestamp = utc_timestamp
+        else:
+            timestamp = datetime.utcnow()
         return cls(event_category=event_category,
                    component_name=component_name,
                    workflow_step=workflow_step,
@@ -50,7 +55,7 @@ class IntegrationEventLog(ndb.Model):
                    gcm_registration_id=gcm_registration_id,
                    mac_address=mac_address,
                    details=details,
-                   utc_timestamp= datetime.utcnow())
+                   utc_timestamp=timestamp)
 
     def _pre_put_hook(self):
         self.class_version = 1
