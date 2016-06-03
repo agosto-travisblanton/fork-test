@@ -18,16 +18,14 @@ class IntegrationEventsLogHandler(RequestHandler, PagingListHandlerMixin, KeyVal
 
     @has_admin_user_key
     def get_list(self):
+        category_filter = config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY
         event_category = self.request.get('eventCategory')
         if event_category:
             category_filter = event_category
-        else:
-            category_filter = config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY
+        fetch_size = config.INTEGRATION_EVENTS_DEFAULT_FETCH_SIZE
         page_size = self.request.get('pageSize')
         if page_size:
             fetch_size = int(page_size)
-        else:
-            fetch_size = config.INTEGRATION_EVENTS_DEFAULT_FETCH_SIZE
         query_results = IntegrationEventLog.query(IntegrationEventLog.event_category == category_filter).order(
             IntegrationEventLog.utc_timestamp).fetch(fetch_size)
         json_response(self.response, query_results, strategy=INTEGRATION_EVENT_LOG_STRATEGY)
