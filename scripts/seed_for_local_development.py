@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-from app_config import config
 from model_entities.integration_events_log_model import IntegrationEventLog
 from models import User, Distributor, Domain, Tenant, ChromeOsDevice
 
@@ -18,6 +17,14 @@ MAC_ADDRESS = '54271e619346'
 UNMANAGED_MAC_ADDRESS = '04271e61934b'
 UNMANAGED_GCM_REGISTRATION_ID = '3c70a8d70a6dfa6df76dfas2'
 SERIAL_NUMBER = 'E6MSCX057790'
+INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY = 'Device Registration'
+INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME = 'Player'
+INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_1 = 'Request from Player for device creation'
+INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_2 = 'Request to Directory API for device information'
+INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_3 = 'Request to CM for device creation'
+INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_4 = 'Response from CM for device creation'
+INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_5 = 'Response from Directory API for device information'
+INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_6 = 'Response to Player with resource URL in header'
 
 distributor = Distributor.query(Distributor.name == DISTRIBUTOR_NAME).get()
 if not distributor:
@@ -98,45 +105,45 @@ for device in devices:
     correlation_id = IntegrationEventLog.generate_correlation_id()
     mac = device.mac_address
     event = IntegrationEventLog.create(
-        event_category=config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
-        component_name=config.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
-        workflow_step=config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_1,
+        event_category=INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
+        component_name=INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
+        workflow_step=INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_1,
         gcm_registration_id=device.gcm_registration_id,
         details='payload = {}',
         mac_address=mac,
         utc_timestamp=timestamp + timedelta(seconds=i + 1), correlation_identifier=correlation_id)
     event.put()
     event = IntegrationEventLog.create(
-        event_category=config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
-        component_name=config.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
-        workflow_step=config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_2,
+        event_category=INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
+        component_name=INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
+        workflow_step=INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_2,
         utc_timestamp=timestamp + timedelta(seconds=i + 2), correlation_identifier=correlation_id)
     event.put()
     event = IntegrationEventLog.create(
-        event_category=config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
-        component_name=config.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
-        workflow_step=config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_3,
+        event_category=INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
+        component_name=INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
+        workflow_step=INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_3,
         details='payload = {}',
         utc_timestamp=timestamp + timedelta(seconds=i + 3), correlation_identifier=correlation_id)
     event.put()
     event = IntegrationEventLog.create(
-        event_category=config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
-        component_name=config.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
-        workflow_step=config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_4,
+        event_category=INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
+        component_name=INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
+        workflow_step=INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_4,
         details='201 Created',
         utc_timestamp=timestamp + timedelta(seconds=i + 4), correlation_identifier=correlation_id)
     event.put()
     event = IntegrationEventLog.create(
-        event_category=config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
-        component_name=config.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
-        workflow_step=config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_5,
+        event_category=INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
+        component_name=INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
+        workflow_step=INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_5,
         details='200 OK, Serial Number = {0}'.format(device.serial_number),
         utc_timestamp=timestamp + timedelta(seconds=i + 5), correlation_identifier=correlation_id)
     event.put()
     event = IntegrationEventLog.create(
-        event_category=config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
-        component_name=config.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
-        workflow_step=config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_6,
+        event_category=INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
+        component_name=INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
+        workflow_step=INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_6,
         details='Location = "https://skykit-provisioning.appspot.com/ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGw',
         utc_timestamp=timestamp + timedelta(seconds=i + 6), correlation_identifier=correlation_id)
     event.put()

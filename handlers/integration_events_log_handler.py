@@ -1,7 +1,3 @@
-import json
-import logging
-import re
-
 from webapp2 import RequestHandler
 
 from app_config import config
@@ -15,10 +11,11 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 class IntegrationEventsLogHandler(RequestHandler, PagingListHandlerMixin, KeyValidatorMixin):
+    INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY = 'Device Registration'
 
     @has_admin_user_key
     def get_list(self):
-        category_filter = config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY
+        category_filter = self.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY
         event_category = self.request.get('eventCategory')
         if event_category:
             category_filter = event_category

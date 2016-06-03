@@ -1,9 +1,7 @@
 import json
-import uuid
 
 from datetime import datetime, timedelta
 
-from app_config import config
 from env_setup import setup_test_paths
 from model_entities.integration_events_log_model import IntegrationEventLog
 from routes import application
@@ -15,6 +13,14 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 class TestIntegrationEventsLogHandler(ProvisioningBaseTest):
+    INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY = 'Device Registration'
+    INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME = 'Player'
+    INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_1 = 'Request from Player for device creation'
+    INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_2 = 'Request to Directory API for device information'
+    INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_3 = 'Request to CM for device creation'
+    INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_4 = 'Response from CM for device creation'
+    INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_5 = 'Response from Directory API for device information'
+    INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_6 = 'Response to Player with resource URL in header'
 
     def setUp(self):
         super(TestIntegrationEventsLogHandler, self).setUp()
@@ -32,44 +38,44 @@ class TestIntegrationEventsLogHandler(ProvisioningBaseTest):
         correlation_id = IntegrationEventLog.generate_correlation_id()
         timestamp = datetime.utcnow()
         self.registration_event_1 = IntegrationEventLog.create(
-            event_category=config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
-            component_name=config.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
-            workflow_step=config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_1,
+            event_category=self.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
+            component_name=self.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
+            workflow_step=self.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_1,
             utc_timestamp=timestamp + timedelta(seconds=1),
             correlation_identifier=correlation_id)
         self.registration_event_1.put()
         self.registration_event_2 = IntegrationEventLog.create(
-            event_category=config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
-            component_name=config.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
-            workflow_step=config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_2,
+            event_category=self.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
+            component_name=self.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
+            workflow_step=self.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_2,
             utc_timestamp=timestamp + timedelta(seconds=2),
             correlation_identifier=correlation_id)
         self.registration_event_2.put()
         self.registration_event_3 = IntegrationEventLog.create(
-            event_category=config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
-            component_name=config.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
-            workflow_step=config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_3,
+            event_category=self.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
+            component_name=self.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
+            workflow_step=self.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_3,
             utc_timestamp=timestamp + timedelta(seconds=3),
             correlation_identifier=correlation_id)
         self.registration_event_3.put()
         self.registration_event_4 = IntegrationEventLog.create(
-            event_category=config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
-            component_name=config.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
-            workflow_step=config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_4,
+            event_category=self.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
+            component_name=self.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
+            workflow_step=self.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_4,
             utc_timestamp=timestamp + timedelta(seconds=4),
             correlation_identifier=correlation_id)
         self.registration_event_4.put()
         self.registration_event_5 = IntegrationEventLog.create(
-            event_category=config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
-            component_name=config.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
-            workflow_step=config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_5,
+            event_category=self.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
+            component_name=self.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
+            workflow_step=self.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_5,
             utc_timestamp=timestamp + timedelta(seconds=5),
             correlation_identifier=correlation_id)
         self.registration_event_5.put()
         self.registration_event_6 = IntegrationEventLog.create(
-            event_category=config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
-            component_name=config.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
-            workflow_step=config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_6,
+            event_category=self.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
+            component_name=self.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
+            workflow_step=self.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_6,
             utc_timestamp=timestamp + timedelta(seconds=6),
             correlation_identifier=correlation_id)
         self.registration_event_6.put()
@@ -106,7 +112,7 @@ class TestIntegrationEventsLogHandler(ProvisioningBaseTest):
         response = self.get(uri, params=request_parameters, headers=self.platform_admin_header)
         response_json = json.loads(response.body)
         item_1 = response_json[0]
-        self.assertEqual(item_1['workflowStep'], config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_1)
+        self.assertEqual(item_1['workflowStep'], self.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_1)
         item_6 = response_json[5]
-        self.assertEqual(item_6['workflowStep'], config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_6)
+        self.assertEqual(item_6['workflowStep'], self.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_6)
         self.assertLess(item_1['utcTimestamp'], item_6['utcTimestamp'])
