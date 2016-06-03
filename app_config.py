@@ -71,7 +71,6 @@ class AppConfig(Config):
     MAIL_FROM = None
     MAIL_SERVER_QUEUED_RESPONSE_MESSAGE = 'Queued. Thank you.'
 
-
     EMAIL_SUPPORT = False
 
     DEFAULT_CONTENT_MANAGER_URL = False
@@ -83,5 +82,6 @@ class AppConfig(Config):
     DEPLOYMENT_COUNTER = None
     PRODUCTION_HOTFIX_COUNTER = None
 
+    INTEGRATION_EVENTS_DEFAULT_FETCH_SIZE = None
 
 config = AppConfig.get_config()

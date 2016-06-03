@@ -307,6 +307,8 @@ app_ETHERNET_CONNECTION = 'Ethernet'
 
 app_WIFI_CONNECTION = 'WiFi'
 
+app_INTEGRATION_EVENTS_DEFAULT_FETCH_SIZE = 200
+
 
 def _DEFAULT_CONTENT_MANAGER_URL():
     if on_development_server or not on_server:
