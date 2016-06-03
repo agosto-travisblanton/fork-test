@@ -1,4 +1,5 @@
 import json
+import uuid
 
 from datetime import datetime, timedelta
 
@@ -27,42 +28,50 @@ class TestIntegrationEventsLogHandler(ProvisioningBaseTest):
         self.platform_admin_header = {
             'X-Provisioning-User': self.platform_admin.key.urlsafe()
         }
+
+        correlation_id = IntegrationEventLog.generate_correlation_id()
         timestamp = datetime.utcnow()
         self.registration_event_1 = IntegrationEventLog.create(
-            event_category=config.INTEGRATION_DEFAULT_EVENTS_CATEGORY,
-            component_name=config.INTEGRATION_DEFAULT_COMPONENT_NAME,
+            event_category=config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
+            component_name=config.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
             workflow_step=config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_1,
-            utc_timestamp=timestamp + timedelta(seconds=1))
+            utc_timestamp=timestamp + timedelta(seconds=1),
+            correlation_identifier=correlation_id)
         self.registration_event_1.put()
         self.registration_event_2 = IntegrationEventLog.create(
-            event_category=config.INTEGRATION_DEFAULT_EVENTS_CATEGORY,
-            component_name=config.INTEGRATION_DEFAULT_COMPONENT_NAME,
+            event_category=config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
+            component_name=config.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
             workflow_step=config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_2,
-            utc_timestamp=timestamp + timedelta(seconds=2))
+            utc_timestamp=timestamp + timedelta(seconds=2),
+            correlation_identifier=correlation_id)
         self.registration_event_2.put()
         self.registration_event_3 = IntegrationEventLog.create(
-            event_category=config.INTEGRATION_DEFAULT_EVENTS_CATEGORY,
-            component_name=config.INTEGRATION_DEFAULT_COMPONENT_NAME,
+            event_category=config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
+            component_name=config.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
             workflow_step=config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_3,
-            utc_timestamp=timestamp + timedelta(seconds=3))
+            utc_timestamp=timestamp + timedelta(seconds=3),
+            correlation_identifier=correlation_id)
         self.registration_event_3.put()
         self.registration_event_4 = IntegrationEventLog.create(
-            event_category=config.INTEGRATION_DEFAULT_EVENTS_CATEGORY,
-            component_name=config.INTEGRATION_DEFAULT_COMPONENT_NAME,
+            event_category=config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
+            component_name=config.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
             workflow_step=config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_4,
-            utc_timestamp=timestamp + timedelta(seconds=4))
+            utc_timestamp=timestamp + timedelta(seconds=4),
+            correlation_identifier=correlation_id)
         self.registration_event_4.put()
         self.registration_event_5 = IntegrationEventLog.create(
-            event_category=config.INTEGRATION_DEFAULT_EVENTS_CATEGORY,
-            component_name=config.INTEGRATION_DEFAULT_COMPONENT_NAME,
+            event_category=config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
+            component_name=config.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
             workflow_step=config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_5,
-            utc_timestamp=timestamp + timedelta(seconds=5))
+            utc_timestamp=timestamp + timedelta(seconds=5),
+            correlation_identifier=correlation_id)
         self.registration_event_5.put()
         self.registration_event_6 = IntegrationEventLog.create(
-            event_category=config.INTEGRATION_DEFAULT_EVENTS_CATEGORY,
-            component_name=config.INTEGRATION_DEFAULT_COMPONENT_NAME,
+            event_category=config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY,
+            component_name=config.INTEGRATION_EVENTS_DEFAULT_COMPONENT_NAME,
             workflow_step=config.INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_6,
-            utc_timestamp=timestamp + timedelta(seconds=6))
+            utc_timestamp=timestamp + timedelta(seconds=6),
+            correlation_identifier=correlation_id)
         self.registration_event_6.put()
 
     def test_get_integration_events_list_with_platform_admin_access_returns_ok_http_status(self):

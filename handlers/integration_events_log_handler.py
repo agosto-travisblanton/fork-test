@@ -22,12 +22,12 @@ class IntegrationEventsLogHandler(RequestHandler, PagingListHandlerMixin, KeyVal
         if event_category:
             category_filter = event_category
         else:
-            category_filter = config.DEFAULT_INTEGRATION_EVENTS_CATEGORY
+            category_filter = config.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY
         page_size = self.request.get('pageSize')
         if page_size:
             fetch_size = int(page_size)
         else:
-            fetch_size = config.DEFAULT_INTEGRATION_EVENTS_FETCH_SIZE
+            fetch_size = config.INTEGRATION_EVENTS_DEFAULT_FETCH_SIZE
         query_results = IntegrationEventLog.query(IntegrationEventLog.event_category == category_filter).order(
             IntegrationEventLog.utc_timestamp).fetch(fetch_size)
         json_response(self.response, query_results, strategy=INTEGRATION_EVENT_LOG_STRATEGY)

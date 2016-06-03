@@ -41,7 +41,7 @@ class IntegrationEventLog(ndb.Model):
         if correlation_identifier:
             correlation_id = correlation_identifier
         else:
-            correlation_id = str(uuid.uuid4().hex)
+            correlation_id = cls.generate_correlation_id()
         if utc_timestamp:
             timestamp = utc_timestamp
         else:
@@ -56,6 +56,10 @@ class IntegrationEventLog(ndb.Model):
                    mac_address=mac_address,
                    details=details,
                    utc_timestamp=timestamp)
+
+    @classmethod
+    def generate_correlation_id(cls):
+        return str(uuid.uuid4().hex)
 
     def _pre_put_hook(self):
         self.class_version = 1
