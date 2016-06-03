@@ -97,7 +97,7 @@ class TestUsersHandler(ProvisioningDistributorUserBase):
             "distributor_admin": False
         }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
         self.assertEqual(403, request.status_int)
-        self.assertEqual('Not a valid distributor', json.loads(request.body)["error"])
+        self.assertEqual('Not a valid distributor', json.loads(request.body)["message"])
 
     def test_add_user_to_distributor_that_already_is_linked_as_admin(self):
         request = self.post('/api/v1/users', json.dumps({
