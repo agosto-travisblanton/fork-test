@@ -307,9 +307,16 @@ app_ETHERNET_CONNECTION = 'Ethernet'
 
 app_WIFI_CONNECTION = 'WiFi'
 
-app_DEFAULT_INTEGRATION_EVENTS_CATEGORY = 'Device Registration'
+app_INTEGRATION_DEFAULT_EVENTS_CATEGORY = 'Device Registration'
+app_INTEGRATION_DEFAULT_EVENTS_COMPONENT_NAME = 'Player'
+app_INTEGRATION_EVENTS_DEFAULT_FETCH_SIZE = 200
+app_INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_1 = 'Request from Player for device creation'
+app_INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_2 = 'Request to Directory API for device information'
+app_INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_3 = 'Request to CM for device creation'
+app_INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_4 = 'Response from CM for device creation'
+app_INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_5 = 'Response from Directory API for device information'
+app_INTEGRATION_EVENTS_REGISTRATION_WORKFLOW_STEP_6 = 'Response to Player with resource URL in header'
 
-app_DEFAULT_INTEGRATION_EVENTS_FETCH_SIZE = 200
 
 def _DEFAULT_CONTENT_MANAGER_URL():
     if on_development_server or not on_server:
