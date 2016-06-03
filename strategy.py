@@ -183,8 +183,9 @@ INTEGRATION_EVENT_LOG_STRATEGY += [
     {'componentName': lambda o, field_name, context: o.key.get().component_name},
     {'workflowStep': lambda o, field_name, context: o.key.get().workflow_step},
     {'utcTimestamp': lambda o, field_name, context: o.key.get().utc_timestamp},
-    {'deviceUrlSafeKey': lambda o, field_name, context: o.device_key.urlsafe() if o.device_key is not None else None},
-    {'tenantUrlSafeKey': lambda o, field_name, context: o.tenant_key.urlsafe() if o.tenant_key is not None else None},
+    {'deviceUrlSafeKey': lambda o, field_name, context: o.key.get().device_urlsafe_key},
+    {'serialNumber': lambda o, field_name, context: o.key.get().serial_number},
+    {'tenantCode': lambda o, field_name, context: o.key.get().tenant_code},
     {'gcmRegistrationId': lambda o, field_name, context: o.key.get().gcm_registration_id},
     {'macAddress': lambda o, field_name, context: o.key.get().mac_address},
     {'details': lambda o, field_name, context: o.key.get().details}

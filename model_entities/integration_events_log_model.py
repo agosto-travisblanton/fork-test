@@ -16,8 +16,9 @@ class IntegrationEventLog(ndb.Model):
     workflow_step = ndb.StringProperty(required=True, indexed=True)
     utc_timestamp = ndb.DateTimeProperty(required=True, indexed=True)
 
-    device_key = ndb.KeyProperty(kind=ChromeOsDevice, required=False, indexed=True)
-    tenant_key = ndb.KeyProperty(kind=Tenant, required=False, indexed=True)
+    device_urlsafe_key = ndb.StringProperty(required=False, indexed=True)
+    serial_number = ndb.StringProperty(required=False, indexed=True)
+    tenant_code = ndb.StringProperty(required=False, indexed=True)
     gcm_registration_id = ndb.StringProperty(required=False, indexed=True)
     mac_address = ndb.StringProperty(required=False, indexed=True)
     details = ndb.StringProperty(required=False, indexed=True)
@@ -32,8 +33,9 @@ class IntegrationEventLog(ndb.Model):
                component_name,
                workflow_step,
                correlation_identifier=None,
-               device_key=None,
-               tenant_key=None,
+               device_urlsafe_key=None,
+               serial_number=None,
+               tenant_code=None,
                gcm_registration_id=None,
                mac_address=None,
                details=None,
@@ -50,8 +52,9 @@ class IntegrationEventLog(ndb.Model):
                    component_name=component_name,
                    workflow_step=workflow_step,
                    correlation_identifier=correlation_id,
-                   device_key=device_key,
-                   tenant_key=tenant_key,
+                   device_urlsafe_key=device_urlsafe_key,
+                   serial_number=serial_number,
+                   tenant_code=tenant_code,
                    gcm_registration_id=gcm_registration_id,
                    mac_address=mac_address,
                    details=details,
