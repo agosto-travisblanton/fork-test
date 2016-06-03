@@ -3,8 +3,6 @@ import uuid
 from datetime import datetime
 from google.appengine.ext import ndb
 
-from chrome_os_device_model import ChromeOsDevice
-from location_and_tenant_model import Tenant
 from restler.decorators import ae_ndb_serializer
 
 

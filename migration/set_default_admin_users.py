@@ -9,7 +9,8 @@ from provisioning_env import (
 DEFAULT_PROD_ADMIN_USERS = [
     "marla.geary@agosto.com",
     "michael.allen@agosto.com",
-    "thomas.blade@agosto.com"
+    "thomas.blade@agosto.com",
+    "bob.macneal@agosto.com"
 ]
 
 DEFAULT_INT_ADMIN_USERS = [

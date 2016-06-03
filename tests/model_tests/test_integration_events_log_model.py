@@ -5,8 +5,7 @@ from tests.provisioning_distributor_user_base_test import ProvisioningDistributo
 
 setup_test_paths()
 
-from agar.test import BaseTest
-from models import Domain, Distributor, ChromeOsDevice, Tenant, IntegrationEventLog
+from models import IntegrationEventLog
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
