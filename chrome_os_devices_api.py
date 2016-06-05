@@ -241,9 +241,15 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
                 logging.error('Error notifying CM of create_device')
             return device
         else:
+            device_not_found_event = IntegrationEventLog.create(
+                event_category='Registration',
+                component_name='Chrome Directory API',
+                workflow_step='Requested device not found',
+                mac_address=device_mac_address,
+                gcm_registration_id=gcm_registration_id,
+                correlation_identifier=correlation_id)
+            device_not_found_event.put()
             if new_page_token:
-                api_response_event.details = 'new page token'
-                api_response_event.put()
                 deferred.defer(register_device,
                                device_urlsafe_key=device_urlsafe_key,
                                device_mac_address=device_mac_address,
