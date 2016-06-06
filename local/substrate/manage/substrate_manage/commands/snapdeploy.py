@@ -149,6 +149,7 @@ def save_config(config):
 
 if __name__ == "__main__":
     args = parser.parse_known_args(sys.argv[1:])
+    print args
     vc_type = get_version_control_type()
     if vc_type is None:
         print("No version control detected. Snapdeploy requires the use of Git or Mercurial.")
