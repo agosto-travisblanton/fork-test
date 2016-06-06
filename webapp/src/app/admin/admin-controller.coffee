@@ -30,7 +30,7 @@ app.controller "AdminCtrl", (
         {
           title: 'Are you sure?'
           textContent: "#{userEmail} will be added to #{whichDistributor}
-        #{withOrWithout} administrator priviledges"
+        #{withOrWithout} administrator privileges"
           targetEvent: ev
           ok: 'Of course!'
           cancel: 'Oops, nevermind.'
