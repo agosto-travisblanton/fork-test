@@ -1,6 +1,6 @@
 'use strict'
 
-authenticated = (SessionsService, $q) ->
+authenticated = (SessionsService, $q, $state, $timeout) ->
   deferred = $q.defer()
 
   userKey = SessionsService.getUserKey()
@@ -9,30 +9,44 @@ authenticated = (SessionsService, $q) ->
     deferred.resolve()
 
   else
-    deferred.reject()
+    $timeout (->
+      $state.go 'sign_in'
+    ), 500
+
+    deferred.reject('sign_in')
 
   deferred.promise
 
-notAuthenticated = (SessionsService, $q) ->
+notAuthenticated = (SessionsService, $q, $state, $timeout) ->
   deferred = $q.defer()
 
   userKey = SessionsService.getUserKey()
   if not userKey
     deferred.resolve()
+
   else
-    deferred.reject()
+    $timeout (->
+      $state.go 'home'
+    ), 500
+
+    deferred.reject('home')
 
   deferred.promise
 
-isAdminOrDistributorAdmin = (SessionsService, $q) ->
+isAdminOrDistributorAdmin = (SessionsService, $q, $state, $timeout) ->
   deferred = $q.defer()
   admin = SessionsService.getIsAdmin()
   distributorAdmin = SessionsService.getDistributorsAsAdmin().length > 0
 
   if not admin and not distributorAdmin
-    deferred.reject()
+    $timeout (->
+      $state.go 'sign_in'
+    ), 500
+    deferred.reject('home')
+
   else
     deferred.resolve()
+    
   deferred.promise
 
 

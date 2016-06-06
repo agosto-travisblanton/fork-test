@@ -2,7 +2,7 @@
 
 app = angular.module 'skykitProvisioning'
 
-app.run (StorageService, Restangular, $location) ->
+app.run (StorageService, Restangular, $location, $rootScope, $state) ->
   app.constant("moment", moment)
 
   Restangular.addRequestInterceptor (elem, operation, what, url) ->
