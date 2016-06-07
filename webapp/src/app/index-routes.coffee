@@ -9,10 +9,6 @@ authenticated = (SessionsService, $q, $state, $timeout) ->
     deferred.resolve()
 
   else
-    $timeout (->
-      $state.go 'sign_in'
-    ), 500
-
     deferred.reject('sign_in')
 
   deferred.promise
@@ -25,10 +21,6 @@ notAuthenticated = (SessionsService, $q, $state, $timeout) ->
     deferred.resolve()
 
   else
-    $timeout (->
-      $state.go 'home'
-    ), 500
-
     deferred.reject('home')
 
   deferred.promise
@@ -36,17 +28,22 @@ notAuthenticated = (SessionsService, $q, $state, $timeout) ->
 isAdminOrDistributorAdmin = (SessionsService, $q, $state, $timeout) ->
   deferred = $q.defer()
   admin = SessionsService.getIsAdmin()
-  distributorAdmin = SessionsService.getDistributorsAsAdmin().length > 0
+  distributorAdmin = SessionsService.getDistributorsAsAdmin()
+  if distributorAdmin and distributorAdmin.length < 0
+    hasAtLeastOneDistributorAdmin = true
 
-  if not admin and not distributorAdmin
-    $timeout (->
-      $state.go 'sign_in'
-    ), 500
+  userKey = SessionsService.getUserKey()
+
+  if not userKey
+    deferred.reject('sign_in')
+
+
+  if not admin and not hasAtLeastOneDistributorAdmin
     deferred.reject('home')
 
   else
     deferred.resolve()
-    
+
   deferred.promise
 
 
@@ -66,12 +63,19 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("signed_out", {
     url: "/signed_out",
+    resolve: {
+      identity: (IdentityService) ->
+        IdentityService.getIdentity()
+      notAuthenticated: notAuthenticated
+    },
     templateUrl: "app/authentication/signed_out.html",
     controller: "AuthenticationCtrl",
     controllerAs: 'authenticationCtrl',
   })
   $stateProvider.state("sign_out", {
     resolve: {
+      identity: (IdentityService) ->
+        IdentityService.getIdentity()
       authenticated: authenticated
     },
     url: "/sign_out",
@@ -313,7 +317,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("admin", {
     resolve: {
-      authenticated: authenticated,
       isAdmin: isAdminOrDistributorAdmin
     },
     url: "/admin",

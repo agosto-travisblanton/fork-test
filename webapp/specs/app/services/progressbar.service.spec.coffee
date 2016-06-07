@@ -2,14 +2,11 @@
 
 describe 'ProgressBarService', ->
   ProgressBarService = undefined
-  ngProgressFactory = undefined
 
   beforeEach module('skykitProvisioning')
 
-  beforeEach inject (_ProgressBarService_, _ngProgressFactory_) ->
+  beforeEach inject (_ProgressBarService_) ->
     ProgressBarService = _ProgressBarService_
-    ngProgressFactory = _ngProgressFactory_
-
 
   describe 'constructor', ->
     it 'creates an instance of progress bar', ->

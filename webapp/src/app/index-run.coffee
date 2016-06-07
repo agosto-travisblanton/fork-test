@@ -5,10 +5,16 @@ app = angular.module 'skykitProvisioning'
 app.run (StorageService, Restangular, $location, $rootScope, $state) ->
   app.constant("moment", moment)
 
+  $rootScope.$on '$stateChangeError', (event, toState, toParams, fromState, fromParams, error) ->
+    $state.go error
+
   Restangular.addRequestInterceptor (elem, operation, what, url) ->
+
     authToken = '6C346588BD4C6D722A1165B43C51C'
+
     if $location.host().indexOf('provisioning-gamestop') > -1
       authToken = '5XZHBF3mOwqJlYAlG1NeeWX0Cb72g'
+
     Restangular.setDefaultHeaders {
       'Content-Type': 'application/json'
       'Accept': 'application/json'
@@ -16,7 +22,7 @@ app.run (StorageService, Restangular, $location, $rootScope, $state) ->
       'X-Provisioning-User': StorageService.get('userKey')
       'X-Provisioning-Distributor': StorageService.get('currentDistributorKey')
     }
-    distributorKey = StorageService.get('currentDistributorKey')
+
     if operation == 'remove'
       return undefined
 
