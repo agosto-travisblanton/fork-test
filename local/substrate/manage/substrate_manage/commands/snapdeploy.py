@@ -43,7 +43,7 @@ VC_TYPE_GIT = "git"
 VC_TYPE_HG = "hg"
 
 parser = argparse.ArgumentParser(description='Perform application deployment on App Engine.',
-    epilog='Any additional arguments are passed verbatim to appcfg.py')
+                                 epilog='Any additional arguments are passed verbatim to appcfg.py')
 parser.add_argument('-V', dest='version', help='override version setting in snapdeploy.yaml')
 parser.add_argument('--ignore-unclean', action='store_true', help='ignore dirty workarea')
 parser.add_argument('--ignore-branch', action='store_true', help='allow deploy from any branch')
@@ -149,7 +149,6 @@ def save_config(config):
 
 if __name__ == "__main__":
     args = parser.parse_known_args(sys.argv[1:])
-    print args
     vc_type = get_version_control_type()
     if vc_type is None:
         print("No version control detected. Snapdeploy requires the use of Git or Mercurial.")
@@ -179,6 +178,7 @@ if __name__ == "__main__":
     else:
         old_version = None
         new_version = 1
+
     if args[0].version is not None:
         new_version = args[0].version
 
@@ -195,12 +195,15 @@ if __name__ == "__main__":
     full_version = '{}-{}'.format(new_version, changeset_info.hash)
     print('New version: {}'.format(full_version))
 
-    print('=== Deploying...')
-    for yaml_filename in config['module_yaml_files'] + ['.']:
-        if subprocess.call(['appcfg.py', 'update', yaml_filename] + args[1] + ['-V', '{}'.format(full_version)]) != 0:
-            print('Deployment failed!')
-            revert_file(vc_type, 'snapdeploy.yaml')
-            sys.exit(1)
+    for project in args[1][1:]:
+        print('=== Deploying: {}'.format(project))
+        for yaml_filename in config['module_yaml_files'] + ['.']:
+            appcfg_command = ['appcfg.py', 'update', yaml_filename] + ["-A {}".format(project)] + ['-V', '{}'.format(
+                full_version)]
+            if subprocess.call(appcfg_command) != 0:
+                print('Deployment failed!')
+                revert_file(vc_type, 'snapdeploy.yaml')
+                sys.exit(1)
 
     print("=== Output of '{} status':".format(vc_type))
     cmd_output = Popen(['{}'.format(vc_type), 'status'], stdout=PIPE).communicate()[0]
@@ -213,8 +216,5 @@ if __name__ == "__main__":
     print('YOUR WORK IS NOT DONE YET, HUMAN.  YOUR NEXT ASSIGNMENT IS AS FOLLOWS:')
     if new_version != old_version:
         print(" - Run '{} commit' and '{} push' to save snapdeploy.yaml changes.".format(vc_type, vc_type))
-    print(" - Make version '{}' the default version on app engine console (https://appengine.google.com).".format(full_version))
-
-    # Direct web browser to version management page on app engine console.
-    #Popen(['open', 'https://appengine.google.com/deployment?&app_id=s~{}'.format(APPLICATION_ID)])
-
+    print(" - Make version '{}' the default version on app engine console (https://appengine.google.com).".format(
+        full_version))
