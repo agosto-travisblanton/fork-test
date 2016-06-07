@@ -61,5 +61,5 @@ describe 'SessionsService', ->
       $httpBackend.expectGET('/api/v1/identity').respond(identityResponse)
       result = SessionsService.login expectedCredentials
       $httpBackend.flush()
-      result.then (data) ->
+      result.then (data) =>
         expect(SessionsService.getUserKey()).toEqual expectedCallbackResponse.user.key
