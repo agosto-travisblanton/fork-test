@@ -58,18 +58,6 @@ describe 'skykitProvisioning module and configuration', ->
       deviceKey = '3741833e781236b4jwdfhhfds98fyasd6fa7d6'
       expect($state.href('editDevice', {deviceKey: deviceKey})).toEqual("#/devices/#{deviceKey}")
 
-    it 'should resolve \'deviceReset\' state', ->
-      deviceKey = '3741833e781236b4jwdfhhfds98fyasd6fa7d6'
-      expect($state.href('deviceReset', {deviceKey: deviceKey})).toEqual("#/devices/#{deviceKey}/commands/reset")
-
-    it 'should resolve \'deviceVolume\' state', ->
-      deviceKey = '3741833e781236b4jwdfhhfds98fyasd6fa7d6'
-      expect($state.href('deviceVolume', {deviceKey: deviceKey})).toEqual("#/devices/#{deviceKey}/commands/volume")
-
-    it 'should resolve \'deviceCustom\' state', ->
-      deviceKey = '3741833e781236b4jwdfhhfds98fyasd6fa7d6'
-      expect($state.href('deviceCustom', {deviceKey: deviceKey})).toEqual("#/devices/#{deviceKey}/commands/custom")
-
   describe 'breadcrumbs', ->
     describe 'labels', ->
       it 'should resolve \'home\' state', ->
@@ -144,15 +132,6 @@ describe 'skykitProvisioning module and configuration', ->
 
       it 'should resolve \'editDevice\' state', ->
         expect($state.get('editDevice').ncyBreadcrumb.parent).toBe 'devices'
-
-      it 'should resolve \'deviceReset\' state', ->
-        expect($state.get('deviceReset').ncyBreadcrumb.parent).toBe 'devices'
-
-      it 'should resolve \'deviceVolume\' state', ->
-        expect($state.get('deviceVolume').ncyBreadcrumb.parent).toBe 'devices'
-
-      it 'should resolve \'deviceCustom\' state', ->
-        expect($state.get('deviceCustom').ncyBreadcrumb.parent).toBe 'devices'
 
       it 'should resolve \'addLocation\' state', ->
         expect($state.get('addLocation').ncyBreadcrumb.parent).toBe 'tenants'

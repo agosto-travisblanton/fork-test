@@ -65,10 +65,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     controllerAs: 'authenticationCtrl',
   })
   $stateProvider.state("signed_out", {
-    resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-    },
     url: "/signed_out",
     templateUrl: "app/authentication/signed_out.html",
     controller: "AuthenticationCtrl",
@@ -76,9 +72,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("sign_out", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-
       authenticated: authenticated
     },
     url: "/sign_out",
@@ -88,8 +81,7 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("distributor_selection", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
+      authenticated: authenticated
     },
     url: "/distributor_selection",
     templateUrl: "app/distributor/distributor_selector.html",
@@ -126,8 +118,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("domains", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
       authenticated: authenticated
     },
     url: "/domains",
@@ -140,8 +130,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("addDomain", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
       authenticated: authenticated
     },
     url: "/domains/add",
@@ -155,8 +143,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("editDomain", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
       authenticated: authenticated
     },
     url: "/domains/:domainKey",
@@ -170,8 +156,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("tenants", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
       authenticated: authenticated
     },
     url: "/tenants",
@@ -184,8 +168,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("addTenant", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
       authenticated: authenticated
     },
     url: "/tenants/add",
@@ -199,8 +181,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("tenantDetails", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
       authenticated: authenticated
     },
     url: "/tenants/:tenantKey/details",
@@ -214,8 +194,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("tenantManagedDevices", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
       authenticated: authenticated
     },
     url: "/tenants/:tenantKey/managed",
@@ -229,8 +207,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("tenantUnmanagedDevices", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
       authenticated: authenticated
     },
     url: "/tenants/:tenantKey/unmanaged",
@@ -244,8 +220,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("tenantLocations", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
       authenticated: authenticated
     },
     url: "/tenants/:tenantKey/locations",
@@ -259,8 +233,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("editLocation", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
       authenticated: authenticated
     },
     url: "/locations/:locationKey",
@@ -274,8 +246,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("addLocation", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
       authenticated: authenticated
     },
     url: "/tenants/:tenantKey/location",
@@ -289,8 +259,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("devices", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
       authenticated: authenticated
     },
     url: "/devices",
@@ -321,8 +289,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("proof", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
       authenticated: authenticated
     },
     url: "/proof",
@@ -335,8 +301,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("proofDetail", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
       authenticated: authenticated
     },
     url: "/proof/:tenant",
@@ -349,8 +313,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("admin", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
       authenticated: authenticated,
       isAdmin: isAdminOrDistributorAdmin
     },
