@@ -319,51 +319,6 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
       return
     controllerAs: 'deviceDetailsCtrl'
   })
-  $stateProvider.state("deviceReset", {
-    resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
-    },
-    url: "/devices/:deviceKey/commands/reset",
-    templateUrl: "app/device/device-detail.html",
-    ncyBreadcrumb: {
-      label: '{{ deviceDetailsCtrl.currentDevice.key }}'
-      parent: 'devices'
-    },
-    controller: 'DeviceDetailsCtrl'
-    controllerAs: 'deviceDetailsCtrl'
-  })
-  $stateProvider.state("deviceVolume", {
-    resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
-    },
-    url: "/devices/:deviceKey/commands/volume",
-    templateUrl: "app/device/device-detail.html",
-    ncyBreadcrumb: {
-      label: '{{ deviceDetailsCtrl.currentDevice.key }}'
-      parent: 'devices'
-    },
-    controller: 'DeviceDetailsCtrl'
-    controllerAs: 'deviceDetailsCtrl'
-  })
-  $stateProvider.state("deviceCustom", {
-    resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
-    },
-    url: "/devices/:deviceKey/commands/custom",
-    templateUrl: "app/device/device-detail.html",
-    ncyBreadcrumb: {
-      label: '{{ deviceDetailsCtrl.currentDevice.key }}'
-      parent: 'devices'
-    },
-    controller: 'DeviceDetailsCtrl'
-    controllerAs: 'deviceDetailsCtrl'
-  })
   $stateProvider.state("proof", {
     resolve: {
       identity: (IdentityService) ->
