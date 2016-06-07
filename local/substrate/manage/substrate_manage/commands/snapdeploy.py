@@ -198,7 +198,7 @@ if __name__ == "__main__":
     for project in args[1][1:]:
         print('=== Deploying: {}'.format(project))
         for yaml_filename in config['module_yaml_files'] + ['.']:
-            appcfg_command = ['appcfg.py', 'update', yaml_filename] + ["-A {}".format(project)] + ['-V', '{}'.format(
+            appcfg_command = ['appcfg.py', 'update', yaml_filename] + ["-A", project] + ['-V', '{}'.format(
                 full_version)]
             if subprocess.call(appcfg_command) != 0:
                 print('Deployment failed!')
