@@ -2,19 +2,21 @@
 
 app = angular.module 'skykitProvisioning'
 
-app.run (StorageService, Restangular, $location, $rootScope, $state) ->
+app.run (StorageService, Restangular, $location, $injector, $rootScope, $timeout) ->
   app.constant("moment", moment)
 
-  $rootScope.$on '$stateChangeError', (event, toState, toParams, fromState, fromParams, error) ->
-    $state.go error
+  stateChangeWatch = ->
+    state = $injector.get('$state')
+    $rootScope.$on '$stateChangeError', (event, toState, toParams, fromState, fromParams, error) ->
+      if error[0] == "authError"
+        state.go error[1]
+
+  $timeout(stateChangeWatch, 500)
 
   Restangular.addRequestInterceptor (elem, operation, what, url) ->
-
     authToken = '6C346588BD4C6D722A1165B43C51C'
-
     if $location.host().indexOf('provisioning-gamestop') > -1
       authToken = '5XZHBF3mOwqJlYAlG1NeeWX0Cb72g'
-
     Restangular.setDefaultHeaders {
       'Content-Type': 'application/json'
       'Accept': 'application/json'

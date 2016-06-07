@@ -1,6 +1,6 @@
 'use strict'
 
-authenticated = (SessionsService, $q, $state, $timeout) ->
+authenticated = (SessionsService, $q) ->
   deferred = $q.defer()
 
   userKey = SessionsService.getUserKey()
@@ -9,11 +9,11 @@ authenticated = (SessionsService, $q, $state, $timeout) ->
     deferred.resolve()
 
   else
-    deferred.reject('sign_in')
+    deferred.reject(["authError", 'sign_in'])
 
   deferred.promise
 
-notAuthenticated = (SessionsService, $q, $state, $timeout) ->
+notAuthenticated = (SessionsService, $q) ->
   deferred = $q.defer()
 
   userKey = SessionsService.getUserKey()
@@ -21,14 +21,15 @@ notAuthenticated = (SessionsService, $q, $state, $timeout) ->
     deferred.resolve()
 
   else
-    deferred.reject('home')
+    deferred.reject(["authError", 'home'])
 
   deferred.promise
 
-isAdminOrDistributorAdmin = (SessionsService, $q, $state, $timeout) ->
+isAdminOrDistributorAdmin = (SessionsService, $q) ->
   deferred = $q.defer()
   admin = SessionsService.getIsAdmin()
   distributorAdmin = SessionsService.getDistributorsAsAdmin()
+  
   if distributorAdmin and distributorAdmin.length < 0
     hasAtLeastOneDistributorAdmin = true
 
@@ -37,9 +38,8 @@ isAdminOrDistributorAdmin = (SessionsService, $q, $state, $timeout) ->
   if not userKey
     deferred.reject('sign_in')
 
-
   if not admin and not hasAtLeastOneDistributorAdmin
-    deferred.reject('home')
+    deferred.reject(["authError", 'home'])
 
   else
     deferred.resolve()
