@@ -75,12 +75,14 @@ class TestContentManagerApi(BaseTest):
 
     def test_create_device_success_returns_true(self):
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=201))
-        result = self.content_manager_api.create_device(device_urlsafe_key=self.device_key.urlsafe())
+        result = self.content_manager_api.create_device(device_urlsafe_key=self.device_key.urlsafe(),
+                                                        correlation_id='some correlation id')
         self.assertTrue(result)
 
     def test_create_device_failure_returns_false(self):
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=400))
-        result = self.content_manager_api.create_device(device_urlsafe_key=self.device_key.urlsafe())
+        result = self.content_manager_api.create_device(device_urlsafe_key=self.device_key.urlsafe(),
+                                                        correlation_id='some correlation id')
         self.assertFalse(result)
 
     ##################################################################################################################
