@@ -28,12 +28,13 @@ angular.module('skykitProvisioning')
       deferred = $q.defer()
       admin = SessionsService.getIsAdmin()
       distributorAdmin = SessionsService.getDistributorsAsAdmin()
-      if distributorAdmin and distributorAdmin.length < 0
+      hasAtLeastOneDistributorAdmin = false
+      if distributorAdmin and distributorAdmin.length > 0
         hasAtLeastOneDistributorAdmin = true
       userKey = SessionsService.getUserKey()
       if not userKey
         deferred.reject('sign_in')
-      if not admin and not hasAtLeastOneDistributorAdmin
+      else if not admin and not hasAtLeastOneDistributorAdmin
         deferred.reject(["authError", 'home'])
       else
         deferred.resolve(true)
