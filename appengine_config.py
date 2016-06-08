@@ -309,7 +309,7 @@ app_WIFI_CONNECTION = 'WiFi'
 
 app_INTEGRATION_EVENTS_DEFAULT_FETCH_SIZE = 200
 
-backup_BACKUP_SENDER = 'Backup Datastore Service gcp.admin@agosto.com'
+backup_BACKUP_EMAIL_SENDER = 'Backup Datastore Service <gcp.admin@agosto.com>'
 
 
 def _DEFAULT_CONTENT_MANAGER_URL():
