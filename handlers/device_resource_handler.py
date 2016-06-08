@@ -12,6 +12,7 @@ from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address
 from content_manager_api import ContentManagerApi
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from device_message_processor import post_unmanaged_device_info, change_intent
+from model_entities.integration_events_log_model import IntegrationEventLog
 from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup, DeviceIssueLog
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
@@ -401,9 +402,21 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 self.response.headers.pop('Content-Type', None)
                 self.response.set_status(status)
             else:
+                correlation_id = IntegrationEventLog.generate_correlation_id()
+                registration_request_event = IntegrationEventLog.create(
+                    event_category='Registration',
+                    component_name='Player',
+                    workflow_step='Request from Player to create a managed device',
+                    mac_address=device_mac_address,
+                    gcm_registration_id=gcm_registration_id,
+                    correlation_identifier=correlation_id)
+                registration_request_event.put()
                 if ChromeOsDevice.mac_address_already_assigned(device_mac_address):
                     status = 400
                     error_message = 'Cannot register because macAddress already assigned to managed device.'
+                    self.response.set_status(status, error_message)
+                    registration_request_event.details = error_message
+                    registration_request_event.put()
                     self.response.set_status(status, error_message)
                     return
                 tenant_code = request_json.get('tenantCode')
@@ -411,11 +424,17 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     status = 400
                     error_message = 'The tenantCode parameter is invalid.'
                     self.response.set_status(status, error_message)
+                    registration_request_event.details = error_message
+                    registration_request_event.put()
+                    self.response.set_status(status, error_message)
                     return
                 tenant_key = Tenant.query(Tenant.tenant_code == tenant_code, Tenant.active == True).get(keys_only=True)
                 if tenant_key is None:
                     status = 400
                     error_message = 'Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
+                    self.response.set_status(status, error_message)
+                    registration_request_event.details = error_message
+                    registration_request_event.put()
                     self.response.set_status(status, error_message)
                     return
                 if status == 201:
@@ -424,9 +443,13 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                            mac_address=device_mac_address,
                                                            timezone=timezone)
                     key = device.put()
+                    registration_request_event.details = 'register_device with device key {0}.'.format(key.urlsafe())
+                    registration_request_event.put()
                     deferred.defer(register_device,
                                    device_urlsafe_key=key.urlsafe(),
                                    device_mac_address=device_mac_address,
+                                   gcm_registration_id=gcm_registration_id,
+                                   correlation_id=correlation_id,
                                    _queue='directory-api',
                                    _countdown=3)
                     device_uri = self.request.app.router.build(None,
@@ -436,6 +459,15 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     self.response.headers['Location'] = device_uri
                     self.response.headers.pop('Content-Type', None)
                     self.response.set_status(status)
+                    registration_response_event = IntegrationEventLog.create(
+                        event_category='Registration',
+                        component_name='Provisioning',
+                        workflow_step='Response to Player after creating a managed device.',
+                        mac_address=device_mac_address,
+                        gcm_registration_id=gcm_registration_id,
+                        correlation_identifier=correlation_id,
+                        details='Device resource uri {0} returned in response Location header.'.format(device_uri))
+                    registration_response_event.put()
                     notifier = EmailNotify()
                     notifier.device_enrolled(tenant_code=tenant_code,
                                              tenant_name=device.get_tenant().name,
