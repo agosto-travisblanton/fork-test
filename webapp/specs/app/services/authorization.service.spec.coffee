@@ -28,7 +28,6 @@ describe 'AuthorizationService', ->
       toResolve = AuthorizationService.notAuthenticated()
       toResolve.then (data) ->
         expect(data).toEqual ["authError", 'home']
-        
 
     it '.notAuthenticated resolves', ->
       toResolve = AuthorizationService.isAdminOrDistributorAdmin()
@@ -51,14 +50,12 @@ describe 'AuthorizationService', ->
       toResolve = AuthorizationService.notAuthenticated()
       toResolve.then (data) ->
         expect(data).toEqual true
-        
 
     it '.notAuthenticated resolves', ->
       toResolve = AuthorizationService.isAdminOrDistributorAdmin()
       toResolve.then (data) ->
         expect(data).toEqual ["authError", 'sign_in']
-        
-        
+
   describe 'AuthorizationService as DistributorAdmin User', ->
     beforeEach ->
       promise = new skykitProvisioning.q.Mock
@@ -75,7 +72,6 @@ describe 'AuthorizationService', ->
       toResolve = AuthorizationService.notAuthenticated()
       toResolve.then (data) ->
         expect(data).toEqual ["authError", 'home']
-        
 
     it '.notAuthenticated resolves', ->
       toResolve = AuthorizationService.isAdminOrDistributorAdmin()
