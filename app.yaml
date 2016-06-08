@@ -105,12 +105,13 @@ skip_files:
 - ^images/readme.md
 - ^local/.*
 - ^tests/.*
-- ^webapp/node_modules.*
+- ^webapp/node_modules/.*
 - ^webapp/bower_components.*
 - ^webapp/dist.*
 - ^webapp/specs.*
-- ^webapp/coverage.*
+- ^webapp/coverage/.*
 - ^.git/.*
+- ^backup/.git/.*
 - ^.idea/.*
 - ^.*~
 - ^.*\.py[co]
