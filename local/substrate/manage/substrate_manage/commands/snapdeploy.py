@@ -20,6 +20,8 @@ Any number of options can be specified and are passed as-is to 'appcfg.py update
 
     python manage.py snapdeploy -A proactiveservices-stage --oauth2
 
+    python manage.py snapdeploy -A proactiveservices-stage -A proactiveservices-prod
+
 
 Older versions may be redeployed in a deterministic manner.  To do so, update your working directory to the desired
 changeset ID (which can be found by looking at the right-hand side of a version string, such as in "34-4db0243959fa"),
@@ -47,19 +49,25 @@ parser = argparse.ArgumentParser(description='Perform application deployment on 
 parser.add_argument('-V', dest='version', help='override version setting in snapdeploy.yaml')
 parser.add_argument('--ignore-unclean', action='store_true', help='ignore dirty workarea')
 parser.add_argument('--ignore-branch', action='store_true', help='allow deploy from any branch')
+parser.add_argument('--oauth2', action='store_true', help='use oauth2')
 
 ChangesetInfo = namedtuple('ChangesetInfo', ['branch', 'hash', 'dirty'])
 
 
-def git_get_current_changeset_info(vc_type):
+def is_even(number):
+    return number % 2 == 0
+
+
+def git_get_current_changeset_info():
     proc = Popen(["git", "branch", "--color=never"], stdout=PIPE)
     proc2 = Popen(["git", "rev-parse", "HEAD"], stdout=PIPE)
     proc3 = Popen(["git", "status", "--porcelain"], stdout=PIPE)
 
     match = re.search('\\* (.*)\n', proc.communicate()[0])
-    if match is None:
+    if not match:
         print("Unrecognized 'git branch' output")
         sys.exit(1)
+
     branch = match.group(1)
     hash = proc2.communicate()[0].strip()[:10]
     dirty = len(proc3.communicate()[0].split('\n')) != 1
@@ -71,7 +79,7 @@ def git_revert_file(filename):
     Popen(["git", "checkout", "--", filename]).wait() == 0
 
 
-def hg_get_current_changeset_info(vc_type):
+def hg_get_current_changeset_info():
     proc = Popen(["hg", "branch"], stdout=PIPE)
     branch = proc.communicate()[0].rstrip()
     proc2 = Popen(["hg", "id", "-i"], stdout=PIPE)
@@ -98,19 +106,18 @@ def hg_revert_file(filename):
 
 def get_version_control_type():
     # Figure out what type of vc is being used.
-    if os.path.exists(GIT_PATH) == True:
-        vc_type = VC_TYPE_GIT
-    elif os.path.exists(HG_PATH) == True:
-        vc_type = VC_TYPE_HG
+    if os.path.exists(GIT_PATH):
+        return VC_TYPE_GIT
 
-    return vc_type
+    elif os.path.exists(HG_PATH):
+        return VC_TYPE_HG
 
 
 def get_current_changeset_info(vc_type):
     if vc_type == VC_TYPE_HG:
-        return hg_get_current_changeset_info(vc_type)
+        return hg_get_current_changeset_info()
     else:
-        return git_get_current_changeset_info(vc_type)
+        return git_get_current_changeset_info()
 
 
 def revert_file(vc_type, filename):
@@ -133,7 +140,7 @@ def make_default_config():
 
 def load_config():
     if os.path.exists(CONFIG_FILE):
-        with open(CONFIG_FILE, 'r') as f:
+        with open(CONFIG_FILE) as f:
             config = yaml.load(f.read())
     else:
         config = make_default_config()
@@ -147,26 +154,77 @@ def save_config(config):
         f.write(yaml.dump(config, default_flow_style=False))
 
 
-if __name__ == "__main__":
-    args = parser.parse_known_args(sys.argv[1:])
-    vc_type = get_version_control_type()
-    if vc_type is None:
+def ensure_projects_prefix_with_a_arg(arguements):
+    for index, project in enumerate(arguements[1]):
+        if index == 0 or index % 2 == 0:
+            if project != "-A":
+                print "You need to preface each project you wish to deploy to with a '-A'"
+                sys.exit(1)
+
+
+def ensure_version_control(vc_type):
+    if not vc_type:
         print("No version control detected. Snapdeploy requires the use of Git or Mercurial.")
         sys.exit(1)
 
-    changeset_info = get_current_changeset_info(vc_type)
-    default_branch_name = get_default_branch_name(vc_type)
+
+def ensure_changeset_has_hash(changeset_info):
     if changeset_info.hash is None:
         print('Failed to find changeset info; aborting...')
         sys.exit(1)
-    if not args[0].ignore_branch and changeset_info.branch != default_branch_name:
+
+
+def on_default_branch_or_using_ignore_branch(arguements, changeset_info, default_branch_name):
+    if not arguements[0].ignore_branch and changeset_info.branch != default_branch_name:
         print('Must be on {} branch in order to deploy (or use --ignore-branch).'.format(default_branch_name))
         sys.exit(1)
-    if not args[0].ignore_unclean and changeset_info.dirty:
+
+
+def clean_or_ignore_unclear(arguments, changeset_info):
+    if not arguments[0].ignore_unclean and changeset_info.dirty:
         print('The working directory is dirty; please shelve changes before deploying (or use --ignore-unclean).')
         sys.exit(1)
 
+
+def run_pre_deploy(config):
+    if 'pre-deploy-script' in config:
+        if subprocess.call(config['pre-deploy-script'], shell=True) != 0:
+            print('Pre-deploy script failed; aborting deployment...')
+            sys.exit(1)
+
+
+def deploy_each_project(arguements, config):
+    oauth2 = args[0].oauth2
+    for index, project in enumerate(arguements[1]):
+        if index != 0 and not is_even(index):
+            print('=== Deploying: {}'.format(project))
+            for yaml_filename in config['module_yaml_files'] + ['.']:
+                appcfg_command = ['appcfg.py', 'update', yaml_filename] + ["-A", project] + ['-V', '{}'.format(
+                    full_version)]
+                if oauth2:
+                    appcfg_command = appcfg_command + ["--oauth2"]
+                if subprocess.call(appcfg_command) != 0:
+                    print('Deployment failed!')
+                    revert_file(vc_type, 'snapdeploy.yaml')
+                    sys.exit(1)
+
+
+if __name__ == "__main__":
+    args = parser.parse_known_args(sys.argv[1:])
+    vc_type = get_version_control_type()
+    ensure_version_control(vc_type)
+    changeset_info = get_current_changeset_info(vc_type)
+    default_branch_name = get_default_branch_name(vc_type)
+
+    ensure_changeset_has_hash(changeset_info)
+
+    on_default_branch_or_using_ignore_branch(args, changeset_info, default_branch_name)
+
+    clean_or_ignore_unclear(args, changeset_info)
+
     config = load_config()
+
+    ensure_projects_prefix_with_a_arg(args)
 
     if 'version' in config:
         old_version = str(config['version'])
@@ -182,10 +240,7 @@ if __name__ == "__main__":
     if args[0].version is not None:
         new_version = args[0].version
 
-    if 'pre-deploy-script' in config:
-        if subprocess.call(config['pre-deploy-script'], shell=True) != 0:
-            print('Pre-deploy script failed; aborting deployment...')
-            sys.exit(1)
+    run_pre_deploy(config)
 
     if new_version != old_version:
         config['version'] = new_version
@@ -195,15 +250,7 @@ if __name__ == "__main__":
     full_version = '{}-{}'.format(new_version, changeset_info.hash)
     print('New version: {}'.format(full_version))
 
-    for project in args[1][1:]:
-        print('=== Deploying: {}'.format(project))
-        for yaml_filename in config['module_yaml_files'] + ['.']:
-            appcfg_command = ['appcfg.py', 'update', yaml_filename] + ["-A", project] + ['-V', '{}'.format(
-                full_version)]
-            if subprocess.call(appcfg_command) != 0:
-                print('Deployment failed!')
-                revert_file(vc_type, 'snapdeploy.yaml')
-                sys.exit(1)
+    deploy_each_project(args, config)
 
     print("=== Output of '{} status':".format(vc_type))
     cmd_output = Popen(['{}'.format(vc_type), 'status'], stdout=PIPE).communicate()[0]
