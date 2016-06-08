@@ -1,55 +1,5 @@
 'use strict'
 
-authenticated = (SessionsService, $q, $state, $timeout) ->
-  deferred = $q.defer()
-
-  userKey = SessionsService.getUserKey()
-
-  if userKey
-    deferred.resolve()
-
-  else
-    $timeout (->
-      $state.go 'sign_in'
-    ), 500
-
-    deferred.reject('sign_in')
-
-  deferred.promise
-
-notAuthenticated = (SessionsService, $q, $state, $timeout) ->
-  deferred = $q.defer()
-
-  userKey = SessionsService.getUserKey()
-  if not userKey
-    deferred.resolve()
-
-  else
-    $timeout (->
-      $state.go 'home'
-    ), 500
-
-    deferred.reject('home')
-
-  deferred.promise
-
-isAdminOrDistributorAdmin = (SessionsService, $q, $state, $timeout) ->
-  deferred = $q.defer()
-  admin = SessionsService.getIsAdmin()
-  distributorAdmin = SessionsService.getDistributorsAsAdmin().length > 0
-
-  if not admin and not distributorAdmin
-    $timeout (->
-      $state.go 'sign_in'
-    ), 500
-    deferred.reject('home')
-
-  else
-    deferred.resolve()
-    
-  deferred.promise
-
-
 app = angular.module 'skykitProvisioning'
 
 app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
@@ -57,7 +7,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     resolve: {
       identity: (IdentityService) ->
         IdentityService.getIdentity()
-      notAuthenticated: notAuthenticated
+      notAuthenticated: (AuthorizationService) ->
+        AuthorizationService.notAuthenticated()
     },
     url: "/sign_in",
     templateUrl: "app/authentication/sign_in.html",
@@ -65,11 +16,13 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     controllerAs: 'authenticationCtrl',
   })
   $stateProvider.state("signed_out", {
+    url: "/signed_out",
     resolve: {
       identity: (IdentityService) ->
         IdentityService.getIdentity()
+      notAuthenticated: (AuthorizationService) ->
+        AuthorizationService.notAuthenticated()
     },
-    url: "/signed_out",
     templateUrl: "app/authentication/signed_out.html",
     controller: "AuthenticationCtrl",
     controllerAs: 'authenticationCtrl',
@@ -78,8 +31,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     resolve: {
       identity: (IdentityService) ->
         IdentityService.getIdentity()
-
-      authenticated: authenticated
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     url: "/sign_out",
     templateUrl: "app/authentication/sign_out.html",
@@ -88,8 +41,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("distributor_selection", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     url: "/distributor_selection",
     templateUrl: "app/distributor/distributor_selector.html",
@@ -102,7 +55,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     resolve: {
       identity: (IdentityService) ->
         IdentityService.getIdentity()
-      authenticated: authenticated
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     controller: "WelcomeCtrl",
     controllerAs: 'welcomeCtrl',
@@ -116,7 +70,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     resolve: {
       identity: (IdentityService) ->
         IdentityService.getIdentity()
-      authenticated: authenticated
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     controller: "WelcomeCtrl"
     controllerAs: 'welcomeCtrl',
@@ -126,9 +81,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("domains", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     url: "/domains",
     templateUrl: "app/domain/domains-listing.html",
@@ -140,9 +94,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("addDomain", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     url: "/domains/add",
     templateUrl: "app/domain/domain-detail.html",
@@ -155,9 +108,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("editDomain", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     url: "/domains/:domainKey",
     templateUrl: "app/domain/domain-detail.html",
@@ -170,9 +122,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("tenants", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     url: "/tenants",
     templateUrl: "app/tenant/tenants-listing.html",
@@ -184,9 +135,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("addTenant", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     url: "/tenants/add",
     templateUrl: "app/tenant/tenant-add.html",
@@ -199,9 +149,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("tenantDetails", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     url: "/tenants/:tenantKey/details",
     templateUrl: "app/tenant/tenant-details.html",
@@ -214,9 +163,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("tenantManagedDevices", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     url: "/tenants/:tenantKey/managed",
     templateUrl: "app/tenant/tenant-managed-devices.html",
@@ -229,9 +177,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("tenantUnmanagedDevices", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     url: "/tenants/:tenantKey/unmanaged",
     templateUrl: "app/tenant/tenant-unmanaged-devices.html",
@@ -244,9 +191,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("tenantLocations", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     url: "/tenants/:tenantKey/locations",
     templateUrl: "app/tenant/tenant-locations.html",
@@ -259,9 +205,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("editLocation", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     url: "/locations/:locationKey",
     templateUrl: "app/tenant/tenant-location.html",
@@ -274,9 +219,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("addLocation", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     url: "/tenants/:tenantKey/location",
     templateUrl: "app/tenant/tenant-location.html",
@@ -289,9 +233,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("devices", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     url: "/devices",
     templateUrl: "app/device/devices-listing.html",
@@ -305,7 +248,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     resolve: {
       identity: (IdentityService) ->
         IdentityService.getIdentity()
-      authenticated: authenticated
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     url: "/devices/:deviceKey?tenantKey?fromDevices",
     templateUrl: "app/device/device-detail.html",
@@ -319,56 +263,10 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
       return
     controllerAs: 'deviceDetailsCtrl'
   })
-  $stateProvider.state("deviceReset", {
-    resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
-    },
-    url: "/devices/:deviceKey/commands/reset",
-    templateUrl: "app/device/device-detail.html",
-    ncyBreadcrumb: {
-      label: '{{ deviceDetailsCtrl.currentDevice.key }}'
-      parent: 'devices'
-    },
-    controller: 'DeviceDetailsCtrl'
-    controllerAs: 'deviceDetailsCtrl'
-  })
-  $stateProvider.state("deviceVolume", {
-    resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
-    },
-    url: "/devices/:deviceKey/commands/volume",
-    templateUrl: "app/device/device-detail.html",
-    ncyBreadcrumb: {
-      label: '{{ deviceDetailsCtrl.currentDevice.key }}'
-      parent: 'devices'
-    },
-    controller: 'DeviceDetailsCtrl'
-    controllerAs: 'deviceDetailsCtrl'
-  })
-  $stateProvider.state("deviceCustom", {
-    resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
-    },
-    url: "/devices/:deviceKey/commands/custom",
-    templateUrl: "app/device/device-detail.html",
-    ncyBreadcrumb: {
-      label: '{{ deviceDetailsCtrl.currentDevice.key }}'
-      parent: 'devices'
-    },
-    controller: 'DeviceDetailsCtrl'
-    controllerAs: 'deviceDetailsCtrl'
-  })
   $stateProvider.state("proof", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     url: "/proof",
     templateUrl: "app/proof/main.html",
@@ -380,9 +278,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("proofDetail", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     url: "/proof/:tenant",
     templateUrl: "app/proof/detail.html",
@@ -394,10 +291,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
   })
   $stateProvider.state("admin", {
     resolve: {
-      identity: (IdentityService) ->
-        IdentityService.getIdentity()
-      authenticated: authenticated,
-      isAdmin: isAdminOrDistributorAdmin
+      isAdmin: (AuthorizationService) ->
+        AuthorizationService.isAdminOrDistributorAdmin()
     },
     url: "/admin",
     templateUrl: "app/admin/admin.html",

@@ -24,7 +24,7 @@ app.controller "AdminCtrl", (
 
       # no option to select distributor is given when there is only one option
       if not whichDistributor
-        whichDistributor = vm.currentDistributorName
+        whichDistributor = vm.distributorsAsAdmin[0]
 
       confirm = $mdDialog.confirm(
         {
@@ -95,7 +95,6 @@ app.controller "AdminCtrl", (
       vm.isAdmin = SessionsService.getIsAdmin()
       vm.distributorsAsAdmin = SessionsService.getDistributorsAsAdmin()
       vm.currentDistributorName = SessionsService.getCurrentDistributorName()
-
 
       if vm.isAdmin
         vm.getAllDistributors()
