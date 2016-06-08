@@ -42,14 +42,24 @@ handlers:
 
 
 skip_files:
-- ^routes.py
+- ^coverage/.*$
+- ^coverage_html_report/.*$
+- ^scripts/.*
+- ^images/readme.md
 - ^local/.*
 - ^tests/.*
-- ^scripts/.*
-- ^.hg/.*
+- ^webapp/node_modules/.*$
+- ^webapp/bower_components/.*$
+- ^webapp/dist/.*$
+- ^webapp/specs/.*$
+- ^webapp/coverage/.*$
+- ^.git/.*$
+- ^backup/.git/.*
 - ^.idea/.*
 - ^.*~
 - ^.*\.py[co]
 - ^.*\.po
 - ^.*\.pot
+- ^.*\.egg-info
 - ^\.DS_Store.*
+- ^(.*/)?.*static/node_modules/.*
