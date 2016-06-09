@@ -53,7 +53,7 @@ parser = argparse.ArgumentParser(description='Perform application deployment on 
 parser.add_argument('-V', dest='version', help='override version setting in snapdeploy.yaml')
 parser.add_argument('--ignore-unclean', action='store_true', help='ignore dirty workarea')
 parser.add_argument('--ignore-branch', action='store_true', help='allow deploy from any branch')
-parser.add_argument('-A', action='append', help='add project')
+parser.add_argument('-A', dest='projects', action='append', help='add project')
 
 ChangesetInfo = namedtuple('ChangesetInfo', ['branch', 'hash', 'dirty'])
 
@@ -226,7 +226,7 @@ def print_deployment_succeeded(args):
     print "++++++++++++++++++  DEPLYOMENT SUCCEEDED  ++++++++++++++++++++++"
     print "+++++++++++++++++++  PROJECTS DEPLOYED  ++++++++++++++++++++++++"
 
-    for project in args[0].A:
+    for project in args[0].projects:
         print project
 
     print "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"

@@ -37,7 +37,7 @@ def start_server():
         sys.exit(1)
 
 
-def pre_serve_script(config):
+def run_pre_serve_script(config):
     if 'pre-serve-script' in config:
         if subprocess.call(config['pre-serve-script'], shell=True) != 0:
             print('Pre-serve script failed; aborting...')
@@ -46,5 +46,5 @@ def pre_serve_script(config):
 
 if __name__ == "__main__":
     config = load_config()
-    pre_serve_script(config)
+    run_pre_serve_script(config)
     start_server()
