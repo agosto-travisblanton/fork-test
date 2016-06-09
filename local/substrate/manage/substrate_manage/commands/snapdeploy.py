@@ -45,7 +45,7 @@ VC_TYPE_GIT = "git"
 VC_TYPE_HG = "hg"
 
 parser = argparse.ArgumentParser(description='Perform application deployment on App Engine.',
-    epilog='Any additional arguments are passed verbatim to appcfg.py')
+                                 epilog='Any additional arguments are passed verbatim to appcfg.py')
 parser.add_argument('-V', dest='version', help='override version setting in snapdeploy.yaml')
 parser.add_argument('--ignore-unclean', action='store_true', help='ignore dirty workarea')
 parser.add_argument('--ignore-branch', action='store_true', help='allow deploy from any branch')
@@ -209,6 +209,24 @@ def deploy_each_project(arguements, config):
                     sys.exit(1)
 
 
+def get_new_version(config):
+    if 'version' in config:
+        old_version = str(config['version'])
+        print('Previously deployed version: {}'.format(old_version))
+        if re.match('\d+$', old_version):
+            new_version = int(old_version) + 1
+        else:
+            new_version = old_version
+    else:
+        old_version = None
+        new_version = 1
+
+    if args[0].version is not None:
+        new_version = args[0].version
+
+    return new_version, old_version
+
+
 if __name__ == "__main__":
     args = parser.parse_known_args(sys.argv[1:])
     vc_type = get_version_control_type()
@@ -226,19 +244,7 @@ if __name__ == "__main__":
 
     ensure_projects_prefix_with_a_arg(args)
 
-    if 'version' in config:
-        old_version = str(config['version'])
-        print('Previously deployed version: {}'.format(old_version))
-        if re.match('\d+$', old_version):
-            new_version = int(old_version) + 1
-        else:
-            new_version = old_version
-    else:
-        old_version = None
-        new_version = 1
-
-    if args[0].version is not None:
-        new_version = args[0].version
+    new_version, old_version = get_new_version(config)
 
     run_pre_deploy(config)
 

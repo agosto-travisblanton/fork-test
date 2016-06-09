@@ -3,12 +3,10 @@ The 'serve' command looks at `snapdeploy.yaml` to figure out which modules need 
 dev_appserver with the correct settings. In addition, a `pre-serve-script` can be specified to run prior to
 dev_appserver, to do things such as JS/CSS preprocessing.
 """
-import threading
 import os
 import subprocess
 import sys
 import yaml
-import time
 
 CONFIG_FILE = 'snapdeploy.yaml'
 
@@ -39,16 +37,6 @@ def start_server():
         sys.exit(1)
 
 
-def post_serve_script(config):
-    if 'post-serve-script' in config:
-        sleep_time = int(config['post-serve-script-sleep']) or 10
-        print "waiting {} seconds to start the post serve script...".format(sleep_time)
-        time.sleep(sleep_time)
-        if subprocess.call(config['post-serve-script'], shell=True) != 0:
-            print('Pre-serve script failed; aborting...')
-            sys.exit(1)
-
-
 def pre_serve_script(config):
     if 'pre-serve-script' in config:
         if subprocess.call(config['pre-serve-script'], shell=True) != 0:
@@ -56,14 +44,7 @@ def pre_serve_script(config):
             sys.exit(1)
 
 
-def threaded_post_serve_script(config):
-    thread = threading.Thread(target=post_serve_script, args=[config])
-    thread.daemon = True
-    thread.start()
-
-
 if __name__ == "__main__":
     config = load_config()
     pre_serve_script(config)
-    threaded_post_serve_script(config)
     start_server()
