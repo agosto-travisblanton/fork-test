@@ -1,34 +1,38 @@
-""" Perform application deployment on App Engine.
-
-This script does the following:
- - Ensure the working directory is on the default branch with no local changes.
- - Determine a version string for the current source code based on the hg revision ID
- - Update version setting in snapdeploy.yaml
- - Deploy to App Engine via appcfg.py
- - Notify user that he/she must commit/push the snapdeploy.yaml changes.
-
-By automating these steps, the aim is to reduce human error where the person deploying forgets to bump the version
-number in snapdeploy.yaml/app.yaml so that the versions deployed to app engine have consistent names.  This allows
-versions to be tracked so that the exact same version that gets deployed/tested on Int can later be pushed to Stage.
-
-
-Usage:
-
-    python manage.py snapdeploy [options for appcfg.py ...]
-
-Any number of options can be specified and are passed as-is to 'appcfg.py update'. For example:
-
-    python manage.py snapdeploy -A proactiveservices-stage --oauth2
-
-    python manage.py snapdeploy -A proactiveservices-stage -A proactiveservices-prod
-
-
-Older versions may be redeployed in a deterministic manner.  To do so, update your working directory to the desired
-changeset ID (which can be found by looking at the right-hand side of a version string, such as in "34-4db0243959fa"),
-make sure there are no local changes, and run the script in exactly the same manner.  snapdeploy.yaml will be updated
-with the appropriate version number, but since the snapdeploy.yaml changes were already committed they can safely be
-discarded when you reset your working directory to tip.
 """
+    Perform application deployment on App Engine.
+
+    This script does the following:
+     - Ensure the working directory is on the default branch with no local changes.
+     - Determine a version string for the current source code based on the hg revision ID
+     - Update version setting in snapdeploy.yaml
+     - Deploy to App Engine via appcfg.py
+     - Notify user that he/she must commit/push the snapdeploy.yaml changes.
+
+    By automating these steps, the aim is to reduce human error where the person deploying forgets to bump the version
+    number in snapdeploy.yaml/app.yaml so that the versions deployed to app engine have consistent names.  This allows
+    versions to be tracked so that the exact same version that gets deployed/tested on Int can later be pushed to Stage.
+
+
+    Usage:
+
+        python manage.py snapdeploy [options for appcfg.py ...]
+
+    Any number of options can be specified and are passed as-is to 'appcfg.py update'. For example:
+
+        python manage.py snapdeploy -A proactiveservices-stage --oauth2
+
+    You may deploy to multiple projects at the same time in this manner:
+
+        python manage.py snapdeploy -A proactiveservices-stage -A proactiveservices-prod
+
+
+    Older versions may be redeployed in a deterministic manner.  To do so, update your working directory to the desired
+    changeset ID (which can be found by looking at the right-hand side of a version string, such as in "34-4db0243959fa"),
+    make sure there are no local changes, and run the script in exactly the same manner.  snapdeploy.yaml will be updated
+    with the appropriate version number, but since the snapdeploy.yaml changes were already committed they can safely be
+    discarded when you reset your working directory to tip.
+"""
+
 import re
 import sys
 import argparse
@@ -45,17 +49,13 @@ VC_TYPE_GIT = "git"
 VC_TYPE_HG = "hg"
 
 parser = argparse.ArgumentParser(description='Perform application deployment on App Engine.',
-                                 epilog='Any additional arguments are passed verbatim to appcfg.py')
+    epilog='Any additional arguments are passed verbatim to appcfg.py')
 parser.add_argument('-V', dest='version', help='override version setting in snapdeploy.yaml')
 parser.add_argument('--ignore-unclean', action='store_true', help='ignore dirty workarea')
 parser.add_argument('--ignore-branch', action='store_true', help='allow deploy from any branch')
-parser.add_argument('--oauth2', action='store_true', help='use oauth2')
+parser.add_argument('-A', action='append', help='add project')
 
 ChangesetInfo = namedtuple('ChangesetInfo', ['branch', 'hash', 'dirty'])
-
-
-def is_even(number):
-    return number % 2 == 0
 
 
 def git_get_current_changeset_info():
@@ -154,14 +154,6 @@ def save_config(config):
         f.write(yaml.dump(config, default_flow_style=False))
 
 
-def ensure_projects_prefix_with_a_arg(arguements):
-    for index, project in enumerate(arguements[1]):
-        if index == 0 or index % 2 == 0:
-            if project != "-A":
-                print "You need to preface each project you wish to deploy to with a '-A'"
-                sys.exit(1)
-
-
 def ensure_version_control(vc_type):
     if not vc_type:
         print("No version control detected. Snapdeploy requires the use of Git or Mercurial.")
@@ -174,13 +166,13 @@ def ensure_changeset_has_hash(changeset_info):
         sys.exit(1)
 
 
-def on_default_branch_or_using_ignore_branch(arguements, changeset_info, default_branch_name):
-    if not arguements[0].ignore_branch and changeset_info.branch != default_branch_name:
+def ensure_on_default_branch_or_using_ignore_branch(arguments, changeset_info, default_branch_name):
+    if not arguments[0].ignore_branch and changeset_info.branch != default_branch_name:
         print('Must be on {} branch in order to deploy (or use --ignore-branch).'.format(default_branch_name))
         sys.exit(1)
 
 
-def clean_or_ignore_unclear(arguments, changeset_info):
+def ensure_clean_or_has_ignore_unclean(arguments, changeset_info):
     if not arguments[0].ignore_unclean and changeset_info.dirty:
         print('The working directory is dirty; please shelve changes before deploying (or use --ignore-unclean).')
         sys.exit(1)
@@ -193,23 +185,24 @@ def run_pre_deploy(config):
             sys.exit(1)
 
 
-def deploy_each_project(arguements, config):
-    oauth2 = args[0].oauth2
-    for index, project in enumerate(arguements[1]):
-        if index != 0 and not is_even(index):
-            print('=== Deploying: {}'.format(project))
-            for yaml_filename in config['module_yaml_files'] + ['.']:
-                appcfg_command = ['appcfg.py', 'update', yaml_filename] + ["-A", project] + ['-V', '{}'.format(
-                    full_version)]
-                if oauth2:
-                    appcfg_command = appcfg_command + ["--oauth2"]
-                if subprocess.call(appcfg_command) != 0:
-                    print('Deployment failed!')
-                    revert_file(vc_type, 'snapdeploy.yaml')
-                    sys.exit(1)
+def deploy_single_project(project, arguments, config, full_version, vc_type):
+    print('=== Deploying: {}'.format(project))
+    for yaml_filename in config['module_yaml_files'] + ['.']:
+        appcfg_command = ['appcfg.py', 'update', yaml_filename] + ["-A", project] + ['-V', '{}'.format(
+            full_version)] + arguments[1]
+
+        if subprocess.call(appcfg_command) != 0:
+            print('Deployment failed!')
+            revert_file(vc_type, 'snapdeploy.yaml')
+            sys.exit(1)
 
 
-def get_new_version(config):
+def deploy_projects(arguments, config, full_version, vc_type):
+    for project in arguments[0].A:
+        deploy_single_project(project, arguments, config, full_version, vc_type)
+
+
+def get_new_version(config, args):
     if 'version' in config:
         old_version = str(config['version'])
         print('Previously deployed version: {}'.format(old_version))
@@ -227,25 +220,30 @@ def get_new_version(config):
     return new_version, old_version
 
 
-if __name__ == "__main__":
+def print_deployment_succeeded(args):
+    print "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+
+    print "++++++++++++++++++  DEPLYOMENT SUCCEEDED  ++++++++++++++++++++++"
+    print "+++++++++++++++++++  PROJECTS DEPLOYED  ++++++++++++++++++++++++"
+
+    for project in args[0].A:
+        print project
+
+    print "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+
+
+def run_all():
     args = parser.parse_known_args(sys.argv[1:])
     vc_type = get_version_control_type()
     ensure_version_control(vc_type)
     changeset_info = get_current_changeset_info(vc_type)
     default_branch_name = get_default_branch_name(vc_type)
+    config = load_config()
+    new_version, old_version = get_new_version(config, args)
 
     ensure_changeset_has_hash(changeset_info)
-
-    on_default_branch_or_using_ignore_branch(args, changeset_info, default_branch_name)
-
-    clean_or_ignore_unclear(args, changeset_info)
-
-    config = load_config()
-
-    ensure_projects_prefix_with_a_arg(args)
-
-    new_version, old_version = get_new_version(config)
-
+    ensure_on_default_branch_or_using_ignore_branch(args, changeset_info, default_branch_name)
+    ensure_clean_or_has_ignore_unclean(args, changeset_info)
     run_pre_deploy(config)
 
     if new_version != old_version:
@@ -256,7 +254,7 @@ if __name__ == "__main__":
     full_version = '{}-{}'.format(new_version, changeset_info.hash)
     print('New version: {}'.format(full_version))
 
-    deploy_each_project(args, config)
+    deploy_projects(args, config, full_version, vc_type)
 
     print("=== Output of '{} status':".format(vc_type))
     cmd_output = Popen(['{}'.format(vc_type), 'status'], stdout=PIPE).communicate()[0]
@@ -271,3 +269,9 @@ if __name__ == "__main__":
         print(" - Run '{} commit' and '{} push' to save snapdeploy.yaml changes.".format(vc_type, vc_type))
     print(" - Make version '{}' the default version on app engine console (https://appengine.google.com).".format(
         full_version))
+
+    print_deployment_succeeded(args)
+
+
+if __name__ == "__main__":
+    run_all()
