@@ -42,7 +42,8 @@ def start_server():
 def post_serve_script():
     if 'post-serve-script' in config:
         print "waiting 10 seconds to start the post serve script..."
-        time.sleep(10)
+        sleep_time = int(config['post-serve-script-sleep']) or 10
+        time.sleep(sleep_time)
         if subprocess.call(config['post-serve-script'], shell=True) != 0:
             print('Pre-serve script failed; aborting...')
             sys.exit(1)
