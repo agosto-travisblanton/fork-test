@@ -45,7 +45,7 @@ VC_TYPE_GIT = "git"
 VC_TYPE_HG = "hg"
 
 parser = argparse.ArgumentParser(description='Perform application deployment on App Engine.',
-                                 epilog='Any additional arguments are passed verbatim to appcfg.py')
+    epilog='Any additional arguments are passed verbatim to appcfg.py')
 parser.add_argument('-V', dest='version', help='override version setting in snapdeploy.yaml')
 parser.add_argument('--ignore-unclean', action='store_true', help='ignore dirty workarea')
 parser.add_argument('--ignore-branch', action='store_true', help='allow deploy from any branch')
@@ -64,7 +64,7 @@ def git_get_current_changeset_info():
     proc3 = Popen(["git", "status", "--porcelain"], stdout=PIPE)
 
     match = re.search('\\* (.*)\n', proc.communicate()[0])
-    if not match:
+    if match is None:
         print("Unrecognized 'git branch' output")
         sys.exit(1)
 
