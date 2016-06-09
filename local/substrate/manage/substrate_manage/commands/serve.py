@@ -3,7 +3,6 @@ The 'serve' command looks at `snapdeploy.yaml` to figure out which modules need 
 dev_appserver with the correct settings. In addition, a `pre-serve-script` can be specified to run prior to
 dev_appserver, to do things such as JS/CSS preprocessing.
 """
-import Queue
 import threading
 import os
 import subprocess
@@ -11,7 +10,6 @@ import sys
 import yaml
 import time
 
-q = Queue.Queue()
 CONFIG_FILE = 'snapdeploy.yaml'
 
 
