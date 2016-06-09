@@ -34,7 +34,7 @@ app.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
 
     vm.initializeSignOut = ->
       SessionsService.removeUserInfo()
-      $timeout vm.proceedToSignedOut, 1500
+      $timeout vm.proceedToSignedOut, 50
 
     vm.loginSuccess = (response) ->
       ProgressBarService.complete()

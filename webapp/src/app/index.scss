@@ -458,6 +458,14 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
   text-align: center;
 }
 
+.ellipsis-overflow {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis // This is where the magic happens
+}
+
 .proof-of-play-selected-item {
   width: 100%;
   white-space: nowrap;

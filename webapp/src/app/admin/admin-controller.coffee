@@ -24,13 +24,13 @@ app.controller "AdminCtrl", (
 
       # no option to select distributor is given when there is only one option
       if not whichDistributor
-        whichDistributor = vm.currentDistributorName
+        whichDistributor = vm.distributorsAsAdmin[0]
 
       confirm = $mdDialog.confirm(
         {
           title: 'Are you sure?'
           textContent: "#{userEmail} will be added to #{whichDistributor}
-        #{withOrWithout} administrator priviledges"
+        #{withOrWithout} administrator privileges"
           targetEvent: ev
           ok: 'Of course!'
           cancel: 'Oops, nevermind.'
@@ -95,7 +95,6 @@ app.controller "AdminCtrl", (
       vm.isAdmin = SessionsService.getIsAdmin()
       vm.distributorsAsAdmin = SessionsService.getDistributorsAsAdmin()
       vm.currentDistributorName = SessionsService.getCurrentDistributorName()
-
 
       if vm.isAdmin
         vm.getAllDistributors()
