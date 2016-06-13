@@ -61,7 +61,6 @@ def _SERVICE_ACCOUNT_EMAIL():
     elif on_stage_server:
         return 'service-247@skykit-provisioning-stage.iam.gserviceaccount.com'
     elif on_gamestop_server:
-        # return 'service@skykit-provisioning-gamestop.iam.gserviceaccount.com'
         return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0@developer.gserviceaccount.com'
     elif on_production_server:
         return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0@developer.gserviceaccount.com'
