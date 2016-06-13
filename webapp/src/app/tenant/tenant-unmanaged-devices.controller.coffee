@@ -4,7 +4,8 @@ appModule = angular.module('skykitProvisioning')
 
 appModule.controller 'TenantUnmanagedDevicesCtrl',
   ($scope, $stateParams, TenantsService, DevicesService, ProgressBarService, $state) ->
-    @currentTenant = {
+    vm = @
+    vm.currentTenant = {
       key: undefined,
       name: undefined,
       tenant_code: undefined,
@@ -16,58 +17,58 @@ appModule.controller 'TenantUnmanagedDevicesCtrl',
       proof_of_play_logging: false,
       active: true
     }
-    @tenantDevices = []
-    @devicesPrev = null
-    @devicesNext = null
-    @selectedButton = "MAC"
-    @serialDevices = {}
-    @disabled = true
-    @macDevices = {}
-    @editMode = !!$stateParams.tenantKey
-    @tenantKey = $stateParams.tenantKey
+    vm.tenantDevices = []
+    vm.devicesPrev = null
+    vm.devicesNext = null
+    vm.selectedButton = "MAC"
+    vm.serialDevices = {}
+    vm.disabled = true
+    vm.macDevices = {}
+    vm.editMode = !!$stateParams.tenantKey
+    vm.tenantKey = $stateParams.tenantKey
 
-    @getUnmanagedDevices = (tenantKey, prev_cursor, next_cursor) ->
+    vm.getUnmanagedDevices = (tenantKey, prev_cursor, next_cursor) ->
       ProgressBarService.start()
       devicesPromise = DevicesService.getUnmanagedDevicesByTenant tenantKey, prev_cursor, next_cursor
-      devicesPromise.then (data) =>
-        @devicesPrev = data["prev_cursor"]
-        @devicesNext = data["next_cursor"]
-        @tenantDevices = data["devices"]
+      devicesPromise.then (data) ->
+        vm.devicesPrev = data["prev_cursor"]
+        vm.devicesNext = data["next_cursor"]
+        vm.tenantDevices = data["devices"]
         ProgressBarService.complete()
 
-    @refreshDevices = () =>
-      @devicesPrev = null
-      @devicesNext = null
-      @tenantDevices = null
+    vm.refreshDevices = () ->
+      vm.devicesPrev = null
+      vm.devicesNext = null
+      vm.tenantDevices = null
       DevicesService.deviceByTenantCache.removeAll()
-      @getUnmanagedDevices @tenantKey, @devicesPrev, @devicesNext
+      vm.getUnmanagedDevices vm.tenantKey, vm.devicesPrev, vm.devicesNext
 
-    if @editMode
-      tenantPromise = TenantsService.getTenantByKey @tenantKey
-      tenantPromise.then (tenant) =>
-        @currentTenant = tenant
+    if vm.editMode
+      tenantPromise = TenantsService.getTenantByKey vm.tenantKey
+      tenantPromise.then (tenant) ->
+        vm.currentTenant = tenant
 
-      @getUnmanagedDevices @tenantKey, null, null
+      vm.getUnmanagedDevices vm.tenantKey, null, null
 
     $scope.tabIndex = 2
 
-    $scope.$watch 'tabIndex', (toTab, fromTab) =>
+    $scope.$watch 'tabIndex', (toTab, fromTab) ->
       if toTab != undefined
         switch toTab
           when 0
-            $state.go 'tenantDetails', {tenantKey: @tenantKey}
+            $state.go 'tenantDetails', {tenantKey: vm.tenantKey}
           when 1
-            $state.go 'tenantManagedDevices', {tenantKey: @tenantKey}
+            $state.go 'tenantManagedDevices', {tenantKey: vm.tenantKey}
           when 2
-            $state.go 'tenantUnmanagedDevices', {tenantKey: @tenantKey}
+            $state.go 'tenantUnmanagedDevices', {tenantKey: vm.tenantKey}
           when 3
-            $state.go 'tenantLocations', {tenantKey: @tenantKey}
+            $state.go 'tenantLocations', {tenantKey: vm.tenantKey}
 
-    @editItem = (item) ->
-      $state.go 'editDevice', {deviceKey: item.key, tenantKey: @tenantKey, fromDevices: false}
+    vm.editItem = (item) ->
+      $state.go 'editDevice', {deviceKey: item.key, tenantKey: vm.tenantKey, fromDevices: false}
 
 
-    @convertArrayToDictionary = (theArray, mac) ->
+    vm.convertArrayToDictionary = (theArray, mac) ->
       Devices = {}
       for item in theArray
         if mac
@@ -76,77 +77,77 @@ appModule.controller 'TenantUnmanagedDevicesCtrl',
           Devices[item.serial] = item
       return Devices
 
-    @changeRadio = () =>
-      @searchText = ''
-      @disabled = true
-      @serialDevices = {}
-      @macDevices = {}
+    vm.changeRadio = () ->
+      vm.searchText = ''
+      vm.disabled = true
+      vm.serialDevices = {}
+      vm.macDevices = {}
 
 
-    @searchDevices = (partial_search) =>
+    vm.searchDevices = (partial_search) ->
       if partial_search
         if partial_search.length > 2
-          if @selectedButton == "Serial Number"
-            DevicesService.searchDevicesByPartialSerialByTenant(@tenantKey, partial_search, true)
-            .then (res) =>
+          if vm.selectedButton == "Serial Number"
+            DevicesService.searchDevicesByPartialSerialByTenant(vm.tenantKey, partial_search, true)
+            .then (res) ->
               result = res["serial_number_matches"]
-              @serialDevices = @convertArrayToDictionary(result, false)
+              vm.serialDevices = vm.convertArrayToDictionary(result, false)
               return [each.serial for each in result][0]
 
           else
-            DevicesService.searchDevicesByPartialMacByTenant(@tenantKey, partial_search, true)
-            .then (res) =>
+            DevicesService.searchDevicesByPartialMacByTenant(vm.tenantKey, partial_search, true)
+            .then (res) ->
               result = res["mac_matches"]
-              @macDevices = @convertArrayToDictionary(result, true)
+              vm.macDevices = vm.convertArrayToDictionary(result, true)
               return [each.mac for each in result][0]
         else
           return []
       else
         return []
 
-    @paginateCall = (forward) ->
+    vm.paginateCall = (forward) ->
       if forward
-        @getUnmanagedDevices @tenantKey, null, @devicesNext
+        vm.getUnmanagedDevices vm.tenantKey, null, vm.devicesNext
 
       else
-        @getUnmanagedDevices @tenantKey, @devicesPrev, null
+        vm.getUnmanagedDevices vm.tenantKey, vm.devicesPrev, null
 
 
-    @prepareForEditView = (searchText) ->
-      mac = @selectedButton == "MAC"
+    vm.prepareForEditView = (searchText) ->
+      mac = vm.selectedButton == "MAC"
       if mac
-        @editItem @macDevices[searchText]
+        vm.editItem vm.macDevices[searchText]
       else
-        @editItem @serialDevices[searchText]
+        vm.editItem vm.serialDevices[searchText]
 
 
-    @controlOpenButton = (isMatch) =>
-      @disabled = !isMatch
-      @loadingDisabled = false
+    vm.controlOpenButton = (isMatch) ->
+      vm.disabled = !isMatch
+      vm.loadingDisabled = false
 
-    @isResourceValid = (resource) ->
+    vm.isResourceValid = (resource) ->
       if resource
         if resource.length > 2
-          mac = @selectedButton == "MAC"
-          @loadingDisabled = true
+          mac = vm.selectedButton == "MAC"
+          vm.loadingDisabled = true
 
           if mac
-            DevicesService.matchDevicesByFullMacByTenant(@tenantKey, resource, true)
-            .then (res) =>
-              @controlOpenButton(res["is_match"])
+            DevicesService.matchDevicesByFullMacByTenant(vm.tenantKey, resource, true)
+            .then (res) ->
+              vm.controlOpenButton(res["is_match"])
 
           else
-            DevicesService.matchDevicesByFullSerialByTenant(@tenantKey, resource, true)
-            .then (res) =>
-              @controlOpenButton(res["is_match"])
+            DevicesService.matchDevicesByFullSerialByTenant(vm.tenantKey, resource, true)
+            .then (res) ->
+              vm.controlOpenButton(res["is_match"])
 
         else
-          @controlOpenButton(false)
+          vm.controlOpenButton(false)
 
       else
-        @controlOpenButton(false)
+        vm.controlOpenButton(false)
 
-    @
+    vm
 
 
 

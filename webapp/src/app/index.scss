@@ -458,6 +458,14 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
   text-align: center;
 }
 
+.ellipsis-overflow {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis // This is where the magic happens
+}
+
 .proof-of-play-selected-item {
   width: 100%;
   white-space: nowrap;
@@ -495,16 +503,22 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
   justify-content: center;
 }
 
-
 .bigger-buttons {
   padding: 0.4em;
   min-width: 88px;
   border-radius: 5px;
   font-size: 16px;
   text-align: center;
-  text-decoration:none;
+  text-decoration: none;
   border: none;
-  outline: none;}
+  outline: none;
+}
+
+.admin-container {
+  display: flex;
+  align-content: flex-start;
+}
+
 
 //.distributor-selection {
 //  font-size: 20pt;

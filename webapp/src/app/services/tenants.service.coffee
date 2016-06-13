@@ -1,11 +1,11 @@
 'use strict'
 appModule = angular.module('skykitProvisioning')
-appModule.factory 'TenantsService', (Restangular, CacheFactory, $cookies) ->
+appModule.factory 'TenantsService', (Restangular, CacheFactory, SessionsService) ->
   new class TenantsService
-    
+
     constructor: ->
       if !CacheFactory.get('tenantCache')
-        distributorKey = $cookies.get('currentDistributorKey')
+        distributorKey = SessionsService.getCurrentDistributorKey()
         @tenantCache = CacheFactory('tenantCache',
           maxAge: 60 * 60 * 1000
           deleteOnExpire: 'aggressive'
@@ -17,7 +17,7 @@ appModule.factory 'TenantsService', (Restangular, CacheFactory, $cookies) ->
             return
         )
 
-    
+
     save: (tenant) ->
       if tenant.key != undefined
         promise = tenant.put()

@@ -6,18 +6,18 @@ describe 'ProofPlayService', ->
   $stateParams = undefined
   $state = undefined
   ToastsService = undefined
-  $httpBackend = undefined
-  $cookies = undefined
+  Lockr = undefined
   deferred = undefined
   $q = undefined
   promise = undefined
   $rootScope = undefined
   window = undefined
+  StorageService = undefined
   cookie_token = undefined
 
   beforeEach module('skykitProvisioning')
 
-  beforeEach inject (_$httpBackend_, _$q_, _ProofPlayService_, _$http_, _$window_, _$cookies_, _ToastsService_, _$state_) ->
+  beforeEach inject (_$httpBackend_, _$q_, _ProofPlayService_, _$http_, _$window_, _StorageService_, _ToastsService_, _$state_) ->
     ProofPlayService = _ProofPlayService_
     $http = _$http_
     ToastsService = _ToastsService_
@@ -25,7 +25,7 @@ describe 'ProofPlayService', ->
     $q = _$q_
     $stateParams = {}
     $state = _$state_
-    $cookies = _$cookies_
+    StorageService = _StorageService_
     window = _$window_
 
 
@@ -41,7 +41,7 @@ describe 'ProofPlayService', ->
       spyOn(ToastsService, 'showErrorToast')
       spyOn(ToastsService, 'showSuccessToast')
       cookie_token = 'test'
-      $cookies.put('currentDistributorKey', cookie_token)
+      StorageService.set('currentDistributorKey', cookie_token)
 
 
     it 'sets @uriBase variable', ->

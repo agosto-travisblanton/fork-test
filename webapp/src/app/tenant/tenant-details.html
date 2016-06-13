@@ -65,7 +65,7 @@
                 <select id="chromeDeviceDomain"
                         ng-model="tenantDetailsCtrl.selectedDomain"
                         class="form-control"
-                        ng-options="i.name for i in tenantDetailsCtrl.distributorDomains track by i.key">
+                        ng-options="i.name for i in tenantDetailsCtrl.distributorDomains track by i.key" required>
                   <option value=''>Select domain</option>
                 </select>
               </div>

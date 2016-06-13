@@ -1,9 +1,8 @@
 'use strict'
 
-angular.module('skykitProvisioning').factory 'SessionsService', (
-  $http,
+angular.module('skykitProvisioning').factory 'SessionsService', ($http,
   $log,
-  $cookies,
+  StorageService,
   IdentityService,
   Restangular,
   $q) ->
@@ -11,10 +10,50 @@ angular.module('skykitProvisioning').factory 'SessionsService', (
 
       constructor: ->
         @uriBase = 'v1/sessions'
-        @currentUserKey = undefined or $cookies.get('userKey')
+
+      setDistributors: (distributors) ->
+        StorageService.set('distributors', distributors)
+
+      setDistributorsAsAdmin: (distributorsAsAdmin)->
+        StorageService.set('distributorsAsAdmin', distributorsAsAdmin)
+
+      setIsAdmin: (isAdmin) ->
+        StorageService.set('isAdmin', isAdmin)
+
+      setUserKey: (value) ->
+        StorageService.set('userKey', value)
+
+      setUserEmail: (value) ->
+        StorageService.set('userEmail', value)
+
+      setCurrentDistributorKey: (value) ->
+        StorageService.set('currentDistributorKey', value)
+
+      setCurrentDistributorName: (value) ->
+        StorageService.set('currentDistributorName', value)
+
+      getUserKey: () ->
+        StorageService.get('userKey')
+
+      getUserEmail: () ->
+        StorageService.get('userEmail')
+
+      getDistributors: () ->
+        StorageService.get('distributors')
+
+      getCurrentDistributorName: () ->
+        StorageService.get('currentDistributorName')
+
+      getCurrentDistributorKey: () ->
+        StorageService.get('currentDistributorKey')
+
+      getDistributorsAsAdmin: () ->
+        StorageService.get('distributorsAsAdmin')
+
+      getIsAdmin: () ->
+        StorageService.get('isAdmin')
 
       login: (credentials) ->
-        deferred = $q.defer()
         authenticationPayload = {
           access_token: _.clone(credentials.access_token)
           authuser: _.clone(credentials.authuser)
@@ -32,25 +71,23 @@ angular.module('skykitProvisioning').factory 'SessionsService', (
 
         promise = $http.post('/login', authenticationPayload)
         promise.success (data) =>
-          @currentUserKey = data.user.key
-          @setIdentity(@currentUserKey)
+          @setUserKey(data.user.key)
+          @setIdentity()
           .then ->
-            deferred.resolve(data)
+            data
 
-        deferred.promise
-
-      setIdentity: (userKey)->
+      setIdentity: () =>
         deferred = $q.defer()
-        $cookies.put('userKey', userKey)
         identityPromise = IdentityService.getIdentity()
-        identityPromise.then (data) ->
-          $cookies.put('userEmail', data['email'])
+        identityPromise.then (data) =>
+          @setDistributors(data['distributors'])
+          @setDistributorsAsAdmin(data['distributors_as_admin'])
+          @setIsAdmin(data['is_admin'])
+          @setUserEmail data['email']
+          @setIsAdmin data["is_admin"]
+
           deferred.resolve()
         deferred.promise
 
-      removeUserInfo: ()->
-        $cookies.remove('userKey')
-        $cookies.remove('userEmail')
-        $cookies.remove('currentDistributorKey')
-        $cookies.remove('currentDistributorName')
-
+      removeUserInfo: () ->
+        StorageService.removeAll()

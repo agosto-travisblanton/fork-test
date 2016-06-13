@@ -2,16 +2,20 @@ from webapp2 import RequestHandler
 from google.appengine.ext.deferred import deferred
 from app_config import config
 from models import User, Distributor, Domain, Tenant, ChromeOsDevice, PlayerCommandEvent, TenantEntityGroup, \
-    DeviceIssueLog, DistributorEntityGroup, Location, DistributorUser
+    DeviceIssueLog, Location
 import random
 
 USER_EMAIL = 'daniel.ternyak@agosto.com'
 DISTRIBUTOR_NAME = 'Dunder'
 SECOND_DISTRIBUTOR = "Mifflin"
+THIRD_DISTRIBUTOR = "Scranton"
 DOMAIN = 'local.skykit.com'
 TENANT_NAME = 'Acme, Inc.'
 TENANT_CODE = 'acme_inc'
 TENANT_ADMIN_EMAIL = 'admin@acme.com'
+SECOND_TENANT_NAME = 'DaveDistribution'
+SECOND_TENANT_CODE = 'davedistribution'
+SECOND_TENANT_ADMIN_EMAIL = 'dave@dave.com'
 DEVICE_ID = '132e235a-b346-4a37-a100-de49fa753a2a'
 GCM_REGISTRATION_ID = '8d70a8d78a6dfa6df76dfasd'
 MAC_ADDRESS = '54271e619346'
@@ -54,30 +58,43 @@ def kick_off(user_first, user_last):
     print array_of_devices_with_values
 
 
-
 def make_data_for_a_distributor():
     ##########################################################################################
     # DISTRIBUTORS
     ##########################################################################################
-    first_distributor = Distributor.query(Distributor.name == SECOND_DISTRIBUTOR).get()
-    if not first_distributor:
-        first_distributor = Distributor.create(name=SECOND_DISTRIBUTOR, active=True)
-        first_distributor.put()
-        print 'Distributor ' + first_distributor.name + ' created'
-    else:
-        print 'Distributor ' + first_distributor.name + ' already exists, so did not create'
-
     distributor = Distributor.query(Distributor.name == DISTRIBUTOR_NAME).get()
     if not distributor:
-        distributor = Distributor.create(name=DISTRIBUTOR_NAME, active=True)
+        distributor = Distributor.create(name=DISTRIBUTOR_NAME)
         distributor.put()
         print 'Distributor ' + distributor.name + ' created'
     else:
         print 'Distributor ' + distributor.name + ' already exists, so did not create'
 
+    second_distributor = Distributor.query(Distributor.name == SECOND_DISTRIBUTOR).get()
+    if not second_distributor:
+        second_distributor = Distributor.create(name=SECOND_DISTRIBUTOR)
+        second_distributor.put()
+        print 'Distributor ' + second_distributor.name + ' created'
+    else:
+        print 'Distributor ' + second_distributor.name + ' already exists, so did not create'
+
+    third_distributor = Distributor.query(Distributor.name == THIRD_DISTRIBUTOR).get()
+    if not third_distributor:
+        third_distributor = Distributor.create(name=THIRD_DISTRIBUTOR)
+        third_distributor.put()
+        print 'Distributor ' + third_distributor.name + ' created'
+    else:
+        print 'Distributor ' + third_distributor.name + ' already exists, so did not create'
+
     ##########################################################################################
     # USERS
     ##########################################################################################
+    default_users_to_add = ["a@gmail.com", "b@gmail.com", "c@gmail.com"]
+    for item in default_users_to_add:
+        u = User.get_or_insert_by_email(email=item)
+        u.add_distributor(distributor.key)
+        u.add_distributor(second_distributor.key)
+
     user = User.get_or_insert_by_email(email=USER_EMAIL)
     if not distributor:
         print 'Distributor ' + DISTRIBUTOR_NAME + ' not found'
@@ -86,10 +103,10 @@ def make_data_for_a_distributor():
         if not user:
             print 'User with email ' + USER_EMAIL + ' not found. Could not add ' + USER_EMAIL + ' to ' + DISTRIBUTOR_NAME
         else:
-            user.add_distributor(distributor.key)
+            user.add_distributor(distributor.key, role=1)
             print 'SUCCESS! ' + user.email + ' is linked to ' + distributor.name
-            user.add_distributor(first_distributor.key)
-            print 'SUCCESS! ' + user.email + ' is linked to ' + first_distributor.name
+            user.add_distributor(second_distributor.key)
+            print 'SUCCESS! ' + user.email + ' is linked to ' + second_distributor.name
     ##########################################################################################
     # DOMAINS
     ##########################################################################################
@@ -107,7 +124,7 @@ def make_data_for_a_distributor():
     ##########################################################################################
     # CREATE TENANTS
     ##########################################################################################
-    for i in range(1, 300):
+    for i in range(1, 101):
         tenant_code = "my_tenant" + str(i)
         tenant_code = tenant_code.lower()
         tenant_code_datastore = Tenant.find_by_tenant_code(tenant_code)
@@ -120,10 +137,24 @@ def make_data_for_a_distributor():
                                    domain_key=domain.key,
                                    active=True)
             tenant.put()
-        print 'Tenant ' + tenant.name + ' created'
+            print 'Tenant ' + tenant.name + ' created'
     else:
         print 'Tenant ' + tenant.name + ' already exists, so did not create'
 
+    ##########################################################################################
+    tenant = Tenant.find_by_tenant_code(SECOND_TENANT_CODE)
+    if not tenant:
+        tenant = Tenant.create(tenant_code=SECOND_TENANT_CODE,
+                               name=SECOND_TENANT_NAME,
+                               admin_email=SECOND_TENANT_ADMIN_EMAIL,
+                               content_server_url='https://skykit-contentmanager-int.appspot.com',
+                               content_manager_base_url='https://skykit-contentmanager-int.appspot.com/content',
+                               domain_key=domain.key,
+                               active=True)
+        tenant.put()
+        print 'Tenant ' + tenant.name + ' created'
+
+    ##########################################################################################
     tenant = Tenant.find_by_tenant_code(TENANT_CODE)
     if not tenant:
         tenant = Tenant.create(tenant_code=TENANT_CODE,
@@ -170,7 +201,7 @@ def make_data_for_a_distributor():
     ##########################################################################################
     # MANAGED DEVICES
     ##########################################################################################
-    for i in range(1, 225):
+    for i in range(1, 101):
         managed_device = ChromeOsDevice.get_by_device_id(DEVICE_ID + str(i))
         if not managed_device:
             managed_device = ChromeOsDevice.create_managed(
@@ -188,7 +219,7 @@ def make_data_for_a_distributor():
                 global array_of_devices_with_values
                 array_of_devices_with_values.append(str(managed_device.serial_number))
 
-                for z in range(1, 101):
+                for z in range(1, 26):
                     issue = DeviceIssueLog.create(device_key=managed_device.key,
                                                   category=config.DEVICE_ISSUE_PLAYER_DOWN,
                                                   up=False,

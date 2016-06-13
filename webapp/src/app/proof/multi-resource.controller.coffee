@@ -1,72 +1,73 @@
 'use strict'
 appModule = angular.module 'skykitProvisioning'
 appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService, $stateParams, $state, ToastsService) ->
-  @radioButtonChoices = {
+  vm = @
+  vm.radioButtonChoices = {
     group1: 'By Device',
     group2: 'By Date',
     selection: null
   }
 
 
-  @dateTimeSelection = {
+  vm.dateTimeSelection = {
     start: null,
     end: null
   }
 
-  @formValidity = {
+  vm.formValidity = {
     start_date: false,
     end_date: false,
     resources: false,
   }
 
-  @tenant = $stateParams.tenant
-  @no_cache = true
-  @loading = true
-  @disabled = true
-  @disabledTenant = true
-  @selected_resources = []
+  vm.tenant = $stateParams.tenant
+  vm.no_cache = true
+  vm.loading = true
+  vm.disabled = true
+  vm.disabledTenant = true
+  vm.selected_resources = []
 
-  @initialize = =>
-    ProofPlayService.getAllResources(@tenant)
-    .then (data) =>
-      @loading = false
-      @full_resource_map = data.data.resources
-      @resources = (resource.resource_name for resource in data.data.resources)
-      if @resources.length > 0
-        @had_some_items = true
+  vm.initialize = ->
+    ProofPlayService.getAllResources(vm.tenant)
+    .then (data) ->
+      vm.loading = false
+      vm.full_resource_map = data.data.resources
+      vm.resources = (resource.resource_name for resource in data.data.resources)
+      if vm.resources.length > 0
+        vm.had_some_items = true
       else
-        @had_some_items = false
+        vm.had_some_items = false
         
-  @refreshResources = () =>
-    @searchText = ''
-    @selectedItem = ''
-    @loading = true
-    @disabled = true
-    @selected_resources = []
+  vm.refreshResources = () ->
+    vm.searchText = ''
+    vm.selectedItem = ''
+    vm.loading = true
+    vm.disabled = true
+    vm.selected_resources = []
     ProofPlayService.proofplayCache.removeAll()
-    @initialize()
+    vm.initialize()
 
-  @addToSelectedResources = (searchText) =>
-    if @isResourceValid(searchText)
-      @selected_resources.push searchText
-      index = @resources.indexOf searchText
-      @resources.splice index, 1
-      @searchText = ''
-    @areResourcesValid()
-    @isDisabled()
+  vm.addToSelectedResources = (searchText) ->
+    if vm.isResourceValid(searchText)
+      vm.selected_resources.push searchText
+      index = vm.resources.indexOf searchText
+      vm.resources.splice index, 1
+      vm.searchText = ''
+    vm.areResourcesValid()
+    vm.isDisabled()
 
-  @querySearch = (resources, searchText) ->
+  vm.querySearch = (resources, searchText) ->
     ProofPlayService.querySearch(resources, searchText)
 
 
-  @isRadioValid = (selection) =>
-    @formValidity.type = selection
-    @isDisabled()
+  vm.isRadioValid = (selection) ->
+    vm.formValidity.type = selection
+    vm.isDisabled()
 
 
-  @isResourceValid = (searchText) =>
-    if searchText in @resources
-      if searchText not in @selected_resources
+  vm.isResourceValid = (searchText) ->
+    if searchText in vm.resources
+      if searchText not in vm.selected_resources
         true
       else
         false
@@ -74,73 +75,73 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService, $statePa
       false
 
 
-  @areResourcesValid = () =>
-    @formValidity.resources = (@selected_resources.length > 0)
-    @isDisabled()
+  vm.areResourcesValid = () ->
+    vm.formValidity.resources = (vm.selected_resources.length > 0)
+    vm.isDisabled()
 
-  @isStartDateValid = (start_date) =>
-    @formValidity.start_date = (start_date instanceof Date)
-    @isDisabled()
-
-
-  @isEndDateValid = (end_date) =>
-    @formValidity.end_date = (end_date instanceof Date)
-    @isDisabled()
-
-  @removeFromSelectedResource = (item) =>
-    index = @selected_resources.indexOf(item)
-    @selected_resources.splice(index, 1)
-    @resources.push item
-    @areResourcesValid()
-    @isDisabled()
+  vm.isStartDateValid = (start_date) ->
+    vm.formValidity.start_date = (start_date instanceof Date)
+    vm.isDisabled()
 
 
-  @isDisabled = () =>
-    if @formValidity.start_date and @formValidity.end_date and @formValidity.resources and @formValidity.type
-      @disabled = false
-      @final = {
-        start_date_unix: moment(@dateTimeSelection.start).unix(),
-        end_date_unix: moment(@dateTimeSelection.end).unix(),
-        resources: @selected_resources,
-        type: @radioButtonChoices.selection
+  vm.isEndDateValid = (end_date) ->
+    vm.formValidity.end_date = (end_date instanceof Date)
+    vm.isDisabled()
+
+  vm.removeFromSelectedResource = (item) ->
+    index = vm.selected_resources.indexOf(item)
+    vm.selected_resources.splice(index, 1)
+    vm.resources.push item
+    vm.areResourcesValid()
+    vm.isDisabled()
+
+
+  vm.isDisabled = () ->
+    if vm.formValidity.start_date and vm.formValidity.end_date and vm.formValidity.resources and vm.formValidity.type
+      vm.disabled = false
+      vm.final = {
+        start_date_unix: moment(vm.dateTimeSelection.start).unix(),
+        end_date_unix: moment(vm.dateTimeSelection.end).unix(),
+        resources: vm.selected_resources,
+        type: vm.radioButtonChoices.selection
       }
 
     else
-      @disabled = true
+      vm.disabled = true
 
-  @submit = () =>
+  vm.submit = () ->
     resources_as_ids = []
-    for item in @final.resources
-      for each in @full_resource_map
+    for item in vm.final.resources
+      for each in vm.full_resource_map
         if each["resource_name"] == item
           resources_as_ids.push each["resource_identifier"]
 
-    if @final.type is "1"
-      ProofPlayService.downloadCSVForMultipleResourcesByDevice(@final.start_date_unix, @final.end_date_unix, resources_as_ids, @tenant)
+    if vm.final.type is "1"
+      ProofPlayService.downloadCSVForMultipleResourcesByDevice(vm.final.start_date_unix, vm.final.end_date_unix, resources_as_ids, vm.tenant)
 
     else
-      ProofPlayService.downloadCSVForMultipleResourcesByDate(@final.start_date_unix, @final.end_date_unix, resources_as_ids, @tenant)
+      ProofPlayService.downloadCSVForMultipleResourcesByDate(vm.final.start_date_unix, vm.final.end_date_unix, resources_as_ids, vm.tenant)
 
-  @tenants = null
-  @currentTenant = @tenant
+  vm.tenants = null
+  vm.currentTenant = vm.tenant
 
-  @initialize_tenant_select = () ->
+  vm.initialize_tenant_select = () ->
     ProofPlayService.getAllTenants()
-    .then (data) =>
-      @tenants = data.data.tenants
+    .then (data) ->
+      vm.tenants = data.data.tenants
       
-  @querySearch = (resources, searchText) ->
+  vm.querySearch = (resources, searchText) ->
     ProofPlayService.querySearch(resources, searchText)
 
-  @isSelectionValid = (search) =>
-    if search in @tenants
-      @disabledTenant = false
+  vm.isSelectionValid = (search) ->
+    if search in vm.tenants
+      vm.disabledTenant = false
     else
-      @disabledTenant = true
+      vm.disabledTenant = true
 
 
-  @submitTenant = (tenant) =>
-    if tenant != @currentTenant
+  vm.submitTenant = (tenant) ->
+    if tenant != vm.currentTenant
       $state.go 'proofDetail', {
         tenant: tenant
       }
@@ -149,4 +150,4 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService, $statePa
       ToastsService.showErrorToast "Proof of Play reporting is already set to " + tenant
 
 
-  @
+  vm

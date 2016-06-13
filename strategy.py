@@ -1,7 +1,14 @@
 from datetime import datetime
 from google.appengine.ext import ndb
 
-from models import (Tenant, ChromeOsDevice, Distributor, Domain, DeviceIssueLog, PlayerCommandEvent, Location)
+from models import (Tenant,
+                    ChromeOsDevice,
+                    Distributor,
+                    Domain,
+                    DeviceIssueLog,
+                    PlayerCommandEvent,
+                    Location,
+                    IntegrationEventLog)
 from restler.serializers import ModelStrategy
 from utils.datetime_util import elapsed_time_message, convert_timezone
 
@@ -90,13 +97,14 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'connectionType': lambda o, field_name, context: o.key.get().connection_type},
     {'proofOfPlayLogging': lambda o, field_name, context: o.key.get().proof_of_play_logging},
     {'proofOfPlayEditable': lambda o, field_name, context: o.key.get().proof_of_play_editable},
-    {'proofOfPlayUrl': lambda o, field_name, context: o.tenant_key.get().proof_of_play_url if o.tenant_key is not None else None},
+    {'proofOfPlayUrl': lambda o, field_name,
+                              context: o.tenant_key.get().proof_of_play_url if o.tenant_key is not None else None},
     # Display Location & Timezone information from Location entity:
     {'locationKey': lambda o, field_name, context: o.location_key.urlsafe() if o.location_key is not None else None},
     {'customerLocationCode': lambda o, field_name,
-                           context: o.location_key.get().customer_location_code if o.location_key is not None else None},
+                                    context: o.location_key.get().customer_location_code if o.location_key is not None else None},
     {'customerLocationName': lambda o, field_name,
-                                  context: o.location_key.get().customer_location_name if o.location_key is not None else None},
+                                    context: o.location_key.get().customer_location_name if o.location_key is not None else None},
     {'customerDisplayCode': lambda o, field_name, context: o.key.get().customer_display_code},
     {'customerDisplayName': lambda o, field_name, context: o.key.get().customer_display_name},
     {'latitude': lambda o, field_name,
@@ -120,9 +128,9 @@ LOCATION_STRATEGY += [
     {'state': lambda o, field_name, context: o.key.get().state},
     {'postalCode': lambda o, field_name, context: o.key.get().postal_code},
     {'latitude': lambda o, field_name,
-        context: o.key.get().geo_location.lat if o.key.get().geo_location is not None else None},
+                        context: o.key.get().geo_location.lat if o.key.get().geo_location is not None else None},
     {'longitude': lambda o, field_name,
-        context: o.key.get().geo_location.lon if o.key.get().geo_location is not None else None},
+                         context: o.key.get().geo_location.lon if o.key.get().geo_location is not None else None},
     {'dma': lambda o, field_name, context: o.key.get().dma},
     {'created': lambda o, field_name, context: o.key.get().created},
     {'updated': lambda o, field_name, context: o.key.get().updated},
@@ -162,7 +170,24 @@ PLAYER_COMMAND_EVENT_STRATEGY += [
     {'deviceKey': lambda o, field_name, context: o.key.get().device_urlsafe_key},
     {'payload': lambda o, field_name, context: o.key.get().payload},
     {'gcmRegistrationId': lambda o, field_name, context: o.key.get().gcm_registration_id},
-    {'postedTime': lambda o, field_name, context: convert_timezone(o.key.get().posted, 'US/Central')},
-    {'confirmedTime': lambda o, field_name, context: convert_timezone(o.key.get().confirmed, 'US/Central')},
+    {'userIdentifier': lambda o, field_name, context: o.key.get().user_identifier},
+    {'postedTime': lambda o, field_name, context: o.key.get().posted},
+    {'confirmedTime': lambda o, field_name, context: o.key.get().confirmed},
     {'confirmed': lambda o, field_name, context: o.key.get().player_has_confirmed}
 ]
+
+INTEGRATION_EVENT_LOG_STRATEGY = ModelStrategy(IntegrationEventLog)
+INTEGRATION_EVENT_LOG_STRATEGY += [
+    {'eventCategory': lambda o, field_name, context: o.key.get().event_category},
+    {'correlationIdentifier': lambda o, field_name, context: o.key.get().correlation_identifier},
+    {'componentName': lambda o, field_name, context: o.key.get().component_name},
+    {'workflowStep': lambda o, field_name, context: o.key.get().workflow_step},
+    {'utcTimestamp': lambda o, field_name, context: o.key.get().utc_timestamp},
+    {'deviceUrlSafeKey': lambda o, field_name, context: o.key.get().device_urlsafe_key},
+    {'serialNumber': lambda o, field_name, context: o.key.get().serial_number},
+    {'tenantCode': lambda o, field_name, context: o.key.get().tenant_code},
+    {'gcmRegistrationId': lambda o, field_name, context: o.key.get().gcm_registration_id},
+    {'macAddress': lambda o, field_name, context: o.key.get().mac_address},
+    {'details': lambda o, field_name, context: o.key.get().details}
+]
+
