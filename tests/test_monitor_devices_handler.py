@@ -63,7 +63,7 @@ class TestMonitorDevicesHandler(BaseTest, WebTest):
         self.empty_header = {}
 
     ##################################################################################################################
-    ## last_contact_check
+    # last_contact_check
     ##################################################################################################################
     def test_get_last_contact_check_returns_accepted_status(self):
         request_parameters = {}
@@ -72,11 +72,6 @@ class TestMonitorDevicesHandler(BaseTest, WebTest):
         self.assertEqual(response.status, '202 Accepted')
         self.assertEqual(response.status_int, 202)
 
-    # def test_get_last_contact_check_with_no_authorization_header_returns_forbidden(self):
-    #     request_parameters = {}
-    #     uri = build_uri('monitor-devices')
-    #     response = self.get(uri, params=request_parameters, headers=self.empty_header)
-    #     self.assertForbidden(response)
 
     def test_get_last_contact_check_does_not_toggle_up_when_threshold_not_met(self):
         request_parameters = {}

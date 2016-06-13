@@ -53,7 +53,7 @@ describe 'TenantDetailsCtrl', ->
       spyOn(TenantsService, 'getTenantByKey').and.returnValue tenantsServicePromise
       spyOn(DistributorsService, 'getDomainsByKey').and.returnValue distributorsDomainsServicePromise
       spyOn(DomainsService, 'getDomainByKey').and.returnValue domainsServicePromise
-      spyOn(TimezonesService, 'getUsTimezones').and.returnValue timezoneServicePromise
+      spyOn(TimezonesService, 'getCustomTimezones').and.returnValue timezoneServicePromise
 
     it 'gameStopServer should be set', ->
       controller = $controller 'TenantDetailsCtrl', serviceInjection
@@ -110,7 +110,7 @@ describe 'TenantDetailsCtrl', ->
 
       it 'calls TimezonesService.getUsTimezones to retrieve US timezones', ->
         controller.initialize()
-        expect(TimezonesService.getUsTimezones).toHaveBeenCalled()
+        expect(TimezonesService.getCustomTimezones).toHaveBeenCalled()
 
       it 'calls DistributorsService.getDomainsByKey to retrieve distributor domains', ->
         controller.initialize()

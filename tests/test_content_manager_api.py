@@ -20,7 +20,6 @@ class TestContentManagerApi(BaseTest):
     CONTENT_SERVER_URL = 'https://skykit-contentmanager-int.appspot.com/content'
     CONTENT_MANAGER_BASE_URL = 'https://skykit-contentmanager-int.appspot.com'
     CONTENT_SERVER_API_KEY = 'API KEY'
-    CHROME_DEVICE_DOMAIN = 'bar.com'
     TENANT_CODE = 'foobar'
     DISTRIBUTOR_NAME = 'agosto'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
@@ -29,8 +28,7 @@ class TestContentManagerApi(BaseTest):
     def setUp(self):
         super(TestContentManagerApi, self).setUp()
         self.content_manager_api = ContentManagerApi()
-        self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
-                                              active=True)
+        self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME)
         self.distributor_key = self.distributor.put()
         self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
                                     distributor_key=self.distributor_key,
@@ -54,7 +52,7 @@ class TestContentManagerApi(BaseTest):
         self.device_key = self.device.put()
 
     ##################################################################################################################
-    ## create_tenant
+    # create_tenant
     ##################################################################################################################
 
     def test_create_tenant_success(self):
@@ -72,21 +70,23 @@ class TestContentManagerApi(BaseTest):
         self.assertEqual(error_message, str(context.exception))
 
     ##################################################################################################################
-    ## create_device
+    # create_device
     ##################################################################################################################
 
     def test_create_device_success_returns_true(self):
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=201))
-        result = self.content_manager_api.create_device(device_urlsafe_key=self.device_key.urlsafe())
+        result = self.content_manager_api.create_device(device_urlsafe_key=self.device_key.urlsafe(),
+                                                        correlation_id='some correlation id')
         self.assertTrue(result)
 
     def test_create_device_failure_returns_false(self):
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=400))
-        result = self.content_manager_api.create_device(device_urlsafe_key=self.device_key.urlsafe())
+        result = self.content_manager_api.create_device(device_urlsafe_key=self.device_key.urlsafe(),
+                                                        correlation_id='some correlation id')
         self.assertFalse(result)
 
     ##################################################################################################################
-    ## update_device
+    # update_device
     ##################################################################################################################
     def test_update_device_success(self):
         when(self.content_manager_api).delete_device(any_matcher()).thenReturn(True)
@@ -104,7 +104,7 @@ class TestContentManagerApi(BaseTest):
         self.assertTrue(error_message in context.exception.message)
 
     ##################################################################################################################
-    ## delete_device
+    # delete_device
     ##################################################################################################################
     def test_delete_device_success(self):
         when(HttpClient).delete(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=204))

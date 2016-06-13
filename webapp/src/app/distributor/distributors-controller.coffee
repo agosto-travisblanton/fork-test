@@ -3,6 +3,7 @@
 appModule = angular.module 'skykitProvisioning'
 
 appModule.controller "DistributorsCtrl", ($state) ->
-  @distributors = []
+  vm = @
+  vm.distributors = []
 
-  @
+  vm

@@ -81,6 +81,24 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertIsNotNone(device)
         self.assertIsNotNone(device.api_key)
 
+    def test_create_managed_handles_proof_of_play_editable_when_tenant_allows(self):
+        self.tenant.proof_of_play_logging = True
+        self.tenant.put()
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
+        self.assertTrue(device.proof_of_play_editable)
+
+    def test_create_managed_handles_proof_of_play_editable_when_if_tenant_prohibits(self):
+        self.tenant.proof_of_play_logging = False
+        self.tenant.put()
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
+        self.assertFalse(device.proof_of_play_editable)
+
     def test_create_managed_auto_sets_heartbeat_info(self):
         device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
                                                device_id=self.TESTING_DEVICE_ID,

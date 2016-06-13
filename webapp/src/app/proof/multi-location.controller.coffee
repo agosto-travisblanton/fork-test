@@ -1,71 +1,72 @@
 'use strict'
 appModule = angular.module 'skykitProvisioning'
 appModule.controller "ProofOfPlayMultiLocationCtrl", (ProofPlayService, $stateParams, $state, ToastsService) ->
-  @radioButtonChoices = {
+  vm = @
+  vm.radioButtonChoices = {
     group1: 'By Device',
     group2: 'Summarized',
     selection: null
   }
 
 
-  @dateTimeSelection = {
+  vm.dateTimeSelection = {
     start: null,
     end: null
   }
 
-  @formValidity = {
+  vm.formValidity = {
     start_date: false,
     end_date: false,
     locations: false,
   }
 
-  @tenant = $stateParams.tenant
-  @no_cache = true
-  @loading = true
-  @disabled = true
-  @disabledTenant = true
-  @selected_locations = []
+  vm.tenant = $stateParams.tenant
+  vm.no_cache = true
+  vm.loading = true
+  vm.disabled = true
+  vm.disabledTenant = true
+  vm.selected_locations = []
 
-  @initialize = =>
-    ProofPlayService.getAllLocations(@tenant)
-    .then (data) =>
-      @loading = false
-      @locations = data.data.locations
-      if @locations.length > 0
-        @had_some_items = true
+  vm.initialize = ->
+    ProofPlayService.getAllLocations(vm.tenant)
+    .then (data) ->
+      vm.loading = false
+      vm.locations = data.data.locations
+      if vm.locations.length > 0
+        vm.had_some_items = true
       else
-        @had_some_items = false
+        vm.had_some_items = false
         
-  @refreshLocations = () =>
-    @searchText = ''
-    @selectedItem = ''
-    @loading = true
-    @disabled = true
-    @selected_locations = []
+  vm.refreshLocations = () ->
+    vm.searchText = ''
+    vm.selectedItem = ''
+    vm.loading = true
+    vm.disabled = true
+    vm.selected_locations = []
     ProofPlayService.proofplayCache.removeAll()
-    @initialize()
+    vm.initialize()
 
-  @addToSelectedLocations = (searchText) =>
-    if @isLocationValid(searchText)
-      @selected_locations.push searchText
-      index = @locations.indexOf searchText
-      @locations.splice index, 1
-      @searchText = ''
-    @areLocationsValid()
-    @isDisabled()
+  vm.addToSelectedLocations = (searchText) ->
+    if vm.isLocationValid(searchText)
+      vm.selected_locations.push searchText
+      index = vm.locations.indexOf searchText
+      vm.locations.splice index, 1
+      vm.searchText = ''
+    vm.areLocationsValid()
+    vm.isDisabled()
 
-  @querySearch = (locations, searchText) ->
+  vm.querySearch = (locations, searchText) ->
     ProofPlayService.querySearch(locations, searchText)
 
 
-  @isRadioValid = (selection) =>
-    @formValidity.type = selection
-    @isDisabled()
+  vm.isRadioValid = (selection) ->
+    vm.formValidity.type = selection
+    vm.isDisabled()
 
 
-  @isLocationValid = (searchText) =>
-    if searchText in @locations
-      if searchText not in @selected_locations
+  vm.isLocationValid = (searchText) ->
+    if searchText in vm.locations
+      if searchText not in vm.selected_locations
         true
       else
         false
@@ -73,68 +74,68 @@ appModule.controller "ProofOfPlayMultiLocationCtrl", (ProofPlayService, $statePa
       false
 
 
-  @areLocationsValid = () =>
-    @formValidity.locations = (@selected_locations.length > 0)
-    @isDisabled()
+  vm.areLocationsValid = () ->
+    vm.formValidity.locations = (vm.selected_locations.length > 0)
+    vm.isDisabled()
 
-  @isStartDateValid = (start_date) =>
-    @formValidity.start_date = (start_date instanceof Date)
-    @isDisabled()
-
-
-  @isEndDateValid = (end_date) =>
-    @formValidity.end_date = (end_date instanceof Date)
-    @isDisabled()
-
-  @removeFromSelectedLocation = (item) =>
-    index = @selected_locations.indexOf(item)
-    @selected_locations.splice(index, 1)
-    @locations.push item
-    @areLocationsValid()
-    @isDisabled()
+  vm.isStartDateValid = (start_date) ->
+    vm.formValidity.start_date = (start_date instanceof Date)
+    vm.isDisabled()
 
 
-  @isDisabled = () =>
-    if @formValidity.start_date and @formValidity.end_date and @formValidity.locations and @formValidity.type
-      @disabled = false
-      @final = {
-        start_date_unix: moment(@dateTimeSelection.start).unix(),
-        end_date_unix: moment(@dateTimeSelection.end).unix(),
-        locations: @selected_locations,
-        type: @radioButtonChoices.selection
+  vm.isEndDateValid = (end_date) ->
+    vm.formValidity.end_date = (end_date instanceof Date)
+    vm.isDisabled()
+
+  vm.removeFromSelectedLocation = (item) ->
+    index = vm.selected_locations.indexOf(item)
+    vm.selected_locations.splice(index, 1)
+    vm.locations.push item
+    vm.areLocationsValid()
+    vm.isDisabled()
+
+
+  vm.isDisabled = () ->
+    if vm.formValidity.start_date and vm.formValidity.end_date and vm.formValidity.locations and vm.formValidity.type
+      vm.disabled = false
+      vm.final = {
+        start_date_unix: moment(vm.dateTimeSelection.start).unix(),
+        end_date_unix: moment(vm.dateTimeSelection.end).unix(),
+        locations: vm.selected_locations,
+        type: vm.radioButtonChoices.selection
 
       }
 
     else
-      @disabled = true
+      vm.disabled = true
 
-  @submit = () =>
-    if @final.type is "1"
-      ProofPlayService.downloadCSVForMultipleLocationsByDevice(@final.start_date_unix, @final.end_date_unix, @final.locations, @tenant)
+  vm.submit = () ->
+    if vm.final.type is "1"
+      ProofPlayService.downloadCSVForMultipleLocationsByDevice(vm.final.start_date_unix, vm.final.end_date_unix, vm.final.locations, vm.tenant)
 
     else
-      ProofPlayService.downloadCSVForMultipleLocationsSummarized(@final.start_date_unix, @final.end_date_unix, @final.locations, @tenant)
+      ProofPlayService.downloadCSVForMultipleLocationsSummarized(vm.final.start_date_unix, vm.final.end_date_unix, vm.final.locations, vm.tenant)
 
-  @tenants = null
-  @currentTenant = @tenant
+  vm.tenants = null
+  vm.currentTenant = vm.tenant
 
-  @initialize_tenant_select = () ->
+  vm.initialize_tenant_select = () ->
     ProofPlayService.getAllTenants()
-    .then (data) =>
-      @tenants = data.data.tenants
+    .then (data) ->
+      vm.tenants = data.data.tenants
 
-  @querySearch = (resources, searchText) ->
+  vm.querySearch = (resources, searchText) ->
     ProofPlayService.querySearch(resources, searchText)
 
-  @isSelectionValid = (search) =>
-    if search in @tenants
-      @disabledTenant = false
+  vm.isSelectionValid = (search) ->
+    if search in vm.tenants
+      vm.disabledTenant = false
     else
-      @disabledTenant = true
+      vm.disabledTenant = true
 
 
-  @submitTenant = (tenant) =>
-    if tenant != @currentTenant
+  vm.submitTenant = (tenant) ->
+    if tenant != vm.currentTenant
       $state.go 'proofDetail', {
         tenant: tenant
       }
@@ -144,4 +145,4 @@ appModule.controller "ProofOfPlayMultiLocationCtrl", (ProofPlayService, $statePa
     else
       ToastsService.showErrorToast "Proof of Play reporting is already set to " + tenant
 
-  @
+  vm

@@ -10,32 +10,33 @@ app.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
   ProofPlayService,
   DevicesService,
   TenantsService) ->
+    vm = @
 
-    @onGooglePlusSignInSuccess = (event, authResult) =>
-      unless @googlePlusSignInButtonClicked
+    vm.onGooglePlusSignInSuccess = (event, authResult) ->
+      unless vm.googlePlusSignInButtonClicked
         ProgressBarService.start()
       promise = SessionsService.login(authResult)
-      promise.then @loginSuccess, @loginFailure
+      promise.then vm.loginSuccess, vm.loginFailure
 
 
-    @onGooglePlusSignInFailure = (event, authResult) =>
-      if @googlePlusSignInButtonClicked
+    vm.onGooglePlusSignInFailure = (event, authResult) ->
+      if vm.googlePlusSignInButtonClicked
         ProgressBarService.complete()
         sweet.show('Oops...', 'Unable to authenticate to Google+.', 'error')
 
-    $scope.$on 'event:google-plus-signin-success', @onGooglePlusSignInSuccess
-    $scope.$on 'event:google-plus-signin-failure', @onGooglePlusSignInFailure
+    $scope.$on 'event:google-plus-signin-success', vm.onGooglePlusSignInSuccess
+    $scope.$on 'event:google-plus-signin-failure', vm.onGooglePlusSignInFailure
 
-    @initializeSignIn = ->
-      @clientId = identity.OAUTH_CLIENT_ID
-      @state = identity.STATE
-      @googlePlusSignInButtonClicked = false
+    vm.initializeSignIn = ->
+      vm.clientId = identity.OAUTH_CLIENT_ID
+      vm.state = identity.STATE
+      vm.googlePlusSignInButtonClicked = false
 
-    @initializeSignOut = ->
+    vm.initializeSignOut = ->
       SessionsService.removeUserInfo()
-      $timeout @proceedToSignedOut, 1500
+      $timeout vm.proceedToSignedOut, 50
 
-    @loginSuccess = (response) ->
+    vm.loginSuccess = (response) ->
       ProgressBarService.complete()
       ProofPlayService.proofplayCache.removeAll()
       TenantsService.tenantCache.removeAll()
@@ -43,19 +44,19 @@ app.controller "AuthenticationCtrl", ($scope, $log, $state, $timeout,
       DevicesService.deviceByTenantCache.removeAll()
       $state.go 'distributor_selection'
 
-    @loginFailure = () ->
+    vm.loginFailure = () ->
       ProgressBarService.complete()
       sweet.show('Oops...', 'Unable to authenticate to Stormpath.', 'error')
 
 
-    @proceedToSignedOut = ->
+    vm.proceedToSignedOut = ->
       $state.go 'signed_out'
 
-    @proceedToSignIn = ->
+    vm.proceedToSignIn = ->
       $state.go 'sign_in'
 
-    @onClickGooglePlusSignIn = =>
-      @googlePlusSignInButtonClicked = true
+    vm.onClickGooglePlusSignIn = ->
+      vm.googlePlusSignInButtonClicked = true
       ProgressBarService.start()
 
-    @
+    vm
