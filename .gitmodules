@@ -1,3 +1,4 @@
 [submodule "backup"]
 	path = backup
 	url = git@github.com:agosto-dev/datastore-backup.git
+	branch = 15094f8f8cd9b4065af90e501292b993006c38c7
