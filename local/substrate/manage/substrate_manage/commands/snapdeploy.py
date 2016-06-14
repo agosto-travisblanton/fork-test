@@ -198,6 +198,7 @@ def deploy_single_project(project, arguments, config, full_version, vc_type):
 
 
 def deploy_projects(arguments, config, full_version, vc_type):
+    print arguments[0]
     for project in arguments[0].A:
         deploy_single_project(project, arguments, config, full_version, vc_type)
 
@@ -244,7 +245,7 @@ def run_all():
     ensure_changeset_has_hash(changeset_info)
     ensure_on_default_branch_or_using_ignore_branch(args, changeset_info, default_branch_name)
     ensure_clean_or_has_ignore_unclean(args, changeset_info)
-    run_pre_deploy(config)
+    # run_pre_deploy(config)
 
     if new_version != old_version:
         config['version'] = new_version
