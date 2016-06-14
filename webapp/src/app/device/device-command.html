@@ -13,7 +13,7 @@
               </div>
               <div flex="55">
                 <form name="resetContentForm" class="form-horizontal"
-                      ng-submit="deviceDetailsCtrl.onResetContent()"
+                      ng-submit="vm.onResetContent()"
                       novalidate>
                   <div layout="row">
                     <md-button type="submit"><i
@@ -44,7 +44,7 @@
               </div>
               <div flex="55">
                 <form name="updateContentForm" class="form-horizontal"
-                      ng-submit="deviceDetailsCtrl.onUpdateContent()"
+                      ng-submit="vm.onUpdateContent()"
                       novalidate>
                   <div layout="row">
                     <md-button type="submit"><i
@@ -76,7 +76,7 @@
               </div>
               <div flex="55">
                 <form name="resetPlayerForm" class="form-horizontal"
-                      ng-submit="deviceDetailsCtrl.onResetPlayer()"
+                      ng-submit="vm.onResetPlayer()"
                       novalidate>
                   <div layout="row">
                     <md-button type="submit"><i
@@ -107,7 +107,7 @@
               </div>
               <div flex="55">
                 <form name="panelOnForm" class="form-horizontal"
-                      ng-submit="deviceDetailsCtrl.onPanelOn()"
+                      ng-submit="vm.onPanelOn()"
                       novalidate>
                   <div layout="row">
                     <md-button type="submit"><i
@@ -138,7 +138,7 @@
               </div>
               <div flex="55">
                 <form name="panelOffForm" class="form-horizontal"
-                      ng-submit="deviceDetailsCtrl.onPanelOff()"
+                      ng-submit="vm.onPanelOff()"
                       novalidate>
                   <div layout="row">
                     <md-button type="submit"><i
@@ -169,7 +169,7 @@
               </div>
               <div flex="55">
                 <form name="updateDeviceForm" class="form-horizontal"
-                      ng-submit="deviceDetailsCtrl.onUpdateDevice()"
+                      ng-submit="vm.onUpdateDevice()"
                       novalidate>
                   <div layout="row">
                     <md-button type="submit"><i
@@ -201,7 +201,7 @@
             </md-card-title>
             <md-card-content>
               <form name="volumeForm" class="form-horizontal"
-                    ng-submit="deviceDetailsCtrl.onVolumeChange()"
+                    ng-submit="vm.onVolumeChange()"
                     novalidate>
                 <div layout="row">
                   <div flex="40">
@@ -209,7 +209,7 @@
                            class="form-control"
                            name="volume"
                            id="volume"
-                           ng-model="deviceDetailsCtrl.currentDevice.volume"
+                           ng-model="vm.currentDevice.volume"
                            min="1"
                            max="100"
                            ngMinlength="1"
@@ -235,7 +235,7 @@
             </md-card-title>
             <md-card-content>
               <form name="customForm" class="form-horizontal"
-                    ng-submit="deviceDetailsCtrl.onCustomCommand()"
+                    ng-submit="vm.onCustomCommand()"
                     novalidate>
                 <div layout="row">
                   <div flex="70">
@@ -243,7 +243,7 @@
                            class="form-control"
                            name="custom"
                            id="custom"
-                           ng-model="deviceDetailsCtrl.currentDevice.custom"
+                           ng-model="vm.currentDevice.custom"
                            ng-required="true">
                   </div>
                   <div flex="30">

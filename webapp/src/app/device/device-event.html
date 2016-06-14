@@ -3,38 +3,38 @@
       <md-card>
         <md-card-content>
           <form name="tenantForm" class="form-horizontal"
-                ng-submit="deviceDetailsCtrl.onClickRefreshButton()"
+                ng-submit="vm.onClickRefreshButton()"
                 novalidate>
             <div class="row">
               <div class="col-sm-3">
                 <md-button class="md-raised"
-                           ng-disabled="!deviceDetailsCtrl.prev_cursor"
-                           ng-click="deviceDetailsCtrl.paginateCall(false)">
+                           ng-disabled="!vm.prev_cursor"
+                           ng-click="vm.paginateCall(false)">
                   Prev
                 </md-button>
                 <md-button class="md-raised"
-                           ng-disabled="!deviceDetailsCtrl.next_cursor"
-                           ng-click="deviceDetailsCtrl.paginateCall(true)">
+                           ng-disabled="!vm.next_cursor"
+                           ng-click="vm.paginateCall(true)">
                   Next
                 </md-button>
               </div>
               <div class="col-sm-2  col-sm-offset-3">
                 <b><p>From:</p></b><input type="text" class="form-control input-sm"
                                           datetimepicker
-                                          datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
-                                          placeholder="{{deviceDetailsCtrl.startTime}}"
+                                          datetimepicker-options="{{vm.pickerOptions}}"
+                                          placeholder="{{vm.startTime}}"
                                           name="startTime"
                                           id="startTime"
-                                          ng-model="deviceDetailsCtrl.startTime">
+                                          ng-model="vm.startTime">
               </div>
               <div class="col-sm-2">
                 <b><p>To:</p></b><input type="text" class="form-control input-sm"
                                         datetimepicker
-                                        datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
-                                        placeholder="{{deviceDetailsCtrl.endTime}}"
+                                        datetimepicker-options="{{vm.pickerOptions}}"
+                                        placeholder="{{vm.endTime}}"
                                         name="endTime"
                                         id="endTime"
-                                        ng-model="deviceDetailsCtrl.endTime">
+                                        ng-model="vm.endTime">
               </div>
               <div class="col-sm-2">
                 <md-button type="submit" class="md-raised">
@@ -64,14 +64,14 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-hide="deviceDetailsCtrl.issues.length">
+                <tr ng-hide="vm.issues.length">
                   <td class="text-center text-warning" colspan="8">
-                    No events logged in the past {{deviceDetailsCtrl.dayRange}}
+                    No events logged in the past {{vm.dayRange}}
                     days.<br>
                     Please try an earlier 'From date' above.
                   </td>
                 </tr>
-                <tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:['-updated']">
+                <tr ng-repeat="item in vm.issues | orderBy:['-updated']">
                   <td class="issue-{{ item.level_descriptor}}-background"></td>
                   <td>{{ item.category }}</td>
                   <td>{{ item.memory_utilization }}%</td>
@@ -95,18 +95,18 @@
       <md-card>
         <md-card-content>
           <form name="tenantForm" class="form-horizontal"
-                ng-submit="deviceDetailsCtrl.onClickRefreshButton()"
+                ng-submit="vm.onClickRefreshButton()"
                 novalidate>
             <div class="row">
               <div class="col-sm-3">
                 <md-button class="md-raised"
-                           ng-disabled="!deviceDetailsCtrl.prev_cursor"
-                           ng-click="deviceDetailsCtrl.paginateCall(false)">
+                           ng-disabled="!vm.prev_cursor"
+                           ng-click="vm.paginateCall(false)">
                   Prev
                 </md-button>
                 <md-button class="md-raised"
-                           ng-disabled="!deviceDetailsCtrl.next_cursor"
-                           ng-click="deviceDetailsCtrl.paginateCall(true)">
+                           ng-disabled="!vm.next_cursor"
+                           ng-click="vm.paginateCall(true)">
                   Next
                 </md-button>
               </div>

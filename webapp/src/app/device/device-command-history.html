@@ -6,13 +6,13 @@
       <div class="row">
         <div class="col-md-12">
           <md-button class="md-raised"
-                     ng-disabled="!deviceDetailsCtrl.event_prev_cursor"
-                     ng-click="deviceDetailsCtrl.paginateEventCall(false)">
+                     ng-disabled="!vm.event_prev_cursor"
+                     ng-click="vm.paginateEventCall(false)">
             Prev
           </md-button>
           <md-button class="md-raised"
-                     ng-disabled="!deviceDetailsCtrl.event_next_cursor"
-                     ng-click="deviceDetailsCtrl.paginateEventCall(true)">
+                     ng-disabled="!vm.event_next_cursor"
+                     ng-click="vm.paginateEventCall(true)">
             Next
           </md-button>
           <hr/>
@@ -29,13 +29,13 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-hide="deviceDetailsCtrl.commandEvents.length">
+            <tr ng-hide="vm.commandEvents.length">
               <td class="text-center text-warning" colspan="4">No commands
                 posted
                 to this player
               </td>
             </tr>
-            <tr ng-repeat="item in deviceDetailsCtrl.commandEvents | orderBy:['-postedTime']">
+            <tr ng-repeat="item in vm.commandEvents | orderBy:['-postedTime']">
               <td class="command-history-command">{{ item.payload }}</td>
               <td>{{ item.postedTime }}</td>
               <td>{{ item.confirmedTime }}</td>
@@ -45,16 +45,16 @@
             </tbody>
           </table>
         </div>
-        <div class="col-md-12" ng-if="deviceDetailsCtrl.commandEvents.length > 10">
+        <div class="col-md-12" ng-if="vm.commandEvents.length > 10">
           <hr/>
           <md-button class="md-raised"
-                     ng-disabled="!deviceDetailsCtrl.event_prev_cursor"
-                     ng-click="deviceDetailsCtrl.paginateEventCall(false)">
+                     ng-disabled="!vm.event_prev_cursor"
+                     ng-click="vm.paginateEventCall(false)">
             Prev
           </md-button>
           <md-button class="md-raised"
-                     ng-disabled="!deviceDetailsCtrl.event_next_cursor"
-                     ng-click="deviceDetailsCtrl.paginateEventCall(true)">
+                     ng-disabled="!vm.event_next_cursor"
+                     ng-click="vm.paginateEventCall(true)">
             Next
           </md-button>
           <hr/>
