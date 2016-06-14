@@ -25,6 +25,10 @@
 
         python manage.py snapdeploy -A proactiveservices-stage -A proactiveservices-prod
 
+    You may run the pre-deploy script with the optional -D argument:
+
+        python manage.py snapdeploy -A proactiveservices-stage -A proactiveservices-prod -D
+
 
     Older versions may be redeployed in a deterministic manner.  To do so, update your working directory to the desired
     changeset ID (which can be found by looking at the right-hand side of a version string, such as in "34-4db0243959fa"),
@@ -54,6 +58,7 @@ parser.add_argument('-V', dest='version', help='override version setting in snap
 parser.add_argument('--ignore-unclean', action='store_true', help='ignore dirty workarea')
 parser.add_argument('--ignore-branch', action='store_true', help='allow deploy from any branch')
 parser.add_argument('-A', dest='projects', action='append', help='add project')
+parser.add_argument('-D', dest='pre_deploy', action='store_true')
 
 ChangesetInfo = namedtuple('ChangesetInfo', ['branch', 'hash', 'dirty'])
 
@@ -198,7 +203,7 @@ def deploy_single_project(project, arguments, config, full_version, vc_type):
 
 
 def deploy_projects(arguments, config, full_version, vc_type):
-    for project in arguments[0].A:
+    for project in arguments[0].projects:
         deploy_single_project(project, arguments, config, full_version, vc_type)
 
 
@@ -234,6 +239,7 @@ def print_deployment_succeeded(args):
 
 def run_all():
     args = parser.parse_known_args(sys.argv[1:])
+    should_run_pre_deploy = args[0].pre_deploy
     vc_type = get_version_control_type()
     ensure_version_control(vc_type)
     changeset_info = get_current_changeset_info(vc_type)
@@ -244,7 +250,9 @@ def run_all():
     ensure_changeset_has_hash(changeset_info)
     ensure_on_default_branch_or_using_ignore_branch(args, changeset_info, default_branch_name)
     ensure_clean_or_has_ignore_unclean(args, changeset_info)
-    run_pre_deploy(config)
+
+    if should_run_pre_deploy:
+        run_pre_deploy(config)
 
     if new_version != old_version:
         config['version'] = new_version
