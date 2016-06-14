@@ -12,7 +12,8 @@ appModule.controller 'DeviceDetailsCtrl', (
   sweet,
   ProgressBarService,
   $mdDialog,
-  ToastsService) ->
+  ToastsService,
+  $timeout) ->
     vm = @
     vm.tenantKey = $stateParams.tenantKey
     vm.deviceKey = $stateParams.deviceKey
@@ -35,7 +36,6 @@ appModule.controller 'DeviceDetailsCtrl', (
     vm.endTime = now.toLocaleString().replace(/,/g, "")
     today.setDate(now.getDate() - vm.dayRange)
     vm.startTime = today.toLocaleString().replace(/,/g, "")
-
 
     vm.generateLocalFromUTC = (UTCTime) ->
       localTime = moment.utc(UTCTime).toDate()
@@ -80,6 +80,12 @@ appModule.controller 'DeviceDetailsCtrl', (
         vm.event_prev_cursor = data.prev_cursor
         vm.commandEvents = data.events
         ProgressBarService.complete()
+
+    vm.getEventsTimeOut = (deviceKey, prev, next) ->
+      $timeout ( ->
+        vm.getEvents deviceKey, prev, next
+      ), 1000
+
 
     vm.paginateCall = (forward) ->
       if forward
@@ -259,6 +265,7 @@ appModule.controller 'DeviceDetailsCtrl', (
 
     vm.onResetContentSuccess = ->
       ProgressBarService.complete()
+      vm.getEventsTimeOut vm.deviceKey
       ToastsService.showSuccessToast "We posted your reset content command into the player's queue."
 
     vm.onResetContentFailure = (error) ->
@@ -273,6 +280,7 @@ appModule.controller 'DeviceDetailsCtrl', (
 
     vm.onUpdateContentSuccess = ->
       ProgressBarService.complete()
+      vm.getEventsTimeOut vm.deviceKey
       ToastsService.showSuccessToast "We posted your update content command into the player's queue."
 
     vm.onUpdateContentFailure = (error) ->
@@ -287,6 +295,7 @@ appModule.controller 'DeviceDetailsCtrl', (
 
     vm.onResetPlayerSuccess = ->
       ProgressBarService.complete()
+      vm.getEventsTimeOut vm.deviceKey
       ToastsService.showSuccessToast "We posted your reset player command into the player's queue."
 
     vm.onResetPlayerFailure = (error) ->
@@ -301,6 +310,7 @@ appModule.controller 'DeviceDetailsCtrl', (
 
     vm.onPanelOnSuccess = ->
       ProgressBarService.complete()
+      vm.getEventsTimeOut vm.deviceKey
       ToastsService.showSuccessToast "We posted your panel on command into the player's queue."
 
     vm.onPanelOnFailure = (error) ->
@@ -315,6 +325,7 @@ appModule.controller 'DeviceDetailsCtrl', (
 
     vm.onPanelOffSuccess = ->
       ProgressBarService.complete()
+      vm.getEventsTimeOut vm.deviceKey
       ToastsService.showSuccessToast "We posted your panel off command into the player's queue."
 
     vm.onPanelOffFailure = (error) ->
@@ -329,6 +340,7 @@ appModule.controller 'DeviceDetailsCtrl', (
 
     vm.onUpdateDeviceSuccess = ->
       ProgressBarService.complete()
+      vm.getEventsTimeOut vm.deviceKey
       ToastsService.showSuccessToast "We posted your update device command into the player's queue."
 
     vm.onUpdateDeviceFailure = (error) ->
@@ -343,6 +355,7 @@ appModule.controller 'DeviceDetailsCtrl', (
 
     vm.onVolumeChangeSuccess = (level) ->
       ProgressBarService.complete()
+      vm.getEventsTimeOut vm.deviceKey
       ToastsService.showSuccessToast "We posted your volume change command of #{level} into the player's queue."
 
     vm.onVolumeChangeFailure = (error) ->
@@ -357,6 +370,7 @@ appModule.controller 'DeviceDetailsCtrl', (
 
     vm.onCustomCommandSuccess = (command) ->
       ProgressBarService.complete()
+      vm.getEventsTimeOut vm.deviceKey
       ToastsService.showSuccessToast "We posted your custom command '#{command}' into the player's queue."
 
     vm.onCustomCommandFailure = (error) ->
