@@ -1,4 +1,4 @@
 [submodule "backup"]
 	path = backup
 	url = git@github.com:agosto-dev/datastore-backup.git
-	branch = feature/sd-3128-reorg-substrate-module
+	branch = master
