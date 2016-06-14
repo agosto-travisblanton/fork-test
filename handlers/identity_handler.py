@@ -11,17 +11,16 @@ from restler.serializers import json_response
 
 class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
     def get(self):
-        app_version = os.environ['CURRENT_VERSION_ID']
-
         state = self.session.get('state')
-        if state is None:
+
+        if not state:
             state = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in xrange(32))
             self.session['state'] = state
 
         user_info = {
             'login_url': self.uri_for('login'),
             'logout_url': self.uri_for('logout'),
-            'version': app_version,
+            'version': os.environ['CURRENT_VERSION_ID'],
             'CLIENT_ID': config.CLIENT_ID,
             'OAUTH_CLIENT_ID': config.OAUTH_CLIENT_ID,
             'BROWSER_API_KEY': config.PUBLIC_API_SERVER_KEY,
@@ -33,21 +32,26 @@ class IdentityHandler(SessionRequestHandler, KeyValidatorMixin):
 
         if user:
             session_distributor = self.session.get('distributor')
-            if self.session.get('is_administrator') is True:
-                user_info['administrator'] = True
-                distributors = Distributor.query().fetch()
-            else:
-                distributors = user.distributors
-            if session_distributor is None and len(distributors) == 1:
+            distributors_as_admin = [each_distributor.name for each_distributor in user.distributors_as_admin]
+            distributors = user.distributors
+
+            if not session_distributor and len(distributors) == 1:
                 session_distributor = distributors[0].name
 
             distributor_names = [distributor.name for distributor in distributors]
+
             user_info.update({
                 'email': user.email,
+                'is_admin': user.is_administrator,
                 'is_logged_in': True,
-                'distributors': distributor_names,
+                'distributors': [distributor.name for distributor in
+                                 Distributor.query().fetch()] if user.is_administrator else distributor_names,
+                'distributors_as_admin': [
+                    distributor.name for distributor in
+                    Distributor.query().fetch()] if user.is_administrator else distributors_as_admin,
                 'distributor': session_distributor
             })
+
         else:
             user_info['is_logged_in'] = False
 

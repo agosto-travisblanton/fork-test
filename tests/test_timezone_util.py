@@ -43,3 +43,14 @@ class TestTimezoneUtil(BaseTest):
     def test_get_all_common_timezones_returns_array(self):
         timezones = TimezoneUtil.get_all_common_timezones()
         self.assertGreaterEqual(400,len(timezones))
+
+    def test_get_custom_timezones_returns_array(self):
+        timezones = TimezoneUtil.get_custom_timezones()
+        self.assertEqual(394,len(timezones))
+
+    def test_get_custom_timezones_return_an_offset(self):
+        timezones = TimezoneUtil.get_custom_timezones()
+        for timezone in timezones:
+            timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
+            self.assertTrue(isinstance(timezone_offset, int))
+

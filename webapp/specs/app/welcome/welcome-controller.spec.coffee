@@ -5,31 +5,33 @@ describe 'WelcomeCtrl', ->
   controller = undefined
   VersionsService = undefined
   promise = undefined
+  otherPromise = undefined
   versionData = undefined
   cookieMock = undefined
   $stateParams = undefined
   $state = undefined
-
+  StorageService = undefined 
+  SessionsService = undefined
+  DistributorsService = undefined
+  
   beforeEach module('skykitProvisioning')
 
-  beforeEach inject (_$controller_, _VersionsService_, _$state_) ->
+  beforeEach inject (_$controller_, _VersionsService_, _$state_, _StorageService_, _SessionsService_, _DistributorsService_) ->
     $controller = _$controller_
     VersionsService = _VersionsService_
     $stateParams = {}
-    $state = {}
     $state = _$state_
-    cookieMock = {
-      storage: {},
-      put: (key, value) ->
-        this.storage[key] = value
-      get: (key) ->
-        return this.storage[key]
-    }
+    DistributorsService = _DistributorsService_
+    StorageService = _StorageService_
+    SessionsService = _SessionsService_
+    
     controller = $controller 'WelcomeCtrl', {
       VersionsService: VersionsService,
-      $cookies: cookieMock,
+      StorageService: StorageService,
+      SessionsService: SessionsService
       $stateParams: $stateParams,
-      $state: $state
+      $state: $state,
+      DistributorsService: DistributorsService
     }
 
   describe 'initialization', ->
@@ -49,26 +51,26 @@ describe 'WelcomeCtrl', ->
 
     beforeEach ->
       promise = new skykitProvisioning.q.Mock
+      otherPromise = new skykitProvisioning.q.Mock
       spyOn($state, 'go')
+      StorageService.removeAll()
       spyOn(VersionsService, 'getVersions').and.returnValue promise
+      spyOn(DistributorsService, 'fetchAllByUser').and.returnValue otherPromise
 
     it 'call VersionsService.getVersions to retrieve module version with auth', ->
-      cookieMock.put("userEmail", "some.user@demo.agosto.com")
+      StorageService.set("userEmail", "some.user@demo.agosto.com")
       controller.initialize()
+      otherPromise.resolve versionData
       expect(VersionsService.getVersions).toHaveBeenCalled()
 
     it "the 'then' handler caches the retrieved version data on the controller with auth", ->
-      cookieMock.put("userEmail", "some.user@demo.agosto.com")
+      StorageService.set("userEmail", "some.user@demo.agosto.com")
       controller.initialize()
+      otherPromise.resolve versionData
       promise.resolve versionData
       expect(controller.version_data).toBe versionData
 
     it 'call VersionsService.getVersions to retrieve module version without auth', ->
-      controller.initialize()
-      expect($state.go).toHaveBeenCalledWith('sign_in')
-
-
-    it "the 'then' handler caches the retrieved version data on the controller without auth", ->
       controller.initialize()
       expect($state.go).toHaveBeenCalledWith('sign_in')
 

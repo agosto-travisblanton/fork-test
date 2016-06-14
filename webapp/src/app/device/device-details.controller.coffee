@@ -1,161 +1,183 @@
 'use strict'
 appModule = angular.module('skykitProvisioning')
-appModule.controller 'DeviceDetailsCtrl', ($log,
+appModule.controller 'DeviceDetailsCtrl', (
+  $log,
   $stateParams,
   $state,
+  SessionsService,
   DevicesService,
   LocationsService,
   CommandsService,
   TimezonesService,
   sweet,
-  $cookies,
   ProgressBarService,
   $mdDialog,
   ToastsService) ->
-    @tenantKey = $stateParams.tenantKey
-    @deviceKey = $stateParams.deviceKey
-    @fromDevices = $stateParams.fromDevices is "true"
-    @currentDevice = {
+    vm = @
+    vm.tenantKey = $stateParams.tenantKey
+    vm.deviceKey = $stateParams.deviceKey
+    vm.fromDevices = $stateParams.fromDevices is "true"
+    vm.currentDevice = {
     }
-    @locations = []
-    @commandEvents = []
-    @dayRange = 30
-    @issues = []
-    @pickerOptions = "{widgetPositioning: {vertical:'bottom'}, showTodayButton: true, sideBySide: true, icons:{
-          next:'glyphicon glyphicon-arrow-right',
-          previous:'glyphicon glyphicon-arrow-left',
-          up:'glyphicon glyphicon-arrow-up',
-          down:'glyphicon glyphicon-arrow-down'}}"
-    @timezones = []
-    @selectedTimezone = undefined
+    vm.locations = []
+    vm.commandEvents = []
+    vm.dayRange = 30
+    vm.issues = []
+    vm.pickerOptions = "{widgetPositioning: {vertical:'bottom'}, showTodayButton: true, sideBySide: true, icons:{
+              next:'glyphicon glyphicon-arrow-right',
+              previous:'glyphicon glyphicon-arrow-left',
+              up:'glyphicon glyphicon-arrow-up',
+              down:'glyphicon glyphicon-arrow-down'}}"
+    vm.timezones = []
+    vm.selectedTimezone = undefined
     now = new Date()
     today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-    @endTime = now.toLocaleString().replace(/,/g, "")
-    today.setDate(now.getDate() - @dayRange)
-    @startTime = today.toLocaleString().replace(/,/g, "")
+    vm.endTime = now.toLocaleString().replace(/,/g, "")
+    today.setDate(now.getDate() - vm.dayRange)
+    vm.startTime = today.toLocaleString().replace(/,/g, "")
 
 
-    @copyDeviceKey = () ->
+    vm.generateLocalFromUTC = (UTCTime) ->
+      localTime = moment.utc(UTCTime).toDate()
+      localTime = moment(localTime).format('YYYY-MM-DD hh:mm:ss A')
+
+
+    vm.replaceIssueTime = (issues) ->
+      for each in issues
+        if each.created
+          each.created = vm.generateLocalFromUTC(each.created)
+        if each.updated
+          each.updated = vm.generateLocalFromUTC(each.updated)
+
+    vm.replaceCommandTime = (issues) ->
+      for each in issues
+        if each.postedTime
+          each.postedTime = vm.generateLocalFromUTC(each.postedTime)
+        if each.confirmedTime
+          each.confirmedTime = vm.generateLocalFromUTC(each.confirmedTime)
+
+    vm.copyDeviceKey = () ->
       ToastsService.showSuccessToast 'Device key has been copied to your clipboard'
 
     # event tab
-    @getIssues = (device, epochStart, epochEnd, prev, next) =>
+    vm.getIssues = (device, epochStart, epochEnd, prev, next) ->
       ProgressBarService.start()
       issuesPromise = DevicesService.getIssuesByKey(device, epochStart, epochEnd, prev, next)
-      issuesPromise.then (data) =>
-        @issues = data.issues
-        @prev_cursor = data.prev
-        @next_cursor = data.next
+      issuesPromise.then (data) ->
+        vm.replaceIssueTime(data.issues)
+        vm.issues = data.issues
+        vm.prev_cursor = data.prev
+        vm.next_cursor = data.next
         ProgressBarService.complete()
-
 
     # command history tab
-    @getEvents = (deviceKey, prev, next) =>
+    vm.getEvents = (deviceKey, prev, next) ->
       ProgressBarService.start()
       commandEventsPromise = DevicesService.getCommandEventsByKey deviceKey, prev, next
-      commandEventsPromise.then (data) =>
-        @event_next_cursor = data.next_cursor
-        @event_prev_cursor = data.prev_cursor
-        @commandEvents = data.events
+      commandEventsPromise.then (data) ->
+        vm.replaceCommandTime(data.events)
+        vm.event_next_cursor = data.next_cursor
+        vm.event_prev_cursor = data.prev_cursor
+        vm.commandEvents = data.events
         ProgressBarService.complete()
 
-    @paginateCall = (forward) =>
+    vm.paginateCall = (forward) ->
       if forward
-        @getIssues @deviceKey, @epochStart, @epochEnd, null, @next_cursor
+        vm.getIssues vm.deviceKey, vm.epochStart, vm.epochEnd, null, vm.next_cursor
 
       else
-        @getIssues @deviceKey, @epochStart, @epochEnd, @prev_cursor, null
+        vm.getIssues vm.deviceKey, vm.epochStart, vm.epochEnd, vm.prev_cursor, null
 
 
-    @paginateEventCall = (forward) =>
+    vm.paginateEventCall = (forward) ->
       if forward
-        @getEvents @deviceKey, null, @event_next_cursor
+        vm.getEvents vm.deviceKey, null, vm.event_next_cursor
 
       else
-        @getEvents @deviceKey, @event_prev_cursor, null
+        vm.getEvents vm.deviceKey, vm.event_prev_cursor, null
 
-    @initialize = () ->
-      @epochStart = moment(new Date(@startTime)).unix()
-      @epochEnd = moment(new Date(@endTime)).unix()
-      timezonePromise = TimezonesService.getUsTimezones()
-      timezonePromise.then (data) =>
-        @timezones = data
+    vm.initialize = () ->
+      vm.epochStart = moment(new Date(vm.startTime)).unix()
+      vm.epochEnd = moment(new Date(vm.endTime)).unix()
+      timezonePromise = TimezonesService.getCustomTimezones()
+      timezonePromise.then (data) ->
+        vm.timezones = data
 
-      @panelModels = DevicesService.getPanelModels()
-      @panelInputs = DevicesService.getPanelInputs()
+      vm.panelModels = DevicesService.getPanelModels()
+      vm.panelInputs = DevicesService.getPanelInputs()
 
-      devicePromise = DevicesService.getDeviceByKey @deviceKey
-      devicePromise.then ((response) =>
-        @onGetDeviceSuccess(response)
-      ), (response) =>
-        @onGetDeviceFailure(response)
+      devicePromise = DevicesService.getDeviceByKey vm.deviceKey
+      devicePromise.then ((response) ->
+        vm.onGetDeviceSuccess(response)
+      ), (response) ->
+        vm.onGetDeviceFailure(response)
 
-      @getEvents @deviceKey
-      @getIssues @deviceKey, @epochStart, @epochEnd
+      vm.getEvents vm.deviceKey
+      vm.getIssues vm.deviceKey, vm.epochStart, vm.epochEnd
 
-    @onGetDeviceSuccess = (response) ->
-      @currentDevice = response
-      @selectedTimezone = response.timezone if response.timezone != @selectedTimezone
-      @tenantKey = @currentDevice.tenantKey if @tenantKey is undefined
+    vm.onGetDeviceSuccess = (response) ->
+      vm.currentDevice = response
+      vm.selectedTimezone = response.timezone if response.timezone != vm.selectedTimezone
+      vm.tenantKey = vm.currentDevice.tenantKey if vm.tenantKey is undefined
       if $stateParams.fromDevices is "true"
-        @backUrl = '/#/devices'
-        @backUrlText = 'Back to devices'
+        vm.backUrl = '/#/devices'
+        vm.backUrlText = 'Back to devices'
       else
-        if @currentDevice.isUnmanagedDevice is true
-          @backUrl = "/#/tenants/#{@tenantKey}/unmanaged"
-          @backUrlText = 'Back to tenant unmanaged devices'
+        if vm.currentDevice.isUnmanagedDevice is true
+          vm.backUrl = "/#/tenants/#{vm.tenantKey}/unmanaged"
+          vm.backUrlText = 'Back to tenant unmanaged devices'
         else
-          @backUrl = "/#/tenants/#{@tenantKey}/managed"
-          @backUrlText = 'Back to tenant managed devices'
-      locationsPromise = LocationsService.getLocationsByTenantKey @tenantKey
-      locationsPromise.then (data) =>
-        @locations = data
-        @setSelectedOptions()
+          vm.backUrl = "/#/tenants/#{vm.tenantKey}/managed"
+          vm.backUrlText = 'Back to tenant managed devices'
+      locationsPromise = LocationsService.getLocationsByTenantKey vm.tenantKey
+      locationsPromise.then (data) ->
+        vm.locations = data
+        vm.setSelectedOptions()
 
-    @onGetDeviceFailure = (response) ->
+    vm.onGetDeviceFailure = (response) ->
       ToastsService.showErrorToast 'Oops. We were unable to fetch the details for this device at this time.'
-      errorMessage = "No detail for device_key ##{@deviceKey}. Error: #{response.status} #{response.statusText}"
+      errorMessage = "No detail for device_key ##{vm.deviceKey}. Error: #{response.status} #{response.statusText}"
       $log.error errorMessage
       $state.go 'devices'
 
-    @setSelectedOptions = () ->
-      if @currentDevice.panelModel == null
-        @currentDevice.panelModel = @panelModels[0]
-        @currentDevice.panelInput = @panelInputs[0]
+    vm.setSelectedOptions = () ->
+      if vm.currentDevice.panelModel == null
+        vm.currentDevice.panelModel = vm.panelModels[0]
+        vm.currentDevice.panelInput = vm.panelInputs[0]
       else
-        for panelModel in @panelModels
-          if panelModel.id is @currentDevice.panelModel
-            @currentDevice.panelModel = panelModel
-        for panelInput in @panelInputs
-          isParent = panelInput.parentId is @currentDevice.panelModel.id
-          if isParent and panelInput.id.toLowerCase() is @currentDevice.panelInput
-            @currentDevice.panelInput = panelInput
-      if @currentDevice.locationKey != null
-        for location in @locations
-          if location.key is @currentDevice.locationKey
-            @currentDevice.location = location
+        for panelModel in vm.panelModels
+          if panelModel.id is vm.currentDevice.panelModel
+            vm.currentDevice.panelModel = panelModel
+        for panelInput in vm.panelInputs
+          isParent = panelInput.parentId is vm.currentDevice.panelModel.id
+          if isParent and panelInput.id.toLowerCase() is vm.currentDevice.panelInput
+            vm.currentDevice.panelInput = panelInput
+      if vm.currentDevice.locationKey != null
+        for location in vm.locations
+          if location.key is vm.currentDevice.locationKey
+            vm.currentDevice.location = location
 
     #####################
     # Properties Tab
     #####################
 
-    @onSaveDevice = () ->
+    vm.onSaveDevice = () ->
       ProgressBarService.start()
-      if @currentDevice.location != undefined && @currentDevice.location.key != undefined
-        @currentDevice.locationKey = @currentDevice.location.key
-      if @currentDevice.panelModel.id != undefined && @currentDevice.panelModel.id != 'None'
-        @currentDevice.panelModelNumber = @currentDevice.panelModel.id
-      if @currentDevice.panelInput.id != undefined && @currentDevice.panelInput.id != 'None'
-        @currentDevice.panelSerialInput = @currentDevice.panelInput.id.toLowerCase()
-      @currentDevice.timezone = @selectedTimezone
-      promise = DevicesService.save @currentDevice
-      promise.then @onSuccessDeviceSave, @onFailureDeviceSave
+      if vm.currentDevice.location != undefined && vm.currentDevice.location.key != undefined
+        vm.currentDevice.locationKey = vm.currentDevice.location.key
+      if vm.currentDevice.panelModel.id != undefined && vm.currentDevice.panelModel.id != 'None'
+        vm.currentDevice.panelModelNumber = vm.currentDevice.panelModel.id
+      if vm.currentDevice.panelInput.id != undefined && vm.currentDevice.panelInput.id != 'None'
+        vm.currentDevice.panelSerialInput = vm.currentDevice.panelInput.id.toLowerCase()
+      vm.currentDevice.timezone = vm.selectedTimezone
+      promise = DevicesService.save vm.currentDevice
+      promise.then vm.onSuccessDeviceSave, vm.onFailureDeviceSave
 
-    @onSuccessDeviceSave = ->
+    vm.onSuccessDeviceSave = ->
       ProgressBarService.complete()
       ToastsService.showSuccessToast 'We saved your update.'
 
-    @onFailureDeviceSave = (error) ->
+    vm.onFailureDeviceSave = (error) ->
       ProgressBarService.complete()
       if error.status == 409
         $log.info(
@@ -165,7 +187,7 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
         $log.error "Failure saving device: #{error.status } #{error.statusText}"
         ToastsService.showErrorToast 'Oops. We were unable to save your updates to this device at this time.'
 
-    @confirmDeviceDelete = (event, key) ->
+    vm.confirmDeviceDelete = (event, key) ->
       confirm = $mdDialog.confirm(
         {
           title: 'Are you sure to delete this device?'
@@ -176,13 +198,13 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
         }
       )
       showPromise = $mdDialog.show confirm
-      success = =>
-        @onConfirmDelete key
-      failure = =>
-        @onConfirmCancel()
+      success = ->
+        vm.onConfirmDelete key
+      failure = ->
+        vm.onConfirmCancel()
       showPromise.then success, failure
 
-    @onConfirmDelete = (key) ->
+    vm.onConfirmDelete = (key) ->
       success = () ->
         ToastsService.showSuccessToast 'We processed your delete request.'
         $state.go 'devices'
@@ -193,176 +215,177 @@ appModule.controller 'DeviceDetailsCtrl', ($log,
       deletePromise = DevicesService.delete key
       deletePromise.then success, failure
 
-    @onConfirmCancel = ->
+    vm.onConfirmCancel = ->
       ToastsService.showInfoToast 'We canceled your delete request.'
 
-    @onProofOfPlayLoggingCheck = ->
-      if @currentDevice.proofOfPlayLogging
-        noLocation = @currentDevice.locationKey == null
-        noDisplayCode = @currentDevice.customerDisplayCode == null
+    vm.onProofOfPlayLoggingCheck = ->
+      if vm.currentDevice.proofOfPlayLogging
+        noLocation = vm.currentDevice.locationKey == null
+        noDisplayCode = vm.currentDevice.customerDisplayCode == null
         if noLocation
           sweet.show('Oops...', "You must have a Location to enable Proof of play.", 'error')
-          @currentDevice.proofOfPlayLogging = false
+          vm.currentDevice.proofOfPlayLogging = false
         else if noDisplayCode
           sweet.show('Oops...', "You must have a Display code to enable Proof of play.", 'error')
-          @currentDevice.proofOfPlayLogging = false
+          vm.currentDevice.proofOfPlayLogging = false
         else
-          @onSaveDevice()
+          vm.onSaveDevice()
       else
-        @onSaveDevice()
+        vm.onSaveDevice()
 
-    @onUpdateLocation = ->
-      @onSaveDevice()
+    vm.onUpdateLocation = ->
+      vm.onSaveDevice()
 
-    @autoGenerateCustomerDisplayCode = ->
+    vm.autoGenerateCustomerDisplayCode = ->
       newDisplayCode = ''
-      if @currentDevice.customerDisplayName
-        newDisplayCode = @currentDevice.customerDisplayName.toLowerCase()
+      if vm.currentDevice.customerDisplayName
+        newDisplayCode = vm.currentDevice.customerDisplayName.toLowerCase()
         newDisplayCode = newDisplayCode.replace(/\s+/g, '_')
         newDisplayCode = newDisplayCode.replace(/\W+/g, '')
-      @currentDevice.customerDisplayCode = newDisplayCode
+      vm.currentDevice.customerDisplayCode = newDisplayCode
 
-    @logglyForUser = () ->
-      userDomain = $cookies.get('userEmail').split("@")[1]
-      return  userDomain == "demo.agosto.com" || userDomain == "agosto.com"
+    vm.logglyForUser = () ->
+      userDomain = SessionsService.getUserEmail().split("@")[1]
+      return userDomain == "demo.agosto.com" || userDomain == "agosto.com"
 
     #####################
     # Commands Tab
     #####################
 
-    @onResetContent = ->
+    vm.onResetContent = ->
       ProgressBarService.start()
-      promise = CommandsService.contentDelete @deviceKey
-      promise.then @onResetContentSuccess, @onResetContentFailure
+      promise = CommandsService.contentDelete vm.deviceKey
+      promise.then vm.onResetContentSuccess, vm.onResetContentFailure
 
-    @onResetContentSuccess = ->
+    vm.onResetContentSuccess = ->
       ProgressBarService.complete()
       ToastsService.showSuccessToast "We posted your reset content command into the player's queue."
 
-    @onResetContentFailure = (error) ->
+    vm.onResetContentFailure = (error) ->
       ProgressBarService.complete()
       $log.error "Reset content command error: #{error.status } #{error.statusText}"
       sweet.show('Oops...', "We were unable to post your reset content command into the player's queue.", 'error')
 
-    @onUpdateContent = ->
+    vm.onUpdateContent = ->
       ProgressBarService.start()
-      promise = CommandsService.contentUpdate @deviceKey
-      promise.then @onUpdateContentSuccess, @onUpdateContentFailure
+      promise = CommandsService.contentUpdate vm.deviceKey
+      promise.then vm.onUpdateContentSuccess, vm.onUpdateContentFailure
 
-    @onUpdateContentSuccess = ->
+    vm.onUpdateContentSuccess = ->
       ProgressBarService.complete()
       ToastsService.showSuccessToast "We posted your update content command into the player's queue."
 
-    @onUpdateContentFailure = (error) ->
+    vm.onUpdateContentFailure = (error) ->
       ProgressBarService.complete()
       $log.error "Content update command error: #{error.status } #{error.statusText}"
       sweet.show('Oops...', "We were unable to post your update content command into the player's queue.", 'error')
 
-    @onResetPlayer = ->
+    vm.onResetPlayer = ->
       ProgressBarService.start()
-      promise = CommandsService.reset @deviceKey
-      promise.then @onResetPlayerSuccess, @onResetPlayerFailure
+      promise = CommandsService.reset vm.deviceKey
+      promise.then vm.onResetPlayerSuccess, vm.onResetPlayerFailure
 
-    @onResetPlayerSuccess = ->
+    vm.onResetPlayerSuccess = ->
       ProgressBarService.complete()
       ToastsService.showSuccessToast "We posted your reset player command into the player's queue."
 
-    @onResetPlayerFailure = (error) ->
+    vm.onResetPlayerFailure = (error) ->
       ProgressBarService.complete()
       $log.error "Reset player command error: #{error.status } #{error.statusText}"
       sweet.show('Oops...', "We were unable to post your reset player command into the player's queue.", 'error')
 
-    @onPanelOn = ->
+    vm.onPanelOn = ->
       ProgressBarService.start()
-      promise = CommandsService.powerOn @deviceKey
-      promise.then @onPanelOnSuccess, @onPanelOnFailure
+      promise = CommandsService.powerOn vm.deviceKey
+      promise.then vm.onPanelOnSuccess, vm.onPanelOnFailure
 
-    @onPanelOnSuccess = ->
+    vm.onPanelOnSuccess = ->
       ProgressBarService.complete()
       ToastsService.showSuccessToast "We posted your panel on command into the player's queue."
 
-    @onPanelOnFailure = (error) ->
+    vm.onPanelOnFailure = (error) ->
       ProgressBarService.complete()
       $log.error "Panel on command error: #{error.status } #{error.statusText}"
       sweet.show('Oops...', "We were unable to post your panel on command into the player's queue.", 'error')
 
-    @onPanelOff = ->
+    vm.onPanelOff = ->
       ProgressBarService.start()
-      promise = CommandsService.powerOff @deviceKey
-      promise.then @onPanelOffSuccess, @onPanelOffFailure
+      promise = CommandsService.powerOff vm.deviceKey
+      promise.then vm.onPanelOffSuccess, vm.onPanelOffFailure
 
-    @onPanelOffSuccess = ->
+    vm.onPanelOffSuccess = ->
       ProgressBarService.complete()
       ToastsService.showSuccessToast "We posted your panel off command into the player's queue."
 
-    @onPanelOffFailure = (error) ->
+    vm.onPanelOffFailure = (error) ->
       ProgressBarService.complete()
       $log.error "Panel off command error: #{error.status } #{error.statusText}"
       sweet.show('Oops...', "We were unable to post your panel off command into the player's queue.", 'error')
 
-    @onUpdateDevice = ->
+    vm.onUpdateDevice = ->
       ProgressBarService.start()
-      promise = CommandsService.updateDevice @deviceKey
-      promise.then @onUpdateDeviceSuccess, @onUpdateDeviceFailure
+      promise = CommandsService.updateDevice vm.deviceKey
+      promise.then vm.onUpdateDeviceSuccess, vm.onUpdateDeviceFailure
 
-    @onUpdateDeviceSuccess = ->
+    vm.onUpdateDeviceSuccess = ->
       ProgressBarService.complete()
       ToastsService.showSuccessToast "We posted your update device command into the player's queue."
 
-    @onUpdateDeviceFailure = (error) ->
+    vm.onUpdateDeviceFailure = (error) ->
       ProgressBarService.complete()
       $log.error "Update device command error: #{error.status } #{error.statusText}"
       sweet.show('Oops...', "We were unable to post your update device command into the player's queue.", 'error')
 
-    @onVolumeChange = ->
+    vm.onVolumeChange = ->
       ProgressBarService.start()
-      promise = CommandsService.volume @deviceKey, @currentDevice.volume
-      promise.then @onVolumeChangeSuccess(@currentDevice.volume), @onVolumeChangeFailure
+      promise = CommandsService.volume vm.deviceKey, vm.currentDevice.volume
+      promise.then vm.onVolumeChangeSuccess(vm.currentDevice.volume), vm.onVolumeChangeFailure
 
-    @onVolumeChangeSuccess = (level) ->
+    vm.onVolumeChangeSuccess = (level) ->
       ProgressBarService.complete()
       ToastsService.showSuccessToast "We posted your volume change command of #{level} into the player's queue."
 
-    @onVolumeChangeFailure = (error) ->
+    vm.onVolumeChangeFailure = (error) ->
       ProgressBarService.complete()
       $log.error "Volume change command error: #{error.status } #{error.statusText}"
       sweet.show('Oops...', "We were unable to post your volume change command into the player's queue.", 'error')
 
-    @onCustomCommand = ->
+    vm.onCustomCommand = ->
       ProgressBarService.start()
-      promise = CommandsService.custom @deviceKey, @currentDevice.custom
-      promise.then @onCustomCommandSuccess(@currentDevice.custom), @onCustomCommandFailure
+      promise = CommandsService.custom vm.deviceKey, vm.currentDevice.custom
+      promise.then vm.onCustomCommandSuccess(vm.currentDevice.custom), vm.onCustomCommandFailure
 
-    @onCustomCommandSuccess = (command) ->
+    vm.onCustomCommandSuccess = (command) ->
       ProgressBarService.complete()
       ToastsService.showSuccessToast "We posted your custom command '#{command}' into the player's queue."
 
-    @onCustomCommandFailure = (error) ->
+    vm.onCustomCommandFailure = (error) ->
       ProgressBarService.complete()
       $log.error "Custom command error: #{error.status } #{error.statusText}"
       sweet.show('Oops...', "We were unable to post your custom command into the player's queue.", 'error')
 
-    @onClickRefreshButton = () ->
+    vm.onClickRefreshButton = () ->
       ProgressBarService.start()
-      @epochStart = moment(new Date(@startTime)).unix()
-      @epochEnd = moment(new Date(@endTime)).unix()
-      @prev_cursor = null
-      @next_cursor = null
-      issuesPromise = DevicesService.getIssuesByKey(@deviceKey, @epochStart, @epochEnd, @prev_cursor, @next_cursor)
-      issuesPromise.then ((data) =>
-        @onRefreshIssuesSuccess(data)
-      ), (error) =>
-        @onRefreshIssuesFailure(error)
+      vm.epochStart = moment(new Date(vm.startTime)).unix()
+      vm.epochEnd = moment(new Date(vm.endTime)).unix()
+      vm.prev_cursor = null
+      vm.next_cursor = null
+      issuesPromise = DevicesService.getIssuesByKey(vm.deviceKey, vm.epochStart, vm.epochEnd, vm.prev_cursor, vm.next_cursor)
+      issuesPromise.then ((data) ->
+        vm.onRefreshIssuesSuccess(data)
+      ), (error) ->
+        vm.onRefreshIssuesFailure(error)
 
-    @onRefreshIssuesSuccess = (data) ->
-      @issues = data.issues
-      @prev_cursor = data.prev
-      @next_cursor = data.next
+    vm.onRefreshIssuesSuccess = (data) ->
+      vm.replaceIssueTime(data.issues)
+      vm.issues = data.issues
+      vm.prev_cursor = data.prev
+      vm.next_cursor = data.next
       ProgressBarService.complete()
 
-    @onRefreshIssuesFailure = (error) ->
+    vm.onRefreshIssuesFailure = (error) ->
       ProgressBarService.complete()
       ToastsService.showInfoToast 'We were unable to refresh the device issues list at this time.'
       $log.error "Failure to refresh device issues: #{error.status } #{error.statusText}"
 
-    @
+    vm

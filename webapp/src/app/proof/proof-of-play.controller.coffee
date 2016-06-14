@@ -3,43 +3,44 @@
 appModule = angular.module 'skykitProvisioning'
 
 appModule.controller "ProofOfPlayCtrl", (ProofPlayService, $stateParams, $state, ToastsService) ->
-  @resource = {title: "Resource Report"}
-  @location = {title: "Location Report"}
-  @display = {title: "Display Report"}
+  vm = @
+  vm.resource = {title: "Resource Report"}
+  vm.location = {title: "Location Report"}
+  vm.display = {title: "Display Report"}
 
-  @chosen_tenant = null
-  @tenants = null
-  @disabled = true
+  vm.chosen_tenant = null
+  vm.tenants = null
+  vm.disabled = true
 
 
-  @initialize = () ->
+  vm.initialize = () ->
     ProofPlayService.getAllTenants()
-    .then (data) =>
-      @tenants = data.data.tenants
+    .then (data) ->
+      vm.tenants = data.data.tenants
 
-  @querySearch = (resources, searchText) ->
+  vm.querySearch = (resources, searchText) ->
     ProofPlayService.querySearch(resources, searchText)
 
       
-  @isSelectionValid = (search) =>
-    if search in @tenants
-      @disabled = false
+  vm.isSelectionValid = (search) ->
+    if search in vm.tenants
+      vm.disabled = false
     else
-      @disabled = true
+      vm.disabled = true
 
 
-  @submitTenant = (tenant) =>
+  vm.submitTenant = (tenant) ->
     if tenant
-      @chosen_tenant = (tenant)
+      vm.chosen_tenant = (tenant)
       $state.go 'proofDetail', {
-        tenant: @chosen_tenant
+        tenant: vm.chosen_tenant
       }
       
-  @refreshTenants = () =>
-    @tenants = null
+  vm.refreshTenants = () ->
+    vm.tenants = null
     url = ProofPlayService.makeHTTPURL "/retrieve_my_tenants", ''
     ProofPlayService.proofplayCache.remove(url)
-    @initialize()
+    vm.initialize()
 
 
-  @
+  vm

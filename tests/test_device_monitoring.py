@@ -44,7 +44,7 @@ class TestDeviceMonitoring(BaseTest):
         self.tenant_key = self.tenant.put()
 
     ##################################################################################################################
-    ## sweep_devices_for_responsiveness
+    # sweep_devices_for_responsiveness
     ##################################################################################################################
     def test_sweep_devices_for_responsiveness_with_unresponsive_devices_creates_issues(self):
         number_of_devices = 3
@@ -67,7 +67,7 @@ class TestDeviceMonitoring(BaseTest):
         self.assertTrue(len(issues) == 0)
 
     ##################################################################################################################
-    ## sweep_devices_for_exceeding_thresholds
+    # sweep_devices_for_exceeding_thresholds
     ##################################################################################################################
 
     def test_sweep_devices_for_exceeding_thresholds_with_devices_exceeding_memory_threshold_creates_issues(self):

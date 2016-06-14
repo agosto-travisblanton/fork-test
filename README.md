@@ -39,7 +39,8 @@ Make sure your virtualenv is activated and has the requirements installed before
 ```
 
 ### Bootstrap back-end: 
-After starting the server, hit `localhost:8080/api/v1/seed/<user_first>/<user_last>`. (e.g. `localhost:8080/api/v1/seed/daniel/ternyak`
+First, clear datastore: `dev_appserver.py . --clear_datastore=yes`.
+After starting the server with `python manage.py serve dispatch.yaml`, hit `localhost:8080/api/v1/seed/<user_first>/<user_last>`. (e.g. `localhost:8080/api/v1/seed/daniel/ternyak`
 You will see a message explaining that the seed script has started in the background,
 and a subsequent message explaining when the seed script has finished.
 

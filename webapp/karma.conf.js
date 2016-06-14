@@ -30,6 +30,7 @@ module.exports = function (config) {
       'bower_components/moment/min/moment.min.js',
       'bower_components/angular-material/angular-material.js', 
       'bower_components/angular-cache/dist/angular-cache.js',
+      'bower_components/lockr/lockr.js',
       'bower_components/angular-aria/angular-aria.js',
       'bower_components/ngclipboard/src/ngclipboard.js',
       'src/app/index.coffee',

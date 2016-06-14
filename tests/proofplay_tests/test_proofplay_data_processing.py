@@ -250,8 +250,8 @@ class TestDataProcessing(SQLBaseTest):
     def test_generate_date_range_csv_by_location(self, retrieve_function):
         now = datetime.datetime.now()
         resources = ["GSAD_4334"]
-        expected_output = """Creation Date,Start Date,End Date,Content\r\n{},2016-02-01 00:00:00,2016-02-02 00:00:00,GSAD_4334\r\nContent,Display,Location,Play Count\r\nGSAD_4334,F5MSCX001001,6034,3\r\nGSAD_4334,F5MSCX001000,6034,4\r\nGSAD_4334,F5MSCX001002,6034,5\r\n""".format(
-            str(now))
+        expected_output = """Creation Date,Start Date,End Date,Content\r\n{},2016-02-01,2016-02-02,GSAD_4334\r\nContent,Display,Location,Play Count\r\nGSAD_4334,F5MSCX001001,6034,3\r\nGSAD_4334,F5MSCX001000,6034,4\r\nGSAD_4334,F5MSCX001002,6034,5\r\n""".format(
+            str(now)[:10])
 
         start_time = datetime.datetime.strptime("Feb 1 2016", '%b %d %Y')
         end_time = datetime.datetime.strptime("Feb 2 2016", '%b %d %Y')
@@ -281,8 +281,8 @@ class TestDataProcessing(SQLBaseTest):
     def test_generate_date_range_csv_by_date(self, retrieve_function):
         now = datetime.datetime.now()
         resources = ["GSAD_4334"]
-        expected_output = """Creation Date,Start Date,End Date,Start Time,End Time,All Content\r\n{},2016-02-01 00:00:00,2016-02-02 00:00:00,12:00 AM,11:59 PM,GSAD_4334\r\nContent,Date,Location Count,Display Count,Play Count\r\nGSAD_4334,2016-02-01 00:00:00,1,2,6\r\nGSAD_4334,2016-02-02 00:00:00,1,3,6\r\n""".format(
-            str(now))
+        expected_output = """Creation Date,Start Date,End Date,Start Time,End Time,All Content\r\n{},2016-02-01,2016-02-02,12:00 AM,11:59 PM,GSAD_4334\r\nContent,Date,Location Count,Display Count,Play Count\r\nGSAD_4334,2016-02-01,1,2,6\r\nGSAD_4334,2016-02-02,1,3,6\r\n""".format(
+            str(now)[:10])
 
         start_time = datetime.datetime.strptime("Feb 1 2016", '%b %d %Y')
         end_time = datetime.datetime.strptime("Feb 2 2016", '%b %d %Y')
@@ -290,8 +290,8 @@ class TestDataProcessing(SQLBaseTest):
         example_input = {
             'GSAD_4334': OrderedDict(
                 [
-                    ('2016-02-01 00:00:00', {'PlayCount': 6, 'LocationCount': 1, 'PlayerCount': 2}),
-                    ('2016-02-02 00:00:00', {'PlayCount': 6, 'LocationCount': 1, 'PlayerCount': 3})]
+                    ('2016-02-01', {'PlayCount': 6, 'LocationCount': 1, 'PlayerCount': 2}),
+                    ('2016-02-02', {'PlayCount': 6, 'LocationCount': 1, 'PlayerCount': 3})]
             )
         }
 
@@ -382,7 +382,7 @@ class TestDataProcessing(SQLBaseTest):
         example_input = [
             {
                 'raw_data': {
-                    '2016-02-02 00:00:00': [
+                    '2016-02-02': [
                         {'device_id': 'my-device-3', 'resource_id': 'GSAD_4334', 'location_id': '1001',
                          'started_at': datetime.datetime(2016, 2, 2, 15, 3, 12),
                          'ended_at': datetime.datetime(2016, 2, 2, 15, 13, 12)}]
@@ -391,7 +391,7 @@ class TestDataProcessing(SQLBaseTest):
             },
             {
                 'raw_data': {
-                    '2016-02-03 00:00:00': [
+                    '2016-02-03': [
                         {'device_id': 'my-device-7', 'resource_id': 'GSAD_4334', 'location_id': '3001',
                          'started_at': datetime.datetime(2016, 2, 3, 15, 43, 13),
                          'ended_at': datetime.datetime(2016, 2, 3, 15, 53, 13)},
@@ -401,11 +401,11 @@ class TestDataProcessing(SQLBaseTest):
                         {'device_id': 'my-device-7', 'resource_id': 'GSAD_2222', 'location_id': '3001',
                          'started_at': datetime.datetime(2016, 2, 3, 16, 13, 13),
                          'ended_at': datetime.datetime(2016, 2, 3, 16, 23, 13)}],
-                    '2016-02-02 00:00:00': [
+                    '2016-02-02': [
                         {'device_id': 'my-device-7', 'resource_id': 'GSAD_2222', 'location_id': '3001',
                          'started_at': datetime.datetime(2016, 2, 2, 15, 53, 12),
                          'ended_at': datetime.datetime(2016, 2, 2, 16, 3, 12)}],
-                    '2016-02-01 00:00:00': [
+                    '2016-02-01': [
                         {'device_id': 'my-device-7', 'resource_id': 'GSAD_2222', 'location_id': '3001',
                          'started_at': datetime.datetime(2016, 2, 1, 15, 3, 12),
                          'ended_at': datetime.datetime(2016, 2, 1, 15, 13, 12)},
@@ -429,7 +429,7 @@ class TestDataProcessing(SQLBaseTest):
                 OrderedDict(
                     [
                         (
-                            '2016-02-02 00:00:00', {
+                            '2016-02-02', {
                                 'GSAD_4334': {
                                     'playcount': 1, 'location': '1001'}}
                         )
@@ -440,7 +440,7 @@ class TestDataProcessing(SQLBaseTest):
                 OrderedDict(
                     [
                         (
-                            '2016-02-01 00:00:00', {
+                            '2016-02-01', {
                                 'GSAD_4334': {
                                     'playcount': 2,
                                     'location': '3001'
@@ -456,7 +456,7 @@ class TestDataProcessing(SQLBaseTest):
                             }
                         ),
                         (
-                            '2016-02-02 00:00:00', {
+                            '2016-02-02', {
                                 'GSAD_2222': {
                                     'playcount': 1,
                                     'location': '3001'
@@ -464,7 +464,7 @@ class TestDataProcessing(SQLBaseTest):
                             }
                         ),
                         (
-                            '2016-02-03 00:00:00', {
+                            '2016-02-03', {
                                 'GSAD_4334': {
                                     'playcount': 1,
                                     'location': '3001'
@@ -497,8 +497,8 @@ class TestDataProcessing(SQLBaseTest):
         ]
         now = str(datetime.datetime.now())
 
-        expected_output = """Creation Date,Start Date,End Date,Displays\r\n{},2016-02-01 00:00:00,2016-02-03 00:00:00,"my-device-3, my-device-7"\r\nDisplay,Location,Content,Play Count\r\nmy-device-3,1001,GSAD_4334,1\r\nmy-device-7,3001,GSAD_2222,3\r\nmy-device-7,3001,GSAD_4334,3\r\nmy-device-7,3001,GSAD_5447,2\r\n""".format(
-            now)
+        expected_output = """Creation Date,Start Date,End Date,Displays\r\n{},2016-02-01,2016-02-03,"my-device-3, my-device-7"\r\nDisplay,Location,Content,Play Count\r\nmy-device-3,1001,GSAD_4334,1\r\nmy-device-7,3001,GSAD_2222,3\r\nmy-device-7,3001,GSAD_4334,3\r\nmy-device-7,3001,GSAD_5447,2\r\n""".format(
+            now[:10])
 
         start_time = datetime.datetime.strptime("Feb 1 2016", '%b %d %Y')
         end_time = datetime.datetime.strptime("Feb 3 2016", '%b %d %Y')
@@ -512,11 +512,11 @@ class TestDataProcessing(SQLBaseTest):
             [
                 ('my-device-3',
                  OrderedDict(
-                     [('2016-02-02 00:00:00', {'GSAD_4334': {'location': '1001', 'playcount': 1}})])),
+                     [('2016-02-02', {'GSAD_4334': {'location': '1001', 'playcount': 1}})])),
                 ('my-device-7',
                  OrderedDict(
                      [(
-                         '2016-02-01 00:00:00',
+                         '2016-02-01',
                          {
                              'GSAD_5447': {
                                  'location': '3001',
@@ -528,13 +528,13 @@ class TestDataProcessing(SQLBaseTest):
                                  'location': '3001',
                                  'playcount': 1}}),
                          (
-                             '2016-02-02 00:00:00',
+                             '2016-02-02',
                              {
                                  'GSAD_2222': {
                                      'location': '3001',
                                      'playcount': 1}}),
                          (
-                             '2016-02-03 00:00:00',
+                             '2016-02-03',
                              {
                                  'GSAD_5447': {
                                      'location': '3001',
@@ -550,8 +550,8 @@ class TestDataProcessing(SQLBaseTest):
         now = str(datetime.datetime.now())
         devices = ["my-device-3", "my-device-7"]
 
-        expected_result = 'Creation Date,Start Date,End Date,Displays\r\n{},2016-02-01 00:00:00,2016-02-03 00:00:00,"my-device-3, my-device-7"\r\nDisplay,Location,Date,Content,Play Count\r\nmy-device-3,1001,2016-02-02 00:00:00,GSAD_4334,1\r\nmy-device-7,3001,2016-02-01 00:00:00,GSAD_5447,1\r\nmy-device-7,3001,2016-02-01 00:00:00,GSAD_2222,1\r\nmy-device-7,3001,2016-02-01 00:00:00,GSAD_4334,2\r\nmy-device-7,3001,2016-02-02 00:00:00,GSAD_2222,1\r\nmy-device-7,3001,2016-02-03 00:00:00,GSAD_5447,1\r\nmy-device-7,3001,2016-02-03 00:00:00,GSAD_2222,1\r\nmy-device-7,3001,2016-02-03 00:00:00,GSAD_4334,1\r\n'.format(
-            now)
+        expected_result = 'Creation Date,Start Date,End Date,Displays\r\n{},2016-02-01,2016-02-03,"my-device-3, my-device-7"\r\nDisplay,Location,Date,Content,Play Count\r\nmy-device-3,1001,2016-02-02,GSAD_4334,1\r\nmy-device-7,3001,2016-02-01,GSAD_5447,1\r\nmy-device-7,3001,2016-02-01,GSAD_2222,1\r\nmy-device-7,3001,2016-02-01,GSAD_4334,2\r\nmy-device-7,3001,2016-02-02,GSAD_2222,1\r\nmy-device-7,3001,2016-02-03,GSAD_5447,1\r\nmy-device-7,3001,2016-02-03,GSAD_2222,1\r\nmy-device-7,3001,2016-02-03,GSAD_4334,1\r\n'.format(
+            now[:10])
 
         start_time = datetime.datetime.strptime("Feb 1 2016", '%b %d %Y')
         end_time = datetime.datetime.strptime("Feb 3 2016", '%b %d %Y')
@@ -666,8 +666,8 @@ class TestDataProcessing(SQLBaseTest):
         end_time = datetime.datetime.strptime("Feb 3 2016", '%b %d %Y')
         locations = ["1001", "3001"]
 
-        expected_result = 'Creation Date,Start Date,End Date,Locations\r\n{},2016-02-01 00:00:00,2016-02-03 00:00:00,"1001, 3001"\r\nLocation,Content,Play Count\r\n3001,GSAD_2222,3\r\n3001,GSAD_5533,3\r\n3001,GSAD_4334,3\r\n1001,GSAD_5447,3\r\n1001,GSAD_2222,4\r\n1001,GSAD_5533,1\r\n1001,GSAD_5553,2\r\n1001,GSAD_4334,1\r\n'.format(
-            now)
+        expected_result = 'Creation Date,Start Date,End Date,Locations\r\n{},2016-02-01,2016-02-03,"1001, 3001"\r\nLocation,Content,Play Count\r\n3001,GSAD_2222,3\r\n3001,GSAD_5533,3\r\n3001,GSAD_4334,3\r\n1001,GSAD_5447,3\r\n1001,GSAD_2222,4\r\n1001,GSAD_5533,1\r\n1001,GSAD_5553,2\r\n1001,GSAD_4334,1\r\n'.format(
+            now[:10])
 
         self.assertEqual(generate_location_csv_summarized(now, start_time, end_time, locations, example_input).read(),
                          expected_result)
@@ -690,8 +690,8 @@ class TestDataProcessing(SQLBaseTest):
         end_time = datetime.datetime.strptime("Feb 3 2016", '%b %d %Y')
         locations = ["1001", "3001"]
 
-        expected_result = 'Creation Date,Start Date,End Date,Locations\r\n{},2016-02-01 00:00:00,2016-02-03 00:00:00,"1001, 3001"\r\nLocation,Device,Content,Play Count\r\n3001,my-device-9,GSAD_2222,2\r\n3001,my-device-8,GSAD_2222,1\r\n3001,my-device-7,GSAD_5533,1\r\n3001,my-device-8,GSAD_5533,2\r\n3001,my-device-8,GSAD_4334,1\r\n3001,my-device-7,GSAD_4334,1\r\n3001,my-device-9,GSAD_4334,1\r\n1001,my-device-1,GSAD_5447,1\r\n1001,my-device-3,GSAD_5447,2\r\n1001,my-device-1,GSAD_2222,2\r\n1001,my-device-2,GSAD_2222,1\r\n1001,my-device-3,GSAD_2222,1\r\n1001,my-device-2,GSAD_5533,1\r\n1001,my-device-2,GSAD_5553,1\r\n1001,my-device-3,GSAD_5553,1\r\n1001,my-device-3,GSAD_4334,1\r\n'.format(
-            now)
+        expected_result = 'Creation Date,Start Date,End Date,Locations\r\n{},2016-02-01,2016-02-03,"1001, 3001"\r\nLocation,Device,Content,Play Count\r\n3001,my-device-9,GSAD_2222,2\r\n3001,my-device-8,GSAD_2222,1\r\n3001,my-device-7,GSAD_5533,1\r\n3001,my-device-8,GSAD_5533,2\r\n3001,my-device-8,GSAD_4334,1\r\n3001,my-device-7,GSAD_4334,1\r\n3001,my-device-9,GSAD_4334,1\r\n1001,my-device-1,GSAD_5447,1\r\n1001,my-device-3,GSAD_5447,2\r\n1001,my-device-1,GSAD_2222,2\r\n1001,my-device-2,GSAD_2222,1\r\n1001,my-device-3,GSAD_2222,1\r\n1001,my-device-2,GSAD_5533,1\r\n1001,my-device-2,GSAD_5553,1\r\n1001,my-device-3,GSAD_5553,1\r\n1001,my-device-3,GSAD_4334,1\r\n'.format(
+            now[:10])
 
         self.assertEqual(generate_location_csv_by_device(now, start_time, end_time, locations, example_input).read(),
                          expected_result)

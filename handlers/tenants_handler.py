@@ -24,8 +24,13 @@ class TenantsHandler(RequestHandler):
         result = get_tenant_list_from_distributor_key(distributor_key=distributor_key)
         paginated_result = result[offset:page_size + offset]
 
-        is_first_page = offset == 0
-        is_last_page = paginated_result[-1] == result[-1]
+        if paginated_result:
+            is_first_page = offset == 0
+            is_last_page = paginated_result[-1] == result[-1]
+
+        else:
+            is_first_page = True
+            is_last_page = True
 
         json_response(
             self.response,
@@ -208,9 +213,11 @@ class TenantsHandler(RequestHandler):
         tenant.active = request_json.get('active')
         proof_of_play_logging = request_json.get('proof_of_play_logging')
         proof_of_play_url = request_json.get('proof_of_play_url')
-        TenantsHandler.proof_of_play_options(proof_of_play_logging=proof_of_play_logging,
-                                             proof_of_play_url=proof_of_play_url,
-                                             tenant=tenant)
+        Tenant.set_proof_of_play_options(
+            tenant_code=tenant.tenant_code,
+            proof_of_play_logging=proof_of_play_logging,
+            proof_of_play_url=proof_of_play_url,
+            tenant_key=key)
         try:
             domain_key = ndb.Key(urlsafe=domain_key_input)
         except Exception, e:
@@ -236,14 +243,3 @@ class TenantsHandler(RequestHandler):
             tenant.put()
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
-
-    @staticmethod
-    def proof_of_play_options(proof_of_play_logging, tenant, proof_of_play_url):
-        if proof_of_play_logging is not None:
-            tenant.proof_of_play_logging = proof_of_play_logging
-            Tenant.toggle_proof_of_play(tenant_code=tenant.tenant_code, should_be_enabled=tenant.proof_of_play_logging)
-        if proof_of_play_url is None or proof_of_play_url == '':
-            tenant.proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
-        else:
-            tenant.proof_of_play_url = proof_of_play_url.strip().lower()
-

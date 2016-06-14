@@ -44,13 +44,13 @@ describe 'DistributorsService', ->
         distributor = {
           key: undefined
         }
-        distributorRestangularService = { post: (distributor) -> }
+        distributorRestangularService = {post: (distributor) ->}
         spyOn(Restangular, 'service').and.returnValue distributorRestangularService
         spyOn(distributorRestangularService, 'post').and.returnValue promise
         result = DistributorsService.save distributor
 
       it 'obtains Restangular service for distributors', ->
-        expect(Restangular.service).toHaveBeenCalledWith 'distributors'
+        expect(Restangular.service).toHaveBeenCalledWith DistributorsService.DISTRIBUTOR_SERVICE
 
       it 'calls post(distributor) on Restangular service for distributors', ->
         expect(distributorRestangularService.post).toHaveBeenCalledWith distributor
@@ -63,13 +63,13 @@ describe 'DistributorsService', ->
     result = undefined
 
     beforeEach ->
-      distributorRestangularService = { getList: -> }
+      distributorRestangularService = {getList: ->}
       spyOn(Restangular, 'all').and.returnValue distributorRestangularService
       spyOn(distributorRestangularService, 'getList').and.returnValue promise
       result = DistributorsService.fetchAll()
 
     it 'obtains Restangular service for distributors', ->
-      expect(Restangular.all).toHaveBeenCalledWith 'distributors'
+      expect(Restangular.all).toHaveBeenCalledWith DistributorsService.DISTRIBUTOR_SERVICE
 
     it 'obtains a list of distributors from the Restangular service', ->
       expect(distributorRestangularService.getList).toHaveBeenCalled()
@@ -83,13 +83,13 @@ describe 'DistributorsService', ->
     distributorKey = 'dhYUYdfhdjfhlasddf7898a7sdfdas78d67'
 
     beforeEach ->
-      distributorRestangularService = { get: -> }
+      distributorRestangularService = {get: ->}
       spyOn(Restangular, 'oneUrl').and.returnValue distributorRestangularService
       spyOn(distributorRestangularService, 'get').and.returnValue promise
       result = DistributorsService.getByKey(distributorKey)
 
     it 'obtains Restangular service for distributors', ->
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'distributors', "api/v1/distributors/#{distributorKey}"
+      expect(Restangular.oneUrl).toHaveBeenCalledWith DistributorsService.DISTRIBUTOR_SERVICE, "api/v1/distributors/#{distributorKey}"
 
     it 'obtains the distributor from the Restangular service', ->
       expect(distributorRestangularService.get).toHaveBeenCalled()
@@ -103,13 +103,13 @@ describe 'DistributorsService', ->
     distributor = {key: 'dhYUYdfhdjfhlasddf7898a7sdfdas78d67', name: 'Foobar'}
 
     beforeEach ->
-      distributorRestangularService = { remove: -> }
+      distributorRestangularService = {remove: ->}
       spyOn(Restangular, 'one').and.returnValue distributorRestangularService
       spyOn(distributorRestangularService, 'remove').and.returnValue promise
       result = DistributorsService.delete distributor
 
     it 'obtains Restangular service for the particular distributor', ->
-      expect(Restangular.one).toHaveBeenCalledWith 'distributors', distributor.key
+      expect(Restangular.one).toHaveBeenCalledWith DistributorsService.DISTRIBUTOR_SERVICE, distributor.key
 
     it 'removes the distributor via the Restangular service', ->
       expect(distributorRestangularService.remove).toHaveBeenCalled()
@@ -122,13 +122,13 @@ describe 'DistributorsService', ->
     result = undefined
 
     beforeEach ->
-      distributorRestangularService = { getList: -> }
+      distributorRestangularService = {getList: ->}
       spyOn(Restangular, 'all').and.returnValue distributorRestangularService
       spyOn(distributorRestangularService, 'getList').and.returnValue promise
       result = DistributorsService.getByName('Tierney Brothers')
 
     it 'obtains Restangular service for distributors', ->
-      expect(Restangular.all).toHaveBeenCalledWith 'distributors'
+      expect(Restangular.all).toHaveBeenCalledWith DistributorsService.DISTRIBUTOR_SERVICE
 
     it 'calls getList with name as query parameter', ->
       expect(distributorRestangularService.getList).toHaveBeenCalledWith(distributorName: 'Tierney Brothers')
@@ -142,13 +142,13 @@ describe 'DistributorsService', ->
     distributorKey = 'dhYUYdfhdjfhlasddf7898a7sdfdas78d67'
 
     beforeEach ->
-      distributorRestangularService = { get: -> }
+      distributorRestangularService = {get: ->}
       spyOn(Restangular, 'oneUrl').and.returnValue distributorRestangularService
       spyOn(distributorRestangularService, 'get').and.returnValue promise
       result = DistributorsService.getDomainsByKey(distributorKey)
 
     it 'obtains Restangular service for distributor domains', ->
-      expect(Restangular.oneUrl).toHaveBeenCalledWith 'distributors', "api/v1/distributors/#{distributorKey}/domains"
+      expect(Restangular.oneUrl).toHaveBeenCalledWith DistributorsService.DISTRIBUTOR_SERVICE, "api/v1/distributors/#{distributorKey}/domains"
 
     it 'obtains the distributor domains from the Restangular service', ->
       expect(distributorRestangularService.get).toHaveBeenCalled()

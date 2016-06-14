@@ -3,19 +3,13 @@ import json
 from ae_test_data import build
 from app_config import config
 from models import User, Distributor, DistributorEntityGroup
-from provisioning_base_test import ProvisioningBaseTest
 from utils.web_util import build_uri
+from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
 
-class IdentityHandlerTest(ProvisioningBaseTest):
+class IdentityHandlerTest(ProvisioningDistributorUserBase):
     def setUp(self):
         super(IdentityHandlerTest, self).setUp()
-        self.user = self.create_user(email='dwight.schrute@demo.agosto.com')
-        self.login_url = build_uri('login')
-        self.logout_url = build_uri('logout')
-        self.identity_url = build_uri('identity')
-        for _ in range(3):
-            build(Distributor)
 
     def test_anonymous_identity(self):
         self.get(self.logout_url)
@@ -63,10 +57,9 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         self.assertEqual(self.logout_url, data.get('logout_url'))
         self.assertTrue(data.get('is_logged_in'))
         self.assertEqual('testbed-version', data.get('version'))
-        self.assertTrue(data.get('administrator'))
+        self.assertTrue(data.get('is_admin'))
         distributor_names = sorted([distributor.name for distributor in Distributor.query().fetch()])
         self.assertEqual(distributor_names, sorted(data.get('distributors')))
-        self.assertEqual(self.user.distributors[0].name, data.get('distributor'))
         self.assertEqual(self.user.email, data.get('email'))
         self.assertEqual(config.CLIENT_ID, data.get('CLIENT_ID'))
         self.assertEqual(config.PUBLIC_API_SERVER_KEY, data.get('BROWSER_API_KEY'))
@@ -83,9 +76,9 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         self.assertEqual('testbed-version', data.get('version'))
         self.assertNotIn('administrator', data)
         distributor_names = sorted([distributor.name for distributor in self.user.distributors])
-        self.assertLength(1, distributor_names)
+        self.assertLength(2, distributor_names)
         self.assertEqual(distributor_names, sorted(data.get('distributors')))
-        self.assertEqual(self.user.distributors[0].name, data.get('distributor'))
+        self.assertEqual(None, data.get('distributor'))
         self.assertEqual(self.user.email, data.get('email'))
         self.assertEqual(config.CLIENT_ID, data.get('CLIENT_ID'))
         self.assertEqual(config.PUBLIC_API_SERVER_KEY, data.get('BROWSER_API_KEY'))
@@ -105,7 +98,7 @@ class IdentityHandlerTest(ProvisioningBaseTest):
         self.assertEqual('testbed-version', data.get('version'))
         self.assertNotIn('administrator', data)
         distributor_names = sorted([distributor.name for distributor in self.user.distributors])
-        self.assertLength(2, distributor_names)
+        self.assertLength(3, distributor_names)
         self.assertEqual(distributor_names, sorted(data.get('distributors')))
         self.assertEqual(None, data.get('distributor'))
         self.assertEqual(self.user.email, data.get('email'))

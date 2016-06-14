@@ -3,6 +3,41 @@ HOST: https://skykit-display-device-int.appspot.com
 
 # Skykit Provisioning API
 
+## Group Player Content Update
+
+### POST /api/v1/tenants/player_content_update
+Posts a GCM message to each of the tenant's players to update content.
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/json
+            Authorization: 6C346588BD4C6D722A1165B43C51C
+
+    + Body
+
+            {
+				"tenantCode":"acme_inc"
+			}
+
++ Response 200 (application/json)
+
+    + Headers
+
+            Alternate-Protocol: 443:quic,p=1
+            Cache-Control: no-cache
+			
++ Response 403 (application/json)
+
+    + Headers
+
+    + Body
+
+            {
+                "error": "HTTP request API token is invalid."
+            }
+
 
 ## Group Device Heartbeat
 

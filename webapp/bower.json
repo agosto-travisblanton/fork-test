@@ -20,6 +20,7 @@
     "bootstrap-sass-official": "~3.3.4",
     "components-font-awesome": "~4.5.0",
     "jquery": "~2.1.1",
+    "lockr": "~0.8.4",
     "lodash": "~3.10.0",
     "moment": "~2.11.2",
     "ngclipboard": "^1.1.0",

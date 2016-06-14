@@ -101,7 +101,6 @@ handlers:
 skip_files:
 - ^coverage/.*
 - ^coverage_html_report/.*
-- ^migration/.*
 - ^scripts/.*
 - ^images/readme.md
 - ^local/.*

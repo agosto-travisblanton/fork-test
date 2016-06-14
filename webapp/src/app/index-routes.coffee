@@ -7,6 +7,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     resolve: {
       identity: (IdentityService) ->
         IdentityService.getIdentity()
+      notAuthenticated: (AuthorizationService) ->
+        AuthorizationService.notAuthenticated()
     },
     url: "/sign_in",
     templateUrl: "app/authentication/sign_in.html",
@@ -14,11 +16,13 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     controllerAs: 'authenticationCtrl',
   })
   $stateProvider.state("signed_out", {
+    url: "/signed_out",
     resolve: {
       identity: (IdentityService) ->
         IdentityService.getIdentity()
+      notAuthenticated: (AuthorizationService) ->
+        AuthorizationService.notAuthenticated()
     },
-    url: "/signed_out",
     templateUrl: "app/authentication/signed_out.html",
     controller: "AuthenticationCtrl",
     controllerAs: 'authenticationCtrl',
@@ -27,6 +31,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     resolve: {
       identity: (IdentityService) ->
         IdentityService.getIdentity()
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     url: "/sign_out",
     templateUrl: "app/authentication/sign_out.html",
@@ -34,6 +40,10 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     controllerAs: 'authenticationCtrl',
   })
   $stateProvider.state("distributor_selection", {
+    resolve: {
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
+    },
     url: "/distributor_selection",
     templateUrl: "app/distributor/distributor_selector.html",
     controller: "DistributorSelectorCtrl",
@@ -45,6 +55,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     resolve: {
       identity: (IdentityService) ->
         IdentityService.getIdentity()
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     controller: "WelcomeCtrl",
     controllerAs: 'welcomeCtrl',
@@ -58,6 +70,8 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     resolve: {
       identity: (IdentityService) ->
         IdentityService.getIdentity()
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
     },
     controller: "WelcomeCtrl"
     controllerAs: 'welcomeCtrl',
@@ -66,6 +80,10 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     }
   })
   $stateProvider.state("domains", {
+    resolve: {
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
+    },
     url: "/domains",
     templateUrl: "app/domain/domains-listing.html",
     controller: "DomainsCtrl",
@@ -75,6 +93,10 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     }
   })
   $stateProvider.state("addDomain", {
+    resolve: {
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
+    },
     url: "/domains/add",
     templateUrl: "app/domain/domain-detail.html",
     controller: "DomainDetailsCtrl",
@@ -85,6 +107,10 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     }
   })
   $stateProvider.state("editDomain", {
+    resolve: {
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
+    },
     url: "/domains/:domainKey",
     templateUrl: "app/domain/domain-detail.html",
     controller: "DomainDetailsCtrl",
@@ -95,6 +121,10 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     }
   })
   $stateProvider.state("tenants", {
+    resolve: {
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
+    },
     url: "/tenants",
     templateUrl: "app/tenant/tenants-listing.html",
     controller: "TenantsCtrl",
@@ -104,6 +134,10 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     }
   })
   $stateProvider.state("addTenant", {
+    resolve: {
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
+    },
     url: "/tenants/add",
     templateUrl: "app/tenant/tenant-add.html",
     controller: "TenantAddCtrl",
@@ -114,6 +148,10 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     }
   })
   $stateProvider.state("tenantDetails", {
+    resolve: {
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
+    },
     url: "/tenants/:tenantKey/details",
     templateUrl: "app/tenant/tenant-details.html",
     controller: "TenantDetailsCtrl",
@@ -124,6 +162,10 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     }
   })
   $stateProvider.state("tenantManagedDevices", {
+    resolve: {
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
+    },
     url: "/tenants/:tenantKey/managed",
     templateUrl: "app/tenant/tenant-managed-devices.html",
     controller: "TenantManagedDevicesCtrl",
@@ -134,6 +176,10 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     }
   })
   $stateProvider.state("tenantUnmanagedDevices", {
+    resolve: {
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
+    },
     url: "/tenants/:tenantKey/unmanaged",
     templateUrl: "app/tenant/tenant-unmanaged-devices.html",
     controller: "TenantUnmanagedDevicesCtrl",
@@ -144,6 +190,10 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     }
   })
   $stateProvider.state("tenantLocations", {
+    resolve: {
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
+    },
     url: "/tenants/:tenantKey/locations",
     templateUrl: "app/tenant/tenant-locations.html",
     controller: "TenantLocationsCtrl",
@@ -154,6 +204,10 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     }
   })
   $stateProvider.state("editLocation", {
+    resolve: {
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
+    },
     url: "/locations/:locationKey",
     templateUrl: "app/tenant/tenant-location.html",
     controller: "TenantLocationCtrl",
@@ -164,6 +218,10 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     }
   })
   $stateProvider.state("addLocation", {
+    resolve: {
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
+    },
     url: "/tenants/:tenantKey/location",
     templateUrl: "app/tenant/tenant-location.html",
     controller: "TenantLocationCtrl",
@@ -174,6 +232,10 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     }
   })
   $stateProvider.state("devices", {
+    resolve: {
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
+    },
     url: "/devices",
     templateUrl: "app/device/devices-listing.html",
     controller: "DevicesListingCtrl",
@@ -183,6 +245,12 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     }
   })
   $stateProvider.state("editDevice", {
+    resolve: {
+      identity: (IdentityService) ->
+        IdentityService.getIdentity()
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
+    },
     url: "/devices/:deviceKey?tenantKey?fromDevices",
     templateUrl: "app/device/device-detail.html",
     ncyBreadcrumb: {
@@ -195,37 +263,11 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
       return
     controllerAs: 'deviceDetailsCtrl'
   })
-  $stateProvider.state("deviceReset", {
-    url: "/devices/:deviceKey/commands/reset",
-    templateUrl: "app/device/device-detail.html",
-    ncyBreadcrumb: {
-      label: '{{ deviceDetailsCtrl.currentDevice.key }}'
-      parent: 'devices'
-    },
-    controller: 'DeviceDetailsCtrl'
-    controllerAs: 'deviceDetailsCtrl'
-  })
-  $stateProvider.state("deviceVolume", {
-    url: "/devices/:deviceKey/commands/volume",
-    templateUrl: "app/device/device-detail.html",
-    ncyBreadcrumb: {
-      label: '{{ deviceDetailsCtrl.currentDevice.key }}'
-      parent: 'devices'
-    },
-    controller: 'DeviceDetailsCtrl'
-    controllerAs: 'deviceDetailsCtrl'
-  })
-  $stateProvider.state("deviceCustom", {
-    url: "/devices/:deviceKey/commands/custom",
-    templateUrl: "app/device/device-detail.html",
-    ncyBreadcrumb: {
-      label: '{{ deviceDetailsCtrl.currentDevice.key }}'
-      parent: 'devices'
-    },
-    controller: 'DeviceDetailsCtrl'
-    controllerAs: 'deviceDetailsCtrl'
-  })
   $stateProvider.state("proof", {
+    resolve: {
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
+    },
     url: "/proof",
     templateUrl: "app/proof/main.html",
     controller: "ProofOfPlayCtrl",
@@ -235,12 +277,29 @@ app.config ($stateProvider, $urlRouterProvider, RestangularProvider) ->
     }
   })
   $stateProvider.state("proofDetail", {
+    resolve: {
+      authenticated: (AuthorizationService) ->
+        AuthorizationService.authenticated()
+    },
     url: "/proof/:tenant",
     templateUrl: "app/proof/detail.html",
     controller: "ProofOfPlayCtrl",
     controllerAs: 'vm',
     ncyBreadcrumb: {
       label: 'Proof of Play'
+    }
+  })
+  $stateProvider.state("admin", {
+    resolve: {
+      isAdmin: (AuthorizationService) ->
+        AuthorizationService.isAdminOrDistributorAdmin()
+    },
+    url: "/admin",
+    templateUrl: "app/admin/admin.html",
+    controller: "AdminCtrl",
+    controllerAs: 'vm',
+    ncyBreadcrumb: {
+      label: 'Admin'
     }
   })
 

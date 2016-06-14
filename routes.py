@@ -275,16 +275,25 @@ application = WSGIApplication(
         ),
 
         ############################################################
-        # DISTRIBUTORS
+        # USERS
         ############################################################
-
+        Route(
+            r'/api/v1/users',
+            handler='handlers.users_handler.UsersHandler',
+            methods=['POST']
+        ),
         Route(
             r'/api/v1/users/<user_urlsafe_key>/distributors',
-            handler='handlers.distributors_handler.DistributorsHandler',
+            handler='handlers.users_handler.UsersHandler',
             handler_method='get_list_by_user',
             name='get-distributors-by-user',
             methods=['GET']
         ),
+
+        ############################################################
+        # DISTRIBUTORS
+        ############################################################
+
         Route(r'/api/v1/distributors',
               handler='handlers.distributors_handler.DistributorsHandler',
               name='distributors',
@@ -296,11 +305,18 @@ application = WSGIApplication(
               name='distributor-creator',
               methods=['POST']
               ),
+        Route(r'/api/v1/analytics/distributors/<distributor_key>/users',
+              handler='handlers.distributors_handler.DistributorsHandler',
+              handler_method='get_users',
+              methods=['GET']
+              ),
+
         Route(r'/api/v1/distributors/<distributor_key>',
               handler='handlers.distributors_handler.DistributorsHandler',
               name='manage-distributor',
               methods=['GET', 'PUT', 'DELETE']
               ),
+
         Route(r'/api/v1/distributors/<distributor_key>/domains',
               handler='handlers.distributors_handler.DistributorsHandler',
               name='distributor-domains',
@@ -367,6 +383,24 @@ application = WSGIApplication(
               handler='handlers.timezones_handler.TimezonesHandler',
               name='all-timezones',
               handler_method='get_all_common_timezones',
+              methods=['GET']
+              ),
+
+        Route(r'/api/v1/timezones/custom',
+              handler='handlers.timezones_handler.TimezonesHandler',
+              name='custom-timezones',
+              handler_method='get_custom_timezones',
+              methods=['GET']
+              ),
+
+        ############################################################
+        # INTEGRATION EVENTS LOG
+        ############################################################
+
+        Route(r'/api/v1/integrations_events',
+              handler='handlers.integration_events_log_handler.IntegrationEventsLogHandler',
+              name='integration-events-list',
+              handler_method='get_list',
               methods=['GET']
               ),
 

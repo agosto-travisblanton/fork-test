@@ -1,10 +1,9 @@
 import logging
-
 from google.appengine.ext import ndb
-
 from app_config import config
 from restler.serializers import json_response
 from proofplay.database_calls import get_tenant_names_for_distributor
+from models import User
 
 
 def identity_required(handler_method):
@@ -40,38 +39,6 @@ def distributor_required(handler_method):
 
     return distributor
 
-
-#
-# def gae_supported_numpy(test_method):
-#     import numpy
-#     from utils.print_utils import StderrLogger
-#
-#     def check_numpy(self, *args, **kwargs):
-#         npv = numpy.version.full_version
-#         if npv != '1.6.1':
-#             logger = StderrLogger()
-#             logger.warning("Found local numpy version {}. App engine only supports version 1.6.1. "
-#                            "You may falsely green bar!".format(npv))
-#         test_method(self, *args, **kwargs)
-#
-#     return check_numpy
-#
-#
-# def no_in_context_cache(function):
-#     """
-#     Disables in-context caching. NOTE: Will not work on functions that get pickled.
-#     :param function:
-#     :return: function that wraps the existing function which disables ndb in-context caching.
-#     """
-#     from google.appengine.ext import ndb
-#
-#     def disable_cache(*args, **kwargs):
-#         ctx = ndb.get_context()
-#         ctx.set_cache_policy(lambda key: False)
-#         return function(*args, **kwargs)
-#
-#     return disable_cache
-#
 
 def log_memory(function):
     """
@@ -111,6 +78,35 @@ def requires_api_token(handler_method):
             json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=403)
             return
         handler_method(self, *args, **kwargs)
+
+    return authorize
+
+
+def has_distributor_admin_user_key(handler_method):
+    def authorize(self, *args, **kwargs):
+        user_key = self.request.headers.get('X-Provisioning-User') or self.request.cookies.get('userKey')
+        valid_user = User.get_user_from_urlsafe_key(user_key)
+
+        if valid_user:
+            if valid_user.is_administrator or valid_user.is_distributor_administrator:
+                kwargs["current_user"] = valid_user
+                return handler_method(self, *args, **kwargs)
+
+        json_response(self.response, {'error': 'You do not have the required permissions.'}, status_code=403)
+
+    return authorize
+
+
+def has_admin_user_key(handler_method):
+    def authorize(self, *args, **kwargs):
+        user_key = self.request.headers.get('X-Provisioning-User') or self.request.cookies.get('userKey')
+        valid_user = User.get_user_from_urlsafe_key(user_key)
+
+        if valid_user:
+            if valid_user.is_administrator:
+                return handler_method(self, *args, **kwargs)
+
+        json_response(self.response, {'error': 'You do not have the required permissions.'}, status_code=403)
 
     return authorize
 
@@ -212,6 +208,6 @@ def _token_invalid(api_token, for_unmanaged_registration_token=False, for_regist
         valid_api_token = api_token == config.API_TOKEN
         unmanaged_api_token = api_token == config.UNMANAGED_API_TOKEN
         if not valid_api_token and not unmanaged_api_token:
-            logging.error('HTTP request API token {0} is invalid. Expected token = {1}'.format(api_token, config.API_TOKEN))
+            logging.error(
+                'HTTP request API token {0} is invalid. Expected token = {1}'.format(api_token, config.API_TOKEN))
             return True
-    return False

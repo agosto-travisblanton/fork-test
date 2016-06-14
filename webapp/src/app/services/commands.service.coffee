@@ -22,20 +22,6 @@ appModule.factory 'CommandsService', (Restangular) ->
       promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}/commands/refresh-device-representation").post()
       promise
 
-    volume: (key, volume) ->
-      volumeCommand = {
-        volume: volume
-      }
-      promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}").customPOST(volumeCommand, 'commands/volume')
-      promise
-
-    custom: (key, command) ->
-      customCommand = {
-        command: command
-      }
-      promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}").customPOST(customCommand, 'commands/custom')
-      promise
-
     powerOn: (key) ->
       promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}/commands/power-on").post()
       promise
@@ -44,3 +30,16 @@ appModule.factory 'CommandsService', (Restangular) ->
       promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}/commands/power-off").post()
       promise
 
+    volume: (key, volume) ->
+      payload = {
+        volume: volume
+      }
+      promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}").customPOST(payload, 'commands/volume')
+      promise
+
+    custom: (key, command) ->
+      payload = {
+        command: command
+      }
+      promise = Restangular.oneUrl(SERVICE_NAME, "api/v1/devices/#{key}").customPOST(payload, 'commands/custom')
+      promise

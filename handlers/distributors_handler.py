@@ -1,28 +1,16 @@
 import json
-import logging
 
 from google.appengine.ext import ndb
 from webapp2 import RequestHandler
-
-from decorators import requires_api_token
-from models import Distributor, DistributorEntityGroup, DistributorUser
-from models import Distributor, DistributorEntityGroup, Domain
+from models import Distributor, DistributorEntityGroup, Domain, DistributorUser, User
 from restler.serializers import json_response
+from decorators import has_admin_user_key, requires_api_token
 from strategy import DISTRIBUTOR_STRATEGY, DOMAIN_STRATEGY
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>, Christopher Bartling <chris.bartling@agosto.com>'
 
 
 class DistributorsHandler(RequestHandler):
-    @requires_api_token
-    def get_list_by_user(self, user_urlsafe_key):
-        key = ndb.Key(urlsafe=user_urlsafe_key)
-        distributor_user_associations = DistributorUser.query(DistributorUser.user_key == key).fetch(100)
-        distributors = []
-        for distributor_user_association in distributor_user_associations:
-            distributors.append(distributor_user_association.distributor_key.get())
-        json_response(self.response, distributors, strategy=DISTRIBUTOR_STRATEGY)
-
     @requires_api_token
     def get_list(self):
         distributor_name = self.request.get('distributorName')
@@ -40,43 +28,50 @@ class DistributorsHandler(RequestHandler):
         json_response(self.response, result, strategy=DISTRIBUTOR_STRATEGY)
 
     @requires_api_token
+    def get_users(self, distributor_key):
+        distributor_key = ndb.Key(urlsafe=distributor_key)
+        all_users_of_distributor = DistributorUser.users_of_distributor(distributor_key)
+        if all_users_of_distributor:
+            filtered_data_about_user = [
+                {
+                    "email": each.user_key.get().email,
+                    "distributor_admin": each.role.get().role == 1 if each.role else False
+                } for each in all_users_of_distributor]
+        else:
+            filtered_data_about_user = []
+
+        json_response(self.response, filtered_data_about_user)
+
+    @requires_api_token
     def get_domains(self, distributor_key):
         distributor_key = ndb.Key(urlsafe=distributor_key)
         result = Domain.query(Domain.distributor_key == distributor_key, True == Domain.active).fetch(100)
         json_response(self.response, result, strategy=DOMAIN_STRATEGY)
 
-    @requires_api_token
+    @has_admin_user_key
     def post(self):
-        if self.request.body is not str('') and self.request.body is not None:
-            status = 201
-            error_message = None
-            request_json = json.loads(self.request.body)
-            name = request_json.get('name')
-            if name is None or name == '':
-                status = 400
-                error_message = 'The name parameter is invalid.'
-            active = request_json.get('active')
-            if active is None or active == '' or (str(active).lower() != 'true' and str(active).lower() != 'false'):
-                status = 400
-                error_message = 'The active parameter is invalid.'
-            else:
-                active = bool(active)
-            if status == 201:
-                distributor = Distributor.create(name=name,
-                                                 active=active)
-                distributor_key = distributor.put()
-                distributor_uri = self.request.app.router.build(None,
-                                                                'manage-distributor',
-                                                                None,
-                                                                {'distributor_key': distributor_key.urlsafe()})
-                self.response.headers['Location'] = distributor_uri
-                self.response.headers.pop('Content-Type', None)
-                self.response.set_status(status)
-            else:
-                self.response.set_status(status, error_message)
+        incoming = json.loads(self.request.body)
+        distributor_name = incoming["distributor"]
+        admin_email = incoming["admin_email"].lower()
+        user = User.get_or_insert_by_email(email=admin_email)
+
+        if Distributor.is_unique(distributor_name):
+            distributor = Distributor.create(name=distributor_name)
+            distributor.admin_email = admin_email
+            distributor.put()
+            user.add_distributor(distributor.key, role=1)
+
+            json_response(
+                self.response, {
+                    "success": True,
+                    "message": 'Distributor ' + distributor.name + ' created.'
+                }
+            )
         else:
-            logging.info("Problem creating Distributor. No request body.")
-            self.response.set_status(400, 'Did not receive request body.')
+            json_response(self.response, {
+                "success": False,
+                "message": "Distributor already exists"
+            }, status_code=409)
 
     @requires_api_token
     def put(self, distributor_key):

@@ -17,3 +17,8 @@ class TimezonesHandler(RequestHandler):
     def get_all_common_timezones(self):
         result = TimezoneUtil.get_all_common_timezones()
         json_response(self.response, result)
+
+    @requires_api_token
+    def get_custom_timezones(self):
+        result = TimezoneUtil.get_custom_timezones()
+        json_response(self.response, result)
