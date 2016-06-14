@@ -198,7 +198,7 @@ def deploy_single_project(project, arguments, config, full_version, vc_type):
 
 
 def deploy_projects(arguments, config, full_version, vc_type):
-    for project in arguments[0].A:
+    for project in arguments[0].projects:
         deploy_single_project(project, arguments, config, full_version, vc_type)
 
 
