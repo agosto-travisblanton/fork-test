@@ -86,6 +86,9 @@ appModule.controller 'DeviceDetailsCtrl', (
         vm.getEvents deviceKey, prev, next
       ), 1000
 
+    vm.commandHistorySelected = () ->
+      console.log 'here'
+      vm.getEvents vm.deviceKey
 
     vm.paginateCall = (forward) ->
       if forward

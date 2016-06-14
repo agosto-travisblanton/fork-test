@@ -1,4 +1,4 @@
-<div ng-controller="DeviceDetailsCtrl" ng-init="deviceDetailsCtrl.initialize()" layout="column" ng-cloak>
+<div ng-controller="DeviceDetailsCtrl as vm" ng-init="deviceDetailsCtrl.initialize()" layout="column" ng-cloak>
   <md-toolbar>
     <div class="md-toolbar-tools">
       <h2 class="md-flex"><i class="fa fa-fw fa-desktop ng-scope"></i> Devices</h2>
@@ -10,32 +10,32 @@
       <md-card>
         <md-card-content>
           <div class="col-sm-5">
-            <div ng-show="deviceDetailsCtrl.currentDevice.macAddress">
+            <div ng-show="vm.currentDevice.macAddress">
               <h5>
                 <i class="fa fa-fw fa-wifi"></i> Wifi Mac Address:
-                {{deviceDetailsCtrl.currentDevice.macAddress}}
+                {{vm.currentDevice.macAddress}}
               </h5>
             </div>
-            <div ng-show="deviceDetailsCtrl.currentDevice.ethernetMacAddress">
+            <div ng-show="vm.currentDevice.ethernetMacAddress">
               <h5>
                 <i class="fa fa-fw fa-plug"></i> Ethernet Mac Address:
-                {{deviceDetailsCtrl.currentDevice.ethernetMacAddress }}
+                {{vm.currentDevice.ethernetMacAddress }}
               </h5>
             </div>
-            <div ng-show="deviceDetailsCtrl.currentDevice.serialNumber">
+            <div ng-show="vm.currentDevice.serialNumber">
               <h5>
                 <i class="fa fa-hashtag"></i> Serial Number:
-                {{deviceDetailsCtrl.currentDevice.serialNumber}}
+                {{vm.currentDevice.serialNumber}}
               </h5>
             </div>
           </div>
 
           <div class="col-sm-2 col-sm-offset-4">
             <md-button ngclipboard data-clipboard-target="#hidden-device-key"
-                       ng-click="deviceDetailsCtrl.copyDeviceKey()" class="md-raised">
+                       ng-click="vm.copyDeviceKey()" class="md-raised">
               <i class="fa fa-fw fa-clipboard"></i> Copy Device key
             </md-button>
-            <a href="{{deviceDetailsCtrl.backUrl}}" class="md-primary md-button md-ink-ripple">
+            <a href="{{vm.backUrl}}" class="md-primary md-button md-ink-ripple">
               <i class="fa fa-fw fa-backward"></i>Back</a>
           </div>
         </md-card-content>
@@ -50,13 +50,13 @@
         <md-tab label="Commands">
           <div ng-include="'webapp/src/app/device/device-command.html'"></div>
         </md-tab>
-        <md-tab label="Command History">
+        <md-tab label="Command History" md-on-select="vm.commandHistorySelected()">
           <div ng-include="'webapp/src/app/device/device-command-history.html'"></div>
         </md-tab>
       </md-tabs>
     </div>
   </md-content>
   <div id="hidden-device-key" class="copy-ready-device-key">
-    {{deviceDetailsCtrl.currentDevice.key}}
+    {{vm.currentDevice.key}}
   </div>
 </div>
