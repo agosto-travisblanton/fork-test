@@ -186,6 +186,10 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
             api_request_event.put()
         logging.error(error_message)
         return
+    else:
+        if api_request_event:
+            api_request_event.details = "impersonation email:".format(impersonation_admin_email_address)
+            api_request_event.put()
 
     api_response_event = IntegrationEventLog.create(
             event_category='Registration',
