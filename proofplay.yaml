@@ -77,6 +77,7 @@ skip_files:
 - ^.*\.py[co]
 - ^.*\.po
 - ^.*\.pot
+- ^.venv2/.*
 - ^.*\.egg-info
 - ^\.DS_Store.*
 - ^(.*/)?.*static/node_modules/.*
