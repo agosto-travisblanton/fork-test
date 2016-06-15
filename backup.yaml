@@ -57,7 +57,7 @@ skip_files:
 - ^backup/.git/.*
 - ^.idea/.*
 - ^.*~
-- ^.venv2/.*
+- ^venv2/.*
 - ^.*\.py[co]
 - ^.*\.po
 - ^.*\.pot
