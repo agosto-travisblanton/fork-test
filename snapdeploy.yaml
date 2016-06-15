@@ -1,9 +1,10 @@
-hash: fc91536e8d
+hash: 6973ca3adc
 module_yaml_files:
 - app.yaml
 - migration.yaml
 - proofplay.yaml
+- backup.yaml
 pre-deploy-script: (echo '\n++++++++ RUNNING DEPLOYJS.PY ++++++++\n' && echo '\n++++++++
   YOU SHOULD HAVE BOWER AND NPM PACKAGES INSTALLED BEFORE THIS STEPP ++++++++\n' &&
   python deployjs.py && (echo '\n++++++++ STARTING DEPLOY ++++++++\n'))
-version: 36-9-0
+version: 36-14-0
