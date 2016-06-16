@@ -443,6 +443,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                            mac_address=device_mac_address,
                                                            timezone=timezone)
                     key = device.put()
+                    registration_request_event.device_urlsafe_key = key.urlsafe()
                     registration_request_event.details = 'register_device with device key {0}.'.format(key.urlsafe())
                     registration_request_event.put()
                     deferred.defer(register_device,
