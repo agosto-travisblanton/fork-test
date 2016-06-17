@@ -22,7 +22,7 @@ class TestIntegrationEventsLogHandler(ProvisioningBaseTest):
     GCM_REGISTRATION_ID = 'APA91bGl7nxmJ9JXF0_9e8zEuXIMBxX0S0o9bmmMMkqxZTjjN4hoPsweooggycp1rJonDbszrTIioEI'
     DEVICE_KEY = 'ahVzfnNreWtpdC1wcm92aXNpb25pbmdyIAsSE0ludGVncmF0aW9uRXZlbnRMb2cYgICA4JmV2wkM'
     REGISTRATION_WORKFLOW_STEP_1 = 'Request from Player to create a managed device'
-    REGISTRATION_WORKFLOW_STEP_2 = 'Response to Player after creating a managed device.'
+    REGISTRATION_WORKFLOW_STEP_2 = 'Response to Player after creating a managed device'
     REGISTRATION_WORKFLOW_STEP_3_REQUEST = 'Request for device information'
     REGISTRATION_WORKFLOW_STEP_3_RESPONSE = 'Response for device information request'
     REGISTRATION_WORKFLOW_NO_DEVICE_INFO = 'Requested device not found'
@@ -219,27 +219,25 @@ class TestIntegrationEventsLogHandler(ProvisioningBaseTest):
         self.assertLength(3, response_json)
 
     # **************************************************************************************************
-    # get_registration_events
+    # get_enrollment_events
     # **************************************************************************************************
-    def test_get_registration_events_returns_expected_registration_events_count_with_gcm_id(self):
-        gcm_registration_id = self.GCM_REGISTRATION_ID
-        request_parameters = {'gcmRegistrationId': gcm_registration_id}
-        uri = build_uri('registration-events-list')
+    def test_get_enrollment_events_returns_expected_enrollment_events_count_with_gcm_id(self):
+        request_parameters = {'deviceKey': self.DEVICE_KEY}
+        uri = build_uri('enrollment-events-list')
         response = self.app.get(uri, params=request_parameters, headers=self.platform_admin_header)
         response_json = json.loads(response.body)
         self.assertLength(9, response_json)
 
-    def test_get_registration_events_returns_expected_registration_events_count_without_gcm_id(self):
+    def test_get_enrollment_events_returns_expected_enrollment_events_count_without_gcm_id(self):
         request_parameters = {}
-        uri = build_uri('registration-events-list')
+        uri = build_uri('enrollment-events-list')
         response = self.app.get(uri, params=request_parameters, headers=self.platform_admin_header)
         response_json = json.loads(response.body)
         self.assertLength(9, response_json)
 
-    def ttest_get_registration_events_returns_list_in_default_order_by_utc_timestamp(self):
-        gcm_registration_id = self.GCM_REGISTRATION_ID
-        request_parameters = {'gcmRegistrationId': gcm_registration_id}
-        uri = build_uri('registration-events-list')
+    def test_get_enrollment_events_returns_list_in_default_order_by_utc_timestamp(self):
+        request_parameters = {'deviceKey': self.DEVICE_KEY}
+        uri = build_uri('enrollment-events-list')
         response = self.app.get(uri, params=request_parameters, headers=self.platform_admin_header)
         response_json = json.loads(response.body)
         item_1 = response_json[0]

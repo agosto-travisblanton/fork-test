@@ -404,10 +404,10 @@ application = WSGIApplication(
               handler_method='get_by_event_category',
               methods=['GET']
               ),
-        Route(r'/api/v1/integration_events/registration',
+        Route(r'/api/v1/integration_events/enrollment',
               handler='handlers.integration_events_log_handler.IntegrationEventsLogHandler',
-              name='registration-events-list',
-              handler_method='get_registration_events',
+              name='enrollment-events-list',
+              handler_method='get_enrollment_events',
               methods=['GET']
               ),
 

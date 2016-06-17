@@ -1,40 +1,66 @@
-  <md-content class="md-padding">
-    <div flex="100" flex-sm="100" flex-xs="100" layout="column">
-      <md-card>
-        <md-card-content>
-          <div class="row margin-top-15">
-            <div class="col-lg-12">
-              <table class="table table-responsive table-striped">
-                <thead>
-                <tr>
-                  <th>Workflow step</th>
-                  <th>Component</th>
-                  <th>Details</th>
-                  <th>Serial number</th>
-                  <th>Tenant code</th>
-                  <th>Time stamp</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-hide="deviceDetailsCtrl.registrationEvents.length">
-                  <td class="text-center text-warning" colspan="6">
-                    No enrollment events have been logged.
-                  </td>
-                </tr>
-                <tr ng-repeat="item in deviceDetailsCtrl.registrationEvents">
-                  <td>{{ item.workflowStep }}</td>
-                  <td>{{ item.componentName }}</td>
-                  <td>{{ item.details }}</td>
-                  <td>{{ item.serialNumber }}</td>
-                  <td>{{ item.tenantCode }}</td>
-                  <td>{{ item.utcTimestamp }}</td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-        </md-card-content>
-      </md-card>
+<md-content class="md-padding">
+  <div flex="100" flex-sm="100" flex-xs="100" layout="column">
+    <div class="row text-center"
+         ng-hide="deviceDetailsCtrl.enrollmentEvents.length>0">
+      No enrollment events
     </div>
-  </md-content>
+    <md-card ng-show="deviceDetailsCtrl.enrollmentEvents.length>0">
+      <md-card-content>
+        <md-list>
+          <md-list-item>
+            <div class="col-sm-4">
+              <b>Workflow step</b>
+            </div>
+            <div class="col-sm-2">
+              <b>Component</b>
+            </div>
+            <div class="col-sm-3">
+              <b>Serial number</b>
+            </div>
+            <div class="col-sm-2">
+              <b>Timestamp</b>
+            </div>
+            <div class="col-sm-1">
+            </div>
+            <md-divider>
+            </md-divider>
+          </md-list-item>
+          <md-list-item ng-repeat="item in deviceDetailsCtrl.enrollmentEvents"
+                        ng-show="deviceDetailsCtrl.enrollmentEvents.length>0">
+            <div class="col-sm-4">
+              {{ item.workflowStep }}
+            </div>
+            <div class="col-sm-2">
+              {{ item.componentName }}
+            </div>
+            <div class="col-sm-3">
+              {{ item.serialNumber }}
+            </div>
+            <div class="col-sm-2">
+              {{deviceDetailsCtrl.generateLocalFromUTC(item.utcTimestamp)}}
+            </div>
+            <div class="col-sm-1">
+              {{item.details}}<br>
+                <i class="fa fa-fw fa-info" title="details"
+                   ng-click="deviceDetailsCtrl.showEnrollmentDetail(deviceDetailsCtrl.item.utcTimestamp)"></i>
+            </div>
+            <md-divider>
+            </md-divider>
+          </md-list-item>
+        </md-list>
+        <div class="row margin-top-10">
+          <div class="col-sm-4">
+            <md-button ngclipboard data-clipboard-target="#hidden-correlation-identifier"
+                       ng-click="deviceDetailsCtrl.copyCorrelationIdentifier()" class="md-raised">
+              <i class="fa fa-fw fa-clipboard"></i> Copy Correlation Id
+            </md-button>
+          </div>
+        </div>
+      </md-card-content>
+    </md-card>
+  </div>
+  <div id="hidden-correlation-identifier" class="copy-ready-transparent"
+       ng-show="deviceDetailsCtrl.enrollmentEvents.length>0">
+    {{deviceDetailsCtrl.enrollmentEvents[0].correlationIdentifier}}
+  </div>
+</md-content>

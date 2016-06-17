@@ -2,7 +2,7 @@ from google.appengine.ext import ndb
 from webapp2 import RequestHandler
 
 from app_config import config
-from decorators import has_admin_user_key
+from decorators import has_admin_user_key, requires_api_token
 from models import IntegrationEventLog
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
@@ -28,20 +28,20 @@ class IntegrationEventsLogHandler(RequestHandler, PagingListHandlerMixin, KeyVal
             IntegrationEventLog.utc_timestamp).fetch(fetch_size)
         json_response(self.response, query_results, strategy=INTEGRATION_EVENT_LOG_STRATEGY)
 
-    @has_admin_user_key
-    def get_registration_events(self):
-        gcm_registration_id = self.request.get('gcmRegistrationId')
-        if gcm_registration_id:
+    @requires_api_token
+    def get_enrollment_events(self):
+        device_key = self.request.get('deviceKey')
+        if device_key:
             query_results = IntegrationEventLog.query(
                 ndb.AND(IntegrationEventLog.event_category == 'Registration',
-                        IntegrationEventLog.gcm_registration_id == gcm_registration_id)).order(
+                        IntegrationEventLog.device_urlsafe_key == device_key)).order(
                 IntegrationEventLog.utc_timestamp).fetch()
             if len(query_results) > 0:
                 json_response(self.response, query_results, strategy=INTEGRATION_EVENT_LOG_STRATEGY)
                 return
             else:
-                error_message = "Unable to find registration events with GCM registration ID: {0}".format(
-                    gcm_registration_id)
+                error_message = "Unable to find registration events with device key: {0}".format(
+                    device_key)
                 self.response.set_status(404, error_message)
                 return
         else:

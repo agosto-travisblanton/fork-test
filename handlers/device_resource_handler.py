@@ -463,7 +463,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     registration_response_event = IntegrationEventLog.create(
                         event_category='Registration',
                         component_name='Provisioning',
-                        workflow_step='Response to Player after creating a managed device.',
+                        workflow_step='Response to Player after creating a managed device',
                         mac_address=device_mac_address,
                         gcm_registration_id=gcm_registration_id,
                         correlation_identifier=correlation_id,
