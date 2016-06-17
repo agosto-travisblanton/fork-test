@@ -356,6 +356,8 @@ app_WIFI_CONNECTION = 'WiFi'
 
 app_INTEGRATION_EVENTS_DEFAULT_FETCH_SIZE = 200
 
+backup_BACKUP_EMAIL_SENDER = 'Backup Datastore Service <gcp.admin@agosto.com>'
+
 
 def _DEFAULT_CONTENT_MANAGER_URL():
     if on_development_server or not on_server:
@@ -476,7 +478,7 @@ def _SQLALCHEMY_DATABASE_URI():
         if on_integration_server:
             instance_name = 'provisioning-int-v2'
         elif on_continuous_integration_server:
-            instance_name = 'provisioning-ci'
+            instance_name = 'sqlite:///:memory:'
         elif on_qa_server:
             instance_name = 'provisioning-qa'
         elif on_stage_server:

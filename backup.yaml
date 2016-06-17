@@ -1,0 +1,66 @@
+application: skykit-display-device-int
+module: backup
+version: snapshot
+runtime: python27
+api_version: 1
+threadsafe: true
+
+env_variables:
+  DJANGO_SETTINGS_MODULE: 'backup.backup_settings'
+
+builtins:
+- deferred: on
+- remote_api: on
+
+libraries:
+- name: django
+  version: "1.3"
+- name: webapp2
+  version: latest
+
+handlers:
+
+- url: /backup/(robots\.txt|favicon\.ico)
+  static_files: backup/static_backup/\1
+  upload: backup/static_backup/(.*)
+
+- url: /backup/css
+  static_dir: backup/static_backup/css
+
+- url: /backup/img
+  static_dir: backup/static_backup/img
+
+- url: /backup/js
+  static_dir: backup/static_backup/js
+
+- url: /backup/backup_cron
+  script: backup.routes_backup.application
+
+- url: /backup/.*
+  script: backup.routes_backup.application
+  login: required
+
+
+skip_files:
+- ^coverage/.*$
+- ^coverage_html_report/.*$
+- ^scripts/.*
+- ^images/readme.md
+- ^local/.*
+- ^tests/.*
+- ^webapp/node_modules/.*$
+- ^webapp/bower_components/.*$
+- ^webapp/dist/.*$
+- ^webapp/specs/.*$
+- ^webapp/coverage/.*$
+- ^.git/.*$
+- ^backup/.git/.*
+- ^.idea/.*
+- ^.*~
+- ^venv2/.*
+- ^.*\.py[co]
+- ^.*\.po
+- ^.*\.pot
+- ^.*\.egg-info
+- ^\.DS_Store.*
+- ^(.*/)?.*static/node_modules/.*

@@ -99,19 +99,21 @@ handlers:
   secure: always
 
 skip_files:
-- ^coverage/.*
-- ^coverage_html_report/.*
+- ^coverage/.*$
+- ^coverage_html_report/.*$
 - ^scripts/.*
 - ^images/readme.md
 - ^local/.*
 - ^tests/.*
-- ^webapp/node_modules.*
-- ^webapp/bower_components.*
-- ^webapp/dist.*
-- ^webapp/specs.*
-- ^webapp/coverage.*
-- ^.git/.*
+- ^webapp/node_modules/.*$
+- ^webapp/bower_components/.*$
+- ^webapp/dist/.*$
+- ^webapp/specs/.*$
+- ^webapp/coverage/.*$
+- ^.git/.*$
+- ^backup/.git/.*
 - ^.idea/.*
+- ^.venv2/.*
 - ^.*~
 - ^.*\.py[co]
 - ^.*\.po

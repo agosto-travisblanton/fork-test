@@ -2,6 +2,8 @@ from env_setup import setup
 from os import path
 from provisioning_env import (
     on_development_server,
+    on_qa_server,
+    on_integration_server
 )
 
 setup()
@@ -113,7 +115,7 @@ application = WSGIApplication([
 
 ])
 
-if on_development_server:
+if on_development_server or on_qa_server or on_integration_server:
     dev_routes = [
         Route(
             BASE_URI + '/seed/<days>/<amount_a_day>',
