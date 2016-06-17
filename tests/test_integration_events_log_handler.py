@@ -2,6 +2,7 @@ import json
 
 from datetime import datetime, timedelta
 
+from app_config import config
 from env_setup import setup_test_paths
 from model_entities.integration_events_log_model import IntegrationEventLog
 from tests.provisioning_base_test import ProvisioningBaseTest
@@ -43,8 +44,10 @@ class TestIntegrationEventsLogHandler(ProvisioningBaseTest):
         self.platform_admin_header = {
             'X-Provisioning-User': self.platform_admin.key.urlsafe()
         }
+        self.api_token_authorization_header = {
+            'Authorization': config.API_TOKEN
+        }
 
-        correlation_id = IntegrationEventLog.generate_correlation_id()
         timestamp = datetime.utcnow()
 
         self.registration_event_1 = IntegrationEventLog.create(
@@ -224,21 +227,21 @@ class TestIntegrationEventsLogHandler(ProvisioningBaseTest):
     def test_get_enrollment_events_returns_expected_enrollment_events_count_with_gcm_id(self):
         request_parameters = {'deviceKey': self.DEVICE_KEY}
         uri = build_uri('enrollment-events-list')
-        response = self.app.get(uri, params=request_parameters, headers=self.platform_admin_header)
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
         self.assertLength(9, response_json)
 
     def test_get_enrollment_events_returns_expected_enrollment_events_count_without_gcm_id(self):
         request_parameters = {}
         uri = build_uri('enrollment-events-list')
-        response = self.app.get(uri, params=request_parameters, headers=self.platform_admin_header)
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
         self.assertLength(9, response_json)
 
     def test_get_enrollment_events_returns_list_in_default_order_by_utc_timestamp(self):
         request_parameters = {'deviceKey': self.DEVICE_KEY}
         uri = build_uri('enrollment-events-list')
-        response = self.app.get(uri, params=request_parameters, headers=self.platform_admin_header)
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
         item_1 = response_json[0]
         self.assertEqual(item_1['workflowStep'], self.REGISTRATION_WORKFLOW_STEP_1)
