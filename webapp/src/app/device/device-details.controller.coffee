@@ -1,11 +1,5 @@
 'use strict'
 
-angular.module('skykitProvisioning').directive 'expander',
-  () ->
-    {
-      templateUrl: 'app/items/detail/item-form.html'
-    }
-
 appModule = angular.module('skykitProvisioning')
 appModule.controller 'DeviceDetailsCtrl', (
   $log,
