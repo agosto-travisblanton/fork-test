@@ -7,8 +7,10 @@ from google.appengine.ext.deferred import deferred
 from webapp2 import RequestHandler
 
 from app_config import config
-from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address, register_device,
-                                   update_chrome_os_device)
+from workflow.refresh_device import refresh_device
+from workflow.refresh_device_by_mac_address import refresh_device_by_mac_address
+from workflow.register_device import register_device
+from workflow.update_chrome_os_device import update_chrome_os_device
 from content_manager_api import ContentManagerApi
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from device_message_processor import post_unmanaged_device_info, change_intent
