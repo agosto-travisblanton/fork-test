@@ -1,8 +1,10 @@
 import logging
+
 from google.appengine.ext import ndb
+
 from migration_base import MigrationBase
-from models import Tenant, TenantEntityGroup, ChromeOsDevice
-from chrome_os_devices_api import (refresh_chrome_os_device)
+from models import Tenant, TenantEntityGroup
+from workflow.refresh_chrome_os_device import refresh_chrome_os_device
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 

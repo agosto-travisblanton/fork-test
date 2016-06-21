@@ -1,24 +1,24 @@
-from datetime import datetime, timedelta
-
-import device_message_processor
 from env_setup import setup_test_paths
+from datetime import datetime, timedelta
+import device_message_processor
 from utils.email_notify import EmailNotify
 from utils.timezone_util import TimezoneUtil
 from utils.web_util import build_uri
 from webtest import AppError
-
-setup_test_paths()
-
+from workflow.refresh_device import refresh_device
+from workflow.refresh_device_by_mac_address import refresh_device_by_mac_address
+from workflow.update_chrome_os_device import update_chrome_os_device
 import json
 from google.appengine.ext.deferred import deferred
 from google.appengine.ext import ndb
-from chrome_os_devices_api import (refresh_device_by_mac_address, refresh_device, ChromeOsDevicesApi,
-                                   update_chrome_os_device)
+from chrome_os_devices_api import ChromeOsDevicesApi
 from agar.test import BaseTest, WebTest
 from mockito import when, any as any_matcher
 from routes import application
 from models import ChromeOsDevice, Tenant, Distributor, Domain, DeviceIssueLog, Location
 from app_config import config
+
+setup_test_paths()
 
 
 class TestDeviceResourceHandler(BaseTest, WebTest):

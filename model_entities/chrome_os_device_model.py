@@ -23,6 +23,7 @@ class ChromeOsDevice(ndb.Model):
     org_unit_path = ndb.StringProperty(required=False, indexed=False)
     annotated_user = ndb.StringProperty(required=False, indexed=False)
     annotated_location = ndb.StringProperty(required=False, indexed=False)
+    annotated_asset_id = ndb.StringProperty(required=False, indexed=False)
     notes = ndb.StringProperty(required=False, indexed=False)
     boot_mode = ndb.StringProperty(required=False, indexed=False)
     last_enrollment_time = ndb.StringProperty(required=False, indexed=False)
@@ -180,3 +181,6 @@ class ChromeOsDevice(ndb.Model):
 
     def _pre_put_hook(self):
         self.class_version = 3
+
+    def get_impersonation_email(self):
+        return self.get_tenant().get_domain().impersonation_admin_email_address
