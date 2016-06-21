@@ -18,10 +18,8 @@ appModule.controller 'DeviceDetailsEventsCtrl', (
     vm.deviceKey = $stateParams.deviceKey
     vm.fromDevices = $stateParams.fromDevices is "true"
     vm.currentDevice = {}
-    
     vm.dayRange = 30
     vm.issues = []
-    
     vm.pickerOptions = "{widgetPositioning: {vertical:'bottom'}, showTodayButton: true, sideBySide: true, icons:{
               next:'glyphicon glyphicon-arrow-right',
               previous:'glyphicon glyphicon-arrow-left',
@@ -51,9 +49,6 @@ appModule.controller 'DeviceDetailsEventsCtrl', (
           each.postedTime = vm.generateLocalFromUTC(each.postedTime)
         if each.confirmedTime
           each.confirmedTime = vm.generateLocalFromUTC(each.confirmedTime)
-
-    vm.copyDeviceKey = () ->
-      ToastsService.showSuccessToast 'Device key has been copied to your clipboard'
 
     vm.getIssues = (device, epochStart, epochEnd, prev, next) ->
       ProgressBarService.start()

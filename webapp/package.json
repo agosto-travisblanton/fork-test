@@ -47,6 +47,7 @@
     "karma-jasmine": "^0.3.6",
     "karma-ng-html2js-preprocessor": "~0.1.2",
     "phantomjs-prebuilt": "~2.1.7",
+    "karma-phantomjs-launcher": "~0.2.1",
     "lodash": "~3.2.0",
     "main-bower-files": "~2.5.0",
     "merge-stream": "~0.1.7",
@@ -54,7 +55,6 @@
     "require-dir": "~0.1.0",
     "uglify-save-license": "~0.4.1",
     "wiredep": "~2.2.0",
-    "karma-phantomjs-launcher": "^1.0.0",
     "wrench": "~1.5.8",
     "phantomjs-prebuilt": "^2.1.7"
   },
@@ -63,6 +63,7 @@
   },
   "dependencies": {
     "fs-extra": "^0.30.0",
+    "karma-phantomjs-launcher": "^1.0.0",
     "lockr": "^0.8.4",
     "moment": "^2.13.0"
   }

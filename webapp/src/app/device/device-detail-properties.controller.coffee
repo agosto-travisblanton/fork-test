@@ -74,9 +74,6 @@ appModule.controller 'DeviceDetailsPropertiesCtrl', (
           if location.key is vm.currentDevice.locationKey
             vm.currentDevice.location = location
 
-    vm.copyDeviceKey = () ->
-      ToastsService.showSuccessToast 'Device key has been copied to your clipboard'
-
     vm.onSaveDevice = () ->
       ProgressBarService.start()
       if vm.currentDevice.location != undefined && vm.currentDevice.location.key != undefined
