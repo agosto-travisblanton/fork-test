@@ -5,6 +5,7 @@
     "test": "gulp test"
   },
   "devDependencies": {
+    "angular-mocks": "~1.4.1",
     "browser-sync": "~2.1.4",
     "browser-sync-spa": "~1.0.2",
     "chalk": "~0.5.1",
@@ -46,7 +47,7 @@
     "karma-coverage": "^0.5.2",
     "karma-jasmine": "^0.3.6",
     "karma-ng-html2js-preprocessor": "~0.1.2",
-    "phantomjs-prebuilt": "~2.1.7",
+    "phantomjs-prebuilt": "^2.1.7",
     "karma-phantomjs-launcher": "~0.2.1",
     "lodash": "~3.2.0",
     "main-bower-files": "~2.5.0",
@@ -55,16 +56,19 @@
     "require-dir": "~0.1.0",
     "uglify-save-license": "~0.4.1",
     "wiredep": "~2.2.0",
-    "wrench": "~1.5.8",
-    "phantomjs-prebuilt": "^2.1.7"
+    "wrench": "~1.5.8"
   },
   "engines": {
     "node": ">=4.1.0"
   },
   "dependencies": {
+    "angular": "~1.5.7",
+    "angular-aria": "^1.5.7",
+    "angular-material": "~1.1.0-rc.5",
     "fs-extra": "^0.30.0",
     "karma-phantomjs-launcher": "^1.0.0",
     "lockr": "^0.8.4",
-    "moment": "^2.13.0"
+    "moment": "^2.13.0",
+    "restangular": "~1.5.2"
   }
 }
