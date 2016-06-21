@@ -18,12 +18,7 @@ appModule.controller 'DeviceDetailsPropertiesCtrl', (
     vm.deviceKey = $stateParams.deviceKey
     vm.fromDevices = $stateParams.fromDevices is "true"
     vm.currentDevice = {}
-    vm.pickerOptions = "{widgetPositioning: {vertical:'bottom'}, showTodayButton: true, sideBySide: true, icons:{
-              next:'glyphicon glyphicon-arrow-right',
-              previous:'glyphicon glyphicon-arrow-left',
-              up:'glyphicon glyphicon-arrow-up',
-              down:'glyphicon glyphicon-arrow-down'}}"
-    
+
     vm.initialize = () ->
       vm.panelModels = DevicesService.getPanelModels()
       vm.panelInputs = DevicesService.getPanelInputs()

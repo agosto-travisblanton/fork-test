@@ -41,13 +41,6 @@ appModule.controller 'DeviceDetailsCtrl', (
       localTime = moment.utc(UTCTime).toDate()
       localTime = moment(localTime).format('YYYY-MM-DD hh:mm:ss A')
 
-    vm.replaceIssueTime = (issues) ->
-      for each in issues
-        if each.created
-          each.created = vm.generateLocalFromUTC(each.created)
-        if each.updated
-          each.updated = vm.generateLocalFromUTC(each.updated)
-
     vm.replaceCommandTime = (issues) ->
       for each in issues
         if each.postedTime
@@ -57,17 +50,6 @@ appModule.controller 'DeviceDetailsCtrl', (
 
     vm.copyDeviceKey = () ->
       ToastsService.showSuccessToast 'Device key has been copied to your clipboard'
-
-    # event tab
-    vm.getIssues = (device, epochStart, epochEnd, prev, next) ->
-      ProgressBarService.start()
-      issuesPromise = DevicesService.getIssuesByKey(device, epochStart, epochEnd, prev, next)
-      issuesPromise.then (data) ->
-        vm.replaceIssueTime(data.issues)
-        vm.issues = data.issues
-        vm.prev_cursor = data.prev
-        vm.next_cursor = data.next
-        ProgressBarService.complete()
 
     # command history tab
     vm.getEvents = (deviceKey, prev, next) ->
@@ -87,15 +69,7 @@ appModule.controller 'DeviceDetailsCtrl', (
 
     vm.commandHistorySelected = () ->
       vm.getEvents vm.deviceKey
-
-    vm.paginateCall = (forward) ->
-      if forward
-        vm.getIssues vm.deviceKey, vm.epochStart, vm.epochEnd, null, vm.next_cursor
-
-      else
-        vm.getIssues vm.deviceKey, vm.epochStart, vm.epochEnd, vm.prev_cursor, null
-
-
+      
     vm.paginateEventCall = (forward) ->
       if forward
         vm.getEvents vm.deviceKey, null, vm.event_next_cursor
@@ -114,7 +88,6 @@ appModule.controller 'DeviceDetailsCtrl', (
         vm.onGetDeviceFailure(response)
 
       vm.getEvents vm.deviceKey
-      vm.getIssues vm.deviceKey, vm.epochStart, vm.epochEnd
 
     vm.onGetDeviceSuccess = (response) ->
       vm.currentDevice = response
@@ -260,29 +233,5 @@ appModule.controller 'DeviceDetailsCtrl', (
       ProgressBarService.complete()
       $log.error "Custom command error: #{error.status } #{error.statusText}"
       sweet.show('Oops...', "We were unable to post your custom command into the player's queue.", 'error')
-
-    vm.onClickRefreshButton = () ->
-      ProgressBarService.start()
-      vm.epochStart = moment(new Date(vm.startTime)).unix()
-      vm.epochEnd = moment(new Date(vm.endTime)).unix()
-      vm.prev_cursor = null
-      vm.next_cursor = null
-      issuesPromise = DevicesService.getIssuesByKey(vm.deviceKey, vm.epochStart, vm.epochEnd, vm.prev_cursor, vm.next_cursor)
-      issuesPromise.then ((data) ->
-        vm.onRefreshIssuesSuccess(data)
-      ), (error) ->
-        vm.onRefreshIssuesFailure(error)
-
-    vm.onRefreshIssuesSuccess = (data) ->
-      vm.replaceIssueTime(data.issues)
-      vm.issues = data.issues
-      vm.prev_cursor = data.prev
-      vm.next_cursor = data.next
-      ProgressBarService.complete()
-
-    vm.onRefreshIssuesFailure = (error) ->
-      ProgressBarService.complete()
-      ToastsService.showInfoToast 'We were unable to refresh the device issues list at this time.'
-      $log.error "Failure to refresh device issues: #{error.status } #{error.statusText}"
 
     vm
