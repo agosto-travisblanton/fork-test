@@ -804,7 +804,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                         mac_address=device.mac_address,
                         gcm_registration_id=device.gcm_registration_id,
                         device_urlsafe_key=device_urlsafe_key,
-                        correlation_identifier=correlation_identifier)
+                        correlation_identifier=correlation_identifier,
+                        details='Program playing: '.format(program))
                     initial_heartbeat_event.put()
                 else:
                     message = '{0} event detected for device_key={1}, but no correlation identifier!'.format(

@@ -1657,6 +1657,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(issues[1].program, self.PROGRAM)
         self.assertEqual(issues[1].program_id, self.PROGRAM_ID)
         self.assertEqual(issues[1].last_error, self.LAST_ERROR)
+
     def test_put_heartbeat_invokes_a_device_issue_log_up_toggle_if_device_was_previously_down(self):
         self.__initialize_heartbeat_info(up=False)
         issues = DeviceIssueLog.get_all_by_device_key(self.managed_device.key)
