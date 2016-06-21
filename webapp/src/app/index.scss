@@ -519,6 +519,13 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
   align-content: flex-start;
 }
 
+.registration-event-column {
+  height:110px;
+  display: inline-block;
+  vertical-align: top;
+  overflow: scroll;
+}
+
 
 //.distributor-selection {
 //  font-size: 20pt;

@@ -93,22 +93,6 @@ appModule.controller 'DeviceDetailsCtrl', (
         vm.enrollmentEvents = data
         ProgressBarService.complete()
 
-    vm.showEnrollmentDetail = (details) ->
-      alert details
-#      confirm = $mdDialog.confirm(
-#        {
-#          textContent: detail
-#          targetEvent: event
-#          ok: 'ok'
-#        }
-#      )
-#      showPromise = $mdDialog.show confirm
-#      success = ->
-#        alert 'success'
-#      failure = ->
-#        alert 'failure'
-#      showPromise.then success, failure
-
     vm.paginateCall = (forward) ->
       if forward
         vm.getIssues vm.deviceKey, vm.epochStart, vm.epochEnd, null, vm.next_cursor

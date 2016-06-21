@@ -62,5 +62,15 @@ class IntegrationEventLog(ndb.Model):
     def generate_correlation_id(cls):
         return str(uuid.uuid4().hex)
 
+    @classmethod
+    def get_correlation_identifier_for_registration(cls, device_urlsafe_key):
+        events = IntegrationEventLog.query(
+            ndb.AND(IntegrationEventLog.event_category == 'Registration',
+                    IntegrationEventLog.device_urlsafe_key == device_urlsafe_key)).fetch()
+        if len(events) > 0:
+            return events[0].correlation_identifier
+        else:
+            return None
+
     def _pre_put_hook(self):
         self.class_version = 1
