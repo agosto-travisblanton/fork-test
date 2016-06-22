@@ -72,6 +72,12 @@ indexes:
   - name: device_key
   - name: created
 
+- kind: IntegrationEventLog
+  properties:
+  - name: device_urlsafe_key
+  - name: event_category
+  - name: utc_timestamp
+
 - kind: Location
   properties:
   - name: tenant_key
