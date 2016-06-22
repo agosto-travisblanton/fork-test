@@ -3,6 +3,9 @@ queue:
   rate: 30/s
   bucket_size: 30
   retry_parameters:
+    min_backoff_seconds: 1
+    max_backoff_seconds: 16
+    max_doublings: 5
     task_retry_limit: 5
 
 - name: content-server
