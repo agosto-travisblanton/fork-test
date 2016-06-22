@@ -3,6 +3,7 @@ import logging
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
+from agar.env import on_development_server
 from app_config import config
 from chrome_os_devices_api import ChromeOsDevicesApi
 
@@ -10,6 +11,8 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 def refresh_device_by_mac_address(device_urlsafe_key, device_mac_address, page_token=None):
+    if on_development_server:
+        return
     """
     A function that is meant to be run asynchronously to update the device entity
     with ChromeOsDevice information from Directory API using the MAC address to match.
