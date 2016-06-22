@@ -1,0 +1,53 @@
+<md-content class="md-padding">
+  <div flex="100" flex-sm="100" flex-xs="100" layout="column">
+    <div class="row text-center"
+         ng-hide="deviceDetailsCtrl.enrollmentEvents.length>0">
+      No enrollment events
+    </div>
+    <md-card ng-show="deviceDetailsCtrl.enrollmentEvents.length>0">
+      <md-card-content>
+        <md-list>
+          <md-list-item>
+            <div class="col-sm-4">
+              <b>Workflow step</b>
+            </div>
+            <div class="col-sm-2">
+              <b>Timestamp</b>
+            </div>
+            <div class="col-sm-6">
+              Details
+            </div>
+            <md-divider></md-divider>
+          </md-list-item>
+          <md-list-item ng-repeat="item in deviceDetailsCtrl.enrollmentEvents"
+                        ng-show="deviceDetailsCtrl.enrollmentEvents.length>0">
+            <div class="col-sm-4 registration-event-column">
+              <b>{{ item.componentName }}</b><br>
+              {{ item.workflowStep }}
+            </div>
+            <div class="col-sm-2 registration-event-column">
+              {{deviceDetailsCtrl.generateLocalFromUTC(item.utcTimestamp)}}
+            </div>
+            <div class="col-sm-6 registration-event-column">
+              {{ item.details }}
+            </div>
+            <md-divider>
+            </md-divider>
+          </md-list-item>
+        </md-list>
+        <div class="row margin-top-10">
+          <div class="col-sm-4">
+            <md-button ngclipboard data-clipboard-target="#hidden-correlation-identifier"
+                       ng-click="deviceDetailsCtrl.copyCorrelationIdentifier()" class="md-raised">
+              <i class="fa fa-fw fa-clipboard"></i> Copy Correlation Id
+            </md-button>
+          </div>
+        </div>
+      </md-card-content>
+    </md-card>
+  </div>
+  <div id="hidden-correlation-identifier" class="copy-ready-transparent"
+       ng-show="deviceDetailsCtrl.enrollmentEvents.length>0">
+    {{deviceDetailsCtrl.enrollmentEvents[0].correlationIdentifier}}
+  </div>
+</md-content>

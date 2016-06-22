@@ -240,7 +240,8 @@ class TestDeviceIssueLogModel(BaseTest):
                                                            category=config.DEVICE_ISSUE_MEMORY_HIGH,
                                                            up=True,
                                                            storage_utilization=self.STORAGE_UTILIZATION,
-                                                           memory_utilization=self.MEMORY_UTILIZATION))
+                                                           memory_utilization=self.MEMORY_UTILIZATION,
+                                                           program=self.PROGRAM))
 
     def test_no_matching_issues_returns_true_when_similar_but_not_matching_issue_exists(self):
         issue = DeviceIssueLog.create(device_key=self.device_key,
@@ -295,7 +296,7 @@ class TestDeviceIssueLogModel(BaseTest):
         self.assertEqual(issue.level, IssueLevel.Normal)
         self.assertEqual(issue.level_descriptor, IssueLevel.stringify(IssueLevel.Normal))
 
-    def test_device_not_reported_method_when_no_records_retrieved(self):
+    def test_device_not_reported_yet_method_when_no_records_retrieved(self):
         mac_address='i3234i03554350'
         device = ChromeOsDevice.create_managed(
             tenant_key=self.tenant_key,
@@ -303,7 +304,7 @@ class TestDeviceIssueLogModel(BaseTest):
             device_id=self.DEVICE_ID,
             mac_address=mac_address)
         device_key = device.put()
-        device_not_reported = DeviceIssueLog.device_not_reported(device_key=device_key)
+        device_not_reported = DeviceIssueLog.device_not_reported_yet(device_key=device_key)
         self.assertTrue(device_not_reported)
 
     def test_device_not_reported_method_when_records_retrieved(self):
@@ -311,6 +312,5 @@ class TestDeviceIssueLogModel(BaseTest):
                                       category=config.DEVICE_ISSUE_TIMEZONE_CHANGE,
                                       up=True)
         issue.put()
-        device_not_reported = DeviceIssueLog.device_not_reported(device_key=self.device_key)
+        device_not_reported = DeviceIssueLog.device_not_reported_yet(device_key=self.device_key)
         self.assertFalse(device_not_reported)
-
