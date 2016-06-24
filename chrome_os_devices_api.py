@@ -279,10 +279,6 @@ def refresh_device_by_mac_address(device_urlsafe_key=None, device_mac_address=No
     if None == impersonation_admin_email_address:
         logging.info('Impersonation email not found for device with device key {0}.'.format(device_urlsafe_key))
         return
-    else:
-        logging.debug('refresh_device_by_mac_address: impersonation email is {0} for key {1}.'.format(
-            impersonation_admin_email_address, device_urlsafe_key))
-
     chrome_os_devices_api = ChromeOsDevicesApi(impersonation_admin_email_address)
     chrome_os_devices, new_page_token = chrome_os_devices_api.cursor_list(customer_id=config.GOOGLE_CUSTOMER_ID,
                                                                           next_page_token=page_token)
@@ -341,10 +337,6 @@ def refresh_device(device_urlsafe_key=None):
     if None == impersonation_admin_email_address:
         logging.info('Impersonation email not found for device with device key {0}.'.format(device_urlsafe_key))
         return
-    else:
-        logging.debug('refresh_device: impersonation email is {0} for key {1}.'.format(
-            impersonation_admin_email_address, device_urlsafe_key))
-
     chrome_os_devices_api = ChromeOsDevicesApi(impersonation_admin_email_address)
     chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, device.device_id)
     if chrome_os_device is not None:
@@ -391,9 +383,6 @@ def refresh_chrome_os_device(device_urlsafe_key=None):
     if None == impersonation_admin_email_address:
         logging.info('Impersonation email not found for device with device key {0}.'.format(device_urlsafe_key))
         return
-    else:
-        logging.debug('refresh_chrome_os_device: impersonation email is {0} for key {1}.'.format(
-            impersonation_admin_email_address, device_urlsafe_key))
     chrome_os_device = None
     chrome_os_devices_api = ChromeOsDevicesApi(impersonation_admin_email_address)
     try:
@@ -439,9 +428,6 @@ def update_chrome_os_device(device_urlsafe_key=None):
     if None == impersonation_admin_email_address:
         logging.info('Impersonation email not found for device with device key {0}.'.format(device_urlsafe_key))
         return
-    else:
-        logging.debug('update_chrome_os_device: impersonation email is {0} for key {1}.'.format(
-            impersonation_admin_email_address, device_urlsafe_key))
     chrome_os_devices_api = ChromeOsDevicesApi(impersonation_admin_email_address)
     chrome_os_devices_api.update(config.GOOGLE_CUSTOMER_ID,
                                  device.device_id,

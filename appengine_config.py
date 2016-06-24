@@ -7,13 +7,16 @@ setup()
 
 import os
 from provisioning_env import (
-    on_production_server,
-    on_stage_server,
+    on_continuous_integration_server,
     on_development_server,
-    on_integration_server,
     on_gamestop_server,
+    on_integration_server,
+    on_production_server,
+    on_qa_server,
     on_server,
-    on_test_harness)
+    on_stage_server,
+    on_test_harness,
+)
 from agar.env import appid
 from os import path
 import yaml
@@ -23,6 +26,7 @@ basedir = path.abspath(path.dirname(__file__))
 ##############################################################################
 # APPLICATION SETTINGS
 ##############################################################################
+
 app_APP_ROOT = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
@@ -50,10 +54,13 @@ app_PRIVATE_KEY = _PRIVATE_KEY()
 def _SERVICE_ACCOUNT_EMAIL():
     if on_development_server or on_integration_server or not on_server:
         return '390010375778-87capuus77kispm64q27iah4kl0rorv4@developer.gserviceaccount.com'
+    elif on_continuous_integration_server:
+        return '133313126637-compute@developer.gserviceaccount.com'
+    elif on_qa_server:
+        return '465572156911-compute@developer.gserviceaccount.com'
     elif on_stage_server:
         return 'service-247@skykit-provisioning-stage.iam.gserviceaccount.com'
     elif on_gamestop_server:
-        # return 'service@skykit-provisioning-gamestop.iam.gserviceaccount.com'
         return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0@developer.gserviceaccount.com'
     elif on_production_server:
         return '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0@developer.gserviceaccount.com'
@@ -80,6 +87,10 @@ def _CLIENT_ID():
         return '390010375778-87capuus77kispm64q27iah4kl0rorv4.apps.googleusercontent.com'
     elif on_integration_server:
         return '390010375778-87capuus77kispm64q27iah4kl0rorv4.apps.googleusercontent.com'
+    elif on_continuous_integration_server:
+        return '100882018913058557387'
+    elif on_qa_server:
+        return '117032486283237201955'
     elif on_stage_server:
         return '106935685560101973796'
     elif on_gamestop_server:
@@ -99,6 +110,10 @@ def _OAUTH_CLIENT_ID():
         return '390010375778-gidaqujfhgkqrc5lat9t890mhc0nhutt.apps.googleusercontent.com'
     elif on_integration_server:
         return '390010375778-gidaqujfhgkqrc5lat9t890mhc0nhutt.apps.googleusercontent.com'
+    elif on_continuous_integration_server:
+        return '133313126637-u5ibnd3a4chjkhlva9i1asfi21vbbb1k.apps.googleusercontent.com'
+    elif on_qa_server:
+        return '465572156911-g1n43vdlpi3h225k1s1n3r7aiopucmvq.apps.googleusercontent.com'
     elif on_stage_server:
         return '1087929808190-q8s9bhpu79ju7fkqblnl3nn2th0efv57.apps.googleusercontent.com'
     elif on_gamestop_server:
@@ -117,6 +132,10 @@ app_OAUTH_CLIENT_ID = _OAUTH_CLIENT_ID()
 #         return '5uw_Cj78Iygf3rfnJKZ_SVVO'
 #     if on_integration_server:
 #         return 'h-PGaqnkAfRhjVTtbxcgSLD5'
+#     if on_continuous_integration_server:
+#         return 'DaHz9u5ldHlLkseLTxJvWYj0'
+#     if on_qa_server:
+#         return 'U5dxJM6B6rXG57l4ZSPCxnVk'
 #     if on_stage_server:
 #         return 'SkT2kDa3nViHTJXLuUYbSbzE'
 #     if on_gamestop_server:
@@ -131,6 +150,10 @@ def _PUBLIC_API_SERVER_KEY():
         return 'AIzaSyAzS-hwl5dV-Wn4g5opG_34gGYplgJT1Fc'
     elif on_integration_server:
         return 'AIzaSyAzS-hwl5dV-Wn4g5opG_34gGYplgJT1Fc'
+    elif on_continuous_integration_server:
+        return 'AIzaSyBkqqGLYZUUdOXQ1yte7S27R-nY5h3BSgM'
+    elif on_qa_server:
+        return 'AIzaSyDpUtlntmN0AxPXvZo-wvnkWo6-fwN6AN0'
     elif on_stage_server:
         return 'AIzaSyB0mE3DWNt8iFFvZ60TQyTgl3NpKK6-BQA'
     elif on_gamestop_server:
@@ -148,6 +171,10 @@ def _API_TOKEN():
     if on_development_server or not on_server:
         return '6C346588BD4C6D722A1165B43C51C'
     elif on_integration_server:
+        return '6C346588BD4C6D722A1165B43C51C'
+    elif on_continuous_integration_server:
+        return '6C346588BD4C6D722A1165B43C51C'
+    elif on_qa_server:
         return '6C346588BD4C6D722A1165B43C51C'
     elif on_stage_server:
         return '6C346588BD4C6D722A1165B43C51C'
@@ -167,6 +194,10 @@ def _UNMANAGED_API_TOKEN():
         return 'A1365B43C51C46588BD4C6D5016C0'
     elif on_integration_server:
         return 'A1365B43C51C46588BD4C6D5016C0'
+    elif on_continuous_integration_server:
+        return 'A1365B43C51C46588BD4C6D5016C0'
+    elif on_qa_server:
+        return 'A1365B43C51C46588BD4C6D5016C0'
     elif on_stage_server:
         return 'A1365B43C51C46588BD4C6D5016C0'
     elif on_gamestop_server:
@@ -184,6 +215,10 @@ def _UNMANAGED_REGISTRATION_TOKEN():
     if on_development_server or not on_server:
         return '43C51C8BD4C6D723A1365B6C34658'
     elif on_integration_server:
+        return '43C51C8BD4C6D723A1365B6C34658'
+    elif on_continuous_integration_server:
+        return '43C51C8BD4C6D723A1365B6C34658'
+    elif on_qa_server:
         return '43C51C8BD4C6D723A1365B6C34658'
     elif on_stage_server:
         return '43C51C8BD4C6D723A1365B6C34658'
@@ -203,6 +238,10 @@ def _CONTENT_MANAGER_API_SERVER_KEY():
         return 'EqwbumxWrJzybkDerDbm9yLBteJqZi7X'
     elif on_integration_server:
         return 'EqwbumxWrJzybkDerDbm9yLBteJqZi7X'
+    elif on_continuous_integration_server:
+        return 'o2EnT5qJ1q07w1DQxVfuafUYiUcJbeYJ'
+    elif on_qa_server:
+        return '2jI6eUVRZcvf9l5u3yxO4GAh4fnlAVhb'
     elif on_stage_server:
         return 'OTJkMGNjMmYzMmZlNjI4MDVmNGVlMjEx'
     elif on_gamestop_server:
@@ -221,6 +260,10 @@ def _DEFAULT_AGOSTO_DEVICE_DOMAIN():
         return 'local.agosto.com'
     elif on_integration_server:
         return 'dev.agosto.com'
+    elif on_continuous_integration_server:
+        return 'devci.skykit.com'
+    elif on_qa_server:
+        return 'devqa.skykit.com'
     elif on_stage_server:
         return 'devstaging.skykit.com'
     elif on_gamestop_server:
@@ -238,6 +281,10 @@ def _GOOGLE_CUSTOMER_ID():
     if on_development_server or not on_server:
         return 'my_customer'
     elif on_integration_server:
+        return 'my_customer'
+    elif on_continuous_integration_server:
+        return 'my_customer'
+    elif on_qa_server:
         return 'my_customer'
     elif on_stage_server:
         return 'my_customer'
@@ -309,12 +356,18 @@ app_WIFI_CONNECTION = 'WiFi'
 
 app_INTEGRATION_EVENTS_DEFAULT_FETCH_SIZE = 200
 
+backup_BACKUP_EMAIL_SENDER = 'Backup Datastore Service <gcp.admin@agosto.com>'
+
 
 def _DEFAULT_CONTENT_MANAGER_URL():
     if on_development_server or not on_server:
         return 'https://skykit-contentmanager-int.appspot.com'
     elif on_integration_server:
         return 'https://skykit-contentmanager-int.appspot.com'
+    elif on_continuous_integration_server:
+        return 'https://skykit-contentmanager-ci.appspot.com'
+    elif on_qa_server:
+        return 'https://skykit-contentmanager-qa.appspot.com'
     elif on_stage_server:
         return 'https://skykit-contentmanager-stage.appspot.com'
     elif on_gamestop_server:
@@ -339,7 +392,8 @@ def _STORMPATH_CLIENT():
     """
     http://docs.stormpath.com/python/quickstart/#create-a-client
     """
-    if on_test_harness or on_development_server or on_integration_server or on_stage_server:
+    if (on_test_harness or on_development_server or on_integration_server or on_continuous_integration_server or
+            on_qa_server or on_stage_server):
         id = '6VYRY6TL26YRBJOAOO533W6DO'
         secret = 'oc4u1Nm0M5p3vJSOENhPZzAhNfzifAxMQS0v3J/kG/U'
     elif on_production_server or on_gamestop_server:
@@ -391,6 +445,10 @@ app_MAIL_SERVER_QUEUED_RESPONSE_MESSAGE = _MAIL_SERVER_QUEUED_RESPONSE_MESSAGE()
 def _EMAIL_SUPPORT():
     if on_development_server or not on_server:
         return True
+    elif on_continuous_integration_server:
+        return True
+    elif on_qa_server:
+        return True
     elif on_integration_server:
         return True
     elif on_stage_server:
@@ -419,6 +477,10 @@ def _SQLALCHEMY_DATABASE_URI():
     else:
         if on_integration_server:
             instance_name = 'provisioning-int-v2'
+        elif on_continuous_integration_server:
+            instance_name = 'provisioning-ci'
+        elif on_qa_server:
+            instance_name = 'provisioning-qa'
         elif on_stage_server:
             instance_name = 'provisioning-stage'
         elif on_gamestop_server:
@@ -440,6 +502,10 @@ def _DEFAULT_PROOF_OF_PLAY_URL():
         return 'https://skykit-display-device-int.appspot.com/proofplay/api/v1/post_new_program_play'
     elif on_integration_server:
         return 'https://skykit-display-device-int.appspot.com/proofplay/api/v1/post_new_program_play'
+    elif on_continuous_integration_server:
+        return 'https://skykit-display-device-ci.appspot.com/proofplay/api/v1/post_new_program_play'
+    elif on_qa_server:
+        return 'https://skykit-display-device-qa.appspot.com/proofplay/api/v1/post_new_program_play'
     elif on_stage_server:
         return 'https://skykit-provisioning-stage.appspot.com/proofplay/api/v1/post_new_program_play'
     elif on_gamestop_server:
@@ -458,14 +524,20 @@ proofplay_DAYS_TO_KEEP_RAW_EVENTS = 30
 ##############################################################################
 # VERSION  sprint_number.deployment_increment.hotfix_increment e.g., 33.3.0
 ##############################################################################
+def as_int(x):
+    try:
+        return int(x)
+    except:
+        return None
+
 def _return_yaml_data():
     with open(os.path.join(basedir, 'snapdeploy.yaml'), 'r') as f:
         data = yaml.load(f.read())["version"]
         array_of_versions = data.split('-')
-        array_of_versions_as_int = [int(each) for each in array_of_versions]
-        return array_of_versions_as_int[0], array_of_versions_as_int[1], array_of_versions_as_int[2]
+        array_of_versions_as_int = [as_int(each) for each in array_of_versions]
+        return array_of_versions_as_int 
 
 snapdeploy_yaml_data = _return_yaml_data()
-app_SPRINT_NUMBER = snapdeploy_yaml_data[0]
-app_DEPLOYMENT_COUNTER = snapdeploy_yaml_data[1]
-app_PRODUCTION_HOTFIX_COUNTER = snapdeploy_yaml_data[2]
+app_SPRINT_NUMBER = snapdeploy_yaml_data[0] if len(snapdeploy_yaml_data) > 0 else None
+app_DEPLOYMENT_COUNTER = snapdeploy_yaml_data[1] if len(snapdeploy_yaml_data) > 1 else None
+app_PRODUCTION_HOTFIX_COUNTER = snapdeploy_yaml_data[2] if len(snapdeploy_yaml_data) > 2 else None
