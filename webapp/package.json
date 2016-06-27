@@ -14,7 +14,7 @@
     "concat-stream": "~1.4.7",
     "del": "~1.1.1",
     "gulp": "~3.9.0",
-    "gulp-angular-filesort": "~1.0.4",
+    "gulp-angular-filesort": "^1.0.4",
     "gulp-angular-templatecache": "~1.5.0",
     "gulp-autoprefixer": "~2.1.0",
     "gulp-babel": "^6.0.0",
@@ -22,6 +22,7 @@
     "gulp-coffeelint": "~0.4.0",
     "gulp-concat": "^2.6.0",
     "gulp-csso": "~1.0.0",
+    "gulp-dedupe": "0.0.2",
     "gulp-filter": "~2.0.2",
     "gulp-flatten": "~0.0.4",
     "gulp-htmlmin": "^2.0.0",
@@ -65,13 +66,9 @@
     "node": ">=4.1.0"
   },
   "dependencies": {
-    "angular": "~1.5.7",
-    "angular-aria": "^1.5.7",
     "fs-extra": "^0.30.0",
-    "gulp-concat": "^2.6.0",
     "karma-phantomjs-launcher": "^1.0.0",
     "lockr": "^0.8.4",
-    "moment": "^2.13.0",
-    "restangular": "~1.5.2"
+    "moment": "^2.13.0"
   }
 }

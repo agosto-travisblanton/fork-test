@@ -1,6 +1,8 @@
 'use strict';
 
 var gulp = require('gulp');
+var order = require("gulp-order");
+var dedupe = require("gulp-dedupe");
 
 var $ = require('gulp-load-plugins')();
 
@@ -18,6 +20,16 @@ module.exports = function(options) {
       '!' + options.src + '/app/**/*.spec.js',
       '!' + options.src + '/app/**/*.mock.js'
     ])
+    .pipe($.babel({
+            presets: ['es2015']
+    }))
+    .pipe(order([
+    "src/app/index.js",
+    // "src/app/*.js",
+    // "src/app/services/*.js",
+    // "src/app/**/*.js"
+    ]))
+    .pipe(dedupe())
 
     var injectOptions = {
       ignorePath: [options.src, options.tmp + '/serve'],
