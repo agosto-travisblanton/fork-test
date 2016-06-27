@@ -56,22 +56,19 @@
             }
             if ($stateParams.fromDevices === "true") {
                 vm.backUrl = '/#/devices';
-                vm.backUrlText = 'Back to devices';
+                return vm.backUrlText = 'Back to devices';
             } else {
                 if (vm.currentDevice.isUnmanagedDevice === true) {
                     vm.backUrl = `/#/tenants/${vm.tenantKey}/unmanaged`;
-                    vm.backUrlText = 'Back to tenant unmanaged devices';
+                    return vm.backUrlText = 'Back to tenant unmanaged devices';
                 } else {
                     vm.backUrl = `/#/tenants/${vm.tenantKey}/managed`;
-                    vm.backUrlText = 'Back to tenant managed devices';
+                    return vm.backUrlText = 'Back to tenant managed devices';
                 }
             }
-            let locationsPromise = LocationsService.getLocationsByTenantKey(vm.tenantKey);
-            return locationsPromise.then(function (data) {
-                vm.locations = data;
-                return vm.setSelectedLocationOptions();
-            });
         };
+        
+        vm.copyCorrelationIdentifier = () => ToastsService.showSuccessToast('Correlation ID copied to your clipboard');
 
         vm.onGetDeviceFailure = function (response) {
             ToastsService.showErrorToast('Oops. We were unable to fetch the details for this device at this time.');
