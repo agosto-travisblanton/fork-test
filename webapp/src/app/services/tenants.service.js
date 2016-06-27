@@ -1,5 +1,4 @@
-let appModule = angular.module('skykitProvisioning');
-appModule.factory('TenantsService', (Restangular, CacheFactory, SessionsService) =>
+angular.module('skykitProvisioning').factory('TenantsService', (Restangular, CacheFactory, SessionsService) =>
   new class TenantsService {
 
     constructor() {

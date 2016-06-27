@@ -1,3 +1,5 @@
+(function () {
+
 let appModule = angular.module('skykitProvisioning');
 appModule.controller('DeviceDetailsCtrl', function(
   $log,
@@ -53,3 +55,5 @@ appModule.controller('DeviceDetailsCtrl', function(
 
     return vm;
   });
+})
+();

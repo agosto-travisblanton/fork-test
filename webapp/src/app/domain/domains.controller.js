@@ -1,3 +1,5 @@
+(function () {
+
 let appModule = angular.module('skykitProvisioning');
 
 appModule.controller("DomainsCtrl", function($state, $log, DomainsService, sweet) {
@@ -29,3 +31,5 @@ appModule.controller("DomainsCtrl", function($state, $log, DomainsService, sweet
 
   return vm;
 });
+})
+();

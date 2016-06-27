@@ -1,3 +1,6 @@
+(function () {
+
+
 let app = angular.module('skykitProvisioning');
 
 app.controller("AdminCtrl", function(
@@ -107,3 +110,6 @@ app.controller("AdminCtrl", function(
 
     return vm;
   });
+
+})
+();

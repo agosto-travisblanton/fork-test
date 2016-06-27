@@ -1,6 +1,4 @@
-let appModule = angular.module('skykitProvisioning');
-
-appModule.factory('LocationsService', function(Restangular) {
+angular.module('skykitProvisioning').factory('LocationsService', function(Restangular) {
   class LocationsService {
 
     constructor() {}

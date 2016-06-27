@@ -1,3 +1,5 @@
+(function () {
+
 let appModule = angular.module('skykitProvisioning');
 appModule.controller("WelcomeCtrl", function(VersionsService, $state, DistributorsService, SessionsService) {
   let vm = this;
@@ -42,3 +44,5 @@ appModule.controller("WelcomeCtrl", function(VersionsService, $state, Distributo
   };
   return vm;
 });
+})
+();

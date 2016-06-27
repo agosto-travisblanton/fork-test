@@ -1,6 +1,4 @@
-let appModule = angular.module('skykitProvisioning');
-
-appModule.factory('DistributorsService', (Restangular,
+angular.module('skykitProvisioning').factory('DistributorsService', (Restangular,
   $state,
   SessionsService,
   ProofPlayService,

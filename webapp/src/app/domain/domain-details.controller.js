@@ -1,3 +1,6 @@
+(function () {
+
+
 let appModule = angular.module('skykitProvisioning');
 appModule.controller('DomainDetailsCtrl', function($log,
   $stateParams,
@@ -53,3 +56,6 @@ appModule.controller('DomainDetailsCtrl', function($log,
 
     return vm;
   });
+
+    })
+();

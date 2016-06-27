@@ -1,3 +1,5 @@
+(function () {
+
 let appModule = angular.module('skykitProvisioning');
 
 appModule.controller('DevicesListingCtrl', function($stateParams, $log, DevicesService, $state, SessionsService, ProgressBarService, sweet) {
@@ -253,3 +255,5 @@ appModule.controller('DevicesListingCtrl', function($stateParams, $log, DevicesS
 
   return vm;
 });
+})
+();

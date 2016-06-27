@@ -1,3 +1,6 @@
+(function () {
+
+
 let appModule = angular.module('skykitProvisioning');
 
 appModule.controller('TenantDetailsCtrl',
@@ -102,3 +105,6 @@ appModule.controller('TenantDetailsCtrl',
 
     return vm;
   });
+    
+    })
+();

@@ -1,3 +1,6 @@
+(function () {
+
+
 let app = angular.module('skykitProvisioning');
 
 app.controller("AuthenticationCtrl", function($scope, $log, $state, $timeout,
@@ -66,3 +69,5 @@ app.controller("AuthenticationCtrl", function($scope, $log, $state, $timeout,
 
     return vm;
   });
+})
+();

@@ -56,7 +56,7 @@ module.exports = function (config) {
             'karma-chrome-launcher',
             'karma-jasmine',
             'karma-coverage',
-            'karma-coffee-preprocessor',
+            'karma-babel-preprocessor',
             'karma-ng-html2js-preprocessor'
         ],
 
@@ -73,7 +73,8 @@ module.exports = function (config) {
         colors: true,
 
         preprocessors: {
-            'src/**/*.js': ['coverage'],
+            'src/**/*.js': ['babel', 'coverage'],
+            'specs/**/*.js': ['babel'],
             'src/**/*.html': ['ng-html2js']
         },
 

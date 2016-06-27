@@ -1,6 +1,4 @@
-let appModule = angular.module('skykitProvisioning');
-
-appModule.factory('CommandsService', Restangular =>
+angular.module('skykitProvisioning').factory('CommandsService', Restangular =>
   new class CommandsService {
     
     constructor() {

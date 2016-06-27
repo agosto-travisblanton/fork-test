@@ -1,8 +1,13 @@
-let appModule = angular.module('skykitProvisioning');
+(function () {
 
-appModule.controller("DistributorsCtrl", function($state) {
-  let vm = this;
-  vm.distributors = [];
 
-  return vm;
-});
+    let appModule = angular.module('skykitProvisioning');
+
+    appModule.controller("DistributorsCtrl", function ($state) {
+        let vm = this;
+        vm.distributors = [];
+
+        return vm;
+    });
+})
+();

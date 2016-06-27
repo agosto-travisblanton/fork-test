@@ -1,3 +1,5 @@
+(function () {
+
 let appModule = angular.module('skykitProvisioning');
 
 appModule.controller("DistributorSelectorCtrl", function(
@@ -28,3 +30,6 @@ appModule.controller("DistributorSelectorCtrl", function(
 
     return vm;
   });
+
+})
+();
