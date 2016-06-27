@@ -38,6 +38,14 @@
             </div>
           </div>
           <div class="form-group"
+               ng-hide="deviceDetailsCtrl.currentDevice.annotatedAssetId == null ||
+                                           deviceDetailsCtrl.currentDevice.annotatedAssetId == ''">
+            <label>Asset Id</label>
+            <div>
+              {{deviceDetailsCtrl.currentDevice.annotatedAssetId}}
+            </div>
+          </div>
+          <div class="form-group"
                ng-hide="deviceDetailsCtrl.currentDevice.bootMode == null ||
                                            deviceDetailsCtrl.currentDevice.bootMode == ''">
             <label>Boot mode</label>
