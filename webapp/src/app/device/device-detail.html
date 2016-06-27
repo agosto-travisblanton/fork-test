@@ -50,16 +50,10 @@
         <md-tab label="Commands">
           <div ng-include="'webapp/src/app/device/device-command.html'"></div>
         </md-tab>
-        <md-tab label="Command History">
-          <div ng-include="'webapp/src/app/device/device-command-history.html'"></div>
-        </md-tab>
-        <md-tab label="Enrollment">
-          <div ng-include="'webapp/src/app/device/device-enrollment.html'"></div>
-        </md-tab>
       </md-tabs>
     </div>
   </md-content>
-  <div id="hidden-device-key" class="copy-ready-transparent">
+  <div id="hidden-device-key" class="copy-ready-device-key">
     {{deviceDetailsCtrl.currentDevice.key}}
   </div>
 </div>

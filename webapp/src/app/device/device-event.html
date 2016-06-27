@@ -1,41 +1,40 @@
-<div ng-controller="DeviceDetailsEventsCtrl as vm" ng-init="vm.initialize()">
   <md-content class="md-padding">
     <div flex="100" flex-sm="100" flex-xs="100" layout="column">
       <md-card>
         <md-card-content>
           <form name="tenantForm" class="form-horizontal"
-                ng-submit="vm.onClickRefreshButton()"
+                ng-submit="deviceDetailsCtrl.onClickRefreshButton()"
                 novalidate>
             <div class="row">
               <div class="col-sm-3">
                 <md-button class="md-raised"
-                           ng-disabled="!vm.prev_cursor"
-                           ng-click="vm.paginateCall(false)">
+                           ng-disabled="!deviceDetailsCtrl.prev_cursor"
+                           ng-click="deviceDetailsCtrl.paginateCall(false)">
                   Prev
                 </md-button>
                 <md-button class="md-raised"
-                           ng-disabled="!vm.next_cursor"
-                           ng-click="vm.paginateCall(true)">
+                           ng-disabled="!deviceDetailsCtrl.next_cursor"
+                           ng-click="deviceDetailsCtrl.paginateCall(true)">
                   Next
                 </md-button>
               </div>
               <div class="col-sm-2  col-sm-offset-3">
                 <b><p>From:</p></b><input type="text" class="form-control input-sm"
                                           datetimepicker
-                                          datetimepicker-options="{{vm.pickerOptions}}"
-                                          placeholder="{{vm.startTime}}"
+                                          datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
+                                          placeholder="{{deviceDetailsCtrl.startTime}}"
                                           name="startTime"
                                           id="startTime"
-                                          ng-model="vm.startTime">
+                                          ng-model="deviceDetailsCtrl.startTime">
               </div>
               <div class="col-sm-2">
                 <b><p>To:</p></b><input type="text" class="form-control input-sm"
                                         datetimepicker
-                                        datetimepicker-options="{{vm.pickerOptions}}"
-                                        placeholder="{{vm.endTime}}"
+                                        datetimepicker-options="{{deviceDetailsCtrl.pickerOptions}}"
+                                        placeholder="{{deviceDetailsCtrl.endTime}}"
                                         name="endTime"
                                         id="endTime"
-                                        ng-model="vm.endTime">
+                                        ng-model="deviceDetailsCtrl.endTime">
               </div>
               <div class="col-sm-2">
                 <md-button type="submit" class="md-raised">
@@ -46,6 +45,7 @@
           </form>
         </md-card-content>
       </md-card>
+
       <md-card>
         <md-card-content>
           <div class="row margin-top-15">
@@ -64,14 +64,14 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-hide="vm.issues.length">
+                <tr ng-hide="deviceDetailsCtrl.issues.length">
                   <td class="text-center text-warning" colspan="8">
-                    No events logged in the past {{vm.dayRange}}
+                    No events logged in the past {{deviceDetailsCtrl.dayRange}}
                     days.<br>
                     Please try an earlier 'From date' above.
                   </td>
                 </tr>
-                <tr ng-repeat="item in vm.issues | orderBy:['-updated']">
+                <tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:['-updated']">
                   <td class="issue-{{ item.level_descriptor}}-background"></td>
                   <td>{{ item.category }}</td>
                   <td>{{ item.memory_utilization }}%</td>
@@ -89,23 +89,24 @@
               </table>
             </div>
           </div>
+
         </md-card-content>
       </md-card>
       <md-card>
         <md-card-content>
           <form name="tenantForm" class="form-horizontal"
-                ng-submit="vm.onClickRefreshButton()"
+                ng-submit="deviceDetailsCtrl.onClickRefreshButton()"
                 novalidate>
             <div class="row">
               <div class="col-sm-3">
                 <md-button class="md-raised"
-                           ng-disabled="!vm.prev_cursor"
-                           ng-click="vm.paginateCall(false)">
+                           ng-disabled="!deviceDetailsCtrl.prev_cursor"
+                           ng-click="deviceDetailsCtrl.paginateCall(false)">
                   Prev
                 </md-button>
                 <md-button class="md-raised"
-                           ng-disabled="!vm.next_cursor"
-                           ng-click="vm.paginateCall(true)">
+                           ng-disabled="!deviceDetailsCtrl.next_cursor"
+                           ng-click="deviceDetailsCtrl.paginateCall(true)">
                   Next
                 </md-button>
               </div>
@@ -116,4 +117,3 @@
       </md-card>
     </div>
   </md-content>
-</div>
