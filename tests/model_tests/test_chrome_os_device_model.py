@@ -201,8 +201,10 @@ class TestChromeOsDeviceModel(BaseTest):
                                    customer_location_name=customer_location_name,
                                    customer_location_code=customer_location_code)
         device.location_key = location.put()
+        device.annotated_asset_id = 'test asset id'
         device.put()
         json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
+        self.assertEqual(str(device.annotated_asset_id), json_representation['annotatedAssetId'])
         self.assertEqual(str(device.device_id), json_representation['deviceId'])
         self.assertEqual(str(device.gcm_registration_id), json_representation['gcmRegistrationId'])
         self.assertEqual(None, json_representation['serialNumber'])

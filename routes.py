@@ -401,9 +401,16 @@ application = WSGIApplication(
         Route(r'/api/v1/integrations_events',
               handler='handlers.integration_events_log_handler.IntegrationEventsLogHandler',
               name='integration-events-list',
-              handler_method='get_list',
+              handler_method='get_by_event_category',
               methods=['GET']
               ),
+        Route(r'/api/v1/integration_events/enrollment',
+              handler='handlers.integration_events_log_handler.IntegrationEventsLogHandler',
+              name='enrollment-events-list',
+              handler_method='get_enrollment_events',
+              methods=['GET']
+              ),
+
 
         ############################################################
         # /dev/ routes secured by admin:required
