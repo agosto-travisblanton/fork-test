@@ -4,6 +4,8 @@ appModule = angular.module('skykitProvisioning')
 
 appModule.factory 'DomainsService', (Restangular) ->
   new class DomainsService
+    
+    constructor: ->
 
     save: (domain) ->
       if domain.key != undefined

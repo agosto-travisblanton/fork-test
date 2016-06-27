@@ -5,7 +5,6 @@ appModule.factory 'TenantsService', (Restangular, CacheFactory, SessionsService)
 
     constructor: ->
       if !CacheFactory.get('tenantCache')
-        distributorKey = SessionsService.getCurrentDistributorKey()
         @tenantCache = CacheFactory('tenantCache',
           maxAge: 60 * 60 * 1000
           deleteOnExpire: 'aggressive'

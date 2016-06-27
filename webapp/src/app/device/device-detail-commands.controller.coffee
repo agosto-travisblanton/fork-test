@@ -31,6 +31,7 @@ appModule.controller 'DeviceDetailsCommandsCtrl', (
           each.postedTime = vm.generateLocalFromUTC(each.postedTime)
         if each.confirmedTime
           each.confirmedTime = vm.generateLocalFromUTC(each.confirmedTime)
+      return 
 
     # command history tab
     vm.getEvents = (deviceKey, prev, next) ->

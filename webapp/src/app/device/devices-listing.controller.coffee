@@ -128,8 +128,12 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
               vm.unmanagedSerialDevices = vm.convertArrayToDictionary(result, false)
             else
               vm.serialDevices = vm.convertArrayToDictionary(result, false)
-
-            return [each.serial for each in result][0]
+              
+            serialsOfMatchedDevices = []
+            for each in result
+              serialsOfMatchedDevices.push each.serial
+              
+            return serialsOfMatchedDevices
 
         else
           DevicesService.searchDevicesByPartialMac(vm.distributorKey, partial, unmanaged)
@@ -141,7 +145,12 @@ appModule.controller 'DevicesListingCtrl', ($stateParams, $log, DevicesService, 
             else
               vm.macDevices = vm.convertArrayToDictionary(result, true)
 
-            return [each.mac for each in result][0]
+            macMatchesMacAddresses = []
+            for each in result
+              macMatchesMacAddresses.push each.mac
+
+            return macMatchesMacAddresses
+
       else
         return []
     else

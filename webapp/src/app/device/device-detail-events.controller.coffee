@@ -20,11 +20,7 @@ appModule.controller 'DeviceDetailsEventsCtrl', (
     vm.currentDevice = {}
     vm.dayRange = 30
     vm.issues = []
-    vm.pickerOptions = "{widgetPositioning: {vertical:'bottom'}, showTodayButton: true, sideBySide: true, icons:{
-              next:'glyphicon glyphicon-arrow-right',
-              previous:'glyphicon glyphicon-arrow-left',
-              up:'glyphicon glyphicon-arrow-up',
-              down:'glyphicon glyphicon-arrow-down'}}"
+    vm.pickerOptions = "{widgetPositioning: {vertical:'bottom'}, showTodayButton: true, sideBySide: true, icons:{ next:'glyphicon glyphicon-arrow-right', previous:'glyphicon glyphicon-arrow-left',  up:'glyphicon glyphicon-arrow-up', down:'glyphicon glyphicon-arrow-down'}}"
 
     now = new Date()
     today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
@@ -42,13 +38,7 @@ appModule.controller 'DeviceDetailsEventsCtrl', (
           each.created = vm.generateLocalFromUTC(each.created)
         if each.updated
           each.updated = vm.generateLocalFromUTC(each.updated)
-
-    vm.replaceCommandTime = (issues) ->
-      for each in issues
-        if each.postedTime
-          each.postedTime = vm.generateLocalFromUTC(each.postedTime)
-        if each.confirmedTime
-          each.confirmedTime = vm.generateLocalFromUTC(each.confirmedTime)
+      return
 
     vm.getIssues = (device, epochStart, epochEnd, prev, next) ->
       ProgressBarService.start()

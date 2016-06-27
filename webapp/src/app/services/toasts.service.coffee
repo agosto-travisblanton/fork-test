@@ -2,6 +2,7 @@
 
 angular.module('skykitProvisioning').factory 'ToastsService', (toastr) ->
   new class ToastsService
+    constructor: ->
 
     showSuccessToast: (message, title = 'Success!') ->
       toastr.success message, title

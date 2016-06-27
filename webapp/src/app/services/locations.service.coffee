@@ -5,6 +5,8 @@ appModule = angular.module('skykitProvisioning')
 appModule.factory 'LocationsService', (Restangular) ->
   class LocationsService
 
+    constructor: ->
+
     save: (location) ->
       if location.key != undefined
         promise = location.put()

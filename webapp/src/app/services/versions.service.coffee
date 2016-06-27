@@ -1,9 +1,8 @@
 'use strict'
 
-appModule = angular.module('skykitProvisioning')
-
-appModule.factory 'VersionsService', (Restangular) ->
+angular.module('skykitProvisioning').factory 'VersionsService', (Restangular) ->
   new class VersionsService
+    constructor: ->
 
     getVersions: () ->
       promise = Restangular.oneUrl('versions').get()

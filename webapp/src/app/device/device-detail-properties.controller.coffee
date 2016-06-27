@@ -73,6 +73,7 @@ appModule.controller 'DeviceDetailsPropertiesCtrl', (
         for location in vm.locations
           if location.key is vm.currentDevice.locationKey
             vm.currentDevice.location = location
+        return
 
     vm.onSaveDevice = () ->
       ProgressBarService.start()

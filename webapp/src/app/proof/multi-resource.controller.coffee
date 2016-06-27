@@ -32,7 +32,10 @@ appModule.controller "ProofOfPlayMultiResourceCtrl", (ProofPlayService, $statePa
     .then (data) ->
       vm.loading = false
       vm.full_resource_map = data.data.resources
-      vm.resources = (resource.resource_name for resource in data.data.resources)
+      vm.resources = []
+      for resource in data.data.resources
+        vm.resources.push resource.resource_name
+      
       if vm.resources.length > 0
         vm.had_some_items = true
       else

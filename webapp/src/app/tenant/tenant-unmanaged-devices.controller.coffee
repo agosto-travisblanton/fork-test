@@ -92,14 +92,22 @@ appModule.controller 'TenantUnmanagedDevicesCtrl',
             .then (res) ->
               result = res["serial_number_matches"]
               vm.serialDevices = vm.convertArrayToDictionary(result, false)
-              return [each.serial for each in result][0]
-
+              
+              deviceSerials = []
+              for each in result
+                deviceSerials.push each.serial
+              return deviceSerials
+              
           else
             DevicesService.searchDevicesByPartialMacByTenant(vm.tenantKey, partial_search, true)
             .then (res) ->
               result = res["mac_matches"]
               vm.macDevices = vm.convertArrayToDictionary(result, true)
-              return [each.mac for each in result][0]
+              deviceMacs = []
+              for each in result
+                deviceMacs.push each.mac
+              return deviceMacs
+              
         else
           return []
       else

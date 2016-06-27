@@ -33,8 +33,8 @@ module.exports = function (config) {
       'bower_components/lockr/lockr.js',
       'bower_components/angular-aria/angular-aria.js',
       'bower_components/ngclipboard/src/ngclipboard.js',
-      'src/app/index.coffee',
-      'src/app/**/*.coffee',
+      'src/app/index.js',
+      'src/app/**/*.js',
       'specs/**/*.coffee'
     ],
 
@@ -76,8 +76,7 @@ module.exports = function (config) {
     colors: true,
 
     preprocessors: {
-      'src/**/*.coffee': ['coffee', 'coverage'],
-      'specs/**/*.coffee': ['coffee'],
+      'src/**/*.js': ['coverage'],
       'src/**/*.html': ['ng-html2js']
     },
 

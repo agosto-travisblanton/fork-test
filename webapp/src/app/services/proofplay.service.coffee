@@ -7,12 +7,11 @@ angular.module('skykitProvisioning')
     constructor: ->
       @uriBase = 'proofplay/api/v1'
       if !CacheFactory.get('proofplayCache')
-        distributorKey = SessionsService.getCurrentDistributorKey()
         @proofplayCache = CacheFactory 'proofplayCache',
           maxAge: 60 * 60 * 1000
           deleteOnExpire: 'aggressive'
           storageMode: 'localStorage'
-          onExpire: (key, value) =>
+          onExpire: (key) =>
             $http.get(key).success (data) =>
               @proofplayCache.put key, data
               return

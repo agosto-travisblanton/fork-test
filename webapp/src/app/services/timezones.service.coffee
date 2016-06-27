@@ -2,6 +2,7 @@
 
 angular.module('skykitProvisioning').factory 'TimezonesService', ($http, $log, Restangular) ->
   class TimezonesService
+    constructor: ->
 
     getUsTimezones: () ->
       promise = Restangular.oneUrl('timezones', 'api/v1/timezones/us').get()
