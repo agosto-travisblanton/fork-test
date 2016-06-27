@@ -43,7 +43,7 @@ module.exports = function(options) {
       .pipe($.rev())
       .pipe(jsFilter)
       .pipe($.babel({
-                presets: ['es2015']
+         presets: ['es2015']
       }))
       .pipe($.ngAnnotate())
       .pipe(jsFilter.restore())
