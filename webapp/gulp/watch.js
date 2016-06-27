@@ -25,7 +25,6 @@ module.exports = function(options) {
 
     gulp.watch([
       options.src + '/app/**/*.js',
-      options.src + '/app/**/*.coffee'
     ], function(event) {
       if(isOnlyChange(event)) {
         gulp.start('scripts');
