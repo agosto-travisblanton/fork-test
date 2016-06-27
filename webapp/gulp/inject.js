@@ -19,7 +19,7 @@ module.exports = function (options) {
             '{' + options.src + ',' + options.tmp + '/serve}/app/**/*.js',
             '!' + options.src + '/app/**/*.spec.js',
             '!' + options.src + '/app/**/*.mock.js'
-        ])
+            ])
             .pipe($.babel({
                 presets: ['es2015']
             }))
@@ -35,8 +35,8 @@ module.exports = function (options) {
 
         return gulp.src(options.src + '/*.html')
             .pipe($.inject(injectStyles, injectOptions))
-            .pipe($.inject(injectScripts, injectOptions))
             .pipe(wiredep(options.wiredep))
+            .pipe($.inject(injectScripts, injectOptions))
             .pipe(gulp.dest(options.tmp + '/serve'));
 
     });
