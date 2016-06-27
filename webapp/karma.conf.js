@@ -33,6 +33,9 @@ module.exports = function (config) {
             'bower_components/lockr/lockr.js',
             'bower_components/angular-aria/angular-aria.js',
             'bower_components/ngclipboard/src/ngclipboard.js',
+            'src/app/index.js',
+            'src/app/**/*.js',
+            'specs/**/*.js'
         ],
 
         //  # list of files / patterns to exclude
