@@ -3,7 +3,6 @@
     let app = angular.module('skykitProvisioning', [
         'ngAnimate',
         'ngCookies',
-//  'ngTouch'
         'ngSanitize',
         'restangular',
         'ui.router',
