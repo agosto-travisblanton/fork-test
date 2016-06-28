@@ -1,4 +1,9 @@
+from uuid import uuid4
+
+from google.appengine.ext.deferred import deferred
+
 from env_setup import setup_test_paths
+from model_entities.integration_events_log_model import IntegrationEventLog
 from workflow.register_device import register_device
 
 setup_test_paths()
@@ -6,6 +11,7 @@ setup_test_paths()
 from models import Tenant, ChromeOsDevice, Distributor, Domain
 from agar.test import BaseTest
 from chrome_os_devices_api import ChromeOsDevicesApi
+from mock import patch
 
 
 class TestRegsiterDevice(BaseTest):
@@ -20,7 +26,7 @@ class TestRegsiterDevice(BaseTest):
 
     def setUp(self):
         super(TestRegsiterDevice, self).setUp()
-        self.chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
+        # self.chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
         self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
                                               active=True)
         self.distributor_key = self.distributor.put()
@@ -38,12 +44,33 @@ class TestRegsiterDevice(BaseTest):
                                     active=True)
         self.tenant_key = self.tenant.put()
         self.mac_address = '54271e4af1e7'
+        self.expected_gcm_registration_id = '8d70a8d78a6dfa6df76dfasd'
+        self.expected_correlation_id = str(uuid4())
         self.device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                                    gcm_registration_id='8d70a8d78a6dfa6df76dfasd',
+                                                    gcm_registration_id=self.expected_gcm_registration_id,
                                                     mac_address=self.mac_address)
         self.device_key = self.device.put()
+        # patch_chrome_os_device_api_update = patch.object(ChromeOsDevicesApi, 'update')
 
-    # def test_register_device(self):
-    #     """ Tests the live connection to Admin SDK Directory API. """
-    #     result = register_device(self.device_key.urlsafe(), self.mac_address)
-    #     self.assertEqual(result.device_id, self.TESTING_DEVICE_ID)
+    def test_register_device_creates_integration_event_log_entities(self):
+        register_device(self.device_key.urlsafe(),
+                        device_mac_address=self.mac_address,
+                        gcm_registration_id=self.expected_gcm_registration_id,
+                        correlation_id=self.expected_correlation_id)
+        integration_event_logs = IntegrationEventLog.query(
+            IntegrationEventLog.correlation_identifier == self.expected_correlation_id).fetch(25)
+        self.assertEqual(2, len(integration_event_logs))
+
+    def test_register_device_fails_device_key_urlsafe_is_none(self):
+        with self.assertRaises(deferred.PermanentTaskFailure):
+            register_device(None,
+                            device_mac_address=self.mac_address,
+                            gcm_registration_id=self.expected_gcm_registration_id,
+                            correlation_id=self.expected_correlation_id)
+
+    def test_register_device_fails_device_mac_address_is_none(self):
+        with self.assertRaises(deferred.PermanentTaskFailure):
+            register_device(self.device_key.urlsafe(),
+                            device_mac_address=None,
+                            gcm_registration_id=self.expected_gcm_registration_id,
+                            correlation_id=self.expected_correlation_id)
