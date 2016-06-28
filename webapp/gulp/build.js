@@ -18,7 +18,10 @@ var minCss = require('gulp-minify-css');
 var uglify = require('gulp-uglify');
 var filever = require('gulp-version-filename');
 var s3 = require("gulp-s3-ls");
-
+var injectOptions;
+var sources;
+var allCss;
+var bowerCSS;
 /**
  * Aggregate the files.
  *
@@ -27,16 +30,47 @@ var s3 = require("gulp-s3-ls");
  */
 module.exports = function (options) {
 
+
     gulp.task('minCSS', [], function () {
-        gulp.src('src/app/*.scss', gulpBowerFiles())
-            .pipe($.filter('**/*.css'))
+        allCss = gulp.src('src/app/**/*.scss')
             .pipe(sass().on('error', sass.logError))
-            .pipe(concat('vendor.css'))
-            .pipe(minCss({
-                keepSpecialComments: 1
-            }))
+            .pipe(minCss())
+            .pipe(concat('app.css'))
             .pipe(gulp.dest(options.dist + '/'));
-        ;
+
+
+        var partialsInjectFile = gulp.src(options.tmp + '/partials/templateCacheHtml.js', {read: false});
+        var partialsInjectOptions = {
+            starttag: '<!-- inject:partials -->',
+            ignorePath: options.tmp + '/partials',
+            addRootSlash: false
+        };
+
+        var htmlFilter = $.filter('*.html');
+        var jsFilter = $.filter('**/*.js');
+        var cssFilter = $.filter('**/*.css');
+        var assets;
+
+        return gulp.src(options.tmp + '/serve/*.html')
+            .pipe($.inject(partialsInjectFile, partialsInjectOptions))
+            .pipe(assets = $.useref.assets())
+            .pipe($.rev())
+            .pipe(cssFilter)
+            .pipe($.replace('../../bower_components/bootstrap-sass-official/assets/fonts/bootstrap/', '../fonts/'))
+            .pipe($.csso())
+            .pipe(assets.restore())
+            .pipe($.useref())
+            .pipe($.revReplace())
+            .pipe(htmlFilter)
+            .pipe($.minifyHtml({
+                empty: true,
+                spare: true,
+                quotes: true,
+                conditionals: true
+            }))
+            .pipe(htmlFilter.restore())
+            .pipe(gulp.dest(options.dist + '/'))
+            .pipe($.size({title: options.dist + '/', showFiles: true}));
     });
 
     /**
@@ -52,46 +86,34 @@ module.exports = function (options) {
                 "**/index.js",
                 '**/*.js'
             ]))
-            .pipe(concat('common.js'))
+            .pipe(concat('scripts/app.js'))
             .pipe($.babel({
                 presets: ['es2015']
             }))
             .pipe(gulp.dest(options.dist + '/'));
 
 
-        var injectOptions = {
+        injectOptions = {
             ignorePath: [options.src, options.tmp + '/serve'],
             addRootSlash: false
         };
 
         var injectDeps = gulpBowerFiles()
             .pipe($.filter('**/*.js'))
-            .pipe(concat('vendor.js'))
+            .pipe(concat('scripts/vendor.js'))
             .pipe(gulp.dest(options.dist + '/'));
 
-        var sources = gulp.src([options.dist + '/vendor.js', options.dist + '/common.js'], {read: false});
+        sources = gulp.src([options.dist + '/vendor.js', options.dist + '/common.js'], {read: false});
 
-        return gulp.src(options.src + '/*.html')
-            .pipe($.inject(sources, injectOptions))
-            .pipe(gulp.dest(options.dist + '/'));
 
     });
 
-    gulp.task('partials', function () {
-        return gulp.src([
-            options.src + '/app/**/*.html',
-            options.tmp + '/serve/app/**/*.html'
-        ])
-            .pipe($.minifyHtml({
-                empty: true,
-                spare: true,
-                quotes: true
-            }))
-            .pipe($.angularTemplatecache('templateCacheHtml.js', {
-                module: 'skykitProvisioning',
-                root: 'app'
-            }))
-            .pipe(gulp.dest(options.tmp + '/partials/'));
+    gulp.task('html', function () {
+        return gulp.src(options.src + '/*.html')
+            .pipe($.inject(sources, injectOptions))
+            .pipe($.inject(allCss, injectOptions))
+            .pipe($.inject(bowerCSS, injectOptions))
+            .pipe(gulp.dest(options.dist + '/'));
     });
 
 
