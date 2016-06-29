@@ -229,8 +229,37 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     @requires_api_token
     def get_device_by_parameter(self):
         pairing_code = self.request.get('pairingCode')
-        device_mac_address = self.request.get('macAddress')
+        if pairing_code:
+            query_results = ChromeOsDevice.query(ChromeOsDevice.pairing_code == pairing_code,
+                                                 ndb.AND(ChromeOsDevice.archived == False)).fetch()
+            if len(query_results) == 1:
+                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+            elif len(query_results) > 1:
+                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+                error_message = "Multiple devices have pairing code {0}".format(pairing_code)
+                logging.error(error_message)
+            else:
+                error_message = "Unable to find device by pairing code: {0}".format(pairing_code)
+                self.response.set_status(404, error_message)
+            return
+
         gcm_registration_id = self.request.get('gcmRegistrationId')
+        if gcm_registration_id:
+            query_results = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
+                                                 ndb.AND(ChromeOsDevice.archived == False)).fetch()
+            if len(query_results) == 1:
+                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+            elif len(query_results) > 1:
+                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+                error_message = "Multiple devices have GCM registration ID {0}".format(gcm_registration_id)
+                logging.error(error_message)
+            else:
+                error_message = "Unable to find Chrome OS device by GCM registration ID: {0}".format(
+                    gcm_registration_id)
+                self.response.set_status(404, error_message)
+            return
+
+        device_mac_address = self.request.get('macAddress')
         if device_mac_address:
             query_results = ChromeOsDevice.query(
                 ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
@@ -251,35 +280,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             else:
                 error_message = "Unable to find Chrome OS device by MAC address: {0}".format(device_mac_address)
                 self.response.set_status(404, error_message)
-        elif gcm_registration_id:
-            query_results = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
-                                                 ndb.AND(ChromeOsDevice.archived == False)).fetch()
-            if len(query_results) == 1:
-                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
-            elif len(query_results) > 1:
-                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
-                error_message = "Multiple devices have GCM registration ID {0}".format(gcm_registration_id)
-                logging.error(error_message)
-            else:
-                error_message = "Unable to find Chrome OS device by GCM registration ID: {0}".format(
-                    gcm_registration_id)
-                self.response.set_status(404, error_message)
-        elif pairing_code:
-            query_results = ChromeOsDevice.query(ChromeOsDevice.pairing_code == pairing_code,
-                                                 ndb.AND(ChromeOsDevice.archived == False)).fetch()
-            if len(query_results) == 1:
-                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
-            elif len(query_results) > 1:
-                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
-                error_message = "Multiple devices have pairing code {0}".format(pairing_code)
-                logging.error(error_message)
-            else:
-                error_message = "Unable to find device by pairing code: {0}".format(pairing_code)
-                self.response.set_status(404, error_message)
-        else:
-            query = ChromeOsDevice.query(ChromeOsDevice.archived == False)
-            query_results = query.fetch()
-            json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
+            return
+
+        query = ChromeOsDevice.query(ChromeOsDevice.archived == False)
+        query_results = query.fetch()
+        json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
 
     @requires_api_token
     def get_devices_by_distributor(self, distributor_urlsafe_key, cur_prev_cursor, cur_next_cursor):
