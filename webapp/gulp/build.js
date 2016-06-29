@@ -98,7 +98,7 @@ module.exports = function (options) {
             addRootSlash: false
         };
 
-        var injectDeps = gulpBowerFiles()
+        var injectDeps = gulp.src($.mainBowerFiles())
             .pipe($.filter('**/*.js'))
             .pipe(concat('scripts/vendor.js'))
             .pipe(gulp.dest(options.dist + '/'));
