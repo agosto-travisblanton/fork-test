@@ -24,7 +24,10 @@
         vm.commandEvents = [];
         vm.dayRange = 30;
         vm.issues = [];
-        vm.pickerOptions = "{widgetPositioning: {vertical:'bottom'}, showTodayButton: true, sideBySide: true, icons:{ next:'glyphicon glyphicon-arrow-right', previous:'glyphicon glyphicon-arrow-left', up:'glyphicon glyphicon-arrow-up', down:'glyphicon glyphicon-arrow-down'}}";
+        vm.pickerOptions = "{widgetPositioning: {vertical:'bottom'}, " +
+            "showTodayButton: true, sideBySide: true, icons:{ next:'glyphicon glyphicon-arrow-right', " +
+            "previous:'glyphicon glyphicon-arrow-left', up:'glyphicon glyphicon-arrow-up', down:'glyphicon " +
+            "glyphicon-arrow-down'}}";
         vm.timezones = [];
         vm.selectedTimezone = undefined;
         let now = new Date();
