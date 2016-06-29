@@ -46,7 +46,7 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
     # if None == device.device_id:
     #     logging.error('Did not refresh in refresh_chrome_os_device because no device_id available.')
     #     return
-    # impersonation_admin_email_address = device.get_impersonation_email()
+    impersonation_admin_email_address = device.get_impersonation_email()
     # if not impersonation_admin_email_address:
     #     error_message = 'register_device: Impersonation email not found for device with device key {0}.'.format(
     #         device_urlsafe_key)
@@ -65,9 +65,10 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
         correlation_identifier=correlation_id)
     api_response_event.put()
 
-    # chrome_os_devices_api = ChromeOsDevicesApi(impersonation_admin_email_address)
-    # chrome_os_devices, new_page_token = chrome_os_devices_api.cursor_list(customer_id=config.GOOGLE_CUSTOMER_ID,
-    #                                                                       next_page_token=page_token)
+    chrome_os_devices_api = ChromeOsDevicesApi(impersonation_admin_email_address)
+    chrome_os_devices, new_page_token = chrome_os_devices_api.cursor_list(customer_id=config.GOOGLE_CUSTOMER_ID,
+                                                                          next_page_token=page_token)
+
     # if chrome_os_devices and len(chrome_os_devices) > 0:
     #     lowercase_device_mac_address = device_mac_address.lower()
     #     loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == lowercase_device_mac_address or

@@ -3,6 +3,7 @@ from uuid import uuid4
 from google.appengine.ext.deferred import deferred
 
 from env_setup import setup_test_paths
+from mock import patch, Mock, ANY
 from model_entities.integration_events_log_model import IntegrationEventLog
 from workflow.register_device import register_device
 
@@ -10,8 +11,6 @@ setup_test_paths()
 
 from models import Tenant, ChromeOsDevice, Distributor, Domain
 from agar.test import BaseTest
-from chrome_os_devices_api import ChromeOsDevicesApi
-from mock import patch
 
 
 class TestRegsiterDevice(BaseTest):
@@ -50,9 +49,10 @@ class TestRegsiterDevice(BaseTest):
                                                     gcm_registration_id=self.expected_gcm_registration_id,
                                                     mac_address=self.mac_address)
         self.device_key = self.device.put()
-        # patch_chrome_os_device_api_update = patch.object(ChromeOsDevicesApi, 'update')
 
-    def test_register_device_creates_integration_event_log_entities(self):
+    @patch('workflow.register_device.ChromeOsDevicesApi')
+    def test_register_device_creates_integration_event_log_entities(self, chrome_os_devices_api_class_mock):
+        self._build_cursor_list_mock(chrome_os_devices_api_class_mock)
         register_device(self.device_key.urlsafe(),
                         device_mac_address=self.mac_address,
                         gcm_registration_id=self.expected_gcm_registration_id,
@@ -61,16 +61,37 @@ class TestRegsiterDevice(BaseTest):
             IntegrationEventLog.correlation_identifier == self.expected_correlation_id).fetch(25)
         self.assertEqual(2, len(integration_event_logs))
 
-    def test_register_device_fails_device_key_urlsafe_is_none(self):
+    @patch('workflow.register_device.ChromeOsDevicesApi')
+    def test_register_device_fails_device_key_urlsafe_is_none(self, chrome_os_devices_api_class_mock):
         with self.assertRaises(deferred.PermanentTaskFailure):
             register_device(None,
                             device_mac_address=self.mac_address,
                             gcm_registration_id=self.expected_gcm_registration_id,
                             correlation_id=self.expected_correlation_id)
 
-    def test_register_device_fails_device_mac_address_is_none(self):
+    @patch('workflow.register_device.ChromeOsDevicesApi')
+    def test_register_device_fails_device_mac_address_is_none(self, chrome_os_devices_api_class_mock):
         with self.assertRaises(deferred.PermanentTaskFailure):
             register_device(self.device_key.urlsafe(),
                             device_mac_address=None,
                             gcm_registration_id=self.expected_gcm_registration_id,
                             correlation_id=self.expected_correlation_id)
+
+    @patch('workflow.register_device.ChromeOsDevicesApi')
+    def test_register_device_invokes_(self, chrome_os_devices_api_class_mock):
+        chrome_os_devices_api_instance_mock = self._build_cursor_list_mock(chrome_os_devices_api_class_mock)
+        register_device(self.device_key.urlsafe(),
+                        device_mac_address=self.mac_address,
+                        gcm_registration_id=self.expected_gcm_registration_id,
+                        correlation_id=self.expected_correlation_id)
+        chrome_os_devices_api_instance_mock.cursor_list.assert_called_with(next_page_token=None,
+                                                                           customer_id=ANY)
+
+    ################################################################################################################
+    ## Private helper methods
+    ################################################################################################################
+    def _build_cursor_list_mock(self, chrome_os_devices_api_class_mock):
+        chrome_os_devices_api_instance_mock = Mock()
+        chrome_os_devices_api_class_mock.return_value = chrome_os_devices_api_instance_mock
+        chrome_os_devices_api_instance_mock.cursor_list.return_value = [], None
+        return chrome_os_devices_api_instance_mock
