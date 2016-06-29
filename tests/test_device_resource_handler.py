@@ -5,13 +5,8 @@ from utils.email_notify import EmailNotify
 from utils.timezone_util import TimezoneUtil
 from utils.web_util import build_uri
 from webtest import AppError
-from workflow.refresh_device import refresh_device
-from workflow.refresh_device_by_mac_address import refresh_device_by_mac_address
-from workflow.update_chrome_os_device import update_chrome_os_device
 import json
-from google.appengine.ext.deferred import deferred
 from google.appengine.ext import ndb
-from chrome_os_devices_api import ChromeOsDevicesApi
 from agar.test import BaseTest, WebTest
 from mockito import when, any as any_matcher
 from routes import application
@@ -108,9 +103,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {'macAddress': mac_address,
                         'gcmRegistrationId': self.GCM_REGISTRATION_ID,
                         'tenantCode': tenant.tenant_code}
-        when(deferred).defer(any_matcher(refresh_device_by_mac_address),
-                             any_matcher(str),
-                             any_matcher(mac_address)).thenReturn(None)
         response = self.app.post('/api/v1/devices', json.dumps(request_body),
                                  headers=self.api_token_authorization_header)
         self.assertEqual('201 Created', response.status)
@@ -127,9 +119,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {'macAddress': mac_address,
                         'gcmRegistrationId': self.GCM_REGISTRATION_ID,
                         'tenantCode': tenant.tenant_code}
-        when(deferred).defer(any_matcher(refresh_device_by_mac_address),
-                             any_matcher(str),
-                             any_matcher(mac_address)).thenReturn(None)
         response = self.app.post('/api/v1/devices', json.dumps(request_body),
                                  headers=self.api_token_authorization_header)
         location_uri_components = str(response.headers['Location']).split('/')
@@ -205,9 +194,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {'macAddress': mac_address,
                         'gcmRegistrationId': self.GCM_REGISTRATION_ID,
                         'tenantCode': tenant.tenant_code}
-        when(deferred).defer(any_matcher(refresh_device_by_mac_address),
-                             any_matcher(str),
-                             any_matcher(mac_address)).thenReturn(None)
         response = self.app.post('/api/v1/devices', json.dumps(request_body),
                                  headers=self.api_token_authorization_header)
         location_uri_components = str(response.headers['Location']).split('/')
@@ -229,9 +215,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'gcmRegistrationId': self.GCM_REGISTRATION_ID,
                         'tenantCode': tenant.tenant_code,
                         'timezone': explicit_timezone}
-        when(deferred).defer(any_matcher(refresh_device_by_mac_address),
-                             any_matcher(str),
-                             any_matcher(mac_address)).thenReturn(None)
         response = self.app.post('/api/v1/devices', json.dumps(request_body),
                                  headers=self.api_token_authorization_header)
         location_uri_components = str(response.headers['Location']).split('/')
@@ -961,8 +944,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        'device',
                                        None,
                                        {'device_urlsafe_key': self.managed_device_key.urlsafe()})
-        when(deferred).defer(any_matcher(refresh_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertOK(response)
 
@@ -979,8 +960,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        None,
                                        {'device_urlsafe_key': new_device_key.urlsafe()})
         new_device.key.delete()
-        when(deferred).defer(any_matcher(refresh_device),
-                             any_matcher(new_device_key.urlsafe())).thenReturn(None)
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertTrue('404 Not Found' in context.exception.message)
@@ -998,8 +977,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        'device',
                                        None,
                                        {'device_urlsafe_key': new_device_key.urlsafe()})
-        when(deferred).defer(any_matcher(refresh_device),
-                             any_matcher(new_device_key.urlsafe())).thenReturn(None)
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertTrue('Bad response: 404 Device with key: {0} archived.'.format(new_device_key.urlsafe())
@@ -1011,8 +988,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        'device',
                                        None,
                                        {'device_urlsafe_key': '0000ZXN0YmVkLXRlc3RyFAsSDkNocm9tZU9zRGV2aWNl0000'})
-        when(deferred).defer(any_matcher(refresh_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertTrue('400 Bad Request' in context.exception.message)
@@ -1023,8 +998,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        'device',
                                        None,
                                        {'device_urlsafe_key': self.managed_device_key.urlsafe()})
-        when(deferred).defer(any_matcher(refresh_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
         device = self.managed_device_key.get()
@@ -1064,8 +1037,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        'device',
                                        None,
                                        {'device_urlsafe_key': managed_device_key.urlsafe()})
-        when(deferred).defer(any_matcher(refresh_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
         device = self.managed_device_key.get()
@@ -1195,7 +1166,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {'gcmRegistrationId': self.GCM_REGISTRATION_ID,
                         'tenantCode': self.TENANT_CODE,
                         'notes': self.DEVICE_NOTES}
-        when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.managed_device_key.get())
         uri = build_uri('device', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
         response = self.put(uri, params=request_body, headers=self.empty_header)
         self.assertForbidden(response)
@@ -1205,8 +1175,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'tenantCode': self.tenant_key.get().tenant_code,
                         'notes': self.DEVICE_NOTES
                         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         response = self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                                 json.dumps(request_body),
                                 headers=self.api_token_authorization_header)
@@ -1222,8 +1190,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         device.archived = True
         device_key = device.put()
         request_body = {}
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         with self.assertRaises(AppError) as context:
             self.app.put('/api/v1/devices/{0}'.format(device_key.urlsafe()),
                          json.dumps(request_body),
@@ -1236,8 +1202,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {
             'notes': new_note
         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
@@ -1251,8 +1215,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             'gcmRegistrationId': gcm_registration_id,
             'tenantCode': self.tenant_key.get().tenant_code
         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
@@ -1265,8 +1227,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {
             'tenantCode': new_tenant.tenant_code
         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
@@ -1327,8 +1287,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                    customer_location_code='store_1234')
         location_key = location.put()
         request_body = {'locationKey': location_key.urlsafe()}
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
@@ -1352,9 +1310,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             'customerDisplayName': customer_display_name,
             'customerDisplayCode': customer_display_code
         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(new_device_key.urlsafe())).thenReturn(None)
-
         with self.assertRaises(AppError) as context:
             self.app.put('/api/v1/devices/{0}'.format(new_device_key.urlsafe()),
                          json.dumps(request_body),
@@ -1375,8 +1330,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             'customerDisplayName': new_display_name,
             'customerDisplayCode': customer_display_code
         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         response = self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                                 json.dumps(request_body),
                                 headers=self.api_token_authorization_header)
@@ -1389,8 +1342,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {
             'heartbeatInterval': interval
         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
@@ -1402,8 +1353,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {
             'checkContentInterval': interval
         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
@@ -1416,8 +1365,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {
             'checkContentInterval': interval
         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
@@ -1430,8 +1377,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {
             'checkContentInterval': interval
         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
@@ -1443,8 +1388,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         explicit_timezone = 'America/Denver'
         self.assertEqual(self.managed_device.timezone_offset, TimezoneUtil.get_timezone_offset(default_timezone))
         request_body = {'timezone': explicit_timezone}
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
