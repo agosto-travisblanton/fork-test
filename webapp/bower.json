@@ -26,7 +26,8 @@
     "ngclipboard": "^1.1.0",
     "ngprogress": "~1.1.2",
     "restangular": "~1.5.1",
-    "sweetalert": "~1.1.0"
+    "sweetalert": "~1.1.0",
+    "eonasdan-bootstrap-datetimepicker": "^4.17.37"
   },
   "overrides": {
     "bootstrap-sass-official": {
