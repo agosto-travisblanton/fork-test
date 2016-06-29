@@ -68,13 +68,12 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
     chrome_os_devices_api = ChromeOsDevicesApi(impersonation_admin_email_address)
     chrome_os_devices, new_page_token = chrome_os_devices_api.cursor_list(customer_id=config.GOOGLE_CUSTOMER_ID,
                                                                           next_page_token=page_token)
-
-    # if chrome_os_devices and len(chrome_os_devices) > 0:
-    #     lowercase_device_mac_address = device_mac_address.lower()
-    #     loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == lowercase_device_mac_address or
-    #                           x.get('ethernetMacAddress') == lowercase_device_mac_address)
-    #     chrome_os_device = next(loop_comprehension, None)
-    #     if chrome_os_device:
+    if chrome_os_devices and len(chrome_os_devices) > 0:
+        lowercase_device_mac_address = device_mac_address.lower()
+        loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == lowercase_device_mac_address or
+                              x.get('ethernetMacAddress') == lowercase_device_mac_address)
+        chrome_os_device = next(loop_comprehension, None)
+        # if chrome_os_device:
     #         device_key = ndb.Key(urlsafe=device_urlsafe_key)
     #         device = device_key.get()
     #         device.device_id = chrome_os_device.get('deviceId')

@@ -78,7 +78,7 @@ class TestRegsiterDevice(BaseTest):
                             correlation_id=self.expected_correlation_id)
 
     @patch('workflow.register_device.ChromeOsDevicesApi')
-    def test_register_device_invokes_(self, chrome_os_devices_api_class_mock):
+    def test_register_device_invokes_cursor_list(self, chrome_os_devices_api_class_mock):
         chrome_os_devices_api_instance_mock = self._build_cursor_list_mock(chrome_os_devices_api_class_mock)
         register_device(self.device_key.urlsafe(),
                         device_mac_address=self.mac_address,
