@@ -36,14 +36,8 @@ class IntegrationEventsLogHandler(RequestHandler, PagingListHandlerMixin, KeyVal
                 ndb.AND(IntegrationEventLog.event_category == 'Registration',
                         IntegrationEventLog.device_urlsafe_key == device_key)).order(
                 IntegrationEventLog.utc_timestamp).fetch()
-            if len(query_results) > 0:
-                json_response(self.response, query_results, strategy=INTEGRATION_EVENT_LOG_STRATEGY)
-                return
-            else:
-                error_message = "Unable to find registration events with device key: {0}".format(
-                    device_key)
-                self.response.set_status(404, error_message)
-                return
+            json_response(self.response, query_results, strategy=INTEGRATION_EVENT_LOG_STRATEGY)
+            return
         else:
             query_results = IntegrationEventLog.query(IntegrationEventLog.event_category == 'Registration').order(
                 IntegrationEventLog.utc_timestamp).fetch()
