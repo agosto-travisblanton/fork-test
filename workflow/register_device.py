@@ -73,42 +73,42 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
         loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == lowercase_device_mac_address or
                               x.get('ethernetMacAddress') == lowercase_device_mac_address)
         chrome_os_device = next(loop_comprehension, None)
-        # if chrome_os_device:
-    #         device_key = ndb.Key(urlsafe=device_urlsafe_key)
-    #         device = device_key.get()
-    #         device.device_id = chrome_os_device.get('deviceId')
-    #         device.mac_address = chrome_os_device.get('macAddress')
-    #         device.serial_number = chrome_os_device.get('serialNumber')
-    #         device.status = chrome_os_device.get('status')
-    #         device.last_sync = chrome_os_device.get('lastSync')
-    #         device.kind = chrome_os_device.get('kind')
-    #         device.ethernet_mac_address = chrome_os_device.get('ethernetMacAddress')
-    #         device.org_unit_path = chrome_os_device.get('orgUnitPath')
-    #         device.annotated_user = chrome_os_device.get('annotatedUser')
-    #         device.annotated_location = chrome_os_device.get('annotatedLocation')
-    #         device.notes = chrome_os_device.get('notes')
-    #         device.boot_mode = chrome_os_device.get('bootMode')
-    #         device.last_enrollment_time = chrome_os_device.get('lastEnrollmentTime')
-    #         device.platform_version = chrome_os_device.get('platformVersion')
-    #         device.model = chrome_os_device.get('model')
-    #         device.os_version = chrome_os_device.get('osVersion')
-    #         device.firmware_version = chrome_os_device.get('firmwareVersion')
-    #         device.etag = chrome_os_device.get('etag')
-    #
-    #         # Registration process sends the customer's display in the annotatedAssetId field of
-    #         # the Directory API ChromeOsDevice resource representation.
-    #         device.customer_display_name = chrome_os_device.get('annotatedAssetId')
-    #         device.annotated_asset_id = device_urlsafe_key
-    #         device.put()
-    #
-    #         api_response_event.serial_number = device.serial_number
-    #         api_response_event.details = 'Chrome Directory API call success! Notifying Content Manager.'
-    #         api_response_event.put()
-    #
-    #         info = 'register_device: retrieved directory API for MAC address = {0}. Notifying Content Manager.' \
-    #             .format(lowercase_device_mac_address)
-    #         logging.info(info)
-    #
+        if chrome_os_device:
+            device_key = ndb.Key(urlsafe=device_urlsafe_key)
+            device = device_key.get()
+            device.device_id = chrome_os_device.get('deviceId')
+            device.mac_address = chrome_os_device.get('macAddress')
+            device.serial_number = chrome_os_device.get('serialNumber')
+            device.status = chrome_os_device.get('status')
+            device.last_sync = chrome_os_device.get('lastSync')
+            device.kind = chrome_os_device.get('kind')
+            device.ethernet_mac_address = chrome_os_device.get('ethernetMacAddress')
+            device.org_unit_path = chrome_os_device.get('orgUnitPath')
+            device.annotated_user = chrome_os_device.get('annotatedUser')
+            device.annotated_location = chrome_os_device.get('annotatedLocation')
+            device.notes = chrome_os_device.get('notes')
+            device.boot_mode = chrome_os_device.get('bootMode')
+            device.last_enrollment_time = chrome_os_device.get('lastEnrollmentTime')
+            device.platform_version = chrome_os_device.get('platformVersion')
+            device.model = chrome_os_device.get('model')
+            device.os_version = chrome_os_device.get('osVersion')
+            device.firmware_version = chrome_os_device.get('firmwareVersion')
+            device.etag = chrome_os_device.get('etag')
+
+            # Registration process sends the customer's display in the annotatedAssetId field of
+            # the Directory API ChromeOsDevice resource representation.
+            device.customer_display_name = chrome_os_device.get('annotatedAssetId')
+            device.annotated_asset_id = device_urlsafe_key
+            device.put()
+
+            api_response_event.serial_number = device.serial_number
+            api_response_event.details = 'Chrome Directory API call success! Notifying Content Manager.'
+            api_response_event.put()
+
+            info = 'register_device: retrieved directory API for MAC address = {0}. Notifying Content Manager.' \
+                .format(lowercase_device_mac_address)
+            logging.info(info)
+
     #         # Update Directory API with the device key in the annotated asset ID.
     #         if not device.is_unmanaged_device:
     #             directory_api_update_event = IntegrationEventLog.create(

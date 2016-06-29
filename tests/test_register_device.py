@@ -87,11 +87,91 @@ class TestRegsiterDevice(BaseTest):
         chrome_os_devices_api_instance_mock.cursor_list.assert_called_with(next_page_token=None,
                                                                            customer_id=ANY)
 
+    @patch('workflow.register_device.ChromeOsDevicesApi')
+    def test_register_copy_values_from_chrome_os_device(self, chrome_os_devices_api_class_mock):
+        matching_chrome_os_device_dict = self._build_chrome_os_device_resource_representation()
+        self._build_cursor_list_mock(chrome_os_devices_api_class_mock, [matching_chrome_os_device_dict])
+        register_device(self.device_key.urlsafe(),
+                        device_mac_address=self.mac_address,
+                        gcm_registration_id=self.expected_gcm_registration_id,
+                        correlation_id=self.expected_correlation_id)
+        actual = self.device_key.get()
+        self.assertEqual(actual.device_id, str(matching_chrome_os_device_dict.get('deviceId')))
+        self.assertEqual(actual.mac_address, str(matching_chrome_os_device_dict.get('macAddress')))
+        self.assertEqual(actual.serial_number, str(matching_chrome_os_device_dict.get('serialNumber')))
+        self.assertEqual(actual.status, str(matching_chrome_os_device_dict.get('status')))
+        self.assertEqual(actual.last_sync, str(matching_chrome_os_device_dict.get('lastSync')))
+        self.assertEqual(actual.kind, str(matching_chrome_os_device_dict.get('kind')))
+        self.assertEqual(actual.ethernet_mac_address, str(matching_chrome_os_device_dict.get('ethernetMacAddress')))
+        self.assertEqual(actual.org_unit_path, str(matching_chrome_os_device_dict.get('orgUnitPath')))
+        self.assertEqual(actual.annotated_user, str(matching_chrome_os_device_dict.get('annotatedUser')))
+        self.assertEqual(actual.annotated_location, str(matching_chrome_os_device_dict.get('annotatedLocation')))
+        self.assertEqual(actual.notes, str(matching_chrome_os_device_dict.get('notes')))
+        self.assertEqual(actual.boot_mode, str(matching_chrome_os_device_dict.get('bootMode')))
+        self.assertEqual(actual.last_enrollment_time, str(matching_chrome_os_device_dict.get('lastEnrollmentTime')))
+        self.assertEqual(actual.platform_version, str(matching_chrome_os_device_dict.get('platformVersion')))
+        self.assertEqual(actual.model, str(matching_chrome_os_device_dict.get('model')))
+        self.assertEqual(actual.os_version, str(matching_chrome_os_device_dict.get('osVersion')))
+        self.assertEqual(actual.firmware_version, str(matching_chrome_os_device_dict.get('firmwareVersion')))
+        self.assertEqual(actual.etag, str(matching_chrome_os_device_dict.get('etag')))
+        self.assertEqual(actual.customer_display_name, str(matching_chrome_os_device_dict.get('annotatedAssetId')))
+
+    @patch('workflow.register_device.ChromeOsDevicesApi')
+    def test_register_device_sets_device_key_to_entity_annotated_asset_id(self, chrome_os_devices_api_class_mock):
+        matching_chrome_os_device_dict = self._build_chrome_os_device_resource_representation()
+        self._build_cursor_list_mock(chrome_os_devices_api_class_mock, [matching_chrome_os_device_dict])
+        register_device(self.device_key.urlsafe(),
+                        device_mac_address=self.mac_address,
+                        gcm_registration_id=self.expected_gcm_registration_id,
+                        correlation_id=self.expected_correlation_id)
+        actual = self.device_key.get()
+        self.assertEqual(actual.annotated_asset_id, self.device_key.urlsafe())
+
+    @patch('workflow.register_device.ChromeOsDevicesApi')
+    def test_register_device_sets_api_response_event_attributes(self, chrome_os_devices_api_class_mock):
+        matching_chrome_os_device_dict = self._build_chrome_os_device_resource_representation()
+        self._build_cursor_list_mock(chrome_os_devices_api_class_mock, [matching_chrome_os_device_dict])
+        register_device(self.device_key.urlsafe(),
+                        device_mac_address=self.mac_address,
+                        gcm_registration_id=self.expected_gcm_registration_id,
+                        correlation_id=self.expected_correlation_id)
+        actual = IntegrationEventLog.query(
+            IntegrationEventLog.correlation_identifier == self.expected_correlation_id,
+            IntegrationEventLog.serial_number == matching_chrome_os_device_dict.get('serialNumber')).fetch(1)
+        self.assertIsNotNone(actual)
+        self.assertIsNotNone(actual[0])
+        self.assertEqual('Chrome Directory API call success! Notifying Content Manager.', actual[0].details)
+
     ################################################################################################################
     ## Private helper methods
     ################################################################################################################
-    def _build_cursor_list_mock(self, chrome_os_devices_api_class_mock):
+    def _build_cursor_list_mock(self, chrome_os_devices_api_class_mock, chrome_os_devices_list=None):
+        if chrome_os_devices_list is None:
+            chrome_os_devices_list = []
         chrome_os_devices_api_instance_mock = Mock()
         chrome_os_devices_api_class_mock.return_value = chrome_os_devices_api_instance_mock
-        chrome_os_devices_api_instance_mock.cursor_list.return_value = [], None
+        chrome_os_devices_api_instance_mock.cursor_list.return_value = chrome_os_devices_list, None
         return chrome_os_devices_api_instance_mock
+
+    def _build_chrome_os_device_resource_representation(self):
+        return {
+            'macAddress': self.mac_address,
+            'serialNumber': 'df78a6d78fasd97asdgd7f6s98d76s9df',
+            'status': 'ACTIVE',
+            'lastSync': '20160101T00:00:00.000',
+            'kind': 'ChromeBit',
+            'ethernetMacAddress': 'test-ethernetMacAddress',
+            'orgUnitPath': 'testing-org-unit-path',
+            'annotatedUser': 'Joe Smith',
+            'annotatedLocation': 'A location',
+            'notes': 'Just some notes',
+            'bootMode': 'NETWORK',
+            'lastEnrollmentTime': '78879898879980909877545644',
+            'platformVersion': '23.4.67',
+            'model': 'Jaguar 7888',
+            'osVersion': 'Linux kernel 3.6.11',
+            'firmwareVersion': '67.9888',
+            'etag': 'd8f7s8d7f0a8s97df89fas7d098f7asd089f7asd89f7as89d7f0a9s87d8f9s',
+            'annotatedAssetId': 'My company display name',
+            'deviceId': 'd7f9s8d79879'
+        }
