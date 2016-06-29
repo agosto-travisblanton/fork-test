@@ -13,7 +13,7 @@ from models import Tenant, ChromeOsDevice, Distributor, Domain
 from agar.test import BaseTest
 
 
-class TestRegsiterDevice(BaseTest):
+class TestRegisterDevice(BaseTest):
     SKYKIT_COM_CUSTOMER_ID = 'C04c2u0lg'
     ADMIN_ACCOUNT_TO_IMPERSONATE = 'administrator@skykit.com'
     TESTING_DEVICE_ID = '6daf712b-7a65-4450-abcd-45027a47a716'
@@ -24,7 +24,7 @@ class TestRegsiterDevice(BaseTest):
     IMPERSONATION_EMAIL = 'administrator@skykit.com'
 
     def setUp(self):
-        super(TestRegsiterDevice, self).setUp()
+        super(TestRegisterDevice, self).setUp()
         # self.chrome_os_devices_api = ChromeOsDevicesApi(self.ADMIN_ACCOUNT_TO_IMPERSONATE)
         self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
                                               active=True)
@@ -141,6 +141,21 @@ class TestRegsiterDevice(BaseTest):
         self.assertIsNotNone(actual)
         self.assertIsNotNone(actual[0])
         self.assertEqual('Chrome Directory API call success! Notifying Content Manager.', actual[0].details)
+
+    @patch('workflow.register_device.ChromeOsDevicesApi')
+    def test_register_device_creates_update_directory_api_integration_event_log(self,
+                                                                                chrome_os_devices_api_class_mock):
+        matching_chrome_os_device_dict = self._build_chrome_os_device_resource_representation()
+        self._build_cursor_list_mock(chrome_os_devices_api_class_mock, [matching_chrome_os_device_dict])
+        register_device(self.device_key.urlsafe(),
+                        device_mac_address=self.mac_address,
+                        gcm_registration_id=self.expected_gcm_registration_id,
+                        correlation_id=self.expected_correlation_id)
+        actual = IntegrationEventLog.query(
+            IntegrationEventLog.correlation_identifier == self.expected_correlation_id,
+            IntegrationEventLog.workflow_step == 'Update Directory API with device key in annotatedAssetId field.').fetch(1)
+        self.assertIsNotNone(actual)
+        self.assertEqual(1, len(actual))
 
     ################################################################################################################
     ## Private helper methods

@@ -109,17 +109,17 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
                 .format(lowercase_device_mac_address)
             logging.info(info)
 
-    #         # Update Directory API with the device key in the annotated asset ID.
-    #         if not device.is_unmanaged_device:
-    #             directory_api_update_event = IntegrationEventLog.create(
-    #                 event_category='Registration',
-    #                 component_name='Chrome Directory API',
-    #                 workflow_step='Update Directory API with device key in annotatedAssetId field.',
-    #                 mac_address=device_mac_address,
-    #                 gcm_registration_id=gcm_registration_id,
-    #                 correlation_identifier=correlation_id)
-    #             directory_api_update_event.put()
-    #             deferred.defer(update_chrome_os_device,
+            # Update Directory API with the device key in the annotated asset ID.
+            if not device.is_unmanaged_device:
+                directory_api_update_event = IntegrationEventLog.create(
+                    event_category='Registration',
+                    component_name='Chrome Directory API',
+                    workflow_step='Update Directory API with device key in annotatedAssetId field.',
+                    mac_address=device_mac_address,
+                    gcm_registration_id=gcm_registration_id,
+                    correlation_identifier=correlation_id)
+                directory_api_update_event.put()
+                # deferred.defer(update_chrome_os_device,
     #                            device_urlsafe_key=device.key.urlsafe(),
     #                            _queue='directory-api',
     #                            _countdown=60)
