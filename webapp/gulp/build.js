@@ -20,7 +20,7 @@ var filever = require('gulp-version-filename');
 var s3 = require("gulp-s3-ls");
 var injectOptions;
 var sources;
-var allCss;
+var appCSS;
 var bowerCSS;
 /**
  * Aggregate the files.
@@ -32,10 +32,10 @@ module.exports = function (options) {
 
 
     gulp.task('minCSS', [], function () {
-        allCss = gulp.src('src/app/**/*.scss')
+        appCSS = gulp.src('src/app/**/*.scss')
             .pipe(sass().on('error', sass.logError))
             .pipe(minCss())
-            .pipe(concat('app.css'))
+            .pipe(concat('styles/app.css'))
             .pipe(gulp.dest(options.dist + '/'));
 
 
@@ -111,7 +111,7 @@ module.exports = function (options) {
     gulp.task('html', function () {
         return gulp.src(options.src + '/*.html')
             .pipe($.inject(sources, injectOptions))
-            .pipe($.inject(allCss, injectOptions))
+            .pipe($.inject(appCSS, injectOptions))
             .pipe($.inject(bowerCSS, injectOptions))
             .pipe(gulp.dest(options.dist + '/'));
     });
