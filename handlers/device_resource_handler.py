@@ -314,7 +314,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @requires_api_token
     def get(self, device_urlsafe_key):
-        device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
+        device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True,
+                                       use_app_engine_memcache=False)
         if device.archived:
             status = 404
             message = 'Device with key: {0} archived.'.format(device_urlsafe_key)
