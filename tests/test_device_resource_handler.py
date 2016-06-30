@@ -101,9 +101,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                           timestamp=any_matcher()).thenReturn(None)
 
         tenant = self.tenant_key.get()
-        mac_address = '7889BE879f'
-        request_body = {'macAddress': mac_address,
-                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': 'foobar',
                         'tenantCode': tenant.tenant_code}
         response = self.app.post('/api/v1/devices', json.dumps(request_body),
                                  headers=self.api_token_authorization_header)
@@ -117,9 +116,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                           timestamp=any_matcher()).thenReturn(None)
 
         tenant = self.tenant_key.get()
-        mac_address = '7889BE879f'
-        request_body = {'macAddress': mac_address,
-                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': 'foobar',
                         'tenantCode': tenant.tenant_code}
         response = self.app.post('/api/v1/devices', json.dumps(request_body),
                                  headers=self.api_token_authorization_header)
@@ -136,19 +134,19 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response = self.post(uri, params=request_body, headers=self.empty_header)
         self.assertForbidden(response)
 
-    def test_device_resource_handler_post_no_returns_bad_response_if_mac_address_already_assigned_to_device(self):
+    def test_device_resource_handler_post_no_returns_conflict_if_gcm_id_is_already_assigned_to_device(self):
         request_body = {'macAddress': self.MAC_ADDRESS,
                         'gcmRegistrationId': self.GCM_REGISTRATION_ID,
                         'tenantCode': self.TENANT_CODE}
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
                           headers=self.api_token_authorization_header)
-        self.assertTrue('Bad response: 400 Cannot register because macAddress already assigned to managed device.'
+        self.assertTrue('Bad response: 409 Conflict gcm_registration_id is already assigned.'
                         in context.exception.message)
 
     def test_device_resource_handler_post_no_returns_bad_response_for_empty_tenant_code(self):
-        request_body = {'macAddress': '232323243223',
-                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': 'foobar',
                         'tenantCode': None}
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
@@ -177,8 +175,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         in context.exception.message)
 
     def test_post_managed_device_when_cannot_resolve_tenant(self):
-        request_body = {'macAddress': '232323243223',
-                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': 'foobar',
                         'tenantCode': 'unresolvable_tenant_code'}
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
@@ -192,9 +190,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                           device_mac_address=any_matcher(),
                                           timestamp=any_matcher()).thenReturn(None)
         tenant = self.tenant_key.get()
-        mac_address = '7889BE879f'
+        mac_address = self.MAC_ADDRESS
         request_body = {'macAddress': mac_address,
-                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'gcmRegistrationId': 'foobar',
                         'tenantCode': tenant.tenant_code}
         response = self.app.post('/api/v1/devices', json.dumps(request_body),
                                  headers=self.api_token_authorization_header)
@@ -211,10 +209,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                           timestamp=any_matcher()).thenReturn(None)
 
         tenant = self.tenant_key.get()
-        mac_address = '7889BE879f'
         explicit_timezone = 'America/Denver'
-        request_body = {'macAddress': mac_address,
-                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': 'foobar',
                         'tenantCode': tenant.tenant_code,
                         'timezone': explicit_timezone}
         response = self.app.post('/api/v1/devices', json.dumps(request_body),

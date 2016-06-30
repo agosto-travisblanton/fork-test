@@ -410,13 +410,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     gcm_registration_id=gcm_registration_id,
                     correlation_identifier=correlation_id)
                 registration_request_event.put()
-                if ChromeOsDevice.mac_address_already_assigned(device_mac_address):
-                    status = 400
-                    error_message = 'Cannot register because macAddress already assigned to managed device.'
-                    self.response.set_status(status, error_message)
+                if ChromeOsDevice.gcm_registration_id_already_assigned(gcm_registration_id=gcm_registration_id):
+                    error_message = 'Conflict gcm_registration_id is already assigned.'
                     registration_request_event.details = error_message
                     registration_request_event.put()
-                    self.response.set_status(status, error_message)
+                    self.response.set_status(409, error_message)
                     return
                 tenant_code = request_json.get('tenantCode')
                 if tenant_code is None or tenant_code == '':
@@ -427,8 +425,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     registration_request_event.put()
                     self.response.set_status(status, error_message)
                     return
-                tenant_key = Tenant.query(Tenant.tenant_code == tenant_code, Tenant.active == True).get(keys_only=True)
-                if tenant_key is None:
+                tenant  = Tenant.find_by_tenant_code(tenant_code)
+                if tenant is None:
                     status = 400
                     error_message = 'Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
                     self.response.set_status(status, error_message)
@@ -437,7 +435,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     self.response.set_status(status, error_message)
                     return
                 if status == 201:
-                    device = ChromeOsDevice.create_managed(tenant_key=tenant_key,
+                    device = ChromeOsDevice.create_managed(tenant_key=tenant.key,
                                                            gcm_registration_id=gcm_registration_id,
                                                            mac_address=device_mac_address,
                                                            timezone=timezone)
