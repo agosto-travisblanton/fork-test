@@ -1,17 +1,19 @@
-from env_setup import setup_test_paths
+import json
+
 from datetime import datetime, timedelta
+from google.appengine.ext import ndb
+
 import device_message_processor
+from agar.test import BaseTest, WebTest
+from app_config import config
+from env_setup import setup_test_paths
+from mockito import when, any as any_matcher
+from models import ChromeOsDevice, Tenant, Distributor, Domain, DeviceIssueLog, Location
+from routes import application
 from utils.email_notify import EmailNotify
 from utils.timezone_util import TimezoneUtil
 from utils.web_util import build_uri
 from webtest import AppError
-import json
-from google.appengine.ext import ndb
-from agar.test import BaseTest, WebTest
-from mockito import when, any as any_matcher
-from routes import application
-from models import ChromeOsDevice, Tenant, Distributor, Domain, DeviceIssueLog, Location
-from app_config import config
 
 setup_test_paths()
 
@@ -235,23 +237,14 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual('201 Created', response.status)
         self.assertEqual(201, response.status_int)
 
-    def test_device_resource_handler_unmanaged_post_returns_cannot_register_when_mac_address_already_assigned(self):
-        request_body = {'macAddress': self.MAC_ADDRESS,
-                        'gcmRegistrationId': '123'}
-        with self.assertRaises(AppError) as context:
-            self.app.post('/api/v1/devices', json.dumps(request_body),
-                          headers=self.unmanaged_registration_token_authorization_header)
-        self.assertTrue('Bad response: 409 Registration conflict because macAddress is already assigned '
-                        'to an unmanaged device.' in context.exception.message)
-
     def test_device_resource_handler_unmanaged_post_returns_cannot_register_when_gcm_already_assigned(self):
         request_body = {'macAddress': '123',
                         'gcmRegistrationId': self.GCM_REGISTRATION_ID}
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
                           headers=self.unmanaged_registration_token_authorization_header)
-        self.assertTrue('Bad response: 409 Registration conflict because gcmRegistrationId is already assigned '
-                        'to an unmanaged device.' in context.exception.message)
+        self.assertTrue('Bad response: 409 Conflict gcm_registration_id is already assigned' in
+                        context.exception.message)
 
     def test_device_resource_handler_unmanaged_post_returns_bad_response_for_empty_gcm(self):
         request_body = {'macAddress': self.MAC_ADDRESS,

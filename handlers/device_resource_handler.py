@@ -7,10 +7,6 @@ from google.appengine.ext.deferred import deferred
 from webapp2 import RequestHandler
 
 from app_config import config
-from workflow.refresh_device import refresh_device
-from workflow.refresh_device_by_mac_address import refresh_device_by_mac_address
-from workflow.register_device import register_device
-from workflow.update_chrome_os_device import update_chrome_os_device
 from content_manager_api import ContentManagerApi
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from device_message_processor import post_unmanaged_device_info, change_intent
@@ -21,6 +17,10 @@ from restler.serializers import json_response
 from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY, DEVICE_ISSUE_LOG_STRATEGY
 from utils.email_notify import EmailNotify
 from utils.timezone_util import TimezoneUtil
+from workflow.refresh_device import refresh_device
+from workflow.refresh_device_by_mac_address import refresh_device_by_mac_address
+from workflow.register_device import register_device
+from workflow.update_chrome_os_device import update_chrome_os_device
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -378,37 +378,28 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             if timezone is None or timezone == '':
                 timezone = 'America/Chicago'
             if self.is_unmanaged_device is True:
-                unmanaged_device = ChromeOsDevice.get_unmanaged_device_by_mac_address(device_mac_address)
-                if None is not unmanaged_device:
-                    post_unmanaged_device_info(gcm_registration_id=unmanaged_device.gcm_registration_id,
-                                               device_urlsafe_key=unmanaged_device.key.urlsafe(),
-                                               host=self.request.host_url)
-                    status = 409
-                    error_message = 'Registration conflict because macAddress is already assigned to ' \
-                                    'an unmanaged device.'
-                    self.response.set_status(status, error_message)
+                if ChromeOsDevice.gcm_registration_id_already_assigned(gcm_registration_id=gcm_registration_id):
+                    error_message = 'Conflict gcm_registration_id is already assigned.'
+                    self.response.set_status(409, error_message)
+                    device = ChromeOsDevice.get_unmanaged_device_by_gcm_registration_id(
+                        gcm_registration_id=gcm_registration_id)
+                    if device:  # TODO consider checking if device has a tenant on it yet before sending this...
+                        post_unmanaged_device_info(gcm_registration_id=device.gcm_registration_id,
+                                                   device_urlsafe_key=device.key.urlsafe(),
+                                                   host=self.request.host_url)
                     return
-                unmanaged_device = ChromeOsDevice.get_unmanaged_device_by_gcm_registration_id(gcm_registration_id)
-                if None is not unmanaged_device:
-                    post_unmanaged_device_info(gcm_registration_id=unmanaged_device.gcm_registration_id,
-                                               device_urlsafe_key=unmanaged_device.key.urlsafe(),
-                                               host=self.request.host_url)
-                    status = 409
-                    error_message = 'Registration conflict because gcmRegistrationId is already assigned to ' \
-                                    'an unmanaged device.'
-                    self.response.set_status(status, error_message)
-                    return
-                device = ChromeOsDevice.create_unmanaged(gcm_registration_id=gcm_registration_id,
-                                                         mac_address=device_mac_address,
-                                                         timezone=timezone)
-                device_key = device.put()
-                device_uri = self.request.app.router.build(None,
-                                                           'device-pairing-code',
-                                                           None,
-                                                           {'device_urlsafe_key': device_key.urlsafe()})
-                self.response.headers['Location'] = device_uri
-                self.response.headers.pop('Content-Type', None)
-                self.response.set_status(status)
+                else:
+                    device = ChromeOsDevice.create_unmanaged(gcm_registration_id=gcm_registration_id,
+                                                             mac_address=device_mac_address,
+                                                             timezone=timezone)
+                    device_key = device.put()
+                    device_uri = self.request.app.router.build(None,
+                                                               'device-pairing-code',
+                                                               None,
+                                                               {'device_urlsafe_key': device_key.urlsafe()})
+                    self.response.headers['Location'] = device_uri
+                    self.response.headers.pop('Content-Type', None)
+                    self.response.set_status(status)
             else:
                 correlation_id = IntegrationEventLog.generate_correlation_id()
                 registration_request_event = IntegrationEventLog.create(
