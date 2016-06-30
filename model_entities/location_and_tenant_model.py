@@ -40,9 +40,9 @@ class Tenant(ndb.Model):
     @classmethod
     def find_by_tenant_code(cls, tenant_code):
         if tenant_code:
-            key = Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
-            if key:
-                return key.get()
+            tenant_key = Tenant.query(Tenant.tenant_code == tenant_code, Tenant.active == True).get(keys_only=True)
+            if tenant_key:
+                return tenant_key.get()
 
     @classmethod
     def is_tenant_code_unique(cls, tenant_code):
