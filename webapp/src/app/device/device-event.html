@@ -18,34 +18,38 @@
                 Next
               </md-button>
             </div>
-
             <div class="col-sm-6 col-sm-offset-1">
-
               <div class="form-group">
                 <div class="col-sm-5">
                   <label>Start Date/Time</label>
-                  <input mdc-datetime-picker date="true" time="true" type="text"
-                         placeholder="Date"
-                         max-date="dateTimeEnd"
-                         class="form-control"
-                         ng-model="dateTimeStart"
+                  <input mdc-datetime-picker
+                          date="true"
+                          time="true"
+                          type="text"
+                          short-time="true"
+                          format="YYYY-MM-DD hh:mm A"
+                          max-date="dateTimeEnd"
+                          placeholder="{{deviceDetailsCtrl.startTime}}"
+                          class="form-control"
+                          ng-model="deviceDetailsCtrl.startTime"
                   />
                 </div>
                 <div class="col-sm-5">
-
                   <label>End Date/Time</label>
-                  <input mdc-datetime-picker date="true" time="true" type="text"
-                         placeholder="Date"
-                         class="form-control"
-                         min-date="dateTimeStart"
-                         ng-model="dateTimeEnd"
+                  <input mdc-datetime-picker
+                          date="true"
+                          time="true"
+                          type="text"
+                          short-time="true"
+                          format="YYYY-MM-DD hh:mm A"
+                          class="form-control"
+                          placeholder="{{deviceDetailsCtrl.endTime}}"
+                          min-date="dateTimeStart"
+                          ng-model="deviceDetailsCtrl.endTime"
                   />
                 </div>
-
               </div>
             </div>
-
-
             <div class="col-md-1">
               <md-button type="submit" class="md-raised">
                 <i class="fa fa-fw fa-filter"></i> Filter
@@ -55,7 +59,6 @@
         </form>
       </md-card-content>
     </md-card>
-
     <md-card>
       <md-card-content>
         <div class="row margin-top-15">
@@ -99,7 +102,6 @@
             </table>
           </div>
         </div>
-
       </md-card-content>
     </md-card>
     <md-card>
@@ -120,7 +122,6 @@
                 Next
               </md-button>
             </div>
-
           </div>
         </form>
       </md-card-content>

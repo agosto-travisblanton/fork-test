@@ -1,6 +1,21 @@
 (function () {
 
 
+    let createFormattedStartAndEndDateFromToday = (daysBack) => {
+        let startTime = moment().format('YYYY-MM-DD')
+        let startTimeMidNight = moment(startTime, 'YYYY-MM-DD').format('YYYY-MM-DD hh:mm A')
+        let startTimeEndOfDay = moment(startTimeMidNight, 'YYYY-MM-DD hh:mm A').add(1, 'day').subtract(60, 'seconds').format('YYYY-MM-DD hh:mm A')
+
+        let endTime = moment().subtract(30, 'days').format('YYYY-MM-DD')
+        let endTimeMidNight = moment(endTime, 'YYYY-MM-DD').format('YYYY-MM-DD hh:mm A')
+
+        return [endTimeMidNight, startTimeEndOfDay]
+
+    }
+
+    createFormattedStartAndEndDateFromToday(30)
+
+
     let appModule = angular.module('skykitProvisioning');
     appModule.controller('DeviceDetailsCtrl', function ($log,
                                                         $stateParams,
@@ -30,12 +45,10 @@
             "glyphicon-arrow-down'}}";
         vm.timezones = [];
         vm.selectedTimezone = undefined;
-        let now = new Date();
-        let today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        vm.endTime = now.toLocaleString().replace(/,/g, "");
-        today.setDate(now.getDate() - vm.dayRange);
-        vm.startTime = today.toLocaleString().replace(/,/g, "");
+
+        [vm.startTime, vm.endTime] = createFormattedStartAndEndDateFromToday(30)
         vm.enrollmentEvents = [];
+
 
         vm.generateLocalFromUTC = function (UTCTime) {
             let localTime = moment.utc(UTCTime).toDate();
@@ -127,8 +140,8 @@
         };
 
         vm.initialize = function () {
-            vm.epochStart = moment(new Date(vm.startTime)).unix();
-            vm.epochEnd = moment(new Date(vm.endTime)).unix();
+            vm.epochStart = moment(vm.startTime, 'YYYY-MM-DD hh:mm A').unix();
+            vm.epochEnd = moment(vm.endTime, 'YYYY-MM-DD hh:mm A').unix();
             let timezonePromise = TimezonesService.getCustomTimezones();
             timezonePromise.then(data => vm.timezones = data);
 
@@ -453,8 +466,8 @@
 
         vm.onClickRefreshButton = function () {
             ProgressBarService.start();
-            vm.epochStart = moment(new Date(vm.startTime)).unix();
-            vm.epochEnd = moment(new Date(vm.endTime)).unix();
+            vm.epochStart = moment(vm.startTime, 'YYYY-MM-DD hh:mm A').unix();
+            vm.epochEnd = moment(vm.endTime, 'YYYY-MM-DD hh:mm A').unix();
             vm.prev_cursor = null;
             vm.next_cursor = null;
             let issuesPromise = DevicesService.getIssuesByKey(vm.deviceKey, vm.epochStart, vm.epochEnd, vm.prev_cursor, vm.next_cursor);
