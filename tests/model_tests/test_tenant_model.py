@@ -147,6 +147,16 @@ class TestTenantModel(BaseTest):
         actual = Tenant.find_by_tenant_code('kdjfashdfjkah')
         self.assertIsNone(actual)
 
+    def test_find_by_tenant_code_returns_none_for_active_false(self):
+        actual = Tenant.find_by_tenant_code(self.TENANT_CODE)
+        self.assertIsNotNone(actual)
+        self.tenant.active = False
+        self.tenant.put()
+        actual = Tenant.find_by_tenant_code(self.TENANT_CODE)
+        self.assertIsNone(actual)
+        self.tenant.active = True
+        self.tenant.put()
+
     def test_find_devices_returns_expected_device_count_for_tenant_key(self):
         self.device_to_be_archived.archived = True
         self.device_to_be_archived.put()
