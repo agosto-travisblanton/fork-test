@@ -8,14 +8,13 @@ from app_config import config
 from chrome_os_devices_api import ChromeOsDevicesApi
 from content_manager_api import ContentManagerApi
 from model_entities.integration_events_log_model import IntegrationEventLog
+from workflow.update_chrome_os_device import update_chrome_os_device
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_registration_id=None,
                     correlation_id=None, page_token=None):
-    if on_development_server:
-        return
     """
     A function that is meant to be run asynchronously to update the device entity
     with ChromeOsDevice information from Directory API using the MAC address to match.
@@ -85,7 +84,6 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
             device.org_unit_path = chrome_os_device.get('orgUnitPath')
             device.annotated_user = chrome_os_device.get('annotatedUser')
             device.annotated_location = chrome_os_device.get('annotatedLocation')
-            device.annotated_asset_id = chrome_os_device.get('annotatedAssetId')
             device.notes = chrome_os_device.get('notes')
             device.boot_mode = chrome_os_device.get('bootMode')
             device.last_enrollment_time = chrome_os_device.get('lastEnrollmentTime')
@@ -94,6 +92,11 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
             device.os_version = chrome_os_device.get('osVersion')
             device.firmware_version = chrome_os_device.get('firmwareVersion')
             device.etag = chrome_os_device.get('etag')
+
+            # Registration process sends the customer's display in the annotatedAssetId field of
+            # the Directory API ChromeOsDevice resource representation.
+            device.customer_display_name = chrome_os_device.get('annotatedAssetId')
+            device.annotated_asset_id = device_urlsafe_key
             device.put()
 
             api_response_event.serial_number = device.serial_number
@@ -103,6 +106,22 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
             info = 'register_device: retrieved directory API for MAC address = {0}. Notifying Content Manager.' \
                 .format(lowercase_device_mac_address)
             logging.info(info)
+
+            # Update Directory API with the device key in the annotated asset ID.
+            if not device.is_unmanaged_device:
+                directory_api_update_event = IntegrationEventLog.create(
+                    event_category='Registration',
+                    component_name='Chrome Directory API',
+                    workflow_step='Update Directory API with device key in annotatedAssetId field.',
+                    mac_address=device_mac_address,
+                    gcm_registration_id=gcm_registration_id,
+                    correlation_identifier=correlation_id,
+                    device_urlsafe_key = device.key.urlsafe())
+                directory_api_update_event.put()
+                deferred.defer(update_chrome_os_device,
+                               device_urlsafe_key=device.key.urlsafe(),
+                               _queue='directory-api',
+                               _countdown=60)
 
             if ContentManagerApi().create_device(device_urlsafe_key, correlation_id):
                 logging.info('CM returned 201 of create_device')
