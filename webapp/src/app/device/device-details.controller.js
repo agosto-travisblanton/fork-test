@@ -28,13 +28,7 @@
         vm.selectedTimezone = undefined;
         [vm.startTime, vm.endTime] = DateManipulationService.createFormattedStartAndEndDateFromToday(30);
         vm.enrollmentEvents = [];
-
-
-        vm.generateLocalFromUTC = function (UTCTime) {
-            let localTime = moment.utc(UTCTime).toDate();
-            return localTime = moment(localTime).format('YYYY-MM-DD hh:mm:ss A');
-        };
-
+        
         vm.replaceIssueTime = function (issues) {
             for (let i = 0; i < issues.length; i++) {
                 let each = issues[i];
