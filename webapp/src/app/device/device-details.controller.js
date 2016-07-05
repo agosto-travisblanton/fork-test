@@ -1,15 +1,5 @@
 (function () {
 
-
-    const createFormattedStartAndEndDateFromToday = (daysBack) => {
-        let startTime = moment().format('YYYY-MM-DD')
-        let startTimeMidNight = moment(startTime, 'YYYY-MM-DD').format('YYYY-MM-DD hh:mm A')
-        let startTimeEndOfDay = moment(startTimeMidNight, 'YYYY-MM-DD hh:mm A').add(1, 'day').subtract(60, 'seconds').format('YYYY-MM-DD hh:mm A')
-        let endTime = moment().subtract(30, 'days').format('YYYY-MM-DD')
-        let endTimeMidNight = moment(endTime, 'YYYY-MM-DD').format('YYYY-MM-DD hh:mm A')
-        return [endTimeMidNight, startTimeEndOfDay]
-    }
-
     function DeviceDetailsCtrl($log,
                                $stateParams,
                                $state,
@@ -22,7 +12,8 @@
                                sweet,
                                ProgressBarService,
                                $mdDialog,
-                               ToastsService) {
+                               ToastsService,
+                               DateManipulationService) {
 
         let vm = this;
         vm.tenantKey = $stateParams.tenantKey;
@@ -33,14 +24,9 @@
         vm.commandEvents = [];
         vm.dayRange = 30;
         vm.issues = [];
-        vm.pickerOptions = "{widgetPositioning: {vertical:'bottom'}, " +
-            "showTodayButton: true, sideBySide: true, icons:{ next:'glyphicon glyphicon-arrow-right', " +
-            "previous:'glyphicon glyphicon-arrow-left', up:'glyphicon glyphicon-arrow-up', down:'glyphicon " +
-            "glyphicon-arrow-down'}}";
         vm.timezones = [];
         vm.selectedTimezone = undefined;
-
-        [vm.startTime, vm.endTime] = createFormattedStartAndEndDateFromToday(30)
+        [vm.startTime, vm.endTime] = DateManipulationService.createFormattedStartAndEndDateFromToday(30);
         vm.enrollmentEvents = [];
 
 
@@ -53,10 +39,10 @@
             for (let i = 0; i < issues.length; i++) {
                 let each = issues[i];
                 if (each.created) {
-                    each.created = vm.generateLocalFromUTC(each.created);
+                    each.created = DateManipulationService.generateLocalFromUTC(each.created);
                 }
                 if (each.updated) {
-                    each.updated = vm.generateLocalFromUTC(each.updated);
+                    each.updated = DateManipulationService.generateLocalFromUTC(each.updated);
                 }
             }
             return;
@@ -66,10 +52,10 @@
             for (let i = 0; i < issues.length; i++) {
                 let each = issues[i];
                 if (each.postedTime) {
-                    each.postedTime = vm.generateLocalFromUTC(each.postedTime);
+                    each.postedTime = DateManipulationService.generateLocalFromUTC(each.postedTime);
                 }
                 if (each.confirmedTime) {
-                    each.confirmedTime = vm.generateLocalFromUTC(each.confirmedTime);
+                    each.confirmedTime = DateManipulationService.generateLocalFromUTC(each.confirmedTime);
                 }
             }
             return;
@@ -136,6 +122,7 @@
         vm.initialize = function () {
             vm.epochStart = moment(vm.startTime, 'YYYY-MM-DD hh:mm A').unix();
             vm.epochEnd = moment(vm.endTime, 'YYYY-MM-DD hh:mm A').unix();
+
             let timezonePromise = TimezonesService.getCustomTimezones();
             timezonePromise.then(data => vm.timezones = data);
 
@@ -460,6 +447,8 @@
 
         vm.onClickRefreshButton = function () {
             ProgressBarService.start();
+            vm.startTime = DateManipulationService.convertToMomentIfNotAlready(vm.startTime);
+            vm.endTime = DateManipulationService.convertToMomentIfNotAlready(vm.endTime);
             vm.epochStart = moment(vm.startTime, 'YYYY-MM-DD hh:mm A').unix();
             vm.epochEnd = moment(vm.endTime, 'YYYY-MM-DD hh:mm A').unix();
             vm.prev_cursor = null;
