@@ -1,4 +1,4 @@
-angular.module('skykitProvisioning').factory('DateManipulationService', ($log, Restangular) =>
+angular.module('skykitProvisioning').factory('DateManipulationService', () =>
     new class DateManipulationService {
 
         constructor() {
@@ -25,7 +25,7 @@ angular.module('skykitProvisioning').factory('DateManipulationService', ($log, R
         
         generateLocalFromUTC(UTCTime) {
             let localTime = moment.utc(UTCTime).toDate();
-            return localTime = moment(localTime).format('YYYY-MM-DD hh:mm:ss A');
+            return moment(localTime).format('YYYY-MM-DD hh:mm:ss A');
         };
 
     }()
