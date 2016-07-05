@@ -152,14 +152,14 @@
                                     vm.serialDevices = vm.convertArrayToDictionary(result, false);
                                 }
 
-                                let serialNumbers = [];
+                                let serialDevices = [];
 
                                 for (let i = 0; i < result.length; i++) {
                                     let each = result[i];
-                                    serialNumbers.push(each.serial);
+                                    serialDevices.push(each.serial);
                                 }
 
-                                return serialNumbers;
+                                return serialDevices;
                             });
 
 
@@ -174,13 +174,14 @@
                                     vm.macDevices = vm.convertArrayToDictionary(result, true);
                                 }
 
-                                let macAddress = [];
+                                let macDevices = [];
+
                                 for (let i = 0; i < result.length; i++) {
                                     let each = result[i];
-                                    macAddress.push(each.mac);
+                                    macDevices.push(each.mac);
                                 }
 
-                                return macAddress;
+                                return macDevices;
                             });
                     }
                 } else {
@@ -261,6 +262,5 @@
 
         return vm;
     });
-
 })
 ();
