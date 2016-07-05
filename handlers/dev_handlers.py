@@ -103,9 +103,9 @@ def make_data_for_a_distributor():
             print 'User with email ' + USER_EMAIL + ' not found. Could not add ' + USER_EMAIL + ' to ' + DISTRIBUTOR_NAME
         else:
             user.add_distributor(distributor.key, role=1)
-            print 'SUCCESS+ ' + user.email + ' is linked to ' + distributor.name
+            print 'SUCCESS! ' + user.email + ' is linked to ' + distributor.name
             user.add_distributor(second_distributor.key)
-            print 'SUCCESS+ ' + user.email + ' is linked to ' + second_distributor.name
+            print 'SUCCESS! ' + user.email + ' is linked to ' + second_distributor.name
     ##########################################################################################
     # DOMAINS
     ##########################################################################################
