@@ -53,14 +53,23 @@ VC_TYPE_GIT = "git"
 VC_TYPE_HG = "hg"
 
 parser = argparse.ArgumentParser(description='Perform application deployment on App Engine.',
-    epilog='Any additional arguments are passed verbatim to appcfg.py')
+                                 epilog='Any additional arguments are passed verbatim to appcfg.py')
 parser.add_argument('-V', dest='version', help='override version setting in snapdeploy.yaml')
 parser.add_argument('--ignore-unclean', action='store_true', help='ignore dirty workarea')
 parser.add_argument('--ignore-branch', action='store_true', help='allow deploy from any branch')
 parser.add_argument('-A', dest='projects', action='append', help='add project')
+parser.add_argument('-E', dest='excludes', action='append', help='exclude module')
 parser.add_argument('-D', dest='pre_deploy', action='store_true')
 
 ChangesetInfo = namedtuple('ChangesetInfo', ['branch', 'hash', 'dirty'])
+
+
+def filtered_module_array(excludes, all_modules):
+    filtered_array = []
+    for yaml_filename in all_modules:
+        if not yaml_filename[:-5] in excludes:
+            filtered_array.append(yaml_filename)
+    return filtered_array
 
 
 def git_get_current_changeset_info():
@@ -192,10 +201,9 @@ def run_pre_deploy(config):
 
 def deploy_single_project(project, arguments, config, full_version, vc_type):
     print('=== Deploying: {}'.format(project))
-    for yaml_filename in config['module_yaml_files'] + ['.']:
+    for yaml_filename in filtered_module_array(excludes=arguments[0].excludes, all_modules=config['module_yaml_files']):
         appcfg_command = ['appcfg.py', 'update', yaml_filename] + ["-A", project] + ['-V', '{}'.format(
             full_version)] + arguments[1]
-
         if subprocess.call(appcfg_command) != 0:
             print('Deployment failed!')
             revert_file(vc_type, 'snapdeploy.yaml')
@@ -225,7 +233,7 @@ def get_new_version(config, args):
     return new_version, old_version
 
 
-def print_deployment_succeeded(args):
+def print_deployment_succeeded(args, config):
     print "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
     print "++++++++++++++++++  DEPLYOMENT SUCCEEDED  ++++++++++++++++++++++"
@@ -233,6 +241,10 @@ def print_deployment_succeeded(args):
 
     for project in args[0].projects:
         print project
+
+    print "+++++++++++++++++++  MODULES DEPLOYED  +++++++++++++++++++++++++"
+
+    print filtered_module_array(excludes=args[0].excludes, all_modules=config['module_yaml_files'])
 
     print "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
@@ -278,7 +290,7 @@ def run_all():
     print(" - Make version '{}' the default version on app engine console (https://appengine.google.com).".format(
         full_version))
 
-    print_deployment_succeeded(args)
+    print_deployment_succeeded(args, config)
 
 
 if __name__ == "__main__":
