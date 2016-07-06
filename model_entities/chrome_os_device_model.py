@@ -164,6 +164,13 @@ class ChromeOsDevice(ndb.Model):
         return mac_address_assigned_to_device
 
     @classmethod
+    def gcm_registration_id_already_assigned(cls, gcm_registration_id):
+        gcm_registration_id_already_assigned_to_device = ChromeOsDevice.query(
+            ndb.AND(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
+                    ChromeOsDevice.archived == False)).count() > 0
+        return gcm_registration_id_already_assigned_to_device
+
+    @classmethod
     def is_rogue_unmanaged_device(cls, mac_address):
         device = ChromeOsDevice.get_unmanaged_device_by_mac_address(mac_address)
         if device is not None and device.pairing_code is not None and device.tenant_key is None:

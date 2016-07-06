@@ -346,6 +346,8 @@ app_PLAYER_UPDATE_CONTENT_COMMAND = 'skykit.com/skdchromeapp/update/content'
 
 app_PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND = 'skykit.com/skdchromeapp/update/provisioning'
 
+app_PLAYER_DIAGNOSTICS_TOGGLE_COMMAND = 'skykit.com/skdchromeapp/diagnostics'
+
 app_PLAYER_HEARTBEAT_INTERVAL_MINUTES = 2
 
 app_CHECK_FOR_CONTENT_INTERVAL_MINUTES = 1

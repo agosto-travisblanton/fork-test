@@ -21,6 +21,7 @@ from set_content_manager_base_url_on_tenant import SetContentManagerBaseUrlOnTen
 from hydrate_agosto_default_domain_key_on_tenant import HydrateAgostoDefaultDomainKeyOnTenant
 from hydrate_default_user_role_on_distributer_user import HydrateDefaultUserRoleOnDistributerUser
 from set_default_admin_users import SetDefaultAdminUsers
+from update_chrome_os_device_annotated_asset_id import UpdateChromeOsDeviceAnnotatedAssetId
 
 MIGRATIONS = [
     HydrateTenantKeyOnDevices(),
@@ -28,7 +29,8 @@ MIGRATIONS = [
     SetContentManagerBaseUrlOnTenant(),
     HydrateAgostoDefaultDomainKeyOnTenant(),
     HydrateDefaultUserRoleOnDistributerUser(),
-    SetDefaultAdminUsers()
+    SetDefaultAdminUsers(),
+    UpdateChromeOsDeviceAnnotatedAssetId()
 ]
 
 MIGRATIONS_MAP = {migration.name: migration for migration in MIGRATIONS}
