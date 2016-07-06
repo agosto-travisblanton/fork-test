@@ -5,7 +5,6 @@
         'ngCookies',
         'ngSanitize',
         'restangular',
-        'ngMaterialDatePicker',
         'ui.router',
         'hSweetAlert',
         'ui.bootstrap',
