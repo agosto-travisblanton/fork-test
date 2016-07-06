@@ -25,6 +25,10 @@
 
         python manage.py snapdeploy -A proactiveservices-stage -A proactiveservices-prod
 
+    You may exclude modules with the -E argument:
+
+        python manage.py snapdeploy --ignore-branch --ignore-unclean -V 39-3-0 -A skykit-display-device-int -E backup -E proofplay
+
     You may run the pre-deploy script with the optional -D argument:
 
         python manage.py snapdeploy -A proactiveservices-stage -A proactiveservices-prod -D
