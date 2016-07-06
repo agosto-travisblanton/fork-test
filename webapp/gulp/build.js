@@ -34,7 +34,6 @@ module.exports = function (options) {
     gulp.task('minCSS', [], function () {
         appCSS = gulp.src('src/app/**/*.scss')
             .pipe(sass().on('error', sass.logError))
-            .pipe(minCss())
             .pipe(concat('styles/app.css'))
             .pipe(gulp.dest(options.dist + '/'));
 
