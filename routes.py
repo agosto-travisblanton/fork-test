@@ -183,6 +183,12 @@ application = WSGIApplication(
               handler_method='refresh_device_representation',
               methods=['POST']
               ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/diagnostics',
+              handler='handlers.device_commands_handler.DeviceCommandsHandler',
+              name='device-diagnostics-toggle-command',
+              handler_method='diagnostics_toggle',
+              methods=['POST']
+              ),
 
         ############################################################
         # DISTRIBUTOR DEVICE ROUTES

@@ -168,6 +168,21 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
                 user_identifier=user_identifier)
         self.response.set_status(status, message)
 
+    @requires_api_token
+    def diagnostics_toggle(self, device_urlsafe_key):
+        status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
+        if device:
+            user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
+            if user_identifier is None or user_identifier == '':
+                user_identifier = 'system'
+            change_intent(
+                gcm_registration_id=device.gcm_registration_id,
+                payload=config.PLAYER_DIAGNOSTICS_TOGGLE_COMMAND,
+                device_urlsafe_key=device_urlsafe_key,
+                host=self.request.host_url,
+                user_identifier=user_identifier)
+        self.response.set_status(status, message)
+
     @staticmethod
     def resolve_device(device_urlsafe_key):
         status = 200
