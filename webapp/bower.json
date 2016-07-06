@@ -12,6 +12,7 @@
     "angular-directive.g-signin": "~0.1.2",
     "angular-h-sweetalert": "~1.4.5",
     "angular-material": "~1.0.8",
+    "angular-material-datetimepicker": "~1.4.0",
     "angular-sanitize": "~1.4.1",
     "angular-spinner": "~0.6.2",
     "angular-toastr": "~1.6.0",
@@ -19,6 +20,7 @@
     "animate-css": "~3.2.6",
     "bootstrap-sass-official": "~3.3.4",
     "components-font-awesome": "~4.5.0",
+    "eonasdan-bootstrap-datetimepicker": "^4.17.37",
     "jquery": "~2.1.1",
     "lockr": "~0.8.4",
     "lodash": "~3.10.0",
@@ -26,8 +28,7 @@
     "ngclipboard": "^1.1.0",
     "ngprogress": "~1.1.2",
     "restangular": "~1.5.1",
-    "sweetalert": "~1.1.0",
-    "eonasdan-bootstrap-datetimepicker": "^4.17.37"
+    "sweetalert": "~1.1.0"
   },
   "overrides": {
     "bootstrap-sass-official": {

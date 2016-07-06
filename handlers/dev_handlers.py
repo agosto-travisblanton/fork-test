@@ -41,21 +41,20 @@ class SeedScript(RequestHandler):
 def kick_off(user_first, user_last):
     global USER_EMAIL
     USER_EMAIL = create_email(user_first, user_last)
-    print "-------------------------------------------------------------------------------"
-    print "SEED SCRIPT HAS BEGUN!!! "
-    print "-------------------------------------------------------------------------------"
-    print "-------------------------------------------------------------------------------"
-    print "CREATE DATA FOR DATASTORE!!! "
-    print "-------------------------------------------------------------------------------"
+    print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    print "++++++++++++++++++++++++    SEED SCRIPT HAS BEGUN    ++++++++++++++++++++++++++"
+    print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    print "+++++++++++++++++++++++++  CREATE DATA FOR DATASTORE  +++++++++++++++++++++++++"
+    print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     make_data_for_a_distributor()
-    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    print "-------------------------------------------------------------------------------"
-    print "COMPLETED SEED SCRIPT"
-    print "-------------------------------------------------------------------------------"
-    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    print "THESE ARE THE DEVICES WITH EVENTS AND COMMANDS"
+    print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    print "++++++++++++++++++++++++++++ COMPLETED SEED SCRIPT ++++++++++++++++++++++++++++"
+    print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    print "++++++++++++++++++++++++ DEVICES WITH EVENTS AND COMMANDS +++++++++++++++++++++"
+    print "+++ YOU WILL WANT TO RECORD THESE TO VIEW DEVICES WITH EVENTS OR COMMANDS +++++"
     global array_of_devices_with_values
     print array_of_devices_with_values
+    print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
 
 def make_data_for_a_distributor():
@@ -219,7 +218,7 @@ def make_data_for_a_distributor():
                 global array_of_devices_with_values
                 array_of_devices_with_values.append(str(managed_device.serial_number))
 
-                for z in range(1, 26):
+                for z in range(1, 78):
                     issue = DeviceIssueLog.create(device_key=managed_device.key,
                                                   category=config.DEVICE_ISSUE_PLAYER_DOWN,
                                                   up=False,
