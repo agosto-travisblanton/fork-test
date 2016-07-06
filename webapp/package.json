@@ -80,6 +80,7 @@
     "gulp-bower-files": "^0.2.7",
     "karma-phantomjs-launcher": "^1.0.0",
     "lockr": "^0.8.4",
+    "lodash": "^3.2.0",
     "moment": "^2.13.0"
   }
 }

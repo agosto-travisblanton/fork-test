@@ -1,20 +1,20 @@
 (function () {
 
+    function DeviceDetailsCtrl($log,
+                               $stateParams,
+                               $state,
+                               SessionsService,
+                               DevicesService,
+                               LocationsService,
+                               CommandsService,
+                               TimezonesService,
+                               IntegrationEvents,
+                               sweet,
+                               ProgressBarService,
+                               $mdDialog,
+                               ToastsService,
+                               DateManipulationService) {
 
-    let appModule = angular.module('skykitProvisioning');
-    appModule.controller('DeviceDetailsCtrl', function ($log,
-                                                        $stateParams,
-                                                        $state,
-                                                        SessionsService,
-                                                        DevicesService,
-                                                        LocationsService,
-                                                        CommandsService,
-                                                        TimezonesService,
-                                                        IntegrationEvents,
-                                                        sweet,
-                                                        ProgressBarService,
-                                                        $mdDialog,
-                                                        ToastsService) {
         let vm = this;
         vm.tenantKey = $stateParams.tenantKey;
         vm.deviceKey = $stateParams.deviceKey;
@@ -24,29 +24,19 @@
         vm.commandEvents = [];
         vm.dayRange = 30;
         vm.issues = [];
-        vm.pickerOptions = "{widgetPositioning: {vertical:'bottom'}, showTodayButton: true, sideBySide: true, icons:{ next:'glyphicon glyphicon-arrow-right', previous:'glyphicon glyphicon-arrow-left', up:'glyphicon glyphicon-arrow-up', down:'glyphicon glyphicon-arrow-down'}}";
         vm.timezones = [];
         vm.selectedTimezone = undefined;
-        let now = new Date();
-        let today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        vm.endTime = now.toLocaleString().replace(/,/g, "");
-        today.setDate(now.getDate() - vm.dayRange);
-        vm.startTime = today.toLocaleString().replace(/,/g, "");
+        [vm.startTime, vm.endTime] = DateManipulationService.createFormattedStartAndEndDateFromToday(30);
         vm.enrollmentEvents = [];
-
-        vm.generateLocalFromUTC = function (UTCTime) {
-            let localTime = moment.utc(UTCTime).toDate();
-            return localTime = moment(localTime).format('YYYY-MM-DD hh:mm:ss A');
-        };
-
+        
         vm.replaceIssueTime = function (issues) {
             for (let i = 0; i < issues.length; i++) {
                 let each = issues[i];
                 if (each.created) {
-                    each.created = vm.generateLocalFromUTC(each.created);
+                    each.created = DateManipulationService.generateLocalFromUTC(each.created);
                 }
                 if (each.updated) {
-                    each.updated = vm.generateLocalFromUTC(each.updated);
+                    each.updated = DateManipulationService.generateLocalFromUTC(each.updated);
                 }
             }
             return;
@@ -56,10 +46,10 @@
             for (let i = 0; i < issues.length; i++) {
                 let each = issues[i];
                 if (each.postedTime) {
-                    each.postedTime = vm.generateLocalFromUTC(each.postedTime);
+                    each.postedTime = DateManipulationService.generateLocalFromUTC(each.postedTime);
                 }
                 if (each.confirmedTime) {
-                    each.confirmedTime = vm.generateLocalFromUTC(each.confirmedTime);
+                    each.confirmedTime = DateManipulationService.generateLocalFromUTC(each.confirmedTime);
                 }
             }
             return;
@@ -124,8 +114,9 @@
         };
 
         vm.initialize = function () {
-            vm.epochStart = moment(new Date(vm.startTime)).unix();
-            vm.epochEnd = moment(new Date(vm.endTime)).unix();
+            vm.epochStart = moment(vm.startTime, 'YYYY-MM-DD hh:mm A').unix();
+            vm.epochEnd = moment(vm.endTime, 'YYYY-MM-DD hh:mm A').unix();
+
             let timezonePromise = TimezonesService.getCustomTimezones();
             timezonePromise.then(data => vm.timezones = data);
 
@@ -450,8 +441,10 @@
 
         vm.onClickRefreshButton = function () {
             ProgressBarService.start();
-            vm.epochStart = moment(new Date(vm.startTime)).unix();
-            vm.epochEnd = moment(new Date(vm.endTime)).unix();
+            vm.startTime = DateManipulationService.convertToMomentIfNotAlready(vm.startTime);
+            vm.endTime = DateManipulationService.convertToMomentIfNotAlready(vm.endTime);
+            vm.epochStart = moment(vm.startTime, 'YYYY-MM-DD hh:mm A').unix();
+            vm.epochEnd = moment(vm.endTime, 'YYYY-MM-DD hh:mm A').unix();
             vm.prev_cursor = null;
             vm.next_cursor = null;
             let issuesPromise = DevicesService.getIssuesByKey(vm.deviceKey, vm.epochStart, vm.epochEnd, vm.prev_cursor, vm.next_cursor);
@@ -473,7 +466,9 @@
         };
 
         return vm;
-    });
+    }
+
+    angular.module('skykitProvisioning').controller('DeviceDetailsCtrl', DeviceDetailsCtrl)
 
 })
 ();
