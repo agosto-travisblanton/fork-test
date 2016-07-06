@@ -165,7 +165,7 @@ describe('DeviceDetailsCommandsCtrl', function () {
 
             it('commandEvents array should be defined', () => expect(controller.commandEvents).toBeDefined());
 
-            
+
         });
 
         return describe('edit mode', function () {
@@ -196,11 +196,11 @@ describe('DeviceDetailsCommandsCtrl', function () {
 
 
             it('defines currentDevice property', () => expect(controller.currentDevice).toBeDefined());
-            
+
             it('calls DevicesService.getByKey to retrieve the selected device', () => expect(DevicesService.getDeviceByKey).toHaveBeenCalledWith($stateParams.deviceKey));
 
             it('calls DevicesService.getCommandEventsByKey to retrieve command events for device', () => expect(DevicesService.getCommandEventsByKey).toHaveBeenCalledWith($stateParams.deviceKey, undefined, undefined));
-            
+
 
             return it("the 'then' handler caches the retrieved command events in the controller", function () {
                 getPlayerCommandEventsPromise.resolve(commandEvents);
@@ -233,7 +233,7 @@ describe('DeviceDetailsCommandsCtrl', function () {
         it('sets the selected timezone', () => expect(controller.selectedTimezone).toBe(timezone));
 
         it('sets the tenant key', () => expect(controller.tenantKey).toBe(tenantKey));
-        
+
         describe('coming from devices', function () {
             beforeEach(function () {
                 $stateParams = {fromDevices: "true"};
@@ -499,6 +499,57 @@ describe('DeviceDetailsCommandsCtrl', function () {
         });
     });
 
+    describe('.onDiagnostics', function () {
+      beforeEach(function () {
+        commandsServicePromise = new skykitProvisioning.q.Mock();
+        spyOn(CommandsService, 'toggleDiagnostics').and.returnValue(commandsServicePromise);
+        spyOn(progressBarService, 'start');
+        spyOn(progressBarService, 'complete');
+        controller = $controller('DeviceDetailsCommandsCtrl', serviceInjection);
+        controller.editMode = true;
+        return controller.onDiagnostics();
+      });
+
+      it('starts the progress bar', () => expect(progressBarService.start).toHaveBeenCalled());
+
+      it('call CommandsService.toggleDiagnostics with the current device', () =>
+        expect(CommandsService.toggleDiagnostics).toHaveBeenCalledWith(controller.currentDevice.key));
+
+      describe('.onToggleDiagnosticsSuccess', function () {
+        beforeEach(function () {
+          spyOn(ToastsService, 'showSuccessToast');
+          return controller.onToggleDiagnosticsSuccess();
+        });
+
+        it('stops the progress bar', () => expect(progressBarService.complete).toHaveBeenCalled());
+
+        return it('displays a toast indicating command was sent to player', () =>
+          expect(ToastsService.showSuccessToast).toHaveBeenCalledWith(
+            "We posted your diagnostics command into the player's queue.")
+        );
+      });
+
+      return describe('.onToggleDiagnosticsFailure', function () {
+        let error = {status: 404, statusText: 'Not Found'};
+
+        beforeEach(function () {
+          spyOn(sweet, 'show');
+          spyOn($log, 'error');
+          return controller.onToggleDiagnosticsFailure(error);
+        });
+
+        it('stops the progress bar', () => expect(progressBarService.complete).toHaveBeenCalled());
+
+        it('displays a sweet alert', () =>
+          expect(sweet.show).toHaveBeenCalledWith(
+            'Oops...', "We were unable to post your diagnostics command into the player's queue.", 'error')
+        );
+
+        return it('logs a detailed error to the console', () => expect($log.error).toHaveBeenCalledWith(
+          `Diagnostics command error: ${error.status} ${error.statusText}`));
+      });
+    });
+
     describe('.onVolumeChange', function () {
         beforeEach(function () {
             commandsServicePromise = new skykitProvisioning.q.Mock();
@@ -696,7 +747,7 @@ describe('DeviceDetailsCommandsCtrl', function () {
             return it('logs a detailed error to the console', () => expect($log.error).toHaveBeenCalledWith(`Content update command error: ${error.status} ${error.statusText}`));
         });
     });
-    
+
 
 
 });

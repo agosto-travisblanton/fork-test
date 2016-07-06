@@ -247,7 +247,25 @@
             return sweet.show('Oops...', "We were unable to post your custom command into the player's queue.", 'error');
         };
 
-        return vm;
+        vm.onDiagnostics = function () {
+          ProgressBarService.start();
+          let promise = CommandsService.toggleDiagnostics(vm.deviceKey);
+          return promise.then(vm.onToggleDiagnosticsSuccess, vm.onToggleDiagnosticsFailure);
+        };
+
+        vm.onToggleDiagnosticsSuccess = function () {
+          ProgressBarService.complete();
+          return ToastsService.showSuccessToast("We posted your diagnostics command into the player's queue.");
+        };
+
+        vm.onToggleDiagnosticsFailure = function (error) {
+          ProgressBarService.complete();
+          $log.error(`Diagnostics command error: ${error.status } ${error.statusText}`);
+          return sweet.show('Oops...', "We were unable to post your diagnostics command into the player's queue.",
+            'error');
+        };
+
+      return vm;
     });
 
 })
