@@ -419,6 +419,17 @@ application = WSGIApplication(
 
 
         ############################################################
+        # Google Directory API
+        ############################################################
+
+        Route(r'/api/v1/chrome-os-devices',
+              handler='handlers.directory_api_handler.DirectoryApiHandler',
+              name='chrome-os-device-interrogation',
+              handler_method='get_device_by_parameter',
+              methods=['GET']
+              ),
+
+        ############################################################
         # /dev/ routes secured by admin:required
         ############################################################
 

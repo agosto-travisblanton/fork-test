@@ -1,5 +1,3 @@
-from google.appengine.ext import ndb
-
 from app_config import config
 from googleapiclient import discovery
 from httplib2 import Http
@@ -28,11 +26,21 @@ class ChromeOsDevicesApi(object):
     KEY_CHROMEOSDEVICES = 'chromeosdevices'
     KEY_NEXTPAGETOKEN = 'nextPageToken'
 
-    def __init__(self, admin_to_impersonate_email_address):
-        self.credentials = SignedJwtAssertionCredentials(config.SERVICE_ACCOUNT_EMAIL,
-                                                         private_key=config.PRIVATE_KEY,
-                                                         scope=self.DIRECTORY_SERVICE_SCOPES,
-                                                         sub=admin_to_impersonate_email_address)
+    def __init__(self, admin_to_impersonate_email_address, prod_credentials=False):
+        if prod_credentials is True:
+            self.credentials = SignedJwtAssertionCredentials(config.SERVICE_ACCOUNT_EMAIL,
+                                                             private_key=config.PRIVATE_KEY,
+                                                             scope=self.DIRECTORY_SERVICE_SCOPES,
+                                                             sub=admin_to_impersonate_email_address)
+        else:
+            key_file = '{}/privatekeys/skykit-provisioning.pem'.format(config.APP_ROOT)
+            with open(key_file) as f:
+                private_key = f.read()
+            self.credentials = SignedJwtAssertionCredentials(
+                '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0@developer.gserviceaccount.com',
+                private_key=private_key,
+                scope=self.DIRECTORY_SERVICE_SCOPES,
+                sub=admin_to_impersonate_email_address)
         self.authorized_http = self.credentials.authorize(Http())
         self.discovery_service = discovery.build('admin', 'directory_v1', http=self.authorized_http)
 
