@@ -25,6 +25,11 @@ angular.module('skykitProvisioning').factory('CommandsService', Restangular =>
             return promise;
         }
 
+        toggleDiagnostics(key) {
+          let promise = Restangular.oneUrl(this.SERVICE_NAME, `api/v1/devices/${key}/commands/diagnostics`).post();
+          return promise;
+        }
+
         powerOn(key) {
             let promise = Restangular.oneUrl(this.SERVICE_NAME, `api/v1/devices/${key}/commands/power-on`).post();
             return promise;
