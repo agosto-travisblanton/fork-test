@@ -1,12 +1,12 @@
 angular.module('skykitProvisioning').factory('IdentityService', ($log, Restangular) =>
-    new class IdentityService {
+  new class IdentityService {
 
-        constructor() {
-        }
+    constructor() {
+    }
 
-        getIdentity() {
-            return Restangular.oneUrl('identity').get();
-        }
-    }()
+    getIdentity() {
+      return Restangular.oneUrl('identity').get();
+    }
+  }()
 );
 
