@@ -70,4 +70,5 @@ def refresh_device_by_mac_address(device_urlsafe_key, device_mac_address, page_t
                 deferred.defer(refresh_device_by_mac_address,
                                device_urlsafe_key=device_urlsafe_key,
                                device_mac_address=device_mac_address,
-                               page_token=new_page_token)
+                               page_token=new_page_token,
+                               _queue='directory-api')

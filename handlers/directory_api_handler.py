@@ -21,6 +21,7 @@ from workflow.refresh_device import refresh_device
 from workflow.refresh_device_by_mac_address import refresh_device_by_mac_address
 from workflow.register_device import register_device
 from workflow.update_chrome_os_device import update_chrome_os_device
+from workflow.interrogate_chrome_os_device_by_mac_address import interrogate_chrome_os_device_by_mac_address
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -30,5 +31,6 @@ class DirectoryApiHandler(RequestHandler):
     def get_device_by_parameter(self):
         device_mac_address = self.request.get('macAddress')
         if device_mac_address:
-            pass
+            interrogate_chrome_os_device_by_mac_address(device_mac_address=device_mac_address,
+                                                        impersonation_admin_email_address='skykit.api@fschrome.com')
         self.response.set_status(200, 'OK')

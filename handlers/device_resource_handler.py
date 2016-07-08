@@ -334,13 +334,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 deferred.defer(refresh_device_by_mac_address,
                                device_urlsafe_key=device_urlsafe_key,
                                device_mac_address=device.mac_address,
-                               _queue='directory-api',
-                               _countdown=5)
+                               _queue='directory-api')
             else:
                 deferred.defer(refresh_device,
                                device_urlsafe_key=device_urlsafe_key,
-                               _queue='directory-api',
-                               _countdown=5)
+                               _queue='directory-api')
         return json_response(self.response, device, strategy=CHROME_OS_DEVICE_STRATEGY)
 
     @requires_unmanaged_registration_token
