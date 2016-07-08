@@ -124,7 +124,8 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
                                device_mac_address=device_mac_address,
                                gcm_registration_id=gcm_registration_id,
                                correlation_id=correlation_id,
-                               page_token=new_page_token)
+                               page_token=new_page_token,
+                               _queue='directory-api')
     else:
         api_response_event.details = 'No devices returned from Chrome Directory API.'
         api_response_event.put()
