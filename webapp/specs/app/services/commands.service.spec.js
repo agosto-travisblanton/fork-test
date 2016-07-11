@@ -103,7 +103,7 @@ describe('CommandsService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(commandsRestangularService);
       spyOn(commandsRestangularService, 'post').and.returnValue(promise);
       let actual = CommandsService.postLog(key);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `api/v1/devices/${key}/commands/postlog`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `api/v1/devices/${key}/commands/post-log`);
       expect(commandsRestangularService.post).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })

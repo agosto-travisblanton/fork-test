@@ -36,7 +36,7 @@ angular.module('skykitProvisioning').factory('CommandsService', Restangular =>
     }
 
     postLog(key) {
-      let promise = Restangular.oneUrl(this.SERVICE_NAME, `api/v1/devices/${key}/commands/postlog`).post();
+      let promise = Restangular.oneUrl(this.SERVICE_NAME, `api/v1/devices/${key}/commands/post-log`).post();
       return promise;
     }
 
