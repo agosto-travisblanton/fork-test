@@ -240,12 +240,12 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         json_response(
             self.response,
             {
-                "serial_number_matches": [
+                "gcmid_matches": [
                     {
                         "serial": device.serial_number,
                         "key": device.key.urlsafe(),
                         "tenantKey": device.tenant_key.urlsafe(),
-                        "gcmid": device.gcm_registration_id.urlsafe()
+                        "gcmid": device.gcm_registration_id
                     } for device in resulting_devices]
             },
         )

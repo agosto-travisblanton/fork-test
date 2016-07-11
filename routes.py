@@ -226,7 +226,7 @@ application = WSGIApplication(
               handler_method='search_for_device_by_mac',
               methods=['GET']
               ),
-        Route(r'/api/v1/distributors/search/gcmid/<distributor_urlsafe_key>/devices',
+        Route(r'/api/v1/distributors/search/gcmid/<distributor_urlsafe_key>/devices/foo',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='search_for_device_by_gcmid',
               handler_method='search_for_device_by_gcmid',
