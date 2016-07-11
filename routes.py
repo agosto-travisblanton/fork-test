@@ -195,6 +195,12 @@ application = WSGIApplication(
               handler_method='restart',
               methods=['POST']
               ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/post-log',
+              handler='handlers.device_commands_handler.DeviceCommandsHandler',
+              name='device-post-log-command',
+              handler_method='post_log',
+              methods=['POST']
+              ),
 
         ############################################################
         # DISTRIBUTOR DEVICE ROUTES
