@@ -730,10 +730,11 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.__setup_distributor_with_two_tenants_with_n_devices(distributor_key,
                                                                  tenant_1_device_count=1,
                                                                  tenant_2_device_count=1)
-        request_parameters = {'unmanaged': 'false'}
+        request_parameters = {'unmanaged': 'false', 'cur_prev_cursor': 'null',
+                              'cur_next_cursor': 'null'}
+
         uri = application.router.build(None, 'devices-by-distributor', None,
-                                       {'distributor_urlsafe_key': distributor_key.urlsafe(), 'cur_prev_cursor': 'null',
-                                        'cur_next_cursor': 'null'})
+                                       {'distributor_urlsafe_key': distributor_key.urlsafe()})
 
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
 
@@ -746,15 +747,15 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.__setup_distributor_with_two_tenants_with_n_devices(distributor_key,
                                                                  tenant_1_device_count=13,
                                                                  tenant_2_device_count=6)
-        request_parameters = {'unmanaged': 'false'}
+        request_parameters = {'unmanaged': 'false', 'cur_prev_cursor': 'null',
+                              'cur_next_cursor': 'null'}
+
         uri = application.router.build(
             None,
             'devices-by-distributor',
             None,
             {
                 'distributor_urlsafe_key': distributor_key.urlsafe(),
-                'cur_prev_cursor': 'null',
-                'cur_next_cursor': 'null'
             }
         )
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
@@ -811,7 +812,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         )
 
         print uri
-
 
         response = self.app.get(uri, headers=self.api_token_authorization_header,
                                 params={'partial_serial': 'm-gcm',

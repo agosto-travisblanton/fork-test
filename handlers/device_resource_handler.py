@@ -314,10 +314,13 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
 
     @requires_api_token
-    def get_devices_by_distributor(self, distributor_urlsafe_key, cur_prev_cursor, cur_next_cursor):
+    def get_devices_by_distributor(self, distributor_urlsafe_key):
+        cur_next_cursor = self.request.get("cur_next_cursor")
+        cur_prev_cursor = self.request.get("cur_prev_cursor")
         cur_next_cursor = cur_next_cursor if cur_next_cursor != "null" else None
         cur_prev_cursor = cur_prev_cursor if cur_prev_cursor != "null" else None
         unmanaged_filter = self.request.get('unmanaged')
+
         unmanaged = not bool(unmanaged_filter == '' or str(unmanaged_filter) == 'false')
         domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
         tenant_keys = [tenant.key for tenant in domain_tenant_list]
