@@ -464,6 +464,39 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
+    # restart
+    ##################################################################################################################
+
+    def test_restart_returns_ok_status(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_RESTART_COMMAND, any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+        uri = application.router.build(None,
+                                       'device-restart-command',
+                                       None,
+                                       {'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
+        request_body = {}
+        response = self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        self.assertOK(response)
+
+    def test_restart_with_bogus_device_key_returns_not_found_status(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_RESTART_COMMAND, any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+        bogus_key = '0AXC19Z0DE'
+        uri = application.router.build(None,
+                                       'device-restart-command',
+                                       None,
+                                       {'device_urlsafe_key': bogus_key})
+        request_body = {}
+        with self.assertRaises(AppError) as context:
+            self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        message = 'Bad response: 404 restart command not executed because device not found with key: {0}'.format(
+            bogus_key
+        )
+        self.assertTrue(message in context.exception.message)
+
+    ##################################################################################################################
     # resolve_device
     ##################################################################################################################
 

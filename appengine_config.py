@@ -334,6 +334,8 @@ app_LATEST_DEVICE_ISSUES_FETCH_COUNT = 250
 
 app_PLAYER_RESET_COMMAND = 'skykit.com/skdchromeapp/reset'
 
+app_PLAYER_RESTART_COMMAND = 'skykit.com/skdchromeapp/restart'
+
 app_PLAYER_VOLUME_COMMAND = 'skykit.com/skdchromeapp/volume/'
 
 app_PLAYER_POWER_ON_COMMAND = 'skykit.com/skdchromeapp/tv/on'
