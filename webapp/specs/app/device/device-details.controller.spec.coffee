@@ -973,5 +973,22 @@ describe 'DeviceDetailsCtrl', ->
     it 'is not if anything else', ->
       StorageService.set("userEmail", "some.user@123.com")
       expect(controller.logglyForUser()).toBeFalsy()
-      
-  
+
+  describe '.copyDeviceKey', ->
+    beforeEach ->
+      controller = $controller 'DeviceDetailsCtrl', {ToastsService: ToastsService}
+      spyOn(ToastsService, 'showSuccessToast')
+      controller.copyDeviceKey()
+
+    it 'is shows a success toast', ->
+      expect(ToastsService.showSuccessToast).toHaveBeenCalledWith 'Device key copied to your clipboard'
+
+  describe '.copyCorrelationIdentifier', ->
+    beforeEach ->
+      controller = $controller 'DeviceDetailsCtrl', {ToastsService: ToastsService}
+      spyOn(ToastsService, 'showSuccessToast')
+      controller.copyCorrelationIdentifier()
+
+    it 'is shows a success toast', ->
+      expect(ToastsService.showSuccessToast).toHaveBeenCalledWith(
+        'Correlation ID copied to your clipboard')

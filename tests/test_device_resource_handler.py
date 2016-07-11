@@ -1,24 +1,24 @@
-from datetime import datetime, timedelta
-
-import device_message_processor
 from env_setup import setup_test_paths
+from datetime import datetime, timedelta
+import device_message_processor
 from utils.email_notify import EmailNotify
 from utils.timezone_util import TimezoneUtil
 from utils.web_util import build_uri
 from webtest import AppError
-
-setup_test_paths()
-
+from workflow.refresh_device import refresh_device
+from workflow.refresh_device_by_mac_address import refresh_device_by_mac_address
+from workflow.update_chrome_os_device import update_chrome_os_device
 import json
 from google.appengine.ext.deferred import deferred
 from google.appengine.ext import ndb
-from chrome_os_devices_api import (refresh_device_by_mac_address, refresh_device, ChromeOsDevicesApi,
-                                   update_chrome_os_device)
+from chrome_os_devices_api import ChromeOsDevicesApi
 from agar.test import BaseTest, WebTest
 from mockito import when, any as any_matcher
 from routes import application
 from models import ChromeOsDevice, Tenant, Distributor, Domain, DeviceIssueLog, Location
 from app_config import config
+
+setup_test_paths()
 
 
 class TestDeviceResourceHandler(BaseTest, WebTest):
@@ -1648,14 +1648,38 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
         self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
         issues = DeviceIssueLog.get_all_by_device_key(self.managed_device.key)
-        self.assertLength(1, issues)
-        self.assertTrue(issues[0].up)
-        self.assertEqual(issues[0].category, config.DEVICE_ISSUE_PLAYER_UP)
-        self.assertEqual(issues[0].storage_utilization, self.STORAGE_UTILIZATION)
-        self.assertEqual(issues[0].memory_utilization, self.MEMORY_UTILIZATION)
-        self.assertEqual(issues[0].program, self.PROGRAM)
-        self.assertEqual(issues[0].program_id, self.PROGRAM_ID)
-        self.assertEqual(issues[0].last_error, self.LAST_ERROR)
+        self.assertLength(2, issues)
+        self.assertEqual(issues[0].category, config.DEVICE_ISSUE_FIRST_HEARTBEAT)
+        self.assertTrue(issues[1].up)
+        self.assertEqual(issues[1].category, config.DEVICE_ISSUE_PLAYER_UP)
+        self.assertEqual(issues[1].storage_utilization, self.STORAGE_UTILIZATION)
+        self.assertEqual(issues[1].memory_utilization, self.MEMORY_UTILIZATION)
+        self.assertEqual(issues[1].program, self.PROGRAM)
+        self.assertEqual(issues[1].program_id, self.PROGRAM_ID)
+        self.assertEqual(issues[1].last_error, self.LAST_ERROR)
+
+    def test_put_heartbeat_invokes_a_device_issue_log_up_toggle_if_device_was_previously_down(self):
+        self.__initialize_heartbeat_info(up=False)
+        issues = DeviceIssueLog.get_all_by_device_key(self.managed_device.key)
+        self.assertLength(0, issues)
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        issues = DeviceIssueLog.get_all_by_device_key(self.managed_device.key)
+        self.assertLength(2, issues)
+        self.assertEqual(issues[0].category, config.DEVICE_ISSUE_FIRST_HEARTBEAT)
+        self.assertTrue(issues[1].up)
+        self.assertEqual(issues[1].category, config.DEVICE_ISSUE_PLAYER_UP)
+        self.assertEqual(issues[1].storage_utilization, self.STORAGE_UTILIZATION)
+        self.assertEqual(issues[1].memory_utilization, self.MEMORY_UTILIZATION)
+        self.assertEqual(issues[1].program, self.PROGRAM)
+        self.assertEqual(issues[1].program_id, self.PROGRAM_ID)
+        self.assertEqual(issues[1].last_error, self.LAST_ERROR)
 
     def test_put_heartbeat_can_resolve_previous_down_issues(self):
         self.managed_device.up = False

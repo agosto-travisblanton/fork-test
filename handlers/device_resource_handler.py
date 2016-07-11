@@ -7,8 +7,10 @@ from google.appengine.ext.deferred import deferred
 from webapp2 import RequestHandler
 
 from app_config import config
-from chrome_os_devices_api import (refresh_device, refresh_device_by_mac_address, register_device,
-                                   update_chrome_os_device)
+from workflow.refresh_device import refresh_device
+from workflow.refresh_device_by_mac_address import refresh_device_by_mac_address
+from workflow.register_device import register_device
+from workflow.update_chrome_os_device import update_chrome_os_device
 from content_manager_api import ContentManagerApi
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from device_message_processor import post_unmanaged_device_info, change_intent
@@ -312,7 +314,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @requires_api_token
     def get(self, device_urlsafe_key):
-        device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
+        device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True,
+                                       use_app_engine_memcache=False)
         if device.archived:
             status = 404
             message = 'Device with key: {0} archived.'.format(device_urlsafe_key)
@@ -443,7 +446,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                            mac_address=device_mac_address,
                                                            timezone=timezone)
                     key = device.put()
-                    registration_request_event.details = 'register_device with device key {0}.'.format(key.urlsafe())
+                    registration_request_event.device_urlsafe_key = key.urlsafe()
+                    registration_request_event.details = 'register_device: tenant code={0}, mac address={1}, ' \
+                                                         'gcm id = {2}, ' \
+                                                         'device key = {3}'.format(tenant_code, device_mac_address,
+                                                                                   gcm_registration_id, key.urlsafe())
                     registration_request_event.put()
                     deferred.defer(register_device,
                                    device_urlsafe_key=key.urlsafe(),
@@ -462,7 +469,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     registration_response_event = IntegrationEventLog.create(
                         event_category='Registration',
                         component_name='Provisioning',
-                        workflow_step='Response to Player after creating a managed device.',
+                        workflow_step='Response to Player after creating a managed device',
                         mac_address=device_mac_address,
                         gcm_registration_id=gcm_registration_id,
                         correlation_identifier=correlation_id,
@@ -598,17 +605,36 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             return self.response.set_status(status, message)
         else:
             request_json = json.loads(self.request.body)
+            storage = request_json.get('storage')
+            memory = request_json.get('memory')
             mac_address = request_json.get('macAddress')
+            program = request_json.get('program')
+            program_id = request_json.get('programId')
+            last_error = request_json.get('lastError')
+            timezone = request_json.get('timezone')
+            timezone_offset = request_json.get('timezoneOffset')
+            sk_player_version = request_json.get('playerVersion')
+            os = request_json.get('os')
+            os_version = request_json.get('osVersion')
+            utc_now = datetime.utcnow()
+
+            if DeviceIssueLog.device_not_reported_yet(device_key=device.key):
+                new_log_entry = DeviceIssueLog.create(device_key=device.key,
+                                                      category=config.DEVICE_ISSUE_FIRST_HEARTBEAT,
+                                                      up=True,
+                                                      storage_utilization=storage,
+                                                      memory_utilization=memory,
+                                                      resolved=True,
+                                                      resolved_datetime=utc_now)
+                new_log_entry.put()
+
             if mac_address:
                 if not device.is_unmanaged_device and ChromeOsDevice.mac_address_already_assigned(mac_address):
-
                     if device.ethernet_mac_address == mac_address:
                         device.connection_type = config.ETHERNET_CONNECTION
-
                     elif device.mac_address == mac_address:
                         device.connection_type = config.WIFI_CONNECTION
                 else:
-
                     if device.mac_address != mac_address or device.ethernet_mac_address != mac_address:
                         info_message = "Heartbeat got an unrecognized macAddress {0} for device {1}".format(
                             mac_address,
@@ -616,39 +642,27 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                         )
                         logging.info(info_message)
 
-            storage = request_json.get('storage')
-
             if storage is not None:
                 storage = int(storage)
-
                 if device.storage_utilization != storage:
                     device.storage_utilization = storage
-
-            memory = request_json.get('memory')
 
             if memory is not None:
                 memory = int(memory)
                 if device.memory_utilization != memory:
                     device.memory_utilization = memory
 
-            program = request_json.get('program')
-
             if program:
                 if device.program != program:
                     device.program = program
-
-            program_id = request_json.get('programId')
 
             if program_id:
                 if device.program_id != program_id:
                     device.program_id = program_id
 
-            last_error = request_json.get('lastError')
-
             if last_error:
                 if device.last_error != last_error:
                     device.last_error = last_error
-            timezone = request_json.get('timezone')
 
             if timezone:
                 if device.timezone != timezone:
@@ -661,10 +675,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                           program_id=program_id,
                                                           last_error=last_error,
                                                           resolved=True,
-                                                          resolved_datetime=datetime.utcnow())
+                                                          resolved_datetime=utc_now)
                     new_log_entry.put()
 
-            timezone_offset = request_json.get('timezoneOffset')
             if timezone_offset and timezone:
                 if timezone_offset != TimezoneUtil.get_timezone_offset(timezone):
                     change_intent(
@@ -682,10 +695,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                           program_id=program_id,
                                                           last_error=last_error,
                                                           resolved=True,
-                                                          resolved_datetime=datetime.utcnow())
+                                                          resolved_datetime=utc_now)
                     new_log_entry.put()
-
-            sk_player_version = request_json.get('playerVersion')
 
             if sk_player_version:
                 if device.sk_player_version != sk_player_version:
@@ -699,10 +710,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                           program_id=program_id,
                                                           last_error=last_error,
                                                           resolved=True,
-                                                          resolved_datetime=datetime.utcnow())
+                                                          resolved_datetime=utc_now)
                     new_log_entry.put()
-
-            os = request_json.get('os')
 
             if os:
                 if device.os != os:
@@ -716,10 +725,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                           program_id=program_id,
                                                           last_error=last_error,
                                                           resolved=True,
-                                                          resolved_datetime=datetime.utcnow())
+                                                          resolved_datetime=utc_now)
                     new_log_entry.put()
-
-            os_version = request_json.get('osVersion')
 
             if os_version:
                 if device.os_version != os_version:
@@ -733,13 +740,12 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                           program_id=program_id,
                                                           last_error=last_error,
                                                           resolved=True,
-                                                          resolved_datetime=datetime.utcnow())
+                                                          resolved_datetime=utc_now)
                     new_log_entry.put()
-            resolved_datetime = datetime.utcnow()
-            previously_down = device.up is False
 
+            previously_down = device.up is False
             if previously_down:
-                DeviceIssueLog.resolve_device_down_issues(device_key=device.key, resolved_datetime=resolved_datetime)
+                DeviceIssueLog.resolve_device_down_issues(device_key=device.key, resolved_datetime=utc_now)
                 notifier = EmailNotify()
                 tenant = device.get_tenant()
                 notifier.device_up(tenant_code=tenant.tenant_code,
@@ -754,12 +760,12 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                       program_id=program_id,
                                                       last_error=last_error,
                                                       resolved=True,
-                                                      resolved_datetime=datetime.utcnow())
+                                                      resolved_datetime=utc_now)
                 new_log_entry.put()
-            previous_memory_issues = DeviceIssueLog.device_has_unresolved_memory_issues(device.key)
 
+            previous_memory_issues = DeviceIssueLog.device_has_unresolved_memory_issues(device.key)
             if previous_memory_issues and device.memory_utilization < config.MEMORY_UTILIZATION_THRESHOLD:
-                DeviceIssueLog.resolve_device_memory_issues(device_key=device.key, resolved_datetime=resolved_datetime)
+                DeviceIssueLog.resolve_device_memory_issues(device_key=device.key, resolved_datetime=utc_now)
                 new_log_entry = DeviceIssueLog.create(device_key=device.key,
                                                       category=config.DEVICE_ISSUE_MEMORY_NORMAL,
                                                       up=True,
@@ -769,12 +775,12 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                       program_id=program_id,
                                                       last_error=last_error,
                                                       resolved=True,
-                                                      resolved_datetime=resolved_datetime)
+                                                      resolved_datetime=utc_now)
                 new_log_entry.put()
-            previous_storage_issues = DeviceIssueLog.device_has_unresolved_storage_issues(device.key)
 
+            previous_storage_issues = DeviceIssueLog.device_has_unresolved_storage_issues(device.key)
             if previous_storage_issues and device.memory_utilization < config.STORAGE_UTILIZATION_THRESHOLD:
-                DeviceIssueLog.resolve_device_storage_issues(device_key=device.key, resolved_datetime=resolved_datetime)
+                DeviceIssueLog.resolve_device_storage_issues(device_key=device.key, resolved_datetime=utc_now)
                 new_log_entry = DeviceIssueLog.create(device_key=device.key,
                                                       category=config.DEVICE_ISSUE_STORAGE_NORMAL,
                                                       up=True,
@@ -784,20 +790,31 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                       program_id=program_id,
                                                       last_error=last_error,
                                                       resolved=True,
-                                                      resolved_datetime=resolved_datetime)
+                                                      resolved_datetime=utc_now)
                 new_log_entry.put()
 
-            if DeviceIssueLog.device_not_reported(device_key=device.key):
-                new_log_entry = DeviceIssueLog.create(device_key=device.key,
-                                                      category=config.DEVICE_ISSUE_FIRST_HEARTBEAT,
-                                                      up=True,
-                                                      storage_utilization=storage,
-                                                      memory_utilization=memory,
-                                                      resolved=True,
-                                                      resolved_datetime=resolved_datetime)
-                new_log_entry.put()
+            initial_heartbeat = device.heartbeat_updated is None
+            if initial_heartbeat:
+                correlation_identifier = IntegrationEventLog.get_correlation_identifier_for_registration(
+                    device_urlsafe_key)
+                if correlation_identifier:
+                    initial_heartbeat_event = IntegrationEventLog.create(
+                        event_category='Registration',
+                        component_name='Player',
+                        workflow_step=config.DEVICE_ISSUE_FIRST_HEARTBEAT,
+                        mac_address=device.mac_address,
+                        gcm_registration_id=device.gcm_registration_id,
+                        device_urlsafe_key=device_urlsafe_key,
+                        correlation_identifier=correlation_identifier,
+                        details='Program playing: '.format(program))
+                    initial_heartbeat_event.put()
+                else:
+                    message = '{0} event detected for device_key={1}, but no correlation identifier!'.format(
+                        config.DEVICE_ISSUE_FIRST_HEARTBEAT, device_urlsafe_key)
+                    logging.debug()
+
             device.up = True
-            device.heartbeat_updated = datetime.utcnow()
+            device.heartbeat_updated = utc_now
             device.put()
             self.response.headers.pop('Content-Type', None)
 

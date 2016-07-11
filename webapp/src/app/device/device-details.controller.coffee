@@ -1,4 +1,5 @@
 'use strict'
+
 appModule = angular.module('skykitProvisioning')
 appModule.controller 'DeviceDetailsCtrl', (
   $log,
@@ -9,6 +10,7 @@ appModule.controller 'DeviceDetailsCtrl', (
   LocationsService,
   CommandsService,
   TimezonesService,
+  IntegrationEvents,
   sweet,
   ProgressBarService,
   $mdDialog,
@@ -35,12 +37,11 @@ appModule.controller 'DeviceDetailsCtrl', (
     vm.endTime = now.toLocaleString().replace(/,/g, "")
     today.setDate(now.getDate() - vm.dayRange)
     vm.startTime = today.toLocaleString().replace(/,/g, "")
-
+    vm.enrollmentEvents = []
 
     vm.generateLocalFromUTC = (UTCTime) ->
       localTime = moment.utc(UTCTime).toDate()
       localTime = moment(localTime).format('YYYY-MM-DD hh:mm:ss A')
-
 
     vm.replaceIssueTime = (issues) ->
       for each in issues
@@ -56,8 +57,11 @@ appModule.controller 'DeviceDetailsCtrl', (
         if each.confirmedTime
           each.confirmedTime = vm.generateLocalFromUTC(each.confirmedTime)
 
-    vm.copyDeviceKey = () ->
-      ToastsService.showSuccessToast 'Device key has been copied to your clipboard'
+    vm.copyDeviceKey = ->
+      ToastsService.showSuccessToast 'Device key copied to your clipboard'
+
+    vm.copyCorrelationIdentifier = ->
+      ToastsService.showSuccessToast 'Correlation ID copied to your clipboard'
 
     # event tab
     vm.getIssues = (device, epochStart, epochEnd, prev, next) ->
@@ -81,13 +85,20 @@ appModule.controller 'DeviceDetailsCtrl', (
         vm.commandEvents = data.events
         ProgressBarService.complete()
 
+    # enrollment tab
+    vm.getEnrollmentEvents = (deviceKey) ->
+      ProgressBarService.start()
+      commandEventsPromise = IntegrationEvents.getEnrollmentEvents deviceKey
+      commandEventsPromise.then (data) ->
+        vm.enrollmentEvents = data
+        ProgressBarService.complete()
+
     vm.paginateCall = (forward) ->
       if forward
         vm.getIssues vm.deviceKey, vm.epochStart, vm.epochEnd, null, vm.next_cursor
 
       else
         vm.getIssues vm.deviceKey, vm.epochStart, vm.epochEnd, vm.prev_cursor, null
-
 
     vm.paginateEventCall = (forward) ->
       if forward
@@ -114,6 +125,7 @@ appModule.controller 'DeviceDetailsCtrl', (
 
       vm.getEvents vm.deviceKey
       vm.getIssues vm.deviceKey, vm.epochStart, vm.epochEnd
+      vm.getEnrollmentEvents vm.deviceKey
 
     vm.onGetDeviceSuccess = (response) ->
       vm.currentDevice = response

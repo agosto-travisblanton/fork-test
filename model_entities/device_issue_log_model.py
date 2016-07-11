@@ -65,18 +65,19 @@ class DeviceIssueLog(ndb.Model):
 
     @classmethod
     def no_matching_issues(cls, device_key, category, up=True, storage_utilization=0, memory_utilization=0,
-                           program=None, program_id=None, last_error=None):
+                           program=None):
         issues = DeviceIssueLog.query(DeviceIssueLog.device_key == device_key,
                                       ndb.AND(DeviceIssueLog.category == category),
                                       ndb.AND(DeviceIssueLog.storage_utilization == storage_utilization),
                                       ndb.AND(DeviceIssueLog.memory_utilization == memory_utilization),
                                       ndb.AND(DeviceIssueLog.up == up),
+                                      ndb.AND(DeviceIssueLog.program == program),
                                       ndb.AND(DeviceIssueLog.resolved == False)
                                       ).get(keys_only=True)
         return None == issues
 
     @classmethod
-    def device_not_reported(cls, device_key):
+    def device_not_reported_yet(cls, device_key):
         issues = DeviceIssueLog.query(DeviceIssueLog.device_key == device_key).get(keys_only=True)
         return None == issues
 

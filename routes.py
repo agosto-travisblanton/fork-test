@@ -1,7 +1,8 @@
 from env_setup import setup
 from provisioning_env import (
     on_development_server,
-    on_integration_server
+    on_integration_server,
+    on_qa_server
 )
 
 setup()
@@ -400,9 +401,16 @@ application = WSGIApplication(
         Route(r'/api/v1/integrations_events',
               handler='handlers.integration_events_log_handler.IntegrationEventsLogHandler',
               name='integration-events-list',
-              handler_method='get_list',
+              handler_method='get_by_event_category',
               methods=['GET']
               ),
+        Route(r'/api/v1/integration_events/enrollment',
+              handler='handlers.integration_events_log_handler.IntegrationEventsLogHandler',
+              name='enrollment-events-list',
+              handler_method='get_enrollment_events',
+              methods=['GET']
+              ),
+
 
         ############################################################
         # /dev/ routes secured by admin:required
@@ -419,7 +427,7 @@ application = WSGIApplication(
     debug=not on_production_server
 )
 
-if on_development_server or on_integration_server:
+if on_development_server or on_integration_server or on_qa_server:
     dev_routes = [
         Route(r'/api/v1/seed/<user_first>/<user_last>',
               handler="handlers.dev_handlers.SeedScript",

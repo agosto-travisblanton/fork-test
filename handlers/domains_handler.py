@@ -23,7 +23,7 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
             domain_list = Domain.query(Domain.distributor_key == distributor).fetch(100)
             result = filter(lambda x: x.active is True, domain_list)
         else:
-            result = self.validate_and_get(domain_key, Domain, abort_on_not_found=True)
+            result = self.validate_and_get(domain_key, Domain, abort_on_not_found=True, use_app_engine_memcache=False)
         json_response(self.response, result, strategy=DOMAIN_STRATEGY)
 
     @requires_api_token

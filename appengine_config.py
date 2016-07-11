@@ -478,7 +478,7 @@ def _SQLALCHEMY_DATABASE_URI():
         if on_integration_server:
             instance_name = 'provisioning-int-v2'
         elif on_continuous_integration_server:
-            instance_name = 'provisioning-ci'
+            instance_name = 'sqlite:///:memory:'
         elif on_qa_server:
             instance_name = 'provisioning-qa'
         elif on_stage_server:

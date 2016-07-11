@@ -113,6 +113,7 @@ skip_files:
 - ^.git/.*$
 - ^backup/.git/.*
 - ^.idea/.*
+- ^.venv2/.*
 - ^.*~
 - ^.*\.py[co]
 - ^.*\.po
