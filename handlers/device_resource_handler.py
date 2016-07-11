@@ -315,10 +315,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
 
     @requires_api_token
     def get_devices_by_distributor(self, distributor_urlsafe_key):
-        cur_next_cursor = self.request.get("cur_next_cursor")
-        cur_prev_cursor = self.request.get("cur_prev_cursor")
-        cur_next_cursor = cur_next_cursor if cur_next_cursor != "null" else None
-        cur_prev_cursor = cur_prev_cursor if cur_prev_cursor != "null" else None
+        next_cursor = self.request.get("next_cursor")
+        prev_cursor = self.request.get("prev_cursor")
+        cur_next_cursor = next_cursor if next_cursor != "null" else None
+        cur_prev_cursor = prev_cursor if prev_cursor != "null" else None
         unmanaged_filter = self.request.get('unmanaged')
 
         unmanaged = not bool(unmanaged_filter == '' or str(unmanaged_filter) == 'false')

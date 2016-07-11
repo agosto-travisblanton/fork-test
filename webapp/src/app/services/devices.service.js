@@ -1,4 +1,4 @@
-angular.module('skykitProvisioning').factory('DevicesService', function ($log, Restangular, $q, $http) {
+angular.module('skykitProvisioning').factory('DevicesService', function ($log, Restangular, $q, CacheFactory, $http) {
   var url;
   var url;
   return new class DevicesService {
@@ -34,7 +34,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
       let promise = Restangular.oneUrl(this.SERVICE_NAME, url).get();
       return promise;
     }
-    
+
     //#######################################################################
     // TENANT VIEW
     //#######################################################################
@@ -50,7 +50,6 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
         let deferred = $q.defer();
         let url = this.makeDevicesByTenantURL(tenantKey, prev, next, true);
         return Restangular.oneUrl(this.SERVICE_NAME, url).get();
-
       }
     }
 
@@ -124,7 +123,6 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
 
     getDevicesByDistributor(distributorKey, prev, next) {
       if (distributorKey !== undefined) {
-        let deferred = $q.defer();
         let url = this.makeDevicesByDistributorURL(distributorKey, prev, next, false);
         return Restangular.oneUrl(this.SERVICE_NAME, url).get();
       }
@@ -132,7 +130,6 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
 
     getUnmanagedDevicesByDistributor(distributorKey, prev, next) {
       if (distributorKey !== undefined) {
-        let deferred = $q.defer();
         let url = this.makeDevicesByDistributorURL(distributorKey, prev, next, true);
         return Restangular.oneUrl(this.SERVICE_NAME, url).get();
       }
@@ -248,11 +245,13 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
     }
 
     makeDevicesByDistributorURL(distributorKey, prev, next, unmanaged) {
-      return url = `/api/v1/distributors/${prev}/${next}/${distributorKey}/devices?unmanaged=${unmanaged}`;
+      let url = `/api/v1/distributors/${distributorKey}/devices?unmanaged=${unmanaged}&next_cursor=${next}&prev_cursor=${prev}`;
+      return url
     }
 
     makeDevicesByTenantURL(tenantKey, prev, next, unmanaged) {
-      return url = `/api/v1/tenants/${prev}/${next}/${tenantKey}/devices?unmanaged=${unmanaged}`;
+      let url = `/api/v1/tenants/${prev}/${next}/${tenantKey}/devices?unmanaged=${unmanaged}`;
+      return url
     }
   }();
 });
