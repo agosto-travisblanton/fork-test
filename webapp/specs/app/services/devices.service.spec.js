@@ -3,38 +3,21 @@ describe('DevicesService', function () {
   let Restangular = undefined;
   let $http = undefined;
   let promise = undefined;
-  let CacheFactory = undefined;
   let $q = undefined;
   let deferred = undefined;
 
   beforeEach(module('skykitProvisioning'));
 
-  beforeEach(inject(function (_DevicesService_, _Restangular_, _CacheFactory_, _$http_, _$q_) {
+  beforeEach(inject(function (_DevicesService_, _Restangular_, _$http_, _$q_) {
     DevicesService = _DevicesService_;
     Restangular = _Restangular_;
-    CacheFactory = _CacheFactory_;
     $http = _$http_;
     $q = _$q_;
     return promise = new skykitProvisioning.q.Mock();
   }));
 
   beforeEach(function () {
-    DevicesService.deviceCache = {
-      get() {
-      },
 
-      put() {
-      }
-
-    };
-    DevicesService.deviceByTenantCache = {
-      get() {
-      },
-
-      put() {
-      }
-
-    };
     return deferred = $q.defer();
   });
 

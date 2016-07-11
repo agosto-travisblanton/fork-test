@@ -54,7 +54,6 @@
       vm.loading = true;
       vm.disabled = true;
       vm.selected_resources = [];
-      ProofPlayService.proofplayCache.removeAll();
       return vm.initialize();
     };
 
