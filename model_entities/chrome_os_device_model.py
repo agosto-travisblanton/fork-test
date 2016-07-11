@@ -1,6 +1,8 @@
 import uuid
+
 from datetime import datetime
 from google.appengine.ext import ndb
+
 from app_config import config
 from restler.decorators import ae_ndb_serializer
 from utils.timezone_util import TimezoneUtil
@@ -79,7 +81,7 @@ class ChromeOsDevice(ndb.Model):
     @classmethod
     def create_managed(cls, tenant_key, gcm_registration_id, mac_address, ethernet_mac_address=None, device_id=None,
                        serial_number=None, archived=False,
-                       model=None, timezone='America/Chicago'):
+                       model=None, timezone='America/Chicago', registration_correlation_identifier=None):
         timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
         proof_of_play_editable = False
         tenant = tenant_key.get()
@@ -106,7 +108,8 @@ class ChromeOsDevice(ndb.Model):
             heartbeat_interval_minutes=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES,
             timezone=timezone,
             timezone_offset=timezone_offset,
-            proof_of_play_editable=proof_of_play_editable)
+            proof_of_play_editable=proof_of_play_editable,
+            registration_correlation_identifier=registration_correlation_identifier)
         return device
 
     @classmethod
