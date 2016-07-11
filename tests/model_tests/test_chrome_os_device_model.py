@@ -40,6 +40,7 @@ class TestChromeOsDeviceModel(BaseTest):
     LATITUDE = 37.78
     LONGITUDE = -122.41
     CUSTOMER_DISPLAY_CODE = 'front_reception'
+    REGISTRATION_CORRELATION_IDENTIFIER = 'correlation id'
 
     def setUp(self):
         super(TestChromeOsDeviceModel, self).setUp()
@@ -149,6 +150,7 @@ class TestChromeOsDeviceModel(BaseTest):
                                    customer_location_name=customer_location_name,
                                    customer_location_code=customer_location_code)
         location.geo_location = ndb.GeoPt(self.LATITUDE, self.LONGITUDE)
+        device.registration_correlation_identifier = self.REGISTRATION_CORRELATION_IDENTIFIER
         device.location_key = location.put()
         device.put()
         json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
@@ -173,6 +175,8 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertEqual(timezone, json_representation['timezone'])
         self.assertEqual(TimezoneUtil.get_timezone_offset(json_representation['timezone']),
                          json_representation['timezoneOffset'])
+        self.assertEqual(self.REGISTRATION_CORRELATION_IDENTIFIER,
+                         json_representation['registrationCorrelationIdentifier'])
 
     def test_json_serialization_strategy_with_explicit_timezone(self):
         timezone = 'America/Denver'
