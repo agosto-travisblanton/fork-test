@@ -109,6 +109,20 @@ class Tenant(ndb.Model):
         return filtered_results
 
     @classmethod
+    def find_devices_with_partial_gcmid(cls, tenant_keys, unmanaged, partial_gcmid):
+        q = ChromeOsDevice.query(ChromeOsDevice.archived == False).filter(
+            ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
+            ChromeOsDevice.is_unmanaged_device == unmanaged).fetch()
+
+        to_return = []
+
+        for item in q:
+            if item.gcm_registration_id and partial_gcmid in item.gcm_registration_id:
+                to_return.append(item)
+
+        return to_return
+
+    @classmethod
     def find_issues_paginated(cls, start, end, device, fetch_size=25, prev_cursor_str=None,
                               next_cursor_str=None):
         objects = None
