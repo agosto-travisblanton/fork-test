@@ -609,6 +609,61 @@ describe('DeviceDetailsCommandsCtrl', function () {
     });
   });
 
+  describe('.onPostLog', function () {
+    beforeEach(function () {
+      commandsServicePromise = new skykitProvisioning.q.Mock();
+      spyOn(CommandsService, 'postLog').and.returnValue(commandsServicePromise);
+      spyOn(progressBarService, 'start');
+      spyOn(progressBarService, 'complete');
+      controller = $controller('DeviceDetailsCommandsCtrl', serviceInjection);
+      controller.editMode = true;
+      return controller.onPostLog();
+    });
+
+    it('starts the progress bar', () =>
+      expect(progressBarService.start).toHaveBeenCalled());
+
+    it('call CommandsService.postLog with the current device', () =>
+      expect(CommandsService.postLog).toHaveBeenCalledWith(controller.currentDevice.key));
+
+    describe('.onPostLogSuccess', function () {
+      beforeEach(function () {
+        spyOn(ToastsService, 'showSuccessToast');
+        return controller.onPostLogSuccess();
+      });
+
+      it('stops the progress bar', () =>
+        expect(progressBarService.complete).toHaveBeenCalled());
+
+      return it('displays a toast indicating command was sent to player', () =>
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith(
+          "We posted your post log command into the player's queue.")
+      );
+    });
+
+    return describe('.onPostLogFailure', function () {
+      let error = {status: 404, statusText: 'Not Found'};
+
+      beforeEach(function () {
+        spyOn(sweet, 'show');
+        spyOn($log, 'error');
+        return controller.onPostLogFailure(error);
+      });
+
+      it('stops the progress bar', () =>
+        expect(progressBarService.complete).toHaveBeenCalled());
+
+      it('displays a sweet alert', () =>
+        expect(sweet.show).toHaveBeenCalledWith(
+          'Oops...', "We were unable to post your post log command into the player's queue.", 'error')
+      );
+
+      return it('logs a detailed error to the console', () =>
+        expect($log.error).toHaveBeenCalledWith(
+          `Post log command error: ${error.status} ${error.statusText}`));
+    });
+  });
+
   describe('.onVolumeChange', function () {
     beforeEach(function () {
       commandsServicePromise = new skykitProvisioning.q.Mock();

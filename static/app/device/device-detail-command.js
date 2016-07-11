@@ -283,6 +283,24 @@
         'error');
     };
 
+    vm.onPostLog = function () {
+      ProgressBarService.start();
+      let promise = CommandsService.postLog(vm.deviceKey);
+      return promise.then(vm.onPostLogSuccess, vm.onPostLogFailure);
+    };
+
+    vm.onPostLogSuccess = function () {
+      ProgressBarService.complete();
+      return ToastsService.showSuccessToast("We posted your post log command into the player's queue.");
+    };
+
+    vm.onPostLogFailure = function (error) {
+      ProgressBarService.complete();
+      $log.error(`Post log command error: ${error.status } ${error.statusText}`);
+      return sweet.show('Oops...', "We were unable to post your post log command into the player's queue.",
+        'error');
+    };
+
     return vm;
   });
 
