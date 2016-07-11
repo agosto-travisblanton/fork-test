@@ -13,3 +13,7 @@ cron:
   url: /proofplay/api/v1/manage_raw_events
   schedule: every 24 hours
   timezone: US/Central
+
+- description: DataStore Backup
+  url: /backup/backup_cron
+  schedule: every day 01:00

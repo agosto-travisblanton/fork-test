@@ -201,8 +201,10 @@ class TestChromeOsDeviceModel(BaseTest):
                                    customer_location_name=customer_location_name,
                                    customer_location_code=customer_location_code)
         device.location_key = location.put()
+        device.annotated_asset_id = 'test asset id'
         device.put()
         json_representation = json.loads(to_json(device, CHROME_OS_DEVICE_STRATEGY))
+        self.assertEqual(str(device.annotated_asset_id), json_representation['annotatedAssetId'])
         self.assertEqual(str(device.device_id), json_representation['deviceId'])
         self.assertEqual(str(device.gcm_registration_id), json_representation['gcmRegistrationId'])
         self.assertEqual(None, json_representation['serialNumber'])
@@ -295,6 +297,23 @@ class TestChromeOsDeviceModel(BaseTest):
     def test_get_unmanaged_device_by_gcm_registration_id_with_bogus_gcm_registration_id(self):
         unmanaged_device = ChromeOsDevice.get_unmanaged_device_by_gcm_registration_id('bogus')
         self.assertIsNone(unmanaged_device)
+
+    def test_gcm_registration_id_already_assigned_for_case_where_it_has_not_yet_been_assigned(self):
+        self.assertFalse(ChromeOsDevice.gcm_registration_id_already_assigned('Foobar'))
+
+    def test_gcm_registration_id_already_assigned_for_managed_case_where_it_has_been_assigned(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
+        device.put()
+        self.assertTrue(ChromeOsDevice.gcm_registration_id_already_assigned(self.TEST_GCM_REGISTRATION_ID))
+
+    def test_gcm_registration_id_already_assigned_for_unmanaged_case_where_it_has_been_assigned(self):
+        unmanaged_device = ChromeOsDevice.create_unmanaged(gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                                           mac_address=self.MAC_ADDRESS)
+        unmanaged_device.put()
+        self.assertTrue(ChromeOsDevice.gcm_registration_id_already_assigned(self.TEST_GCM_REGISTRATION_ID))
 
     def test_is_rogue_unmanaged_device_without_tenant_key_returns_true(self):
         device = ChromeOsDevice.create_unmanaged(self.TEST_GCM_REGISTRATION_ID, self.MAC_ADDRESS)

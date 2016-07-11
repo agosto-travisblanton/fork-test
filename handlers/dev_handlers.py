@@ -41,21 +41,20 @@ class SeedScript(RequestHandler):
 def kick_off(user_first, user_last):
     global USER_EMAIL
     USER_EMAIL = create_email(user_first, user_last)
-    print "-------------------------------------------------------------------------------"
-    print "SEED SCRIPT HAS BEGUN!!! "
-    print "-------------------------------------------------------------------------------"
-    print "-------------------------------------------------------------------------------"
-    print "CREATE DATA FOR DATASTORE!!! "
-    print "-------------------------------------------------------------------------------"
+    print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    print "++++++++++++++++++++++++    SEED SCRIPT HAS BEGUN    ++++++++++++++++++++++++++"
+    print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    print "+++++++++++++++++++++++++  CREATE DATA FOR DATASTORE  +++++++++++++++++++++++++"
+    print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
     make_data_for_a_distributor()
-    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    print "-------------------------------------------------------------------------------"
-    print "COMPLETED SEED SCRIPT"
-    print "-------------------------------------------------------------------------------"
-    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    print "THESE ARE THE DEVICES WITH EVENTS AND COMMANDS"
+    print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    print "++++++++++++++++++++++++++++ COMPLETED SEED SCRIPT ++++++++++++++++++++++++++++"
+    print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    print "++++++++++++++++++++++++ DEVICES WITH EVENTS AND COMMANDS +++++++++++++++++++++"
+    print "+++ YOU WILL WANT TO RECORD THESE TO VIEW DEVICES WITH EVENTS OR COMMANDS +++++"
     global array_of_devices_with_values
     print array_of_devices_with_values
+    print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
 
 def make_data_for_a_distributor():
@@ -93,7 +92,7 @@ def make_data_for_a_distributor():
     for item in default_users_to_add:
         u = User.get_or_insert_by_email(email=item)
         u.add_distributor(distributor.key)
-        u.add_distributor(first_distributor.key)
+        u.add_distributor(second_distributor.key)
 
     user = User.get_or_insert_by_email(email=USER_EMAIL)
     if not distributor:
@@ -105,8 +104,8 @@ def make_data_for_a_distributor():
         else:
             user.add_distributor(distributor.key, role=1)
             print 'SUCCESS! ' + user.email + ' is linked to ' + distributor.name
-            user.add_distributor(first_distributor.key)
-            print 'SUCCESS! ' + user.email + ' is linked to ' + first_distributor.name
+            user.add_distributor(second_distributor.key)
+            print 'SUCCESS! ' + user.email + ' is linked to ' + second_distributor.name
     ##########################################################################################
     # DOMAINS
     ##########################################################################################
@@ -124,7 +123,7 @@ def make_data_for_a_distributor():
     ##########################################################################################
     # CREATE TENANTS
     ##########################################################################################
-    for i in range(1, 300):
+    for i in range(1, 101):
         tenant_code = "my_tenant" + str(i)
         tenant_code = tenant_code.lower()
         tenant_code_datastore = Tenant.find_by_tenant_code(tenant_code)
@@ -137,7 +136,7 @@ def make_data_for_a_distributor():
                                    domain_key=domain.key,
                                    active=True)
             tenant.put()
-        print 'Tenant ' + tenant.name + ' created'
+            print 'Tenant ' + tenant.name + ' created'
     else:
         print 'Tenant ' + tenant.name + ' already exists, so did not create'
 
@@ -201,7 +200,7 @@ def make_data_for_a_distributor():
     ##########################################################################################
     # MANAGED DEVICES
     ##########################################################################################
-    for i in range(1, 225):
+    for i in range(1, 101):
         managed_device = ChromeOsDevice.get_by_device_id(DEVICE_ID + str(i))
         if not managed_device:
             managed_device = ChromeOsDevice.create_managed(
@@ -219,7 +218,7 @@ def make_data_for_a_distributor():
                 global array_of_devices_with_values
                 array_of_devices_with_values.append(str(managed_device.serial_number))
 
-                for z in range(1, 101):
+                for z in range(1, 78):
                     issue = DeviceIssueLog.create(device_key=managed_device.key,
                                                   category=config.DEVICE_ISSUE_PLAYER_DOWN,
                                                   up=False,

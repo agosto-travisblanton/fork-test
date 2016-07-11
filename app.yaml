@@ -46,9 +46,6 @@ handlers:
   static_files: static/favicon.ico
   upload: static/favicon.ico
 
-- url: /bower_components
-  static_dir: static/app/bower_components
-
 - url: /scripts
   static_dir: static/scripts
 
@@ -82,6 +79,15 @@ handlers:
   secure: always
   auth_fail_action: redirect
 
+- url: /bower_components
+  static_dir: webapp/bower_components
+
+- url: /app
+  static_dir: webapp/src/app
+
+- url: /dist
+  static_dir: static
+
 - url: /webapp
   static_dir: webapp
 
@@ -99,19 +105,20 @@ handlers:
   secure: always
 
 skip_files:
-- ^coverage/.*
-- ^coverage_html_report/.*
+- ^coverage/.*$
+- ^coverage_html_report/.*$
 - ^scripts/.*
 - ^images/readme.md
 - ^local/.*
 - ^tests/.*
-- ^webapp/node_modules.*
-- ^webapp/bower_components.*
-- ^webapp/dist.*
-- ^webapp/specs.*
-- ^webapp/coverage.*
-- ^.git/.*
+- ^webapp/node_modules/.*$
+- ^webapp/dist/.*$
+- ^webapp/specs/.*$
+- ^webapp/coverage/.*$
+- ^.git/.*$
+- ^backup/.git/.*
 - ^.idea/.*
+- ^.venv2/.*
 - ^.*~
 - ^.*\.py[co]
 - ^.*\.po

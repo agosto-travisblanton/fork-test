@@ -3,3 +3,5 @@ dispatch:
     module: migration
   - url: "*/proofplay/*"
     module: proofplay
+  - url: "*/backup/*"
+    module: backup

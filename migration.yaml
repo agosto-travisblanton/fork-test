@@ -50,6 +50,7 @@ skip_files:
 - ^.hg/.*
 - ^.idea/.*
 - ^.*~
+- ^venv2/.*
 - ^.*\.py[co]
 - ^.*\.po
 - ^.*\.pot

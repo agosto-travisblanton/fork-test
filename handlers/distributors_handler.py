@@ -52,11 +52,10 @@ class DistributorsHandler(RequestHandler):
     def post(self):
         incoming = json.loads(self.request.body)
         distributor_name = incoming["distributor"]
-        admin_email = incoming["admin_email"]
+        admin_email = incoming["admin_email"].lower()
         user = User.get_or_insert_by_email(email=admin_email)
 
         if Distributor.is_unique(distributor_name):
-            print "got here"
             distributor = Distributor.create(name=distributor_name)
             distributor.admin_email = admin_email
             distributor.put()

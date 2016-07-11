@@ -1,24 +1,21 @@
+import json
+
 from datetime import datetime, timedelta
+from google.appengine.ext import ndb
 
 import device_message_processor
+from agar.test import BaseTest, WebTest
+from app_config import config
 from env_setup import setup_test_paths
+from mockito import when, any as any_matcher
+from models import ChromeOsDevice, Tenant, Distributor, Domain, DeviceIssueLog, Location
+from routes import application
 from utils.email_notify import EmailNotify
 from utils.timezone_util import TimezoneUtil
 from utils.web_util import build_uri
 from webtest import AppError
 
 setup_test_paths()
-
-import json
-from google.appengine.ext.deferred import deferred
-from google.appengine.ext import ndb
-from chrome_os_devices_api import (refresh_device_by_mac_address, refresh_device, ChromeOsDevicesApi,
-                                   update_chrome_os_device)
-from agar.test import BaseTest, WebTest
-from mockito import when, any as any_matcher
-from routes import application
-from models import ChromeOsDevice, Tenant, Distributor, Domain, DeviceIssueLog, Location
-from app_config import config
 
 
 class TestDeviceResourceHandler(BaseTest, WebTest):
@@ -104,13 +101,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                           timestamp=any_matcher()).thenReturn(None)
 
         tenant = self.tenant_key.get()
-        mac_address = '7889BE879f'
-        request_body = {'macAddress': mac_address,
-                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': 'foobar',
                         'tenantCode': tenant.tenant_code}
-        when(deferred).defer(any_matcher(refresh_device_by_mac_address),
-                             any_matcher(str),
-                             any_matcher(mac_address)).thenReturn(None)
         response = self.app.post('/api/v1/devices', json.dumps(request_body),
                                  headers=self.api_token_authorization_header)
         self.assertEqual('201 Created', response.status)
@@ -123,13 +116,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                           timestamp=any_matcher()).thenReturn(None)
 
         tenant = self.tenant_key.get()
-        mac_address = '7889BE879f'
-        request_body = {'macAddress': mac_address,
-                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': 'foobar',
                         'tenantCode': tenant.tenant_code}
-        when(deferred).defer(any_matcher(refresh_device_by_mac_address),
-                             any_matcher(str),
-                             any_matcher(mac_address)).thenReturn(None)
         response = self.app.post('/api/v1/devices', json.dumps(request_body),
                                  headers=self.api_token_authorization_header)
         location_uri_components = str(response.headers['Location']).split('/')
@@ -145,19 +134,19 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response = self.post(uri, params=request_body, headers=self.empty_header)
         self.assertForbidden(response)
 
-    def test_device_resource_handler_post_no_returns_bad_response_if_mac_address_already_assigned_to_device(self):
+    def test_device_resource_handler_post_no_returns_conflict_if_gcm_id_is_already_assigned_to_device(self):
         request_body = {'macAddress': self.MAC_ADDRESS,
                         'gcmRegistrationId': self.GCM_REGISTRATION_ID,
                         'tenantCode': self.TENANT_CODE}
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
                           headers=self.api_token_authorization_header)
-        self.assertTrue('Bad response: 400 Cannot register because macAddress already assigned to managed device.'
+        self.assertTrue('Bad response: 409 Conflict gcm_registration_id is already assigned.'
                         in context.exception.message)
 
     def test_device_resource_handler_post_no_returns_bad_response_for_empty_tenant_code(self):
-        request_body = {'macAddress': '232323243223',
-                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': 'foobar',
                         'tenantCode': None}
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
@@ -186,8 +175,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         in context.exception.message)
 
     def test_post_managed_device_when_cannot_resolve_tenant(self):
-        request_body = {'macAddress': '232323243223',
-                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': 'foobar',
                         'tenantCode': 'unresolvable_tenant_code'}
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
@@ -201,13 +190,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                           device_mac_address=any_matcher(),
                                           timestamp=any_matcher()).thenReturn(None)
         tenant = self.tenant_key.get()
-        mac_address = '7889BE879f'
+        mac_address = self.MAC_ADDRESS
         request_body = {'macAddress': mac_address,
-                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'gcmRegistrationId': 'foobar',
                         'tenantCode': tenant.tenant_code}
-        when(deferred).defer(any_matcher(refresh_device_by_mac_address),
-                             any_matcher(str),
-                             any_matcher(mac_address)).thenReturn(None)
         response = self.app.post('/api/v1/devices', json.dumps(request_body),
                                  headers=self.api_token_authorization_header)
         location_uri_components = str(response.headers['Location']).split('/')
@@ -223,15 +209,11 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                           timestamp=any_matcher()).thenReturn(None)
 
         tenant = self.tenant_key.get()
-        mac_address = '7889BE879f'
         explicit_timezone = 'America/Denver'
-        request_body = {'macAddress': mac_address,
-                        'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': 'foobar',
                         'tenantCode': tenant.tenant_code,
                         'timezone': explicit_timezone}
-        when(deferred).defer(any_matcher(refresh_device_by_mac_address),
-                             any_matcher(str),
-                             any_matcher(mac_address)).thenReturn(None)
         response = self.app.post('/api/v1/devices', json.dumps(request_body),
                                  headers=self.api_token_authorization_header)
         location_uri_components = str(response.headers['Location']).split('/')
@@ -252,23 +234,14 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual('201 Created', response.status)
         self.assertEqual(201, response.status_int)
 
-    def test_device_resource_handler_unmanaged_post_returns_cannot_register_when_mac_address_already_assigned(self):
-        request_body = {'macAddress': self.MAC_ADDRESS,
-                        'gcmRegistrationId': '123'}
-        with self.assertRaises(AppError) as context:
-            self.app.post('/api/v1/devices', json.dumps(request_body),
-                          headers=self.unmanaged_registration_token_authorization_header)
-        self.assertTrue('Bad response: 409 Registration conflict because macAddress is already assigned '
-                        'to an unmanaged device.' in context.exception.message)
-
     def test_device_resource_handler_unmanaged_post_returns_cannot_register_when_gcm_already_assigned(self):
         request_body = {'macAddress': '123',
                         'gcmRegistrationId': self.GCM_REGISTRATION_ID}
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
                           headers=self.unmanaged_registration_token_authorization_header)
-        self.assertTrue('Bad response: 409 Registration conflict because gcmRegistrationId is already assigned '
-                        'to an unmanaged device.' in context.exception.message)
+        self.assertTrue('Bad response: 409 Conflict gcm_registration_id is already assigned' in
+                        context.exception.message)
 
     def test_device_resource_handler_unmanaged_post_returns_bad_response_for_empty_gcm(self):
         request_body = {'macAddress': self.MAC_ADDRESS,
@@ -327,34 +300,112 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     #################################################################################################################
     # get_device_by_parameter
     #################################################################################################################
-
-    def test_get_device_by_parameter_without_parameter_returns_http_status_ok(self):
-        request_parameters = {}
+    def test_get_device_by_pairing_code_returns_http_status_ok(self):
+        self.unmanaged_device.pairing_code = self.PAIRING_CODE
+        self.unmanaged_device.put()
+        request_parameters = {'pairingCode': self.PAIRING_CODE}
         uri = build_uri('devices-retrieval')
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertOK(response)
 
-    def test_get_device_by_parameter_without_parameter_returns_list(self):
-        ndb.delete_multi(ChromeOsDevice.query().fetch(keys_only=True))
-        self.__build_list_devices(tenant_key=self.tenant_key, managed_number_to_build=5, unmanaged_number_to_build=3)
-        request_parameters = {}
+    def test_get_device_by_pairing_code_returns_not_found_for_non_existent_code(self):
+        request_parameters = {'pairingCode': self.PAIRING_CODE}
         uri = build_uri('devices-retrieval')
-        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
-        response_json = json.loads(response.body)
-        self.assertLength(8, response_json)
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 404 Unable to find device by pairing code: {0}'.format(
+            self.PAIRING_CODE) in context.exception.message)
 
-    def test_get_device_by_parameter_without_parameter_returns_empty_list_for_archived_devices(self):
-        ndb.delete_multi(ChromeOsDevice.query().fetch(keys_only=True))
-        self.__build_list_devices(tenant_key=self.tenant_key, managed_number_to_build=5, unmanaged_number_to_build=3)
-        devices = ChromeOsDevice.query().fetch(8)
-        for device in devices:
-            device.archived = True
-            device.put()
-        request_parameters = {}
+    def test_get_device_by_pairing_code_returns_single_resource(self):
+        self.unmanaged_device.pairing_code = self.PAIRING_CODE
+        self.unmanaged_device.put()
+        request_parameters = {'pairingCode': self.PAIRING_CODE}
         uri = build_uri('devices-retrieval')
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertLength(0, response_json)
+        self.assertEqual(response_json['pairingCode'], self.PAIRING_CODE)
+        device = self.managed_device_key.get()
+        self.assertEqual(response_json['gcmRegistrationId'], device.gcm_registration_id)
+
+    def test_get_device_by_pairing_code_with_archived_true_returns_http_status_not_found(self):
+        device = ChromeOsDevice.create_managed(
+            tenant_key=self.tenant_key,
+            gcm_registration_id=self.GCM_REGISTRATION_ID,
+            device_id=self.DEVICE_ID,
+            mac_address=self.MAC_ADDRESS)
+        device.archived = True
+        device.put()
+        request_parameters = {'pairingCode': self.PAIRING_CODE}
+        uri = build_uri('devices-retrieval')
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        self.assertTrue("Unable to find device by pairing code: {0}".format(self.PAIRING_CODE) in
+                        context.exception.message)
+
+    def test_get_device_by_pairing_code_returns_zeroeth_resource_when_dupes(self):
+        device_1 = ChromeOsDevice.create_unmanaged(
+            gcm_registration_id='g1111',
+            mac_address='m1111')
+        device_1.pairing_code = self.PAIRING_CODE
+        device_1.put()
+        device_2 = ChromeOsDevice.create_unmanaged(
+            gcm_registration_id='g2222',
+            mac_address='m2222')
+        device_2.pairing_code = self.PAIRING_CODE
+        device_2.put()
+        request_parameters = {'pairingCode': self.PAIRING_CODE}
+        uri = build_uri('devices-retrieval')
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['pairingCode'], self.PAIRING_CODE)
+        self.assertEqual(response_json['gcmRegistrationId'], 'g1111')
+        self.assertEqual(response_json['macAddress'], 'm1111')
+
+    def test_get_device_by_gcm_registration_id_returns_http_status_ok(self):
+        gcm_registration_id = '123123123123'
+        device = ChromeOsDevice.create_unmanaged(gcm_registration_id=gcm_registration_id,
+                                                 mac_address=self.MAC_ADDRESS)
+        device.put()
+        request_parameters = {'gcmRegistrationId': gcm_registration_id}
+        uri = build_uri('devices-retrieval')
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        self.assertOK(response)
+
+    def test_get_list_by_gcm_registration_id_returns_zeroeth_resource(self):
+        gcm_registration_id = '123123123123'
+        device = ChromeOsDevice.create_unmanaged(gcm_registration_id=gcm_registration_id,
+                                                 mac_address=self.MAC_ADDRESS)
+        device.put()
+        request_parameters = {'gcmRegistrationId': gcm_registration_id}
+        uri = build_uri('devices-retrieval')
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['gcmRegistrationId'], device.gcm_registration_id)
+
+    def test_get_device_gcm_registration_id_with_archived_true_returns_http_status_not_found(self):
+        gcm_registration_id = 'foobar'
+        device = ChromeOsDevice.create_managed(
+            tenant_key=self.tenant_key,
+            gcm_registration_id=gcm_registration_id,
+            device_id=self.DEVICE_ID,
+            mac_address=self.MAC_ADDRESS)
+        device.archived = True
+        device.put()
+        request_parameters = {'gcmRegistrationId': gcm_registration_id}
+        uri = build_uri('devices-retrieval')
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        self.assertTrue("Unable to find Chrome OS device by GCM registration ID: {0}".format(gcm_registration_id) in
+                        context.exception.message)
+
+    def test_get_device_by_gcm_registration_id_returns_not_found_for_non_existent_id(self):
+        gcm_registration_id = 'bogus'
+        request_parameters = {'gcmRegistrationId': gcm_registration_id}
+        uri = build_uri('devices-retrieval')
+        with self.assertRaises(AppError) as context:
+            self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 404 Unable to find Chrome OS device by GCM registration ID: {0}'.format(
+            gcm_registration_id) in context.exception.message)
 
     def test_get_device_by_mac_address_returns_http_status_ok(self):
         request_parameters = {'macAddress': self.MAC_ADDRESS}
@@ -396,7 +447,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json['deviceId'], device.device_id)
 
     def test_get_device_by_mac_address_with_multiples_returns_zeroeth_device(self):
-        # TODO would like a decent mocking framework to assert we're logging this edge case as an error
         mac_address = '2342342342342'
         device = ChromeOsDevice.create_managed(
             tenant_key=self.tenant_key,
@@ -464,113 +514,33 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['proofOfPlayUrl'], config.DEFAULT_PROOF_OF_PLAY_URL)
 
-    def test_get_device_by_pairing_code_returns_not_found_for_non_existent_code(self):
-        request_parameters = {'pairingCode': self.PAIRING_CODE}
-        uri = build_uri('devices-retrieval')
-        with self.assertRaises(AppError) as context:
-            self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
-        self.assertTrue('Bad response: 404 Unable to find device by pairing code: {0}'.format(
-            self.PAIRING_CODE) in context.exception.message)
-
-    def test_get_device_by_pairing_code_returns_http_status_ok(self):
-        self.unmanaged_device.pairing_code = self.PAIRING_CODE
-        self.unmanaged_device.put()
-        request_parameters = {'pairingCode': self.PAIRING_CODE}
+    def test_get_device_by_parameter_without_parameter_returns_http_status_ok(self):
+        request_parameters = {}
         uri = build_uri('devices-retrieval')
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertOK(response)
 
-    def test_get_device_by_pairing_code_returns_single_resource(self):
-        self.unmanaged_device.pairing_code = self.PAIRING_CODE
-        self.unmanaged_device.put()
-        request_parameters = {'pairingCode': self.PAIRING_CODE}
+    def test_get_device_by_parameter_without_parameter_returns_list(self):
+        ndb.delete_multi(ChromeOsDevice.query().fetch(keys_only=True))
+        self.__build_list_devices(tenant_key=self.tenant_key, managed_number_to_build=5, unmanaged_number_to_build=3)
+        request_parameters = {}
         uri = build_uri('devices-retrieval')
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json['pairingCode'], self.PAIRING_CODE)
-        device = self.managed_device_key.get()
-        self.assertEqual(response_json['gcmRegistrationId'], device.gcm_registration_id)
+        self.assertLength(8, response_json)
 
-    def test_get_device_by_pairing_code_with_archived_true_returns_http_status_not_found(self):
-        device = ChromeOsDevice.create_managed(
-            tenant_key=self.tenant_key,
-            gcm_registration_id=self.GCM_REGISTRATION_ID,
-            device_id=self.DEVICE_ID,
-            mac_address=self.MAC_ADDRESS)
-        device.archived = True
-        device.put()
-        request_parameters = {'pairingCode': self.PAIRING_CODE}
-        uri = build_uri('devices-retrieval')
-        with self.assertRaises(AppError) as context:
-            self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
-        self.assertTrue("Unable to find device by pairing code: {0}".format(self.PAIRING_CODE) in
-                        context.exception.message)
-
-    def test_get_device_by_pairing_code_returns_zeroeth_resource_when_dupes(self):
-        # TODO would like a decent mocking framework to assert we're logging this edge case as an error
-        device_1 = ChromeOsDevice.create_unmanaged(
-            gcm_registration_id='g1111',
-            mac_address='m1111')
-        device_1.pairing_code = self.PAIRING_CODE
-        device_1.put()
-        device_2 = ChromeOsDevice.create_unmanaged(
-            gcm_registration_id='g2222',
-            mac_address='m2222')
-        device_2.pairing_code = self.PAIRING_CODE
-        device_2.put()
-        request_parameters = {'pairingCode': self.PAIRING_CODE}
+    def test_get_device_by_parameter_without_parameter_returns_empty_list_for_archived_devices(self):
+        ndb.delete_multi(ChromeOsDevice.query().fetch(keys_only=True))
+        self.__build_list_devices(tenant_key=self.tenant_key, managed_number_to_build=5, unmanaged_number_to_build=3)
+        devices = ChromeOsDevice.query().fetch(8)
+        for device in devices:
+            device.archived = True
+            device.put()
+        request_parameters = {}
         uri = build_uri('devices-retrieval')
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json['pairingCode'], self.PAIRING_CODE)
-        self.assertEqual(response_json['gcmRegistrationId'], 'g1111')
-        self.assertEqual(response_json['macAddress'], 'm1111')
-
-    def test_get_device_by_gcm_registration_id_returns_not_found_for_non_existent_id(self):
-        gcm_registration_id = 'bogus'
-        request_parameters = {'gcmRegistrationId': gcm_registration_id}
-        uri = build_uri('devices-retrieval')
-        with self.assertRaises(AppError) as context:
-            self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
-        self.assertTrue('Bad response: 404 Unable to find Chrome OS device by GCM registration ID: {0}'.format(
-            gcm_registration_id) in context.exception.message)
-
-    def test_get_device_by_gcm_registration_id_returns_http_status_ok(self):
-        gcm_registration_id = '123123123123'
-        device = ChromeOsDevice.create_unmanaged(gcm_registration_id=gcm_registration_id,
-                                                 mac_address=self.MAC_ADDRESS)
-        device.put()
-        request_parameters = {'gcmRegistrationId': gcm_registration_id}
-        uri = build_uri('devices-retrieval')
-        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
-        self.assertOK(response)
-
-    def test_get_list_by_gcm_registration_id_returns_zeroeth_resource(self):
-        gcm_registration_id = '123123123123'
-        device = ChromeOsDevice.create_unmanaged(gcm_registration_id=gcm_registration_id,
-                                                 mac_address=self.MAC_ADDRESS)
-        device.put()
-        request_parameters = {'gcmRegistrationId': gcm_registration_id}
-        uri = build_uri('devices-retrieval')
-        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
-        response_json = json.loads(response.body)
-        self.assertEqual(response_json['gcmRegistrationId'], device.gcm_registration_id)
-
-    def test_get_device_by_gcm_registration_id_with_archived_true_returns_http_status_not_found(self):
-        gcm_registration_id = 'adsfasdfa'
-        device = ChromeOsDevice.create_managed(
-            tenant_key=self.tenant_key,
-            gcm_registration_id=gcm_registration_id,
-            device_id=self.DEVICE_ID,
-            mac_address=self.MAC_ADDRESS)
-        device.archived = True
-        device.put()
-        request_parameters = {'gcmRegistrationId': gcm_registration_id}
-        uri = build_uri('devices-retrieval')
-        with self.assertRaises(AppError) as context:
-            self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
-        self.assertTrue("Unable to find Chrome OS device by GCM registration ID: {0}".format(gcm_registration_id)
-                        in context.exception.message)
+        self.assertLength(0, response_json)
 
     ##################################################################################################################
     # TENANT VIEW TESTS
@@ -961,8 +931,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        'device',
                                        None,
                                        {'device_urlsafe_key': self.managed_device_key.urlsafe()})
-        when(deferred).defer(any_matcher(refresh_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertOK(response)
 
@@ -979,8 +947,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        None,
                                        {'device_urlsafe_key': new_device_key.urlsafe()})
         new_device.key.delete()
-        when(deferred).defer(any_matcher(refresh_device),
-                             any_matcher(new_device_key.urlsafe())).thenReturn(None)
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertTrue('404 Not Found' in context.exception.message)
@@ -998,8 +964,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        'device',
                                        None,
                                        {'device_urlsafe_key': new_device_key.urlsafe()})
-        when(deferred).defer(any_matcher(refresh_device),
-                             any_matcher(new_device_key.urlsafe())).thenReturn(None)
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertTrue('Bad response: 404 Device with key: {0} archived.'.format(new_device_key.urlsafe())
@@ -1011,8 +975,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        'device',
                                        None,
                                        {'device_urlsafe_key': '0000ZXN0YmVkLXRlc3RyFAsSDkNocm9tZU9zRGV2aWNl0000'})
-        when(deferred).defer(any_matcher(refresh_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertTrue('400 Bad Request' in context.exception.message)
@@ -1023,8 +985,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        'device',
                                        None,
                                        {'device_urlsafe_key': self.managed_device_key.urlsafe()})
-        when(deferred).defer(any_matcher(refresh_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
         device = self.managed_device_key.get()
@@ -1064,8 +1024,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        'device',
                                        None,
                                        {'device_urlsafe_key': managed_device_key.urlsafe()})
-        when(deferred).defer(any_matcher(refresh_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
         device = self.managed_device_key.get()
@@ -1195,7 +1153,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {'gcmRegistrationId': self.GCM_REGISTRATION_ID,
                         'tenantCode': self.TENANT_CODE,
                         'notes': self.DEVICE_NOTES}
-        when(ChromeOsDevicesApi).get(any_matcher(), any_matcher()).thenReturn(self.managed_device_key.get())
         uri = build_uri('device', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
         response = self.put(uri, params=request_body, headers=self.empty_header)
         self.assertForbidden(response)
@@ -1205,8 +1162,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'tenantCode': self.tenant_key.get().tenant_code,
                         'notes': self.DEVICE_NOTES
                         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         response = self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                                 json.dumps(request_body),
                                 headers=self.api_token_authorization_header)
@@ -1222,8 +1177,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         device.archived = True
         device_key = device.put()
         request_body = {}
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         with self.assertRaises(AppError) as context:
             self.app.put('/api/v1/devices/{0}'.format(device_key.urlsafe()),
                          json.dumps(request_body),
@@ -1236,8 +1189,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {
             'notes': new_note
         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
@@ -1251,8 +1202,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             'gcmRegistrationId': gcm_registration_id,
             'tenantCode': self.tenant_key.get().tenant_code
         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
@@ -1265,8 +1214,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {
             'tenantCode': new_tenant.tenant_code
         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
@@ -1327,8 +1274,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                    customer_location_code='store_1234')
         location_key = location.put()
         request_body = {'locationKey': location_key.urlsafe()}
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
@@ -1352,9 +1297,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             'customerDisplayName': customer_display_name,
             'customerDisplayCode': customer_display_code
         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(new_device_key.urlsafe())).thenReturn(None)
-
         with self.assertRaises(AppError) as context:
             self.app.put('/api/v1/devices/{0}'.format(new_device_key.urlsafe()),
                          json.dumps(request_body),
@@ -1375,8 +1317,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             'customerDisplayName': new_display_name,
             'customerDisplayCode': customer_display_code
         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         response = self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                                 json.dumps(request_body),
                                 headers=self.api_token_authorization_header)
@@ -1389,8 +1329,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {
             'heartbeatInterval': interval
         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
@@ -1402,8 +1340,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {
             'checkContentInterval': interval
         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
@@ -1416,8 +1352,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {
             'checkContentInterval': interval
         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
@@ -1430,8 +1364,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         request_body = {
             'checkContentInterval': interval
         }
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
@@ -1443,8 +1375,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         explicit_timezone = 'America/Denver'
         self.assertEqual(self.managed_device.timezone_offset, TimezoneUtil.get_timezone_offset(default_timezone))
         request_body = {'timezone': explicit_timezone}
-        when(deferred).defer(any_matcher(update_chrome_os_device),
-                             any_matcher(self.managed_device_key.urlsafe())).thenReturn(None)
         self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
                      json.dumps(request_body),
                      headers=self.api_token_authorization_header)
@@ -1648,14 +1578,38 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
         self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
         issues = DeviceIssueLog.get_all_by_device_key(self.managed_device.key)
-        self.assertLength(1, issues)
-        self.assertTrue(issues[0].up)
-        self.assertEqual(issues[0].category, config.DEVICE_ISSUE_PLAYER_UP)
-        self.assertEqual(issues[0].storage_utilization, self.STORAGE_UTILIZATION)
-        self.assertEqual(issues[0].memory_utilization, self.MEMORY_UTILIZATION)
-        self.assertEqual(issues[0].program, self.PROGRAM)
-        self.assertEqual(issues[0].program_id, self.PROGRAM_ID)
-        self.assertEqual(issues[0].last_error, self.LAST_ERROR)
+        self.assertLength(2, issues)
+        self.assertEqual(issues[0].category, config.DEVICE_ISSUE_FIRST_HEARTBEAT)
+        self.assertTrue(issues[1].up)
+        self.assertEqual(issues[1].category, config.DEVICE_ISSUE_PLAYER_UP)
+        self.assertEqual(issues[1].storage_utilization, self.STORAGE_UTILIZATION)
+        self.assertEqual(issues[1].memory_utilization, self.MEMORY_UTILIZATION)
+        self.assertEqual(issues[1].program, self.PROGRAM)
+        self.assertEqual(issues[1].program_id, self.PROGRAM_ID)
+        self.assertEqual(issues[1].last_error, self.LAST_ERROR)
+
+    def test_put_heartbeat_invokes_a_device_issue_log_up_toggle_if_device_was_previously_down(self):
+        self.__initialize_heartbeat_info(up=False)
+        issues = DeviceIssueLog.get_all_by_device_key(self.managed_device.key)
+        self.assertLength(0, issues)
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'lastError': self.LAST_ERROR,
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        issues = DeviceIssueLog.get_all_by_device_key(self.managed_device.key)
+        self.assertLength(2, issues)
+        self.assertEqual(issues[0].category, config.DEVICE_ISSUE_FIRST_HEARTBEAT)
+        self.assertTrue(issues[1].up)
+        self.assertEqual(issues[1].category, config.DEVICE_ISSUE_PLAYER_UP)
+        self.assertEqual(issues[1].storage_utilization, self.STORAGE_UTILIZATION)
+        self.assertEqual(issues[1].memory_utilization, self.MEMORY_UTILIZATION)
+        self.assertEqual(issues[1].program, self.PROGRAM)
+        self.assertEqual(issues[1].program_id, self.PROGRAM_ID)
+        self.assertEqual(issues[1].last_error, self.LAST_ERROR)
 
     def test_put_heartbeat_can_resolve_previous_down_issues(self):
         self.managed_device.up = False

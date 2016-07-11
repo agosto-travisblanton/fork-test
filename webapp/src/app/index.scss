@@ -369,7 +369,7 @@ ul.alert-dropdown {
   padding-top: 10px;
 }
 
-.copy-ready-device-key {
+.copy-ready-transparent {
   color: transparent;
 }
 
@@ -458,6 +458,14 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
   text-align: center;
 }
 
+.ellipsis-overflow {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis // This is where the magic happens
+}
+
 .proof-of-play-selected-item {
   width: 100%;
   white-space: nowrap;
@@ -511,6 +519,36 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
   align-content: flex-start;
 }
 
+.registration-event-column {
+  height: 110px;
+  display: inline-block;
+  vertical-align: top;
+  overflow: scroll;
+}
+
+header.dtp-header {
+  background: #1b75bb !important;
+}
+
+.dtp div.dtp-date, .dtp div.dtp-time {
+  background: black;
+}
+
+.dtp table.dtp-picker-days tr > td > a.selected {
+  background: #1b75bb !important;
+}
+
+.dtp .dtp-picker-time > a.dtp-select-hour.selected {
+  background: #1b75bb !important;
+}
+
+.dtp .dtp-actual-meridien a.selected {
+  background: #1b75bb !important;
+}
+
+.dtp .dtp-hand.on {
+  background: black
+}
 
 //.distributor-selection {
 //  font-size: 20pt;
