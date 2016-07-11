@@ -60,6 +60,7 @@ class ChromeOsDevice(ndb.Model):
     location_key = ndb.KeyProperty(required=False, indexed=True)
     timezone = ndb.StringProperty(required=False, indexed=True)
     timezone_offset = ndb.IntegerProperty(required=False, indexed=True)  # computed property
+    registration_correlation_identifier = ndb.StringProperty(required=False, indexed=True)
     archived = ndb.BooleanProperty(default=False, required=True, indexed=True)
     class_version = ndb.IntegerProperty()
 
