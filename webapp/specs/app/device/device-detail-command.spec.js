@@ -554,6 +554,61 @@ describe('DeviceDetailsCommandsCtrl', function () {
     });
   });
 
+  describe('.onRestart', function () {
+    beforeEach(function () {
+      commandsServicePromise = new skykitProvisioning.q.Mock();
+      spyOn(CommandsService, 'restart').and.returnValue(commandsServicePromise);
+      spyOn(progressBarService, 'start');
+      spyOn(progressBarService, 'complete');
+      controller = $controller('DeviceDetailsCommandsCtrl', serviceInjection);
+      controller.editMode = true;
+      return controller.onRestart();
+    });
+
+    it('starts the progress bar', () =>
+      expect(progressBarService.start).toHaveBeenCalled());
+
+    it('call CommandsService.restart with the current device', () =>
+      expect(CommandsService.restart).toHaveBeenCalledWith(controller.currentDevice.key));
+
+    describe('.onRestartSuccess', function () {
+      beforeEach(function () {
+        spyOn(ToastsService, 'showSuccessToast');
+        return controller.onRestartSuccess();
+      });
+
+      it('stops the progress bar', () =>
+        expect(progressBarService.complete).toHaveBeenCalled());
+
+      return it('displays a toast indicating command was sent to player', () =>
+        expect(ToastsService.showSuccessToast).toHaveBeenCalledWith(
+          "We posted your restart command into the player's queue.")
+      );
+    });
+
+    return describe('.onRestartFailure', function () {
+      let error = {status: 404, statusText: 'Not Found'};
+
+      beforeEach(function () {
+        spyOn(sweet, 'show');
+        spyOn($log, 'error');
+        return controller.onRestartFailure(error);
+      });
+
+      it('stops the progress bar', () =>
+        expect(progressBarService.complete).toHaveBeenCalled());
+
+      it('displays a sweet alert', () =>
+        expect(sweet.show).toHaveBeenCalledWith(
+          'Oops...', "We were unable to post your restart command into the player's queue.", 'error')
+      );
+
+      return it('logs a detailed error to the console', () =>
+        expect($log.error).toHaveBeenCalledWith(
+          `Restart command error: ${error.status} ${error.statusText}`));
+    });
+  });
+
   describe('.onVolumeChange', function () {
     beforeEach(function () {
       commandsServicePromise = new skykitProvisioning.q.Mock();

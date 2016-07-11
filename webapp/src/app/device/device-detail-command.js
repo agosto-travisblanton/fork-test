@@ -265,6 +265,24 @@
         'error');
     };
 
+    vm.onRestart = function () {
+      ProgressBarService.start();
+      let promise = CommandsService.restart(vm.deviceKey);
+      return promise.then(vm.onRestartSuccess, vm.onRestartFailure);
+    };
+
+    vm.onRestartSuccess = function () {
+      ProgressBarService.complete();
+      return ToastsService.showSuccessToast("We posted your restart command into the player's queue.");
+    };
+
+    vm.onRestartFailure = function (error) {
+      ProgressBarService.complete();
+      $log.error(`Restart command error: ${error.status } ${error.statusText}`);
+      return sweet.show('Oops...', "We were unable to post your restart command into the player's queue.",
+        'error');
+    };
+
     return vm;
   });
 
