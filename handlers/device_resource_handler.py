@@ -180,6 +180,25 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         )
 
     @requires_api_token
+    def match_for_device_by_gcmid(self, distributor_urlsafe_key):
+        unmanaged = self.request.get("unmanaged") == "true"
+        full_gcmid = self.request.get("full_gcmid")
+
+        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
+        tenant_keys = [tenant.key for tenant in domain_tenant_list]
+        is_match = Tenant.match_device_with_full_gcmid(
+            tenant_keys=tenant_keys,
+            unmanaged=unmanaged,
+            full_gcmid=full_gcmid
+        )
+        json_response(
+            self.response,
+            {
+                "is_match": is_match
+            },
+        )
+
+    @requires_api_token
     def search_for_device_by_mac(self, distributor_urlsafe_key, partial_mac, unmanaged):
         unmanaged = unmanaged == "true"
         domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
@@ -226,7 +245,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     @requires_api_token
     def search_for_device_by_gcmid(self, distributor_urlsafe_key):
         unmanaged = self.request.get("unmanaged") == "true"
-        partial_gmcid = self.request.get("partial_gmcid")
+        partial_gcmid = self.request.get("partial_gcmid")
 
         domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
         tenant_keys = [tenant.key for tenant in domain_tenant_list]
@@ -234,7 +253,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         resulting_devices = Tenant.find_devices_with_partial_gcmid(
             tenant_keys=tenant_keys,
             unmanaged=unmanaged,
-            partial_gcmid=partial_gmcid
+            partial_gcmid=partial_gcmid
         )
 
         json_response(
