@@ -189,6 +189,12 @@ application = WSGIApplication(
               handler_method='diagnostics_toggle',
               methods=['POST']
               ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/restart',
+              handler='handlers.device_commands_handler.DeviceCommandsHandler',
+              name='device-restart-command',
+              handler_method='restart',
+              methods=['POST']
+              ),
 
         ############################################################
         # DISTRIBUTOR DEVICE ROUTES
