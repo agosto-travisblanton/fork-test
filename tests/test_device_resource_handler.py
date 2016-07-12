@@ -562,21 +562,23 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.__build_list_devices(tenant_key=self.tenant_key, managed_number_to_build=201,
                                   unmanaged_number_to_build=0)
 
-        request_parameters = {'unmanaged': 'false'}
+        request_parameters = {'unmanaged': 'false', 'prev_cursor': "null",
+                              "next_cursor": "null"}
 
         uri = application.router.build(None, 'devices-by-tenant', None,
-                                       {'tenant_urlsafe_key': self.tenant_key.urlsafe(), 'cur_prev_cursor': "null",
-                                        "cur_next_cursor": "null"})
+                                       {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
 
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
         self.assertLength(25, response_json["devices"])
 
         next_uri = application.router.build(None, 'devices-by-tenant', None,
-                                            {'tenant_urlsafe_key': self.tenant_key.urlsafe(), 'cur_prev_cursor': "null",
-                                             "cur_next_cursor": response_json["next_cursor"]})
+                                            {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
 
-        next_response = self.app.get(next_uri, params=request_parameters, headers=self.api_token_authorization_header)
+        next_params = {'unmanaged': 'false', 'prev_cursor': "null",
+                       "next_cursor": response_json["next_cursor"]}
+
+        next_response = self.app.get(next_uri, params=next_params, headers=self.api_token_authorization_header)
         next_response_json = json.loads(next_response.body)
         self.assertLength(25, next_response_json["devices"])
         self.assertTrue(next_response_json["prev_cursor"])
@@ -585,11 +587,11 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.__build_list_devices(tenant_key=self.tenant_key, managed_number_to_build=20,
                                   unmanaged_number_to_build=0)
 
-        request_parameters = {'unmanaged': 'true'}
+        request_parameters = {'unmanaged': 'true', 'prev_cursor': "null",
+                                        "next_cursor": "null"}
 
         uri = application.router.build(None, 'devices-by-tenant', None,
-                                       {'tenant_urlsafe_key': self.tenant_key.urlsafe(), 'cur_prev_cursor': "null",
-                                        "cur_next_cursor": "null"})
+                                       {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
 
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)

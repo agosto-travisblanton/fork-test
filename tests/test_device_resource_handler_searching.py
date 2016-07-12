@@ -9,7 +9,7 @@ from models import ChromeOsDevice, Tenant, Distributor, Domain
 setup_test_paths()
 
 
-class TestDeviceResourceHandler(BaseTest, WebTest):
+class TestDeviceResourceSearchHandlers(BaseTest, WebTest):
     ADMIN_EMAIL = 'foo@bar.com'
     ANOTHER_TENANT_NAME = 'Another, Inc,'
     ANOTHER_TENANT_CODE = 'another_inc'
@@ -36,7 +36,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     LAST_ERROR = 'some error'
 
     def setUp(self):
-        super(TestDeviceResourceHandler, self).setUp()
+        super(TestDeviceResourceSearchHandlers, self).setUp()
         self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
                                               active=True)
         self.distributor_key = self.distributor.put()
