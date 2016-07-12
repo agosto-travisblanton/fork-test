@@ -205,13 +205,16 @@ application = WSGIApplication(
         ############################################################
         # DISTRIBUTOR DEVICE ROUTES
         ############################################################
-
-        Route(r'/api/v1/distributors/<cur_prev_cursor>/<cur_next_cursor>/<distributor_urlsafe_key>/devices',
+        # PAGINATION DEVICE LIST
+        Route(r'/api/v1/distributors/<distributor_urlsafe_key>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='devices-by-distributor',
               handler_method='get_devices_by_distributor',
               methods=['GET']
               ),
+        ############################################################
+        # SEARCH
+        ############################################################
         Route(r'/api/v1/distributors/search/serial/<distributor_urlsafe_key>/<partial_serial>/<unmanaged>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='search_for_device_by_serial',
@@ -224,6 +227,15 @@ application = WSGIApplication(
               handler_method='search_for_device_by_mac',
               methods=['GET']
               ),
+        Route(r'/api/v1/distributors/search/<distributor_urlsafe_key>/devices',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='search_for_device',
+              handler_method='search_for_device',
+              methods=['GET']
+              ),
+        ############################################################
+        # MATCH
+        ############################################################
         Route(r'/api/v1/distributors/match/serial/<distributor_urlsafe_key>/<full_serial>/<unmanaged>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='match_for_device_by_serial',
@@ -234,6 +246,12 @@ application = WSGIApplication(
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='match_for_device_by_mac',
               handler_method='match_for_device_by_mac',
+              methods=['GET']
+              ),
+        Route(r'/api/v1/distributors/match/<distributor_urlsafe_key>/devices',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='match_for_device',
+              handler_method='match_for_device',
               methods=['GET']
               ),
 
