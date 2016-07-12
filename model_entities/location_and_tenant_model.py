@@ -128,6 +128,8 @@ class Tenant(ndb.Model):
                         item.gcm_registration_id and item.gcm_registration_id == partial_gcmid):
                 filtered_devices.append(item)
 
+        print filtered_devices
+
         return filtered_devices
 
     @classmethod
