@@ -214,7 +214,7 @@
 
             return DevicesService.searchDistributorDevicesByPartialGCMid(vm.distributorKey, partial, unmanaged)
               .then(function (res) {
-                let result = res["gcmid_matches"];
+                let result = res["matches"];
 
                 if (unmanaged) {
                   vm.unmanagedGCMidDevices = vm.convertArrayToDictionary(result, false, true);

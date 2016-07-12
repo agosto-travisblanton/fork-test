@@ -436,13 +436,13 @@ describe('DevicesListingCtrl', function () {
       controller.unmanagedSelectedButton = "GCM ID";
       controller.searchDevices(unmanaged, partial);
       let gcmid_matches = {
-        "gcmid_matches": [
+        "matches": [
           {"gcmid": "1234"},
           {"gcmid": "45566"}
         ]
       };
       gcmidPromise.resolve(gcmid_matches);
-      return expect(controller.unmanagedGCMidDevices).toEqual(controller.convertArrayToDictionary(gcmid_matches["gcmid_matches"], false, true));
+      return expect(controller.unmanagedGCMidDevices).toEqual(controller.convertArrayToDictionary(gcmid_matches["matches"], false, true));
     });
 
     it("returns every serial name when called as an managed serial", function () {
@@ -478,13 +478,13 @@ describe('DevicesListingCtrl', function () {
       controller.selectedButton = "GCM ID";
       controller.searchDevices(unmanaged, partial);
       let gcmid_matches = {
-        "gcmid_matches": [
+        "matches": [
           {"gcmid": "1234"},
           {"gcmid": "45566"}
         ]
       };
       gcmidPromise.resolve(gcmid_matches);
-      return expect(controller.gcmidDevices).toEqual(controller.convertArrayToDictionary(gcmid_matches["gcmid_matches"], false, true));
+      return expect(controller.gcmidDevices).toEqual(controller.convertArrayToDictionary(gcmid_matches["matches"], false, true));
     });
   });
 });
