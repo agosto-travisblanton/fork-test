@@ -730,11 +730,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.__setup_distributor_with_two_tenants_with_n_devices(distributor_key,
                                                                  tenant_1_device_count=1,
                                                                  tenant_2_device_count=1)
-        request_parameters = {'unmanaged': 'false', 'cur_prev_cursor': 'null',
-                              'cur_next_cursor': 'null'}
-
+        request_parameters = {'unmanaged': 'false'}
         uri = application.router.build(None, 'devices-by-distributor', None,
-                                       {'distributor_urlsafe_key': distributor_key.urlsafe()})
+                                       {'distributor_urlsafe_key': distributor_key.urlsafe(), 'cur_prev_cursor': 'null',
+                                        'cur_next_cursor': 'null'})
 
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
 
@@ -747,16 +746,15 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.__setup_distributor_with_two_tenants_with_n_devices(distributor_key,
                                                                  tenant_1_device_count=13,
                                                                  tenant_2_device_count=6)
-        request_parameters = {'unmanaged': 'false', 'cur_prev_cursor': 'null',
-                              'cur_next_cursor': 'null'}
-
+        request_parameters = {'unmanaged': 'false'}
         uri = application.router.build(
             None,
             'devices-by-distributor',
             None,
             {
                 'distributor_urlsafe_key': distributor_key.urlsafe(),
-
+                'cur_prev_cursor': 'null',
+                'cur_next_cursor': 'null'
             }
         )
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
@@ -790,32 +788,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
         response_json = json.loads(response.body)
         self.assertTrue(len(response_json["serial_number_matches"]) == tenant_one_amount + tenant_two_amount)
-
-    def test_search_for_device_by_gcmid(self):
-        distributor = Distributor.create(name='Acme Brothers', active=True)
-        distributor_key = distributor.put()
-        tenant_one_amount = 13
-        tenant_two_amount = 6
-        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(
-            distributor_key,
-            tenant_1_device_count=tenant_one_amount,
-            tenant_2_device_count=tenant_two_amount
-        )
-
-        uri = application.router.build(
-            None,
-            'search_for_device_by_gcmid',
-            None,
-            {
-                'distributor_urlsafe_key': distributor_key.urlsafe()
-            }
-        )
-        response = self.app.get(uri, headers=self.api_token_authorization_header,
-                                params={'partial_serial': 'm-gcm',
-                                        'unmanaged': 'false'})
-
-        response_json = json.loads(response.body)
-        self.assertTrue(len(response_json["gcmid_matches"]) == tenant_one_amount + tenant_two_amount)
 
     def test_search_for_device_by_mac(self):
         distributor = Distributor.create(name='Acme Brothers',
@@ -941,56 +913,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         )
 
         response = self.app.get(uri, headers=self.api_token_authorization_header)
-        response_json = json.loads(response.body)
-        self.assertFalse(response_json["is_match"])
-
-    def test_match_for_device_by_gcmid(self):
-        distributor = Distributor.create(name='Acme Brothers')
-        distributor_key = distributor.put()
-        tenant_one_amount = 13
-        tenant_two_amount = 6
-        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(
-            distributor_key,
-            tenant_1_device_count=tenant_one_amount,
-            tenant_2_device_count=tenant_two_amount
-        )
-        uri = application.router.build(
-            None,
-            'match_for_device_by_gcmid',
-            None,
-            {
-                'distributor_urlsafe_key': distributor_key.urlsafe(),
-
-            }
-        )
-
-        response = self.app.get(uri, headers=self.api_token_authorization_header, params={'full_gcmid': 'm-gcm0',
-                                                                                          'unmanaged': 'false'})
-        response_json = json.loads(response.body)
-        self.assertTrue(response_json["is_match"])
-
-    def test_not_match_for_device_by_gcmid(self):
-        distributor = Distributor.create(name='Acme Brothers')
-        distributor_key = distributor.put()
-        tenant_one_amount = 13
-        tenant_two_amount = 6
-        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(
-            distributor_key,
-            tenant_1_device_count=tenant_one_amount,
-            tenant_2_device_count=tenant_two_amount
-        )
-        uri = application.router.build(
-            None,
-            'match_for_device_by_gcmid',
-            None,
-            {
-                'distributor_urlsafe_key': distributor_key.urlsafe(),
-            }
-        )
-
-        response = self.app.get(uri, headers=self.api_token_authorization_header, params={'full_gcmid': 'm-gcdfdfdfm0',
-                                                                                          'unmanaged': 'false'})
-
         response_json = json.loads(response.body)
         self.assertFalse(response_json["is_match"])
 

@@ -180,25 +180,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         )
 
     @requires_api_token
-    def match_for_device_by_gcmid(self, distributor_urlsafe_key):
-        unmanaged = self.request.get("unmanaged") == "true"
-        full_gcmid = self.request.get("full_gcmid")
-
-        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
-        tenant_keys = [tenant.key for tenant in domain_tenant_list]
-        is_match = Tenant.match_device_with_full_gcmid(
-            tenant_keys=tenant_keys,
-            unmanaged=unmanaged,
-            full_gcmid=full_gcmid
-        )
-        json_response(
-            self.response,
-            {
-                "is_match": is_match
-            },
-        )
-
-    @requires_api_token
     def search_for_device_by_mac(self, distributor_urlsafe_key, partial_mac, unmanaged):
         unmanaged = unmanaged == "true"
         domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
@@ -238,35 +219,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                         "serial": device.serial_number,
                         "key": device.key.urlsafe(),
                         "tenantKey": device.tenant_key.urlsafe()
-                    } for device in resulting_devices]
-            },
-        )
-
-    @requires_api_token
-    def search_for_device_by_gcmid(self, distributor_urlsafe_key):
-        unmanaged = self.request.get("unmanaged") == "true"
-        partial_gcmid = self.request.get("partial_gcmid")
-
-        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
-        tenant_keys = [tenant.key for tenant in domain_tenant_list]
-
-        resulting_devices = Tenant.find_devices_with_partial_gcmid(
-            tenant_keys=tenant_keys,
-            unmanaged=unmanaged,
-            partial_gcmid=partial_gcmid
-        )
-
-        print resulting_devices
-
-        json_response(
-            self.response,
-            {
-                "gcmid_matches": [
-                    {
-                        "serial": device.serial_number,
-                        "key": device.key.urlsafe(),
-                        "tenantKey": device.tenant_key.urlsafe(),
-                        "gcmid": device.gcm_registration_id
                     } for device in resulting_devices]
             },
         )
@@ -335,13 +287,10 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
 
     @requires_api_token
-    def get_devices_by_distributor(self, distributor_urlsafe_key):
-        next_cursor = self.request.get("next_cursor")
-        prev_cursor = self.request.get("prev_cursor")
-        cur_next_cursor = next_cursor if next_cursor != "null" else None
-        cur_prev_cursor = prev_cursor if prev_cursor != "null" else None
+    def get_devices_by_distributor(self, distributor_urlsafe_key, cur_prev_cursor, cur_next_cursor):
+        cur_next_cursor = cur_next_cursor if cur_next_cursor != "null" else None
+        cur_prev_cursor = cur_prev_cursor if cur_prev_cursor != "null" else None
         unmanaged_filter = self.request.get('unmanaged')
-
         unmanaged = not bool(unmanaged_filter == '' or str(unmanaged_filter) == 'false')
         domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
         tenant_keys = [tenant.key for tenant in domain_tenant_list]
@@ -476,7 +425,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     registration_request_event.put()
                     self.response.set_status(status, error_message)
                     return
-                tenant = Tenant.find_by_tenant_code(tenant_code)
+                tenant  = Tenant.find_by_tenant_code(tenant_code)
                 if tenant is None:
                     status = 400
                     error_message = 'Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
@@ -489,8 +438,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     device = ChromeOsDevice.create_managed(tenant_key=tenant.key,
                                                            gcm_registration_id=gcm_registration_id,
                                                            mac_address=device_mac_address,
-                                                           timezone=timezone,
-                                                           registration_correlation_identifier=correlation_id)
+                                                           timezone=timezone)
                     key = device.put()
                     registration_request_event.device_urlsafe_key = key.urlsafe()
                     registration_request_event.details = 'register_device: tenant code={0}, mac address={1}, ' \
