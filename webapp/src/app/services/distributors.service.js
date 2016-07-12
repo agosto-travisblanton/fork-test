@@ -53,6 +53,11 @@ angular.module('skykitProvisioning').factory('DistributorsService', (Restangular
     }
 
     switchDistributor(distributor) {
+      ProofPlayService.proofplayCache.removeAll();
+      TenantsService.tenantCache.removeAll();
+      DevicesService.deviceCache.removeAll();
+      DevicesService.deviceByTenantCache.removeAll();
+
       SessionsService.setCurrentDistributorName(distributor.name);
       SessionsService.setCurrentDistributorKey(distributor.key);
 
