@@ -34,7 +34,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
       let promise = Restangular.oneUrl(this.SERVICE_NAME, url).get();
       return promise;
     }
-    
+
     //#######################################################################
     // TENANT VIEW
     //#######################################################################
@@ -248,7 +248,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
     }
 
     makeDevicesByDistributorURL(distributorKey, prev, next, unmanaged) {
-      return url = `/api/v1/distributors/${prev}/${next}/${distributorKey}/devices?unmanaged=${unmanaged}`;
+      return url = `/api/v1/distributors/${distributorKey}/devices?unmanaged=${unmanaged}&prev_cursor=${prev}&next_cursor=${next}`;
     }
 
     makeDevicesByTenantURL(tenantKey, prev, next, unmanaged) {
