@@ -326,8 +326,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                 params={'partial_gcmid': 'm-gcm',
                                         'unmanaged': 'false'})
 
-        print json.loads(response.body)
-
         response_json = json.loads(response.body)
         self.assertTrue(len(response_json["matches"]) == tenant_one_amount + tenant_two_amount)
 
