@@ -805,14 +805,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             'search_for_device_by_gcmid',
             None,
             {
-                'distributor_urlsafe_key': distributor_key.urlsafe(),
-
+                'distributor_urlsafe_key': distributor_key.urlsafe()
             }
         )
-
-        print uri
-
-
         response = self.app.get(uri, headers=self.api_token_authorization_header,
                                 params={'partial_serial': 'm-gcm',
                                         'unmanaged': 'false'})
