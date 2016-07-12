@@ -1,0 +1,78 @@
+<div ng-controller="DeviceDetailsCommandsCtrl as vm" ng-init="vm.initialize()">
+  <md-tab label="Command History" md-on-select="vm.commandHistorySelected()">
+
+    <div flex="100" flex-sm="100" flex-xs="100" layout="column">
+      <md-card>
+        <md-card-content>
+          <h3>Command History</h3>
+          <hr/>
+          <div class="row">
+            <div class="col-md-12">
+              <md-button class="md-raised"
+                         ng-disabled="!vm.event_prev_cursor"
+                         ng-click="vm.paginateEventCall(false)">
+                Prev
+              </md-button>
+              <md-button class="md-raised"
+                         ng-disabled="!vm.event_next_cursor"
+                         ng-click="vm.paginateEventCall(true)">
+                Next
+              </md-button>
+              <md-button class="md-raised  md-primary"
+                         ng-click="vm.getEvents(vm.deviceKey)">
+                Refresh
+              </md-button>
+              <hr/>
+            </div>
+            <div class="col-lg-12">
+              <table class="table table-responsive table-striped">
+                <thead>
+                <tr>
+                  <th>Command</th>
+                  <th>Posted (US/Central)</th>
+                  <th>Confirmed (US/Central)</th>
+                  <th>Issued by</th>
+                  <th style="width:1px"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-hide="vm.commandEvents.length">
+                  <td class="text-center text-warning" colspan="4">No commands
+                    posted
+                    to this player
+                  </td>
+                </tr>
+                <tr ng-repeat="item in vm.commandEvents">
+                  <td class="command-history-command">{{ item.payload }}</td>
+                  <td>{{ item.postedTime }}</td>
+                  <td>{{ item.confirmedTime }}</td>
+                  <td>{{ item.userIdentifier }}</td>
+                  <td class="up-{{ item.confirmed}}-background"></td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-md-12" ng-if="vm.commandEvents.length > 10">
+              <hr/>
+              <md-button class="md-raised"
+                         ng-disabled="!vm.event_prev_cursor"
+                         ng-click="vm.paginateEventCall(false)">
+                Prev
+              </md-button>
+              <md-button class="md-raised"
+                         ng-disabled="!vm.event_next_cursor"
+                         ng-click="vm.paginateEventCall(true)">
+                Next
+              </md-button>
+              <md-button class="md-raised  md-primary"
+                         ng-click="vm.getEvents(vm.deviceKey)">
+                Refresh
+              </md-button>
+              <hr/>
+            </div>
+          </div>
+        </md-card-content>
+      </md-card>
+    </div>
+  </md-tab>
+</div>

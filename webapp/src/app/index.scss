@@ -526,6 +526,30 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
   overflow: scroll;
 }
 
+header.dtp-header {
+  background: #1b75bb !important;
+}
+
+.dtp div.dtp-date, .dtp div.dtp-time {
+  background: black;
+}
+
+.dtp table.dtp-picker-days tr > td > a.selected {
+  background: #1b75bb !important;
+}
+
+.dtp .dtp-picker-time > a.dtp-select-hour.selected {
+  background: #1b75bb !important;
+}
+
+.dtp .dtp-actual-meridien a.selected {
+  background: #1b75bb !important;
+}
+
+.dtp .dtp-hand.on {
+  background: black
+}
+
 //.distributor-selection {
 //  font-size: 20pt;
 //  border: solid 1px #c9c9c9;

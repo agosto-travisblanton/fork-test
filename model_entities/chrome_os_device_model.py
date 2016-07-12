@@ -1,6 +1,8 @@
 import uuid
+
 from datetime import datetime
 from google.appengine.ext import ndb
+
 from app_config import config
 from restler.decorators import ae_ndb_serializer
 from utils.timezone_util import TimezoneUtil
@@ -60,6 +62,7 @@ class ChromeOsDevice(ndb.Model):
     location_key = ndb.KeyProperty(required=False, indexed=True)
     timezone = ndb.StringProperty(required=False, indexed=True)
     timezone_offset = ndb.IntegerProperty(required=False, indexed=True)  # computed property
+    registration_correlation_identifier = ndb.StringProperty(required=False, indexed=True)
     archived = ndb.BooleanProperty(default=False, required=True, indexed=True)
     class_version = ndb.IntegerProperty()
 
@@ -78,7 +81,7 @@ class ChromeOsDevice(ndb.Model):
     @classmethod
     def create_managed(cls, tenant_key, gcm_registration_id, mac_address, ethernet_mac_address=None, device_id=None,
                        serial_number=None, archived=False,
-                       model=None, timezone='America/Chicago'):
+                       model=None, timezone='America/Chicago', registration_correlation_identifier=None):
         timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
         proof_of_play_editable = False
         tenant = tenant_key.get()
@@ -105,7 +108,8 @@ class ChromeOsDevice(ndb.Model):
             heartbeat_interval_minutes=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES,
             timezone=timezone,
             timezone_offset=timezone_offset,
-            proof_of_play_editable=proof_of_play_editable)
+            proof_of_play_editable=proof_of_play_editable,
+            registration_correlation_identifier=registration_correlation_identifier)
         return device
 
     @classmethod
@@ -162,6 +166,13 @@ class ChromeOsDevice(ndb.Model):
                    ChromeOsDevice.ethernet_mac_address == device_mac_address),
             ndb.AND(ChromeOsDevice.archived == False)).count() > 0
         return mac_address_assigned_to_device
+
+    @classmethod
+    def gcm_registration_id_already_assigned(cls, gcm_registration_id):
+        gcm_registration_id_already_assigned_to_device = ChromeOsDevice.query(
+            ndb.AND(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
+                    ChromeOsDevice.archived == False)).count() > 0
+        return gcm_registration_id_already_assigned_to_device
 
     @classmethod
     def is_rogue_unmanaged_device(cls, mac_address):

@@ -183,6 +183,24 @@ application = WSGIApplication(
               handler_method='refresh_device_representation',
               methods=['POST']
               ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/diagnostics',
+              handler='handlers.device_commands_handler.DeviceCommandsHandler',
+              name='device-diagnostics-toggle-command',
+              handler_method='diagnostics_toggle',
+              methods=['POST']
+              ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/restart',
+              handler='handlers.device_commands_handler.DeviceCommandsHandler',
+              name='device-restart-command',
+              handler_method='restart',
+              methods=['POST']
+              ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/post-log',
+              handler='handlers.device_commands_handler.DeviceCommandsHandler',
+              name='device-post-log-command',
+              handler_method='post_log',
+              methods=['POST']
+              ),
 
         ############################################################
         # DISTRIBUTOR DEVICE ROUTES

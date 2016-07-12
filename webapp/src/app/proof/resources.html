@@ -14,15 +14,15 @@
           <div ng-if="vm.tenants" class="proof-of-play-horizontal-top-bar">
             <div class="col-md-3 col-md-offset-7">
               <md-autocomplete
-                      md-no-cache="true"
-                      md-selected-item="vm.tenantselectedItem"
-                      md-search-text="vm.tenantsearchText"
-                      md-items="item in vm.querySearch(vm.tenants, vm.tenantsearchText)"
-                      md-item-text="item"
-                      md-min-length="0"
-                      md-search-text-change="vm.isSelectionValid(vm.tenantsearchText)"
-                      md-selected-item-change="vm.isSelectionValid(vm.tenantsearchText)"
-                      placeholder="Switch Tenants">
+                md-no-cache="true"
+                md-selected-item="vm.tenantselectedItem"
+                md-search-text="vm.tenantsearchText"
+                md-items="item in vm.querySearch(vm.tenants, vm.tenantsearchText)"
+                md-item-text="item"
+                md-min-length="0"
+                md-search-text-change="vm.isSelectionValid(vm.tenantsearchText)"
+                md-selected-item-change="vm.isSelectionValid(vm.tenantsearchText)"
+                placeholder="Switch Tenants">
 
                 <md-item-template>
                   <span md-highlight-text="vm.searchText"
@@ -63,15 +63,15 @@
                   <h4 class="proof-of-play-label">Resource Selection</h4>
                   <form ng-submit="$event.preventDefault()">
                     <md-autocomplete
-                            md-no-cache="true"
-                            md-selected-item="vm.selectedItem"
-                            md-search-text="vm.searchText"
-                            md-items="item in vm.querySearch(vm.resources, vm.searchText)"
-                            md-item-text="item"
-                            md-min-length="0"
-                            md-search-text-change="vm.isResourceValid(vm.searchText)"
-                            md-selected-item-change="vm.isResourceValid(vm.searchText)"
-                            placeholder="Select a resource">
+                      md-no-cache="true"
+                      md-selected-item="vm.selectedItem"
+                      md-search-text="vm.searchText"
+                      md-items="item in vm.querySearch(vm.resources, vm.searchText)"
+                      md-item-text="item"
+                      md-min-length="0"
+                      md-search-text-change="vm.isResourceValid(vm.searchText)"
+                      md-selected-item-change="vm.isResourceValid(vm.searchText)"
+                      placeholder="Select a resource">
                       <md-item-template>
                         <span md-highlight-text="vm.searchText"
                               md-highlight-flags="^i">{{item}}</span>
@@ -117,8 +117,8 @@
                 <md-input-container class="md-block">
                   <h4 class="proof-of-play-label">Report Type</h4>
                   <md-radio-group
-                          ng-model="vm.radioButtonChoices.selection"
-                          ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
+                    ng-model="vm.radioButtonChoices.selection"
+                    ng-change="vm.isRadioValid(vm.radioButtonChoices.selection)">
                     <md-radio-button value="1">
                       {{vm.radioButtonChoices.group1}}
                     </md-radio-button>
