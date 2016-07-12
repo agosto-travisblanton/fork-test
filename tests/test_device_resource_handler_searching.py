@@ -1,12 +1,10 @@
 import json
 
-
 from agar.test import BaseTest, WebTest
 from app_config import config
 from env_setup import setup_test_paths
 from routes import application
 from models import ChromeOsDevice, Tenant, Distributor, Domain
-
 
 setup_test_paths()
 
@@ -279,6 +277,30 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertTrue(len(response_json["serial_number_matches"]) == tenant_one_amount + tenant_two_amount)
 
+    def test_search_for_device_by_serial(self):
+        distributor = Distributor.create(name='Acme Brothers',
+                                         active=True)
+        distributor_key = distributor.put()
+        tenant_one_amount = 13
+        tenant_two_amount = 6
+        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(distributor_key,
+                                                                              tenant_1_device_count=tenant_one_amount,
+                                                                              tenant_2_device_count=tenant_two_amount)
+        uri = application.router.build(
+            None,
+            'search_for_device',
+            None,
+            {
+                'distributor_urlsafe_key': distributor_key.urlsafe(),
+
+            }
+        )
+
+        response = self.app.get(uri, headers=self.api_token_authorization_header, params={'partial_serial': 'm-',
+                                                                                          'unmanaged': 'false'})
+        response_json = json.loads(response.body)
+        self.assertTrue(len(response_json["matches"]) == tenant_one_amount + tenant_two_amount)
+
     def test_search_for_device_by_gcmid(self):
         distributor = Distributor.create(name='Acme Brothers', active=True)
         distributor_key = distributor.put()
@@ -305,7 +327,31 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         print json.loads(response.body)
 
         response_json = json.loads(response.body)
-        self.assertTrue(len(response_json["gcmid_matches"]) == tenant_one_amount + tenant_two_amount)
+        self.assertTrue(len(response_json["matches"]) == tenant_one_amount + tenant_two_amount)
+
+    def test_search_for_device_by_mac(self):
+        distributor = Distributor.create(name='Acme Brothers',
+                                         active=True)
+        distributor_key = distributor.put()
+        tenant_one_amount = 13
+        tenant_two_amount = 6
+        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(distributor_key,
+                                                                              tenant_1_device_count=tenant_one_amount,
+                                                                              tenant_2_device_count=tenant_two_amount)
+        uri = application.router.build(
+            None,
+            'search_for_device',
+            None,
+            {
+                'distributor_urlsafe_key': distributor_key.urlsafe(),
+            }
+        )
+
+        response = self.app.get(uri, headers=self.api_token_authorization_header, params={'partial_mac': 'm-mac',
+                                                                                          'unmanaged': 'false'})
+
+        response_json = json.loads(response.body)
+        self.assertTrue(len(response_json["matches"]) == tenant_one_amount + tenant_two_amount)
 
     def test_search_for_device_by_mac(self):
         distributor = Distributor.create(name='Acme Brothers',

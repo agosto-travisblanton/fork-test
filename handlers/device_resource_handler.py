@@ -277,7 +277,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         json_response(
             self.response,
             {
-                "gcmid_matches": [
+                "matches": [
                     {
                         "serial": device.serial_number,
                         "key": device.key.urlsafe(),
