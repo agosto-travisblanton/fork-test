@@ -6,6 +6,37 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
     constructor() {
       this.SERVICE_NAME = 'devices';
       this.uriBase = 'v1/devices';
+      if (!CacheFactory.get('deviceCache')) {
+        this.deviceCache = CacheFactory('deviceCache', {
+            maxAge: 60 * 60 * 1000,
+            deleteOnExpire: 'aggressive',
+            storageMode: 'localStorage',
+            onExpire: (key, value) => {
+              $http.get(key).success(data => {
+                this.deviceCache.put(key, data);
+                return;
+              });
+              return;
+            }
+          }
+        );
+      }
+
+      if (!CacheFactory.get('deviceByTenantCache')) {
+        this.deviceByTenantCache = CacheFactory('deviceByTenantCache', {
+            maxAge: 60 * 60 * 1000,
+            deleteOnExpire: 'aggressive',
+            storageMode: 'localStorage',
+            onExpire: (key, value) => {
+              $http.get(key).success(data => {
+                this.deviceByTenantCache.put(key, data);
+                return;
+              });
+              return;
+            }
+          }
+        );
+      }
     }
 
     getDeviceByMacAddress(macAddress) {
@@ -35,13 +66,24 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
       return promise;
     }
 
-    //#######################################################################
-    // TENANT VIEW
-    //#######################################################################
+//#######################################################################
+// TENANT VIEW
+//#######################################################################
     getDevicesByTenant(tenantKey, prev, next) {
       if (tenantKey !== undefined) {
+        let deferred = $q.defer();
         let url = this.makeDevicesByTenantURL(tenantKey, prev, next, false);
-        return Restangular.oneUrl(this.SERVICE_NAME, url).get();
+        if (!this.deviceByTenantCache.get(url)) {
+          let promise = Restangular.oneUrl(this.SERVICE_NAME, url).get();
+          promise.then(data => {
+            this.deviceByTenantCache.put(url, data);
+            return deferred.resolve(data);
+          });
+        } else {
+          deferred.resolve(this.deviceByTenantCache.get(url));
+        }
+
+        return deferred.promise;
       }
     }
 
@@ -49,7 +91,17 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
       if (tenantKey !== undefined) {
         let deferred = $q.defer();
         let url = this.makeDevicesByTenantURL(tenantKey, prev, next, true);
-        return Restangular.oneUrl(this.SERVICE_NAME, url).get();
+        if (!this.deviceByTenantCache.get(url)) {
+          let promise = Restangular.oneUrl(this.SERVICE_NAME, url).get();
+          promise.then(data => {
+            this.deviceByTenantCache.put(url, data);
+            return deferred.resolve(data);
+          });
+        } else {
+          deferred.resolve(this.deviceByTenantCache.get(url));
+        }
+
+        return deferred.promise;
       }
     }
 
@@ -86,9 +138,9 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
       }
     }
 
-    //#######################################################################
-    // DEVICES VIEW
-    //#######################################################################
+//#######################################################################
+// DEVICES VIEW
+//#######################################################################
     searchDevicesByPartialSerial(distributorKey, partial_serial, unmanaged) {
       if (distributorKey !== undefined) {
         let url = `api/v1/distributors/search/serial/${distributorKey}/${partial_serial}/${unmanaged}/devices`;
@@ -123,15 +175,37 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
 
     getDevicesByDistributor(distributorKey, prev, next) {
       if (distributorKey !== undefined) {
+        let deferred = $q.defer();
         let url = this.makeDevicesByDistributorURL(distributorKey, prev, next, false);
-        return Restangular.oneUrl(this.SERVICE_NAME, url).get();
+        if (!this.deviceCache.get(url)) {
+          let promise = Restangular.oneUrl(this.SERVICE_NAME, url).get();
+          promise.then(data => {
+            this.deviceCache.put(url, data);
+            return deferred.resolve(data);
+          });
+        } else {
+          deferred.resolve(this.deviceCache.get(url));
+        }
+
+        return deferred.promise;
       }
     }
 
     getUnmanagedDevicesByDistributor(distributorKey, prev, next) {
       if (distributorKey !== undefined) {
+        let deferred = $q.defer();
         let url = this.makeDevicesByDistributorURL(distributorKey, prev, next, true);
-        return Restangular.oneUrl(this.SERVICE_NAME, url).get();
+        if (!this.deviceCache.get(url)) {
+          let promise = Restangular.oneUrl(this.SERVICE_NAME, url).get();
+          promise.then(data => {
+            this.deviceCache.put(url, data);
+            return deferred.resolve(data);
+          });
+        } else {
+          deferred.resolve(this.deviceCache.get(url));
+        }
+
+        return deferred.promise;
       }
     }
 
@@ -245,13 +319,11 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
     }
 
     makeDevicesByDistributorURL(distributorKey, prev, next, unmanaged) {
-      let url = `/api/v1/distributors/${distributorKey}/devices?unmanaged=${unmanaged}&next_cursor=${next}&prev_cursor=${prev}`;
-      return url
+      return url = `/api/v1/distributors/${prev}/${next}/${distributorKey}/devices?unmanaged=${unmanaged}`;
     }
 
     makeDevicesByTenantURL(tenantKey, prev, next, unmanaged) {
-      let url = `/api/v1/tenants/${prev}/${next}/${tenantKey}/devices?unmanaged=${unmanaged}`;
-      return url
+      return url = `/api/v1/tenants/${prev}/${next}/${tenantKey}/devices?unmanaged=${unmanaged}`;
     }
   }();
 });

@@ -48,6 +48,7 @@
       vm.loading = true;
       vm.disabled = true;
       vm.selected_locations = [];
+      ProofPlayService.proofplayCache.removeAll();
       return vm.initialize();
     };
 

@@ -45,6 +45,10 @@
 
     vm.loginSuccess = function (response) {
       ProgressBarService.complete();
+      ProofPlayService.proofplayCache.removeAll();
+      TenantsService.tenantCache.removeAll();
+      DevicesService.deviceCache.removeAll();
+      DevicesService.deviceByTenantCache.removeAll();
       return $state.go('distributor_selection');
     };
 

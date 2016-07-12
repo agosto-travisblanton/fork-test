@@ -74,6 +74,38 @@ describe('AuthenticationCtrl', function () {
     promise = void 0;
     beforeEach(function () {
       promise = new skykitProvisioning.q.Mock();
+      DevicesService.deviceCache = {
+        get: function () {
+        },
+        put: function () {
+        },
+        removeAll: function () {
+        }
+      };
+      DevicesService.deviceByTenantCache = {
+        get: function () {
+        },
+        put: function () {
+        },
+        removeAll: function () {
+        }
+      };
+      ProofPlayService.proofplayCache = {
+        get: function () {
+        },
+        put: function () {
+        },
+        removeAll: function () {
+        }
+      };
+      TenantsService.tenantCache = {
+        get: function () {
+        },
+        put: function () {
+        },
+        removeAll: function () {
+        }
+      };
       spyOn(ProgressBarService, 'start');
       spyOn(SessionsService, 'login').and.callFake(function (authResult) {
         return promise;
@@ -204,7 +236,38 @@ describe('AuthenticationCtrl', function () {
     var response;
     response = {};
     beforeEach(function () {
-
+      DevicesService.deviceCache = {
+        get: function () {
+        },
+        put: function () {
+        },
+        removeAll: function () {
+        }
+      };
+      DevicesService.deviceByTenantCache = {
+        get: function () {
+        },
+        put: function () {
+        },
+        removeAll: function () {
+        }
+      };
+      ProofPlayService.proofplayCache = {
+        get: function () {
+        },
+        put: function () {
+        },
+        removeAll: function () {
+        }
+      };
+      TenantsService.tenantCache = {
+        get: function () {
+        },
+        put: function () {
+        },
+        removeAll: function () {
+        }
+      };
       spyOn(ProgressBarService, 'complete');
       spyOn(SessionsService, 'setIdentity');
       spyOn($state, 'go').and.callFake(function (name) {
