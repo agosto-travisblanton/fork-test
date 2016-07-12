@@ -132,7 +132,6 @@
             mac = vm.selectedButton === "MAC";
             serial = vm.selectedButton === "Serial Number";
             gcmid = vm.selectedButton === "GCM ID"
-
             vm.disabledButtonLoading = true;
           }
 
