@@ -50,7 +50,6 @@
       vm.loading = true;
       vm.disabled = true;
       vm.selected_displays = [];
-      ProofPlayService.proofplayCache.removeAll();
       return vm.initialize();
     };
 

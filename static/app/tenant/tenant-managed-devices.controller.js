@@ -43,7 +43,6 @@
       vm.devicesPrev = null;
       vm.devicesNext = null;
       vm.tenantDevices = null;
-      DevicesService.deviceByTenantCache.removeAll();
       return vm.getManagedDevices(vm.tenantKey, vm.devicesPrev, vm.devicesNext);
     };
 

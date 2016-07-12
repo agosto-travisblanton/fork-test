@@ -84,6 +84,7 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
             device.org_unit_path = chrome_os_device.get('orgUnitPath')
             device.annotated_user = chrome_os_device.get('annotatedUser')
             device.annotated_location = chrome_os_device.get('annotatedLocation')
+            device.annotated_asset_id = chrome_os_device.get('annotatedAssetId')
             device.notes = chrome_os_device.get('notes')
             device.boot_mode = chrome_os_device.get('bootMode')
             device.last_enrollment_time = chrome_os_device.get('lastEnrollmentTime')
