@@ -63,7 +63,7 @@
         let item = theArray[i];
         if (mac) {
           devices[item.mac] = item;
-        } else if (gmc) {
+        } else if (gcm) {
           devices[item.gcmid] = item;
         } else {
           devices[item.serial] = item;
@@ -74,23 +74,37 @@
     };
 
     vm.prepareForEditView = function (unmanaged, searchText) {
+      let mac, serial, gcmid;
       if (unmanaged) {
-        let mac = vm.unmanagedSelectedButton === "MAC";
+        mac = vm.unmanagedSelectedButton === "MAC";
+        serial = vm.unmanagedSelectedButton === "Serial Number";
+        gcmid = vm.unmanagedSelectedButton === "GCM ID"
+
         if (mac) {
           return vm.editItem(vm.unmanagedMacDevices[searchText]);
-        } else {
+        } else if (serial) {
           return vm.editItem(vm.unmanagedSerialDevices[searchText]);
+        } else {
+          return vm.editItem(vm.unmanagedGCMidDevices[searchText])
         }
 
       } else {
-        let mac = vm.selectedButton === "MAC";
+        mac = vm.selectedButton === "MAC";
+        serial = vm.selectedButton === "Serial Number";
+        gcmid = vm.selectedButton === "GCM ID"
+
+
         if (mac) {
           return vm.editItem(vm.macDevices[searchText]);
-        } else {
+        } else if (serial) {
           return vm.editItem(vm.serialDevices[searchText]);
+        } else {
+          return vm.editItem(vm.gcmidDevices[searchText])
         }
+
+
       }
-    };
+    }
 
 
     vm.controlOpenButton = function (unmanaged, isMatch) {
@@ -106,17 +120,18 @@
 
     vm.isResourceValid = function (unmanaged, resource) {
       if (resource) {
+        let mac, serial, gcmid;
         if (resource.length > 2) {
           if (unmanaged) {
-            let mac = vm.unmanagedSelectedButton === "MAC";
-            let serial = vm.unmanagedSelectedButton === "Serial Number";
-            let gcmid = vm.unmanagedSelectedButton === "GCM ID"
+            mac = vm.unmanagedSelectedButton === "MAC";
+            serial = vm.unmanagedSelectedButton === "Serial Number";
+            gcmid = vm.unmanagedSelectedButton === "GCM ID"
             vm.unmanagedDisabledButtonLoading = true;
 
           } else {
-            let mac = vm.selectedButton === "MAC";
-            let serial = vm.selectedButton === "Serial Number";
-            let gcmid = vm.selectedButton === "GCM ID"
+            mac = vm.selectedButton === "MAC";
+            serial = vm.selectedButton === "Serial Number";
+            gcmid = vm.selectedButton === "GCM ID"
 
             vm.disabledButtonLoading = true;
           }
@@ -265,12 +280,13 @@
       return sweet.show('Oops...', errorMessage, 'error');
     };
 
-    vm.editItem = item =>
+    vm.editItem = item => {
       $state.go('editDevice', {
         deviceKey: item.key,
         tenantKey: item.tenantKey,
         fromDevices: true
       })
+    }
     ;
 
     vm.paginateCall = function (forward, managed) {

@@ -107,7 +107,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
 
     searchDistributorDevicesByPartialGCMid(distributorKey, partial_gcmid, unmanaged) {
       if (distributorKey !== undefined) {
-        let url = `/api/v1/distributors/search/gcmid/${distributorKey}/devices?unmanaged=${unmanaged}&partial_gcmid=${partial_gcmid}`;
+        let url = `/api/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_gcmid=${partial_gcmid}`;
         let promise = Restangular.oneUrl(this.SERVICE_NAME, url).get();
         return promise;
       }
@@ -131,7 +131,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
 
     matchDevicesByFullGCMid(distributorKey, full_gcmid, unmanaged) {
       if (distributorKey !== undefined) {
-        let url = `/api/v1/distributors/match/gcmid/${distributorKey}/devices?unmanaged=${unmanaged}&full_gcmid=${full_gcmid}`;
+        let url = `/api/v1/distributors/match/${distributorKey}/devices?unmanaged=${unmanaged}&full_gcmid=${full_gcmid}`;
         let promise = Restangular.oneUrl(this.SERVICE_NAME, url).get();
         return promise;
       }
