@@ -256,8 +256,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             partial_gcmid=partial_gcmid
         )
 
-        print resulting_devices
-
         json_response(
             self.response,
             {
