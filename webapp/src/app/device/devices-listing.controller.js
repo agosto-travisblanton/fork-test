@@ -16,6 +16,7 @@
     vm.serialDevices = {};
     vm.disabled = true;
     vm.macDevices = {};
+    vm.gcmidDevices = {};
 
     //####################################
     // Unmanaged
@@ -27,6 +28,7 @@
     vm.unmanagedDevicesNext = null;
     vm.unmanagedDevices = [];
     vm.unmanagedMacDevices = {};
+    vm.unmanagedGCMidDevices = {};
 
     vm.refreshManagedDevices = function () {
       vm.devicesPrev = null;
@@ -55,12 +57,14 @@
       }
     };
 
-    vm.convertArrayToDictionary = function (theArray, mac) {
+    vm.convertArrayToDictionary = function (theArray, mac, gcm) {
       let devices = {};
       for (let i = 0; i < theArray.length; i++) {
         let item = theArray[i];
         if (mac) {
           devices[item.mac] = item;
+        } else if (gmc) {
+          devices[item.gcmid] = item;
         } else {
           devices[item.serial] = item;
         }
@@ -71,7 +75,7 @@
 
     vm.prepareForEditView = function (unmanaged, searchText) {
       if (unmanaged) {
-        var mac = vm.unmanagedSelectedButton === "MAC";
+        let mac = vm.unmanagedSelectedButton === "MAC";
         if (mac) {
           return vm.editItem(vm.unmanagedMacDevices[searchText]);
         } else {
@@ -79,7 +83,7 @@
         }
 
       } else {
-        var mac = vm.selectedButton === "MAC";
+        let mac = vm.selectedButton === "MAC";
         if (mac) {
           return vm.editItem(vm.macDevices[searchText]);
         } else {
@@ -104,11 +108,16 @@
       if (resource) {
         if (resource.length > 2) {
           if (unmanaged) {
-            var mac = vm.unmanagedSelectedButton === "MAC";
+            let mac = vm.unmanagedSelectedButton === "MAC";
+            let serial = vm.unmanagedSelectedButton === "Serial Number";
+            let gcmid = vm.unmanagedSelectedButton === "GCM ID"
             vm.unmanagedDisabledButtonLoading = true;
 
           } else {
-            var mac = vm.selectedButton === "MAC";
+            let mac = vm.selectedButton === "MAC";
+            let serial = vm.selectedButton === "Serial Number";
+            let gcmid = vm.selectedButton === "GCM ID"
+
             vm.disabledButtonLoading = true;
           }
 
@@ -116,8 +125,12 @@
             return DevicesService.matchDevicesByFullMac(vm.distributorKey, resource, unmanaged)
               .then(res => vm.controlOpenButton(unmanaged, res["is_match"]));
 
-          } else {
+          } else if (serial) {
             return DevicesService.matchDevicesByFullSerial(vm.distributorKey, resource, unmanaged)
+              .then(res => vm.controlOpenButton(unmanaged, res["is_match"]));
+
+          } else if (gcmid) {
+            return DevicesService.matchDevicesByFullGCMid(vm.distributorKey, resource, unmanaged)
               .then(res => vm.controlOpenButton(unmanaged, res["is_match"]));
           }
 
@@ -132,12 +145,13 @@
 
 
     vm.searchDevices = function (unmanaged, partial) {
+      let button;
       if (partial) {
         if (partial.length > 2) {
           if (unmanaged) {
-            var button = vm.unmanagedSelectedButton;
+            button = vm.unmanagedSelectedButton;
           } else {
-            var button = vm.selectedButton;
+            button = vm.selectedButton;
           }
 
           if (button === "Serial Number") {
@@ -161,7 +175,7 @@
               });
 
 
-          } else {
+          } else if (button === "MAC") {
             return DevicesService.searchDevicesByPartialMac(vm.distributorKey, partial, unmanaged)
               .then(function (res) {
                 let result = res["mac_matches"];
@@ -181,6 +195,29 @@
 
                 return macDevices;
               });
+
+          } else {
+
+            return DevicesService.searchDistributorDevicesByPartialGCMid(vm.distributorKey, partial, unmanaged)
+              .then(function (res) {
+                let result = res["gcmid_matches"];
+
+                if (unmanaged) {
+                  vm.unmanagedGCMidDevices = vm.convertArrayToDictionary(result, false, true);
+                } else {
+                  vm.gcmidDevices = vm.convertArrayToDictionary(result, false, true);
+                }
+
+                let gcmidDevices = [];
+
+                for (let i = 0; i < result.length; i++) {
+                  let each = result[i];
+                  gcmidDevices.push(each.gcmid);
+                }
+
+                return gcmidDevices;
+              });
+
           }
         } else {
           return [];
