@@ -468,7 +468,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     device = ChromeOsDevice.create_managed(tenant_key=tenant.key,
                                                            gcm_registration_id=gcm_registration_id,
                                                            mac_address=device_mac_address,
-                                                           timezone=timezone)
+                                                           timezone=timezone,
+                                                           registration_correlation_identifier=correlation_id)
                     key = device.put()
                     registration_request_event.device_urlsafe_key = key.urlsafe()
                     registration_request_event.details = 'register_device: tenant code={0}, mac address={1}, ' \

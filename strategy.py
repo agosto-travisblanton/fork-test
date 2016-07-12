@@ -10,7 +10,7 @@ from models import (Tenant,
                     Location,
                     IntegrationEventLog)
 from restler.serializers import ModelStrategy
-from utils.datetime_util import elapsed_time_message, convert_timezone
+from utils.datetime_util import elapsed_time_message
 
 TENANT_FIELDS = [
     'name',
@@ -108,6 +108,8 @@ CHROME_OS_DEVICE_STRATEGY += [
                                     context: o.location_key.get().customer_location_name if o.location_key is not None else None},
     {'customerDisplayCode': lambda o, field_name, context: o.key.get().customer_display_code},
     {'customerDisplayName': lambda o, field_name, context: o.key.get().customer_display_name},
+    {'registrationCorrelationIdentifier': lambda o, field_name,
+                                                 context: o.key.get().registration_correlation_identifier},
     {'latitude': lambda o, field_name,
                         context: o.location_key.get().geo_location.lat if o.location_key is not None else None},
     {'longitude': lambda o, field_name,
