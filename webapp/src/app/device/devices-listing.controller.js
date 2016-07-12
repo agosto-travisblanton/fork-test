@@ -6,9 +6,9 @@
   appModule.controller('DevicesListingCtrl', function ($stateParams, $log, DevicesService, $state, SessionsService, ProgressBarService, sweet) {
     let vm = this;
     vm.distributorKey = undefined;
-    //####################################
+    //////////////////////////////////////
     // Managed
-    //####################################
+    //////////////////////////////////////
     vm.devices = [];
     vm.devicesPrev = null;
     vm.devicesNext = null;
@@ -18,9 +18,9 @@
     vm.macDevices = {};
     vm.gcmidDevices = {};
 
-    //####################################
+    //////////////////////////////////////
     // Unmanaged
-    //####################################
+    //////////////////////////////////////
     vm.unmanagedSelectedButton = "MAC";
     vm.unmanagedSerialDevices = {};
     vm.unmanagedDisabled = true;
@@ -171,7 +171,7 @@
           if (button === "Serial Number") {
             return DevicesService.searchDevicesByPartialSerial(vm.distributorKey, partial, unmanaged)
               .then(function (res) {
-                let result = res["serial_number_matches"];
+                let result = res["matches"];
                 if (unmanaged) {
                   vm.unmanagedSerialDevices = vm.convertArrayToDictionary(result, false);
                 } else {
@@ -192,8 +192,8 @@
           } else if (button === "MAC") {
             return DevicesService.searchDevicesByPartialMac(vm.distributorKey, partial, unmanaged)
               .then(function (res) {
-                let result = res["mac_matches"];
-
+                let result = res["matches"];
+                
                 if (unmanaged) {
                   vm.unmanagedMacDevices = vm.convertArrayToDictionary(result, true);
                 } else {
@@ -201,13 +201,14 @@
                 }
 
                 let macDevices = [];
-
+                
                 for (let i = 0; i < result.length; i++) {
                   let each = result[i];
                   macDevices.push(each.mac);
                 }
 
                 return macDevices;
+
               });
 
           } else {

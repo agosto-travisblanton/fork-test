@@ -104,7 +104,7 @@
           if (vm.selectedButton === "Serial Number") {
             return DevicesService.searchDevicesByPartialSerialByTenant(vm.tenantKey, partial_search, false)
               .then(function (res) {
-                let result = res["serial_number_matches"];
+                let result = res["matches"];
                 vm.serialDevices = vm.convertArrayToDictionary(result, false);
                 let deviceSerials = [];
                 for (let i = 0; i < result.length; i++) {
@@ -117,7 +117,7 @@
           } else {
             return DevicesService.searchDevicesByPartialMacByTenant(vm.tenantKey, partial_search, false)
               .then(function (res) {
-                let result = res["mac_matches"];
+                let result = res["matches"];
                 vm.macDevices = vm.convertArrayToDictionary(result, true);
                 let deviceMacs = [];
                 for (let i = 0; i < result.length; i++) {

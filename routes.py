@@ -93,7 +93,7 @@ application = WSGIApplication(
               ),
 
         ############################################################
-        # DEVICE_RESOURCE_HANDLER
+        # DEVICE (ADDITONAL DEVICE ROUTES UNDER DISTRIBUTOR/TENANT)
         ############################################################
 
         Route(r'/api/v1/devices/<device_urlsafe_key>/heartbeat',
@@ -202,10 +202,12 @@ application = WSGIApplication(
               methods=['POST']
               ),
 
+
         ############################################################
-        # DISTRIBUTOR DEVICE ROUTES
+        # (DISTRIBUTOR) DEVICE ROUTES
         ############################################################
-        # PAGINATION DEVICE LIST
+        # PAGINATED DEVICE LIST
+        ############################################################
         Route(r'/api/v1/distributors/<distributor_urlsafe_key>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='devices-by-distributor',
@@ -231,16 +233,37 @@ application = WSGIApplication(
               methods=['GET']
               ),
         ############################################################
-        # TENANTS
+        # TENANT ROUTES
         ############################################################
-
+        # PAGINATED TENANT DEVICE LIST
+        ############################################################
         Route(r'/api/v1/tenants/<tenant_urlsafe_key>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='devices-by-tenant',
               handler_method='get_devices_by_tenant',
               methods=['GET']
               ),
-
+        ############################################################
+        # SEARCH
+        ############################################################
+        Route(r'/api/v1/tenants/search/<tenant_urlsafe_key>/devices',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='search_for_device_by_tenant',
+              handler_method='search_for_device_by_tenant',
+              methods=['GET']
+              ),
+        ############################################################
+        # MATCH
+        ############################################################
+        Route(r'/api/v1/tenants/match/<tenant_urlsafe_key>/devices',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='match_for_device_by_tenant',
+              handler_method='match_for_device_by_tenant',
+              methods=['GET']
+              ),
+        ############################################################
+        # OTHER
+        ############################################################
         Route(r'/api/v1/tenants/paginated/<page_size>/<offset>',
               handler='handlers.tenants_handler.TenantsHandler',
               name='get_tenants_paginated',

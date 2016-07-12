@@ -35,9 +35,9 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
       return promise;
     }
 
-    //#######################################################################
+    /////////////////////////////////////////////////////////////////////////
     // TENANT VIEW
-    //#######################################################################
+    /////////////////////////////////////////////////////////////////////////
     getDevicesByTenant(tenantKey, prev, next) {
       if (tenantKey !== undefined) {
         let url = this.makeDevicesByTenantURL(tenantKey, prev, next, false);
@@ -53,10 +53,9 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
       }
     }
 
-
     searchDevicesByPartialSerialByTenant(tenantKey, partial_serial, unmanaged) {
       if (tenantKey !== undefined) {
-        let url = `api/v1/tenants/search/serial/${tenantKey}/${partial_serial}/${unmanaged}/devices`;
+        let url = `/api/v1/tenants/search/${tenantKey}/devices?unmanaged=${unmanaged}&partial_serial=${partial_serial}`;
         let promise = Restangular.oneUrl(this.SERVICE_NAME, url).get();
         return promise;
       }
@@ -64,7 +63,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
 
     searchDevicesByPartialMacByTenant(tenantKey, partial_mac, unmanaged) {
       if (tenantKey !== undefined) {
-        let url = `api/v1/tenants/search/mac/${tenantKey}/${partial_mac}/${unmanaged}/devices`;
+        let url = `/api/v1/tenants/search/${tenantKey}/devices?unmanaged=${unmanaged}&partial_mac=${partial_mac}`;
         let promise = Restangular.oneUrl(this.SERVICE_NAME, url).get();
         return promise;
       }
@@ -72,7 +71,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
 
     matchDevicesByFullSerialByTenant(tenantKey, full_serial, unmanaged) {
       if (tenantKey !== undefined) {
-        let url = `api/v1/tenants/match/serial/${tenantKey}/${full_serial}/${unmanaged}/devices`;
+        let url = `/api/v1/tenants/match/${tenantKey}/devices?unmanaged=${unmanaged}&full_serial=${full_serial}`;
         let promise = Restangular.oneUrl(this.SERVICE_NAME, url).get();
         return promise;
       }
@@ -80,18 +79,18 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
 
     matchDevicesByFullMacByTenant(tenantKey, full_mac, unmanaged) {
       if (tenantKey !== undefined) {
-        let url = `api/v1/tenants/match/mac/${tenantKey}/${full_mac}/${unmanaged}/devices`;
+        let url = `/api/v1/tenants/match/${tenantKey}/devices?unmanaged=${unmanaged}&full_mac=${full_mac}`;
         let promise = Restangular.oneUrl(this.SERVICE_NAME, url).get();
         return promise;
       }
     }
 
-    //#######################################################################
+    /////////////////////////////////////////////////////////////////////////
     // DEVICES VIEW
-    //#######################################################################
+    /////////////////////////////////////////////////////////////////////////
     searchDevicesByPartialSerial(distributorKey, partial_serial, unmanaged) {
       if (distributorKey !== undefined) {
-        let url = `api/v1/distributors/search/serial/${distributorKey}/${partial_serial}/${unmanaged}/devices`;
+        let url = `/api/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_serial=${partial_serial}`;
         let promise = Restangular.oneUrl(this.SERVICE_NAME, url).get();
         return promise;
       }
@@ -99,7 +98,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
 
     searchDevicesByPartialMac(distributorKey, partial_mac, unmanaged) {
       if (distributorKey !== undefined) {
-        let url = `api/v1/distributors/search/mac/${distributorKey}/${partial_mac}/${unmanaged}/devices`;
+        let url = `/api/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_mac=${partial_mac}`;
         let promise = Restangular.oneUrl(this.SERVICE_NAME, url).get();
         return promise;
       }
@@ -115,7 +114,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
 
     matchDevicesByFullSerial(distributorKey, full_serial, unmanaged) {
       if (distributorKey !== undefined) {
-        let url = `api/v1/distributors/match/serial/${distributorKey}/${full_serial}/${unmanaged}/devices`;
+        let url = `/api/v1/distributors/match/${distributorKey}/devices?unmanaged=${unmanaged}&full_serial=${full_serial}`;
         let promise = Restangular.oneUrl(this.SERVICE_NAME, url).get();
         return promise;
       }
@@ -123,7 +122,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
 
     matchDevicesByFullMac(distributorKey, full_mac, unmanaged) {
       if (distributorKey !== undefined) {
-        let url = `api/v1/distributors/match/mac/${distributorKey}/${full_mac}/${unmanaged}/devices`;
+        let url = `/api/v1/distributors/match/${distributorKey}/devices?unmanaged=${unmanaged}&full_mac=${full_mac}`;
         let promise = Restangular.oneUrl(this.SERVICE_NAME, url).get();
         return promise;
       }
@@ -266,7 +265,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
     }
 
     makeDevicesByTenantURL(tenantKey, prev, next, unmanaged) {
-      let url = `/api/v1/tenants/${prev}/${next}/${tenantKey}/devices?unmanaged=${unmanaged}`;
+      let url = `/api/v1/tenants/${tenantKey}/devices?unmanaged=${unmanaged}&next_cursor=${next}&prev_cursor=${prev}`;
       return url
     }
   }();

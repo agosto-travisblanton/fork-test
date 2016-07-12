@@ -29,6 +29,19 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     MAILGUN_QUEUED_MESSAGE = 'Queued. Thank you.'
 
     ############################################################################################
+    # HELPER METHODS
+    ############################################################################################
+    @staticmethod
+    def ethernet_or_wifi_mac_address(device, partial_mac):
+        if partial_mac and partial_mac in device.mac_address:
+            return device.mac_address
+        elif partial_mac == "null":
+            return device.mac_address
+        else:
+            return device.ethernet_mac_address
+
+
+    ############################################################################################
     # TENANTS VIEW
     ############################################################################################
     @requires_api_token
@@ -37,9 +50,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         full_gcmid = self.request.get("full_gcmid")
         full_serial = self.request.get("full_serial")
         full_mac = self.request.get("full_mac")
-
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
-
 
         if full_gcmid:
             is_match = Tenant.match_device_with_full_gcmid(
@@ -58,7 +69,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             is_match = Tenant.match_device_with_full_mac(
                 tenant_keys=[tenant_key],
                 unmanaged=unmanaged,
-                partial_mac=full_mac
+                full_mac=full_mac
             )
 
         json_response(
@@ -67,7 +78,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 "is_match": is_match
             },
         )
-
 
     @requires_api_token
     def search_for_device_by_tenant(self, tenant_urlsafe_key):
@@ -103,6 +113,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 "matches": [
                     {
                         "serial": device.serial_number,
+                        "mac": DeviceResourceHandler.ethernet_or_wifi_mac_address(device, partial_mac),
                         "key": device.key.urlsafe(),
                         "tenantKey": device.tenant_key.urlsafe(),
                         "gcmid": device.gcm_registration_id
@@ -141,6 +152,40 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     # (DISTRIBUTOR) DEVICES VIEW
     ############################################################################################
     @requires_api_token
+    def get_devices_by_distributor(self, distributor_urlsafe_key):
+        next_cursor = self.request.get("next_cursor")
+        prev_cursor = self.request.get("prev_cursor")
+        cur_next_cursor = next_cursor if next_cursor != "null" else None
+        cur_prev_cursor = prev_cursor if prev_cursor != "null" else None
+        unmanaged_filter = self.request.get('unmanaged')
+
+        unmanaged = not bool(unmanaged_filter == '' or str(unmanaged_filter) == 'false')
+        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
+        tenant_keys = [tenant.key for tenant in domain_tenant_list]
+
+        distributor_devices = Tenant.find_devices_paginated(
+            tenant_keys=tenant_keys,
+            unmanaged=unmanaged,
+            prev_cursor_str=cur_prev_cursor,
+            next_cursor_str=cur_next_cursor
+        )
+
+        prev_cursor = distributor_devices["prev_cursor"]
+        next_cursor = distributor_devices["next_cursor"]
+        devices = distributor_devices["objects"]
+
+        json_response(
+            self.response,
+            {
+                "devices": devices,
+                "next_cursor": next_cursor,
+                "prev_cursor": prev_cursor,
+
+            },
+            strategy=CHROME_OS_DEVICE_STRATEGY
+        )
+
+    @requires_api_token
     def match_for_device(self, distributor_urlsafe_key):
         unmanaged = self.request.get("unmanaged") == "true"
         full_gcmid = self.request.get("full_gcmid")
@@ -167,7 +212,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             is_match = Tenant.match_device_with_full_mac(
                 tenant_keys=tenant_keys,
                 unmanaged=unmanaged,
-                partial_mac=full_mac
+                full_mac=full_mac
             )
 
         json_response(
@@ -207,11 +252,13 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 partial_mac=partial_mac
             )
 
+
         json_response(
             self.response,
             {
                 "matches": [
                     {
+                        "mac": DeviceResourceHandler.ethernet_or_wifi_mac_address(device, partial_mac),
                         "serial": device.serial_number,
                         "key": device.key.urlsafe(),
                         "tenantKey": device.tenant_key.urlsafe(),
@@ -282,40 +329,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         query = ChromeOsDevice.query(ChromeOsDevice.archived == False)
         query_results = query.fetch()
         json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
-
-    @requires_api_token
-    def get_devices_by_distributor(self, distributor_urlsafe_key):
-        next_cursor = self.request.get("next_cursor")
-        prev_cursor = self.request.get("prev_cursor")
-        cur_next_cursor = next_cursor if next_cursor != "null" else None
-        cur_prev_cursor = prev_cursor if prev_cursor != "null" else None
-        unmanaged_filter = self.request.get('unmanaged')
-
-        unmanaged = not bool(unmanaged_filter == '' or str(unmanaged_filter) == 'false')
-        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
-        tenant_keys = [tenant.key for tenant in domain_tenant_list]
-
-        distributor_devices = Tenant.find_devices_paginated(
-            tenant_keys=tenant_keys,
-            unmanaged=unmanaged,
-            prev_cursor_str=cur_prev_cursor,
-            next_cursor_str=cur_next_cursor
-        )
-
-        prev_cursor = distributor_devices["prev_cursor"]
-        next_cursor = distributor_devices["next_cursor"]
-        devices = distributor_devices["objects"]
-
-        json_response(
-            self.response,
-            {
-                "devices": devices,
-                "next_cursor": next_cursor,
-                "prev_cursor": prev_cursor,
-
-            },
-            strategy=CHROME_OS_DEVICE_STRATEGY
-        )
 
     @requires_api_token
     def get(self, device_urlsafe_key):
