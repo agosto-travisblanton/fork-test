@@ -608,7 +608,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         else:
             request_json = json.loads(self.request.body)
             storage = request_json.get('storage')
+            if storage is not None:
+                storage = int(storage)
             memory = request_json.get('memory')
+            if memory is not None:
+                memory = int(memory)
             mac_address = request_json.get('macAddress')
             program = request_json.get('program')
             program_id = request_json.get('programId')
@@ -644,15 +648,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                         )
                         logging.info(info_message)
 
-            if storage is not None:
-                storage = int(storage)
-                if device.storage_utilization != storage:
-                    device.storage_utilization = storage
+            if device.storage_utilization != storage:
+                device.storage_utilization = storage
 
-            if memory is not None:
-                memory = int(memory)
-                if device.memory_utilization != memory:
-                    device.memory_utilization = memory
+            if device.memory_utilization != memory:
+                device.memory_utilization = memory
 
             if program:
                 if device.program != program:
