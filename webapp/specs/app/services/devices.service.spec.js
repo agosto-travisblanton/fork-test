@@ -201,6 +201,24 @@ describe('DevicesService', function () {
       return expect(actual).toBe(promise);
     })
   );
+  
+    describe('.searchDevicesByPartialGCMid', () =>
+    it('search devices with a partial gcmid returns an http promise', function () {
+      let distributorKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw';
+      let partialGCMid = "1234";
+      let unmanaged = false;
+      let deviceRestangularService = {
+        get() {
+        }
+      };
+      spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
+      spyOn(deviceRestangularService, 'get').and.returnValue(promise);
+      let request = DevicesService.searchDistributorDevicesByPartialGCMid(distributorKey, partialGCMid, unmanaged);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_gcmid=${partialGCMid}`);
+      expect(deviceRestangularService.get).toHaveBeenCalled();
+      return expect(request).toBe(promise);
+    })
+  );
 
   describe('.matchDevicesByFullMac', () =>
     it('match devices with a full mac address returns an http promise', function () {
@@ -233,6 +251,24 @@ describe('DevicesService', function () {
       spyOn(deviceRestangularService, 'get').and.returnValue(promise);
       let actual = DevicesService.matchDevicesByFullSerial(distributorKey, partialMac, unmanaged);
       expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `api/v1/distributors/match/serial/${distributorKey}/${partialMac}/${unmanaged}/devices`);
+      expect(deviceRestangularService.get).toHaveBeenCalled();
+      return expect(actual).toBe(promise);
+    })
+  );
+  
+    describe('.matchDevicesByFullGCMid', () =>
+    it('match devices with a full mac address returns an http promise', function () {
+      let distributorKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw';
+      let partialGCMid = "1234";
+      let unmanaged = false;
+      let deviceRestangularService = {
+        get() {
+        }
+      };
+      spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
+      spyOn(deviceRestangularService, 'get').and.returnValue(promise);
+      let actual = DevicesService.matchDevicesByFullGCMid(distributorKey, partialGCMid, unmanaged);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/distributors/match/${distributorKey}/devices?unmanaged=${unmanaged}&full_gcmid=${partialGCMid}`);
       expect(deviceRestangularService.get).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
