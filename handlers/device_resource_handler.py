@@ -329,6 +329,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 deferred.defer(refresh_device_by_mac_address,
                                device_urlsafe_key=device_urlsafe_key,
                                device_mac_address=device.mac_address,
+                               device_has_previous_directory_api_info=False,
                                _queue='directory-api',
                                _countdown=5)
             else:
@@ -445,6 +446,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                            gcm_registration_id=gcm_registration_id,
                                                            mac_address=device_mac_address,
                                                            timezone=timezone)
+                    device.registration_correlation_identifier = correlation_id
                     key = device.put()
                     registration_request_event.device_urlsafe_key = key.urlsafe()
                     registration_request_event.details = 'register_device: tenant code={0}, mac address={1}, ' \

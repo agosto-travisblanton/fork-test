@@ -3,7 +3,6 @@ import logging
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
-from agar.env import on_development_server
 from app_config import config
 from chrome_os_devices_api import (ChromeOsDevicesApi)
 
@@ -11,11 +10,10 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 def update_chrome_os_device(device_urlsafe_key=None):
-    if on_development_server:
-        return
     """
     A function that is meant to be run asynchronously to update the ChromeOsDevice
     information from Directory API with information found on the devie entity.
+    :param device_urlsafe_key: our device key
     """
     if device_urlsafe_key is None:
         raise deferred.PermanentTaskFailure('The device URL-safe key parameter is None.  It is required.')
