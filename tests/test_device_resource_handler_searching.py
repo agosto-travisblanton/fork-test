@@ -91,19 +91,19 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
         uri = application.router.build(
             None,
-            'search_for_device_by_serial_by_tenant',
+            'search_for_device_by_tenant',
             None,
             {
                 'tenant_urlsafe_key': self.tenant_key.urlsafe(),
-                'partial_serial': 'm-',
-                'unmanaged': 'false'
+
             }
         )
 
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
+        response = self.app.get(uri, headers=self.api_token_authorization_header, params={'partial_serial': 'm-',
+                                                                                          'unmanaged': 'false'})
 
         response_json = json.loads(response.body)
-        self.assertTrue(len(response_json["serial_number_matches"]) == managed_number_build)
+        self.assertTrue(len(response_json["matches"]) == managed_number_build)
 
     def test_search_for_device_by_mac_by_tenant(self):
         managed_number_build = 20
@@ -112,19 +112,19 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
         uri = application.router.build(
             None,
-            'search_for_device_by_mac_by_tenant',
+            'search_for_device_by_tenant',
             None,
             {
                 'tenant_urlsafe_key': self.tenant_key.urlsafe(),
-                'partial_mac': 'm-mac',
-                'unmanaged': 'false'
+
             }
         )
 
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
+        response = self.app.get(uri, headers=self.api_token_authorization_header, params={'partial_mac': 'm-mac',
+                                                                                          'unmanaged': 'false'})
 
         response_json = json.loads(response.body)
-        self.assertTrue(len(response_json["mac_matches"]) == managed_number_build)
+        self.assertTrue(len(response_json["matches"]) == managed_number_build)
 
     def test_match_for_device_by_serial_by_tenant(self):
         managed_number_build = 20
@@ -132,16 +132,16 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                                unmanaged_number_to_build=0)
         uri = application.router.build(
             None,
-            'match_for_device_by_serial_by_tenant',
+            'match_for_device_by_tenant',
             None,
             {
                 'tenant_urlsafe_key': self.tenant_key.urlsafe(),
-                'full_serial': 'm-serial0',
-                'unmanaged': 'false'
+
             }
         )
 
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
+        response = self.app.get(uri, headers=self.api_token_authorization_header, params={'full_serial': 'm-serial0',
+                                                                                          'unmanaged': 'false'})
 
         response_json = json.loads(response.body)
         self.assertTrue(response_json["is_match"])
@@ -152,16 +152,16 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                                unmanaged_number_to_build=0)
         uri = application.router.build(
             None,
-            'match_for_device_by_mac_by_tenant',
+            'match_for_device_by_tenant',
             None,
             {
                 'tenant_urlsafe_key': self.tenant_key.urlsafe(),
-                'full_mac': 'm-mac0',
-                'unmanaged': 'false'
+
             }
         )
 
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
+        response = self.app.get(uri, headers=self.api_token_authorization_header, params={'full_mac': 'm-mac0',
+                                                                                          'unmanaged': 'false'})
         response_json = json.loads(response.body)
         self.assertTrue(response_json["is_match"])
 
@@ -171,16 +171,17 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                                unmanaged_number_to_build=0)
         uri = application.router.build(
             None,
-            'match_for_device_by_serial_by_tenant',
+            'match_for_device_by_tenant',
             None,
             {
                 'tenant_urlsafe_key': self.tenant_key.urlsafe(),
-                'full_serial': 'm-serial093942392349423',
-                'unmanaged': 'false'
+
             }
         )
 
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
+        response = self.app.get(uri, headers=self.api_token_authorization_header,
+                                params={'full_serial': 'm-serial093942392349423',
+                                        'unmanaged': 'false'})
 
         response_json = json.loads(response.body)
         self.assertFalse(response_json["is_match"])
@@ -192,16 +193,17 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
         uri = application.router.build(
             None,
-            'match_for_device_by_mac_by_tenant',
+            'match_for_device_by_tenant',
             None,
             {
                 'tenant_urlsafe_key': self.tenant_key.urlsafe(),
-                'full_mac': 'm-mac09249423923492349',
-                'unmanaged': 'false'
+
             }
         )
 
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
+        response = self.app.get(uri, headers=self.api_token_authorization_header,
+                                params={'full_mac': 'm-mac09249423923492349',
+                                        'unmanaged': 'false'})
         response_json = json.loads(response.body)
         self.assertFalse(response_json["is_match"])
 
@@ -275,7 +277,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response = self.app.get(uri, headers=self.api_token_authorization_header)
 
         response_json = json.loads(response.body)
-        self.assertTrue(len(response_json["serial_number_matches"]) == tenant_one_amount + tenant_two_amount)
+        self.assertTrue(len(response_json["matches"]) == tenant_one_amount + tenant_two_amount)
 
     def test_search_for_device_by_serial(self):
         distributor = Distributor.create(name='Acme Brothers',
@@ -364,19 +366,19 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                                                               tenant_2_device_count=tenant_two_amount)
         uri = application.router.build(
             None,
-            'search_for_device_by_mac',
+            'search_for_device',
             None,
             {
                 'distributor_urlsafe_key': distributor_key.urlsafe(),
-                'partial_mac': 'm-mac',
-                'unmanaged': 'false'
+
             }
         )
 
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
+        response = self.app.get(uri, headers=self.api_token_authorization_header, params={'partial_mac': 'm-mac',
+                                                                                          'unmanaged': 'false'})
 
         response_json = json.loads(response.body)
-        self.assertTrue(len(response_json["mac_matches"]) == tenant_one_amount + tenant_two_amount)
+        self.assertTrue(len(response_json["matches"]) == tenant_one_amount + tenant_two_amount)
 
     def test_match_for_device_by_serial(self):
         distributor = Distributor.create(name='Acme Brothers')
@@ -390,16 +392,16 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         )
         uri = application.router.build(
             None,
-            'match_for_device_by_serial',
+            'match_for_device',
             None,
             {
                 'distributor_urlsafe_key': distributor_key.urlsafe(),
-                'full_serial': 'm-serial0',
-                'unmanaged': 'false'
+
             }
         )
 
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
+        response = self.app.get(uri, headers=self.api_token_authorization_header, params={'full_serial': 'm-serial0',
+                                                                                          'unmanaged': 'false'})
 
         response_json = json.loads(response.body)
         self.assertTrue(response_json["is_match"])
@@ -416,16 +418,16 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         )
         uri = application.router.build(
             None,
-            'match_for_device_by_mac',
+            'match_for_device',
             None,
             {
                 'distributor_urlsafe_key': distributor_key.urlsafe(),
-                'full_mac': 'm-mac0',
-                'unmanaged': 'false'
+
             }
         )
 
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
+        response = self.app.get(uri, headers=self.api_token_authorization_header, params={'full_mac': 'm-mac0',
+                                                                                          'unmanaged': 'false'})
         response_json = json.loads(response.body)
         self.assertTrue(response_json["is_match"])
 
@@ -441,16 +443,17 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         )
         uri = application.router.build(
             None,
-            'match_for_device_by_serial',
+            'match_for_device',
             None,
             {
                 'distributor_urlsafe_key': distributor_key.urlsafe(),
-                'full_serial': 'm-serial093942392349423',
-                'unmanaged': 'false'
+
             }
         )
 
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
+        response = self.app.get(uri, headers=self.api_token_authorization_header,
+                                params={'full_serial': 'm-serial093942392349423',
+                                        'unmanaged': 'false'})
 
         response_json = json.loads(response.body)
         self.assertFalse(response_json["is_match"])
@@ -467,16 +470,18 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         )
         uri = application.router.build(
             None,
-            'match_for_device_by_mac',
+            'match_for_device',
             None,
             {
                 'distributor_urlsafe_key': distributor_key.urlsafe(),
-                'full_mac': 'm-mac09249423923492349',
-                'unmanaged': 'false'
+
             }
         )
 
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
+        response = self.app.get(uri, headers=self.api_token_authorization_header,
+                                params={'full_mac': 'm-mac09249423923492349',
+                                        'unmanaged': 'false'})
+
         response_json = json.loads(response.body)
         self.assertFalse(response_json["is_match"])
 

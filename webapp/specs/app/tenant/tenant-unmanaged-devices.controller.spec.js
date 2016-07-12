@@ -182,26 +182,26 @@ describe('TenantUnmanagedDevicesCtrl', function () {
         controller.selectedButton = "Serial Number";
         controller.searchDevices(partial);
         let serial_matches = {
-          "serial_number_matches": [
+          "matches": [
             {"serial": "1234"},
             {"serial": "45566"}
           ]
         };
         promise.resolve(serial_matches);
-        return expect(controller.serialDevices).toEqual(convertArrayToDictionary(serial_matches["serial_number_matches"], false));
+        return expect(controller.serialDevices).toEqual(convertArrayToDictionary(serial_matches["matches"], false));
       });
 
       it("returns every serial name when called as an managed mac", function () {
         controller.selectedButton = "MAC";
         controller.searchDevices(partial);
         let mac_matches = {
-          "mac_matches": [
+          "matches": [
             {"mac": "1234"},
             {"mac": "45566"}
           ]
         };
         promise.resolve(mac_matches);
-        return expect(controller.macDevices).toEqual(convertArrayToDictionary(mac_matches["mac_matches"], true));
+        return expect(controller.macDevices).toEqual(convertArrayToDictionary(mac_matches["matches"], true));
       });
 
       it('resets variables whenever function is called', function () {

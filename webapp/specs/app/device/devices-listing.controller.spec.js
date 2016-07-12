@@ -407,27 +407,27 @@ describe('DevicesListingCtrl', function () {
       controller.unmanagedSelectedButton = "Serial Number";
       controller.searchDevices(unmanaged, partial);
       let serial_matches = {
-        "serial_number_matches": [
+        "matches": [
           {"serial": "1234"},
           {"serial": "45566"}
         ]
       };
       serialPromise.resolve(serial_matches);
-      return expect(controller.unmanagedSerialDevices).toEqual(controller.convertArrayToDictionary(serial_matches["serial_number_matches"], false));
+      return expect(controller.unmanagedSerialDevices).toEqual(controller.convertArrayToDictionary(serial_matches["matches"], false));
     });
 
     it("returns every serial name when called as an unmanaged mac", function () {
       let unmanaged = true;
       controller.unmanagedSelectedButton = "MAC";
       controller.searchDevices(unmanaged, partial);
-      let mac_matches = {
-        "mac_matches": [
+      let matches = {
+        "matches": [
           {"mac": "1234"},
           {"mac": "45566"}
         ]
       };
-      promise.resolve(mac_matches);
-      return expect(controller.unmanagedMacDevices).toEqual(controller.convertArrayToDictionary(mac_matches["mac_matches"], true));
+      promise.resolve(matches);
+      return expect(controller.unmanagedMacDevices).toEqual(controller.convertArrayToDictionary(matches["matches"], true));
     });
     
     
@@ -450,27 +450,27 @@ describe('DevicesListingCtrl', function () {
       controller.selectedButton = "Serial Number";
       controller.searchDevices(unmanaged, partial);
       let serial_matches = {
-        "serial_number_matches": [
+        "matches": [
           {"serial": "1234"},
           {"serial": "45566"}
         ]
       };
       serialPromise.resolve(serial_matches);
-      return expect(controller.serialDevices).toEqual(controller.convertArrayToDictionary(serial_matches["serial_number_matches"], false));
+      return expect(controller.serialDevices).toEqual(controller.convertArrayToDictionary(serial_matches["matches"], false));
     });
 
     it("returns every mac name when called as an managed mac", function () {
       let unmanaged = false;
       controller.selectedButton = "MAC";
       controller.searchDevices(unmanaged, partial);
-      let mac_matches = {
-        "mac_matches": [
+      let matches = {
+        "matches": [
           {"mac": "1234"},
           {"mac": "45566"}
         ]
       };
-      promise.resolve(mac_matches);
-      return expect(controller.macDevices).toEqual(controller.convertArrayToDictionary(mac_matches["mac_matches"], true));
+      promise.resolve(matches);
+      return expect(controller.macDevices).toEqual(controller.convertArrayToDictionary(matches["matches"], true));
     });
     
     it("returns every gcmid name when called as an managed gcmid", function () {
