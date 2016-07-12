@@ -1,17 +1,25 @@
 angular.module('skykitProvisioning')
-  .factory('ProofPlayService', function ($http,
-                                         $q,
-                                         $window,
-                                         SessionsService,
-                                         $stateParams,
-                                         $state,
-                                         ToastsService) {
+  .factory('ProofPlayService', function ($http, $q, $window, SessionsService, $stateParams, $state, ToastsService, CacheFactory) {
     let url;
     return new class ProofPlayService {
 
       constructor() {
         this.makeHTTPRequest = this.makeHTTPRequest.bind(this);
         this.uriBase = 'proofplay/api/v1';
+        if (!CacheFactory.get('proofplayCache')) {
+          this.proofplayCache = CacheFactory('proofplayCache', {
+            maxAge: 60 * 60 * 1000,
+            deleteOnExpire: 'aggressive',
+            storageMode: 'localStorage',
+            onExpire: key => {
+              $http.get(key).success(data => {
+                this.proofplayCache.put(key, data);
+                return;
+              });
+              return;
+            }
+          });
+        }
       }
 
       makeHTTPURL(where_to_go, tenant) {
@@ -21,13 +29,28 @@ angular.module('skykitProvisioning')
       makeHTTPRequest(where_to_go, tenant) {
         let deferred = $q.defer();
         let url = this.makeHTTPURL(where_to_go, tenant);
-        return $http.get(url);
+
+        if (!this.proofplayCache.get(url)) {
+          let res = $http.get(url);
+
+          res.then(data => {
+            this.proofplayCache.put(url, data);
+            return deferred.resolve(data);
+          });
+
+          res.catch(err => deferred.reject(err));
+
+        } else {
+          deferred.resolve(this.proofplayCache.get(url));
+        }
+
+        return deferred.promise;
       }
 
       getAllResources(tenant) {
+// the catch is only done here because 3 proof of play views are initilized at the same time
+// so this catch will be done 3 times with 3 error messages if we add it to getAllDisplays and getAllLocations
         let r = this.makeHTTPRequest("/retrieve_all_resources/", tenant);
-        // the catch is only done here because 3 proof of play views are initilized at the same time
-        // so this catch will be done 3 times with 3 error messages if we add it to getAllDisplays and getAllLocations        
         r.catch(function (err, data) {
           let {status} = err;
           if (status === 403) {

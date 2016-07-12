@@ -31,12 +31,14 @@
     vm.refreshManagedDevices = function () {
       vm.devicesPrev = null;
       vm.devicesNext = null;
+      DevicesService.deviceCache.removeAll();
       return vm.getManagedDevices(vm.distributorKey, vm.devicesPrev, vm.devicesNext);
     };
 
     vm.refreshUnmanagedDevices = function () {
       vm.unmanagedDevicesPrev = null;
       vm.unmanagedDevicesNext = null;
+      DevicesService.deviceCache.removeAll();
       return vm.getUnmanagedDevices(vm.distributorKey, vm.unmanagedDevicesPrev, vm.unmanagedDevicesNext);
     };
 
