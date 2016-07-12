@@ -223,6 +223,33 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             },
         )
 
+    @requires_api_token
+    def search_for_device_by_gcmid(self, distributor_urlsafe_key):
+        unmanaged = self.request.get("unmanaged") == "true"
+        partial_gmcid = self.request.get("partial_gmcid")
+
+        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
+        tenant_keys = [tenant.key for tenant in domain_tenant_list]
+
+        resulting_devices = Tenant.find_devices_with_partial_gcmid(
+            tenant_keys=tenant_keys,
+            unmanaged=unmanaged,
+            partial_gcmid=partial_gmcid
+        )
+
+        json_response(
+            self.response,
+            {
+                "gcmid_matches": [
+                    {
+                        "serial": device.serial_number,
+                        "key": device.key.urlsafe(),
+                        "tenantKey": device.tenant_key.urlsafe(),
+                        "gcmid": device.gcm_registration_id
+                    } for device in resulting_devices]
+            },
+        )
+
     ############################################################################################
     # END DEVICES VIEW
     ############################################################################################
@@ -425,7 +452,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     registration_request_event.put()
                     self.response.set_status(status, error_message)
                     return
-                tenant  = Tenant.find_by_tenant_code(tenant_code)
+                tenant = Tenant.find_by_tenant_code(tenant_code)
                 if tenant is None:
                     status = 400
                     error_message = 'Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
