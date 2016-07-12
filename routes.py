@@ -246,6 +246,12 @@ application = WSGIApplication(
               handler_method='match_for_device_by_mac',
               methods=['GET']
               ),
+        Route(r'/api/v1/distributors/match/gcmid/<distributor_urlsafe_key>/devices',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='match_for_device_by_gcmid',
+              handler_method='match_for_device_by_gcmid',
+              methods=['GET']
+              ),
 
         ############################################################
         # TENANTS

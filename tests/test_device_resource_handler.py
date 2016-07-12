@@ -944,6 +944,56 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertFalse(response_json["is_match"])
 
+    def test_match_for_device_by_gcmid(self):
+        distributor = Distributor.create(name='Acme Brothers')
+        distributor_key = distributor.put()
+        tenant_one_amount = 13
+        tenant_two_amount = 6
+        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(
+            distributor_key,
+            tenant_1_device_count=tenant_one_amount,
+            tenant_2_device_count=tenant_two_amount
+        )
+        uri = application.router.build(
+            None,
+            'match_for_device_by_gcmid',
+            None,
+            {
+                'distributor_urlsafe_key': distributor_key.urlsafe(),
+
+            }
+        )
+
+        response = self.app.get(uri, headers=self.api_token_authorization_header, params={'full_gcmid': 'm-gcm0',
+                                                                                          'unmanaged': 'false'})
+        response_json = json.loads(response.body)
+        self.assertTrue(response_json["is_match"])
+
+    def test_not_match_for_device_by_gcmid(self):
+        distributor = Distributor.create(name='Acme Brothers')
+        distributor_key = distributor.put()
+        tenant_one_amount = 13
+        tenant_two_amount = 6
+        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(
+            distributor_key,
+            tenant_1_device_count=tenant_one_amount,
+            tenant_2_device_count=tenant_two_amount
+        )
+        uri = application.router.build(
+            None,
+            'match_for_device_by_gcmid',
+            None,
+            {
+                'distributor_urlsafe_key': distributor_key.urlsafe(),
+            }
+        )
+
+        response = self.app.get(uri, headers=self.api_token_authorization_header, params={'full_gcmid': 'm-gcdfdfdfm0',
+                                                                                          'unmanaged': 'false'})
+
+        response_json = json.loads(response.body)
+        self.assertFalse(response_json["is_match"])
+
     #################################################################################################################
     # get managed device
     #################################################################################################################

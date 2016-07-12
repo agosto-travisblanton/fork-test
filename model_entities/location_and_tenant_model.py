@@ -73,6 +73,13 @@ class Tenant(ndb.Model):
             ChromeOsDevice.serial_number == full_serial).count() > 0
 
     @classmethod
+    def match_device_with_full_gcmid(cls, tenant_keys, unmanaged, full_gcmid):
+        return ChromeOsDevice.query(ChromeOsDevice.archived == False).filter(
+            ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
+            ChromeOsDevice.is_unmanaged_device == unmanaged).filter(
+            ChromeOsDevice.gcm_registration_id == full_gcmid).count() > 0
+
+    @classmethod
     def find_devices_with_partial_serial(cls, tenant_keys, unmanaged, partial_serial):
         q = ChromeOsDevice.query(ChromeOsDevice.archived == False).filter(
             ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
@@ -118,7 +125,7 @@ class Tenant(ndb.Model):
 
         for item in q:
             if (item.gcm_registration_id and partial_gcmid in item.gcm_registration_id) or (
-                item.gcm_registration_id and item.gcm_registration_id == partial_gcmid):
+                        item.gcm_registration_id and item.gcm_registration_id == partial_gcmid):
                 filtered_devices.append(item)
 
         return filtered_devices
