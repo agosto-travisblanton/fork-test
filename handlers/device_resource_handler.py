@@ -180,7 +180,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         )
 
     @requires_api_token
-    def match_for_device_by_gcmid(self, distributor_urlsafe_key):
+    def match_for_device(self, distributor_urlsafe_key):
         unmanaged = self.request.get("unmanaged") == "true"
         full_gcmid = self.request.get("full_gcmid")
 
@@ -243,7 +243,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         )
 
     @requires_api_token
-    def search_for_device_by_gcmid(self, distributor_urlsafe_key):
+    def search_for_device(self, distributor_urlsafe_key):
         unmanaged = self.request.get("unmanaged") == "true"
         partial_gcmid = self.request.get("partial_gcmid")
 

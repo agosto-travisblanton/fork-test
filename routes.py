@@ -214,6 +214,7 @@ application = WSGIApplication(
               ),
         ############################################################
         # SEARCH
+        ############################################################
         Route(r'/api/v1/distributors/search/serial/<distributor_urlsafe_key>/<partial_serial>/<unmanaged>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='search_for_device_by_serial',
@@ -226,14 +227,15 @@ application = WSGIApplication(
               handler_method='search_for_device_by_mac',
               methods=['GET']
               ),
-        Route(r'/api/v1/distributors/search/gcmid/<distributor_urlsafe_key>/devices',
+        Route(r'/api/v1/distributors/search/<distributor_urlsafe_key>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='search_for_device_by_gcmid',
-              handler_method='search_for_device_by_gcmid',
+              name='search_for_device',
+              handler_method='search_for_device',
               methods=['GET']
               ),
         ############################################################
         # MATCH
+        ############################################################
         Route(r'/api/v1/distributors/match/serial/<distributor_urlsafe_key>/<full_serial>/<unmanaged>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='match_for_device_by_serial',
@@ -246,10 +248,10 @@ application = WSGIApplication(
               handler_method='match_for_device_by_mac',
               methods=['GET']
               ),
-        Route(r'/api/v1/distributors/match/gcmid/<distributor_urlsafe_key>/devices',
+        Route(r'/api/v1/distributors/match/<distributor_urlsafe_key>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='match_for_device_by_gcmid',
-              handler_method='match_for_device_by_gcmid',
+              name='match_for_device',
+              handler_method='match_for_device',
               methods=['GET']
               ),
 

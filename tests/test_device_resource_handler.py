@@ -791,7 +791,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertTrue(len(response_json["serial_number_matches"]) == tenant_one_amount + tenant_two_amount)
 
-    def test_search_for_device_by_gcmid(self):
+    def test_search_for_device(self):
         distributor = Distributor.create(name='Acme Brothers', active=True)
         distributor_key = distributor.put()
         tenant_one_amount = 13
@@ -804,7 +804,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
         uri = application.router.build(
             None,
-            'search_for_device_by_gcmid',
+            'search_for_device',
             None,
             {
                 'distributor_urlsafe_key': distributor_key.urlsafe()
@@ -944,7 +944,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertFalse(response_json["is_match"])
 
-    def test_match_for_device_by_gcmid(self):
+    def test_match_for_device(self):
         distributor = Distributor.create(name='Acme Brothers')
         distributor_key = distributor.put()
         tenant_one_amount = 13
@@ -956,7 +956,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         )
         uri = application.router.build(
             None,
-            'match_for_device_by_gcmid',
+            'match_for_device',
             None,
             {
                 'distributor_urlsafe_key': distributor_key.urlsafe(),
@@ -969,7 +969,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertTrue(response_json["is_match"])
 
-    def test_not_match_for_device_by_gcmid(self):
+    def test_not_match_for_device(self):
         distributor = Distributor.create(name='Acme Brothers')
         distributor_key = distributor.put()
         tenant_one_amount = 13
@@ -981,7 +981,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         )
         uri = application.router.build(
             None,
-            'match_for_device_by_gcmid',
+            'match_for_device',
             None,
             {
                 'distributor_urlsafe_key': distributor_key.urlsafe(),
