@@ -50,8 +50,6 @@ class TestRegisterDevice(BaseTest):
                                                     gcm_registration_id=self.expected_gcm_registration_id,
                                                     mac_address=self.mac_address,
                                                     device_id='a8sd7f8df9sd7')
-                                                    gcm_registration_id=self.expected_gcm_registration_id,
-                                                    mac_address=self.mac_address)
         self.device_key = self.device.put()
 
     @patch('workflow.register_device.ContentManagerApi')
