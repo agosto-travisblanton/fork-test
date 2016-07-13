@@ -61,46 +61,39 @@
     };
 
     vm.prepareForEditView = function (unmanaged, searchText) {
-      let mac, serial, gcmid;
+      let button, macDevices, serialDevices, gcmidDevices;
       if (unmanaged) {
-        mac = vm.unmanagedSelectedButton === "MAC";
-        serial = vm.unmanagedSelectedButton === "Serial Number";
-        gcmid = vm.unmanagedSelectedButton === "GCM ID"
-
-        if (mac) {
-          return DevicesService.editItem(vm.unmanagedMacDevices[searchText], vm.tenantKey);
-        } else if (serial) {
-          return DevicesService.editItem(vm.unmanagedSerialDevices[searchText], vm.tenantKey);
-        } else {
-          return DevicesService.editItem(vm.unmanagedGCMidDevices[searchText], vm.tenantKey)
-        }
+        button = vm.unmanagedSelectedButton;
+        macDevices = vm.unmanagedMacDevices;
+        serialDevices = vm.unmanagedSerialDevices;
+        gcmidDevices = vm.unmanagedGCMidDevices;
 
       } else {
-        mac = vm.selectedButton === "MAC";
-        serial = vm.selectedButton === "Serial Number";
-        gcmid = vm.selectedButton === "GCM ID"
-        if (mac) {
-          return vm.editItem(vm.macDevices[searchText], vm.tenantKey);
-        } else if (serial) {
-          return vm.editItem(vm.serialDevices[searchText], vm.tenantKey);
-        } else {
-          return vm.editItem(vm.gcmidDevices[searchText], vm.tenantKey)
-        }
+        button = vm.selectedButton;
+        macDevices = vm.macDevices;
+        serialDevices = vm.serialDevices;
+        gcmidDevices = vm.gcmidDevices;
       }
+
+      return DevicesService.preprateForEditView(
+        button,
+        vm.tenantKey,
+        searchText,
+        macDevices,
+        serialDevices,
+        gcmidDevices
+      )
     }
-
-
+    
     vm.controlOpenButton = function (unmanaged, isMatch) {
       if (!unmanaged) {
         vm.disabled = !isMatch;
         return vm.disabledButtonLoading = false;
-
       } else {
         vm.unmanagedDisabled = !isMatch;
         return vm.unmanagedDisabledButtonLoading = false;
       }
     };
-
 
     vm.isResourceValid = function (resource) {
       let unmanaged = true;
@@ -133,41 +126,38 @@
       let byTenant = false;
       let tenantKey = null;
 
-      if (partial) {
-        if (partial.length > 2) {
-          return DevicesService.searchDevices(partial, button, byTenant, tenantKey, vm.distributorKey, unmanaged)
-            .then(function (devices) {
-              if (button === "Serial Number") {
-                if (unmanaged) {
-                  vm.unmanagedSerialDevices = devices[1]
-                } else {
-                  vm.serialDevices = devices[1]
-                }
-                return devices[0]
-              } else if (button === "MAC") {
-                if (unmanaged) {
-                  vm.unmanagedMacDevices = devices[1]
-                } else {
-                  vm.macDevices = devices[1]
-                }
-                return devices[0]
+      return DevicesService.searchDevices(partial, button, byTenant, tenantKey, vm.distributorKey, unmanaged)
+        .then(function (response) {
+          if (response.success) {
+            let devices = response.devices;
+            if (button === "Serial Number") {
+              if (unmanaged) {
+                vm.unmanagedSerialDevices = devices[1]
               } else {
-                if (unmanaged) {
-                  vm.unmanagedGCMidDevices = devices[1]
-                } else {
-                  vm.gcmidDevices = devices[1]
-                }
-                return devices[0]
+                vm.serialDevices = devices[1]
               }
-            })
-        } else {
-          return [];
-        }
-      } else {
-        return [];
-      }
+              return devices[0]
+            } else if (button === "MAC") {
+              if (unmanaged) {
+                vm.unmanagedMacDevices = devices[1]
+              } else {
+                vm.macDevices = devices[1]
+              }
+              return devices[0]
+            } else {
+              if (unmanaged) {
+                vm.unmanagedGCMidDevices = devices[1]
+              } else {
+                vm.gcmidDevices = devices[1]
+              }
+              return devices[0]
+            }
+          } else {
+            return []
+          }
+        })
     };
-
+    
     vm.getManagedDevices = function (key, prev, next) {
       ProgressBarService.start();
       let devicesPromise = DevicesService.getDevicesByDistributor(key, prev, next);
