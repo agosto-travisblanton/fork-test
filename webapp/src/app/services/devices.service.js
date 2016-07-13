@@ -19,6 +19,15 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
         return promise;
       }
 
+      retriveFilteredDictionaryValue(dictionary, value) {
+        let results = []
+        for (let i = 0; i < dictionary.length; i++) {
+          let each = dictionary[i];
+          results.push(each["value"]);
+        }
+        return results
+      }
+      
       executeSearchingPartialSerialByTenant(tenantKey, partialSearch, unmanaged) {
         return this.searchDevicesByPartialSerialByTenant(tenantKey, partialSearch, unmanaged)
           .then((res) => {
@@ -26,11 +35,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
             let isMac = false
             let isGCMid = false
             let serialDevicesDict = this.convertDevicesArrayToDictionaryObj(result, isMac, isGCMid);
-            let deviceSerialsOnly = [];
-            for (let i = 0; i < result.length; i++) {
-              let each = result[i];
-              deviceSerialsOnly.push(each.serial);
-            }
+            let deviceSerialsOnly = this.retriveFilteredDictionaryValue(result, "serial");
             return [deviceSerialsOnly, serialDevicesDict];
           });
       }
@@ -47,11 +52,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
             } else {
               serialDevicesDict = this.convertDevicesArrayToDictionaryObj(result, isMac, isGCMid);
             }
-            let serialDevicesOnly = [];
-            for (let i = 0; i < result.length; i++) {
-              let each = result[i];
-              serialDevicesOnly.push(each.serial);
-            }
+            let serialDevicesOnly = this.retriveFilteredDictionaryValue(result, "serial");
             return [serialDevicesOnly, serialDevicesDict];
           });
       }
@@ -61,11 +62,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
           .then((res) => {
             let result = res["matches"];
             let macDevicesDict = this.convertDevicesArrayToDictionaryObj(result, true);
-            let deviceMacsOnly = [];
-            for (let i = 0; i < result.length; i++) {
-              let each = result[i];
-              deviceMacsOnly.push(each.mac);
-            }
+            let deviceMacsOnly = this.retriveFilteredDictionaryValue(result, "mac");
             return [deviceMacsOnly, macDevicesDict];
           })
       }
@@ -82,11 +79,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
             } else {
               macDevicesDict = this.convertDevicesArrayToDictionaryObj(result, isMac, isGCMid);
             }
-            let macDevices = [];
-            for (let i = 0; i < result.length; i++) {
-              let each = result[i];
-              macDevices.push(each.mac);
-            }
+            let macDevices = this.retriveFilteredDictionaryValue(result, "mac")
             return [macDevices, macDevicesDict];
           });
 
@@ -97,11 +90,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
           .then((res) => {
             let result = res["matches"];
             let gcmidDevicesDict = this.convertDevicesArrayToDictionaryObj(result, false, true);
-            let gcmidDevicesOnly = [];
-            for (let i = 0; i < result.length; i++) {
-              let each = result[i];
-              gcmidDevicesOnly.push(each.gcmid);
-            }
+            let gcmidDevicesOnly = this.retriveFilteredDictionaryValue(result, "gcmid")
             return [gcmidDevicesOnly, gcmidDevicesDict];
           });
       }
@@ -116,11 +105,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
             } else {
               GCMidDevicesDict = this.convertDevicesArrayToDictionaryObj(result, false, true);
             }
-            let gcmidDevicesOnly = [];
-            for (let i = 0; i < result.length; i++) {
-              let each = result[i];
-              gcmidDevicesOnly.push(each.gcmid);
-            }
+            let gcmidDevicesOnly = this.retriveFilteredDictionaryValue(result, "gcmid")
             return [gcmidDevicesOnly, GCMidDevicesDict];
           });
       }
@@ -169,7 +154,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
             "devices": resultingDevices
           })
         }
-        
+
         return deferred.promise
       }
 
@@ -181,9 +166,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
             mac = button === "MAC";
             serial = button === "Serial Number";
             gcmid = button === "GCM ID";
-
             if (byTenant) {
-
               if (mac) {
                 deferred.resolve(this.matchDevicesByFullMacByTenant(tenantKey, resource, unmanaged))
               } else if (serial) {
@@ -200,18 +183,14 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
                 deferred.resolve(this.matchDevicesByFullGCMid(distributorKey, resource, unmanaged))
               }
             }
-
           } else {
             deferred.resolve({"is_match": false})
           }
-
         } else {
           deferred.resolve({"is_match": false})
         }
         return deferred.promise
-
-      }
-      ;
+      };
 
       convertDevicesArrayToDictionaryObj(theArray, mac, gcm) {
         /** Converts array to dictionary with mac, gcmid, or serial as the key **/
@@ -227,13 +206,12 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
           }
         }
         return devices;
-      }
-      ;
+      };
 
-      editItem(item, tenantKey) {
+      editItem(item) {
         $state.go('editDevice', {
           deviceKey: item.key,
-          tenantKey: tenantKey,
+          tenantKey: item.tenantKey,
           fromDevices: false
         });
       }
@@ -252,8 +230,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
         } else {
           return this.editItem(gcmidDevices[searchText], tenantKey)
         }
-
-
+        
       }
 
       getIssuesByKey(deviceKey, startEpoch, endEpoch, prev, next) {
@@ -522,10 +499,6 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
         let url = `/api/v1/tenants/${tenantKey}/devices?unmanaged=${unmanaged}&next_cursor=${next}&prev_cursor=${prev}`;
         return url
       }
-    }
-
-    ()
-      ;
+    }();
   }
-)
-;
+);
