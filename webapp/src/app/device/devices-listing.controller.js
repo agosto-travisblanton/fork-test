@@ -57,6 +57,7 @@
       }
     };
 
+    // todo move this into a service
     vm.convertArrayToDictionary = function (theArray, mac, gcm) {
       let devices = {};
       for (let i = 0; i < theArray.length; i++) {
@@ -131,7 +132,7 @@
           } else {
             mac = vm.selectedButton === "MAC";
             serial = vm.selectedButton === "Serial Number";
-            gcmid = vm.selectedButton === "GCM ID"
+            gcmid = vm.selectedButton === "GCM ID";
             vm.disabledButtonLoading = true;
           }
 

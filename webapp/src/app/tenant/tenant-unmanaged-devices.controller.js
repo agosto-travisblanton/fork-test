@@ -18,6 +18,7 @@
         proof_of_play_logging: false,
         active: true
       };
+      vm.gcmidDevices = [];
       vm.tenantDevices = [];
       vm.devicesPrev = null;
       vm.devicesNext = null;
@@ -49,7 +50,6 @@
       if (vm.editMode) {
         let tenantPromise = TenantsService.getTenantByKey(vm.tenantKey);
         tenantPromise.then(tenant => vm.currentTenant = tenant);
-
         vm.getUnmanagedDevices(vm.tenantKey, null, null);
       }
 
@@ -76,18 +76,21 @@
         fromDevices: false
       });
 
-
-      vm.convertArrayToDictionary = function (theArray, mac) {
-        let Devices = {};
+      // todo move this into a service
+      vm.convertArrayToDictionary = function (theArray, mac, gcm) {
+        let devices = {};
         for (let i = 0; i < theArray.length; i++) {
           let item = theArray[i];
           if (mac) {
-            Devices[item.mac] = item;
+            devices[item.mac] = item;
+          } else if (gcm) {
+            devices[item.gcmid] = item;
           } else {
-            Devices[item.serial] = item;
+            devices[item.serial] = item;
           }
         }
-        return Devices;
+
+        return devices;
       };
 
       vm.changeRadio = function () {
@@ -115,7 +118,7 @@
                   return deviceSerials;
                 });
 
-            } else {
+            } else if (vm.selectedButton === "MAC") {
               return DevicesService.searchDevicesByPartialMacByTenant(vm.tenantKey, partial_search, true)
                 .then(function (res) {
                   let result = res["matches"];
@@ -126,6 +129,22 @@
                     deviceMacs.push(each.mac);
                   }
                   return deviceMacs;
+                })
+            } else {
+              return DevicesService.searchDistributorDevicesByPartialGCMid(vm.tenantKey, partial_search, true)
+                .then(function (res) {
+                  let result = res["matches"];
+
+                  vm.gcmidDevices = vm.convertArrayToDictionary(result, false, true);
+
+                  let gcmidDevices = [];
+
+                  for (let i = 0; i < result.length; i++) {
+                    let each = result[i];
+                    gcmidDevices.push(each.gcmid);
+                  }
+
+                  return gcmidDevices;
                 });
             }
 
@@ -148,12 +167,21 @@
 
 
       vm.prepareForEditView = function (searchText) {
-        let mac = vm.selectedButton === "MAC";
+        let mac, serial, gcmid;
+
+        mac = vm.selectedButton === "MAC";
+        serial = vm.selectedButton === "Serial Number";
+        gcmid = vm.selectedButton === "GCM ID"
+
+
         if (mac) {
           return vm.editItem(vm.macDevices[searchText]);
-        } else {
+        } else if (serial) {
           return vm.editItem(vm.serialDevices[searchText]);
+        } else {
+          return vm.editItem(vm.gcmidDevices[searchText])
         }
+
       };
 
 
@@ -163,17 +191,22 @@
       };
 
       vm.isResourceValid = function (resource) {
+        let mac, serial, gcmid;
         if (resource) {
           if (resource.length > 2) {
-            let mac = vm.selectedButton === "MAC";
-            vm.loadingDisabled = true;
+            mac = vm.selectedButton === "MAC";
+            serial = vm.selectedButton === "Serial Number";
+            gcmid = vm.selectedButton === "GCM ID";
 
             if (mac) {
               return DevicesService.matchDevicesByFullMacByTenant(vm.tenantKey, resource, true)
                 .then(res => vm.controlOpenButton(res["is_match"]));
 
-            } else {
+            } else if (serial) {
               return DevicesService.matchDevicesByFullSerialByTenant(vm.tenantKey, resource, true)
+                .then(res => vm.controlOpenButton(res["is_match"]));
+            } else {
+              return DevicesService.matchDevicesByFullGCMid(vm.tenantKey, resource, true)
                 .then(res => vm.controlOpenButton(res["is_match"]));
             }
 
