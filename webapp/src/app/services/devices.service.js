@@ -1,4 +1,4 @@
-angular.module('skykitProvisioning').factory('DevicesService', function ($log, Restangular, $q, CacheFactory, $http) {
+angular.module('skykitProvisioning').factory('DevicesService', function ($log, Restangular, $q, CacheFactory, $http, $state) {
   var url;
   var url;
   return new class DevicesService {
@@ -17,6 +17,199 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
       let url = `api/v1/devices/${deviceKey}`;
       let promise = Restangular.oneUrl(this.SERVICE_NAME, url).get();
       return promise;
+    }
+
+    executeSearchingPartialSerialByTenant(tenantKey, partialSearch, unmanaged) {
+      return this.searchDevicesByPartialSerialByTenant(tenantKey, partialSearch, unmanaged)
+        .then((res) => {
+          let result = res["matches"];
+          let isMac = false
+          let isGCMid = false
+          let serialDevicesDict = this.convertDevicesArrayToDictionaryObj(result, isMac, isGCMid);
+          let deviceSerialsOnly = [];
+          for (let i = 0; i < result.length; i++) {
+            let each = result[i];
+            deviceSerialsOnly.push(each.serial);
+          }
+          return [deviceSerialsOnly, serialDevicesDict];
+        });
+    }
+
+    executeSearchingPartialSerialByDistributor(distributorKey, partialSearch, unmanaged) {
+      return this.searchDevicesByPartialSerial(distributorKey, partialSearch, unmanaged)
+        .then((res) => {
+          let result = res["matches"];
+          let serialDevicesDict;
+          let isMac = false
+          let isGCMid = false
+          if (unmanaged) {
+            serialDevicesDict = this.convertDevicesArrayToDictionaryObj(result, isMac, isGCMid);
+          } else {
+            serialDevicesDict = this.convertDevicesArrayToDictionaryObj(result, isMac, isGCMid);
+          }
+          let serialDevicesOnly = [];
+          for (let i = 0; i < result.length; i++) {
+            let each = result[i];
+            serialDevicesOnly.push(each.serial);
+          }
+          return [serialDevicesOnly, serialDevicesDict];
+        });
+    }
+
+    executeSearchingPartialMacByTenant(tenantKey, partialSearch, unmanaged) {
+      return this.searchDevicesByPartialMacByTenant(tenantKey, partialSearch, unmanaged)
+        .then((res) => {
+          let result = res["matches"];
+          let macDevicesDict = this.convertDevicesArrayToDictionaryObj(result, true);
+          let deviceMacsOnly = [];
+          for (let i = 0; i < result.length; i++) {
+            let each = result[i];
+            deviceMacsOnly.push(each.mac);
+          }
+          return [deviceMacsOnly, macDevicesDict];
+        })
+    }
+
+    executeSearchingPartialMacByDistributor(distributorKey, partialSearch, unmanaged) {
+      return this.searchDevicesByPartialMac(distributorKey, partialSearch, unmanaged)
+        .then((res) => {
+          let result = res["matches"];
+          let macDevicesDict;
+          let isMac = true;
+          let isGCMid = false;
+          if (unmanaged) {
+            macDevicesDict = this.convertDevicesArrayToDictionaryObj(result, isMac, isGCMid);
+          } else {
+            macDevicesDict = this.convertDevicesArrayToDictionaryObj(result, isMac, isGCMid);
+          }
+          let macDevices = [];
+          for (let i = 0; i < result.length; i++) {
+            let each = result[i];
+            macDevices.push(each.mac);
+          }
+          return [macDevices, macDevicesDict];
+        });
+
+    }
+
+    executeSearchingPartialGCMidByTenant(tenantKey, partialSearch, unmanaged) {
+      return this.searchDistributorDevicesByPartialGCMidByTenant(tenantKey, partialSearch, unmanaged)
+        .then((res) => {
+          let result = res["matches"];
+          let gcmidDevicesDict = this.convertDevicesArrayToDictionaryObj(result, false, true);
+          let gcmidDevicesOnly = [];
+          for (let i = 0; i < result.length; i++) {
+            let each = result[i];
+            gcmidDevicesOnly.push(each.gcmid);
+          }
+          return [gcmidDevicesOnly, gcmidDevicesDict];
+        });
+    }
+
+    executeSearchingPartialGCMidByDistributor(distributorKey, partialSearch, unmanaged) {
+      return this.searchDistributorDevicesByPartialGCMid(distributorKey, partialSearch, unmanaged)
+        .then((res) => {
+          let result = res["matches"];
+          let GCMidDevicesDict;
+          if (unmanaged) {
+            GCMidDevicesDict = this.convertDevicesArrayToDictionaryObj(result, false, true);
+          } else {
+            GCMidDevicesDict = this.convertDevicesArrayToDictionaryObj(result, false, true);
+          }
+          let gcmidDevicesOnly = [];
+          for (let i = 0; i < result.length; i++) {
+            let each = result[i];
+            gcmidDevicesOnly.push(each.gcmid);
+          }
+          return [gcmidDevicesOnly, GCMidDevicesDict];
+        });
+    }
+
+
+    searchDevices(partialSearch, button, byTenant, tenantKey, distributorKey, unmanaged) {
+      if (button === "Serial Number") {
+        if (byTenant) {
+          return this.executeSearchingPartialSerialByTenant(tenantKey, partialSearch, unmanaged)
+        } else {
+          return this.executeSearchingPartialSerialByDistributor(distributorKey, partialSearch, unmanaged)
+        }
+      } else if (button === "MAC") {
+        if (byTenant) {
+          return this.executeSearchingPartialMacByTenant(tenantKey, partialSearch, unmanaged)
+        } else {
+          return this.executeSearchingPartialMacByDistributor(distributorKey, partialSearch, unmanaged)
+        }
+      } else {
+        if (byTenant) {
+          return this.executeSearchingPartialGCMidByTenant(tenantKey, partialSearch, unmanaged)
+        } else {
+          return this.executeSearchingPartialGCMidByDistributor(distributorKey, partialSearch, unmanaged)
+        }
+      }
+    }
+
+    isResourceValid(resource, button, byTenant, tenantKey, distributorKey, unmanaged) {
+      let mac, serial, gcmid;
+      let deferred = $q.defer();
+      if (resource) {
+        if (resource.length > 2) {
+          mac = button === "MAC";
+          serial = button === "Serial Number";
+          gcmid = button === "GCM ID";
+
+          if (byTenant) {
+
+            if (mac) {
+              deferred.resolve(this.matchDevicesByFullMacByTenant(tenantKey, resource, unmanaged))
+            } else if (serial) {
+              deferred.resolve(this.matchDevicesByFullSerialByTenant(tenantKey, resource, unmanaged))
+            } else {
+              deferred.resolve(this.matchDevicesByFullGCMidByTenant(tenantKey, resource, unmanaged))
+            }
+          } else {
+            if (mac) {
+              deferred.resolve(this.matchDevicesByFullMac(distributorKey, resource, unmanaged))
+            } else if (serial) {
+              deferred.resolve(this.matchDevicesByFullSerial(distributorKey, resource, unmanaged))
+            } else {
+              deferred.resolve(this.matchDevicesByFullGCMid(distributorKey, resource, unmanaged))
+            }
+          }
+
+        } else {
+          deferred.resolve({"is_match": false})
+        }
+
+      } else {
+        deferred.resolve({"is_match": false})
+      }
+      return deferred.promise
+
+    };
+
+    convertDevicesArrayToDictionaryObj(theArray, mac, gcm) {
+      /** Converts array to dictionary with mac, gcmid, or serial as the key **/
+      let devices = {};
+      for (let i = 0; i < theArray.length; i++) {
+        let item = theArray[i];
+        if (mac) {
+          devices[item.mac] = item;
+        } else if (gcm) {
+          devices[item.gcmid] = item;
+        } else {
+          devices[item.serial] = item;
+        }
+      }
+      return devices;
+    }
+    ;
+
+    editItem(item, tenantKey) {
+      $state.go('editDevice', {
+        deviceKey: item.key,
+        tenantKey: tenantKey,
+        fromDevices: false
+      });
     }
 
     getIssuesByKey(deviceKey, startEpoch, endEpoch, prev, next) {
@@ -69,7 +262,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
       }
     }
 
-    searchDistributorDevicesByPartialGCMid(tenantKey, partial_gcmid, unmanaged) {
+    searchDistributorDevicesByPartialGCMidByTenant(tenantKey, partial_gcmid, unmanaged) {
       if (tenantKey !== undefined) {
         let url = `/api/v1/tenants/search/${tenantKey}/devices?unmanaged=${unmanaged}&partial_gcmid=${partial_gcmid}`;
         let promise = Restangular.oneUrl(this.SERVICE_NAME, url).get();
@@ -94,7 +287,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
       }
     }
 
-    matchDevicesByFullGCMid(tenantKey, full_gcmid, unmanaged) {
+    matchDevicesByFullGCMidByTenant(tenantKey, full_gcmid, unmanaged) {
       if (tenantKey !== undefined) {
         let url = `/api/v1/tenants/match/${tenantKey}/devices?unmanaged=${unmanaged}&full_gcmid=${full_gcmid}`;
         let promise = Restangular.oneUrl(this.SERVICE_NAME, url).get();
@@ -286,4 +479,5 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
       return url
     }
   }();
-});
+})
+;

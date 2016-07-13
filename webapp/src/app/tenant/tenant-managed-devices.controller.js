@@ -38,6 +38,7 @@
       });
     };
 
+    vm.editItem = (item, tenantKey) => DevicesService.editItem(item, tenantKey)
 
     vm.refreshDevices = function () {
       vm.devicesPrev = null;
@@ -49,7 +50,6 @@
     if (vm.editMode) {
       let tenantPromise = TenantsService.getTenantByKey(vm.tenantKey);
       tenantPromise.then(tenant => vm.currentTenant = tenant);
-
       vm.getManagedDevices(vm.tenantKey, null, null);
     }
 
@@ -70,14 +70,8 @@
       }
     });
 
-    vm.editItem = item => $state.go('editDevice', {
-      deviceKey: item.key,
-      tenantKey: vm.tenantKey,
-      fromDevices: false
-    });
 
-
-    vm.convertArrayToDictionary = function (theArray, mac) {
+    DevicesService.convertDevicesArrayToDictionaryObj = function (theArray, mac) {
       let Devices = {};
       for (let i = 0; i < theArray.length; i++) {
         let item = theArray[i];
@@ -98,36 +92,27 @@
     };
 
 
-    vm.searchDevices = function (partial_search) {
-      if (partial_search) {
-        if (partial_search.length > 2) {
-          if (vm.selectedButton === "Serial Number") {
-            return DevicesService.searchDevicesByPartialSerialByTenant(vm.tenantKey, partial_search, false)
-              .then(function (res) {
-                let result = res["matches"];
-                vm.serialDevices = vm.convertArrayToDictionary(result, false);
-                let deviceSerials = [];
-                for (let i = 0; i < result.length; i++) {
-                  let each = result[i];
-                  deviceSerials.push(each.serial);
-                }
-                return deviceSerials;
-              });
+    vm.searchDevices = function (partial) {
+      let unmanaged = false;
+      let button = vm.selectedButton;
+      let byTenant = true;
+      let tenantKey = vm.tenantKey;
 
-          } else {
-            return DevicesService.searchDevicesByPartialMacByTenant(vm.tenantKey, partial_search, false)
-              .then(function (res) {
-                let result = res["matches"];
-                vm.macDevices = vm.convertArrayToDictionary(result, true);
-                let deviceMacs = [];
-                for (let i = 0; i < result.length; i++) {
-                  let each = result[i];
-                  deviceMacs.push(each.mac);
-                }
-                return deviceMacs;
-              });
-          }
-
+      if (partial) {
+        if (partial.length > 2) {
+          return DevicesService.searchDevices(partial, button, byTenant, tenantKey, vm.distributorKey, unmanaged)
+            .then(function (devices) {
+              if (button === "Serial Number") {
+                vm.serialDevices = devices[1]
+                return devices[0]
+              } else if (button === "MAC") {
+                vm.macDevices = devices[1]
+                return devices[0]
+              } else {
+                vm.gcmidDevices = devices[1]
+                return devices[0]
+              }
+            })
         } else {
           return [];
         }
@@ -149,9 +134,9 @@
     vm.prepareForEditView = function (searchText) {
       let mac = vm.selectedButton === "MAC";
       if (mac) {
-        return vm.editItem(vm.macDevices[searchText]);
+        return DevicesService.editItem(vm.macDevices[searchText], vm.tenantKey);
       } else {
-        return vm.editItem(vm.serialDevices[searchText]);
+        return DevicesService.editItem(vm.serialDevices[searchText], vm.tenantKey);
       }
     };
 

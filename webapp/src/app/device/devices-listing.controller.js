@@ -6,9 +6,9 @@
   appModule.controller('DevicesListingCtrl', function ($stateParams, $log, DevicesService, $state, SessionsService, ProgressBarService, sweet) {
     let vm = this;
     vm.distributorKey = undefined;
-    //////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
     // Managed
-    //////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
     vm.devices = [];
     vm.devicesPrev = null;
     vm.devicesNext = null;
@@ -18,9 +18,9 @@
     vm.macDevices = {};
     vm.gcmidDevices = {};
 
-    //////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
     // Unmanaged
-    //////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
     vm.unmanagedSelectedButton = "MAC";
     vm.unmanagedSerialDevices = {};
     vm.unmanagedDisabled = true;
@@ -29,6 +29,9 @@
     vm.unmanagedDevices = [];
     vm.unmanagedMacDevices = {};
     vm.unmanagedGCMidDevices = {};
+
+    vm.editItem = (item, tenantKey) => DevicesService.editItem(item, tenantKey)
+
 
     vm.refreshManagedDevices = function () {
       vm.devicesPrev = null;
@@ -57,23 +60,6 @@
       }
     };
 
-    // todo move this into a service
-    vm.convertArrayToDictionary = function (theArray, mac, gcm) {
-      let devices = {};
-      for (let i = 0; i < theArray.length; i++) {
-        let item = theArray[i];
-        if (mac) {
-          devices[item.mac] = item;
-        } else if (gcm) {
-          devices[item.gcmid] = item;
-        } else {
-          devices[item.serial] = item;
-        }
-      }
-
-      return devices;
-    };
-
     vm.prepareForEditView = function (unmanaged, searchText) {
       let mac, serial, gcmid;
       if (unmanaged) {
@@ -82,28 +68,24 @@
         gcmid = vm.unmanagedSelectedButton === "GCM ID"
 
         if (mac) {
-          return vm.editItem(vm.unmanagedMacDevices[searchText]);
+          return DevicesService.editItem(vm.unmanagedMacDevices[searchText], vm.tenantKey);
         } else if (serial) {
-          return vm.editItem(vm.unmanagedSerialDevices[searchText]);
+          return DevicesService.editItem(vm.unmanagedSerialDevices[searchText], vm.tenantKey);
         } else {
-          return vm.editItem(vm.unmanagedGCMidDevices[searchText])
+          return DevicesService.editItem(vm.unmanagedGCMidDevices[searchText], vm.tenantKey)
         }
 
       } else {
         mac = vm.selectedButton === "MAC";
         serial = vm.selectedButton === "Serial Number";
         gcmid = vm.selectedButton === "GCM ID"
-
-
         if (mac) {
-          return vm.editItem(vm.macDevices[searchText]);
+          return vm.editItem(vm.macDevices[searchText], vm.tenantKey);
         } else if (serial) {
-          return vm.editItem(vm.serialDevices[searchText]);
+          return vm.editItem(vm.serialDevices[searchText], vm.tenantKey);
         } else {
-          return vm.editItem(vm.gcmidDevices[searchText])
+          return vm.editItem(vm.gcmidDevices[searchText], vm.tenantKey)
         }
-
-
       }
     }
 
@@ -119,122 +101,65 @@
       }
     };
 
-    vm.isResourceValid = function (unmanaged, resource) {
-      if (resource) {
-        let mac, serial, gcmid;
-        if (resource.length > 2) {
-          if (unmanaged) {
-            mac = vm.unmanagedSelectedButton === "MAC";
-            serial = vm.unmanagedSelectedButton === "Serial Number";
-            gcmid = vm.unmanagedSelectedButton === "GCM ID"
-            vm.unmanagedDisabledButtonLoading = true;
 
-          } else {
-            mac = vm.selectedButton === "MAC";
-            serial = vm.selectedButton === "Serial Number";
-            gcmid = vm.selectedButton === "GCM ID";
-            vm.disabledButtonLoading = true;
-          }
-
-          if (mac) {
-            return DevicesService.matchDevicesByFullMac(vm.distributorKey, resource, unmanaged)
-              .then(res => vm.controlOpenButton(unmanaged, res["is_match"]));
-
-          } else if (serial) {
-            return DevicesService.matchDevicesByFullSerial(vm.distributorKey, resource, unmanaged)
-              .then(res => vm.controlOpenButton(unmanaged, res["is_match"]));
-
-          } else if (gcmid) {
-            return DevicesService.matchDevicesByFullGCMid(vm.distributorKey, resource, unmanaged)
-              .then(res => vm.controlOpenButton(unmanaged, res["is_match"]));
-          }
-
-        } else {
-          return vm.controlOpenButton(unmanaged, false);
-        }
-
+    vm.isResourceValid = function (resource) {
+      let unmanaged = true;
+      let button;
+      if (unmanaged) {
+        button = vm.unmanagedSelectedButton
       } else {
-        return vm.controlOpenButton(unmanaged, false);
+        button = vm.selectedButton;
       }
+
+      return DevicesService.isResourceValid(resource, button, vm.tenantKey, unmanaged)
+        .then(res => vm.controlOpenButton(res["is_match"]));
+    };
+
+    vm.isResourceValid = function (unmanaged, resource) {
+      let byTenant = false;
+      DevicesService.isResourceValid(resource, vm.selectedButton, byTenant, vm.tenantKey, vm.distributorKey, unmanaged)
+        .then(res => vm.controlOpenButton(unmanaged, res["is_match"]));
     };
 
 
     vm.searchDevices = function (unmanaged, partial) {
       let button;
+      if (unmanaged) {
+        button = vm.unmanagedSelectedButton;
+      } else {
+        button = vm.selectedButton;
+      }
+
+      let byTenant = false;
+      let tenantKey = null;
+
       if (partial) {
         if (partial.length > 2) {
-          if (unmanaged) {
-            button = vm.unmanagedSelectedButton;
-          } else {
-            button = vm.selectedButton;
-          }
-
-          if (button === "Serial Number") {
-            return DevicesService.searchDevicesByPartialSerial(vm.distributorKey, partial, unmanaged)
-              .then(function (res) {
-                let result = res["matches"];
+          return DevicesService.searchDevices(partial, button, byTenant, tenantKey, vm.distributorKey, unmanaged)
+            .then(function (devices) {
+              if (button === "Serial Number") {
                 if (unmanaged) {
-                  vm.unmanagedSerialDevices = vm.convertArrayToDictionary(result, false);
+                  vm.unmanagedSerialDevices = devices[1]
                 } else {
-                  vm.serialDevices = vm.convertArrayToDictionary(result, false);
+                  vm.serialDevices = devices[1]
                 }
-
-                let serialDevices = [];
-
-                for (let i = 0; i < result.length; i++) {
-                  let each = result[i];
-                  serialDevices.push(each.serial);
-                }
-
-                return serialDevices;
-              });
-
-
-          } else if (button === "MAC") {
-            return DevicesService.searchDevicesByPartialMac(vm.distributorKey, partial, unmanaged)
-              .then(function (res) {
-                let result = res["matches"];
-                
+                return devices[0]
+              } else if (button === "MAC") {
                 if (unmanaged) {
-                  vm.unmanagedMacDevices = vm.convertArrayToDictionary(result, true);
+                  vm.unmanagedMacDevices = devices[1]
                 } else {
-                  vm.macDevices = vm.convertArrayToDictionary(result, true);
+                  vm.macDevices = devices[1]
                 }
-
-                let macDevices = [];
-                
-                for (let i = 0; i < result.length; i++) {
-                  let each = result[i];
-                  macDevices.push(each.mac);
-                }
-
-                return macDevices;
-
-              });
-
-          } else {
-
-            return DevicesService.searchDistributorDevicesByPartialGCMid(vm.distributorKey, partial, unmanaged)
-              .then(function (res) {
-                let result = res["matches"];
-
+                return devices[0]
+              } else {
                 if (unmanaged) {
-                  vm.unmanagedGCMidDevices = vm.convertArrayToDictionary(result, false, true);
+                  vm.unmanagedGCMidDevices = devices[1]
                 } else {
-                  vm.gcmidDevices = vm.convertArrayToDictionary(result, false, true);
+                  vm.gcmidDevices = devices[1]
                 }
-
-                let gcmidDevices = [];
-
-                for (let i = 0; i < result.length; i++) {
-                  let each = result[i];
-                  gcmidDevices.push(each.gcmid);
-                }
-
-                return gcmidDevices;
-              });
-
-          }
+                return devices[0]
+              }
+            })
         } else {
           return [];
         }
@@ -242,7 +167,6 @@
         return [];
       }
     };
-
 
     vm.getManagedDevices = function (key, prev, next) {
       ProgressBarService.start();
@@ -254,7 +178,6 @@
         return vm.getFetchSuccess();
       }), response => vm.getFetchFailure(response));
     };
-
 
     vm.getUnmanagedDevices = function (key, prev, next) {
       ProgressBarService.start();
@@ -281,26 +204,16 @@
       return sweet.show('Oops...', errorMessage, 'error');
     };
 
-    vm.editItem = item => {
-      $state.go('editDevice', {
-        deviceKey: item.key,
-        tenantKey: item.tenantKey,
-        fromDevices: true
-      })
-    }
-    ;
 
     vm.paginateCall = function (forward, managed) {
       if (forward) {
         if (managed) {
           vm.getManagedDevices(vm.distributorKey, null, vm.devicesNext);
         }
-
         if (!managed) {
           vm.getUnmanagedDevices(vm.distributorKey, null, vm.unmanagedDevicesNext);
         }
       }
-
       if (!forward) {
         if (managed) {
           vm.getManagedDevices(vm.distributorKey, vm.devicesPrev, null);
