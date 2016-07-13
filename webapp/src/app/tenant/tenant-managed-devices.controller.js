@@ -38,7 +38,7 @@
       });
     };
 
-    vm.editItem = (item, tenantKey) => DevicesService.editItem(item, tenantKey)
+    vm.editItem = (item) => DevicesService.editItem(item)
 
     vm.refreshDevices = function () {
       vm.devicesPrev = null;

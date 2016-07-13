@@ -389,6 +389,7 @@ describe('DevicesListingCtrl', function () {
     });
   });
 
+  // TODO fix these tests
   // return describe('.searchDevices', function () {
   //   let partial = "it doesn't matter dwight!";
   //   beforeEach(function () {

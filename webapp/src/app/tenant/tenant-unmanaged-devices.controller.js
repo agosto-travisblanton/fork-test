@@ -46,7 +46,7 @@
         }
       });
 
-      vm.editItem = (item) => DevicesService.editItem(item)
+    vm.editItem = (item) => DevicesService.editItem(item)
 
       vm.getUnmanagedDevices = function (tenantKey, prev_cursor, next_cursor) {
         ProgressBarService.start();

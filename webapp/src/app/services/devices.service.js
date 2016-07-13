@@ -27,7 +27,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
         }
         return results
       }
-      
+
       executeSearchingPartialSerialByTenant(tenantKey, partialSearch, unmanaged) {
         return this.searchDevicesByPartialSerialByTenant(tenantKey, partialSearch, unmanaged)
           .then((res) => {
@@ -208,11 +208,14 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
         return devices;
       };
 
-      editItem(item) {
+      editItem(item, fromDevices) {
+        if (!fromDevices) {
+          fromDevices = false
+        }
         $state.go('editDevice', {
           deviceKey: item.key,
           tenantKey: item.tenantKey,
-          fromDevices: false
+          fromDevices: fromDevices
         });
       }
 
@@ -224,13 +227,13 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
         gcmid = button === "GCM ID"
 
         if (mac) {
-          return this.editItem(macDevices[searchText], tenantKey);
+          return this.editItem(macDevices[searchText]);
         } else if (serial) {
-          return this.editItem(serialDevices[searchText], tenantKey);
+          return this.editItem(serialDevices[searchText]);
         } else {
-          return this.editItem(gcmidDevices[searchText], tenantKey)
+          return this.editItem(gcmidDevices[searchText])
         }
-        
+
       }
 
       getIssuesByKey(deviceKey, startEpoch, endEpoch, prev, next) {

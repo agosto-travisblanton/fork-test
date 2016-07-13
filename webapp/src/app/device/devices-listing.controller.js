@@ -57,13 +57,7 @@
       }
     };
 
-    vm.editItem = item => {
-      $state.go('editDevice', {
-        deviceKey: item.key,
-        tenantKey: item.tenantKey,
-        fromDevices: true
-      })
-    }
+    vm.editItem = (item) => DevicesService.editItem(item, true)
 
     vm.prepareForEditView = function (unmanaged, searchText) {
       let mac, serial, gcmid;
