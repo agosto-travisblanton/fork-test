@@ -90,7 +90,7 @@ def refresh_device_by_mac_address(device_urlsafe_key, device_mac_address,
                                _countdown=5)
             return device
         else:
-            logging.debug('INSIDE refresh_device_by_mac_address. Did not find mac_address={0} in first 100.'.format(
+            logging.debug('INSIDE refresh_device_by_mac_address. Did not find mac_address={0} in this chunk.'.format(
                 device_mac_address))
 
             if new_page_token is not None:

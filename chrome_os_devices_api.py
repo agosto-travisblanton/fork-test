@@ -59,15 +59,18 @@ class ChromeOsDevicesApi(object):
         while True:
             # https://google-api-client-libraries.appspot.com/documentation/admin/directory_v1/python/latest/admin_directory_v1.chromeosdevices.html#list
             if page_token is None:
+
+                logging.debug('INSIDE list branch 1. Page token is None.')
                 request = chrome_os_devices_api.list(customerId=customer_id,
                                                      orderBy='serialNumber',
-                                                     projection=self.PROJECTION_BASIC,
+                                                     projection=self.PROJECTION_FULL,
                                                      maxResults=self.MAX_RESULTS,
                                                      sortOrder=self.SORT_ORDER_ASCENDING)
             else:
+                logging.debug('INSIDE list branch 1. Have a page token.')
                 request = chrome_os_devices_api.list(customerId=customer_id,
                                                      orderBy='serialNumber',
-                                                     projection=self.PROJECTION_BASIC,
+                                                     projection=self.PROJECTION_FULL,
                                                      pageToken=page_token,
                                                      maxResults=self.MAX_RESULTS,
                                                      sortOrder=self.SORT_ORDER_ASCENDING)
@@ -78,6 +81,8 @@ class ChromeOsDevicesApi(object):
                 results.extend(chrome_os_devices)
             if page_token is None:
                 break
+            logging.debug('INSIDE list sending back len(results)={0}'.format(len(results)))
+
         return results
 
     # https://developers.google.com/admin-sdk/directory/v1/reference/chromeosdevices/list
@@ -95,14 +100,14 @@ class ChromeOsDevicesApi(object):
         logging.debug('INSIDE cursor_list have chrome_os_devices_api')
         # https://google-api-client-libraries.appspot.com/documentation/admin/directory_v1/python/latest/admin_directory_v1.chromeosdevices.html#list
         if next_page_token is None:
-            logging.debug('INSIDE cursor_list branch 1')
+            logging.debug('INSIDE cursor_list branch 1. Page token is None.')
             request = chrome_os_devices_api.list(customerId=customer_id,
                                                  orderBy='serialNumber',
                                                  projection=self.PROJECTION_FULL,
                                                  maxResults=self.MAX_RESULTS,
                                                  sortOrder=self.SORT_ORDER_ASCENDING)
         else:
-            logging.debug('INSIDE cursor_list branch 2')
+            logging.debug('INSIDE cursor_list branch 2. Have a page token.')
             request = chrome_os_devices_api.list(customerId=customer_id,
                                                  orderBy='serialNumber',
                                                  projection=self.PROJECTION_FULL,
