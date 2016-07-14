@@ -325,7 +325,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         else:
             device.timezone_offset = TimezoneUtil.get_timezone_offset('America/Chicago')
         if self.is_unmanaged_device is False:
+            logging.debug('GET refresh_device_by_mac_address for managed device.')
             if not device.device_id:
+                logging.debug('GET refresh_device_by_mac_address')
                 deferred.defer(refresh_device_by_mac_address,
                                device_urlsafe_key=device_urlsafe_key,
                                device_mac_address=device.mac_address,
@@ -333,6 +335,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                _queue='directory-api',
                                _countdown=5)
             else:
+                logging.debug('GET refresh_device')
                 deferred.defer(refresh_device,
                                device_urlsafe_key=device_urlsafe_key,
                                _queue='directory-api',
