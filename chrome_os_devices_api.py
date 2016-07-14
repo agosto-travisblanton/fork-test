@@ -89,15 +89,20 @@ class ChromeOsDevicesApi(object):
         :return: An array of Chrome OS devices.
         """
         results = []
+        logging.debug('INSIDE cursor_list customer_id={0}, page_token={1}'.format(customer_id, next_page_token))
+
         chrome_os_devices_api = self.discovery_service.chromeosdevices()
+        logging.debug('INSIDE cursor_list have chrome_os_devices_api')
         # https://google-api-client-libraries.appspot.com/documentation/admin/directory_v1/python/latest/admin_directory_v1.chromeosdevices.html#list
         if next_page_token is None:
+            logging.debug('INSIDE cursor_list branch 1')
             request = chrome_os_devices_api.list(customerId=customer_id,
                                                  orderBy='serialNumber',
                                                  projection=self.PROJECTION_FULL,
                                                  maxResults=self.MAX_RESULTS,
                                                  sortOrder=self.SORT_ORDER_ASCENDING)
         else:
+            logging.debug('INSIDE cursor_list branch 2')
             request = chrome_os_devices_api.list(customerId=customer_id,
                                                  orderBy='serialNumber',
                                                  projection=self.PROJECTION_FULL,
