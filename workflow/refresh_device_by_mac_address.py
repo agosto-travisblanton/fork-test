@@ -39,6 +39,10 @@ def refresh_device_by_mac_address(device_urlsafe_key, device_mac_address,
     chrome_os_devices_api = ChromeOsDevicesApi(impersonation_admin_email_address)
     chrome_os_devices, new_page_token = chrome_os_devices_api.cursor_list(customer_id=config.GOOGLE_CUSTOMER_ID,
                                                                           next_page_token=page_token)
+
+    logging.debug('INSIDE refresh_device_by_mac_address got initial 100 with page token={0}'.format(
+        page_token))
+
     if chrome_os_devices is not None and len(chrome_os_devices) > 0:
         lowercase_device_mac_address = device_mac_address.lower()
         loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == lowercase_device_mac_address or
