@@ -57,7 +57,7 @@ def _SERVICE_ACCOUNT_EMAIL():
     elif on_continuous_integration_server:
         return '133313126637-compute@developer.gserviceaccount.com'
     elif on_qa_server:
-        return '465572156911-g1n43vdlpi3h225k1s1n3r7aiopucmvq.apps.googleusercontent.com'
+        return '465572156911-compute@developer.gserviceaccount.com'
     elif on_stage_server:
         return 'service-247@skykit-provisioning-stage.iam.gserviceaccount.com'
     elif on_gamestop_server:
