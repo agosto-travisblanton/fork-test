@@ -34,15 +34,14 @@
                 Refresh
               </md-button>
             </div>
-            <div class="col-md-3 col-md-offset-1">
+            <div class="col-md-4">
               <md-radio-group ng-model="vm.selectedButton"
-                              ng-change="vm.changeRadio()"
+                              ng-change="vm.changeRadio(false)"
                               class="radio-horizontal">
 
-                <div class="col-md-4">
+                <div class="col-md-2">
                   <md-radio-button value="Serial Number"
-                                   class="md-primary"
-                                   ng-disabled="true">
+                                   class="md-primary" ng-disabled="true">
                     Serial Number
                   </md-radio-button>
                 </div>
@@ -53,6 +52,15 @@
                     value="MAC"
                     class="md-primary radio-button">
                     MAC
+                  </md-radio-button>
+                </div>
+
+                <div class="col-md-2 col-md-offset-2">
+
+                  <md-radio-button
+                    value="GCM ID"
+                    class="md-primary radio-button">
+                    GCM ID
                   </md-radio-button>
                 </div>
               </md-radio-group>

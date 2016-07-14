@@ -110,7 +110,7 @@
         return vm.getManagedDevices(vm.tenantKey, vm.devicesPrev, null);
       }
     };
-    
+
     vm.prepareForEditView = (searchText) => DevicesService.preprateForEditView(
       vm.selectedButton,
       vm.tenantKey,
@@ -119,12 +119,12 @@
       vm.serialDevices,
       vm.gcmidDevices
     )
-    
+
     vm.controlOpenButton = function (isMatch) {
       vm.disabled = !isMatch;
       return vm.loadingDisabled = false;
     };
-    
+
     vm.isResourceValid = function (resource) {
       let unmanaged = false;
       let byTenant = true;

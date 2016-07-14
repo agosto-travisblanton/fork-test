@@ -23,7 +23,7 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
         let results = []
         for (let i = 0; i < dictionary.length; i++) {
           let each = dictionary[i];
-          results.push(each["value"]);
+          results.push(each[value]);
         }
         return results
       }
@@ -110,50 +110,57 @@ angular.module('skykitProvisioning').factory('DevicesService', function ($log, R
           });
       }
 
+      rejectedPromise() {
+        let deviceDeferred = $q.defer();
+        deviceDeferred.reject()
+        return deviceDeferred.promise
+      };
+
 
       searchDevices(partialSearch, button, byTenant, tenantKey, distributorKey, unmanaged) {
         let deferred = $q.defer();
-        let resultingDevices;
+        let devicesPromise;
         if (partialSearch) {
           if (partialSearch.length > 2) {
             if (button === "Serial Number") {
               if (byTenant) {
-                resultingDevices = this.executeSearchingPartialSerialByTenant(tenantKey, partialSearch, unmanaged)
+                devicesPromise = this.executeSearchingPartialSerialByTenant(tenantKey, partialSearch, unmanaged)
               } else {
-                resultingDevices = this.executeSearchingPartialSerialByDistributor(distributorKey, partialSearch, unmanaged)
+                devicesPromise = this.executeSearchingPartialSerialByDistributor(distributorKey, partialSearch, unmanaged)
               }
             } else if (button === "MAC") {
               if (byTenant) {
-                resultingDevices = this.executeSearchingPartialMacByTenant(tenantKey, partialSearch, unmanaged)
+                devicesPromise = this.executeSearchingPartialMacByTenant(tenantKey, partialSearch, unmanaged)
               } else {
-                resultingDevices = this.executeSearchingPartialMacByDistributor(distributorKey, partialSearch, unmanaged)
+                devicesPromise = this.executeSearchingPartialMacByDistributor(distributorKey, partialSearch, unmanaged)
               }
             } else {
               if (byTenant) {
-                resultingDevices = this.executeSearchingPartialGCMidByTenant(tenantKey, partialSearch, unmanaged)
+                devicesPromise = this.executeSearchingPartialGCMidByTenant(tenantKey, partialSearch, unmanaged)
               } else {
-                resultingDevices = this.executeSearchingPartialGCMidByDistributor(distributorKey, partialSearch, unmanaged)
+                devicesPromise = this.executeSearchingPartialGCMidByDistributor(distributorKey, partialSearch, unmanaged)
               }
             }
           } else {
-            resultingDevices = false;
+            devicesPromise = this.rejectedPromise()
           }
         } else {
-          resultingDevices = false;
+          devicesPromise = this.rejectedPromise()
         }
 
-        if (resultingDevices) {
+        devicesPromise.then(function (devicesResult) {
           deferred.resolve({
             "success": true,
-            "devices": resultingDevices
+            "devices": devicesResult
           })
+        })
 
-        } else {
+        devicesPromise.catch(function (devicesResult) {
           deferred.resolve({
             "success": false,
-            "devices": resultingDevices
+            "devices": []
           })
-        }
+        })
 
         return deferred.promise
       }
