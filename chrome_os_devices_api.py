@@ -61,13 +61,13 @@ class ChromeOsDevicesApi(object):
             if page_token is None:
                 request = chrome_os_devices_api.list(customerId=customer_id,
                                                      orderBy='serialNumber',
-                                                     projection=self.PROJECTION_FULL,
+                                                     projection=self.PROJECTION_BASIC,
                                                      maxResults=self.MAX_RESULTS,
                                                      sortOrder=self.SORT_ORDER_ASCENDING)
             else:
                 request = chrome_os_devices_api.list(customerId=customer_id,
                                                      orderBy='serialNumber',
-                                                     projection=self.PROJECTION_FULL,
+                                                     projection=self.PROJECTION_BASIC,
                                                      pageToken=page_token,
                                                      maxResults=self.MAX_RESULTS,
                                                      sortOrder=self.SORT_ORDER_ASCENDING)
