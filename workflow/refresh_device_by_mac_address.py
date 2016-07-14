@@ -37,6 +37,8 @@ def refresh_device_by_mac_address(device_urlsafe_key, device_mac_address,
     logging.debug('INSIDE refresh_device_by_mac_address impersonation_admin_email_address={0}'.format(
         impersonation_admin_email_address))
     chrome_os_devices_api = ChromeOsDevicesApi(impersonation_admin_email_address)
+    logging.debug('INSIDE refresh_device_by_mac_address chrome_os_devices_api instantiated')
+    
     chrome_os_devices, new_page_token = chrome_os_devices_api.cursor_list(customer_id=config.GOOGLE_CUSTOMER_ID,
                                                                           next_page_token=page_token)
 
