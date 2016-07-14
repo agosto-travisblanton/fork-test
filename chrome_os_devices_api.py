@@ -1,4 +1,4 @@
-from google.appengine.ext import ndb
+import logging
 
 from app_config import config
 from googleapiclient import discovery
@@ -29,12 +29,22 @@ class ChromeOsDevicesApi(object):
     KEY_NEXTPAGETOKEN = 'nextPageToken'
 
     def __init__(self, admin_to_impersonate_email_address):
+        logging.debug(
+            'login google api: SERVICE_ACCOUNT_EMAIL={0},DIRECTORY_SERVICE_SCOPES={1}, impersonation email={2}'.format(
+                config.SERVICE_ACCOUNT_EMAIL,
+                self.DIRECTORY_SERVICE_SCOPES,
+                admin_to_impersonate_email_address))
+
         self.credentials = SignedJwtAssertionCredentials(config.SERVICE_ACCOUNT_EMAIL,
                                                          private_key=config.PRIVATE_KEY,
                                                          scope=self.DIRECTORY_SERVICE_SCOPES,
                                                          sub=admin_to_impersonate_email_address)
+        logging.debug('login google api: about to get oAuth2 handshake.')
+
         self.authorized_http = self.credentials.authorize(Http())
+        logging.debug('login google api: got past authorized_http')
         self.discovery_service = discovery.build('admin', 'directory_v1', http=self.authorized_http)
+        logging.debug('login google api: got past discovery_service.')
 
     # https://developers.google.com/admin-sdk/directory/v1/reference/chromeosdevices/list
     def list(self, customer_id, page_token=None):
