@@ -44,5 +44,8 @@ class TestRefreshDeviceByMacAddress(BaseTest):
 
     def test_refresh_device_by_mac_address(self):
         """ Tests the live connection to Admin SDK Directory API. """
-        result = refresh_device_by_mac_address(self.device_key.urlsafe(), self.mac_address)
+        result = refresh_device_by_mac_address(
+            device_urlsafe_key=self.device_key.urlsafe(),
+            device_mac_address=self.mac_address,
+            device_has_previous_directory_api_info=False)
         self.assertEqual(result.device_id, self.TESTING_DEVICE_ID)

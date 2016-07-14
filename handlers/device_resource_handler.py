@@ -329,6 +329,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 deferred.defer(refresh_device_by_mac_address,
                                device_urlsafe_key=device_urlsafe_key,
                                device_mac_address=device.mac_address,
+                               device_has_previous_directory_api_info=False,
                                _queue='directory-api',
                                _countdown=5)
             else:
@@ -445,6 +446,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                            gcm_registration_id=gcm_registration_id,
                                                            mac_address=device_mac_address,
                                                            timezone=timezone)
+                    device.registration_correlation_identifier = correlation_id
                     key = device.put()
                     registration_request_event.device_urlsafe_key = key.urlsafe()
                     registration_request_event.details = 'register_device: tenant code={0}, mac address={1}, ' \
@@ -606,7 +608,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         else:
             request_json = json.loads(self.request.body)
             storage = request_json.get('storage')
+            if storage is not None:
+                storage = int(storage)
             memory = request_json.get('memory')
+            if memory is not None:
+                memory = int(memory)
             mac_address = request_json.get('macAddress')
             program = request_json.get('program')
             program_id = request_json.get('programId')
@@ -642,15 +648,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                         )
                         logging.info(info_message)
 
-            if storage is not None:
-                storage = int(storage)
-                if device.storage_utilization != storage:
-                    device.storage_utilization = storage
+            if device.storage_utilization != storage:
+                device.storage_utilization = storage
 
-            if memory is not None:
-                memory = int(memory)
-                if device.memory_utilization != memory:
-                    device.memory_utilization = memory
+            if device.memory_utilization != memory:
+                device.memory_utilization = memory
 
             if program:
                 if device.program != program:
