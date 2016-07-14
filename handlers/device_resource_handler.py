@@ -383,6 +383,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 deferred.defer(refresh_device_by_mac_address,
                                device_urlsafe_key=device_urlsafe_key,
                                device_mac_address=device.mac_address,
+                               device_has_previous_directory_api_info=False,
                                _queue='directory-api',
                                _countdown=5)
             else:
