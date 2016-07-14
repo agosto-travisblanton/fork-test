@@ -3,7 +3,6 @@ import logging
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
-from agar.env import on_development_server
 from app_config import config
 from chrome_os_devices_api import ChromeOsDevicesApi
 from content_manager_api import ContentManagerApi
@@ -16,8 +15,13 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_registration_id=None,
                     correlation_id=None, page_token=None):
     """
-    A function that is meant to be run asynchronously to update the device entity
-    with ChromeOsDevice information from Directory API using the MAC address to match.
+    A function that is meant to be run asynchronously to fetch information about the device entity
+    with ChromeOsDevice information from Directory API using the device's MAC address to match.
+    :param page_token: a google api page marker for where you are in the larger list. Fetches in chunks of 100 records.
+    :param correlation_id: our generated id to track the registration process
+    :param gcm_registration_id: google cloud messaging id the player sends to us for messaging purposes.
+    :param device_mac_address: the device's MAC address
+    :param device_urlsafe_key: our device key
     """
     api_request_event = IntegrationEventLog.create(
         event_category='Registration',
@@ -41,8 +45,12 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
         raise deferred.PermanentTaskFailure(error_message)
     device_key = ndb.Key(urlsafe=device_urlsafe_key)
     device = device_key.get()
-    if None == device.device_id:
-        logging.error('Did not refresh in refresh_chrome_os_device because no device_id available.')
+    if None == device:
+        error_message = 'Unable to find device by device_urlsafe_key: {0}'.format(device_urlsafe_key)
+        logging.error(error_message)
+        if api_request_event:
+            api_request_event.details = error_message
+            api_request_event.put()
         return
     impersonation_admin_email_address = device.get_impersonation_email()
     if not impersonation_admin_email_address:
@@ -107,6 +115,11 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
             info = 'register_device: retrieved directory API for MAC address = {0}. Notifying Content Manager.' \
                 .format(lowercase_device_mac_address)
             logging.info(info)
+            deferred.defer(ContentManagerApi().create_device,
+                           device_urlsafe_key=device_urlsafe_key,
+                           correlation_id=correlation_id,
+                           _queue='content-server',
+                           _countdown=5)
 
             # Update Directory API with the device key in the annotated asset ID.
             if not device.is_unmanaged_device:
@@ -123,11 +136,6 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
                                device_urlsafe_key=device.key.urlsafe(),
                                _queue='directory-api',
                                _countdown=60)
-
-            if ContentManagerApi().create_device(device_urlsafe_key, correlation_id):
-                logging.info('CM returned 201 of create_device')
-            else:
-                logging.error('Error notifying CM of create_device')
             return device
         else:
             device_not_found_event = IntegrationEventLog.create(

@@ -4,7 +4,7 @@ from google.appengine.ext import ndb
 
 from migration_base import MigrationBase
 from models import Tenant, TenantEntityGroup
-from workflow.refresh_chrome_os_device import refresh_chrome_os_device
+from workflow.refresh_device import refresh_device
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -23,4 +23,4 @@ class RefreshChromeDevicePropertiesFromDirectoryApi(MigrationBase):
             tenant_key = ndb.Key(urlsafe=tenant.key.urlsafe())
             devices = Tenant.find_devices(tenant_key)
             for device in devices:
-                refresh_chrome_os_device(device_urlsafe_key=device.key.urlsafe())
+                refresh_device(device_urlsafe_key=device.key.urlsafe())
