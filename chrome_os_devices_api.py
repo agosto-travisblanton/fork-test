@@ -54,6 +54,8 @@ class ChromeOsDevicesApi(object):
         :param customer_id: An identifier for a customer.
         :return: An array of Chrome OS devices.
         """
+        logging.debug('INSIDE list!! customer_id={0}, page_token={1}'.format(customer_id, page_token))
+
         results = []
         chrome_os_devices_api = self.discovery_service.chromeosdevices()
         while True:
@@ -74,12 +76,19 @@ class ChromeOsDevicesApi(object):
                                                      pageToken=page_token,
                                                      maxResults=self.MAX_RESULTS,
                                                      sortOrder=self.SORT_ORDER_ASCENDING)
+            logging.debug('INSIDE list chrome_os_devices_api.list RETURNED')
             current_page_json = request.execute()
+            logging.debug('INSIDE list past current_page_json')
             chrome_os_devices = current_page_json.get(self.KEY_CHROMEOSDEVICES)
+            logging.debug('INSIDE list past current_page_json.get')
             page_token = current_page_json.get(self.KEY_NEXTPAGETOKEN)
+            logging.debug('INSIDE list past page_token')
             if chrome_os_devices is not None:
+                logging.debug('INSIDE list about to extend results')
                 results.extend(chrome_os_devices)
+                logging.debug('INSIDE list got PAST extend results')
             if page_token is None:
+                logging.debug('INSIDE list page_token is None')
                 break
             logging.debug('INSIDE list sending back len(results)={0}'.format(len(results)))
 
