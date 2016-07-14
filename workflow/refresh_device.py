@@ -3,7 +3,6 @@ import logging
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
-from agar.env import on_development_server
 from app_config import config
 from chrome_os_devices_api import (ChromeOsDevicesApi)
 
@@ -11,11 +10,10 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 def refresh_device(device_urlsafe_key=None):
-    if on_development_server:
-        return
     """
     A function that is meant to be run asynchronously to update the device entity
     with ChromeOsDevice information from Directory API using the device ID to match.
+    :param device_urlsafe_key: our device key
     """
     if device_urlsafe_key is None:
         raise deferred.PermanentTaskFailure('The device URL-safe key parameter is None. It is required.')
@@ -28,8 +26,12 @@ def refresh_device(device_urlsafe_key=None):
     if None == impersonation_admin_email_address:
         logging.info('Impersonation email not found for device with device key {0}.'.format(device_urlsafe_key))
         return
+    chrome_os_device = None
     chrome_os_devices_api = ChromeOsDevicesApi(impersonation_admin_email_address)
-    chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, device.device_id)
+    try:
+        chrome_os_device = chrome_os_devices_api.get(config.GOOGLE_CUSTOMER_ID, device.device_id)
+    except Exception, e:
+        logging.exception('refresh_device failed for this key {0}. Exception: {1}'.format(device_urlsafe_key, e))
     if chrome_os_device is not None:
         device.device_id = chrome_os_device.get('deviceId')
         device.mac_address = chrome_os_device.get('macAddress')

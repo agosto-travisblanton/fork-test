@@ -90,7 +90,8 @@ for i in range(12, 24):
             gcm_registration_id=GCM_REGISTRATION_ID + str(i),
             device_id=DEVICE_ID + str(i),
             mac_address=str(i) + MAC_ADDRESS,
-            ethernet_mac_address=str(i) + "ether" + MAC_ADDRESS
+            ethernet_mac_address=str(i) + "ether" + MAC_ADDRESS,
+            registration_correlation_identifier = 'a47671549a049'+ str(i)
         )
         managed_device.serial_number = SERIAL_NUMBER + str(i)
         managed_device.put()
