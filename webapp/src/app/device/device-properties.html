@@ -194,6 +194,14 @@
           </div>
         </div>
         <div class="form-group"
+             ng-hide="deviceDetailsCtrl.currentDevice.registrationCorrelationIdentifier == null ||
+                                           deviceDetailsCtrl.currentDevice.registrationCorrelationIdentifier == ''">
+          <label>Registration correlation identifier</label>
+          <div>
+            {{deviceDetailsCtrl.currentDevice.registrationCorrelationIdentifier}}
+          </div>
+        </div>
+        <div class="form-group"
              ng-hide="deviceDetailsCtrl.currentDevice.status == null ||
                                            deviceDetailsCtrl.currentDevice.status == ''">
           <label>Status</label>
