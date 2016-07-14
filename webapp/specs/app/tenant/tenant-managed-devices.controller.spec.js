@@ -148,7 +148,8 @@ describe('TenantManagedDevicesCtrl', function () {
     });
 
     describe('search and pagination ', function () {
-      beforeEach(function () {
+      let genericMatches;
+      beforeEach(inject(function ($q) {
         spyOn($state, 'go');
         let tenantKey = 'bhjad897d987fa32fg708fg72';
         $stateParams = {tenantKey};
@@ -160,36 +161,38 @@ describe('TenantManagedDevicesCtrl', function () {
 
         partial = "some text";
         promise = new skykitProvisioning.q.Mock();
-        spyOn(DevicesService, 'searchDevices').and.returnValue(promise);
+        spyOn(DevicesService, 'searchDevices').and.callFake(function (someData) {
+          genericMatches = {
+            "matches": [
+              {"serial": "1234"},
+              {"serial": "45566"}
+            ]
+          };
+          let deferred = $q.defer();
+          deferred.resolve({
+            "success": true,
+            "devices": genericMatches
+          })
+          return deferred.promise
+        })
+        spyOn(DevicesService, 'executeSearchingPartialSerialByTenant')
+        spyOn(DevicesService, 'executeSearchingPartialMacByTenant')
         return controller = $controller('TenantManagedDevicesCtrl', serviceInjection);
+      }));
+
+      it("returns every serial name when called as a managed serial", function () {
+        controller.selectedButton = "Serial Number";
+        controller.searchDevices(partial)
+          .then(() => expect(controller.serialDevices).toEqual(genericMatches))
+
       });
-      
-      // TODO fix these tests
-      // it("returns every serial name when called as a managed serial", function () {
-      //   controller.selectedButton = "Serial Number";
-      //   controller.searchDevices(partial);
-      //   let serial_matches = {
-      //     "success": true,
-      //     "devices": [
-      //       {"serial": "45566"}
-      //     ]
-      //   };
-      //   promise.resolve(serial_matches);
-      //   return expect(controller.serialDevices).toEqual(serial_matches["devices"]);
-      // });
-      //
-      // it("returns every serial name when called as a managed mac", function () {
-      //   controller.selectedButton = "MAC";
-      //   controller.searchDevices(partial);
-      //   let mac_matches = {
-      //     "success": true,
-      //     "devices": [
-      //       {"mac": "45566"}
-      //     ]
-      //   };
-      //   promise.resolve(mac_matches);
-      //   return expect(controller.macDevices).toEqual(mac_matches["devices"]);
-      // });
+
+      it("returns every serial name when called as a managed mac", function () {
+        controller.selectedButton = "MAC";
+        controller.searchDevices(partial)
+          .then(() => expect(controller.macDevices).toEqual(genericMatches))
+
+      });
 
       it('resets variables whenever function is called', function () {
         controller.changeRadio();
