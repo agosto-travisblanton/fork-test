@@ -63,19 +63,26 @@ class ChromeOsDevicesApi(object):
             if page_token is None:
 
                 logging.debug('INSIDE list branch 1. Page token is None.')
+                # request = chrome_os_devices_api.list(customerId=customer_id,
+                #                                      orderBy='serialNumber',
+                #                                      projection=self.PROJECTION_FULL,
+                #                                      maxResults=self.MAX_RESULTS,
+                #                                      sortOrder=self.SORT_ORDER_ASCENDING)
                 request = chrome_os_devices_api.list(customerId=customer_id,
-                                                     orderBy='serialNumber',
                                                      projection=self.PROJECTION_FULL,
-                                                     maxResults=self.MAX_RESULTS,
-                                                     sortOrder=self.SORT_ORDER_ASCENDING)
+                                                     maxResults=self.MAX_RESULTS)
             else:
                 logging.debug('INSIDE list branch 1. Have a page token.')
+                # request = chrome_os_devices_api.list(customerId=customer_id,
+                #                                      orderBy='serialNumber',
+                #                                      projection=self.PROJECTION_FULL,
+                #                                      pageToken=page_token,
+                #                                      maxResults=self.MAX_RESULTS,
+                #                                      sortOrder=self.SORT_ORDER_ASCENDING)
                 request = chrome_os_devices_api.list(customerId=customer_id,
-                                                     orderBy='serialNumber',
                                                      projection=self.PROJECTION_FULL,
                                                      pageToken=page_token,
-                                                     maxResults=self.MAX_RESULTS,
-                                                     sortOrder=self.SORT_ORDER_ASCENDING)
+                                                     maxResults=self.MAX_RESULTS)
             logging.debug('INSIDE list chrome_os_devices_api.list RETURNED')
             current_page_json = request.execute()
             logging.debug('INSIDE list past current_page_json')
