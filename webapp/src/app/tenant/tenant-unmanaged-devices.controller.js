@@ -80,18 +80,16 @@
       };
 
       vm.searchDevices = function (partial) {
-        let unmanaged = false;
-        let button = vm.selectedButton;
+        let unmanaged = true;
         let byTenant = true;
-        let tenantKey = vm.tenantKey;
-        return DevicesService.searchDevices(partial, button, byTenant, tenantKey, vm.distributorKey, unmanaged)
+        return DevicesService.searchDevices(partial, vm.selectedButton, byTenant, vm.tenantKey, vm.distributorKey, unmanaged)
           .then(function (response) {
             if (response.success) {
               let devices = response.devices
-              if (button === "Serial Number") {
+              if (vm.selectedButton === "Serial Number") {
                 vm.serialDevices = devices[1]
                 return devices[0]
-              } else if (button === "MAC") {
+              } else if (vm.selectedButton === "MAC") {
                 vm.macDevices = devices[1]
                 return devices[0]
               } else {
@@ -112,7 +110,6 @@
           return vm.getUnmanagedDevices(vm.tenantKey, vm.devicesPrev, null);
         }
       };
-
 
       vm.prepareForEditView = (searchText) => DevicesService.preprateForEditView(
         vm.selectedButton,
