@@ -80,8 +80,5 @@ def refresh_device_by_mac_address(device_urlsafe_key, device_mac_address,
             return device
         else:
             if new_page_token is not None:
-                deferred.defer(refresh_device_by_mac_address,
-                               device_urlsafe_key=device_urlsafe_key,
-                               device_mac_address=device_mac_address,
-                               page_token=new_page_token,
-                               _queue='directory-api')
+                refresh_device_by_mac_address(device_urlsafe_key, device_mac_address,
+                                              device_has_previous_directory_api_info, new_page_token)

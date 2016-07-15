@@ -497,7 +497,6 @@ def handle_posting_a_new_program_play(incoming_data):
                 if not customer_display_code:
                     customer_display_code = "None"
 
-                logging.info("ABOUT TO INSERT NEW LOG")
                 logging.info(each_log)
 
                 tenant_id = insert_new_tenant_code_or_get_existing(
