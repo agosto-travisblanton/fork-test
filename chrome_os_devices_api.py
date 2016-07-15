@@ -1,5 +1,3 @@
-import logging
-
 from app_config import config
 from googleapiclient import discovery
 from httplib2 import Http
@@ -29,22 +27,12 @@ class ChromeOsDevicesApi(object):
     KEY_NEXTPAGETOKEN = 'nextPageToken'
 
     def __init__(self, admin_to_impersonate_email_address):
-        logging.debug(
-            'login google api: SERVICE_ACCOUNT_EMAIL={0},DIRECTORY_SERVICE_SCOPES={1}, impersonation email={2}'.format(
-                config.SERVICE_ACCOUNT_EMAIL,
-                self.DIRECTORY_SERVICE_SCOPES,
-                admin_to_impersonate_email_address))
-
         self.credentials = SignedJwtAssertionCredentials(config.SERVICE_ACCOUNT_EMAIL,
                                                          private_key=config.PRIVATE_KEY,
                                                          scope=self.DIRECTORY_SERVICE_SCOPES,
                                                          sub=admin_to_impersonate_email_address)
-        logging.debug('login google api: about to get oAuth2 handshake.')
-
         self.authorized_http = self.credentials.authorize(Http())
-        logging.debug('login google api: got past authorized_http')
         self.discovery_service = discovery.build('admin', 'directory_v1', http=self.authorized_http)
-        logging.debug('login google api: got past discovery_service.')
 
     # https://developers.google.com/admin-sdk/directory/v1/reference/chromeosdevices/list
     def list(self, customer_id, page_token=None):
@@ -54,51 +42,26 @@ class ChromeOsDevicesApi(object):
         :param customer_id: An identifier for a customer.
         :return: An array of Chrome OS devices.
         """
-        logging.debug('INSIDE list!! customer_id={0}, page_token={1}'.format(customer_id, page_token))
-
         results = []
         chrome_os_devices_api = self.discovery_service.chromeosdevices()
         while True:
             # https://google-api-client-libraries.appspot.com/documentation/admin/directory_v1/python/latest/admin_directory_v1.chromeosdevices.html#list
             if page_token is None:
-
-                logging.debug('INSIDE list branch 1. Page token is None.')
-                # request = chrome_os_devices_api.list(customerId=customer_id,
-                #                                      orderBy='serialNumber',
-                #                                      projection=self.PROJECTION_FULL,
-                #                                      maxResults=self.MAX_RESULTS,
-                #                                      sortOrder=self.SORT_ORDER_ASCENDING)
                 request = chrome_os_devices_api.list(customerId=customer_id,
                                                      projection=self.PROJECTION_FULL,
                                                      maxResults=self.MAX_RESULTS)
             else:
-                logging.debug('INSIDE list branch 1. Have a page token.')
-                # request = chrome_os_devices_api.list(customerId=customer_id,
-                #                                      orderBy='serialNumber',
-                #                                      projection=self.PROJECTION_FULL,
-                #                                      pageToken=page_token,
-                #                                      maxResults=self.MAX_RESULTS,
-                #                                      sortOrder=self.SORT_ORDER_ASCENDING)
                 request = chrome_os_devices_api.list(customerId=customer_id,
                                                      projection=self.PROJECTION_FULL,
                                                      pageToken=page_token,
                                                      maxResults=self.MAX_RESULTS)
-            logging.debug('INSIDE list chrome_os_devices_api.list RETURNED')
             current_page_json = request.execute()
-            logging.debug('INSIDE list past current_page_json')
             chrome_os_devices = current_page_json.get(self.KEY_CHROMEOSDEVICES)
-            logging.debug('INSIDE list past current_page_json.get')
             page_token = current_page_json.get(self.KEY_NEXTPAGETOKEN)
-            logging.debug('INSIDE list past page_token')
             if chrome_os_devices is not None:
-                logging.debug('INSIDE list about to extend results')
                 results.extend(chrome_os_devices)
-                logging.debug('INSIDE list got PAST extend results')
             if page_token is None:
-                logging.debug('INSIDE list page_token is None')
                 break
-            logging.debug('INSIDE list sending back len(results)={0}'.format(len(results)))
-
         return results
 
     # https://developers.google.com/admin-sdk/directory/v1/reference/chromeosdevices/list
@@ -110,29 +73,12 @@ class ChromeOsDevicesApi(object):
         :return: An array of Chrome OS devices.
         """
         results = []
-        logging.debug('INSIDE cursor_list customer_id={0}, page_token={1}'.format(customer_id, next_page_token))
-
         chrome_os_devices_api = self.discovery_service.chromeosdevices()
-        logging.debug('INSIDE cursor_list have chrome_os_devices_api')
-        # https://google-api-client-libraries.appspot.com/documentation/admin/directory_v1/python/latest/admin_directory_v1.chromeosdevices.html#list
         if next_page_token is None:
-            logging.debug('INSIDE cursor_list branch 1. Page token is None.')
-            # request = chrome_os_devices_api.list(customerId=customer_id,
-            #                                      orderBy='serialNumber',
-            #                                      projection=self.PROJECTION_FULL,
-            #                                      maxResults=self.MAX_RESULTS,
-            #                                      sortOrder=self.SORT_ORDER_ASCENDING)
             request = chrome_os_devices_api.list(customerId=customer_id,
                                                  projection=self.PROJECTION_FULL,
                                                  maxResults=self.MAX_RESULTS)
         else:
-            logging.debug('INSIDE cursor_list branch 2. Have a page token.')
-            # request = chrome_os_devices_api.list(customerId=customer_id,
-            #                                      orderBy='serialNumber',
-            #                                      projection=self.PROJECTION_FULL,
-            #                                      pageToken=next_page_token,
-            #                                      maxResults=self.MAX_RESULTS,
-            #                                      sortOrder=self.SORT_ORDER_ASCENDING)
             request = chrome_os_devices_api.list(customerId=customer_id,
                                                  projection=self.PROJECTION_FULL,
                                                  pageToken=next_page_token,

@@ -26,7 +26,6 @@ def refresh_device_by_mac_address(device_urlsafe_key, device_mac_address,
         raise deferred.PermanentTaskFailure('The device MAC address parameter is None. It is required.')
     device_key = ndb.Key(urlsafe=device_urlsafe_key)
     device = device_key.get()
-    logging.debug('INSIDE refresh_device_by_mac_address for managed device.')
     if None == device:
         logging.error('Unable to find device by device_urlsafe_key: {0}'.format(device_urlsafe_key))
         return
@@ -34,25 +33,15 @@ def refresh_device_by_mac_address(device_urlsafe_key, device_mac_address,
     if None == impersonation_admin_email_address:
         logging.info('Impersonation email not found for device with device key {0}.'.format(device_urlsafe_key))
         return
-    logging.debug('INSIDE refresh_device_by_mac_address impersonation_admin_email_address={0}'.format(
-        impersonation_admin_email_address))
     chrome_os_devices_api = ChromeOsDevicesApi(impersonation_admin_email_address)
-    logging.debug('INSIDE refresh_device_by_mac_address chrome_os_devices_api instantiated')
-    
     chrome_os_devices, new_page_token = chrome_os_devices_api.cursor_list(customer_id=config.GOOGLE_CUSTOMER_ID,
                                                                           next_page_token=page_token)
-
-    logging.debug('INSIDE refresh_device_by_mac_address got initial 100 with page token={0}'.format(
-        page_token))
-
     if chrome_os_devices is not None and len(chrome_os_devices) > 0:
         lowercase_device_mac_address = device_mac_address.lower()
         loop_comprehension = (x for x in chrome_os_devices if x.get('macAddress') == lowercase_device_mac_address or
                               x.get('ethernetMacAddress') == lowercase_device_mac_address)
         chrome_os_device = next(loop_comprehension, None)
         if chrome_os_device is not None:
-            logging.debug('INSIDE refresh_device_by_mac_address. Found mac_address={0}.')
-
             device_key = ndb.Key(urlsafe=device_urlsafe_key)
             device = device_key.get()
             device.device_id = chrome_os_device.get('deviceId')
@@ -90,18 +79,6 @@ def refresh_device_by_mac_address(device_urlsafe_key, device_mac_address,
                                _countdown=5)
             return device
         else:
-            logging.debug('INSIDE refresh_device_by_mac_address. Did not find mac_address={0} in this chunk.'.format(
-                device_mac_address))
-
             if new_page_token is not None:
-                logging.debug('INSIDE refresh_device_by_mac_address. Calling again with new_page_token={0}.'.format(
-                    new_page_token))
                 refresh_device_by_mac_address(device_urlsafe_key, device_mac_address,
                                               device_has_previous_directory_api_info, new_page_token)
-
-                # deferred.defer(refresh_device_by_mac_address,
-                #                device_urlsafe_key=device_urlsafe_key,
-                #                device_mac_address=device_mac_address,
-                #                device_has_previous_directory_api_info=device_has_previous_directory_api_info,
-                #                page_token=new_page_token,
-                #                _queue='directory-api')

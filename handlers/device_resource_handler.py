@@ -7,10 +7,6 @@ from google.appengine.ext.deferred import deferred
 from webapp2 import RequestHandler
 
 from app_config import config
-from workflow.refresh_device import refresh_device
-from workflow.refresh_device_by_mac_address import refresh_device_by_mac_address
-from workflow.register_device import register_device
-from workflow.update_chrome_os_device import update_chrome_os_device
 from content_manager_api import ContentManagerApi
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from device_message_processor import post_unmanaged_device_info, change_intent
@@ -21,6 +17,10 @@ from restler.serializers import json_response
 from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY, DEVICE_ISSUE_LOG_STRATEGY
 from utils.email_notify import EmailNotify
 from utils.timezone_util import TimezoneUtil
+from workflow.refresh_device import refresh_device
+from workflow.refresh_device_by_mac_address import refresh_device_by_mac_address
+from workflow.register_device import register_device
+from workflow.update_chrome_os_device import update_chrome_os_device
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -325,9 +325,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         else:
             device.timezone_offset = TimezoneUtil.get_timezone_offset('America/Chicago')
         if self.is_unmanaged_device is False:
-            logging.debug('GET refresh for managed device:')
             if not device.device_id:
-                logging.debug('refresh_device_by_mac_address')
                 deferred.defer(refresh_device_by_mac_address,
                                device_urlsafe_key=device_urlsafe_key,
                                device_mac_address=device.mac_address,
@@ -335,7 +333,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                _queue='directory-api',
                                _countdown=5)
             else:
-                logging.debug('refresh_device')
                 deferred.defer(refresh_device,
                                device_urlsafe_key=device_urlsafe_key,
                                _queue='directory-api',
@@ -816,8 +813,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 else:
                     message = '{0} event detected for device_key={1}, but no correlation identifier!'.format(
                         config.DEVICE_ISSUE_FIRST_HEARTBEAT, device_urlsafe_key)
-                    logging.debug()
-
+                    logging.info(message)
             device.up = True
             device.heartbeat_updated = utc_now
             device.put()
