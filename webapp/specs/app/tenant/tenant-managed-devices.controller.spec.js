@@ -123,84 +123,75 @@ describe('TenantManagedDevicesCtrl', function () {
     describe('editItem', function () {
       controller = undefined;
       let tenantKey = 'bhjad897d987fa32fg708fg72';
-      let item = {key: 'ahjad897d987fadafg708fg71'};
+      let item = {key: 'ahjad897d987fadafg708fg71', tenantKey: tenantKey};
 
       beforeEach(function () {
-        spyOn($state, 'go');
         $stateParams = {tenantKey};
         serviceInjection = {
           $scope: scope,
-          $stateParams
+          $stateParams,
+          DevicesService: DevicesService,
+          $state: $state
         };
+        spyOn($state, 'go');
+        spyOn(DevicesService, 'editItem');
+
         return controller = $controller('TenantManagedDevicesCtrl', serviceInjection);
       });
 
       return it("route to the 'editDevice' named route, passing the supplied device key", function () {
         controller.editItem(item);
-        return expect($state.go).toHaveBeenCalledWith('editDevice', {
-          deviceKey: item.key,
-          tenantKey,
-          fromDevices: false
-        });
+        expect(DevicesService.editItem).toHaveBeenCalledWith(
+          item
+        );
       });
     });
 
     describe('search and pagination ', function () {
-      beforeEach(function () {
+      let genericMatches;
+      beforeEach(inject(function ($q) {
         spyOn($state, 'go');
         let tenantKey = 'bhjad897d987fa32fg708fg72';
         $stateParams = {tenantKey};
         serviceInjection = {
           $scope: scope,
-          $stateParams
+          $stateParams,
+          DevicesService: DevicesService
         };
 
         partial = "some text";
         promise = new skykitProvisioning.q.Mock();
-        spyOn(DevicesService, 'searchDevicesByPartialMacByTenant').and.returnValue(promise);
-        spyOn(DevicesService, 'searchDevicesByPartialSerialByTenant').and.returnValue(promise);
+        spyOn(DevicesService, 'searchDevices').and.callFake(function (someData) {
+          genericMatches = {
+            "matches": [
+              {"serial": "1234"},
+              {"serial": "45566"}
+            ]
+          };
+          let deferred = $q.defer();
+          deferred.resolve({
+            "success": true,
+            "devices": genericMatches
+          })
+          return deferred.promise
+        })
+        spyOn(DevicesService, 'executeSearchingPartialSerialByTenant')
+        spyOn(DevicesService, 'executeSearchingPartialMacByTenant')
         return controller = $controller('TenantManagedDevicesCtrl', serviceInjection);
-      });
+      }));
 
-      let convertArrayToDictionary = function (theArray, mac) {
-        let Devices = {};
-        for (let i = 0; i < theArray.length; i++) {
-          let item = theArray[i];
-          if (mac) {
-            Devices[item.mac] = item;
-          } else {
-            Devices[item.serial] = item;
-          }
-        }
-
-        return Devices;
-      };
-
-
-      it("returns every serial name when called as an managed serial", function () {
+      it("returns every serial name when called as a managed serial", function () {
         controller.selectedButton = "Serial Number";
-        controller.searchDevices(partial);
-        let serial_matches = {
-          "serial_number_matches": [
-            {"serial": "1234"},
-            {"serial": "45566"}
-          ]
-        };
-        promise.resolve(serial_matches);
-        return expect(controller.serialDevices).toEqual(convertArrayToDictionary(serial_matches["serial_number_matches"], false));
+        controller.searchDevices(partial)
+          .then(() => expect(controller.serialDevices).toEqual(genericMatches))
+
       });
 
-      it("returns every serial name when called as an managed mac", function () {
+      it("returns every serial name when called as a managed mac", function () {
         controller.selectedButton = "MAC";
-        controller.searchDevices(partial);
-        let mac_matches = {
-          "mac_matches": [
-            {"mac": "1234"},
-            {"mac": "45566"}
-          ]
-        };
-        promise.resolve(mac_matches);
-        return expect(controller.macDevices).toEqual(convertArrayToDictionary(mac_matches["mac_matches"], true));
+        controller.searchDevices(partial)
+          .then(() => expect(controller.macDevices).toEqual(genericMatches))
+
       });
 
       it('resets variables whenever function is called', function () {
@@ -230,6 +221,8 @@ describe('TenantManagedDevicesCtrl', function () {
         spyOn($state, 'go');
         controller = $controller('TenantManagedDevicesCtrl', serviceInjection);
         controller.macDevices = {"test": {"key": "1234", "tenantKey": "5678"}};
+        controller.tenantKey = controller.macDevices.test.tenantKey
+
         return controller.serialDevices = {"test": {"key": "1234", "tenantKey": "5678"}};
       });
 

@@ -93,7 +93,7 @@ application = WSGIApplication(
               ),
 
         ############################################################
-        # DEVICE_RESOURCE_HANDLER
+        # DEVICE (ADDITONAL DEVICE ROUTES UNDER DISTRIBUTOR/TENANT)
         ############################################################
 
         Route(r'/api/v1/devices/<device_urlsafe_key>/heartbeat',
@@ -202,10 +202,12 @@ application = WSGIApplication(
               methods=['POST']
               ),
 
+
         ############################################################
-        # DISTRIBUTOR DEVICE ROUTES
+        # (DISTRIBUTOR) DEVICE ROUTES
         ############################################################
-        # PAGINATION DEVICE LIST
+        # PAGINATED DEVICE LIST
+        ############################################################
         Route(r'/api/v1/distributors/<distributor_urlsafe_key>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='devices-by-distributor',
@@ -215,18 +217,6 @@ application = WSGIApplication(
         ############################################################
         # SEARCH
         ############################################################
-        Route(r'/api/v1/distributors/search/serial/<distributor_urlsafe_key>/<partial_serial>/<unmanaged>/devices',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='search_for_device_by_serial',
-              handler_method='search_for_device_by_serial',
-              methods=['GET']
-              ),
-        Route(r'/api/v1/distributors/search/mac/<distributor_urlsafe_key>/<partial_mac>/<unmanaged>/devices',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='search_for_device_by_mac',
-              handler_method='search_for_device_by_mac',
-              methods=['GET']
-              ),
         Route(r'/api/v1/distributors/search/<distributor_urlsafe_key>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='search_for_device',
@@ -236,61 +226,44 @@ application = WSGIApplication(
         ############################################################
         # MATCH
         ############################################################
-        Route(r'/api/v1/distributors/match/serial/<distributor_urlsafe_key>/<full_serial>/<unmanaged>/devices',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='match_for_device_by_serial',
-              handler_method='match_for_device_by_serial',
-              methods=['GET']
-              ),
-        Route(r'/api/v1/distributors/match/mac/<distributor_urlsafe_key>/<full_mac>/<unmanaged>/devices',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='match_for_device_by_mac',
-              handler_method='match_for_device_by_mac',
-              methods=['GET']
-              ),
         Route(r'/api/v1/distributors/match/<distributor_urlsafe_key>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='match_for_device',
               handler_method='match_for_device',
               methods=['GET']
               ),
-
         ############################################################
-        # TENANTS
+        # TENANT ROUTES
         ############################################################
-
-        Route(r'/api/v1/tenants/search/serial/<tenant_urlsafe_key>/<partial_serial>/<unmanaged>/devices',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='search_for_device_by_serial_by_tenant',
-              handler_method='search_for_device_by_serial_by_tenant',
-              methods=['GET']
-              ),
-        Route(r'/api/v1/tenants/search/mac/<tenant_urlsafe_key>/<partial_mac>/<unmanaged>/devices',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='search_for_device_by_mac_by_tenant',
-              handler_method='search_for_device_by_mac_by_tenant',
-              methods=['GET']
-              ),
-        Route(r'/api/v1/tenants/match/serial/<tenant_urlsafe_key>/<full_serial>/<unmanaged>/devices',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='match_for_device_by_serial_by_tenant',
-              handler_method='match_for_device_by_serial_by_tenant',
-              methods=['GET']
-              ),
-        Route(r'/api/v1/tenants/match/mac/<tenant_urlsafe_key>/<full_mac>/<unmanaged>/devices',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='match_for_device_by_mac_by_tenant',
-              handler_method='match_for_device_by_mac_by_tenant',
-              methods=['GET']
-              ),
-
-        Route(r'/api/v1/tenants/<cur_prev_cursor>/<cur_next_cursor>/<tenant_urlsafe_key>/devices',
+        # PAGINATED TENANT DEVICE LIST
+        ############################################################
+        Route(r'/api/v1/tenants/<tenant_urlsafe_key>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='devices-by-tenant',
               handler_method='get_devices_by_tenant',
               methods=['GET']
               ),
-
+        ############################################################
+        # SEARCH
+        ############################################################
+        Route(r'/api/v1/tenants/search/<tenant_urlsafe_key>/devices',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='search_for_device_by_tenant',
+              handler_method='search_for_device_by_tenant',
+              methods=['GET']
+              ),
+        ############################################################
+        # MATCH
+        ############################################################
+        Route(r'/api/v1/tenants/match/<tenant_urlsafe_key>/devices',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='match_for_device_by_tenant',
+              handler_method='match_for_device_by_tenant',
+              methods=['GET']
+              ),
+        ############################################################
+        # OTHER
+        ############################################################
         Route(r'/api/v1/tenants/paginated/<page_size>/<offset>',
               handler='handlers.tenants_handler.TenantsHandler',
               name='get_tenants_paginated',

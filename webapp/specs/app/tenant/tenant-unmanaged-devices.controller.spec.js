@@ -12,6 +12,7 @@ describe('TenantUnmanagedDevicesCtrl', function () {
   let partial = undefined;
   let promise = undefined;
   let devicesServicePromise = undefined;
+  let serialByTenantPromise = undefined;
 
 
   beforeEach(module('skykitProvisioning'));
@@ -101,6 +102,11 @@ describe('TenantUnmanagedDevicesCtrl', function () {
     });
 
     describe('creating a new tenant', function () {
+      beforeEach(function () {
+
+      })
+
+
       it('editMode should be set to false', function () {
         $stateParams = {};
         controller = $controller('TenantUnmanagedDevicesCtrl', serviceInjection);
@@ -123,7 +129,7 @@ describe('TenantUnmanagedDevicesCtrl', function () {
     describe('editItem', function () {
       controller = undefined;
       let tenantKey = 'bhjad897d987fa32fg708fg72';
-      let item = {key: 'ahjad897d987fadafg708fg71'};
+      let item = {key: 'ahjad897d987fadafg708fg71', tenantKey: tenantKey};
 
       beforeEach(function () {
         spyOn($state, 'go');
@@ -139,153 +145,144 @@ describe('TenantUnmanagedDevicesCtrl', function () {
         controller.editItem(item);
         return expect($state.go).toHaveBeenCalledWith('editDevice', {
           deviceKey: item.key,
-          tenantKey,
+          tenantKey: tenantKey,
+          fromDevices: false
+        });
+      });
+    });
+    
+    describe('.prepareForEditItem', function () {
+      let resourceSearch = "test";
+
+      beforeEach(function () {
+        spyOn($state, 'go');
+
+        controller = $controller('TenantUnmanagedDevicesCtrl', serviceInjection);
+        controller.macDevices = {"test": {"key": "1234", "tenantKey": "5678"}};
+        controller.tenantKey = controller.macDevices.test.tenantKey
+        return controller.serialDevices = {"test": {"key": "1234", "tenantKey": "5678"}};
+      });
+
+
+      it("prepares for editItem as mac", function () {
+        controller.selectedButton === "MAC";
+        controller.prepareForEditView(resourceSearch);
+        return expect($state.go).toHaveBeenCalledWith('editDevice', {
+          deviceKey: controller.macDevices[resourceSearch].key,
+          tenantKey: controller.tenantKey,
+          fromDevices: false
+        });
+      });
+
+      return it("prepares for editItem as serial", function () {
+        controller.selectedButton === "Serial Number";
+        controller.prepareForEditView(resourceSearch);
+        return expect($state.go).toHaveBeenCalledWith('editDevice', {
+          deviceKey: controller.serialDevices[resourceSearch].key,
+          tenantKey: controller.tenantKey,
           fromDevices: false
         });
       });
     });
 
-    return describe('search and pagination ', function () {
+    return describe('.isResourceValid', function () {
+      let resource = 'my-resource';
+
       beforeEach(function () {
-        spyOn($state, 'go');
         let tenantKey = 'bhjad897d987fa32fg708fg72';
         $stateParams = {tenantKey};
         serviceInjection = {
           $scope: scope,
           $stateParams
         };
-
-        partial = "some text";
+        controller = $controller('TenantUnmanagedDevicesCtrl', serviceInjection);
         promise = new skykitProvisioning.q.Mock();
-        spyOn(DevicesService, 'searchDevicesByPartialMacByTenant').and.returnValue(promise);
-        spyOn(DevicesService, 'searchDevicesByPartialSerialByTenant').and.returnValue(promise);
-        return controller = $controller('TenantUnmanagedDevicesCtrl', serviceInjection);
+        spyOn(DevicesService, 'matchDevicesByFullMacByTenant').and.returnValue(promise);
+        return spyOn(DevicesService, 'matchDevicesByFullSerialByTenant').and.returnValue(promise);
       });
 
+      it("matchDevicesByFullMac called when managed and button is mac", function () {
+        controller.selectedButton = "MAC";
+        controller.isResourceValid(resource);
+        promise.resolve(false);
+        return expect(DevicesService.matchDevicesByFullMacByTenant).toHaveBeenCalledWith(controller.tenantKey, resource, true);
+      });
 
-      let convertArrayToDictionary = function (theArray, mac) {
-        let Devices = {};
-        for (let i = 0; i < theArray.length; i++) {
-          let item = theArray[i];
-          if (mac) {
-            Devices[item.mac] = item;
-          } else {
-            Devices[item.serial] = item;
-          }
-        }
+      return it("matchDevicesByFullSerial called button is not mac", function () {
+        controller.selectedButton = "Serial Number";
+        controller.isResourceValid(resource);
+        promise.resolve(false);
+        return expect(DevicesService.matchDevicesByFullSerialByTenant).toHaveBeenCalledWith(controller.tenantKey, resource, true);
+      });
+    });
+  });
 
-        return Devices;
+  describe('search and pagination ', function () {
+    let genericMatches;
+    beforeEach(inject(function ($q) {
+      spyOn($state, 'go');
+      let tenantKey = 'bhjad897d987fa32fg708fg72';
+      $stateParams = {tenantKey};
+      serviceInjection = {
+        $scope: scope,
+        $stateParams,
+        DevicesService: DevicesService
       };
 
-
-      it("returns every serial name when called as an managed serial", function () {
-        controller.selectedButton = "Serial Number";
-        controller.searchDevices(partial);
-        let serial_matches = {
-          "serial_number_matches": [
+      partial = "some text";
+      promise = new skykitProvisioning.q.Mock();
+      spyOn(DevicesService, 'searchDevices').and.callFake(function (someData) {
+        genericMatches = {
+          "matches": [
             {"serial": "1234"},
             {"serial": "45566"}
           ]
         };
-        promise.resolve(serial_matches);
-        return expect(controller.serialDevices).toEqual(convertArrayToDictionary(serial_matches["serial_number_matches"], false));
-      });
+        let deferred = $q.defer();
+        deferred.resolve({
+          "success": true,
+          "devices": genericMatches
+        })
+        return deferred.promise
+      })
+      spyOn(DevicesService, 'executeSearchingPartialSerialByTenant')
+      spyOn(DevicesService, 'getUnmanagedDevicesByTenant').and.callThrough();
 
-      it("returns every serial name when called as an managed mac", function () {
-        controller.selectedButton = "MAC";
-        controller.searchDevices(partial);
-        let mac_matches = {
-          "mac_matches": [
-            {"mac": "1234"},
-            {"mac": "45566"}
-          ]
-        };
-        promise.resolve(mac_matches);
-        return expect(controller.macDevices).toEqual(convertArrayToDictionary(mac_matches["mac_matches"], true));
-      });
+      spyOn(DevicesService, 'executeSearchingPartialMacByTenant')
+      return controller = $controller('TenantManagedDevicesCtrl', serviceInjection);
+    }));
 
-      it('resets variables whenever function is called', function () {
-        controller.changeRadio();
-        expect(controller.searchText).toEqual('');
-        expect(controller.disabled).toEqual(true);
-        expect(controller.serialDevices).toEqual({});
-        return expect(controller.macDevices).toEqual({});
-      });
-
-      it('paginates forward', function () {
-        controller.paginateCall(true);
-        return expect(DevicesService.getUnmanagedDevicesByTenant).toHaveBeenCalledWith(controller.tenantKey, null, controller.devicesNext);
-      });
-
-      it('paginates backward', function () {
-        controller.paginateCall(false);
-        return expect(DevicesService.getUnmanagedDevicesByTenant).toHaveBeenCalledWith(controller.tenantKey, controller.devicesPrev, null);
-      });
-
-
-      describe('.prepareForEditItem', function () {
-        let resourceSearch = "test";
-
-        beforeEach(function () {
-          controller = $controller('TenantUnmanagedDevicesCtrl', serviceInjection);
-          controller.macDevices = {"test": {"key": "1234", "tenantKey": "5678"}};
-          return controller.serialDevices = {"test": {"key": "1234", "tenantKey": "5678"}};
-        });
-
-
-        it("prepares for editItem as", function () {
-          controller.selectedButton === "MAC";
-          controller.prepareForEditView(resourceSearch);
-          return expect($state.go).toHaveBeenCalledWith('editDevice', {
-            deviceKey: controller.macDevices[resourceSearch].key,
-            tenantKey: controller.tenantKey,
-            fromDevices: false
-          });
-        });
-
-        return it("prepares for editItem as serial", function () {
-          controller.selectedButton === "Serial Number";
-          controller.prepareForEditView(resourceSearch);
-          return expect($state.go).toHaveBeenCalledWith('editDevice', {
-            deviceKey: controller.serialDevices[resourceSearch].key,
-            tenantKey: controller.tenantKey,
-            fromDevices: false
-          });
-        });
-      });
-
-      return describe('.isResourceValid', function () {
-        let resource = 'my-resource';
-
-        beforeEach(function () {
-          let tenantKey = 'bhjad897d987fa32fg708fg72';
-          $stateParams = {tenantKey};
-          serviceInjection = {
-            $scope: scope,
-            $stateParams
-          };
-          controller = $controller('TenantUnmanagedDevicesCtrl', serviceInjection);
-          promise = new skykitProvisioning.q.Mock();
-          spyOn(DevicesService, 'matchDevicesByFullMacByTenant').and.returnValue(promise);
-          return spyOn(DevicesService, 'matchDevicesByFullSerialByTenant').and.returnValue(promise);
-        });
-
-        it("matchDevicesByFullMac called when managed and button is mac", function () {
-          controller.selectedButton = "MAC";
-          controller.isResourceValid(resource);
-          promise.resolve(false);
-          return expect(DevicesService.matchDevicesByFullMacByTenant).toHaveBeenCalledWith(controller.tenantKey, resource, true);
-        });
-
-        return it("matchDevicesByFullSerial called button is not mac", function () {
-          controller.selectedButton = "Serial Number";
-          controller.isResourceValid(resource);
-          promise.resolve(false);
-          return expect(DevicesService.matchDevicesByFullSerialByTenant).toHaveBeenCalledWith(controller.tenantKey, resource, true);
-        });
-      });
+    it("returns every serial name when called as a managed serial", function () {
+      controller.selectedButton = "Serial Number";
+      controller.searchDevices(partial)
+        .then(() => expect(controller.serialDevices).toEqual(genericMatches))
     });
-  });
+
+    it("returns every serial name when called as a managed mac", function () {
+      controller.selectedButton = "MAC";
+      controller.searchDevices(partial)
+        .then(() => expect(controller.macDevices).toEqual(genericMatches))
+    });
+
+    it('resets variables whenever function is called', function () {
+      controller.changeRadio();
+      expect(controller.searchText).toEqual('');
+      expect(controller.disabled).toEqual(true);
+      expect(controller.serialDevices).toEqual({});
+      return expect(controller.macDevices).toEqual({});
+    });
+
+    it('paginates forward', function () {
+      controller.paginateCall(true);
+      return expect(DevicesService.getUnmanagedDevicesByTenant).toHaveBeenCalledWith(controller.tenantKey, null, controller.devicesNext);
+    });
+
+    it('paginates backward', function () {
+      controller.paginateCall(false);
+      return expect(DevicesService.getUnmanagedDevicesByTenant).toHaveBeenCalledWith(controller.tenantKey, controller.devicesPrev, null);
+    });
+  })
+
 });
-  
-  
+
+
