@@ -49,6 +49,8 @@ class ChromeOsDevice(ndb.Model):
     program = ndb.StringProperty(required=False, indexed=True)
     program_id = ndb.StringProperty(required=False, indexed=True)
     last_error = ndb.StringProperty(required=False, indexed=True)
+    playlist = ndb.StringProperty(required=False, indexed=True)
+    playlist_id = ndb.StringProperty(required=False, indexed=True)
     connection_type = ndb.StringProperty(required=False, indexed=True)
     sk_player_version = ndb.StringProperty(required=False, indexed=True)
     heartbeat_interval_minutes = ndb.IntegerProperty(default=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES, required=True,

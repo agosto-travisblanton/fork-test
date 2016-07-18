@@ -42,6 +42,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     MEMORY_UTILIZATION = 63
     PROGRAM = 'some program'
     PROGRAM_ID = 'ID-512341234'
+    PLAYLIST = 'some playlist'
+    PLAYLIST_ID = 'Playlist Id'
     LAST_ERROR = 'some error'
 
     def setUp(self):
@@ -1147,8 +1149,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
         updated_heartbeat = self.managed_device_key.get()
         self.assertNotEqual(updated_heartbeat.storage_utilization, self.STORAGE_UTILIZATION)
-        self.assertEqual(updated_heartbeat.memory_utilization, self.MEMORY_UTILIZATION)
-        self.assertEqual(updated_heartbeat.program, self.PROGRAM)
 
     def test_put_heartbeat_updates_memory_utilization(self):
         self.__initialize_heartbeat_info()
@@ -1162,16 +1162,12 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
         updated_heartbeat = self.managed_device_key.get()
         self.assertNotEqual(updated_heartbeat.memory_utilization, self.MEMORY_UTILIZATION)
-        self.assertEqual(updated_heartbeat.storage_utilization, self.STORAGE_UTILIZATION)
-        self.assertEqual(updated_heartbeat.program, self.PROGRAM)
-        self.assertEqual(updated_heartbeat.last_error, self.LAST_ERROR)
-        self.assertEqual(updated_heartbeat.program_id, self.PROGRAM_ID)
 
     def test_put_heartbeat_updates_program(self):
         self.__initialize_heartbeat_info()
         request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
-                        'program': 'Chronicles of Bob',
+                        'program': 'Chronicles of Narnia',
                         'programId': self.PROGRAM_ID,
                         'lastError': self.LAST_ERROR,
                         }
@@ -1179,27 +1175,54 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
         updated_heartbeat = self.managed_device_key.get()
         self.assertNotEqual(updated_heartbeat.program, self.PROGRAM)
-        self.assertEqual(updated_heartbeat.memory_utilization, self.MEMORY_UTILIZATION)
-        self.assertEqual(updated_heartbeat.storage_utilization, self.STORAGE_UTILIZATION)
-        self.assertEqual(updated_heartbeat.program_id, self.PROGRAM_ID)
-        self.assertEqual(updated_heartbeat.last_error, self.LAST_ERROR)
+        self.assertEqual(updated_heartbeat.program, 'Chronicles of Narnia')
 
     def test_put_heartbeat_updates_program_id(self):
         self.__initialize_heartbeat_info()
         request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
                         'program': self.PROGRAM,
-                        'programId': 'some program id',
+                        'programId': 'new program id',
                         'lastError': self.LAST_ERROR,
                         }
         uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
         self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
         updated_heartbeat = self.managed_device_key.get()
         self.assertNotEqual(updated_heartbeat.program_id, self.PROGRAM_ID)
-        self.assertEqual(updated_heartbeat.program, self.PROGRAM)
-        self.assertEqual(updated_heartbeat.memory_utilization, self.MEMORY_UTILIZATION)
-        self.assertEqual(updated_heartbeat.storage_utilization, self.STORAGE_UTILIZATION)
-        self.assertEqual(updated_heartbeat.last_error, self.LAST_ERROR)
+        self.assertEqual(updated_heartbeat.program_id, 'new program id')
+
+    def test_put_heartbeat_updates_playlist(self):
+        self.__initialize_heartbeat_info()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'playlist': 'new playlist',
+                        'playlistId': self.PLAYLIST_ID,
+                        'lastError': self.LAST_ERROR,
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        updated_heartbeat = self.managed_device_key.get()
+        self.assertNotEqual(updated_heartbeat.playlist, self.PLAYLIST)
+        self.assertEqual(updated_heartbeat.playlist, 'new playlist')
+
+    def test_put_heartbeat_updates_playlist_id(self):
+        self.__initialize_heartbeat_info()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'playListId': self.PLAYLIST_ID,
+                        'playlist': self.PLAYLIST,
+                        'playlistId': 'new playlist id',
+                        'lastError': self.LAST_ERROR,
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        updated_heartbeat = self.managed_device_key.get()
+        self.assertNotEqual(updated_heartbeat.playlist_id, self.PLAYLIST_ID)
+        self.assertEqual(updated_heartbeat.playlist_id, 'new playlist id')
 
     def test_put_heartbeat_updates_last_error(self):
         self.__initialize_heartbeat_info()
@@ -1213,10 +1236,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
         updated_heartbeat = self.managed_device_key.get()
         self.assertNotEqual(updated_heartbeat.last_error, self.LAST_ERROR)
-        self.assertEqual(updated_heartbeat.program, self.PROGRAM)
-        self.assertEqual(updated_heartbeat.memory_utilization, self.MEMORY_UTILIZATION)
-        self.assertEqual(updated_heartbeat.storage_utilization, self.STORAGE_UTILIZATION)
-        self.assertEqual(updated_heartbeat.program_id, self.PROGRAM_ID)
 
     def test_put_heartbeat_cannot_update_up_status(self):
         self.__initialize_heartbeat_info()
@@ -1616,31 +1635,31 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         issue.put()
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json["issues"][0]['elapsed_time'], '1.5 minutes')
+        self.assertEqual(response_json["issues"][0]['elapsedTime'], '1.5 minutes')
 
         issue.created = datetime.utcnow() - timedelta(minutes=59)
         issue.put()
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json["issues"][0]['elapsed_time'], '59.0 minutes')
+        self.assertEqual(response_json["issues"][0]['elapsedTime'], '59.0 minutes')
 
         issue.created = datetime.utcnow() - timedelta(minutes=90)
         issue.put()
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json["issues"][0]['elapsed_time'], '1.5 hours')
+        self.assertEqual(response_json["issues"][0]['elapsedTime'], '1.5 hours')
 
         issue.created = datetime.utcnow() - timedelta(hours=23)
         issue.put()
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json["issues"][0]['elapsed_time'], '23.0 hours')
+        self.assertEqual(response_json["issues"][0]['elapsedTime'], '23.0 hours')
 
         issue.created = datetime.utcnow() - timedelta(hours=48)
         issue.put()
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json["issues"][0]['elapsed_time'], '2.0 days')
+        self.assertEqual(response_json["issues"][0]['elapsedTime'], '2.0 days')
 
     def test_get_latest_issues_returns_expected_issue_order_with_latest_first(self):
         start = datetime.utcnow() - timedelta(days=5)
@@ -1715,6 +1734,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.managed_device.program = self.PROGRAM
         self.managed_device.program_id = self.PROGRAM_ID
         self.managed_device.last_error = self.LAST_ERROR
+        self.managed_device.playlist = self.PLAYLIST
+        self.managed_device.playlist_id = self.PLAYLIST_ID
         self.managed_device.up = up
         self.managed_device.put()
 
