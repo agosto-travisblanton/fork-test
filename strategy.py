@@ -155,7 +155,7 @@ DEVICE_ISSUE_LOG_STRATEGY += [
     {'programId': lambda o, field_name, context: o.key.get().program_id},
     {'lastError': lambda o, field_name, context: o.key.get().last_error},
     {'playlist': lambda o, field_name, context: o.key.get().playlist},
-    {'playListId': lambda o, field_name, context: o.key.get().playlist_id},
+    {'playlistId': lambda o, field_name, context: o.key.get().playlist_id},
     {'created': lambda o, field_name, context: o.key.get().created},
     {'updated': lambda o, field_name, context: o.key.get().updated},
     {'level': lambda o, field_name, context: o.key.get().level},
