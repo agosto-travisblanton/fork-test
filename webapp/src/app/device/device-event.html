@@ -70,6 +70,7 @@
                 <th>Category</th>
                 <th>Memory</th>
                 <th>Storage</th>
+                <th>Playlist</th>
                 <th>Program</th>
                 <th>Event created</th>
                 <th>Last updated</th>
@@ -78,7 +79,7 @@
               </thead>
               <tbody>
               <tr ng-hide="deviceDetailsCtrl.issues.length">
-                <td class="text-center text-warning" colspan="11">
+                <td class="text-center text-warning" colspan="9">
                   No events logged in the past {{deviceDetailsCtrl.dayRange}}
                   days.<br>
                   Please try an earlier 'From date' above.
@@ -89,10 +90,8 @@
                 <td>{{ item.category }}</td>
                 <td>{{ item.memoryUtilization }}%</td>
                 <td>{{ item.storageUtilization }}%</td>
-                <td>{{ item.program }}</td>
-                <td>{{ item.programId }}</td>
                 <td>{{ item.playlist }}</td>
-                <td>{{ item.playlistId }}</td>
+                <td>{{ item.program }}</td>
                 <td>{{ item.created }}</td>
                 <td>{{ item.updated }}</td>
                 <td class="issue-{{ item.levelDescriptor}}-text">
