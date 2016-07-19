@@ -28,7 +28,7 @@
                          type="text"
                          short-time="true"
                          format="YYYY-MM-DD hh:mm A"
-                         max-date="dateTimeEnd"
+                         max-date="deviceDetailsCtrl.endTime"
                          placeholder="{{deviceDetailsCtrl.startTime}}"
                          class="form-control"
                          ng-model="deviceDetailsCtrl.startTime"
@@ -44,7 +44,7 @@
                          format="YYYY-MM-DD hh:mm A"
                          class="form-control"
                          placeholder="{{deviceDetailsCtrl.endTime}}"
-                         min-date="dateTimeStart"
+                         min-date="deviceDetailsCtrl.startTime"
                          ng-model="deviceDetailsCtrl.endTime"
                   />
                 </div>
