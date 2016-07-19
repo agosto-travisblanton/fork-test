@@ -66,6 +66,7 @@ class ChromeOsDevice(ndb.Model):
     timezone_offset = ndb.IntegerProperty(required=False, indexed=True)  # computed property
     registration_correlation_identifier = ndb.StringProperty(required=False, indexed=True)
     archived = ndb.BooleanProperty(default=False, required=True, indexed=True)
+    panel_sleep = ndb.BooleanProperty(default=False, required=True, indexed=True)
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):

@@ -54,6 +54,7 @@ DEVICE_PAIRING_CODE_STRATEGY += [
 
 CHROME_OS_DEVICE_STRATEGY = ModelStrategy(ChromeOsDevice)
 CHROME_OS_DEVICE_STRATEGY += [
+    {'panelSleep': lambda o, field_name, context: o.panel_sleep if o.panel_sleep is not None else None},
     {'tenantKey': lambda o, field_name, context: o.tenant_key.urlsafe() if o.tenant_key is not None else None},
     {'tenantName': lambda o, field_name, context: o.tenant_key.get().name if o.tenant_key is not None else None},
     {'lastSync': lambda o, field_name, context: o.key.get().last_sync},
@@ -202,4 +203,3 @@ INTEGRATION_EVENT_LOG_STRATEGY += [
     {'macAddress': lambda o, field_name, context: o.key.get().mac_address},
     {'details': lambda o, field_name, context: o.key.get().details}
 ]
-
