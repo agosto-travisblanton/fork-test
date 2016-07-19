@@ -79,6 +79,36 @@ describe('CommandsService', function () {
     })
   );
 
+  describe('.restart', () =>
+    it('prepares a restart command, returning a promise', function () {
+      let commandsRestangularService = {
+        post() {
+        }
+      };
+      spyOn(Restangular, 'oneUrl').and.returnValue(commandsRestangularService);
+      spyOn(commandsRestangularService, 'post').and.returnValue(promise);
+      let actual = CommandsService.restart(key);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `api/v1/devices/${key}/commands/restart`);
+      expect(commandsRestangularService.post).toHaveBeenCalled();
+      return expect(actual).toBe(promise);
+    })
+  );
+
+  describe('.postLog', () =>
+    it('prepares a post log command, returning a promise', function () {
+      let commandsRestangularService = {
+        post() {
+        }
+      };
+      spyOn(Restangular, 'oneUrl').and.returnValue(commandsRestangularService);
+      spyOn(commandsRestangularService, 'post').and.returnValue(promise);
+      let actual = CommandsService.postLog(key);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `api/v1/devices/${key}/commands/post-log`);
+      expect(commandsRestangularService.post).toHaveBeenCalled();
+      return expect(actual).toBe(promise);
+    })
+  );
+
   describe('.contentDelete', () =>
     it('prepares a content delete command, returning a promise', function () {
       let commandsRestangularService = {

@@ -58,17 +58,13 @@ class ChromeOsDevicesApi(object):
             # https://google-api-client-libraries.appspot.com/documentation/admin/directory_v1/python/latest/admin_directory_v1.chromeosdevices.html#list
             if page_token is None:
                 request = chrome_os_devices_api.list(customerId=customer_id,
-                                                     orderBy='serialNumber',
                                                      projection=self.PROJECTION_FULL,
-                                                     maxResults=self.MAX_RESULTS,
-                                                     sortOrder=self.SORT_ORDER_ASCENDING)
+                                                     maxResults=self.MAX_RESULTS)
             else:
                 request = chrome_os_devices_api.list(customerId=customer_id,
-                                                     orderBy='serialNumber',
                                                      projection=self.PROJECTION_FULL,
                                                      pageToken=page_token,
-                                                     maxResults=self.MAX_RESULTS,
-                                                     sortOrder=self.SORT_ORDER_ASCENDING)
+                                                     maxResults=self.MAX_RESULTS)
             current_page_json = request.execute()
             chrome_os_devices = current_page_json.get(self.KEY_CHROMEOSDEVICES)
             page_token = current_page_json.get(self.KEY_NEXTPAGETOKEN)
@@ -91,17 +87,13 @@ class ChromeOsDevicesApi(object):
         # https://google-api-client-libraries.appspot.com/documentation/admin/directory_v1/python/latest/admin_directory_v1.chromeosdevices.html#list
         if next_page_token is None:
             request = chrome_os_devices_api.list(customerId=customer_id,
-                                                 orderBy='serialNumber',
                                                  projection=self.PROJECTION_FULL,
-                                                 maxResults=self.MAX_RESULTS,
-                                                 sortOrder=self.SORT_ORDER_ASCENDING)
+                                                 maxResults=self.MAX_RESULTS)
         else:
             request = chrome_os_devices_api.list(customerId=customer_id,
-                                                 orderBy='serialNumber',
                                                  projection=self.PROJECTION_FULL,
                                                  pageToken=next_page_token,
-                                                 maxResults=self.MAX_RESULTS,
-                                                 sortOrder=self.SORT_ORDER_ASCENDING)
+                                                 maxResults=self.MAX_RESULTS)
         current_page_json = request.execute()
         chrome_os_devices = current_page_json.get(self.KEY_CHROMEOSDEVICES)
         next_page_token = current_page_json.get(self.KEY_NEXTPAGETOKEN)

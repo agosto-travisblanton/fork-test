@@ -42,6 +42,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     MEMORY_UTILIZATION = 63
     PROGRAM = 'some program'
     PROGRAM_ID = 'ID-512341234'
+    PLAYLIST = 'some playlist'
+    PLAYLIST_ID = 'Playlist Id'
     LAST_ERROR = 'some error'
 
     def setUp(self):
@@ -562,21 +564,23 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.__build_list_devices(tenant_key=self.tenant_key, managed_number_to_build=201,
                                   unmanaged_number_to_build=0)
 
-        request_parameters = {'unmanaged': 'false'}
+        request_parameters = {'unmanaged': 'false', 'prev_cursor': "null",
+                              "next_cursor": "null"}
 
         uri = application.router.build(None, 'devices-by-tenant', None,
-                                       {'tenant_urlsafe_key': self.tenant_key.urlsafe(), 'cur_prev_cursor': "null",
-                                        "cur_next_cursor": "null"})
+                                       {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
 
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
         self.assertLength(25, response_json["devices"])
 
         next_uri = application.router.build(None, 'devices-by-tenant', None,
-                                            {'tenant_urlsafe_key': self.tenant_key.urlsafe(), 'cur_prev_cursor': "null",
-                                             "cur_next_cursor": response_json["next_cursor"]})
+                                            {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
 
-        next_response = self.app.get(next_uri, params=request_parameters, headers=self.api_token_authorization_header)
+        next_params = {'unmanaged': 'false', 'prev_cursor': "null",
+                       "next_cursor": response_json["next_cursor"]}
+
+        next_response = self.app.get(next_uri, params=next_params, headers=self.api_token_authorization_header)
         next_response_json = json.loads(next_response.body)
         self.assertLength(25, next_response_json["devices"])
         self.assertTrue(next_response_json["prev_cursor"])
@@ -585,336 +589,15 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.__build_list_devices(tenant_key=self.tenant_key, managed_number_to_build=20,
                                   unmanaged_number_to_build=0)
 
-        request_parameters = {'unmanaged': 'true'}
+        request_parameters = {'unmanaged': 'true', 'prev_cursor': "null",
+                                        "next_cursor": "null"}
 
         uri = application.router.build(None, 'devices-by-tenant', None,
-                                       {'tenant_urlsafe_key': self.tenant_key.urlsafe(), 'cur_prev_cursor': "null",
-                                        "cur_next_cursor": "null"})
+                                       {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
 
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
         self.assertLength(0, response_json["devices"])
-
-    ############################################################
-    # TENANT SEARCH AND MAC
-    ############################################################
-    def test_search_for_device_by_serial_by_tenant(self):
-        managed_number_build = 20
-        self.__build_list_devices_with_serials(tenant_key=self.tenant_key, managed_number_to_build=managed_number_build,
-                                               unmanaged_number_to_build=0)
-
-        uri = application.router.build(
-            None,
-            'search_for_device_by_serial_by_tenant',
-            None,
-            {
-                'tenant_urlsafe_key': self.tenant_key.urlsafe(),
-                'partial_serial': 'm-',
-                'unmanaged': 'false'
-            }
-        )
-
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
-
-        response_json = json.loads(response.body)
-        self.assertTrue(len(response_json["serial_number_matches"]) == managed_number_build)
-
-    def test_search_for_device_by_mac_by_tenant(self):
-        managed_number_build = 20
-        self.__build_list_devices_with_serials(tenant_key=self.tenant_key, managed_number_to_build=managed_number_build,
-                                               unmanaged_number_to_build=0)
-
-        uri = application.router.build(
-            None,
-            'search_for_device_by_mac_by_tenant',
-            None,
-            {
-                'tenant_urlsafe_key': self.tenant_key.urlsafe(),
-                'partial_mac': 'm-mac',
-                'unmanaged': 'false'
-            }
-        )
-
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
-
-        response_json = json.loads(response.body)
-        self.assertTrue(len(response_json["mac_matches"]) == managed_number_build)
-
-    def test_match_for_device_by_serial_by_tenant(self):
-        managed_number_build = 20
-        self.__build_list_devices_with_serials(tenant_key=self.tenant_key, managed_number_to_build=managed_number_build,
-                                               unmanaged_number_to_build=0)
-        uri = application.router.build(
-            None,
-            'match_for_device_by_serial_by_tenant',
-            None,
-            {
-                'tenant_urlsafe_key': self.tenant_key.urlsafe(),
-                'full_serial': 'm-serial0',
-                'unmanaged': 'false'
-            }
-        )
-
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
-
-        response_json = json.loads(response.body)
-        self.assertTrue(response_json["is_match"])
-
-    def test_match_for_device_by_mac_by_tenant(self):
-        managed_number_build = 20
-        self.__build_list_devices_with_serials(tenant_key=self.tenant_key, managed_number_to_build=managed_number_build,
-                                               unmanaged_number_to_build=0)
-        uri = application.router.build(
-            None,
-            'match_for_device_by_mac_by_tenant',
-            None,
-            {
-                'tenant_urlsafe_key': self.tenant_key.urlsafe(),
-                'full_mac': 'm-mac0',
-                'unmanaged': 'false'
-            }
-        )
-
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
-        response_json = json.loads(response.body)
-        self.assertTrue(response_json["is_match"])
-
-    def test_not_match_for_device_by_serial_by_tenant(self):
-        managed_number_build = 20
-        self.__build_list_devices_with_serials(tenant_key=self.tenant_key, managed_number_to_build=managed_number_build,
-                                               unmanaged_number_to_build=0)
-        uri = application.router.build(
-            None,
-            'match_for_device_by_serial_by_tenant',
-            None,
-            {
-                'tenant_urlsafe_key': self.tenant_key.urlsafe(),
-                'full_serial': 'm-serial093942392349423',
-                'unmanaged': 'false'
-            }
-        )
-
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
-
-        response_json = json.loads(response.body)
-        self.assertFalse(response_json["is_match"])
-
-    def test_not_match_for_device_by_mac_by_tenant(self):
-        managed_number_build = 20
-        self.__build_list_devices_with_serials(tenant_key=self.tenant_key, managed_number_to_build=managed_number_build,
-                                               unmanaged_number_to_build=0)
-
-        uri = application.router.build(
-            None,
-            'match_for_device_by_mac_by_tenant',
-            None,
-            {
-                'tenant_urlsafe_key': self.tenant_key.urlsafe(),
-                'full_mac': 'm-mac09249423923492349',
-                'unmanaged': 'false'
-            }
-        )
-
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
-        response_json = json.loads(response.body)
-        self.assertFalse(response_json["is_match"])
-
-    #################################################################################################################
-    # get_devices_by_distributor
-    #################################################################################################################
-
-    def test_get_devices_by_distributor_http_status_ok(self):
-        distributor = Distributor.create(name='Acme Brothers',
-                                         active=True)
-        distributor_key = distributor.put()
-        self.__setup_distributor_with_two_tenants_with_n_devices(distributor_key,
-                                                                 tenant_1_device_count=1,
-                                                                 tenant_2_device_count=1)
-        request_parameters = {'unmanaged': 'false'}
-        uri = application.router.build(None, 'devices-by-distributor', None,
-                                       {'distributor_urlsafe_key': distributor_key.urlsafe(), 'cur_prev_cursor': 'null',
-                                        'cur_next_cursor': 'null'})
-
-        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
-
-        self.assertOK(response)
-
-    def test_get_devices_by_distributor_returns_expected_device_count(self):
-        distributor = Distributor.create(name='Acme Brothers',
-                                         active=True)
-        distributor_key = distributor.put()
-        self.__setup_distributor_with_two_tenants_with_n_devices(distributor_key,
-                                                                 tenant_1_device_count=13,
-                                                                 tenant_2_device_count=6)
-        request_parameters = {'unmanaged': 'false'}
-        uri = application.router.build(
-            None,
-            'devices-by-distributor',
-            None,
-            {
-                'distributor_urlsafe_key': distributor_key.urlsafe(),
-                'cur_prev_cursor': 'null',
-                'cur_next_cursor': 'null'
-            }
-        )
-        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
-
-        response_json = json.loads(response.body)
-
-        self.assertTrue(len(response_json["devices"]) < 200)
-        self.assertFalse(response_json["prev_cursor"])
-
-    def test_search_for_device_by_serial(self):
-        distributor = Distributor.create(name='Acme Brothers',
-                                         active=True)
-        distributor_key = distributor.put()
-        tenant_one_amount = 13
-        tenant_two_amount = 6
-        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(distributor_key,
-                                                                              tenant_1_device_count=tenant_one_amount,
-                                                                              tenant_2_device_count=tenant_two_amount)
-        uri = application.router.build(
-            None,
-            'search_for_device_by_serial',
-            None,
-            {
-                'distributor_urlsafe_key': distributor_key.urlsafe(),
-                'partial_serial': 'm-',
-                'unmanaged': 'false'
-            }
-        )
-
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
-
-        response_json = json.loads(response.body)
-        self.assertTrue(len(response_json["serial_number_matches"]) == tenant_one_amount + tenant_two_amount)
-
-    def test_search_for_device_by_mac(self):
-        distributor = Distributor.create(name='Acme Brothers',
-                                         active=True)
-        distributor_key = distributor.put()
-        tenant_one_amount = 13
-        tenant_two_amount = 6
-        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(distributor_key,
-                                                                              tenant_1_device_count=tenant_one_amount,
-                                                                              tenant_2_device_count=tenant_two_amount)
-        uri = application.router.build(
-            None,
-            'search_for_device_by_mac',
-            None,
-            {
-                'distributor_urlsafe_key': distributor_key.urlsafe(),
-                'partial_mac': 'm-mac',
-                'unmanaged': 'false'
-            }
-        )
-
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
-
-        response_json = json.loads(response.body)
-        self.assertTrue(len(response_json["mac_matches"]) == tenant_one_amount + tenant_two_amount)
-
-    def test_match_for_device_by_serial(self):
-        distributor = Distributor.create(name='Acme Brothers')
-        distributor_key = distributor.put()
-        tenant_one_amount = 13
-        tenant_two_amount = 6
-        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(
-            distributor_key,
-            tenant_1_device_count=tenant_one_amount,
-            tenant_2_device_count=tenant_two_amount
-        )
-        uri = application.router.build(
-            None,
-            'match_for_device_by_serial',
-            None,
-            {
-                'distributor_urlsafe_key': distributor_key.urlsafe(),
-                'full_serial': 'm-serial0',
-                'unmanaged': 'false'
-            }
-        )
-
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
-
-        response_json = json.loads(response.body)
-        self.assertTrue(response_json["is_match"])
-
-    def test_match_for_device_by_mac(self):
-        distributor = Distributor.create(name='Acme Brothers')
-        distributor_key = distributor.put()
-        tenant_one_amount = 13
-        tenant_two_amount = 6
-        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(
-            distributor_key,
-            tenant_1_device_count=tenant_one_amount,
-            tenant_2_device_count=tenant_two_amount
-        )
-        uri = application.router.build(
-            None,
-            'match_for_device_by_mac',
-            None,
-            {
-                'distributor_urlsafe_key': distributor_key.urlsafe(),
-                'full_mac': 'm-mac0',
-                'unmanaged': 'false'
-            }
-        )
-
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
-        response_json = json.loads(response.body)
-        self.assertTrue(response_json["is_match"])
-
-    def test_not_match_for_device_by_serial(self):
-        distributor = Distributor.create(name='Acme Brothers')
-        distributor_key = distributor.put()
-        tenant_one_amount = 13
-        tenant_two_amount = 6
-        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(
-            distributor_key,
-            tenant_1_device_count=tenant_one_amount,
-            tenant_2_device_count=tenant_two_amount
-        )
-        uri = application.router.build(
-            None,
-            'match_for_device_by_serial',
-            None,
-            {
-                'distributor_urlsafe_key': distributor_key.urlsafe(),
-                'full_serial': 'm-serial093942392349423',
-                'unmanaged': 'false'
-            }
-        )
-
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
-
-        response_json = json.loads(response.body)
-        self.assertFalse(response_json["is_match"])
-
-    def test_not_match_for_device_by_mac(self):
-        distributor = Distributor.create(name='Acme Brothers')
-        distributor_key = distributor.put()
-        tenant_one_amount = 13
-        tenant_two_amount = 6
-        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(
-            distributor_key,
-            tenant_1_device_count=tenant_one_amount,
-            tenant_2_device_count=tenant_two_amount
-        )
-        uri = application.router.build(
-            None,
-            'match_for_device_by_mac',
-            None,
-            {
-                'distributor_urlsafe_key': distributor_key.urlsafe(),
-                'full_mac': 'm-mac09249423923492349',
-                'unmanaged': 'false'
-            }
-        )
-
-        response = self.app.get(uri, headers=self.api_token_authorization_header)
-        response_json = json.loads(response.body)
-        self.assertFalse(response_json["is_match"])
 
     #################################################################################################################
     # get managed device
@@ -1466,8 +1149,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
         updated_heartbeat = self.managed_device_key.get()
         self.assertNotEqual(updated_heartbeat.storage_utilization, self.STORAGE_UTILIZATION)
-        self.assertEqual(updated_heartbeat.memory_utilization, self.MEMORY_UTILIZATION)
-        self.assertEqual(updated_heartbeat.program, self.PROGRAM)
 
     def test_put_heartbeat_updates_memory_utilization(self):
         self.__initialize_heartbeat_info()
@@ -1481,16 +1162,12 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
         updated_heartbeat = self.managed_device_key.get()
         self.assertNotEqual(updated_heartbeat.memory_utilization, self.MEMORY_UTILIZATION)
-        self.assertEqual(updated_heartbeat.storage_utilization, self.STORAGE_UTILIZATION)
-        self.assertEqual(updated_heartbeat.program, self.PROGRAM)
-        self.assertEqual(updated_heartbeat.last_error, self.LAST_ERROR)
-        self.assertEqual(updated_heartbeat.program_id, self.PROGRAM_ID)
 
     def test_put_heartbeat_updates_program(self):
         self.__initialize_heartbeat_info()
         request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
-                        'program': 'Chronicles of Bob',
+                        'program': 'Chronicles of Narnia',
                         'programId': self.PROGRAM_ID,
                         'lastError': self.LAST_ERROR,
                         }
@@ -1498,27 +1175,54 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
         updated_heartbeat = self.managed_device_key.get()
         self.assertNotEqual(updated_heartbeat.program, self.PROGRAM)
-        self.assertEqual(updated_heartbeat.memory_utilization, self.MEMORY_UTILIZATION)
-        self.assertEqual(updated_heartbeat.storage_utilization, self.STORAGE_UTILIZATION)
-        self.assertEqual(updated_heartbeat.program_id, self.PROGRAM_ID)
-        self.assertEqual(updated_heartbeat.last_error, self.LAST_ERROR)
+        self.assertEqual(updated_heartbeat.program, 'Chronicles of Narnia')
 
     def test_put_heartbeat_updates_program_id(self):
         self.__initialize_heartbeat_info()
         request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
                         'program': self.PROGRAM,
-                        'programId': 'some program id',
+                        'programId': 'new program id',
                         'lastError': self.LAST_ERROR,
                         }
         uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
         self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
         updated_heartbeat = self.managed_device_key.get()
         self.assertNotEqual(updated_heartbeat.program_id, self.PROGRAM_ID)
-        self.assertEqual(updated_heartbeat.program, self.PROGRAM)
-        self.assertEqual(updated_heartbeat.memory_utilization, self.MEMORY_UTILIZATION)
-        self.assertEqual(updated_heartbeat.storage_utilization, self.STORAGE_UTILIZATION)
-        self.assertEqual(updated_heartbeat.last_error, self.LAST_ERROR)
+        self.assertEqual(updated_heartbeat.program_id, 'new program id')
+
+    def test_put_heartbeat_updates_playlist(self):
+        self.__initialize_heartbeat_info()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'playlist': 'new playlist',
+                        'playlistId': self.PLAYLIST_ID,
+                        'lastError': self.LAST_ERROR,
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        updated_heartbeat = self.managed_device_key.get()
+        self.assertNotEqual(updated_heartbeat.playlist, self.PLAYLIST)
+        self.assertEqual(updated_heartbeat.playlist, 'new playlist')
+
+    def test_put_heartbeat_updates_playlist_id(self):
+        self.__initialize_heartbeat_info()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'playListId': self.PLAYLIST_ID,
+                        'playlist': self.PLAYLIST,
+                        'playlistId': 'new playlist id',
+                        'lastError': self.LAST_ERROR,
+                        }
+        uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        updated_heartbeat = self.managed_device_key.get()
+        self.assertNotEqual(updated_heartbeat.playlist_id, self.PLAYLIST_ID)
+        self.assertEqual(updated_heartbeat.playlist_id, 'new playlist id')
 
     def test_put_heartbeat_updates_last_error(self):
         self.__initialize_heartbeat_info()
@@ -1532,10 +1236,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
         updated_heartbeat = self.managed_device_key.get()
         self.assertNotEqual(updated_heartbeat.last_error, self.LAST_ERROR)
-        self.assertEqual(updated_heartbeat.program, self.PROGRAM)
-        self.assertEqual(updated_heartbeat.memory_utilization, self.MEMORY_UTILIZATION)
-        self.assertEqual(updated_heartbeat.storage_utilization, self.STORAGE_UTILIZATION)
-        self.assertEqual(updated_heartbeat.program_id, self.PROGRAM_ID)
 
     def test_put_heartbeat_cannot_update_up_status(self):
         self.__initialize_heartbeat_info()
@@ -1935,31 +1635,31 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         issue.put()
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json["issues"][0]['elapsed_time'], '1.5 minutes')
+        self.assertEqual(response_json["issues"][0]['elapsedTime'], '1.5 minutes')
 
         issue.created = datetime.utcnow() - timedelta(minutes=59)
         issue.put()
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json["issues"][0]['elapsed_time'], '59.0 minutes')
+        self.assertEqual(response_json["issues"][0]['elapsedTime'], '59.0 minutes')
 
         issue.created = datetime.utcnow() - timedelta(minutes=90)
         issue.put()
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json["issues"][0]['elapsed_time'], '1.5 hours')
+        self.assertEqual(response_json["issues"][0]['elapsedTime'], '1.5 hours')
 
         issue.created = datetime.utcnow() - timedelta(hours=23)
         issue.put()
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json["issues"][0]['elapsed_time'], '23.0 hours')
+        self.assertEqual(response_json["issues"][0]['elapsedTime'], '23.0 hours')
 
         issue.created = datetime.utcnow() - timedelta(hours=48)
         issue.put()
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json["issues"][0]['elapsed_time'], '2.0 days')
+        self.assertEqual(response_json["issues"][0]['elapsedTime'], '2.0 days')
 
     def test_get_latest_issues_returns_expected_issue_order_with_latest_first(self):
         start = datetime.utcnow() - timedelta(days=5)
@@ -2034,6 +1734,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.managed_device.program = self.PROGRAM
         self.managed_device.program_id = self.PROGRAM_ID
         self.managed_device.last_error = self.LAST_ERROR
+        self.managed_device.playlist = self.PLAYLIST
+        self.managed_device.playlist_id = self.PLAYLIST_ID
         self.managed_device.up = up
         self.managed_device.put()
 

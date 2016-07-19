@@ -61,38 +61,6 @@ describe('DistributorSelectorCtrl', function () {
         return promise;
       });
       spyOn(controller, 'selectDistributor');
-      DevicesService.deviceCache = {
-        get: function () {
-        },
-        put: function () {
-        },
-        removeAll: function () {
-        }
-      };
-      DevicesService.deviceByTenantCache = {
-        get: function () {
-        },
-        put: function () {
-        },
-        removeAll: function () {
-        }
-      };
-      ProofPlayService.proofplayCache = {
-        get: function () {
-        },
-        put: function () {
-        },
-        removeAll: function () {
-        }
-      };
-      TenantsService.tenantCache = {
-        get: function () {
-        },
-        put: function () {
-        },
-        removeAll: function () {
-        }
-      };
       return controller.initialize();
     });
     describe('when distributors array is not a length of 1', function () {
@@ -146,38 +114,7 @@ describe('DistributorSelectorCtrl', function () {
       name: 'some_distro'
     };
     beforeEach(function () {
-      DevicesService.deviceCache = {
-        get: function () {
-        },
-        put: function () {
-        },
-        removeAll: function () {
-        }
-      };
-      DevicesService.deviceByTenantCache = {
-        get: function () {
-        },
-        put: function () {
-        },
-        removeAll: function () {
-        }
-      };
-      ProofPlayService.proofplayCache = {
-        get: function () {
-        },
-        put: function () {
-        },
-        removeAll: function () {
-        }
-      };
-      TenantsService.tenantCache = {
-        get: function () {
-        },
-        put: function () {
-        },
-        removeAll: function () {
-        }
-      };
+
       spyOn($state, 'go');
       spyOn(ToastsService, 'showErrorToast');
       spyOn(DistributorsService, 'switchDistributor');

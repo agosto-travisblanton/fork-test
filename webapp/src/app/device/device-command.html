@@ -226,6 +226,68 @@
               </div>
             </md-card>
             <md-card flex="100">
+              <div layout="row">
+                <div flex="55">
+                  <h5 class="md-headline" style="padding-left: 15px">Restart</h5>
+                </div>
+                <div flex="55">
+                  <form name="updateDeviceForm" class="form-horizontal"
+                        ng-submit="vm.onRestart()"
+                        novalidate>
+                    <div layout="row">
+                      <md-button type="submit"><i
+                        class="fa fa-fw fa-building"></i>
+                        Send
+                      </md-button>
+                      <md-button class="md-fab md-primary" aria-label="Restart">
+                        <md-tooltip>
+                          skykit.com/skdchromeapp/restart
+                        </md-tooltip>
+                        <md-icon>
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                               width="24" height="24">
+                            <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1z"></path>
+                            <path d="M17 12V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"></path>
+                          </svg>
+                        </md-icon>
+                      </md-button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </md-card>
+            <md-card flex="100">
+              <div layout="row">
+                <div flex="55">
+                  <h5 class="md-headline" style="padding-left: 15px">Post log</h5>
+                </div>
+                <div flex="55">
+                  <form name="updateDeviceForm" class="form-horizontal"
+                        ng-submit="vm.onPostLog()"
+                        novalidate>
+                    <div layout="row">
+                      <md-button type="submit"><i
+                        class="fa fa-fw fa-building"></i>
+                        Send
+                      </md-button>
+                      <md-button class="md-fab md-primary" aria-label="Restart">
+                        <md-tooltip>
+                          skykit.com/skdchromeapp/postlog
+                        </md-tooltip>
+                        <md-icon>
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                               width="24" height="24">
+                            <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1z"></path>
+                            <path d="M17 12V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"></path>
+                          </svg>
+                        </md-icon>
+                      </md-button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </md-card>
+            <md-card flex="100">
               <md-card-title>
                 <md-card-title-text>
                   <span class="md-headline">Volume</span>
@@ -249,7 +311,7 @@
                              ng-required="true">
                     </div>
                     <div flex="60">
-                      <md-button type="submit"
+                      <md-button type="submit" class="pull-command-send-button-up"
                                  ng-disabled="!volumeForm.$dirty || volumeForm.$invalid">
                         <i class="fa fa-fw fa-building"></i>
                         Send
@@ -279,7 +341,7 @@
                              ng-required="true">
                     </div>
                     <div flex="30">
-                      <md-button type="submit"
+                      <md-button type="submit" class="pull-command-send-button-up"
                                  ng-disabled="!customForm.$dirty || customForm.$invalid">
                         <i class="fa fa-fw fa-building"></i>
                         Send

@@ -1,22 +1,7 @@
-angular.module('skykitProvisioning').factory('TenantsService', (Restangular, CacheFactory, SessionsService) =>
+angular.module('skykitProvisioning').factory('TenantsService', (Restangular, SessionsService) =>
   new class TenantsService {
 
     constructor() {
-      if (!CacheFactory.get('tenantCache')) {
-        this.tenantCache = CacheFactory('tenantCache', {
-            maxAge: 60 * 60 * 1000,
-            deleteOnExpire: 'aggressive',
-            storageMode: 'localStorage',
-            onExpire: (key, value) => {
-              $http.get(key).success(data => {
-                this.tenantCache.put(key, data);
-                return;
-              });
-              return;
-            }
-          }
-        );
-      }
     }
 
 

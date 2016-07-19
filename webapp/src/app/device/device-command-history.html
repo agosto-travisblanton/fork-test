@@ -42,7 +42,7 @@
                     to this player
                   </td>
                 </tr>
-                <tr ng-repeat="item in vm.commandEvents | orderBy:['-postedTime']">
+                <tr ng-repeat="item in vm.commandEvents">
                   <td class="command-history-command">{{ item.payload }}</td>
                   <td>{{ item.postedTime }}</td>
                   <td>{{ item.confirmedTime }}</td>

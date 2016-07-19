@@ -9,6 +9,7 @@ describe('DevicesListingCtrl', function () {
   let ProgressBarService = undefined;
   let serialPromise = undefined;
   let sweet = undefined;
+  let gcmidPromise = undefined;
 
   let to_respond_with_devices = {
     devices: [
@@ -187,16 +188,24 @@ describe('DevicesListingCtrl', function () {
     it('converts array to dictionary with serial as key', function () {
       let theArray = [{"serial": "test", "a": "b"}];
       let isMac = false;
-      let result = controller.convertArrayToDictionary(theArray, isMac);
+      let result = DevicesService.convertDevicesArrayToDictionaryObj(theArray, isMac);
       return expect(result).toEqual({"test": {"a": "b", "serial": "test"}});
     });
 
 
-    return it('converts array to dictionary with mac key', function () {
+    it('converts array to dictionary with mac key', function () {
       let theArray = [{"mac": "test", "a": "b"}];
       let isMac = true;
-      let result = controller.convertArrayToDictionary(theArray, isMac);
+      let result = DevicesService.convertDevicesArrayToDictionaryObj(theArray, isMac);
       return expect(result).toEqual({"test": {"a": "b", "mac": "test"}});
+    });
+
+    return it('converts array to dictionary with gcmid key', function () {
+      let theArray = [{"gcmid": "test", "a": "b"}];
+      let isMac = false;
+      let isGCMid = true
+      let result = DevicesService.convertDevicesArrayToDictionaryObj(theArray, isMac, isGCMid);
+      return expect(result).toEqual({"test": {"a": "b", "gcmid": "test"}});
     });
   });
 
@@ -234,6 +243,31 @@ describe('DevicesListingCtrl', function () {
         fromDevices: true
       });
     });
+
+
+    it("prepares for editItem as unmanaged gcmid", function () {
+      controller.unmanagedSelectedButton === "GCM ID";
+      let unmanaged = true;
+      controller.prepareForEditView(unmanaged, resourceSearch);
+      return expect($state.go).toHaveBeenCalledWith('editDevice', {
+        deviceKey: controller.unmanagedMacDevices[resourceSearch].key,
+        tenantKey: controller.unmanagedMacDevices[resourceSearch].tenantKey,
+        fromDevices: true
+      });
+    });
+
+
+    it("prepares for editItem as managed gcmid", function () {
+      controller.selectedButton === "GCM ID";
+      let unmanaged = false;
+      controller.prepareForEditView(unmanaged, resourceSearch);
+      return expect($state.go).toHaveBeenCalledWith('editDevice', {
+        deviceKey: controller.macDevices[resourceSearch].key,
+        tenantKey: controller.macDevices[resourceSearch].tenantKey,
+        fromDevices: true
+      });
+    });
+
 
     it("prepares for editItem as managed mac", function () {
       controller.selectedButton === "MAC";
@@ -299,16 +333,17 @@ describe('DevicesListingCtrl', function () {
       controller = $controller('DevicesListingCtrl', {});
       promise = new skykitProvisioning.q.Mock();
       serialPromise = new skykitProvisioning.q.Mock();
-
+      gcmidPromise = new skykitProvisioning.q.Mock();
+      spyOn(DevicesService, 'matchDevicesByFullGCMid').and.returnValue(gcmidPromise);
       spyOn(DevicesService, 'matchDevicesByFullMac').and.returnValue(promise);
-      return spyOn(DevicesService, 'matchDevicesByFullSerial').and.returnValue(serialPromise);
+      spyOn(DevicesService, 'matchDevicesByFullSerial').and.returnValue(serialPromise);
     });
 
     it("matchDevicesByFullMac called when unmanaged and button is mac", function () {
       let unmanaged = true;
       controller.unmanagedSelectedButton = "MAC";
       controller.isResourceValid(unmanaged, resource);
-      promise.resolve(false);
+      promise.resolve({"is_match": false});
       return expect(DevicesService.matchDevicesByFullMac).toHaveBeenCalledWith(controller.distributorKey, resource, unmanaged);
     });
 
@@ -318,6 +353,22 @@ describe('DevicesListingCtrl', function () {
       controller.isResourceValid(unmanaged, resource);
       serialPromise.resolve(false);
       return expect(DevicesService.matchDevicesByFullSerial).toHaveBeenCalledWith(controller.distributorKey, resource, unmanaged);
+    });
+
+    it("matchDevicesByFullGCMid called when unmanaged and button is gcmid", function () {
+      let unmanaged = true;
+      controller.unmanagedSelectedButton = "GCM ID";
+      controller.isResourceValid(unmanaged, resource);
+      gcmidPromise.resolve(false);
+      return expect(DevicesService.matchDevicesByFullGCMid).toHaveBeenCalledWith(controller.distributorKey, resource, unmanaged);
+    });
+
+    it("matchDevicesByFullGCMid called when managed and button is gcmid", function () {
+      let unmanaged = false;
+      controller.selectedButton = "GCM ID";
+      controller.isResourceValid(unmanaged, resource);
+      gcmidPromise.resolve(false);
+      return expect(DevicesService.matchDevicesByFullGCMid).toHaveBeenCalledWith(controller.distributorKey, resource, unmanaged);
     });
 
     it("matchDevicesByFullMac called when managed and button is mac", function () {
@@ -339,83 +390,87 @@ describe('DevicesListingCtrl', function () {
 
   return describe('.searchDevices', function () {
     let partial = "it doesn't matter dwight!";
-    beforeEach(function () {
+    let genericMatches;
+
+
+    beforeEach(inject(function ($q) {
       controller = $controller('DevicesListingCtrl', {});
       promise = new skykitProvisioning.q.Mock();
       serialPromise = new skykitProvisioning.q.Mock();
-
-      spyOn(DevicesService, 'searchDevicesByPartialMac').and.returnValue(promise);
+      spyOn(DevicesService, 'searchDevices').and.callFake(function (someData) {
+        genericMatches = {
+          "matches": [
+            {"serial": "1234"},
+            {"serial": "45566"}
+          ]
+        };
+        let deferred = $q.defer();
+        deferred.resolve({
+          "success": true,
+          "devices": genericMatches
+        })
+        return deferred.promise
+      })
       return spyOn(DevicesService, 'searchDevicesByPartialSerial').and.returnValue(serialPromise);
-    });
-
-    let convertArrayToDictionary = function (theArray, mac) {
-      let Devices = {};
-      for (let i = 0; i < theArray.length; i++) {
-        let item = theArray[i];
-        if (mac) {
-          Devices[item.mac] = item;
-        } else {
-          Devices[item.serial] = item;
-        }
-      }
-
-      return Devices;
-    };
+      
+    }));
 
     it("returns every serial name when called as an unmanaged serial", function () {
       let unmanaged = true;
       controller.unmanagedSelectedButton = "Serial Number";
-      controller.searchDevices(unmanaged, partial);
-      let serial_matches = {
-        "serial_number_matches": [
-          {"serial": "1234"},
-          {"serial": "45566"}
-        ]
-      };
-      serialPromise.resolve(serial_matches);
-      return expect(controller.unmanagedSerialDevices).toEqual(convertArrayToDictionary(serial_matches["serial_number_matches"], false));
+      controller.searchDevices(unmanaged, partial)
+        .then(function () {
+          return expect(controller.unmanagedSerialDevices).toEqual(genericMatches);
+        })
     });
+
 
     it("returns every serial name when called as an unmanaged mac", function () {
       let unmanaged = true;
       controller.unmanagedSelectedButton = "MAC";
-      controller.searchDevices(unmanaged, partial);
-      let mac_matches = {
-        "mac_matches": [
-          {"mac": "1234"},
-          {"mac": "45566"}
-        ]
-      };
-      promise.resolve(mac_matches);
-      return expect(controller.unmanagedMacDevices).toEqual(convertArrayToDictionary(mac_matches["mac_matches"], true));
+      controller.searchDevices(unmanaged, partial)
+        .then(function () {
+          return expect(controller.unmanagedMacDevices).toEqual(genericMatches);
+        })
+    });
+
+
+    it("returns every gcmid name when called as an unmanaged gcmid", function () {
+      let unmanaged = true;
+      controller.unmanagedSelectedButton = "GCM ID";
+      controller.searchDevices(unmanaged, partial)
+        .then(function () {
+          return expect(controller.unmanagedSerialDevices).toEqual(genericMatches);
+        })
     });
 
     it("returns every serial name when called as an managed serial", function () {
       let unmanaged = false;
       controller.selectedButton = "Serial Number";
-      controller.searchDevices(unmanaged, partial);
-      let serial_matches = {
-        "serial_number_matches": [
-          {"serial": "1234"},
-          {"serial": "45566"}
-        ]
-      };
-      serialPromise.resolve(serial_matches);
-      return expect(controller.serialDevices).toEqual(convertArrayToDictionary(serial_matches["serial_number_matches"], false));
+      controller.searchDevices(unmanaged, partial)
+        .then(function () {
+          return expect(controller.serialDevices).toEqual(genericMatches);
+        })
     });
 
-    return it("returns every mac name when called as an managed mac", function () {
+    it("returns every mac name when called as an managed mac", function () {
       let unmanaged = false;
       controller.selectedButton = "MAC";
-      controller.searchDevices(unmanaged, partial);
-      let mac_matches = {
-        "mac_matches": [
-          {"mac": "1234"},
-          {"mac": "45566"}
-        ]
-      };
-      promise.resolve(mac_matches);
-      return expect(controller.macDevices).toEqual(convertArrayToDictionary(mac_matches["mac_matches"], true));
+
+      controller.searchDevices(unmanaged, partial)
+        .then(function () {
+          return expect(controller.macDevices).toEqual(genericMatches);
+        })
+    });
+
+    it("returns every gcmid name when called as an managed gcmid", function () {
+      let unmanaged = false;
+      controller.selectedButton = "GCM ID";
+      
+      controller.searchDevices(unmanaged, partial)
+        .then(function () {
+          return expect(controller.gcmidDevices).toEqual(genericMatches);
+        })
     });
   });
 });

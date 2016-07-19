@@ -377,7 +377,7 @@ ul.alert-dropdown {
   text-align: center;
 }
 
-.gcm-registration-id-word-break {
+.properties-word-break {
   width: 390px;
   word-wrap: break-word;
   display: block;
@@ -524,6 +524,10 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
   display: inline-block;
   vertical-align: top;
   overflow: scroll;
+}
+
+.pull-command-send-button-up {
+  margin-top: -2px;
 }
 
 header.dtp-header {

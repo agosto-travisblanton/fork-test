@@ -28,7 +28,7 @@
                          type="text"
                          short-time="true"
                          format="YYYY-MM-DD hh:mm A"
-                         max-date="dateTimeEnd"
+                         max-date="deviceDetailsCtrl.endTime"
                          placeholder="{{deviceDetailsCtrl.startTime}}"
                          class="form-control"
                          ng-model="deviceDetailsCtrl.startTime"
@@ -44,7 +44,7 @@
                          format="YYYY-MM-DD hh:mm A"
                          class="form-control"
                          placeholder="{{deviceDetailsCtrl.endTime}}"
-                         min-date="dateTimeStart"
+                         min-date="deviceDetailsCtrl.startTime"
                          ng-model="deviceDetailsCtrl.endTime"
                   />
                 </div>
@@ -70,6 +70,7 @@
                 <th>Category</th>
                 <th>Memory</th>
                 <th>Storage</th>
+                <th>Playlist</th>
                 <th>Program</th>
                 <th>Event created</th>
                 <th>Last updated</th>
@@ -78,21 +79,22 @@
               </thead>
               <tbody>
               <tr ng-hide="deviceDetailsCtrl.issues.length">
-                <td class="text-center text-warning" colspan="8">
+                <td class="text-center text-warning" colspan="9">
                   No events logged in the past {{deviceDetailsCtrl.dayRange}}
                   days.<br>
                   Please try an earlier 'From date' above.
                 </td>
               </tr>
               <tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:['-updated']">
-                <td class="issue-{{ item.level_descriptor}}-background"></td>
+                <td class="issue-{{ item.levelDescriptor}}-background"></td>
                 <td>{{ item.category }}</td>
-                <td>{{ item.memory_utilization }}%</td>
-                <td>{{ item.storage_utilization }}%</td>
+                <td>{{ item.memoryUtilization }}%</td>
+                <td>{{ item.storageUtilization }}%</td>
+                <td>{{ item.playlist }}</td>
                 <td>{{ item.program }}</td>
                 <td>{{ item.created }}</td>
                 <td>{{ item.updated }}</td>
-                <td class="issue-{{ item.level_descriptor}}-text">
+                <td class="issue-{{ item.levelDescriptor}}-text">
                   <i ng-class="item.level==1? 'fa fa-fw fa-warning' :
                                                           item.level==0? 'fa fa-fw fa-check-circle': 'fa fa-fw fa-ambulance'"></i>
                   {{ item.elapsed_time }}

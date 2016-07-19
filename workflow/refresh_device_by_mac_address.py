@@ -3,19 +3,22 @@ import logging
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
-from agar.env import on_development_server
 from app_config import config
 from chrome_os_devices_api import ChromeOsDevicesApi
+from content_manager_api import ContentManagerApi
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
-def refresh_device_by_mac_address(device_urlsafe_key, device_mac_address, page_token=None):
-    if on_development_server:
-        return
+def refresh_device_by_mac_address(device_urlsafe_key, device_mac_address,
+                                  device_has_previous_directory_api_info=False, page_token=None):
     """
     A function that is meant to be run asynchronously to update the device entity
     with ChromeOsDevice information from Directory API using the MAC address to match.
+    :param device_has_previous_directory_api_info: indicates if device has any info from Directory API.
+    :param page_token: a google api page marker for where you are in the larger list. Fetches in chunks of 100 records.
+    :param device_mac_address: the device's MAC address
+    :param device_urlsafe_key: our device key
     """
     if device_urlsafe_key is None:
         raise deferred.PermanentTaskFailure('The device URL-safe key parameter is None. It is required.')
@@ -64,6 +67,16 @@ def refresh_device_by_mac_address(device_urlsafe_key, device_mac_address, page_t
             logging.info('Refreshed device_id = {0} by MAC address = {1}'.
                          format(device.device_id, lowercase_device_mac_address))
 
+            if device.registration_correlation_identifier:
+                correlation_id = device.registration_correlation_identifier
+            else:
+                correlation_id = 'NA'
+            if not device_has_previous_directory_api_info:
+                deferred.defer(ContentManagerApi().create_device,
+                               device_urlsafe_key=device_urlsafe_key,
+                               correlation_id=correlation_id,
+                               _queue='content-server',
+                               _countdown=5)
             return device
         else:
             if new_page_token is not None:
