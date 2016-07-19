@@ -41,7 +41,7 @@
              ng-hide="deviceDetailsCtrl.currentDevice.annotatedAssetId == null ||
                                            deviceDetailsCtrl.currentDevice.annotatedAssetId == ''">
           <label>Asset Id</label>
-          <div>
+          <div class="properties-word-break">
             {{deviceDetailsCtrl.currentDevice.annotatedAssetId}}
           </div>
         </div>
@@ -105,7 +105,7 @@
              ng-hide="deviceDetailsCtrl.currentDevice.gcmRegistrationId == null ||
                                            deviceDetailsCtrl.currentDevice.gcmRegistrationId == ''">
           <label>GCM registration ID</label>
-          <div class="gcm-registration-id-word-break">
+          <div class="properties-word-break">
             {{deviceDetailsCtrl.currentDevice.gcmRegistrationId}}
           </div>
         </div>
@@ -250,7 +250,7 @@
         <hr/>
         <div class="form-group">
           <label>Device key</label>
-          <div class="gcm-registration-id-word-break">
+          <div class="properties-word-break">
             {{deviceDetailsCtrl.currentDevice.key}}
           </div>
           <md-card-actions layout="row" layout-align="end center">
