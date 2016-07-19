@@ -22,6 +22,7 @@ from hydrate_agosto_default_domain_key_on_tenant import HydrateAgostoDefaultDoma
 from hydrate_default_user_role_on_distributer_user import HydrateDefaultUserRoleOnDistributerUser
 from set_default_admin_users import SetDefaultAdminUsers
 from update_chrome_os_device_annotated_asset_id import UpdateChromeOsDeviceAnnotatedAssetId
+from hydrate_default_device_sleep_property import HydrateDefaultDeviceSleepProperty
 
 MIGRATIONS = [
     HydrateTenantKeyOnDevices(),
@@ -30,7 +31,8 @@ MIGRATIONS = [
     HydrateAgostoDefaultDomainKeyOnTenant(),
     HydrateDefaultUserRoleOnDistributerUser(),
     SetDefaultAdminUsers(),
-    UpdateChromeOsDeviceAnnotatedAssetId()
+    UpdateChromeOsDeviceAnnotatedAssetId(),
+    HydrateDefaultDeviceSleepProperty()
 ]
 
 MIGRATIONS_MAP = {migration.name: migration for migration in MIGRATIONS}
