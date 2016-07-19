@@ -2,7 +2,7 @@ from app_config import config
 from models import ChromeOsDevice, DeviceIssueLog
 
 query = ChromeOsDevice.query().order(ChromeOsDevice.created)
-devices = query.fetch(5)
+devices = query.fetch(100)
 print 'Device count = ' + str(len(devices))
 for device in devices:
     issue = DeviceIssueLog.create(device_key=device.key,
@@ -12,6 +12,8 @@ for device in devices:
                                   memory_utilization=50,
                                   program='Test Content',
                                   program_id='Program Id #1213',
+                                  playlist='Some Playlist',
+                                  playlist_id='Playlist Id #1234',
                                   last_error=None,
                                   resolved=False)
     issue.put()
@@ -24,6 +26,8 @@ for device in devices:
                                   memory_utilization=50,
                                   program='Test Content',
                                   program_id='Program Id #1213',
+                                  playlist='Some Playlist',
+                                  playlist_id='Playlist Id #1234',
                                   last_error=None,
                                   resolved=False)
     issue.put()
@@ -36,6 +40,8 @@ for device in devices:
                                   memory_utilization=93,
                                   program='Test Content',
                                   program_id='Program Id #1213',
+                                  playlist='Some Playlist',
+                                  playlist_id='Playlist Id #1234',
                                   last_error=None,
                                   resolved=False)
     issue.put()
@@ -48,6 +54,8 @@ for device in devices:
                                   memory_utilization=53,
                                   program='Test Content',
                                   program_id='Program Id #1213',
+                                  playlist='Some Playlist',
+                                  playlist_id='Playlist Id #1234',
                                   last_error=None,
                                   resolved=True)
     issue.put()
@@ -60,6 +68,8 @@ for device in devices:
                                   memory_utilization=40,
                                   program='Test Content',
                                   program_id='Program Id #1213',
+                                  playlist='Some Playlist',
+                                  playlist_id='Playlist Id #1234',
                                   last_error=None,
                                   resolved=True)
     issue.put()

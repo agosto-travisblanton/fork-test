@@ -25,23 +25,23 @@ describe('DeviceDetailsCommandsCtrl', function () {
       {
         category: "Player down",
         created: "2015-12-15 18:05:52",
-        elapsed_time: "37.3 minutes",
+        elapsedTime: "37.3 minutes",
         level: 2,
-        level_descriptor: "danger",
-        memory_utilization: 40,
+        levelDescriptor: "danger",
+        memoryUtilization: 40,
         program: "Test Content",
-        storage_utilization: 44,
+        storageUtilization: 44,
         up: false
       },
       {
         category: "Player up",
         created: "2015-12-15 18:05:52",
-        elapsed_time: "37.3 minutes",
+        elapsedTime: "37.3 minutes",
         level: 0,
-        level_descriptor: "normal",
-        memory_utilization: 40,
+        levelDescriptor: "normal",
+        memoryUtilization: 40,
         program: "Test Content",
-        storage_utilization: 44,
+        storageUtilization: 44,
         up: true
       }
     ]

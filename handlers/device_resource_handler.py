@@ -625,6 +625,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             sk_player_version = request_json.get('playerVersion')
             os = request_json.get('os')
             os_version = request_json.get('osVersion')
+            playlist = request_json.get('playlist')
+            playlist_id = request_json.get('playlistId')
             utc_now = datetime.utcnow()
 
             if DeviceIssueLog.device_not_reported_yet(device_key=device.key):
@@ -668,6 +670,14 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             if program_id:
                 if device.program_id != program_id:
                     device.program_id = program_id
+
+            if playlist:
+                if device.playlist != playlist:
+                    device.playlist = playlist
+
+            if playlist_id:
+                if device.playlist_id != playlist_id:
+                    device.playlist_id = playlist_id
 
             if last_error:
                 if device.last_error != last_error:

@@ -116,6 +116,11 @@ CHROME_OS_DEVICE_STRATEGY += [
                          context: o.location_key.get().geo_location.lon if o.location_key is not None else None},
     {'timezone': lambda o, field_name, context: o.key.get().timezone},
     {'timezoneOffset': lambda o, field_name, context: o.key.get().timezone_offset},
+    {'program': lambda o, field_name, context: o.key.get().program},
+    {'programId': lambda o, field_name, context: o.key.get().program_id},
+    {'playlist': lambda o, field_name, context: o.key.get().playlist},
+    {'playlistId': lambda o, field_name, context: o.key.get().playlist_id},
+    {'lastError': lambda o, field_name, context: o.key.get().last_error},
     {'archived': lambda o, field_name, context: o.key.get().archived}
 ]
 
@@ -144,14 +149,18 @@ DEVICE_ISSUE_LOG_STRATEGY = ModelStrategy(DeviceIssueLog)
 DEVICE_ISSUE_LOG_STRATEGY += [
     {'category': lambda o, field_name, context: o.key.get().category},
     {'up': lambda o, field_name, context: o.key.get().up},
-    {'storage_utilization': lambda o, field_name, context: o.key.get().storage_utilization},
-    {'memory_utilization': lambda o, field_name, context: o.key.get().memory_utilization},
+    {'storageUtilization': lambda o, field_name, context: o.key.get().storage_utilization},
+    {'memoryUtilization': lambda o, field_name, context: o.key.get().memory_utilization},
     {'program': lambda o, field_name, context: o.key.get().program},
+    {'programId': lambda o, field_name, context: o.key.get().program_id},
+    {'lastError': lambda o, field_name, context: o.key.get().last_error},
+    {'playlist': lambda o, field_name, context: o.key.get().playlist},
+    {'playlistId': lambda o, field_name, context: o.key.get().playlist_id},
     {'created': lambda o, field_name, context: o.key.get().created},
     {'updated': lambda o, field_name, context: o.key.get().updated},
     {'level': lambda o, field_name, context: o.key.get().level},
-    {'level_descriptor': lambda o, field_name, context: o.key.get().level_descriptor},
-    {'elapsed_time': lambda o, field_name, context: elapsed_time_message(o.key.get().created, datetime.utcnow())}
+    {'levelDescriptor': lambda o, field_name, context: o.key.get().level_descriptor},
+    {'elapsedTime': lambda o, field_name, context: elapsed_time_message(o.key.get().created, datetime.utcnow())}
 ]
 
 DOMAIN_FIELDS = [
