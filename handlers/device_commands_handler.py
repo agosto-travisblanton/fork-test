@@ -14,7 +14,6 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>. Bob MacNeal <bob
 
 
 class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
-
     @requires_api_token
     def post(self, device_urlsafe_key):
         method_name = inspect.stack()[0][3]
@@ -196,6 +195,29 @@ class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
                 device_urlsafe_key=device_urlsafe_key,
                 host=self.request.host_url,
                 user_identifier=user_identifier)
+        self.response.set_status(status, message)
+
+    @requires_api_token
+    def panel_sleep(self, device_urlsafe_key):
+        status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
+        if device:
+            user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
+            if user_identifier is None or user_identifier == '':
+                user_identifier = 'system'
+
+            request_json = json.loads(self.request.body)
+            panel_sleep = request_json["panel_sleep"]
+            device = ndb.Key(urlsafe=device_urlsafe_key).get()
+            device.panel_sleep = panel_sleep
+            device.put()
+
+            change_intent(
+                gcm_registration_id=device.gcm_registration_id,
+                payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                device_urlsafe_key=device_urlsafe_key,
+                host=self.request.host_url,
+                user_identifier=user_identifier)
+
         self.response.set_status(status, message)
 
     @requires_api_token
