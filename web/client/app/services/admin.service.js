@@ -38,11 +38,11 @@ export default class AdminService {
     return promise;
   }
 
-  static adminServiceFactory(Restangular) {
+  static create(Restangular) {
     return new AdminService(Restangular)
   }
 }
 
-AdminService.adminServiceFactory.$inject = ["Restangular"]
+AdminService.create.$inject = ["Restangular"]
 
 

@@ -62,7 +62,6 @@
     "http-proxy-middleware": "^0.17.0",
     "imports-loader": "^0.6.5",
     "jasmine-core": "^2.4.1",
-    "jasmine-es6": "^0.2.1",
     "karma": "^0.13.9",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^0.2.0",

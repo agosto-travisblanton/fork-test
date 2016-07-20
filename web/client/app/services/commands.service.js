@@ -58,12 +58,12 @@ export default class CommandsService {
     return promise;
   }
 
-  static commandServiceFactory(Restangular) {
+  static create(Restangular) {
     return new CommandsService(Restangular)
   }
 }
 
-CommandsService.commandServiceFactory.$inject = ["Restangular"]
+CommandsService.create.$inject = ["Restangular"]
 
 
 

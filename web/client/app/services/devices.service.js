@@ -513,12 +513,12 @@ export default class DevicesService {
     return url
   }
 
-  static devicesServiceFactory($log, Restangular, $q, $http, $state) {
+  static create($log, Restangular, $q, $http, $state) {
     return new DevicesService($log, Restangular, $q, $http, $state)
   }
 }
 
-DevicesService.devicesServiceFactory.$inject = [
+DevicesService.create.$inject = [
   "$log",
   "Restangular",
   "$q",

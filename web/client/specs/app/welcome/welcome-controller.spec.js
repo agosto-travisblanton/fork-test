@@ -1,27 +1,37 @@
 import angular from 'angular';
 
+import VersionsService from './../../../app/services/versions.service'
+import StorageService from './../../../app/services/storage.service'
+import SessionsService from './../../../app/services/sessions.service'
+import DistributorsService from './../../../app/services/distributors.service'
+
 // Built by the core Angular team for mocking dependencies
 import mocks from 'angular-mocks';
 
 let module = angular.mock.module
+let inject = angular.mock.inject
+
 
 describe('WelcomeCtrl', function () {
   let $controller = undefined;
   let controller = undefined;
-  let VersionsService = undefined;
   let promise = undefined;
   let otherPromise = undefined;
   let versionData = undefined;
   let cookieMock = undefined;
   let $stateParams = undefined;
   let $state = undefined;
-  let StorageService = undefined;
-  let SessionsService = undefined;
-  let DistributorsService = undefined;
 
-  beforeEach(() => {
-    console.log("hi")
-  })
+
+  beforeEach(module('skykitProvisioning'));
+
+  beforeEach(module(function ($provide) {
+    $provide.value('VersionsService', VersionsService.create);
+    $provide.value('StorageService', StorageService.create);
+    $provide.value('SessionsService', SessionsService.create);
+    $provide.value('DistributorsService', DistributorsService.create);
+
+  }));
 
   beforeEach(inject(function (_$controller_, _VersionsService_, _$state_, _StorageService_, _SessionsService_, _DistributorsService_) {
     $controller = _$controller_;
@@ -31,7 +41,7 @@ describe('WelcomeCtrl', function () {
     DistributorsService = _DistributorsService_;
     StorageService = _StorageService_;
     SessionsService = _SessionsService_;
-    
+
     console.log("this doesn;t work")
     console.log(beforeEach)
 
@@ -46,14 +56,9 @@ describe('WelcomeCtrl', function () {
   }));
 
   describe('initialization', () => {
-    console.log(beforeEach)
-    console.log($controller)
-    console.log(expect)
-    console.log(controller)
-    console.log("here")
     it('version_data should be an empty array', () => expect(angular.isArray(controller.version_data)).toBeTruthy())
   })
- 
+
 
   return describe('.initialize', function () {
     versionData = [

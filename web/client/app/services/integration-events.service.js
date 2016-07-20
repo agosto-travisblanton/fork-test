@@ -12,12 +12,12 @@ export default class IntegrationEvents {
     return this.Restangular.all(this.ENROLLMENT_EVENTS).customGET('', query);
   }
 
-  static integrationEventsServiceFactory(Restangular) {
+  static create(Restangular) {
     return new IntegrationEvents(Restangular)
   }
 }
 
-IntegrationEvents.integrationEventsServiceFactory.$inject = [
+IntegrationEvents.create.$inject = [
   "Restangular",
 ]
 

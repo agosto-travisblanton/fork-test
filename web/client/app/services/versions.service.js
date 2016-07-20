@@ -8,11 +8,11 @@ export default class VersionsService {
     return promise;
   }
 
-  static versionsServiceFactory(Restangular) {
+  static create(Restangular) {
     return new VersionsService(Restangular)
   }
 }
 
-VersionsService.versionsServiceFactory.$inject = [
+VersionsService.create.$inject = [
   "Restangular"
 ]

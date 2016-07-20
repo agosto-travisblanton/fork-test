@@ -8,12 +8,12 @@ export default class IdentityService {
     return this.Restangular.oneUrl('identity').get();
   }
 
-  static identityServiceFactory( Restangular) {
+  static create( Restangular) {
     return new IdentityService(Restangular)
   }
 }
 
-IdentityService.identityServiceFactory.$inject = [
+IdentityService.create.$inject = [
   "Restangular"
 ]
 

@@ -18,12 +18,12 @@ export default class TimezonesService {
     return promise;
   }
 
-  static timezoneServiceFactory(Restangular) {
+  static create(Restangular) {
     return new TimezonesService(Restangular)
   }
 }
 
-TimezonesService.timezoneServiceFactory.$inject = [
+TimezonesService.create.$inject = [
   "Restangular"
 ]
 

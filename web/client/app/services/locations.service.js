@@ -30,9 +30,9 @@ export default class LocationsService {
     return promise;
   }
 
-  static locationsServiceFactory(Restangular) {
+  static create(Restangular) {
     return new LocationsService(Restangular)
   }
 }
 
-LocationsService.$inject = ["Restangular"]
+LocationsService.create.$inject = ["Restangular"]

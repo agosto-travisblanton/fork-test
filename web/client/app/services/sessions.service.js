@@ -112,12 +112,12 @@ export default class SessionsService {
     return this.StorageService.removeAll();
   }
 
-  static sessionsServiceFactory($http, $log, StorageService, IdentityService, Restangular, $q) {
+  static create($http, $log, StorageService, IdentityService, Restangular, $q) {
     return new SessionsService($http, $log, StorageService, IdentityService, Restangular, $q)
   }
 }
 
-SessionsService.sessionsServiceFactory.$inject = [
+SessionsService.create.$inject = [
   "$http",
   "$log",
   "StorageService",

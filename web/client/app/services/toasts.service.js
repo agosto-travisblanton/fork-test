@@ -15,11 +15,11 @@ export default class ToastsService {
     return this.toastr.info(message, title);
   }
 
-  static toastsServiceFactory(toastr) {
+  static create(toastr) {
     return new ToastsService(toastr)
   }
 }
 
-ToastsService.toastsServiceFactory.$inject = [
+ToastsService.create.$inject = [
   "toastr"
 ]

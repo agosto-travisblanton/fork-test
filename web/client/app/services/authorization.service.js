@@ -46,10 +46,10 @@ export default class AuthorizationService {
     return deferred.promise;
   }
 
-  static authorizationServiceFactory(SessionsService, $q) {
+  static create(SessionsService, $q) {
     return new AuthorizationService(SessionsService, $q)
   }
 }
 
-AuthorizationService.authorizationServiceFactory.$inject = ["SessionsService", "$q"]
+AuthorizationService.create.$inject = ["SessionsService", "$q"]
 

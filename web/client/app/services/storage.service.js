@@ -21,7 +21,7 @@ export default class StorageService {
     return localStorage.clear();
   }
 
-  static storageServiceFactory() {
+  static create() {
     return new StorageService()
   }
 }

@@ -57,12 +57,12 @@ export default class DistributorsService {
     return this.$state.go('welcome');
   }
 
-  static distributorServiceFactory(Restangular, $state, SessionsService) {
+  static create(Restangular, $state, SessionsService) {
     return new DistributorsService(Restangular, $state, SessionsService)
   }
 }
 
-DistributorsService.distributorServiceFactory.$inject = [
+DistributorsService.create.$inject = [
   "Restangular",
   "$state",
   "SessionsService"

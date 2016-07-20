@@ -38,12 +38,12 @@ export default class TenantsService {
     }
   }
 
-  static tenantsServiceFactory(Restangular, SessionsService) {
+  static create(Restangular, SessionsService) {
     return new TenantsService(Restangular, SessionsService)
   }
 }
 
-TenantsService.tenantsServiceFactory.$inject = [
+TenantsService.create.$inject = [
   "Restangular", "SessionsService"
 ]
 

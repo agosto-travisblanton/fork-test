@@ -28,7 +28,7 @@ export default class DateManipulationService {
     return moment(localTime).format('YYYY-MM-DD hh:mm:ss A');
   };
 
-  static datemanipulationServiceFactory(Restangular) {
+  static create(Restangular) {
     return new DateManipulationService()
   }
 }
