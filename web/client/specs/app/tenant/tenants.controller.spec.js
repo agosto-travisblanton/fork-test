@@ -1,3 +1,9 @@
+import ProgressBarServiceClass from './../../../app/services/progressbar.service'
+import TenantsServiceClass from './../../../app/services/tenants.service'
+import mocks from 'angular-mocks';
+let module = angular.mock.module
+let inject = angular.mock.inject
+
 describe('TenantsCtrl', function () {
   let $controller = undefined;
   let controller = undefined;
@@ -8,6 +14,13 @@ describe('TenantsCtrl', function () {
   let sweet = undefined;
 
   beforeEach(module('skykitProvisioning'));
+
+  beforeEach(module(function ($provide) {
+    $provide.service('TenantsService', TenantsServiceClass);
+    $provide.service('ProgressBarService', ProgressBarServiceClass);
+    ;
+  }));
+
 
   beforeEach(inject(function (_$controller_, _TenantsService_, _$state_, _ProgressBarService_, _sweet_) {
     $controller = _$controller_;
