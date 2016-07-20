@@ -1,0 +1,132 @@
+<md-content class="md-padding">
+  <div flex="100" flex-sm="100" flex-xs="100" layout="column">
+    <md-card>
+      <md-card-content>
+        <form name="tenantForm" class="form-horizontal"
+              ng-submit="deviceDetailsCtrl.onClickRefreshButton()"
+              novalidate>
+          <div class="row">
+            <div class="col-sm-3">
+              <md-button class="md-raised"
+                         ng-disabled="!deviceDetailsCtrl.prev_cursor"
+                         ng-click="deviceDetailsCtrl.paginateCall(false)">
+                Prev
+              </md-button>
+              <md-button class="md-raised"
+                         ng-disabled="!deviceDetailsCtrl.next_cursor"
+                         ng-click="deviceDetailsCtrl.paginateCall(true)">
+                Next
+              </md-button>
+            </div>
+            <div class="col-sm-6 col-sm-offset-1">
+              <div class="form-group">
+                <div class="col-sm-5">
+                  <label>Start Date/Time</label>
+                  <input mdc-datetime-picker
+                         date="true"
+                         time="true"
+                         type="text"
+                         short-time="true"
+                         format="YYYY-MM-DD hh:mm A"
+                         max-date="deviceDetailsCtrl.endTime"
+                         placeholder="{{deviceDetailsCtrl.startTime}}"
+                         class="form-control"
+                         ng-model="deviceDetailsCtrl.startTime"
+                  />
+                </div>
+                <div class="col-sm-5">
+                  <label>End Date/Time</label>
+                  <input mdc-datetime-picker
+                         date="true"
+                         time="true"
+                         type="text"
+                         short-time="true"
+                         format="YYYY-MM-DD hh:mm A"
+                         class="form-control"
+                         placeholder="{{deviceDetailsCtrl.endTime}}"
+                         min-date="deviceDetailsCtrl.startTime"
+                         ng-model="deviceDetailsCtrl.endTime"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-md-1">
+              <md-button type="submit" class="md-raised">
+                <i class="fa fa-fw fa-filter"></i> Filter
+              </md-button>
+            </div>
+          </div>
+        </form>
+      </md-card-content>
+    </md-card>
+    <md-card>
+      <md-card-content>
+        <div class="row margin-top-15">
+          <div class="col-lg-12">
+            <table class="table table-responsive table-striped">
+              <thead>
+              <tr>
+                <th width="3px"></th>
+                <th>Category</th>
+                <th>Memory</th>
+                <th>Storage</th>
+                <th>Playlist</th>
+                <th>Program</th>
+                <th>Event created</th>
+                <th>Last updated</th>
+                <th></th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr ng-hide="deviceDetailsCtrl.issues.length">
+                <td class="text-center text-warning" colspan="9">
+                  No events logged in the past {{deviceDetailsCtrl.dayRange}}
+                  days.<br>
+                  Please try an earlier 'From date' above.
+                </td>
+              </tr>
+              <tr ng-repeat="item in deviceDetailsCtrl.issues | orderBy:['-updated']">
+                <td class="issue-{{ item.levelDescriptor}}-background"></td>
+                <td>{{ item.category }}</td>
+                <td>{{ item.memoryUtilization }}%</td>
+                <td>{{ item.storageUtilization }}%</td>
+                <td>{{ item.playlist }}</td>
+                <td>{{ item.program }}</td>
+                <td>{{ item.created }}</td>
+                <td>{{ item.updated }}</td>
+                <td class="issue-{{ item.levelDescriptor}}-text">
+                  <i ng-class="item.level==1? 'fa fa-fw fa-warning' :
+                                                          item.level==0? 'fa fa-fw fa-check-circle': 'fa fa-fw fa-ambulance'"></i>
+                  {{ item.elapsed_time }}
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </md-card-content>
+    </md-card>
+    <md-card>
+      <md-card-content>
+        <form name="tenantForm" class="form-horizontal"
+              ng-submit="deviceDetailsCtrl.onClickRefreshButton()"
+              novalidate>
+          <div class="row">
+            <div class="col-sm-3">
+              <md-button class="md-raised"
+                         ng-disabled="!deviceDetailsCtrl.prev_cursor"
+                         ng-click="deviceDetailsCtrl.paginateCall(false)">
+                Prev
+              </md-button>
+              <md-button class="md-raised"
+                         ng-disabled="!deviceDetailsCtrl.next_cursor"
+                         ng-click="deviceDetailsCtrl.paginateCall(true)">
+                Next
+              </md-button>
+            </div>
+          </div>
+        </form>
+      </md-card-content>
+    </md-card>
+  </div>
+</md-content>

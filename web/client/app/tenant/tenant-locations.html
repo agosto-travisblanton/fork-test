@@ -1,0 +1,88 @@
+<div ng-controller="TenantLocationsCtrl as vm" ng-init="vm.initialize()" layout="column" ng-cloak>
+  <md-toolbar class="md-hue-2">
+    <div class="md-toolbar-tools">
+      <h2 class="md-flex"><i class="fa fa-fw fa-group ng-scope"></i> Tenants</h2>
+    </div>
+  </md-toolbar>
+  <md-content class="md-padding">
+    <div flex="80" flex-xs="100" layout="column">
+      <div ncy-breadcrumb></div>
+    </div>
+    <md-tabs md-stretch-tabs md-selected="tabIndex">
+      <md-tab label="General"></md-tab>
+      <md-tab label="Managed Devices"></md-tab>
+      <md-tab label="Unmanaged Devices"></md-tab>
+      <md-tab label="Locations"></md-tab>
+    </md-tabs>
+
+    <div flex="90" flex-sm="90" flex-xs="90" layout="column">
+      <md-card>
+        <md-card-title>
+          <md-card-title-text>
+            <span class="md-headline">{{ vm.currentTenant.name }}</span>
+          </md-card-title-text>
+          <md-button href="#/tenants/{{ vm.currentTenant.key }}/location"
+                     class="md-raised md-primary md-button md-ink-ripple">
+            <i class="fa fa-fw fa-plus"></i> Add</a>
+          </md-button>
+        </md-card-title>
+        <md-card-content>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="col-sm-3">
+                <md-button class="md-raised"
+                           ng-disabled="!vm.prev_cursor"
+                           ng-click="vm.paginateCall(false)">
+                  Prev
+                </md-button>
+                <md-button class="md-raised"
+                           ng-disabled="!vm.next_cursor"
+                           ng-click="vm.paginateCall(true)">
+                  Next
+                </md-button>
+              </div>
+            </div>
+            <div class="col-lg-12">
+              <table name="tenant-locations-table" class="table table-responsive table-striped">
+                <thead>
+                <tr>
+                  <th></th>
+                  <th>Customer Location Name</th>
+                  <th>Customer Location Code</th>
+                  <th>City</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-hide="vm.locations.length">
+                  <td class="text-center text-danger" colspan="4">
+                    {{ vm.currentTenant.name }} has no locations.
+                  </td>
+                </tr>
+                <tr ng-repeat="item in vm.locations | orderBy:'customerLocationName' "
+                    ng-click="vm.editItem(item)">
+                  <td>
+                    <a ng-click="vm.editItem(item)"
+                       title="Location detail">
+                      <ng-md-icon icon="mode_edit" size="48">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24"
+                             height="24">
+                          <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"></path>
+                          <path
+                            d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+                        </svg>
+                      </ng-md-icon>
+                    </a>
+                  </td>
+                  <td>{{item.customerLocationName}}</td>
+                  <td>{{item.customerLocationCode}}</td>
+                  <td>{{item.city}} {{item.state}}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </md-card-content>
+      </md-card>
+    </div>
+  </md-content>
+</div>

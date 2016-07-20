@@ -1,0 +1,30 @@
+export default class TimezonesService {
+  constructor(Restangular) {
+    this.Restangular = Restangular
+  }
+
+  getUsTimezones() {
+    let promise = this.Restangular.oneUrl('timezones', 'api/v1/timezones/us').get();
+    return promise;
+  }
+
+  getAllTimezones() {
+    let promise = this.Restangular.oneUrl('timezones', 'api/v1/timezones/all').get();
+    return promise;
+  }
+
+  getCustomTimezones() {
+    let promise = this.Restangular.oneUrl('timezones', 'api/v1/timezones/custom').get();
+    return promise;
+  }
+
+  static timezoneServiceFactory(Restangular) {
+    return new TimezonesService(Restangular)
+  }
+}
+
+TimezonesService.timezoneServiceFactory.$inject = [
+  "Restangular"
+]
+
+
