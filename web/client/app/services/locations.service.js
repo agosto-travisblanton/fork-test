@@ -1,5 +1,5 @@
 export default class LocationsService {
-
+/*@ngInject*/
   constructor(Restangular) {
     this.Restangular = Restangular
   }
@@ -35,4 +35,3 @@ export default class LocationsService {
   }
 }
 
-LocationsService.create.$inject = ["Restangular"]

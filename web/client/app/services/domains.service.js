@@ -1,5 +1,5 @@
 export default  class DomainsService {
-
+/*@ngInject*/
   constructor(Restangular) {
     this.Restangular = Restangular
   }
@@ -34,7 +34,3 @@ export default  class DomainsService {
     return new DomainsService(Restangular)
   }
 }
-
-DomainsService.create.$inject = ["Restangular"]
-
-

@@ -1,5 +1,5 @@
 export default class IdentityService {
-
+/*@ngInject*/
   constructor(Restangular) {
     this.Restangular = Restangular
   }
@@ -12,10 +12,5 @@ export default class IdentityService {
     return new IdentityService(Restangular)
   }
 }
-
-IdentityService.create.$inject = [
-  "Restangular"
-]
-
 
 

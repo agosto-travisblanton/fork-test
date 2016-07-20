@@ -9,6 +9,9 @@
 */
 //
 import './client/app/app.js'
+import DistributorServiceFactory from './client/app/services/distributors.service'
+console.log(DistributorServiceFactory)
+console.log(DistributorServiceFactory.create)
 
 
 

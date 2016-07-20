@@ -1,6 +1,8 @@
 import 'restangular';
 
 export default class DistributorsService {
+  
+  /*@ngInject*/
   constructor(Restangular, $state, SessionsService) {
     this.Restangular = Restangular;
     this.$state = $state;
@@ -62,8 +64,3 @@ export default class DistributorsService {
   }
 }
 
-DistributorsService.create.$inject = [
-  "Restangular",
-  "$state",
-  "SessionsService"
-]

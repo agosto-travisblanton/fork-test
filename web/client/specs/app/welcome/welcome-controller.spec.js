@@ -1,9 +1,9 @@
 import angular from 'angular';
 
-import VersionsService from './../../../app/services/versions.service'
-import StorageService from './../../../app/services/storage.service'
-import SessionsService from './../../../app/services/sessions.service'
-import DistributorsService from './../../../app/services/distributors.service'
+import VersionsServiceFactory from './../../../app/services/versions.service'
+import StorageServiceFactory from './../../../app/services/storage.service'
+import SessionsServiceFactory from './../../../app/services/sessions.service'
+import DistributorsServiceFactory from './../../../app/services/distributors.service'
 
 // Built by the core Angular team for mocking dependencies
 import mocks from 'angular-mocks';
@@ -21,37 +21,36 @@ describe('WelcomeCtrl', function () {
   let cookieMock = undefined;
   let $stateParams = undefined;
   let $state = undefined;
-
+  let StorageService = undefined;
+  let VersionsService = undefined;
+  let SessionsService = undefined;
+  let DistributorsService = undefined;
 
   beforeEach(module('skykitProvisioning'));
 
   beforeEach(module(function ($provide) {
-    $provide.value('VersionsService', VersionsService.create);
-    $provide.value('StorageService', StorageService.create);
-    $provide.value('SessionsService', SessionsService.create);
-    $provide.value('DistributorsService', DistributorsService.create);
-
+    $provide.value('VersionsService', VersionsServiceFactory.create());
+    $provide.value('StorageService', StorageServiceFactory.create());
+    $provide.value('SessionsService', SessionsServiceFactory.create());
+    $provide.value('DistributorsService', DistributorsServiceFactory.create());
   }));
 
   beforeEach(inject(function (_$controller_, _VersionsService_, _$state_, _StorageService_, _SessionsService_, _DistributorsService_) {
     $controller = _$controller_;
-    VersionsService = _VersionsService_;
     $stateParams = {};
     $state = _$state_;
-    DistributorsService = _DistributorsService_;
-    StorageService = _StorageService_;
-    SessionsService = _SessionsService_;
-
-    console.log("this doesn;t work")
-    console.log(beforeEach)
+    VersionsService = _VersionsService_
+    SessionsService = _SessionsService_
+    StorageService = _StorageService_
+    DistributorsService = _DistributorsService_
 
     controller = $controller('WelcomeCtrl', {
-      VersionsService,
-      StorageService,
-      SessionsService,
+      VersionsService: _VersionsService_,
+      StorageService: _StorageService_,
+      SessionsService: _SessionsService_,
       $stateParams,
       $state,
-      DistributorsService
+      DistributorsService: _DistributorsService_
     });
   }));
 

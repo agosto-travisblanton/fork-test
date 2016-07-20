@@ -1,5 +1,5 @@
 export default class ProofPlayService {
-
+/*@ngInject*/
   constructor($http,
               $q,
               $window,
@@ -170,12 +170,12 @@ export default class ProofPlayService {
   }
 
   static create($http,
-                                 $q,
-                                 $window,
-                                 SessionsService,
-                                 $stateParams,
-                                 $state,
-                                 ToastsService) {
+                $q,
+                $window,
+                SessionsService,
+                $stateParams,
+                $state,
+                ToastsService) {
     return new ProofPlayService(
       $http,
       $q,
@@ -189,6 +189,3 @@ export default class ProofPlayService {
   }
 }
 
-ProofPlayService.create.$inject = [
-  "$http", "$q", "$window", "SessionsService", "$stateParams", "$state", "ToastsService",
-]

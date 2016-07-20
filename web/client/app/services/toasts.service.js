@@ -1,4 +1,5 @@
 export default class ToastsService {
+  /*@ngInject*/
   constructor(toastr) {
     this.toastr = toastr
   }
@@ -20,6 +21,3 @@ export default class ToastsService {
   }
 }
 
-ToastsService.create.$inject = [
-  "toastr"
-]

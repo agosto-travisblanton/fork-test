@@ -117,13 +117,3 @@ export default class SessionsService {
   }
 }
 
-SessionsService.create.$inject = [
-  "$http",
-  "$log",
-  "StorageService",
-  "IdentityService",
-  "Restangular",
-  "$q"
-]
-
-

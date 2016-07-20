@@ -1,7 +1,7 @@
 import localStorage from 'local-storage';
 
 export default class StorageService {
-
+  /*@ngInject*/
   constructor() {
   }
 

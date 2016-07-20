@@ -1,7 +1,7 @@
 import 'restangular';
 
 export default class CommandsService {
-
+/*@ngInject*/
   constructor(Restangular) {
     this.Restangular = Restangular
     this.SERVICE_NAME = 'devices';
@@ -62,8 +62,6 @@ export default class CommandsService {
     return new CommandsService(Restangular)
   }
 }
-
-CommandsService.create.$inject = ["Restangular"]
 
 
 

@@ -1,5 +1,5 @@
 export default class AuthorizationService {
-
+/*@ngInject*/
   constructor(SessionsService, $q) {
     this.$q = $q
     this.SessionsService = SessionsService
@@ -50,6 +50,4 @@ export default class AuthorizationService {
     return new AuthorizationService(SessionsService, $q)
   }
 }
-
-AuthorizationService.create.$inject = ["SessionsService", "$q"]
 

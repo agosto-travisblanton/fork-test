@@ -1,6 +1,7 @@
 import 'restangular';
 
 export default class AdminService {
+  /*@ngInject*/
   constructor(Restangular) {
     this.Restangular = Restangular
     this.USER_SERVICE = "users";
@@ -43,6 +44,5 @@ export default class AdminService {
   }
 }
 
-AdminService.create.$inject = ["Restangular"]
 
 
