@@ -105,24 +105,24 @@ let app = angular.module('skykitProvisioning', [
   'toastr',
 ])
 // Services
-  .factory("StorageService", StorageService.create)
-  .factory("AdminService", AdminService.create)
-  .factory("AuthorizationService", AuthorizationService.create)
-  .factory("CommandsService", CommandsService.create)
-  .factory("DateManipulationService", DateManipulationService)
-  .factory("DevicesService", DevicesService.create)
-  .factory("DistributorsService", DistributorsService)
-  .factory("DomainsService", DomainsService.create)
-  .factory("IdentityService", IdentityService.create)
-  .factory("IntegrationEvents", IntegrationEvents.create)
-  .factory("LocationsService", LocationsService.create)
-  .factory("ProgressBarService", ProgressBarService.create)
-  .factory("ProofPlayService", ProofPlayService.create)
-  .factory("SessionsService", SessionsService.create)
-  .factory("TenantsService", TenantsService.create)
-  .factory("TimezonesService", TimezonesService.create)
-  .factory("ToastsService", ToastsService.create)
-  .factory("VersionsService", VersionsService.create)
+  .service("StorageService", StorageService)
+  .service("AdminService", AdminService)
+  .service("AuthorizationService", AuthorizationService)
+  .service("CommandsService", CommandsService)
+  .service("DateManipulationService", DateManipulationService)
+  .service("DevicesService", DevicesService)
+  .service("DistributorsService", DistributorsService)
+  .service("DomainsService", DomainsService)
+  .service("IdentityService", IdentityService)
+  .service("IntegrationEvents", IntegrationEvents)
+  .service("LocationsService", LocationsService)
+  .service("ProgressBarService", ProgressBarService)
+  .service("ProofPlayService", ProofPlayService)
+  .service("SessionsService", SessionsService)
+  .service("TenantsService", TenantsService)
+  .service("TimezonesService", TimezonesService)
+  .service("ToastsService", ToastsService)
+  .service("VersionsService", VersionsService)
   // Device
   .controller("DeviceDetailsCommandsCtrl", DeviceDetailsCommandsCtrl)
   .controller("DeviceDetailsCtrl", DeviceDetailsCtrl)
@@ -159,7 +159,7 @@ let app = angular.module('skykitProvisioning', [
   .config(routes)
 
 // Request Interceptor
-app.factory('RequestInterceptor', function (StorageService, $location) {
+app.service('RequestInterceptor', function (StorageService, $location) {
   "ngInject";
   let interceptor = {
     request(config) {

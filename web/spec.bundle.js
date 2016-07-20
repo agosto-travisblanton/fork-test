@@ -7,19 +7,12 @@
  * `bundle.js` file for the compressed app source files, when we
  * run our tests, Webpack, likewise, compiles and bundles those tests here.
 */
-//
+
 import './client/app/app.js'
-import DistributorServiceFactory from './client/app/services/distributors.service'
-console.log(DistributorServiceFactory)
-console.log(DistributorServiceFactory.create)
 
-
-
-// import angular from 'angular';
-//
-// // Built by the core Angular team for mocking dependencies
+// Built by the core Angular team for mocking dependencies
 import 'angular-mocks';
-//
+
 
 let module = angular.mock.module
 let inject = angular.mock.inject

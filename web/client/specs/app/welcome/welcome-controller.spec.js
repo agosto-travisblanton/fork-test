@@ -1,9 +1,9 @@
 import angular from 'angular';
 
-import VersionsServiceFactory from './../../../app/services/versions.service'
-import StorageServiceFactory from './../../../app/services/storage.service'
-import SessionsServiceFactory from './../../../app/services/sessions.service'
-import DistributorsServiceFactory from './../../../app/services/distributors.service'
+import VersionsServiceClass from './../../../app/services/versions.service'
+import StorageServiceClass from './../../../app/services/storage.service'
+import SessionsServiceClass from './../../../app/services/sessions.service'
+import DistributorsServiceClass from './../../../app/services/distributors.service'
 
 // Built by the core Angular team for mocking dependencies
 import mocks from 'angular-mocks';
@@ -27,10 +27,10 @@ describe('WelcomeCtrl', function () {
   beforeEach(module('skykitProvisioning'));
 
   beforeEach(module(function ($provide) {
-    $provide.value('VersionsService', VersionsServiceFactory.create());
-    $provide.value('StorageService', StorageServiceFactory.create());
-    $provide.value('SessionsService', SessionsServiceFactory.create());
-    $provide.value('DistributorsService', DistributorsServiceFactory.create());
+    $provide.service('VersionsService', VersionsServiceClass);
+    $provide.service('StorageService', StorageServiceClass);
+    $provide.service('SessionsService', SessionsServiceClass);
+    $provide.service('DistributorsService', DistributorsServiceClass);
   }));
 
   beforeEach(inject(function (_$controller_, _VersionsService_, _$state_, _StorageService_, _SessionsService_, _DistributorsService_) {
@@ -69,7 +69,6 @@ describe('WelcomeCtrl', function () {
     ];
 
     beforeEach(function () {
-      console.log(VersionsService)
       promise = new skykitProvisioning.q.Mock();
       otherPromise = new skykitProvisioning.q.Mock();
       spyOn($state, 'go');
