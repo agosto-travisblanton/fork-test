@@ -1,5 +1,5 @@
 export default class AuthorizationService {
-/*@ngInject*/
+
   constructor(SessionsService, $q) {
     this.$q = $q
     this.SessionsService = SessionsService
@@ -46,8 +46,10 @@ export default class AuthorizationService {
     return deferred.promise;
   }
 
-  static create(SessionsService, $q) {
+  static authorizationServiceFactory(SessionsService, $q) {
     return new AuthorizationService(SessionsService, $q)
   }
 }
+
+AuthorizationService.authorizationServiceFactory.$inject = ["SessionsService", "$q"]
 

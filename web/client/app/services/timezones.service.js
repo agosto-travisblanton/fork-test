@@ -1,5 +1,4 @@
 export default class TimezonesService {
-  /*@ngInject*/
   constructor(Restangular) {
     this.Restangular = Restangular
   }
@@ -19,7 +18,13 @@ export default class TimezonesService {
     return promise;
   }
 
-  static create(Restangular) {
+  static timezoneServiceFactory(Restangular) {
     return new TimezonesService(Restangular)
   }
 }
+
+TimezonesService.timezoneServiceFactory.$inject = [
+  "Restangular"
+]
+
+

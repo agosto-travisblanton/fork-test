@@ -1,7 +1,6 @@
 import 'restangular';
 
 export default class AdminService {
-  /*@ngInject*/
   constructor(Restangular) {
     this.Restangular = Restangular
     this.USER_SERVICE = "users";
@@ -39,10 +38,11 @@ export default class AdminService {
     return promise;
   }
 
-  static create(Restangular) {
+  static adminServiceFactory(Restangular) {
     return new AdminService(Restangular)
   }
 }
 
+AdminService.adminServiceFactory.$inject = ["Restangular"]
 
 

@@ -1,7 +1,6 @@
 import 'restangular';
 
 export default class DevicesService {
-  /*@ngInject*/
   constructor($log, Restangular, $q, $http, $state) {
     this.$log = $log
     this.Restangular = Restangular
@@ -514,8 +513,15 @@ export default class DevicesService {
     return url
   }
 
-  static create($log, Restangular, $q, $http, $state) {
+  static devicesServiceFactory($log, Restangular, $q, $http, $state) {
     return new DevicesService($log, Restangular, $q, $http, $state)
   }
 }
 
+DevicesService.devicesServiceFactory.$inject = [
+  "$log",
+  "Restangular",
+  "$q",
+  "$http",
+  "$state"
+]

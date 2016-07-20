@@ -1,5 +1,4 @@
 export default class VersionsService {
-  /*@ngInject*/
   constructor(Restangular) {
     this.Restangular = Restangular
   }
@@ -9,7 +8,11 @@ export default class VersionsService {
     return promise;
   }
 
-  static create(Restangular) {
+  static versionsServiceFactory(Restangular) {
     return new VersionsService(Restangular)
   }
 }
+
+VersionsService.versionsServiceFactory.$inject = [
+  "Restangular"
+]

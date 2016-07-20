@@ -1,5 +1,5 @@
 export default class IntegrationEvents {
-/*@ngInject*/
+
   constructor(Restangular) {
     this.Restangular = Restangular
     this.ENROLLMENT_EVENTS = 'integration_events/enrollment';
@@ -12,10 +12,13 @@ export default class IntegrationEvents {
     return this.Restangular.all(this.ENROLLMENT_EVENTS).customGET('', query);
   }
 
-  static create(Restangular) {
+  static integrationEventsServiceFactory(Restangular) {
     return new IntegrationEvents(Restangular)
   }
 }
 
+IntegrationEvents.integrationEventsServiceFactory.$inject = [
+  "Restangular",
+]
 
 

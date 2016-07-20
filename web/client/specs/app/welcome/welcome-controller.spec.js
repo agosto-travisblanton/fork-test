@@ -10,22 +10,20 @@ import mocks from 'angular-mocks';
 
 let module = angular.mock.module
 let inject = angular.mock.inject
-
+let $controller = undefined;
+let controller = undefined;
+let promise = undefined;
+let otherPromise = undefined;
+let versionData = undefined;
+let cookieMock = undefined;
+let $stateParams = undefined;
+let $state = undefined;
+let StorageService = undefined;
+let VersionsService = undefined;
+let SessionsService = undefined;
+let DistributorsService = undefined;
 
 describe('WelcomeCtrl', function () {
-  let $controller = undefined;
-  let controller = undefined;
-  let promise = undefined;
-  let otherPromise = undefined;
-  let versionData = undefined;
-  let cookieMock = undefined;
-  let $stateParams = undefined;
-  let $state = undefined;
-  let StorageService = undefined;
-  let VersionsService = undefined;
-  let SessionsService = undefined;
-  let DistributorsService = undefined;
-
   beforeEach(module('skykitProvisioning'));
 
   beforeEach(module(function ($provide) {
@@ -71,6 +69,7 @@ describe('WelcomeCtrl', function () {
     ];
 
     beforeEach(function () {
+      console.log(VersionsService)
       promise = new skykitProvisioning.q.Mock();
       otherPromise = new skykitProvisioning.q.Mock();
       spyOn($state, 'go');

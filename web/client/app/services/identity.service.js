@@ -1,5 +1,5 @@
 export default class IdentityService {
-/*@ngInject*/
+
   constructor(Restangular) {
     this.Restangular = Restangular
   }
@@ -8,9 +8,14 @@ export default class IdentityService {
     return this.Restangular.oneUrl('identity').get();
   }
 
-  static create( Restangular) {
+  static identityServiceFactory( Restangular) {
     return new IdentityService(Restangular)
   }
 }
+
+IdentityService.identityServiceFactory.$inject = [
+  "Restangular"
+]
+
 
 

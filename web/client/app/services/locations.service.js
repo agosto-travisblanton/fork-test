@@ -1,5 +1,5 @@
 export default class LocationsService {
-/*@ngInject*/
+
   constructor(Restangular) {
     this.Restangular = Restangular
   }
@@ -30,8 +30,9 @@ export default class LocationsService {
     return promise;
   }
 
-  static create(Restangular) {
+  static locationsServiceFactory(Restangular) {
     return new LocationsService(Restangular)
   }
 }
 
+LocationsService.$inject = ["Restangular"]
