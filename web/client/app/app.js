@@ -86,7 +86,7 @@ import {routes} from './app-routes'
 import {RestangularConfig} from './app-config'
 import {appRun} from './app-run';
 
-let app = angular.module('app', [
+let app = angular.module('skykitProvisioning', [
   uiRouter,
   'ngAnimate',
   'ngCookies',

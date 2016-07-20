@@ -5,10 +5,10 @@ module.exports = function (config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['mocha', 'chai'],
+    frameworks: ['jasmine'],
 
     // list of files/patterns to load in the browser
-    files: [{ pattern: 'spec.bundle.js', watched: false }],
+    files: [{pattern: 'spec.bundle.js', watched: false}],
 
     // files to exclude
     exclude: [],
@@ -16,6 +16,7 @@ module.exports = function (config) {
     plugins: [
       require("karma-phantomjs-launcher"),
       require("karma-chai"),
+      require('karma-jasmine'),
       require("karma-chrome-launcher"),
       require("karma-mocha"),
       require("karma-mocha-reporter"),
@@ -25,16 +26,16 @@ module.exports = function (config) {
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: { 'spec.bundle.js': ['webpack', 'sourcemap'] },
+    preprocessors: {'spec.bundle.js': ['webpack', 'sourcemap']},
 
     webpack: {
       devtool: 'inline-source-map',
       module: {
         loaders: [
-          { test: /\.js/, exclude: [/app\/lib/, /node_modules/], loader: 'babel' },
-          { test: /\.html/, loader: 'raw' },
-          { test: /\.styl$/, loader: 'style!css!stylus' },
-          { test: /\.css$/, loader: 'style!css' }
+          {test: /\.js/, exclude: [/app\/lib/, /node_modules/], loader: 'babel'},
+          {test: /\.html/, loader: 'raw'},
+          {test: /\.styl$/, loader: 'style!css!stylus'},
+          {test: /\.css$/, loader: 'style!css'}
         ]
       }
     },
