@@ -1,4 +1,8 @@
-'use strict';
+import mocks from 'angular-mocks';
+let module = angular.mock.module
+let inject = angular.mock.inject
+
+
 describe('DistributorSelectorCtrl', function () {
   var $controller, $log, $rootScope, $scope, $state, DevicesService, DistributorsService, ProofPlayService, SessionsService, StorageService, TenantsService, ToastsService, controller, promise;
   $controller = void 0;

@@ -1,3 +1,8 @@
+import mocks from 'angular-mocks';
+let module = angular.mock.module
+let inject = angular.mock.inject
+
+
 describe('TenantAddCtrl', function () {
   let $cookies = undefined;
   let controllerFactory = undefined;

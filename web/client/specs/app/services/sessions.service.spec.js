@@ -1,3 +1,8 @@
+import mocks from 'angular-mocks';
+let module = angular.mock.module
+let inject = angular.mock.inject
+
+
 describe('SessionsService', function () {
   let SessionsService = undefined;
   let Restangular = undefined;

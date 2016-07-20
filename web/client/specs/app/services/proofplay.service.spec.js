@@ -1,3 +1,8 @@
+import mocks from 'angular-mocks';
+let module = angular.mock.module
+let inject = angular.mock.inject
+
+
 describe('ProofPlayService', function () {
   let ProofPlayService = undefined;
   let $http = undefined;

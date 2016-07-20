@@ -1,3 +1,7 @@
+import mocks from 'angular-mocks';
+let module = angular.mock.module
+let inject = angular.mock.inject
+
 describe('TenantManagedDevicesCtrl', function () {
   let scope = undefined;
   let $controller = undefined;

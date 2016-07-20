@@ -1,4 +1,8 @@
-'use strict';
+import mocks from 'angular-mocks';
+let module = angular.mock.module
+let inject = angular.mock.inject
+
+
 describe('AuthenticationCtrl', function () {
   var $controller, $log, $rootScope, $scope, $state, $timeoutMock, DevicesService, ProgressBarService, ProofPlayService, SessionsService, TenantsService, controller, identity, promise, sweet;
   $controller = void 0;
