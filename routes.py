@@ -422,13 +422,13 @@ application = WSGIApplication(
 
 
         ############################################################
-        # Google Directory API
+        # Google Directory API Interrogation
         ############################################################
 
         Route(r'/api/v1/chrome-os-devices',
-              handler='handlers.directory_api_handler.DirectoryApiHandler',
+              handler='handlers.interrogate_directory_api_handler.InterrogateDirectoryApiHandler',
               name='chrome-os-device-interrogation',
-              handler_method='get_device_by_parameter',
+              handler_method='lookup_device_by_parameter',
               methods=['GET']
               ),
 
