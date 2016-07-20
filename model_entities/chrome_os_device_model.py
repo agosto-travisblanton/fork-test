@@ -1,4 +1,5 @@
 import uuid
+import logging
 
 from datetime import datetime
 from google.appengine.ext import ndb
@@ -70,7 +71,12 @@ class ChromeOsDevice(ndb.Model):
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):
-        return self.tenant_key.get()
+        if self.tenant_key:
+            return self.tenant_key.get()
+        else:
+            logging.debug(
+                'Device has no tenant. Most likely an unmanaged device where tenant has not been specified.')
+            return None
 
     @classmethod
     def get_by_device_id(cls, device_id):
