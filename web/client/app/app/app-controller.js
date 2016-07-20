@@ -4,6 +4,8 @@ function AppController($mdSidenav, $state, $window, SessionsService) {
   "ngInject";
 
   let vm = this;
+  
+  console.log("@@@@@@@@@@@@@@@@@")
 
   vm.identity = {};
 

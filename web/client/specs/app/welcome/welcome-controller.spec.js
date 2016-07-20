@@ -1,3 +1,10 @@
+import angular from 'angular';
+
+// Built by the core Angular team for mocking dependencies
+import mocks from 'angular-mocks';
+
+let module = angular.mock.module
+
 describe('WelcomeCtrl', function () {
   let $controller = undefined;
   let controller = undefined;
@@ -12,7 +19,9 @@ describe('WelcomeCtrl', function () {
   let SessionsService = undefined;
   let DistributorsService = undefined;
 
-  beforeEach(module('skykitProvisioning'));
+  beforeEach(() => {
+    console.log("hi")
+  })
 
   beforeEach(inject(function (_$controller_, _VersionsService_, _$state_, _StorageService_, _SessionsService_, _DistributorsService_) {
     $controller = _$controller_;
@@ -22,8 +31,11 @@ describe('WelcomeCtrl', function () {
     DistributorsService = _DistributorsService_;
     StorageService = _StorageService_;
     SessionsService = _SessionsService_;
+    
+    console.log("this doesn;t work")
+    console.log(beforeEach)
 
-    return controller = $controller('WelcomeCtrl', {
+    controller = $controller('WelcomeCtrl', {
       VersionsService,
       StorageService,
       SessionsService,
@@ -33,9 +45,15 @@ describe('WelcomeCtrl', function () {
     });
   }));
 
-  describe('initialization', () =>
+  describe('initialization', () => {
+    console.log(beforeEach)
+    console.log($controller)
+    console.log(expect)
+    console.log(controller)
+    console.log("here")
     it('version_data should be an empty array', () => expect(angular.isArray(controller.version_data)).toBeTruthy())
-  );
+  })
+ 
 
   return describe('.initialize', function () {
     versionData = [

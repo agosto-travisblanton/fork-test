@@ -1,3 +1,9 @@
+var webpack = require("webpack")
+var path = require('path')
+
+var root = 'client';
+
+
 module.exports = function (config) {
   config.set({
     // base path used to resolve all patterns
@@ -26,18 +32,33 @@ module.exports = function (config) {
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {'spec.bundle.js': ['webpack', 'sourcemap']},
+    preprocessors: {
+      'spec.bundle.js': ['webpack', 'sourcemap']
+    },
 
     webpack: {
       devtool: 'inline-source-map',
       module: {
         loaders: [
-          {test: /\.js/, exclude: [/app\/lib/, /node_modules/], loader: 'babel'},
-          {test: /\.html/, loader: 'raw'},
+          {test: /\.js$/, exclude: [/app\/lib/, /node_modules/, /bower_components/], loader: 'ng-annotate!babel'},
+          {test: /\.html$/, loader: 'raw'},
+          {test: /\.scss$/, loaders: ['style', 'css', 'sass']},
           {test: /\.styl$/, loader: 'style!css!stylus'},
-          {test: /\.css$/, loader: 'style!css'}
+          {test: /\.css$/, loader: 'style!css'},
+          {test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=application/font-woff'},
+          {test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=application/octet-stream'},
+          {test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: 'file'},
+          {test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=image/svg+xml'}
         ]
-      }
+      },
+      plugins: [
+
+        new webpack.ProvidePlugin({
+          $: "jquery",
+          jQuery: "jquery"
+        })
+
+      ]
     },
 
     webpackServer: {
@@ -62,7 +83,7 @@ module.exports = function (config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS'],
+    browsers: ['Chrome'],
 
     // if true, Karma runs tests once and exits
     singleRun: true

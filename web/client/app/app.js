@@ -30,6 +30,7 @@ import './scss/vendor.scss'
 import './scss/index.scss'
 import _ from 'lodash';
 window._ = _;
+window.angular = angular;
 
 
 // Device

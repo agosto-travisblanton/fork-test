@@ -28,10 +28,7 @@ module.exports = {
       inject: 'body',
       hash: true
     }),
-
-    new webpack.ResolverPlugin(
-      new webpack.ResolverPlugin.DirectoryDescriptionFilePlugin(".bower.json", ["main"])
-    ),
+    
 
     new webpack.ProvidePlugin({
       $: "jquery",

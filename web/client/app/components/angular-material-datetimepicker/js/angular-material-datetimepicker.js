@@ -1,7 +1,7 @@
-  import moment from 'moment';
+import moment from 'moment';
 
 (function (moment) {
-  
+
   'use strict';
   var moduleName = "ngMaterialDatePicker";
 
@@ -68,7 +68,7 @@
     + '            <md-button class="dtp-btn-ok md-button" ng-click="picker.ok()"> {{picker.params.okText}}</md-button>'
     + '      </md-dialog-actions>'
     + '</md-dialog>';
-  
+
 
   angular.module(moduleName, ['ngMaterial'])
     .provider('mdcDatetimePickerDefaultLocale', function () {
@@ -146,15 +146,15 @@
               options.currentDate = scope.currentDate;
               var locals = {options: options};
               $mdDialog.show({
-                  template: template,
-                  controller: PluginController,
-                  controllerAs: 'picker',
-                  locals: locals,
-                  openFrom: element,
-                  parent: angular.element(document.body),
-                  bindToController: true,
-                  disableParentScroll: false
-                })
+                template: template,
+                controller: PluginController,
+                controllerAs: 'picker',
+                locals: locals,
+                openFrom: element,
+                parent: angular.element(document.body),
+                bindToController: true,
+                disableParentScroll: false
+              })
                 .then(function (v) {
                   scope.currentDate = v ? v._d : v;
                   isOn = false;
@@ -567,8 +567,8 @@
                 if (date !== null) {
                   month.name = date.format('MMMM YYYY');
                   var startOfMonth = moment(date).locale(picker.params.lang).startOf('month')
-                    .hour(date.hour())
-                    .minute(date.minute())
+                      .hour(date.hour())
+                      .minute(date.minute())
                     ;
                   var iNumDay = startOfMonth.format('d');
                   month.days = [];

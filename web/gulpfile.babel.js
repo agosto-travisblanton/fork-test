@@ -64,6 +64,7 @@ gulp.task('webpack', ['clean'], (cb) => {
     cb();
   });
 });
+
 gulp.task('deploy', ['webpack'], function () {
   return gulp.src(['dist' + '/**/*'])
     .pipe(gulp.dest('../static'));
@@ -115,17 +116,6 @@ function proxyMiddleware(req, res, next) {
     next();
   }
 }
-
-/*
- * Location of your backend server
- */
-// var proxyTarget = 'http://localhost:8080/';
-// var proxy = httpProxy.createProxyServer({target: proxyTarget});
-// proxy.on('error', function (error, req, res) {
-//   res.writeHead(500, {'Content-Type': 'text/plain'});
-//   console.error(chalk.red('[Proxy]'), error);
-// });
-//
 
 gulp.task('serve', () => {
   const config = require('./webpack.dev.config');
