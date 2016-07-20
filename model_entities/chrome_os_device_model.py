@@ -108,6 +108,8 @@ class ChromeOsDevice(ndb.Model):
             heartbeat_updated=datetime.utcnow(),
             program='****initial****',
             program_id='****initial****',
+            playlist='****initial playlist****',
+            playlist_id='****initial playlist id****',
             heartbeat_interval_minutes=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES,
             timezone=timezone,
             timezone_offset=timezone_offset,
