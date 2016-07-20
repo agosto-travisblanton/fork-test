@@ -194,6 +194,22 @@
           </div>
         </div>
         <div class="form-group"
+             ng-hide="deviceDetailsCtrl.currentDevice.playlist == null ||
+                                           deviceDetailsCtrl.currentDevice.playlist == ''">
+          <label>Playlist / Playlist Id</label>
+          <div>
+            {{deviceDetailsCtrl.currentDevice.playlist}} / {{deviceDetailsCtrl.currentDevice.playlistId}}
+          </div>
+        </div>
+        <div class="form-group"
+             ng-hide="deviceDetailsCtrl.currentDevice.program == null ||
+                                           deviceDetailsCtrl.currentDevice.program == ''">
+          <label>Program / Program Id</label>
+          <div>
+            {{deviceDetailsCtrl.currentDevice.program}} / {{deviceDetailsCtrl.currentDevice.programId}}
+          </div>
+        </div>
+        <div class="form-group"
              ng-hide="deviceDetailsCtrl.currentDevice.registrationCorrelationIdentifier == null ||
                                            deviceDetailsCtrl.currentDevice.registrationCorrelationIdentifier == ''">
           <label>Registration correlation identifier</label>
