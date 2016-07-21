@@ -2,6 +2,10 @@ import mocks from 'angular-mocks';
 let module = angular.mock.module
 let inject = angular.mock.inject
 
+import StorageServiceClass from './../../../app/services/storage.service'
+import TenantsServiceClass from './../../../app/services/tenants.service'
+import DistributorServiceClass from './../../../app/services/distributors.service'
+import TimezonesServiceClass from './../../../app/services/timezones.service'
 
 describe('TenantAddCtrl', function () {
   let $cookies = undefined;
@@ -23,9 +27,18 @@ describe('TenantAddCtrl', function () {
   let $log = undefined;
   let $location = undefined;
 
-  beforeEach(function () {
-    angular.mock.module('skykitProvisioning');
+  beforeEach(module('skykitProvisioning'));
 
+
+  beforeEach(module(function ($provide) {
+    $provide.service('DistributorsService', DistributorServiceClass);
+    $provide.service('TimezonesService', TimezonesServiceClass);
+    $provide.service('StorageService', StorageServiceClass);
+    $provide.service('TenantsService', TenantsServiceClass);
+  }));
+
+
+  beforeEach(function () {
     return inject(function (_$controller_, _DistributorsService_, _TimezonesService_, _StorageService_, _TenantsService_, _$state_, _sweet_,
                             _$log_, _$location_) {
       controllerFactory = _$controller_;

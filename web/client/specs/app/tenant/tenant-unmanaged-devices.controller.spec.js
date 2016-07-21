@@ -2,6 +2,11 @@ import mocks from 'angular-mocks';
 let module = angular.mock.module
 let inject = angular.mock.inject
 
+import ProgressBarServiceClass from './../../../app/services/progressbar.service'
+import TenantsServiceClass from './../../../app/services/tenants.service'
+import DevicesServiceClass from './../../../app/services/devices.service'
+
+
 describe('TenantUnmanagedDevicesCtrl', function () {
   let scope = undefined;
   let $controller = undefined;
@@ -17,9 +22,14 @@ describe('TenantUnmanagedDevicesCtrl', function () {
   let promise = undefined;
   let devicesServicePromise = undefined;
   let serialByTenantPromise = undefined;
-
-
+  
   beforeEach(module('skykitProvisioning'));
+
+  beforeEach(module(function ($provide) {
+    $provide.service('ProgressBarService', ProgressBarServiceClass);
+    $provide.service('TenantsService', TenantsServiceClass);
+    $provide.service('DevicesService', DevicesServiceClass);
+  }));
 
   beforeEach(inject(function (_$controller_, _TenantsService_, _DevicesService_, _$state_, _ProgressBarService_, _$rootScope_) {
     $controller = _$controller_;
@@ -154,7 +164,7 @@ describe('TenantUnmanagedDevicesCtrl', function () {
         });
       });
     });
-    
+
     describe('.prepareForEditItem', function () {
       let resourceSearch = "test";
 

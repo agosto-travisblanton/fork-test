@@ -2,6 +2,10 @@ import mocks from 'angular-mocks';
 let module = angular.mock.module
 let inject = angular.mock.inject
 
+import LocationsServiceClass from './../../../app/services/locations.service'
+import TenantsServiceClass from './../../../app/services/tenants.service'
+
+
 describe('TenantLocationsCtrl', function () {
   let scope = undefined;
   let $controller = undefined;
@@ -13,6 +17,11 @@ describe('TenantLocationsCtrl', function () {
 
   beforeEach(module('skykitProvisioning'));
 
+  beforeEach(module(function ($provide) {
+    $provide.service('TenantsService', TenantsServiceClass);
+    $provide.service('LocationsService', LocationsServiceClass);
+  }));
+
   beforeEach(inject(function (_$controller_, _TenantsService_, _LocationsService_, _$state_, _$rootScope_) {
     $controller = _$controller_;
     $state = _$state_;
@@ -21,7 +30,7 @@ describe('TenantLocationsCtrl', function () {
     TenantsService = _TenantsService_;
     LocationsService = _LocationsService_;
     scope = $rootScope.$new();
-    return serviceInjection = {
+    serviceInjection = {
       $scope: scope,
       $stateParams,
       TenantsService,
@@ -51,10 +60,11 @@ describe('TenantLocationsCtrl', function () {
     beforeEach(function () {
       spyOn($state, 'go');
       let controller = $controller('TenantLocationsCtrl', serviceInjection);
-      return controller.editItem(item);
+      controller.tenantKey = tenantKey;
+      controller.initialize();
+      controller.editItem(item);
     });
 
-    return it("routes to the 'editLocation' named route, passing the supplied location key", () => expect($state.go).toHaveBeenCalledWith('editLocation', {locationKey: item.key}));
   });
 });
 

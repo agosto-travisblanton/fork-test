@@ -18,7 +18,6 @@ describe('TenantsCtrl', function () {
   beforeEach(module(function ($provide) {
     $provide.service('TenantsService', TenantsServiceClass);
     $provide.service('ProgressBarService', ProgressBarServiceClass);
-    ;
   }));
 
 

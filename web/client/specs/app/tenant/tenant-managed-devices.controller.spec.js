@@ -2,6 +2,11 @@ import mocks from 'angular-mocks';
 let module = angular.mock.module
 let inject = angular.mock.inject
 
+import ProgressBarServiceClass from './../../../app/services/progressbar.service'
+import TenantsServiceClass from './../../../app/services/tenants.service'
+import DevicesServiceClass from './../../../app/services/devices.service'
+
+
 describe('TenantManagedDevicesCtrl', function () {
   let scope = undefined;
   let $controller = undefined;
@@ -16,7 +21,15 @@ describe('TenantManagedDevicesCtrl', function () {
   let promise = undefined;
   let ProgressBarService = undefined;
   let partial = undefined;
+  
   beforeEach(module('skykitProvisioning'));
+  
+    beforeEach(module(function ($provide) {
+    $provide.service('ProgressBarService', ProgressBarServiceClass);
+    $provide.service('TenantsService', TenantsServiceClass);
+    $provide.service('DevicesService', DevicesServiceClass);
+  }));
+  
 
   beforeEach(inject(function (_$controller_, _TenantsService_, _DevicesService_, _ProgressBarService_, _$state_, _$rootScope_) {
     $controller = _$controller_;

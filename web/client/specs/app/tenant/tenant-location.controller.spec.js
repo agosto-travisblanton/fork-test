@@ -2,6 +2,10 @@ import mocks from 'angular-mocks';
 let module = angular.mock.module
 let inject = angular.mock.inject
 
+import ToastsServiceClass from './../../../app/services/toasts.service'
+import TenantsServiceClass from './../../../app/services/tenants.service'
+import LocationsServiceClass from './../../../app/services/locations.service'
+
 
 describe('TenantLocationCtrl', function () {
   let scope = undefined;
@@ -18,6 +22,12 @@ describe('TenantLocationCtrl', function () {
   let locationsServicePromise = undefined;
 
   beforeEach(module('skykitProvisioning'));
+
+  beforeEach(module(function ($provide) {
+    $provide.service('TenantsService', TenantsServiceClass);
+    $provide.service('ToastsService', ToastsServiceClass);
+    $provide.service('LocationsService', LocationsServiceClass);
+  }));
 
   beforeEach(inject(function (_$controller_, _TenantsService_, _LocationsService_, _$state_, _$rootScope_, _sweet_,
                               _ToastsService_) {
