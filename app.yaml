@@ -111,10 +111,10 @@ skip_files:
 - ^images/readme.md
 - ^local/.*
 - ^tests/.*
-- ^web/node_modules/.*$
-- ^web/dist/.*$
-- ^web/specs/.*$
-- ^web/coverage/.*$
+- ^webapp/node_modules/.*$
+- ^webapp/dist/.*$
+- ^webapp/src/specs/.*$
+- ^webapp/coverage/.*$
 - ^.git/.*$
 - ^backup/.git/.*
 - ^.idea/.*
