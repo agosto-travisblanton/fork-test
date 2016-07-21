@@ -7,7 +7,8 @@ import "bootstrap-webpack";
 import './components/ngProgress/ngProgress';
 import './components/ngProgress/ngProgress.css';
 import './components/angularBreadcrumb/angularBreadcrumb';
-import './components/angular-material-datetimepicker'
+import './components/angular-material-datetimepicker/js/angular-material-datetimepicker'
+import './components/angular-material-datetimepicker/css/material-datetimepicker.css'
 import './components/angular-directive.g-signin/google-plus-signin'
 import './components/angular-h-sweetalert/ngSweetAlert.min'
 import 'restangular';
