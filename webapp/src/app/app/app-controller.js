@@ -1,12 +1,11 @@
 import contains from 'lodash.contains';
 
 function AppController($mdSidenav, $state, $window, SessionsService) {
-  
+  "ngInject";
+
   let vm = this;
 
   vm.identity = {};
-  
-  console.log("here")
 
   vm.currentDistributerInDistributerAdminList = function () {
     let currentDistributorName = SessionsService.getCurrentDistributorName();
@@ -14,17 +13,17 @@ function AppController($mdSidenav, $state, $window, SessionsService) {
     return contains(distributorsAsAdmin, currentDistributorName);
   };
 
-  vm.identity = {
-    key: SessionsService.getUserKey(),
-    email: SessionsService.getUserEmail(),
-    admin: SessionsService.getIsAdmin(),
-    distributor_admin: SessionsService.getDistributorsAsAdmin(),
-    admin_of_current_distributor: vm.currentDistributerInDistributerAdminList(),
-    distributorKey: SessionsService.getCurrentDistributorKey(),
-    distributorName: SessionsService.getCurrentDistributorName()
-  }
 
   vm.getIdentity = () => {
+    vm.identity = {
+      key: SessionsService.getUserKey(),
+      email: SessionsService.getUserEmail(),
+      admin: SessionsService.getIsAdmin(),
+      distributor_admin: SessionsService.getDistributorsAsAdmin(),
+      admin_of_current_distributor: vm.currentDistributerInDistributerAdminList(),
+      distributorKey: SessionsService.getCurrentDistributorKey(),
+      distributorName: SessionsService.getCurrentDistributorName()
+    }
     return vm.identity
   };
 

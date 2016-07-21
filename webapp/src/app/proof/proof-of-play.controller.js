@@ -1,4 +1,6 @@
 function ProofOfPlayCtrl(ProofPlayService, $stateParams, $state, ToastsService) {
+  "ngInject";
+
   let vm = this;
   vm.resource = {title: "Resource Report"};
   vm.location = {title: "Location Report"};

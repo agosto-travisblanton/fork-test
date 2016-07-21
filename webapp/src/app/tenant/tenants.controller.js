@@ -1,4 +1,6 @@
 function TenantsCtrl($state, $log, TenantsService, ProgressBarService, sweet) {
+  "ngInject";
+
   let vm = this;
 
   vm.tenants = [];

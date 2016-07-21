@@ -1,4 +1,6 @@
 function WelcomeCtrl(VersionsService, $state, DistributorsService, SessionsService) {
+  "ngInject";
+
   let vm = this;
   vm.version_data = [];
   vm.loading = true;

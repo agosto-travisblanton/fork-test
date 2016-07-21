@@ -1,4 +1,6 @@
 function TenantUnmanagedDevicesCtrl($scope, $stateParams, TenantsService, DevicesService, ProgressBarService, $state) {
+  "ngInject";
+
   let vm = this;
   vm.currentTenant = {
     key: undefined,

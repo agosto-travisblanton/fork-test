@@ -1,7 +1,7 @@
 function DomainsCtrl($state,
                      DomainsService,
                      sweet) {
-  // "ngInject";
+  "ngInject";
 
   let vm = this;
   vm.domains = [];

@@ -1,5 +1,7 @@
 function TenantAddCtrl($log, $location, TenantsService, DistributorsService, TimezonesService, $state, sweet, ProgressBarService,
                        SessionsService) {
+  "ngInject";
+
   let vm = this;
   vm.gameStopServer = $location.host().indexOf('provisioning-gamestop') > -1;
   vm.currentTenant = {

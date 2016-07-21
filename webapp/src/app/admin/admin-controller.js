@@ -3,6 +3,8 @@ function AdminCtrl(AdminService,
                    ToastsService,
                    $mdDialog,
                    DistributorsService) {
+  "ngInject";
+
   let vm = this;
 
   vm.getAllDistributors = function () {

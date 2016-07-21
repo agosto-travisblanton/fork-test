@@ -18,7 +18,7 @@ export default class StorageService {
   }
 
   removeAll() {
-    return localStorage.clear();
+    localStorage.clear();
   }
   
 }

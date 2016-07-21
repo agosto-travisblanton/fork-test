@@ -2,6 +2,8 @@ import moment from 'moment';
 
 
 function ProofOfPlayMultiResourceCtrl(ProofPlayService, $stateParams, $state, ToastsService) {
+  "ngInject";
+
   let vm = this;
   vm.radioButtonChoices = {
     group1: 'By Device',

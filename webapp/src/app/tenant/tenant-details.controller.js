@@ -1,5 +1,7 @@
 function TenantDetailsCtrl($stateParams, TenantsService, DomainsService, TimezonesService, DistributorsService, $state, sweet,
                            ProgressBarService, ToastsService, SessionsService, $scope, $location) {
+  "ngInject";
+
   let vm = this;
   vm.gameStopServer = $location.host().indexOf('provisioning-gamestop') > -1;
   vm.currentTenant = {

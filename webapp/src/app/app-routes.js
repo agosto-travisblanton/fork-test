@@ -1,4 +1,6 @@
 export function routes($stateProvider, $urlRouterProvider, RestangularProvider) {
+  "ngInject";
+
   $stateProvider.state("sign_in", {
     resolve: {
       identity(IdentityService) {

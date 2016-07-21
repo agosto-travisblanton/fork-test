@@ -1,4 +1,6 @@
 function TenantLocationCtrl($stateParams, TenantsService, LocationsService, $state, sweet, ProgressBarService, ToastsService) {
+  "ngInject";
+
   let vm = this;
   vm.location = {
     key: undefined

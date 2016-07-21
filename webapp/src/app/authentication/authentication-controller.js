@@ -6,6 +6,8 @@ function AuthenticationCtrl($scope, $log, $state, $timeout,
                             ProofPlayService,
                             DevicesService,
                             TenantsService) {
+  "ngInject";
+
   let vm = this;
 
   vm.onGooglePlusSignInSuccess = function (event, authResult) {
