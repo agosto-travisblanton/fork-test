@@ -3,6 +3,7 @@
   <div flex="50" flex-sm="50" flex-xs="50" layout="column">
     <md-card>
       <md-card-content>
+
         <h2>Information</h2>
         <hr/>
         <div class="form-group"
@@ -191,6 +192,22 @@
           <label>Platform version</label>
           <div>
             {{deviceDetailsCtrl.currentDevice.platformVersion}}
+          </div>
+        </div>
+        <div class="form-group"
+             ng-hide="deviceDetailsCtrl.currentDevice.playlist == null ||
+                                           deviceDetailsCtrl.currentDevice.playlist == ''">
+          <label>Playlist / Playlist Id</label>
+          <div>
+            {{deviceDetailsCtrl.currentDevice.playlist}} / {{deviceDetailsCtrl.currentDevice.playlistId}}
+          </div>
+        </div>
+        <div class="form-group"
+             ng-hide="deviceDetailsCtrl.currentDevice.program == null ||
+                                           deviceDetailsCtrl.currentDevice.program == ''">
+          <label>Program / Program Id</label>
+          <div>
+            {{deviceDetailsCtrl.currentDevice.program}} / {{deviceDetailsCtrl.currentDevice.programId}}
           </div>
         </div>
         <div class="form-group"

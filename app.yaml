@@ -59,7 +59,7 @@ handlers:
   static_dir: static/fonts
 
 - url: /assets/images
-  static_dir: static/assets/images
+  static_dir: web/images
 
 - url: /migrate
   script: routes.application
@@ -86,13 +86,13 @@ handlers:
   static_dir: webapp/bower_components
 
 - url: /app
-  static_dir: webapp/src/app
+  static_dir: web/client/app
 
 - url: /dist
   static_dir: static
 
-- url: /webapp
-  static_dir: webapp
+- url: /web
+  static_dir: web
 
 - url: /dev/.*
   login: admin
