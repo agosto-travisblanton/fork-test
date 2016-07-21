@@ -1,8 +1,9 @@
 export default class TenantsService {
 
   constructor(Restangular, SessionsService) {
-    this.Restangular = Restangular
-    this.SessionsService = SessionsService
+    'ngInject';
+    this.Restangular = Restangular;
+    this.SessionsService = SessionsService;
   }
 
   save(tenant) {
@@ -38,9 +39,4 @@ export default class TenantsService {
     }
   }
 }
-
-TenantsService.$inject = [
-  "Restangular", "SessionsService"
-]
-
 

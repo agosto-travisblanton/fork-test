@@ -1,6 +1,7 @@
 export default class DistributorsService {
   
   constructor(Restangular, $state, SessionsService) {
+    'ngInject';
     this.Restangular = Restangular;
     this.$state = $state;
     this.SessionsService = SessionsService;
@@ -56,9 +57,3 @@ export default class DistributorsService {
     return this.$state.go('welcome');
   }
 }
-
-DistributorsService.$inject = [
-  "Restangular",
-  "$state",
-  "SessionsService"
-]

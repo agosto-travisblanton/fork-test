@@ -1,6 +1,7 @@
 export default  class DomainsService {
 
   constructor(Restangular) {
+    'ngInject';
     this.Restangular = Restangular
   }
 
@@ -29,9 +30,6 @@ export default  class DomainsService {
       return promise;
     }
   }
-
 }
-
-DomainsService.$inject = ["Restangular"]
 
 

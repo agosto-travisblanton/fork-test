@@ -1,6 +1,7 @@
 export default class SessionsService {
 
   constructor($http, $log, StorageService, IdentityService, Restangular, $q) {
+    'ngInject';
     this.$http = $http
     this.$log = $log
     this.StorageService = StorageService
@@ -112,14 +113,4 @@ export default class SessionsService {
     return this.StorageService.removeAll();
   }
 }
-
-SessionsService.$inject = [
-  "$http",
-  "$log",
-  "StorageService",
-  "IdentityService",
-  "Restangular",
-  "$q"
-]
-
 

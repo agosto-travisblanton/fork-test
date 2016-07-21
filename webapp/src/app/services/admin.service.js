@@ -1,5 +1,6 @@
 export default class AdminService {
   constructor(Restangular) {
+    'ngInject';
     this.Restangular = Restangular
     this.USER_SERVICE = "users";
     this.DISTRIBUTOR_SERVICE = "distributors";
@@ -35,9 +36,6 @@ export default class AdminService {
     let promise = this.Restangular.oneUrl(this.DISTRIBUTOR_SERVICE, "/api/v1/distributors").get();
     return promise;
   }
-  
 }
-
-AdminService.$inject = ["Restangular"]
 
 

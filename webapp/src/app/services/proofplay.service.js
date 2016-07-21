@@ -7,6 +7,7 @@ export default class ProofPlayService {
               $stateParams,
               $state,
               ToastsService) {
+    'ngInject';
     this.$http = $http
     this.$q = $q
     this.$window = $window
@@ -151,7 +152,6 @@ export default class ProofPlayService {
     return true;
   }
 
-
   createFilterFor(query) {
     query = angular.lowercase(query);
     return function (resource) {
@@ -159,8 +159,7 @@ export default class ProofPlayService {
       return (resource.indexOf(query) === 0);
     };
   }
-
-
+  
   querySearch(resources, searchText) {
     if (searchText) {
       return resources.filter(this.createFilterFor(searchText));
@@ -168,10 +167,4 @@ export default class ProofPlayService {
       return resources;
     }
   }
-
-
 }
-
-ProofPlayService.$inject = [
-  "$http", "$q", "$window", "SessionsService", "$stateParams", "$state", "ToastsService",
-]

@@ -1,5 +1,6 @@
 export default class TimezonesService {
   constructor(Restangular) {
+    'ngInject';
     this.Restangular = Restangular
   }
 
@@ -18,9 +19,5 @@ export default class TimezonesService {
     return promise;
   }
 }
-
-TimezonesService.$inject = [
-  "Restangular"
-]
 
 

@@ -1,11 +1,5 @@
 import angular from 'angular';
 
-export function addRequestInterceptor($httpProvider) {
-  $httpProvider.interceptors.push('RequestInterceptor');
-}
-addRequestInterceptor.$inject = ['$httpProvider'];
-
-
 export function toastrConfig(toastrConfig) {
   angular.extend(toastrConfig, {
     progressBar: true,

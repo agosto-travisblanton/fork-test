@@ -1,6 +1,7 @@
 export default class CommandsService {
 
   constructor(Restangular) {
+    'ngInject';
     this.Restangular = Restangular
     this.SERVICE_NAME = 'devices';
   }
@@ -66,8 +67,6 @@ export default class CommandsService {
     return promise;
   }
 }
-
-CommandsService.$inject = ["Restangular"]
 
 
 

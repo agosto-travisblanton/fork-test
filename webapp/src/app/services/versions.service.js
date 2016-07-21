@@ -1,5 +1,7 @@
 export default class VersionsService {
+
   constructor(Restangular) {
+    'ngInject';
     this.Restangular = Restangular
   }
 
@@ -7,9 +9,4 @@ export default class VersionsService {
     let promise = this.Restangular.oneUrl('versions').get();
     return promise;
   }
-
 }
-
-VersionsService.$inject = [
-  "Restangular"
-]

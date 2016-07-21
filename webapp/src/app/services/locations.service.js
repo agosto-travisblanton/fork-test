@@ -1,7 +1,8 @@
 export default class LocationsService {
 
   constructor(Restangular) {
-    this.Restangular = Restangular
+    'ngInject';
+    this.Restangular = Restangular;
   }
 
   save(location) {
@@ -29,7 +30,4 @@ export default class LocationsService {
     let promise = this.Restangular.oneUrl('locations', `api/v1/locations/${locationKey}`).get();
     return promise;
   }
-  
 }
-
-LocationsService.$inject = ["Restangular"]

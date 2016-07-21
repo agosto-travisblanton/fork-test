@@ -1,6 +1,8 @@
 export default class ToastsService {
+  
   constructor(toastr) {
-    this.toastr = toastr
+    'ngInject';
+    this.toastr = toastr;
   }
 
   showSuccessToast(message, title = 'Success!') {
@@ -14,9 +16,4 @@ export default class ToastsService {
   showInfoToast(message, title = 'Information') {
     return this.toastr.info(message, title);
   }
-  
 }
-
-ToastsService.$inject = [
-  "toastr"
-]

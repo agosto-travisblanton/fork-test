@@ -1,5 +1,7 @@
 export default class ProgressBarService {
+
   constructor(ngProgressFactory) {
+    'ngInject';
     this.ngProgressFactory = ngProgressFactory
     this.progressBar = this.ngProgressFactory.createInstance();
   }
@@ -13,9 +15,4 @@ export default class ProgressBarService {
   complete() {
     return this.progressBar.complete();
   }
-
 }
-
-ProgressBarService.$inject = [
-  "ngProgressFactory",
-]

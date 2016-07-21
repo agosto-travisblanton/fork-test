@@ -2,6 +2,7 @@ import 'restangular';
 
 export default class DevicesService {
   constructor($log, Restangular, $q, $http, $state) {
+    'ngInject';
     this.$log = $log
     this.Restangular = Restangular
     this.$q = $q
@@ -512,13 +513,4 @@ export default class DevicesService {
     let url = `/api/v1/tenants/${tenantKey}/devices?unmanaged=${unmanaged}&next_cursor=${next}&prev_cursor=${prev}`;
     return url
   }
-
 }
-
-DevicesService.$inject = [
-  "$log",
-  "Restangular",
-  "$q",
-  "$http",
-  "$state"
-]
