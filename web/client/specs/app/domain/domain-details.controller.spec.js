@@ -2,6 +2,10 @@ import mocks from 'angular-mocks';
 let module = angular.mock.module
 let inject = angular.mock.inject
 
+import DomainsServiceClass from './../../../app/services/domains.service'
+import DistributorsServiceClass from './../../../app/services/distributors.service'
+import ToastsServiceClass from './../../../app/services/toasts.service'
+
 
 describe('DomainDetailsCtrl', function () {
   let $controller = undefined;
@@ -27,6 +31,13 @@ describe('DomainDetailsCtrl', function () {
   };
 
   beforeEach(module('skykitProvisioning'));
+
+  beforeEach(module(function ($provide) {
+    $provide.service('DomainsService', DomainsServiceClass);
+    $provide.service('ToastsService', ToastsServiceClass);
+    $provide.service('DistributorsService', DistributorsServiceClass);
+  }));
+
 
   beforeEach(inject(function (_$controller_, _DomainsService_, _DistributorsService_, _sweet_, _ToastsService_, _$log_) {
     $controller = _$controller_;

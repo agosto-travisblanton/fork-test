@@ -2,6 +2,9 @@ import mocks from 'angular-mocks';
 let module = angular.mock.module
 let inject = angular.mock.inject
 
+import ProofPlayServiceClass from './../../../app/services/proofplay.service'
+import ToastsServiceClass from './../../../app/services/toasts.service'
+
 
 describe('ProofOfPlayCtrl', function () {
   let $controller = undefined;
@@ -14,6 +17,11 @@ describe('ProofOfPlayCtrl', function () {
 
 
   beforeEach(module('skykitProvisioning'));
+  
+   beforeEach(module(function ($provide) {
+    $provide.service('ProofPlayService', ProofPlayServiceClass);
+    $provide.service('ToastsService', ToastsServiceClass);
+  }));
 
   beforeEach(inject(function (_$controller_, _ProofPlayService_, _$state_, _ToastsService_) {
     $controller = _$controller_;

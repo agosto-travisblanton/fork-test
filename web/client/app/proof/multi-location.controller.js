@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 function ProofOfPlayMultiLocationCtrl(ProofPlayService, $stateParams, $state, ToastsService) {
   let vm = this;
   vm.radioButtonChoices = {

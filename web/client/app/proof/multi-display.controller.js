@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 function ProofOfPlayMultiDisplayCtrl(ProofPlayService, $stateParams, $state, ToastsService) {
   let vm = this;
 

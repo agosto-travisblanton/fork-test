@@ -2,6 +2,8 @@ import mocks from 'angular-mocks';
 let module = angular.mock.module
 let inject = angular.mock.inject
 
+import DomainsServiceClass from './../../../app/services/domains.service'
+
 
 describe('DomainsCtrl', function () {
   let $controller = undefined;
@@ -11,8 +13,12 @@ describe('DomainsCtrl', function () {
   let sweet = undefined;
   let promise = undefined;
 
-
   beforeEach(module('skykitProvisioning'));
+  
+   beforeEach(module(function ($provide) {
+    $provide.service('DomainsService', DomainsServiceClass);
+  }));
+  
 
   beforeEach(inject(function (_$controller_, _DomainsService_, _$state_, _sweet_) {
     $controller = _$controller_;

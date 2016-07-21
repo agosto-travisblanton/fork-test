@@ -1,6 +1,11 @@
 import mocks from 'angular-mocks';
 let module = angular.mock.module
 let inject = angular.mock.inject
+import moment from 'moment';
+
+import ProofPlayServiceClass from './../../../app/services/proofplay.service'
+import ToastsServiceClass from './../../../app/services/toasts.service'
+
 
 
 describe('ProofOfPlayMultiLocationCtrl', function () {
@@ -14,6 +19,12 @@ describe('ProofOfPlayMultiLocationCtrl', function () {
   let selected_tenant = undefined;
 
   beforeEach(module('skykitProvisioning'));
+  
+  beforeEach(module(function ($provide) {
+    $provide.service('ProofPlayService', ProofPlayServiceClass);
+    $provide.service('ToastsService', ToastsServiceClass);
+  }));
+
 
   beforeEach(inject(function (_$controller_, _ProofPlayService_, _ToastsService_, _$state_) {
     $controller = _$controller_;
