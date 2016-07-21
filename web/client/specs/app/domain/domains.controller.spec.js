@@ -15,10 +15,10 @@ describe('DomainsCtrl', function () {
 
   beforeEach(module('skykitProvisioning'));
   
-   beforeEach(module(function ($provide) {
-    $provide.service('DomainsService', DomainsServiceClass);
-  }));
-  
+  //  beforeEach(module(function ($provide) {
+  //   $provide.service('DomainsService', DomainsServiceClass);
+  // }));
+  //
 
   beforeEach(inject(function (_$controller_, _DomainsService_, _$state_, _sweet_) {
     $controller = _$controller_;

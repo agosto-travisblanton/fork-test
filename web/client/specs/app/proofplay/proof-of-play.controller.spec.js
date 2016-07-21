@@ -18,10 +18,10 @@ describe('ProofOfPlayCtrl', function () {
 
   beforeEach(module('skykitProvisioning'));
   
-   beforeEach(module(function ($provide) {
-    $provide.service('ProofPlayService', ProofPlayServiceClass);
-    $provide.service('ToastsService', ToastsServiceClass);
-  }));
+  //  beforeEach(module(function ($provide) {
+  //   $provide.service('ProofPlayService', ProofPlayServiceClass);
+  //   $provide.service('ToastsService', ToastsServiceClass);
+  // }));
 
   beforeEach(inject(function (_$controller_, _ProofPlayService_, _$state_, _ToastsService_) {
     $controller = _$controller_;

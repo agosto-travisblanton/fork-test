@@ -99,14 +99,14 @@ describe('DeviceDetailsCommandsCtrl', function () {
   beforeEach(module('skykitProvisioning'));
 
 
-  beforeEach(module(function ($provide) {
-    $provide.service('StorageService', StorageServiceClass); //
-    $provide.service('LocationsService', LocationsServiceClass); //
-    $provide.service('CommandsService', CommandsServiceClass); //
-    $provide.service('TimezonesService', TimezonesServiceClass); //
-    $provide.service('DevicesService', DevicesServiceClass); //
-    $provide.service('ToastsService', ToastsServiceClass); //
-  }));
+  // beforeEach(module(function ($provide) {
+  //   $provide.service('StorageService', StorageServiceClass); //
+  //   $provide.service('LocationsService', LocationsServiceClass); //
+  //   $provide.service('CommandsService', CommandsServiceClass); //
+  //   $provide.service('TimezonesService', TimezonesServiceClass); //
+  //   $provide.service('DevicesService', DevicesServiceClass); //
+  //   $provide.service('ToastsService', ToastsServiceClass); //
+  // }));
 
   beforeEach(inject(function (_$controller_, _DevicesService_, _TimezonesService_, _LocationsService_, _CommandsService_,
                               _sweet_, _ToastsService_, _$state_, _$mdDialog_, _$log_, _StorageService_) {

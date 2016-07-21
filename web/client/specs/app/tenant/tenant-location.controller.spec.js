@@ -23,11 +23,11 @@ describe('TenantLocationCtrl', function () {
 
   beforeEach(module('skykitProvisioning'));
 
-  beforeEach(module(function ($provide) {
-    $provide.service('TenantsService', TenantsServiceClass);
-    $provide.service('ToastsService', ToastsServiceClass);
-    $provide.service('LocationsService', LocationsServiceClass);
-  }));
+  // beforeEach(module(function ($provide) {
+  //   $provide.service('TenantsService', TenantsServiceClass);
+  //   $provide.service('ToastsService', ToastsServiceClass);
+  //   $provide.service('LocationsService', LocationsServiceClass);
+  // }));
 
   beforeEach(inject(function (_$controller_, _TenantsService_, _LocationsService_, _$state_, _$rootScope_, _sweet_,
                               _ToastsService_) {

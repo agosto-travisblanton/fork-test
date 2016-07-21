@@ -15,10 +15,10 @@ describe('TenantsCtrl', function () {
 
   beforeEach(module('skykitProvisioning'));
 
-  beforeEach(module(function ($provide) {
-    $provide.service('TenantsService', TenantsServiceClass);
-    $provide.service('ProgressBarService', ProgressBarServiceClass);
-  }));
+  // beforeEach(module(function ($provide) {
+  //   $provide.service('TenantsService', TenantsServiceClass);
+  //   $provide.service('ProgressBarService', ProgressBarServiceClass);
+  // }));
 
 
   beforeEach(inject(function (_$controller_, _TenantsService_, _$state_, _ProgressBarService_, _sweet_) {

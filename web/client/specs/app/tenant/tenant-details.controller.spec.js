@@ -28,13 +28,13 @@ describe('TenantDetailsCtrl', function () {
 
   beforeEach(module('skykitProvisioning'));
 
-
-  beforeEach(module(function ($provide) {
-    $provide.service('TenantsService', TenantsServiceClass);
-    $provide.service('DomainsService', DomainsServiceClass);
-    $provide.service('TimezonesService', TimezonesServiceClass);
-    $provide.service('DistributorsService', DistributorServiceClass);
-  }));
+  //
+  // beforeEach(module(function ($provide) {
+  //   $provide.service('TenantsService', TenantsServiceClass);
+  //   $provide.service('DomainsService', DomainsServiceClass);
+  //   $provide.service('TimezonesService', TimezonesServiceClass);
+  //   $provide.service('DistributorsService', DistributorServiceClass);
+  // }));
 
 
   beforeEach(inject(function (_$controller_,

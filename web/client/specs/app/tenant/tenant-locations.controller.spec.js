@@ -16,11 +16,11 @@ describe('TenantLocationsCtrl', function () {
   let serviceInjection = undefined;
 
   beforeEach(module('skykitProvisioning'));
-
-  beforeEach(module(function ($provide) {
-    $provide.service('TenantsService', TenantsServiceClass);
-    $provide.service('LocationsService', LocationsServiceClass);
-  }));
+  //
+  // beforeEach(module(function ($provide) {
+  //   $provide.service('TenantsService', TenantsServiceClass);
+  //   $provide.service('LocationsService', LocationsServiceClass);
+  // }));
 
   beforeEach(inject(function (_$controller_, _TenantsService_, _LocationsService_, _$state_, _$rootScope_) {
     $controller = _$controller_;

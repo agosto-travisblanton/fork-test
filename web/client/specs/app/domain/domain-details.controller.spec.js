@@ -32,11 +32,11 @@ describe('DomainDetailsCtrl', function () {
 
   beforeEach(module('skykitProvisioning'));
 
-  beforeEach(module(function ($provide) {
-    $provide.service('DomainsService', DomainsServiceClass);
-    $provide.service('ToastsService', ToastsServiceClass);
-    $provide.service('DistributorsService', DistributorsServiceClass);
-  }));
+  // beforeEach(module(function ($provide) {
+  //   $provide.service('DomainsService', DomainsServiceClass);
+  //   $provide.service('ToastsService', ToastsServiceClass);
+  //   $provide.service('DistributorsService', DistributorsServiceClass);
+  // }));
 
 
   beforeEach(inject(function (_$controller_, _DomainsService_, _DistributorsService_, _sweet_, _ToastsService_, _$log_) {

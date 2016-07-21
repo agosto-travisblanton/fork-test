@@ -21,10 +21,10 @@ describe('ProofOfPlayMultiResourceCtrl', function () {
   beforeEach(module('skykitProvisioning'));
 
 
-  beforeEach(module(function ($provide) {
-    $provide.service('ProofPlayService', ProofPlayServiceClass);
-    $provide.service('ToastsService', ToastsServiceClass);
-  }));
+  // beforeEach(module(function ($provide) {
+  //   $provide.service('ProofPlayService', ProofPlayServiceClass);
+  //   $provide.service('ToastsService', ToastsServiceClass);
+  // }));
 
   beforeEach(inject(function (_$controller_, _ProofPlayService_, _ToastsService_, _$state_) {
     $controller = _$controller_;

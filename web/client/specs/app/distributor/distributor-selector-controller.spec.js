@@ -54,10 +54,10 @@ describe('DistributorSelectorCtrl', function () {
       spyOn(controller, 'selectDistributor');
       return controller.initialize();
     });
-  
+
     describe('when distributors array is not a length of 1', function () {
-  
-  
+
+
       let distributors;
       distributors = [
         {
@@ -81,7 +81,7 @@ describe('DistributorSelectorCtrl', function () {
       });
     });
     return describe('when distributors array is a length of 1', function () {
-  
+
       let distributors = [
         {
           key: 'dsifuyadfya7a8sdf678a6dsf9',

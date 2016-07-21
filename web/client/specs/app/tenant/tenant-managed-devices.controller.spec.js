@@ -24,12 +24,12 @@ describe('TenantManagedDevicesCtrl', function () {
   
   beforeEach(module('skykitProvisioning'));
   
-    beforeEach(module(function ($provide) {
-    $provide.service('ProgressBarService', ProgressBarServiceClass);
-    $provide.service('TenantsService', TenantsServiceClass);
-    $provide.service('DevicesService', DevicesServiceClass);
-  }));
-  
+  //   beforeEach(module(function ($provide) {
+  //   $provide.service('ProgressBarService', ProgressBarServiceClass);
+  //   $provide.service('TenantsService', TenantsServiceClass);
+  //   $provide.service('DevicesService', DevicesServiceClass);
+  // }));
+  //
 
   beforeEach(inject(function (_$controller_, _TenantsService_, _DevicesService_, _ProgressBarService_, _$state_, _$rootScope_) {
     $controller = _$controller_;
