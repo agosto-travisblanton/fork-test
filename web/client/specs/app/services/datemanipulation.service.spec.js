@@ -1,7 +1,7 @@
 import mocks from 'angular-mocks';
 let module = angular.mock.module
 let inject = angular.mock.inject
-
+import moment from 'moment';
 
 describe('DateManipulationService', function () {
   let DateManipulationService = undefined;

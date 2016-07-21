@@ -8,6 +8,8 @@ module.exports = function (config) {
   config.set({
     // base path used to resolve all patterns
     basePath: '',
+    
+    browserNoActivityTimeout: 60000, // 60 seconds
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
@@ -52,7 +54,6 @@ module.exports = function (config) {
         ]
       },
       plugins: [
-
         new webpack.ProvidePlugin({
           $: "jquery",
           jQuery: "jquery"
@@ -61,12 +62,15 @@ module.exports = function (config) {
       ]
     },
 
+    logLevel: config.LOG_INFO,
+
+
     webpackServer: {
       noInfo: true // prevent console spamming when running in Karma!
     },
 
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['mocha'],
+    reporters: ['dots'],
 
     // web server port
     port: 9876,

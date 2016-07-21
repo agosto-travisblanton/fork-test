@@ -3,6 +3,10 @@ let module = angular.mock.module
 let inject = angular.mock.inject
 
 
+import DevicesServiceClass from './../../../app/services/devices.service' // 
+import ProgressBarService from './../../../app/services/progressbar.service'//
+
+
 describe('DevicesListingCtrl', function () {
   let $controller = undefined;
   let controller = undefined;
@@ -33,25 +37,31 @@ describe('DevicesListingCtrl', function () {
 
   beforeEach(module('skykitProvisioning'));
 
+  beforeEach(module(function ($provide) {
+    $provide.service('DevicesService', DevicesServiceClass); //
+    $provide.service('ProgressBarService', ProgressBarService); //
+  }));
+
   beforeEach(inject(function (_$controller_, _DevicesService_, _$stateParams_, _$state_, _ProgressBarService_, _sweet_) {
     $controller = _$controller_;
     $stateParams = _$stateParams_;
     DevicesService = _DevicesService_;
     $state = _$state_;
     ProgressBarService = _ProgressBarService_;
-    return sweet = _sweet_;
+    sweet = _sweet_;
   }));
 
   describe('initialization', function () {
     beforeEach(function () {
+      controller = $controller('DevicesListingCtrl', {});
+      controller.distributorKey = 'some-key';
       promise = new skykitProvisioning.q.Mock();
       unmanagedPromise = new skykitProvisioning.q.Mock();
       spyOn(DevicesService, 'getDevicesByDistributor').and.returnValue(promise);
       spyOn(DevicesService, 'getUnmanagedDevicesByDistributor').and.returnValue(unmanagedPromise);
       spyOn(ProgressBarService, 'start');
       spyOn(ProgressBarService, 'complete');
-      controller = $controller('DevicesListingCtrl', {});
-      return controller.distributorKey = 'some-key';
+
     });
 
     it('devices should be an array', () => expect(angular.isArray(controller.devices)).toBeTruthy());
@@ -417,7 +427,7 @@ describe('DevicesListingCtrl', function () {
         return deferred.promise
       })
       return spyOn(DevicesService, 'searchDevicesByPartialSerial').and.returnValue(serialPromise);
-      
+
     }));
 
     it("returns every serial name when called as an unmanaged serial", function () {
@@ -470,8 +480,9 @@ describe('DevicesListingCtrl', function () {
 
     it("returns every gcmid name when called as an managed gcmid", function () {
       let unmanaged = false;
+      console.log(controller)
       controller.selectedButton = "GCM ID";
-      
+
       controller.searchDevices(unmanaged, partial)
         .then(function () {
           return expect(controller.gcmidDevices).toEqual(genericMatches);

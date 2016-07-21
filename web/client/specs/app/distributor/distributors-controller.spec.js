@@ -9,7 +9,9 @@ describe('DistributorsCtrl', function () {
   $state = void 0;
   DistributorsService = void 0;
   promise = void 0;
+
   beforeEach(module('skykitProvisioning'));
+  
   beforeEach(inject(function (_$controller_, _$state_) {
     $controller = _$controller_;
     $state = _$state_;

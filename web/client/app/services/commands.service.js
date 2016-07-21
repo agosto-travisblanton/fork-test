@@ -1,5 +1,3 @@
-import 'restangular';
-
 export default class CommandsService {
 
   constructor(Restangular) {

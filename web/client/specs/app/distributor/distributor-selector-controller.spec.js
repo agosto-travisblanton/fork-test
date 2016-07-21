@@ -1,41 +1,74 @@
 import mocks from 'angular-mocks';
 let module = angular.mock.module
 let inject = angular.mock.inject
+import angular from 'angular';
+
+import DistributorsServiceClass from './../../../app/services/distributors.service'
+import SessionsServiceClass from './../../../app/services/sessions.service'
+import ToastsServiceClass from './../../../app/services/toasts.service'
+import DevicesServiceClass from './../../../app/services/devices.service'
+import ProofPlayServiceClass from './../../../app/services/proofplay.service'
+import TenantsServiceClass from './../../../app/services/tenants.service'
+import StorageServiceClass from './../../../app/services/storage.service'
 
 
 describe('DistributorSelectorCtrl', function () {
-  var $controller, $log, $rootScope, $scope, $state, DevicesService, DistributorsService, ProofPlayService, SessionsService, StorageService, TenantsService, ToastsService, controller, promise;
-  $controller = void 0;
-  controller = void 0;
-  $state = void 0;
-  promise = void 0;
-  $rootScope = void 0;
-  StorageService = void 0;
-  $scope = void 0;
-  $log = void 0;
-  ToastsService = void 0;
-  SessionsService = void 0;
-  DistributorsService = void 0;
-  DevicesService = void 0;
-  ProofPlayService = void 0;
-  TenantsService = void 0;
+  let $controller = undefined;
+  let controller = undefined;
+  let $state = undefined;
+  let promise = undefined;
+  let $rootScope = undefined;
+  let StorageService = undefined;
+  let $scope = undefined;
+  let $log = undefined;
+  let ToastsService = undefined;
+  let SessionsService = undefined;
+  let DistributorsService = undefined;
+  let DevicesService = undefined;
+  let ProofPlayService = undefined;
+  let TenantsService = undefined;
+
+
   beforeEach(module('skykitProvisioning'));
-  beforeEach(inject(function (_$controller_, _$state_, _StorageService_, _$rootScope_, _$log_, _DistributorsService_, _SessionsService_, _ToastsService_, _DevicesService_, _ProofPlayService_, _TenantsService_) {
+
+  beforeEach(module(function ($provide) {
+    $provide.service('StorageService', StorageServiceClass); //
+    $provide.service('DistributorsService', DistributorsServiceClass); //
+    $provide.service('SessionsService', SessionsService); //
+    $provide.service('ToastsService', ToastsServiceClass); //
+    $provide.service('DevicesService', DevicesServiceClass); //
+    $provide.service('ProofPlayService', ProofPlayServiceClass); //
+    $provide.service('TenantsService', TenantsServiceClass); //
+  }));
+
+  beforeEach(inject(function (_$controller_,
+                              _$state_,
+                              _$rootScope_,
+                              _$log_,
+                              _StorageService_,
+                              _DistributorsService_,
+                              _SessionsService_,
+                              _ToastsService_,
+                              _DevicesService_,
+                              _ProofPlayService_,
+                              _TenantsService_) {
     $controller = _$controller_;
     $state = _$state_;
-    StorageService = _StorageService_;
     $rootScope = _$rootScope_;
     $scope = _$rootScope_.$new();
-    ToastsService = _ToastsService_;
     $log = _$log_;
+
+    ToastsService = _ToastsService_;
+    StorageService = _StorageService_;
     DistributorsService = _DistributorsService_;
     SessionsService = _SessionsService_;
     DevicesService = _DevicesService_;
     ProofPlayService = _ProofPlayService_;
     TenantsService = _TenantsService_;
-    return controller = $controller('DistributorSelectorCtrl', {
+
+    controller = $controller('DistributorSelectorCtrl', {
       $scope: $scope,
-      StorageService: _StorageService_,
+      StorageService: StorageService,
       $log: $log,
       $state: $state,
       ToastsService: ToastsService,
@@ -45,9 +78,11 @@ describe('DistributorSelectorCtrl', function () {
       ProofPlayService: ProofPlayService,
       TenantsService: TenantsService
     });
+   
   }));
   describe('initialization', function () {
     it('distributors should be an empty array', function () {
+      console.log(controller)
       return expect(angular.isArray(controller.distributors)).toBeTruthy();
     });
     return it('currentDistributor should be undefined', function () {
@@ -56,7 +91,7 @@ describe('DistributorSelectorCtrl', function () {
   });
   describe('.initialize', function () {
     var expectedCurrentUserKey;
-    promise = void 0;
+    promise = undefined;
     expectedCurrentUserKey = '32748092734827340';
     beforeEach(function () {
       promise = new skykitProvisioning.q.Mock();
@@ -123,13 +158,10 @@ describe('DistributorSelectorCtrl', function () {
       spyOn(ToastsService, 'showErrorToast');
       spyOn(DistributorsService, 'switchDistributor');
       spyOn(ToastsService, 'showSuccessToast');
-      return controller.selectDistributor(distributor);
+      controller.selectDistributor(distributor);
     });
     return it('sets the currentDistributor property', function () {
       return expect(DistributorsService.switchDistributor).toHaveBeenCalledWith(distributor);
     });
   });
 });
-
-// ---
-// generated by coffee-script 1.9.2

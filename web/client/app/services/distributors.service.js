@@ -1,6 +1,5 @@
-import 'restangular';
-
 export default class DistributorsService {
+  
   constructor(Restangular, $state, SessionsService) {
     this.Restangular = Restangular;
     this.$state = $state;
@@ -56,7 +55,6 @@ export default class DistributorsService {
     this.SessionsService.setCurrentDistributorKey(distributor.key);
     return this.$state.go('welcome');
   }
-  
 }
 
 DistributorsService.$inject = [

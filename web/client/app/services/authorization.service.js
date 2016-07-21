@@ -45,7 +45,6 @@ export default class AuthorizationService {
     }
     return deferred.promise;
   }
-  
 }
 
 AuthorizationService.$inject = ["SessionsService", "$q"]

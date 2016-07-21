@@ -1,5 +1,3 @@
-import 'restangular';
-
 export default class AdminService {
   constructor(Restangular) {
     this.Restangular = Restangular

@@ -5,8 +5,6 @@ function AppController($mdSidenav, $state, $window, SessionsService) {
 
   let vm = this;
   
-  console.log("@@@@@@@@@@@@@@@@@")
-
   vm.identity = {};
 
   vm.currentDistributerInDistributerAdminList = function () {
