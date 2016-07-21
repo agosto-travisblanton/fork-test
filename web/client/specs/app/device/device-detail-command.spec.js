@@ -1,7 +1,7 @@
 import mocks from 'angular-mocks';
 let module = angular.mock.module
 let inject = angular.mock.inject
-
+import moment from 'moment'
 
 import ToastsServiceClass from './../../../app/services/toasts.service'//
 import DevicesServiceClass from './../../../app/services/devices.service' // 

@@ -1,5 +1,4 @@
-function DistributorSelectorCtrl($log,
-                                 $state,
+function DistributorSelectorCtrl($state,
                                  DistributorsService,
                                  SessionsService) {
   "ngInject";
@@ -9,7 +8,7 @@ function DistributorSelectorCtrl($log,
   vm.loading = true;
 
   vm.initialize = function () {
-    vm.loading = true;
+    vm.loeading = true;
     let distributorsPromise = DistributorsService.fetchAllByUser(SessionsService.getUserKey());
     return distributorsPromise.then(function (data) {
       vm.distributors = data;
@@ -22,7 +21,7 @@ function DistributorSelectorCtrl($log,
   };
 
 
-  vm.selectDistributor = distributor => DistributorsService.switchDistributor(distributor);
+  vm.selectDistributor = (distributor) => DistributorsService.switchDistributor(distributor);
 
   return vm;
 }

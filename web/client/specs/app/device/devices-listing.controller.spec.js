@@ -37,10 +37,10 @@ describe('DevicesListingCtrl', function () {
 
   beforeEach(module('skykitProvisioning'));
 
-  beforeEach(module(function ($provide) {
-    $provide.service('DevicesService', DevicesServiceClass); //
-    $provide.service('ProgressBarService', ProgressBarService); //
-  }));
+  // beforeEach(module(function ($provide) {
+  //   $provide.service('DevicesService', DevicesServiceClass); //
+  //   $provide.service('ProgressBarService', ProgressBarService); //
+  // }));
 
   beforeEach(inject(function (_$controller_, _DevicesService_, _$stateParams_, _$state_, _ProgressBarService_, _sweet_) {
     $controller = _$controller_;
@@ -480,7 +480,6 @@ describe('DevicesListingCtrl', function () {
 
     it("returns every gcmid name when called as an managed gcmid", function () {
       let unmanaged = false;
-      console.log(controller)
       controller.selectedButton = "GCM ID";
 
       controller.searchDevices(unmanaged, partial)

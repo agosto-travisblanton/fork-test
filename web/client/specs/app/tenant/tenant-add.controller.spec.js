@@ -29,7 +29,6 @@ describe('TenantAddCtrl', function () {
 
   beforeEach(module('skykitProvisioning'));
 
-
   beforeEach(module(function ($provide) {
     $provide.service('DistributorsService', DistributorServiceClass);
     $provide.service('TimezonesService', TimezonesServiceClass);

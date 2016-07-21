@@ -1,3 +1,7 @@
+import mocks from 'angular-mocks';
+let module = angular.mock.module
+let inject = angular.mock.inject
+
 describe('skykitProvisioning module and configuration', function () {
   let $rootScope = undefined;
   let $state = undefined;

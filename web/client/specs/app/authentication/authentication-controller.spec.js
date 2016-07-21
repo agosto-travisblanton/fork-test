@@ -33,12 +33,12 @@ describe('AuthenticationCtrl', function () {
 
   beforeEach(module('skykitProvisioning'));
 
-  beforeEach(module(function ($provide) {
-    $provide.service('SessionsService', SessionsServiceClass); //
-    $provide.service('ProgressBarService', ProgressBarServiceClass); //
-    $provide.service('DevicesService', DevicesServiceClass); //
-    $provide.service('TenantsService', TenantsServiceClass); //
-  }));
+  // beforeEach(module(function ($provide) {
+  //   $provide.service('SessionsService', SessionsServiceClass); //
+  //   $provide.service('ProgressBarService', ProgressBarServiceClass); //
+  //   $provide.service('DevicesService', DevicesServiceClass); //
+  //   $provide.service('TenantsService', TenantsServiceClass); //
+  // }));
 
 
   beforeEach(module(function ($provide) {
