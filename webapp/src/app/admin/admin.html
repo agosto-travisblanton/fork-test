@@ -6,14 +6,14 @@
   </md-toolbar>
   <md-content>
     <div flex="100" flex-sm="100" flex-xs="100">
-      <div ng-if="!vm.isAdmin" ng-include="'web/client/app/admin/create-user.html'"></div>
+      <div ng-if="!vm.isAdmin" ng-include="'webapp/src/app/admin/create-user.html'"></div>
       <md-tabs md-dynamic-height md-border-bottom ng-if="vm.isAdmin">
         <div class="container">
           <md-tab label="Create User">
-            <div ng-include="'web/client/app/admin/create-user.html'"></div>
+            <div ng-include="'webapp/src/app/admin/create-user.html'"></div>
           </md-tab>
           <md-tab label="Create Distributor" layout-align="center center" ng-if="vm.isAdmin">
-            <div ng-include="'web/client/app/admin/create-distributor.html'"></div>
+            <div ng-include="'webapp/src/app/admin/create-distributor.html'"></div>
           </md-tab>
         </div>
       </md-tabs>

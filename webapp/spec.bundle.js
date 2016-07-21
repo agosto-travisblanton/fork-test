@@ -8,7 +8,7 @@
  * run our tests, Webpack, likewise, compiles and bundles those tests here.
 */
 
-import './client/app/app.js'
+import './src/app/app.js'
 
 // Built by the core Angular team for mocking dependencies
 import 'angular-mocks';

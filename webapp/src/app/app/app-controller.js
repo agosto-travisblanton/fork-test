@@ -1,18 +1,19 @@
 import contains from 'lodash.contains';
 
 function AppController($mdSidenav, $state, $window, SessionsService) {
-  "ngInject";
-
-  let vm = this;
   
+  let vm = this;
+
   vm.identity = {};
+  
+  console.log("here")
 
   vm.currentDistributerInDistributerAdminList = function () {
     let currentDistributorName = SessionsService.getCurrentDistributorName();
     let distributorsAsAdmin = SessionsService.getDistributorsAsAdmin();
     return contains(distributorsAsAdmin, currentDistributorName);
   };
-  
+
   vm.identity = {
     key: SessionsService.getUserKey(),
     email: SessionsService.getUserEmail(),

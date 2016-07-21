@@ -12,9 +12,17 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
   <base href="/">
+  <style type="text/css">
+    /**
+     * Hide when Angular is not yet loaded and initialized
+     */
+    [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+      display: none !important;
+    }
+  </style>
 
 </head>
-<body ng-app="app" ng-cloak layout="row"
+<body ng-app="skykitProvisioning" ng-cloak layout="row"
       ng-controller="AppController as appController"
       ng-init="appController.initialize()">
 <md-sidenav class="site-sidenav md-sidenav-left md-whiteframe-z2"
@@ -90,5 +98,5 @@
   ga('create', 'UA-71073175-2', 'auto');
   ga('send', 'pageview');
 </script>
-<script src="static/vendor.bundle.js?5e1fbdc72a3d53df74d0"></script><script src="static/app.bundle.js?5e1fbdc72a3d53df74d0"></script></body>
+<script src="static/vendor.bundle.js?be4da6f2fc5961fbc586"></script><script src="static/app.bundle.js?be4da6f2fc5961fbc586"></script></body>
 </html>

@@ -1,7 +1,7 @@
 var webpack = require("webpack")
 var path = require('path')
 
-var root = 'client';
+var root = 'src';
 
 
 module.exports = function (config) {
