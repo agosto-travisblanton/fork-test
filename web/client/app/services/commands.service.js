@@ -57,13 +57,9 @@ export default class CommandsService {
     let promise = this.Restangular.oneUrl(this.SERVICE_NAME, `api/v1/devices/${key}`).customPOST(payload, 'commands/custom');
     return promise;
   }
-
-  static commandServiceFactory(Restangular) {
-    return new CommandsService(Restangular)
-  }
 }
 
-CommandsService.commandServiceFactory.$inject = ["Restangular"]
+CommandsService.$inject = ["Restangular"]
 
 
 

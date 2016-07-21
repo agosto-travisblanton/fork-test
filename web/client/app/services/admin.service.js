@@ -37,12 +37,9 @@ export default class AdminService {
     let promise = this.Restangular.oneUrl(this.DISTRIBUTOR_SERVICE, "/api/v1/distributors").get();
     return promise;
   }
-
-  static adminServiceFactory(Restangular) {
-    return new AdminService(Restangular)
-  }
+  
 }
 
-AdminService.adminServiceFactory.$inject = ["Restangular"]
+AdminService.$inject = ["Restangular"]
 
 

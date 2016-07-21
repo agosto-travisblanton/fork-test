@@ -169,26 +169,9 @@ export default class ProofPlayService {
     }
   }
 
-  static proofplayServiceFactory($http,
-                                 $q,
-                                 $window,
-                                 SessionsService,
-                                 $stateParams,
-                                 $state,
-                                 ToastsService) {
-    return new ProofPlayService(
-      $http,
-      $q,
-      $window,
-      SessionsService,
-      $stateParams,
-      $state,
-      ToastsService
-    )
 
-  }
 }
 
-ProofPlayService.proofplayServiceFactory.$inject = [
+ProofPlayService.$inject = [
   "$http", "$q", "$window", "SessionsService", "$stateParams", "$state", "ToastsService",
 ]

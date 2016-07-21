@@ -14,11 +14,8 @@ export default class ProgressBarService {
     return this.progressBar.complete();
   }
 
-  static progressBarServiceFactory(ngProgressFactory) {
-    return new ProgressBarService(ngProgressFactory)
-  }
 }
 
-ProgressBarService.progressBarServiceFactory.$inject = [
+ProgressBarService.$inject = [
   "ngProgressFactory",
 ]

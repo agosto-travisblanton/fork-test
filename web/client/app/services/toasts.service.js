@@ -14,12 +14,9 @@ export default class ToastsService {
   showInfoToast(message, title = 'Information') {
     return this.toastr.info(message, title);
   }
-
-  static toastsServiceFactory(toastr) {
-    return new ToastsService(toastr)
-  }
+  
 }
 
-ToastsService.toastsServiceFactory.$inject = [
+ToastsService.$inject = [
   "toastr"
 ]

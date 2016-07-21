@@ -37,13 +37,9 @@ export default class TenantsService {
       return promise;
     }
   }
-
-  static tenantsServiceFactory(Restangular, SessionsService) {
-    return new TenantsService(Restangular, SessionsService)
-  }
 }
 
-TenantsService.tenantsServiceFactory.$inject = [
+TenantsService.$inject = [
   "Restangular", "SessionsService"
 ]
 

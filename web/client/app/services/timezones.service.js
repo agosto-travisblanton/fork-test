@@ -17,13 +17,9 @@ export default class TimezonesService {
     let promise = this.Restangular.oneUrl('timezones', 'api/v1/timezones/custom').get();
     return promise;
   }
-
-  static timezoneServiceFactory(Restangular) {
-    return new TimezonesService(Restangular)
-  }
 }
 
-TimezonesService.timezoneServiceFactory.$inject = [
+TimezonesService.$inject = [
   "Restangular"
 ]
 

@@ -48,7 +48,7 @@ window.skykitProvisioning.q.Mock = class Mock {
 // Using that regex, we scan within `client/app` and target
 // all files ending with `.spec.js` and trace its path.
 // By passing in true, we permit this process to occur recursively.
-let context = require.context('./client/specs', true, /tenants.controller\.spec\.js/);
+let context = require.context('./client/specs', true, /tenants\.controller\.spec\.js/);
 
 // Get all files, for each file, call the context function
 // that will require the file and load it here. Context will

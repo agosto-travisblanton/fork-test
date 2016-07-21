@@ -56,13 +56,10 @@ export default class DistributorsService {
     this.SessionsService.setCurrentDistributorKey(distributor.key);
     return this.$state.go('welcome');
   }
-
-  static distributorServiceFactory(Restangular, $state, SessionsService) {
-    return new DistributorsService(Restangular, $state, SessionsService)
-  }
+  
 }
 
-DistributorsService.distributorServiceFactory.$inject = [
+DistributorsService.$inject = [
   "Restangular",
   "$state",
   "SessionsService"

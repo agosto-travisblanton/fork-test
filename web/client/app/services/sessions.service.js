@@ -111,13 +111,9 @@ export default class SessionsService {
   removeUserInfo() {
     return this.StorageService.removeAll();
   }
-
-  static sessionsServiceFactory($http, $log, StorageService, IdentityService, Restangular, $q) {
-    return new SessionsService($http, $log, StorageService, IdentityService, Restangular, $q)
-  }
 }
 
-SessionsService.sessionsServiceFactory.$inject = [
+SessionsService.$inject = [
   "$http",
   "$log",
   "StorageService",

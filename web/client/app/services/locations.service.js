@@ -29,10 +29,7 @@ export default class LocationsService {
     let promise = this.Restangular.oneUrl('locations', `api/v1/locations/${locationKey}`).get();
     return promise;
   }
-
-  static locationsServiceFactory(Restangular) {
-    return new LocationsService(Restangular)
-  }
+  
 }
 
 LocationsService.$inject = ["Restangular"]

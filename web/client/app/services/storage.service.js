@@ -20,9 +20,6 @@ export default class StorageService {
   removeAll() {
     return localStorage.clear();
   }
-
-  static storageServiceFactory() {
-    return new StorageService()
-  }
+  
 }
 

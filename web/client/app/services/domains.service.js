@@ -30,11 +30,8 @@ export default  class DomainsService {
     }
   }
 
-  static domainServiceFactory(Restangular) {
-    return new DomainsService(Restangular)
-  }
 }
 
-DomainsService.domainServiceFactory.$inject = ["Restangular"]
+DomainsService.$inject = ["Restangular"]
 
 
