@@ -16,10 +16,11 @@ describe('CommandsService', function () {
 
   beforeEach(module('skykitProvisioning'));
 
-  beforeEach(inject(function (_CommandsService_, _Restangular_, _$cookies_) {
-    CommandsService = _CommandsService_;
+  beforeEach(inject(function (_Restangular_, _$cookies_, _CommandsService_) {
     Restangular = _Restangular_;
     $cookies = _$cookies_;
+    CommandsService = _CommandsService_;
+
     promise = new skykitProvisioning.q.Mock();
     return spyOn($cookies, 'get').and.returnValue(userEmail);
   }));

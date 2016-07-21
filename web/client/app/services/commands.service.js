@@ -30,6 +30,16 @@ export default class CommandsService {
     return promise;
   }
 
+  restart(key) {
+    let promise = this.Restangular.oneUrl(this.SERVICE_NAME, `api/v1/devices/${key}/commands/restart`).post();
+    return promise;
+  }
+
+  postLog(key) {
+    let promise = this.Restangular.oneUrl(this.SERVICE_NAME, `api/v1/devices/${key}/commands/post-log`).post();
+    return promise;
+  }
+
   powerOn(key) {
     let promise = this.Restangular.oneUrl(this.SERVICE_NAME, `api/v1/devices/${key}/commands/power-on`).post();
     return promise;

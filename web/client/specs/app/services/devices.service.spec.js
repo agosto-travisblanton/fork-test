@@ -2,7 +2,7 @@ import mocks from 'angular-mocks';
 let module = angular.mock.module
 let inject = angular.mock.inject
 
-
+import moment from 'moment';
 describe('DevicesService', function () {
   let DevicesService = undefined;
   let Restangular = undefined;

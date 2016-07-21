@@ -2,17 +2,19 @@ import mocks from 'angular-mocks';
 let module = angular.mock.module
 let inject = angular.mock.inject
 
+import StorageServiceClass from './../../../app/services/storage.service'//
 
 describe('StorageService', function () {
-  beforeEach(module('skykitProvisioning'));
   let StorageService = undefined;
   let key = undefined;
   let value = undefined;
-
-  beforeEach(inject(function (_StorageService_) {
-    StorageService = _StorageService_;
+  
+  beforeEach(module('skykitProvisioning'));
+  
+  beforeEach((function () {
+    StorageService = new StorageServiceClass();
     key = "jim";
-    return value = "dwight";
+    value = "dwight";
   }));
 
   return describe('StorageService API', function () {
@@ -24,7 +26,7 @@ describe('StorageService', function () {
     it('sets than does not get a value for key after removal of key', function () {
       StorageService.set(key, value);
       StorageService.rm(key);
-      return expect(StorageService.get(key)).toEqual(undefined);
+      return expect(StorageService.get(key)).toEqual(null);
     });
 
     return it('sets than does not get a value for key after removeAll', function () {
@@ -32,8 +34,8 @@ describe('StorageService', function () {
       let pam = "pam";
       StorageService.set(pam, "angela");
       StorageService.removeAll();
-      expect(StorageService.get(key)).toEqual(undefined);
-      return expect(StorageService.get(pam)).toEqual(undefined);
+      expect(StorageService.get(key)).toEqual(null);
+      return expect(StorageService.get(pam)).toEqual(null);
     });
   });
 });
