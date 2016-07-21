@@ -23,17 +23,16 @@
 
 </head>
 <body ng-app="skykitProvisioning" ng-cloak layout="row"
-      ng-controller="AppController as appController"
-      ng-init="appController.initialize()">
+      ng-controller="AppController as appController">
 <md-sidenav class="site-sidenav md-sidenav-left md-whiteframe-z2"
             md-component-id="left"
             md-is-locked-open="$mdMedia('gt-lg')" style="margin-top:-50px">
   <md-list>
     <md-list-item>
-      <span class="md-headline">{{ appController.identity.distributorName }}</span>
+      <span class="md-headline">{{ appController.getIdentity().distributorName }}</span>
     </md-list-item>
     <md-list-item>
-      {{ appController.identity.email }}
+      {{ appController.getIdentity().email }}
     </md-list-item>
   </md-list>
   <md-divider></md-divider>

@@ -5,17 +5,14 @@ function AppController($mdSidenav, $state, $window, SessionsService) {
 
   let vm = this;
 
-  vm.identity = {};
-
   vm.currentDistributerInDistributerAdminList = function () {
     let currentDistributorName = SessionsService.getCurrentDistributorName();
     let distributorsAsAdmin = SessionsService.getDistributorsAsAdmin();
     return contains(distributorsAsAdmin, currentDistributorName);
   };
 
-
   vm.getIdentity = () => {
-    vm.identity = {
+    return {
       key: SessionsService.getUserKey(),
       email: SessionsService.getUserEmail(),
       admin: SessionsService.getIsAdmin(),
@@ -24,7 +21,6 @@ function AppController($mdSidenav, $state, $window, SessionsService) {
       distributorKey: SessionsService.getCurrentDistributorKey(),
       distributorName: SessionsService.getCurrentDistributorName()
     }
-    return vm.identity
   };
 
   vm.isCurrentURLDistributorSelector = function () {
@@ -43,6 +39,8 @@ function AppController($mdSidenav, $state, $window, SessionsService) {
       return $mdSidenav('left').close();
     }
   };
+
+  vm.initialize()
 
   return vm;
 }
