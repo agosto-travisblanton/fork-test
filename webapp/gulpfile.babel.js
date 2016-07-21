@@ -16,7 +16,9 @@ import webpackDevMiddelware from 'webpack-dev-middleware';
 import webpachHotMiddelware from 'webpack-hot-middleware';
 import colorsSupported      from 'supports-color';
 import historyApiFallback   from 'connect-history-api-fallback';
-
+let proxy = require('http-proxy-middleware')
+var httpProxy = require('http-proxy');
+var chalk = require('chalk');
 let root = 'src';
 
 // helper method for resolving paths
@@ -71,52 +73,6 @@ gulp.task('deploy', ['webpack'], function () {
 });
 
 
-let proxy = require('http-proxy-middleware')
-require('http-proxy')
-
-let webpackDevMiddleFixed = function (compiler, opts) {
-  var devPack = webpackDevMiddelware(compiler, opts)
-
-
-  var p = proxy('/api', {
-    target: 'http://localhost:8080',
-    logLevel: 'error',
-    changeOrigin: true   // for vhosted sites, changes host header to match to target's host
-  });
-  return [devPack];
-}
-
-var httpProxy = require('http-proxy');
-var chalk = require('chalk');
-
-
-/*
- * The proxy middleware is an Express middleware added to BrowserSync to
- * handle backend request and proxy them to your backend.
- */
-function proxyMiddleware(req, res, next) {
-  /*
-   * This test is the switch of each request to determine if the request is
-   * for a static file to be handled by BrowserSync or a backend request to proxy.
-   *
-   * The existing test is a standard check on the files extensions but it may fail
-   * for your needs. If you can, you could also check on a context in the url which
-   * may be more reliable but can't be generic.
-   */
-  if (/\/webapp\//.test(req.url)) {
-    console.log(chalk.green('[Proxy] ' + req.url));
-    proxy.web(req, res);
-  } else if (/\/api\//.test(req.url)) {
-    console.log(chalk.green('[Proxy] ' + req.url));
-    proxy.web(req, res);
-  } else if (/\/login/.test(req.url)) {
-    console.log(chalk.green('[Proxy] ' + req.url));
-    proxy.web(req, res);
-  } else {
-    next();
-  }
-}
-
 gulp.task('serve', () => {
   const config = require('./webpack.dev.config');
   config.entry.app = [
@@ -136,7 +92,6 @@ gulp.task('serve', () => {
     baseDir: root,
     port: process.env.PORT || 3000,
     open: false,
-    // server: {baseDir: root},
     middleware: [
       historyApiFallback(),
       webpackDevMiddelware(compiler, {
