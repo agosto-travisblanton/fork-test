@@ -19,4 +19,4 @@ npm install
 
 printf "\n${COLOR_LIGHT_GREEN}===> Running Jasmine tests in gulp build...${COLOR_OFF}\n"
 
-karma test
+karma start
