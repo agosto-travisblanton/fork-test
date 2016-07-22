@@ -1,5 +1,5 @@
 export default class DistributorsService {
-  
+
   constructor(Restangular, $state, SessionsService) {
     'ngInject';
     this.Restangular = Restangular;
@@ -52,6 +52,8 @@ export default class DistributorsService {
   }
 
   switchDistributor(distributor) {
+    console.log(distributor.name)
+    console.log(distributor.key)
     this.SessionsService.setCurrentDistributorName(distributor.name);
     this.SessionsService.setCurrentDistributorKey(distributor.key);
     return this.$state.go('welcome');

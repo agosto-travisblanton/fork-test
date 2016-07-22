@@ -20,7 +20,6 @@ function DistributorSelectorCtrl($state,
     });
   };
 
-
   vm.selectDistributor = (distributor) => DistributorsService.switchDistributor(distributor);
 
   return vm;
