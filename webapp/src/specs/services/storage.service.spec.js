@@ -24,7 +24,7 @@ describe('StorageService', function () {
     it('sets than does not get a value for key after removal of key', function () {
       StorageService.set(key, value);
       StorageService.rm(key);
-      return expect(StorageService.get(key)).toEqual(null);
+      return expect(StorageService.get(key)).toEqual(undefined);
     });
 
     return it('sets than does not get a value for key after removeAll', function () {
@@ -32,8 +32,8 @@ describe('StorageService', function () {
       let pam = "pam";
       StorageService.set(pam, "angela");
       StorageService.removeAll();
-      expect(StorageService.get(key)).toEqual(null);
-      return expect(StorageService.get(pam)).toEqual(null);
+      expect(StorageService.get(key)).toEqual(undefined);
+      return expect(StorageService.get(pam)).toEqual(undefined);
     });
   });
 });
