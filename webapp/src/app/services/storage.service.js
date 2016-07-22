@@ -1,4 +1,4 @@
-import localStorage from 'local-storage';
+import Lockr from 'lockr';
 
 export default class StorageService {
 
@@ -6,20 +6,20 @@ export default class StorageService {
   }
 
   set(key, value) {
-    return localStorage.set(key, value);
+    return Lockr.set(key, value);
   }
 
   get(key) {
-    return localStorage.get(key);
+    return Lockr.get(key);
   }
 
   rm(key) {
-    return localStorage.remove(key);
+    return Lockr.rm(key);
   }
 
   removeAll() {
-    localStorage.clear();
+    Lockr.flush();
   }
-  
+
 }
 

@@ -99,7 +99,6 @@ export default class SessionsService {
     identityPromise.then(data => {
       this.setDistributors(data['distributors']);
       this.setDistributorsAsAdmin(data['distributors_as_admin']);
-      this.setCurrentDistributorKey("null")
       this.setIsAdmin(data['is_admin']);
       this.setUserEmail(data['email']);
       this.setIsAdmin(data["is_admin"]);
@@ -110,7 +109,7 @@ export default class SessionsService {
   }
 
   removeUserInfo() {
-    return this.StorageService.removeAll();
+    this.StorageService.removeAll();
   }
 }
 
