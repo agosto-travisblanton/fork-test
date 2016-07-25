@@ -19,12 +19,12 @@
               Refresh
             </md-button>
           </div>
-          <div class="col-md-3 col-md-offset-1">
+          <div class="col-md-4">
             <md-radio-group ng-model="vm.selectedButton"
                             ng-change="vm.changeRadio(false)"
                             class="radio-horizontal">
 
-              <div class="col-md-4">
+              <div class="col-md-2">
                 <md-radio-button value="Serial Number"
                                  class="md-primary">
                   Serial Number
@@ -34,24 +34,33 @@
               <div class="col-md-2 col-md-offset-2">
 
                 <md-radio-button
-                        value="MAC"
-                        class="md-primary radio-button">
+                  value="MAC"
+                  class="md-primary radio-button">
                   MAC
+                </md-radio-button>
+              </div>
+
+              <div class="col-md-2 col-md-offset-2">
+
+                <md-radio-button
+                  value="GCM ID"
+                  class="md-primary radio-button">
+                  GCM ID
                 </md-radio-button>
               </div>
             </md-radio-group>
           </div>
           <div class="col-md-3">
             <md-autocomplete
-                    md-no-cache="true"
-                    md-selected-item="vm.selectedItem"
-                    md-search-text="vm.searchText"
-                    md-items="item in vm.searchDevices(false, vm.searchText)"
-                    md-item-text="item"
-                    md-min-length="0"
-                    md-search-text-change="vm.isResourceValid(false, vm.searchText)"
-                    md-selected-item-change="vm.isResourceValid(false, vm.searchText)"
-                    placeholder="Make A Search">
+              md-no-cache="true"
+              md-selected-item="vm.selectedItem"
+              md-search-text="vm.searchText"
+              md-items="item in vm.searchDevices(false, vm.searchText)"
+              md-item-text="item"
+              md-min-length="0"
+              md-search-text-change="vm.isResourceValid(false, vm.searchText)"
+              md-selected-item-change="vm.isResourceValid(false, vm.searchText)"
+              placeholder="Make A Search">
 
               <md-item-template>
                   <span md-highlight-text="vm.searchText"
@@ -63,7 +72,7 @@
                   found.
                 </div>
                 <div
-                        ng-if="vm.searchText !== '' && vm.searchText.length <= 2">
+                  ng-if="vm.searchText !== '' && vm.searchText.length <= 2">
                   Please enter at least 3 characters.
                 </div>
               </md-not-found>
@@ -120,7 +129,7 @@
                          width="24" height="24">
                       <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"></path>
                       <path
-                              d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+                        d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
                     </svg>
                   </ng-md-icon>
                 </a>

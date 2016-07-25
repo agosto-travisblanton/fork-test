@@ -3,10 +3,12 @@ import logging
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
+from agar.env import on_development_server
 from app_config import config
 from chrome_os_devices_api import ChromeOsDevicesApi
 from content_manager_api import ContentManagerApi
 from model_entities.integration_events_log_model import IntegrationEventLog
+from workflow.update_chrome_os_device import update_chrome_os_device
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -100,6 +102,11 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
             device.os_version = chrome_os_device.get('osVersion')
             device.firmware_version = chrome_os_device.get('firmwareVersion')
             device.etag = chrome_os_device.get('etag')
+
+            # Registration process sends the customer's display in the annotatedAssetId field of
+            # the Directory API ChromeOsDevice resource representation.
+            device.customer_display_name = chrome_os_device.get('annotatedAssetId')
+            device.annotated_asset_id = device_urlsafe_key
             device.put()
 
             api_response_event.serial_number = device.serial_number
@@ -114,6 +121,23 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
                            correlation_id=correlation_id,
                            _queue='content-server',
                            _countdown=5)
+
+            # Update Directory API with the device key in the annotated asset ID.
+            if not device.is_unmanaged_device:
+                directory_api_update_event = IntegrationEventLog.create(
+                    event_category='Registration',
+                    component_name='Chrome Directory API',
+                    workflow_step='Update Directory API with device key in annotatedAssetId field.',
+                    mac_address=device_mac_address,
+                    gcm_registration_id=gcm_registration_id,
+                    correlation_identifier=correlation_id,
+                    device_urlsafe_key = device.key.urlsafe())
+                directory_api_update_event.put()
+                deferred.defer(update_chrome_os_device,
+                               device_urlsafe_key=device.key.urlsafe(),
+                               _queue='directory-api',
+                               _countdown=60)
+            return device
         else:
             device_not_found_event = IntegrationEventLog.create(
                 event_category='Registration',
@@ -129,8 +153,7 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
                                device_mac_address=device_mac_address,
                                gcm_registration_id=gcm_registration_id,
                                correlation_id=correlation_id,
-                               page_token=new_page_token,
-                               _queue='directory-api')
+                               page_token=new_page_token)
     else:
         api_response_event.details = 'No devices returned from Chrome Directory API.'
         api_response_event.put()

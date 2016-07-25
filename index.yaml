@@ -50,6 +50,40 @@ indexes:
 
 - kind: ChromeOsDevice
   properties:
+  - name: archived
+  - name: is_unmanaged_device
+  - name: tenant_key
+  - name: created
+
+- kind: ChromeOsDevice
+  properties:
+  - name: archived
+  - name: is_unmanaged_device
+  - name: tenant_key
+  - name: created
+  - name: __key__
+    direction: desc
+
+- kind: ChromeOsDevice
+  properties:
+  - name: archived
+  - name: is_unmanaged_device
+  - name: tenant_key
+  - name: created
+    direction: desc
+
+- kind: ChromeOsDevice
+  properties:
+  - name: archived
+  - name: is_unmanaged_device
+  - name: tenant_key
+  - name: created
+    direction: desc
+  - name: __key__
+    direction: desc
+
+- kind: ChromeOsDevice
+  properties:
   - name: is_unmanaged_device
   - name: tenant_key
   - name: __key__

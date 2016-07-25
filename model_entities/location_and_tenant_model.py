@@ -40,16 +40,16 @@ class Tenant(ndb.Model):
     @classmethod
     def find_by_tenant_code(cls, tenant_code):
         if tenant_code:
-            key = Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
-            if key:
-                return key.get()
+            tenant_key = Tenant.query(Tenant.tenant_code == tenant_code, Tenant.active == True).get(keys_only=True)
+            if tenant_key:
+                return tenant_key.get()
 
     @classmethod
     def is_tenant_code_unique(cls, tenant_code):
         return not Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
 
     @classmethod
-    def find_devices(cls, tenant_key, unmanaged):
+    def find_devices(cls, tenant_key, unmanaged=False):
         if tenant_key:
             return ChromeOsDevice.query(
                 ndb.AND(ChromeOsDevice.archived == False,
@@ -71,6 +71,13 @@ class Tenant(ndb.Model):
             ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
             ChromeOsDevice.is_unmanaged_device == unmanaged).filter(
             ChromeOsDevice.serial_number == full_serial).count() > 0
+
+    @classmethod
+    def match_device_with_full_gcmid(cls, tenant_keys, unmanaged, full_gcmid):
+        return ChromeOsDevice.query(ChromeOsDevice.archived == False).filter(
+            ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
+            ChromeOsDevice.is_unmanaged_device == unmanaged).filter(
+            ChromeOsDevice.gcm_registration_id == full_gcmid).count() > 0
 
     @classmethod
     def find_devices_with_partial_serial(cls, tenant_keys, unmanaged, partial_serial):
@@ -107,6 +114,21 @@ class Tenant(ndb.Model):
                         filtered_results.append(item)
 
         return filtered_results
+
+    @classmethod
+    def find_devices_with_partial_gcmid(cls, tenant_keys, unmanaged, partial_gcmid):
+        q = ChromeOsDevice.query(ChromeOsDevice.archived == False).filter(
+            ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
+            ChromeOsDevice.is_unmanaged_device == unmanaged).fetch()
+
+        filtered_devices = []
+
+        for item in q:
+            if (item.gcm_registration_id and partial_gcmid in item.gcm_registration_id) or (
+                        item.gcm_registration_id and item.gcm_registration_id == partial_gcmid):
+                filtered_devices.append(item)
+
+        return filtered_devices
 
     @classmethod
     def find_issues_paginated(cls, start, end, device, fetch_size=25, prev_cursor_str=None,
@@ -173,7 +195,6 @@ class Tenant(ndb.Model):
     @classmethod
     def find_devices_paginated(cls, tenant_keys, fetch_size=25, unmanaged=False, prev_cursor_str=None,
                                next_cursor_str=None):
-
         objects = None
         next_cursor = None
         prev_cursor = None
@@ -191,7 +212,8 @@ class Tenant(ndb.Model):
                 ndb.OR(ChromeOsDevice.archived == None, ChromeOsDevice.archived == False),
                 ndb.AND(
                     ChromeOsDevice.tenant_key.IN(tenant_keys),
-                    ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(
+                    ChromeOsDevice.is_unmanaged_device == unmanaged)).order(-ChromeOsDevice.created).order(
+                ChromeOsDevice.key).fetch_page(
                 page_size=fetch_size)
 
             prev_cursor = None
@@ -203,7 +225,8 @@ class Tenant(ndb.Model):
                 ndb.OR(ChromeOsDevice.archived == None, ChromeOsDevice.archived == False),
                 ndb.AND(
                     ChromeOsDevice.tenant_key.IN(tenant_keys),
-                    ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.key).fetch_page(
+                    ChromeOsDevice.is_unmanaged_device == unmanaged)).order(-ChromeOsDevice.created).order(
+                ChromeOsDevice.key).fetch_page(
                 page_size=fetch_size,
                 start_cursor=cursor
             )
@@ -217,7 +240,8 @@ class Tenant(ndb.Model):
                 ndb.OR(ChromeOsDevice.archived == None, ChromeOsDevice.archived == False),
                 ndb.AND(
                     ChromeOsDevice.tenant_key.IN(tenant_keys),
-                    ChromeOsDevice.is_unmanaged_device == unmanaged)).order(-ChromeOsDevice.key).fetch_page(
+                    ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.created).order(
+                -ChromeOsDevice.key).fetch_page(
                 page_size=fetch_size,
                 start_cursor=cursor.reversed()
             )

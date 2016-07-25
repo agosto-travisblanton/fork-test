@@ -28,6 +28,8 @@ class DeviceIssueLog(ndb.Model):
     program = ndb.StringProperty(required=False, indexed=True)
     program_id = ndb.StringProperty(required=False, indexed=True)
     last_error = ndb.StringProperty(required=False, indexed=True)
+    playlist = ndb.StringProperty(required=False, indexed=True)
+    playlist_id = ndb.StringProperty(required=False, indexed=True)
     storage_utilization = ndb.IntegerProperty(default=0, required=True, indexed=True)
     memory_utilization = ndb.IntegerProperty(default=0, required=True, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
@@ -40,7 +42,8 @@ class DeviceIssueLog(ndb.Model):
 
     @classmethod
     def create(cls, device_key, category, up=True, storage_utilization=0, memory_utilization=0,
-               program=None, program_id=None, last_error=None, resolved=False, resolved_datetime=None):
+               program=None, program_id=None, last_error=None, playlist=None, playlist_id=None,
+               resolved=False, resolved_datetime=None):
         if category in [config.DEVICE_ISSUE_MEMORY_HIGH, config.DEVICE_ISSUE_STORAGE_LOW]:
             level = IssueLevel.Warning
             level_descriptor = IssueLevel.stringify(IssueLevel.Warning)
@@ -58,6 +61,8 @@ class DeviceIssueLog(ndb.Model):
                    program=program,
                    program_id=program_id,
                    last_error=last_error,
+                   playlist=playlist,
+                   playlist_id=playlist_id,
                    resolved=resolved,
                    resolved_datetime=resolved_datetime,
                    level=level,

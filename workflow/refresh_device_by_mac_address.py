@@ -3,6 +3,7 @@ import logging
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
+from agar.env import on_development_server
 from app_config import config
 from chrome_os_devices_api import ChromeOsDevicesApi
 from content_manager_api import ContentManagerApi
@@ -80,5 +81,8 @@ def refresh_device_by_mac_address(device_urlsafe_key, device_mac_address,
             return device
         else:
             if new_page_token is not None:
-                refresh_device_by_mac_address(device_urlsafe_key, device_mac_address,
-                                              device_has_previous_directory_api_info, new_page_token)
+                deferred.defer(refresh_device_by_mac_address,
+                               device_urlsafe_key=device_urlsafe_key,
+                               device_mac_address=device_mac_address,
+                               page_token=new_page_token,
+                               _queue='directory-api')

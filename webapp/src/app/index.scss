@@ -377,7 +377,7 @@ ul.alert-dropdown {
   text-align: center;
 }
 
-.gcm-registration-id-word-break {
+.properties-word-break {
   width: 390px;
   word-wrap: break-word;
   display: block;
@@ -520,12 +520,39 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
 }
 
 .registration-event-column {
-  height:110px;
+  height: 110px;
   display: inline-block;
   vertical-align: top;
   overflow: scroll;
 }
 
+.pull-command-send-button-up {
+  margin-top: -2px;
+}
+
+header.dtp-header {
+  background: #1b75bb !important;
+}
+
+.dtp div.dtp-date, .dtp div.dtp-time {
+  background: black;
+}
+
+.dtp table.dtp-picker-days tr > td > a.selected {
+  background: #1b75bb !important;
+}
+
+.dtp .dtp-picker-time > a.dtp-select-hour.selected {
+  background: #1b75bb !important;
+}
+
+.dtp .dtp-actual-meridien a.selected {
+  background: #1b75bb !important;
+}
+
+.dtp .dtp-hand.on {
+  background: black
+}
 
 //.distributor-selection {
 //  font-size: 20pt;

@@ -47,9 +47,9 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
                                     active=True)
         self.tenant_key = self.tenant.put()
         self.chrome_os_device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                                      device_id=self.DEVICE_ID,
-                                                      gcm_registration_id=self.GCM_REGISTRATION_ID,
-                                                      mac_address=self.MAC_ADDRESS)
+                                                              device_id=self.DEVICE_ID,
+                                                              gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                                              mac_address=self.MAC_ADDRESS)
         self.chrome_os_device_key = self.chrome_os_device.put()
         self.valid_authorization_header = {
             'Authorization': config.API_TOKEN
@@ -179,7 +179,6 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
             bogus_key
         )
         self.assertTrue(message in context.exception.message)
-
 
     ##################################################################################################################
     # content_update
@@ -428,6 +427,161 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
         message = 'Bad response: 404 {0} command not executed because device not found with key: {1}'.format(
             command, bogus_key
+        )
+        self.assertTrue(message in context.exception.message)
+
+    ##################################################################################################################
+    # diagnostics toggle
+    ##################################################################################################################
+
+    def test_diagnostics_toggle_returns_ok_status(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_DIAGNOSTICS_TOGGLE_COMMAND, any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+        uri = application.router.build(None,
+                                       'device-diagnostics-toggle-command',
+                                       None,
+                                       {'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
+        request_body = {}
+        response = self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        self.assertOK(response)
+
+    def test_diagnostics_toggle_with_bogus_device_key_returns_not_found_status(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_RESET_COMMAND, any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+        bogus_key = '0AXC19Z0DE'
+        uri = application.router.build(None,
+                                       'device-diagnostics-toggle-command',
+                                       None,
+                                       {'device_urlsafe_key': bogus_key})
+        request_body = {}
+        with self.assertRaises(AppError) as context:
+            self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        message = 'Bad response: 404 diagnostics_toggle command not executed because device not found with key: {0}'. \
+            format(bogus_key)
+        self.assertTrue(message in context.exception.message)
+
+    ##################################################################################################################
+    # restart
+    ##################################################################################################################
+
+    def test_restart_returns_ok_status(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_RESTART_COMMAND, any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+        uri = application.router.build(None,
+                                       'device-restart-command',
+                                       None,
+                                       {'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
+        request_body = {}
+        response = self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        self.assertOK(response)
+
+    def test_restart_with_bogus_device_key_returns_not_found_status(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_RESTART_COMMAND, any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+        bogus_key = '0AXC19Z0DE'
+        uri = application.router.build(None,
+                                       'device-restart-command',
+                                       None,
+                                       {'device_urlsafe_key': bogus_key})
+        request_body = {}
+        with self.assertRaises(AppError) as context:
+            self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        message = 'Bad response: 404 restart command not executed because device not found with key: {0}'.format(
+            bogus_key
+        )
+        self.assertTrue(message in context.exception.message)
+
+    ##################################################################################################################
+    # panel_sleep
+    ##################################################################################################################
+
+    def test_panel_sleep_returns_ok_status(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                                                     any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+        uri = application.router.build(None,
+                                       'panel_sleep',
+                                       None,
+                                       {'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
+        request_body = {"panel_sleep": True}
+        response = self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        self.assertOK(response)
+
+    def test_panel_sleep_alters_device_value(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                                                     any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+        device_sleep_value = self.chrome_os_device.panel_sleep
+        self.assertFalse(device_sleep_value)
+
+        uri = application.router.build(None,
+                                       'panel_sleep',
+                                       None,
+                                       {'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
+        request_body = {"panel_sleep": True}
+        response = self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        self.assertOK(response)
+        device_sleep_value = self.chrome_os_device.panel_sleep
+        self.assertTrue(device_sleep_value)
+
+    def test_panel_sleep_with_bogus_device_key_returns_not_found_status(self):
+        when(device_message_processor).change_intent(gcm_registration_id=self.chrome_os_device.gcm_registration_id,
+                                                     payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                                                     device_urlsafe_key=any_matcher(str),
+                                                     host=any_matcher(str),
+                                                     user_identifier=any_matcher(str)).thenReturn(None)
+        bogus_key = '0AXC19Z0DE'
+        uri = application.router.build(None,
+                                       'panel_sleep',
+                                       None,
+                                       {'device_urlsafe_key': bogus_key})
+        request_body = {}
+        try:
+
+            self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+            message = 'Bad response: 404 refresh_device_representation command not executed because device not found with key: {1}'.format(
+            bogus_key
+            )
+        except Exception, e:
+            if e.__class__.__name__ == 'ProtocolBufferDecodeError':
+                self.assertTrue(message in Exception.message)
+
+    ##################################################################################################################
+    # post log
+    ##################################################################################################################
+
+    def test_post_log_returns_ok_status(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_POST_LOG_COMMAND, any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+        uri = application.router.build(None,
+                                       'device-post-log-command',
+                                       None,
+                                       {'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
+        request_body = {}
+        response = self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        self.assertOK(response)
+
+    def test_post_log_with_bogus_device_key_returns_not_found_status(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_RESTART_COMMAND, any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+        bogus_key = '0AXC19Z0DE'
+        uri = application.router.build(None,
+                                       'device-post-log-command',
+                                       None,
+                                       {'device_urlsafe_key': bogus_key})
+        request_body = {}
+        with self.assertRaises(AppError) as context:
+            self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        message = 'Bad response: 404 post_log command not executed because device not found with key: {0}'.format(
+            bogus_key
         )
         self.assertTrue(message in context.exception.message)
 

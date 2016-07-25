@@ -10,7 +10,7 @@ from models import (Tenant,
                     Location,
                     IntegrationEventLog)
 from restler.serializers import ModelStrategy
-from utils.datetime_util import elapsed_time_message, convert_timezone
+from utils.datetime_util import elapsed_time_message
 
 TENANT_FIELDS = [
     'name',
@@ -54,6 +54,7 @@ DEVICE_PAIRING_CODE_STRATEGY += [
 
 CHROME_OS_DEVICE_STRATEGY = ModelStrategy(ChromeOsDevice)
 CHROME_OS_DEVICE_STRATEGY += [
+    {'panelSleep': lambda o, field_name, context: o.panel_sleep if o.panel_sleep is not None else None},
     {'tenantKey': lambda o, field_name, context: o.tenant_key.urlsafe() if o.tenant_key is not None else None},
     {'tenantName': lambda o, field_name, context: o.tenant_key.get().name if o.tenant_key is not None else None},
     {'lastSync': lambda o, field_name, context: o.key.get().last_sync},
@@ -108,12 +109,19 @@ CHROME_OS_DEVICE_STRATEGY += [
                                     context: o.location_key.get().customer_location_name if o.location_key is not None else None},
     {'customerDisplayCode': lambda o, field_name, context: o.key.get().customer_display_code},
     {'customerDisplayName': lambda o, field_name, context: o.key.get().customer_display_name},
+    {'registrationCorrelationIdentifier': lambda o, field_name,
+                                                 context: o.key.get().registration_correlation_identifier},
     {'latitude': lambda o, field_name,
                         context: o.location_key.get().geo_location.lat if o.location_key is not None else None},
     {'longitude': lambda o, field_name,
                          context: o.location_key.get().geo_location.lon if o.location_key is not None else None},
     {'timezone': lambda o, field_name, context: o.key.get().timezone},
     {'timezoneOffset': lambda o, field_name, context: o.key.get().timezone_offset},
+    {'program': lambda o, field_name, context: o.key.get().program},
+    {'programId': lambda o, field_name, context: o.key.get().program_id},
+    {'playlist': lambda o, field_name, context: o.key.get().playlist},
+    {'playlistId': lambda o, field_name, context: o.key.get().playlist_id},
+    {'lastError': lambda o, field_name, context: o.key.get().last_error},
     {'archived': lambda o, field_name, context: o.key.get().archived}
 ]
 
@@ -142,14 +150,18 @@ DEVICE_ISSUE_LOG_STRATEGY = ModelStrategy(DeviceIssueLog)
 DEVICE_ISSUE_LOG_STRATEGY += [
     {'category': lambda o, field_name, context: o.key.get().category},
     {'up': lambda o, field_name, context: o.key.get().up},
-    {'storage_utilization': lambda o, field_name, context: o.key.get().storage_utilization},
-    {'memory_utilization': lambda o, field_name, context: o.key.get().memory_utilization},
+    {'storageUtilization': lambda o, field_name, context: o.key.get().storage_utilization},
+    {'memoryUtilization': lambda o, field_name, context: o.key.get().memory_utilization},
     {'program': lambda o, field_name, context: o.key.get().program},
+    {'programId': lambda o, field_name, context: o.key.get().program_id},
+    {'lastError': lambda o, field_name, context: o.key.get().last_error},
+    {'playlist': lambda o, field_name, context: o.key.get().playlist},
+    {'playlistId': lambda o, field_name, context: o.key.get().playlist_id},
     {'created': lambda o, field_name, context: o.key.get().created},
     {'updated': lambda o, field_name, context: o.key.get().updated},
     {'level': lambda o, field_name, context: o.key.get().level},
-    {'level_descriptor': lambda o, field_name, context: o.key.get().level_descriptor},
-    {'elapsed_time': lambda o, field_name, context: elapsed_time_message(o.key.get().created, datetime.utcnow())}
+    {'levelDescriptor': lambda o, field_name, context: o.key.get().level_descriptor},
+    {'elapsedTime': lambda o, field_name, context: elapsed_time_message(o.key.get().created, datetime.utcnow())}
 ]
 
 DOMAIN_FIELDS = [
@@ -191,4 +203,3 @@ INTEGRATION_EVENT_LOG_STRATEGY += [
     {'macAddress': lambda o, field_name, context: o.key.get().mac_address},
     {'details': lambda o, field_name, context: o.key.get().details}
 ]
-

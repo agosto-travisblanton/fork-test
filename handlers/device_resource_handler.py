@@ -29,18 +29,48 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     MAILGUN_QUEUED_MESSAGE = 'Queued. Thank you.'
 
     ############################################################################################
+    # HELPER METHODS
+    ############################################################################################
+    @staticmethod
+    def ethernet_or_wifi_mac_address(device, partial_mac):
+        if partial_mac and partial_mac in device.mac_address:
+            return device.mac_address
+        elif partial_mac == "null":
+            return device.mac_address
+        else:
+            return device.ethernet_mac_address
+
+
+    ############################################################################################
     # TENANTS VIEW
     ############################################################################################
     @requires_api_token
-    def match_for_device_by_mac_by_tenant(self, tenant_urlsafe_key, full_mac, unmanaged):
-        unmanaged = unmanaged == "true"
+    def match_for_device_by_tenant(self, tenant_urlsafe_key):
+        unmanaged = self.request.get("unmanaged") == "true"
+        full_gcmid = self.request.get("full_gcmid")
+        full_serial = self.request.get("full_serial")
+        full_mac = self.request.get("full_mac")
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
 
-        is_match = Tenant.match_device_with_full_mac(
-            tenant_keys=[tenant_key],
-            unmanaged=unmanaged,
-            full_mac=full_mac
-        )
+        if full_gcmid:
+            is_match = Tenant.match_device_with_full_gcmid(
+                tenant_keys=[tenant_key],
+                unmanaged=unmanaged,
+                full_gcmid=full_gcmid
+            )
+
+        elif full_serial:
+            is_match = Tenant.match_device_with_full_serial(
+                tenant_keys=[tenant_key],
+                unmanaged=unmanaged,
+                full_serial=full_serial
+            )
+        elif full_mac:
+            is_match = Tenant.match_device_with_full_mac(
+                tenant_keys=[tenant_key],
+                unmanaged=unmanaged,
+                full_mac=full_mac
+            )
 
         json_response(
             self.response,
@@ -50,76 +80,56 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         )
 
     @requires_api_token
-    def match_for_device_by_serial_by_tenant(self, tenant_urlsafe_key, full_serial, unmanaged):
-        unmanaged = unmanaged == "true"
+    def search_for_device_by_tenant(self, tenant_urlsafe_key):
+        unmanaged = self.request.get("unmanaged") == "true"
+        partial_gcmid = self.request.get("partial_gcmid")
+        partial_serial = self.request.get("partial_serial")
+        partial_mac = self.request.get("partial_mac")
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
 
-        is_match = Tenant.match_device_with_full_serial(
-            tenant_keys=[tenant_key],
-            unmanaged=unmanaged,
-            full_serial=full_serial
-        )
+        if partial_gcmid:
+            resulting_devices = Tenant.find_devices_with_partial_gcmid(
+                tenant_keys=[tenant_key],
+                unmanaged=unmanaged,
+                partial_gcmid=partial_gcmid
+            )
+
+        elif partial_serial:
+            resulting_devices = Tenant.find_devices_with_partial_serial(
+                tenant_keys=[tenant_key],
+                unmanaged=unmanaged,
+                partial_serial=partial_serial
+            )
+        elif partial_mac:
+            resulting_devices = Tenant.find_devices_with_partial_mac(
+                tenant_keys=[tenant_key],
+                unmanaged=unmanaged,
+                partial_mac=partial_mac
+            )
 
         json_response(
             self.response,
             {
-                "is_match": is_match
-            },
-        )
-
-    @requires_api_token
-    def search_for_device_by_mac_by_tenant(self, tenant_urlsafe_key, partial_mac, unmanaged):
-        unmanaged = unmanaged == "true"
-        tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
-
-        resulting_devices = Tenant.find_devices_with_partial_mac(
-            tenant_keys=[tenant_key],
-            unmanaged=unmanaged,
-            partial_mac=partial_mac
-        )
-
-        json_response(
-            self.response,
-            {
-                "mac_matches": [
-                    {
-                        "mac": device.mac_address if partial_mac in device.mac_address else device.ethernet_mac_address,
-                        "key": device.key.urlsafe(),
-                        "tenantKey": device.tenant_key.urlsafe()
-                    } for device in resulting_devices]
-            },
-        )
-
-    @requires_api_token
-    def search_for_device_by_serial_by_tenant(self, tenant_urlsafe_key, partial_serial, unmanaged):
-        unmanaged = unmanaged == "true"
-        tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
-
-        resulting_devices = Tenant.find_devices_with_partial_serial(
-            tenant_keys=[tenant_key],
-            unmanaged=unmanaged,
-            partial_serial=partial_serial
-        )
-
-        json_response(
-            self.response,
-            {
-                "serial_number_matches": [
+                "matches": [
                     {
                         "serial": device.serial_number,
+                        "mac": DeviceResourceHandler.ethernet_or_wifi_mac_address(device, partial_mac),
                         "key": device.key.urlsafe(),
-                        "tenantKey": device.tenant_key.urlsafe()
+                        "tenantKey": device.tenant_key.urlsafe(),
+                        "gcmid": device.gcm_registration_id
                     } for device in resulting_devices]
             },
         )
 
     @requires_api_token
-    def get_devices_by_tenant(self, tenant_urlsafe_key, cur_prev_cursor, cur_next_cursor):
+    def get_devices_by_tenant(self, tenant_urlsafe_key):
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
+        next_cursor = self.request.get("next_cursor")
+        prev_cursor = self.request.get("prev_cursor")
+        cur_next_cursor = next_cursor if next_cursor != "null" else None
+        cur_prev_cursor = prev_cursor if prev_cursor != "null" else None
         unmanaged_filter = self.request.get('unmanaged')
         unmanaged = not bool(unmanaged_filter == '' or str(unmanaged_filter) == 'false')
-        cur_next_cursor = cur_next_cursor if cur_next_cursor != "null" else None
-        cur_prev_cursor = cur_prev_cursor if cur_prev_cursor != "null" else None
 
         tenant_devices = Tenant.find_devices_paginated(
             tenant_keys=[tenant_key],
@@ -128,164 +138,27 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             next_cursor_str=cur_next_cursor,
         )
 
-        prev_cursor = tenant_devices["prev_cursor"]
-        next_cursor = tenant_devices["next_cursor"]
-        devices = tenant_devices["objects"]
-
         json_response(
             self.response,
             {
-                "devices": devices,
-                "next_cursor": next_cursor,
-                "prev_cursor": prev_cursor,
+                "devices": tenant_devices["objects"],
+                "next_cursor": tenant_devices["next_cursor"],
+                "prev_cursor": tenant_devices["prev_cursor"],
             },
             strategy=CHROME_OS_DEVICE_STRATEGY
         )
 
     ############################################################################################
-    # DEVICES VIEW
+    # (DISTRIBUTOR) DEVICES VIEW
     ############################################################################################
     @requires_api_token
-    def match_for_device_by_mac(self, distributor_urlsafe_key, full_mac, unmanaged):
-        unmanaged = unmanaged == "true"
-        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
-        tenant_keys = [tenant.key for tenant in domain_tenant_list]
-        is_match = Tenant.match_device_with_full_mac(
-            tenant_keys=tenant_keys,
-            unmanaged=unmanaged,
-            full_mac=full_mac
-        )
-        json_response(
-            self.response,
-            {
-                "is_match": is_match
-            },
-        )
-
-    @requires_api_token
-    def match_for_device_by_serial(self, distributor_urlsafe_key, full_serial, unmanaged):
-        unmanaged = unmanaged == "true"
-        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
-        tenant_keys = [tenant.key for tenant in domain_tenant_list]
-        is_match = Tenant.match_device_with_full_serial(
-            tenant_keys=tenant_keys,
-            unmanaged=unmanaged,
-            full_serial=full_serial
-        )
-        json_response(
-            self.response,
-            {
-                "is_match": is_match
-            },
-        )
-
-    @requires_api_token
-    def search_for_device_by_mac(self, distributor_urlsafe_key, partial_mac, unmanaged):
-        unmanaged = unmanaged == "true"
-        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
-        tenant_keys = [tenant.key for tenant in domain_tenant_list]
-        resulting_devices = Tenant.find_devices_with_partial_mac(
-            tenant_keys=tenant_keys,
-            unmanaged=unmanaged,
-            partial_mac=partial_mac
-        )
-        json_response(
-            self.response,
-            {
-                "mac_matches": [
-                    {
-                        "mac": device.mac_address if partial_mac in device.mac_address else device.ethernet_mac_address,
-                        "key": device.key.urlsafe(),
-                        "tenantKey": device.tenant_key.urlsafe()
-                    } for device in resulting_devices]
-            },
-        )
-
-    @requires_api_token
-    def search_for_device_by_serial(self, distributor_urlsafe_key, partial_serial, unmanaged):
-        unmanaged = unmanaged == "true"
-        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
-        tenant_keys = [tenant.key for tenant in domain_tenant_list]
-        resulting_devices = Tenant.find_devices_with_partial_serial(
-            tenant_keys=tenant_keys,
-            unmanaged=unmanaged,
-            partial_serial=partial_serial
-        )
-        json_response(
-            self.response,
-            {
-                "serial_number_matches": [
-                    {
-                        "serial": device.serial_number,
-                        "key": device.key.urlsafe(),
-                        "tenantKey": device.tenant_key.urlsafe()
-                    } for device in resulting_devices]
-            },
-        )
-
-    ############################################################################################
-    # END DEVICES VIEW
-    ############################################################################################
-    @requires_api_token
-    def get_device_by_parameter(self):
-        pairing_code = self.request.get('pairingCode')
-        device_mac_address = self.request.get('macAddress')
-        gcm_registration_id = self.request.get('gcmRegistrationId')
-        if device_mac_address:
-            query_results = ChromeOsDevice.query(
-                ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
-                       ChromeOsDevice.ethernet_mac_address == device_mac_address),
-                ndb.AND(ChromeOsDevice.archived == False)).fetch()
-            if len(query_results) == 1:
-                if ChromeOsDevice.is_rogue_unmanaged_device(device_mac_address):
-                    self.delete(query_results[0].key.urlsafe())
-                    error_message = "Rogue unmanaged device with MAC address: {0} no longer exists.".format(
-                        device_mac_address)
-                    self.response.set_status(404, error_message)
-                else:
-                    json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
-            elif len(query_results) > 1:
-                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
-                error_message = "Multiple devices have MAC address {0}".format(device_mac_address)
-                logging.error(error_message)
-            else:
-                error_message = "Unable to find Chrome OS device by MAC address: {0}".format(device_mac_address)
-                self.response.set_status(404, error_message)
-        elif gcm_registration_id:
-            query_results = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
-                                                 ndb.AND(ChromeOsDevice.archived == False)).fetch()
-            if len(query_results) == 1:
-                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
-            elif len(query_results) > 1:
-                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
-                error_message = "Multiple devices have GCM registration ID {0}".format(gcm_registration_id)
-                logging.error(error_message)
-            else:
-                error_message = "Unable to find Chrome OS device by GCM registration ID: {0}".format(
-                    gcm_registration_id)
-                self.response.set_status(404, error_message)
-        elif pairing_code:
-            query_results = ChromeOsDevice.query(ChromeOsDevice.pairing_code == pairing_code,
-                                                 ndb.AND(ChromeOsDevice.archived == False)).fetch()
-            if len(query_results) == 1:
-                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
-            elif len(query_results) > 1:
-                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
-                error_message = "Multiple devices have pairing code {0}".format(pairing_code)
-                logging.error(error_message)
-            else:
-                error_message = "Unable to find device by pairing code: {0}".format(pairing_code)
-                self.response.set_status(404, error_message)
-        else:
-            query = ChromeOsDevice.query(ChromeOsDevice.archived == False)
-            query_results = query.fetch()
-            json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
-
-    @requires_api_token
-    def get_devices_by_distributor(self, distributor_urlsafe_key, cur_prev_cursor, cur_next_cursor):
-        cur_next_cursor = cur_next_cursor if cur_next_cursor != "null" else None
-        cur_prev_cursor = cur_prev_cursor if cur_prev_cursor != "null" else None
+    def get_devices_by_distributor(self, distributor_urlsafe_key):
+        next_cursor = self.request.get("next_cursor")
+        prev_cursor = self.request.get("prev_cursor")
+        cur_next_cursor = next_cursor if next_cursor != "null" else None
+        cur_prev_cursor = prev_cursor if prev_cursor != "null" else None
         unmanaged_filter = self.request.get('unmanaged')
+
         unmanaged = not bool(unmanaged_filter == '' or str(unmanaged_filter) == 'false')
         domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
         tenant_keys = [tenant.key for tenant in domain_tenant_list]
@@ -311,6 +184,151 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             },
             strategy=CHROME_OS_DEVICE_STRATEGY
         )
+
+    @requires_api_token
+    def match_for_device(self, distributor_urlsafe_key):
+        unmanaged = self.request.get("unmanaged") == "true"
+        full_gcmid = self.request.get("full_gcmid")
+        full_serial = self.request.get("full_serial")
+        full_mac = self.request.get("full_mac")
+
+        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
+        tenant_keys = [tenant.key for tenant in domain_tenant_list]
+
+        if full_gcmid:
+            is_match = Tenant.match_device_with_full_gcmid(
+                tenant_keys=tenant_keys,
+                unmanaged=unmanaged,
+                full_gcmid=full_gcmid
+            )
+
+        elif full_serial:
+            is_match = Tenant.match_device_with_full_serial(
+                tenant_keys=tenant_keys,
+                unmanaged=unmanaged,
+                full_serial=full_serial
+            )
+        elif full_mac:
+            is_match = Tenant.match_device_with_full_mac(
+                tenant_keys=tenant_keys,
+                unmanaged=unmanaged,
+                full_mac=full_mac
+            )
+
+        json_response(
+            self.response,
+            {
+                "is_match": is_match
+            },
+        )
+
+    @requires_api_token
+    def search_for_device(self, distributor_urlsafe_key):
+        unmanaged = self.request.get("unmanaged") == "true"
+        partial_gcmid = self.request.get("partial_gcmid")
+        partial_serial = self.request.get("partial_serial")
+        partial_mac = self.request.get("partial_mac")
+
+        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
+        tenant_keys = [tenant.key for tenant in domain_tenant_list]
+
+        if partial_gcmid:
+            resulting_devices = Tenant.find_devices_with_partial_gcmid(
+                tenant_keys=tenant_keys,
+                unmanaged=unmanaged,
+                partial_gcmid=partial_gcmid
+            )
+
+        elif partial_serial:
+            resulting_devices = Tenant.find_devices_with_partial_serial(
+                tenant_keys=tenant_keys,
+                unmanaged=unmanaged,
+                partial_serial=partial_serial
+            )
+        elif partial_mac:
+            resulting_devices = Tenant.find_devices_with_partial_mac(
+                tenant_keys=tenant_keys,
+                unmanaged=unmanaged,
+                partial_mac=partial_mac
+            )
+
+
+        json_response(
+            self.response,
+            {
+                "matches": [
+                    {
+                        "mac": DeviceResourceHandler.ethernet_or_wifi_mac_address(device, partial_mac),
+                        "serial": device.serial_number,
+                        "key": device.key.urlsafe(),
+                        "tenantKey": device.tenant_key.urlsafe(),
+                        "gcmid": device.gcm_registration_id
+                    } for device in resulting_devices]
+            },
+        )
+
+    ############################################################################################
+    # END DEVICES VIEW
+    ############################################################################################
+    @requires_api_token
+    def get_device_by_parameter(self):
+        pairing_code = self.request.get('pairingCode')
+        if pairing_code:
+            query_results = ChromeOsDevice.query(ChromeOsDevice.pairing_code == pairing_code,
+                                                 ndb.AND(ChromeOsDevice.archived == False)).fetch()
+            if len(query_results) == 1:
+                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+            elif len(query_results) > 1:
+                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+                error_message = "Multiple devices have pairing code {0}".format(pairing_code)
+                logging.error(error_message)
+            else:
+                error_message = "Unable to find device by pairing code: {0}".format(pairing_code)
+                self.response.set_status(404, error_message)
+            return
+
+        gcm_registration_id = self.request.get('gcmRegistrationId')
+        if gcm_registration_id:
+            query_results = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
+                                                 ndb.AND(ChromeOsDevice.archived == False)).fetch()
+            if len(query_results) == 1:
+                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+            elif len(query_results) > 1:
+                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+                error_message = "Multiple devices have GCM registration ID {0}".format(gcm_registration_id)
+                logging.error(error_message)
+            else:
+                error_message = "Unable to find Chrome OS device by GCM registration ID: {0}".format(
+                    gcm_registration_id)
+                self.response.set_status(404, error_message)
+            return
+
+        device_mac_address = self.request.get('macAddress')
+        if device_mac_address:
+            query_results = ChromeOsDevice.query(
+                ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
+                       ChromeOsDevice.ethernet_mac_address == device_mac_address),
+                ndb.AND(ChromeOsDevice.archived == False)).fetch()
+            if len(query_results) == 1:
+                if ChromeOsDevice.is_rogue_unmanaged_device(device_mac_address):
+                    self.delete(query_results[0].key.urlsafe())
+                    error_message = "Rogue unmanaged device with MAC address: {0} no longer exists.".format(
+                        device_mac_address)
+                    self.response.set_status(404, error_message)
+                else:
+                    json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+            elif len(query_results) > 1:
+                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+                error_message = "Multiple devices have MAC address {0}".format(device_mac_address)
+                logging.error(error_message)
+            else:
+                error_message = "Unable to find Chrome OS device by MAC address: {0}".format(device_mac_address)
+                self.response.set_status(404, error_message)
+            return
+
+        query = ChromeOsDevice.query(ChromeOsDevice.archived == False)
+        query_results = query.fetch()
+        json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
 
     @requires_api_token
     def get(self, device_urlsafe_key):
@@ -374,37 +392,28 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             if timezone is None or timezone == '':
                 timezone = 'America/Chicago'
             if self.is_unmanaged_device is True:
-                unmanaged_device = ChromeOsDevice.get_unmanaged_device_by_mac_address(device_mac_address)
-                if None is not unmanaged_device:
-                    post_unmanaged_device_info(gcm_registration_id=unmanaged_device.gcm_registration_id,
-                                               device_urlsafe_key=unmanaged_device.key.urlsafe(),
-                                               host=self.request.host_url)
-                    status = 409
-                    error_message = 'Registration conflict because macAddress is already assigned to ' \
-                                    'an unmanaged device.'
-                    self.response.set_status(status, error_message)
+                if ChromeOsDevice.gcm_registration_id_already_assigned(gcm_registration_id=gcm_registration_id):
+                    error_message = 'Conflict gcm_registration_id is already assigned.'
+                    self.response.set_status(409, error_message)
+                    device = ChromeOsDevice.get_unmanaged_device_by_gcm_registration_id(
+                        gcm_registration_id=gcm_registration_id)
+                    if device:  # TODO consider checking if device has a tenant on it yet before sending this...
+                        post_unmanaged_device_info(gcm_registration_id=device.gcm_registration_id,
+                                                   device_urlsafe_key=device.key.urlsafe(),
+                                                   host=self.request.host_url)
                     return
-                unmanaged_device = ChromeOsDevice.get_unmanaged_device_by_gcm_registration_id(gcm_registration_id)
-                if None is not unmanaged_device:
-                    post_unmanaged_device_info(gcm_registration_id=unmanaged_device.gcm_registration_id,
-                                               device_urlsafe_key=unmanaged_device.key.urlsafe(),
-                                               host=self.request.host_url)
-                    status = 409
-                    error_message = 'Registration conflict because gcmRegistrationId is already assigned to ' \
-                                    'an unmanaged device.'
-                    self.response.set_status(status, error_message)
-                    return
-                device = ChromeOsDevice.create_unmanaged(gcm_registration_id=gcm_registration_id,
-                                                         mac_address=device_mac_address,
-                                                         timezone=timezone)
-                device_key = device.put()
-                device_uri = self.request.app.router.build(None,
-                                                           'device-pairing-code',
-                                                           None,
-                                                           {'device_urlsafe_key': device_key.urlsafe()})
-                self.response.headers['Location'] = device_uri
-                self.response.headers.pop('Content-Type', None)
-                self.response.set_status(status)
+                else:
+                    device = ChromeOsDevice.create_unmanaged(gcm_registration_id=gcm_registration_id,
+                                                             mac_address=device_mac_address,
+                                                             timezone=timezone)
+                    device_key = device.put()
+                    device_uri = self.request.app.router.build(None,
+                                                               'device-pairing-code',
+                                                               None,
+                                                               {'device_urlsafe_key': device_key.urlsafe()})
+                    self.response.headers['Location'] = device_uri
+                    self.response.headers.pop('Content-Type', None)
+                    self.response.set_status(status)
             else:
                 correlation_id = IntegrationEventLog.generate_correlation_id()
                 registration_request_event = IntegrationEventLog.create(
@@ -415,13 +424,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     gcm_registration_id=gcm_registration_id,
                     correlation_identifier=correlation_id)
                 registration_request_event.put()
-                if ChromeOsDevice.mac_address_already_assigned(device_mac_address):
-                    status = 400
-                    error_message = 'Cannot register because macAddress already assigned to managed device.'
-                    self.response.set_status(status, error_message)
+                if ChromeOsDevice.gcm_registration_id_already_assigned(gcm_registration_id=gcm_registration_id):
+                    error_message = 'Conflict gcm_registration_id is already assigned.'
                     registration_request_event.details = error_message
                     registration_request_event.put()
-                    self.response.set_status(status, error_message)
+                    self.response.set_status(409, error_message)
                     return
                 tenant_code = request_json.get('tenantCode')
                 if tenant_code is None or tenant_code == '':
@@ -432,8 +439,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     registration_request_event.put()
                     self.response.set_status(status, error_message)
                     return
-                tenant_key = Tenant.query(Tenant.tenant_code == tenant_code, Tenant.active == True).get(keys_only=True)
-                if tenant_key is None:
+                tenant = Tenant.find_by_tenant_code(tenant_code)
+                if tenant is None:
                     status = 400
                     error_message = 'Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
                     self.response.set_status(status, error_message)
@@ -442,11 +449,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     self.response.set_status(status, error_message)
                     return
                 if status == 201:
-                    device = ChromeOsDevice.create_managed(tenant_key=tenant_key,
+                    device = ChromeOsDevice.create_managed(tenant_key=tenant.key,
                                                            gcm_registration_id=gcm_registration_id,
                                                            mac_address=device_mac_address,
-                                                           timezone=timezone)
-                    device.registration_correlation_identifier = correlation_id
+                                                           timezone=timezone,
+                                                           registration_correlation_identifier=correlation_id)
                     key = device.put()
                     registration_request_event.device_urlsafe_key = key.urlsafe()
                     registration_request_event.details = 'register_device: tenant code={0}, mac address={1}, ' \
@@ -608,11 +615,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         else:
             request_json = json.loads(self.request.body)
             storage = request_json.get('storage')
-            if storage is not None:
-                storage = int(storage)
             memory = request_json.get('memory')
-            if memory is not None:
-                memory = int(memory)
             mac_address = request_json.get('macAddress')
             program = request_json.get('program')
             program_id = request_json.get('programId')
@@ -622,6 +625,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             sk_player_version = request_json.get('playerVersion')
             os = request_json.get('os')
             os_version = request_json.get('osVersion')
+            playlist = request_json.get('playlist')
+            playlist_id = request_json.get('playlistId')
             utc_now = datetime.utcnow()
 
             if DeviceIssueLog.device_not_reported_yet(device_key=device.key):
@@ -648,11 +653,15 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                         )
                         logging.info(info_message)
 
-            if device.storage_utilization != storage:
-                device.storage_utilization = storage
+            if storage is not None:
+                storage = int(storage)
+                if device.storage_utilization != storage:
+                    device.storage_utilization = storage
 
-            if device.memory_utilization != memory:
-                device.memory_utilization = memory
+            if memory is not None:
+                memory = int(memory)
+                if device.memory_utilization != memory:
+                    device.memory_utilization = memory
 
             if program:
                 if device.program != program:
@@ -661,6 +670,14 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             if program_id:
                 if device.program_id != program_id:
                     device.program_id = program_id
+
+            if playlist:
+                if device.playlist != playlist:
+                    device.playlist = playlist
+
+            if playlist_id:
+                if device.playlist_id != playlist_id:
+                    device.playlist_id = playlist_id
 
             if last_error:
                 if device.last_error != last_error:

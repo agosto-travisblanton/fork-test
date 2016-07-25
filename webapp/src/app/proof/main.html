@@ -27,15 +27,15 @@
 
               <div ng-if="vm.tenants.length > 0">
                 <md-autocomplete
-                        md-no-cache="true"
-                        md-selected-item="vm.selectedItem"
-                        md-search-text="vm.searchText"
-                        md-items="item in vm.querySearch(vm.tenants, vm.searchText)"
-                        md-item-text="item"
-                        md-min-length="0"
-                        md-search-text-change="vm.isSelectionValid( vm.searchText)"
-                        md-selected-item-change="vm.isSelectionValid( vm.searchText)"
-                        placeholder="Make A Search">
+                  md-no-cache="true"
+                  md-selected-item="vm.selectedItem"
+                  md-search-text="vm.searchText"
+                  md-items="item in vm.querySearch(vm.tenants, vm.searchText)"
+                  md-item-text="item"
+                  md-min-length="0"
+                  md-search-text-change="vm.isSelectionValid( vm.searchText)"
+                  md-selected-item-change="vm.isSelectionValid( vm.searchText)"
+                  placeholder="Make A Search">
 
                   <md-item-template>
                     <span md-highlight-text="vm.searchText"
