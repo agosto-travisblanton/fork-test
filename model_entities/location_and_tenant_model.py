@@ -49,7 +49,7 @@ class Tenant(ndb.Model):
         return not Tenant.query(Tenant.tenant_code == tenant_code).get(keys_only=True)
 
     @classmethod
-    def find_devices(cls, tenant_key, unmanaged):
+    def find_devices(cls, tenant_key, unmanaged=False):
         if tenant_key:
             return ChromeOsDevice.query(
                 ndb.AND(ChromeOsDevice.archived == False,
