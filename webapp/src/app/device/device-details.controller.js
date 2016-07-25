@@ -247,10 +247,8 @@ function DeviceDetailsCtrl($log,
 
   vm.onPanelSleepFailure = function (error) {
     ProgressBarService.complete();
-    $log.error(`Reset content command error: ${error.status } ${error.statusText}`);
     return sweet.show('Oops...', "We were unalbed to toggle the panel sleep attribute.", 'error');
   };
-
 
   vm.confirmDeviceDelete = function (event, key) {
     let confirm = $mdDialog.confirm(

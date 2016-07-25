@@ -4,7 +4,6 @@ let inject = angular.mock.inject
 import moment from 'moment'
 
 
-
 describe('DeviceDetailsCtrl', function () {
   let $controller = undefined;
   let controller = undefined;
@@ -401,6 +400,44 @@ describe('DeviceDetailsCtrl', function () {
       });
     });
   });
+
+  describe('.onPanelSleep', function () {
+    let jquery_event = {};
+    let device_key = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHIbCxIOQ2hyb21lT3NEZXZpY2UYgICAgICAhggM';
+    let confirm = undefined;
+    let promise = undefined;
+
+    beforeEach(function () {
+      spyOn(progressBarService, 'start');
+      spyOn(sweet, 'show');
+
+      spyOn(progressBarService, 'complete');
+      promise = new skykitProvisioning.q.Mock();
+      spyOn(CommandsService, 'panelSleep').and.returnValue(promise);
+      return controller = $controller('DeviceDetailsCtrl', serviceInjection);
+    });
+
+    it('calls CommandsService.panelSleep on function call', function () {
+      controller.onPanelSleep(true);
+      expect(progressBarService.start).toHaveBeenCalled();
+      return expect(CommandsService.panelSleep).toHaveBeenCalled();
+    });
+
+    it('completes ProgressBar after successful response', function () {
+      controller.onPanelSleep(true);
+      promise.resolve(true)
+      expect(progressBarService.complete).toHaveBeenCalled();
+    });
+
+    it('completes ProgressBar after failure response and shows sweet', function () {
+      controller.onPanelSleep(true);
+      promise.reject()
+      expect(sweet.show).toHaveBeenCalled();
+      expect(progressBarService.complete).toHaveBeenCalled();
+    });
+
+  });
+
 
   describe('.confirmDeviceDelete', function () {
     let jquery_event = {};
