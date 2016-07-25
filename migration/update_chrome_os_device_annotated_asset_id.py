@@ -22,7 +22,7 @@ class UpdateChromeOsDeviceAnnotatedAssetId(MigrationBase):
         active_tenants = filter(lambda x: x.active is True, tenants)
         for tenant in active_tenants:
             tenant_key = ndb.Key(urlsafe=tenant.key.urlsafe())
-            devices = Tenant.find_devices(tenant_key)
+            devices = Tenant.find_devices(tenant_key, unmanaged=False)
             for device in devices:
                 deferred.defer(update_chrome_os_device,
                                device_urlsafe_key=device.key.urlsafe(),
