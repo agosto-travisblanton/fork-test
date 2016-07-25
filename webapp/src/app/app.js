@@ -1,6 +1,8 @@
 import angular from 'angular';
 import uiRouter from 'angular-ui-router';
 import moment from 'moment';
+import 'angular-toastr/dist/angular-toastr.css'
+import 'angular-toastr';
 import "font-awesome/css/font-awesome.css";
 import 'normalize.css';
 import "bootstrap-webpack";
