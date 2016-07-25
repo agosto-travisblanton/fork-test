@@ -59,7 +59,7 @@ handlers:
   static_dir: static/fonts
 
 - url: /assets/images
-  static_dir: static/assets/images
+  static_dir: webapp/images
 
 - url: /migrate
   script: routes.application
@@ -79,8 +79,8 @@ handlers:
   secure: always
   auth_fail_action: redirect
 
-- url: /bower_components
-  static_dir: webapp/bower_components
+- url: /static
+  static_dir: static
 
 - url: /app
   static_dir: webapp/src/app
@@ -113,7 +113,7 @@ skip_files:
 - ^tests/.*
 - ^webapp/node_modules/.*$
 - ^webapp/dist/.*$
-- ^webapp/specs/.*$
+- ^webapp/src/specs/.*$
 - ^webapp/coverage/.*$
 - ^.git/.*$
 - ^backup/.git/.*

@@ -1,18 +1,19 @@
-angular.module('skykitProvisioning').factory('ToastsService', toastr =>
-  new class ToastsService {
-    constructor() {
-    }
+export default class ToastsService {
+  
+  constructor(toastr) {
+    'ngInject';
+    this.toastr = toastr;
+  }
 
-    showSuccessToast(message, title = 'Success!') {
-      return toastr.success(message, title);
-    }
+  showSuccessToast(message, title = 'Success!') {
+    return this.toastr.success(message, title);
+  }
 
-    showErrorToast(message, title = 'Error!') {
-      return toastr.error(message, title);
-    }
+  showErrorToast(message, title = 'Error!') {
+    return this.toastr.error(message, title);
+  }
 
-    showInfoToast(message, title = 'Information') {
-      return toastr.info(message, title);
-    }
-  }()
-);
+  showInfoToast(message, title = 'Information') {
+    return this.toastr.info(message, title);
+  }
+}

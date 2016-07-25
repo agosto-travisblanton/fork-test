@@ -1,13 +1,10 @@
-(function () {
+function DistributorsCtrl($state) {
+  "ngInject";
 
+  let vm = this;
+  vm.distributors = [];
 
-  let appModule = angular.module('skykitProvisioning');
+  return vm;
+}
 
-  appModule.controller("DistributorsCtrl", function ($state) {
-    let vm = this;
-    vm.distributors = [];
-
-    return vm;
-  });
-})
-();
+export {DistributorsCtrl}

@@ -1,24 +1,25 @@
-angular.module('skykitProvisioning').factory('StorageService', () =>
-  new class StorageService {
+import Lockr from 'lockr';
 
-    constructor() {
-    }
+export default class StorageService {
 
-    set(key, value) {
-      return Lockr.set(key, value);
-    }
+  constructor() {
+  }
 
-    get(key) {
-      return Lockr.get(key);
-    }
+  set(key, value) {
+    return Lockr.set(key, value);
+  }
 
-    rm(key) {
-      return Lockr.rm(key);
-    }
+  get(key) {
+    return Lockr.get(key);
+  }
 
-    removeAll() {
-      return Lockr.flush();
-    }
-  }()
-);
+  rm(key) {
+    return Lockr.rm(key);
+  }
+
+  removeAll() {
+    Lockr.flush();
+  }
+
+}
 
