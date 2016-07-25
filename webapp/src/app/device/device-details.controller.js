@@ -234,6 +234,24 @@ function DeviceDetailsCtrl($log,
     }
   };
 
+  vm.onPanelSleep = function (command) {
+    ProgressBarService.start();
+    let promise = CommandsService.panelSleep(vm.deviceKey, command);
+    return promise.then(vm.onPanelSleepSuccess, vm.onPanelSleepFailure);
+  };
+
+  vm.onPanelSleepSuccess = function () {
+    ProgressBarService.complete();
+    return ToastsService.showSuccessToast("We toggled the panel sleep attribute. The player should adjust to these changes within 15 minutes.");
+  };
+
+  vm.onPanelSleepFailure = function (error) {
+    ProgressBarService.complete();
+    $log.error(`Reset content command error: ${error.status } ${error.statusText}`);
+    return sweet.show('Oops...', "We were unalbed to toggle the panel sleep attribute.", 'error');
+  };
+
+
   vm.confirmDeviceDelete = function (event, key) {
     let confirm = $mdDialog.confirm(
       {

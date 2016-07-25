@@ -1,4 +1,5 @@
 import moment from 'moment';
+
 function DeviceDetailsCommandsCtrl($log,
                                    $stateParams,
                                    $state,
