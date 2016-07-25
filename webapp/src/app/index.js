@@ -51,6 +51,7 @@ import {WelcomeCtrl} from './welcome/welcome-controller'
 // Config
 import {routes} from './app-routes'
 import {appRun} from './app-run';
+import {toastrConfig, breadcrumbProvider} from './app-config'
 
 
 app
@@ -107,6 +108,8 @@ app
   .run(appRun)
   // Config
   .config(routes)
+  .config(toastrConfig)
+  .config(breadcrumbProvider)
 
 // Request Interceptor
 app.service('RequestInterceptor', function (StorageService, $location) {
