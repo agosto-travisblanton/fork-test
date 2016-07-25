@@ -557,7 +557,7 @@ import moment from 'moment';
                   var nDate = moment(val2, 'YYYY-MM');
                   var index = currentMonthIndex(nDate);
                   if (calendar.topIndex != index) {
-                    calendar.topIndex = index;
+                    calendar.topIndex = index - calendar.months[0];
                   }
                 }
               });
