@@ -247,7 +247,7 @@ function DeviceDetailsCtrl($log,
 
   vm.onPanelSleepFailure = function (error) {
     ProgressBarService.complete();
-    return sweet.show('Oops...', "We were unalbed to toggle the panel sleep attribute.", 'error');
+    return sweet.show('Oops...', "We were unable to toggle the panel sleep attribute.", 'error');
   };
 
   vm.confirmDeviceDelete = function (event, key) {
