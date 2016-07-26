@@ -561,3 +561,12 @@ header.dtp-header {
 .md-content-command-override md-content {
   overflow: unset
 }
+
+.pull-tooltip-left {
+  margin-left: -55px;
+}
+
+.command-button-right {
+  float: right;
+  flex-direction: row-reverse;
+}
