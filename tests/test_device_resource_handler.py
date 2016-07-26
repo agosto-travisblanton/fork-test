@@ -48,6 +48,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def setUp(self):
         super(TestDeviceResourceHandler, self).setUp()
+        self.valid_authorization_header = {
+            'Authorization': config.API_TOKEN
+        }
         self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
                                               active=True)
         self.distributor_key = self.distributor.put()
@@ -64,6 +67,12 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                     domain_key=self.domain_key,
                                     active=True)
         self.tenant_key = self.tenant.put()
+        self.chrome_os_device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                                              device_id=self.DEVICE_ID,
+                                                              gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                                              mac_address=self.MAC_ADDRESS)
+        self.chrome_os_device_key = self.chrome_os_device.put()
+
         self.another_tenant = Tenant.create(tenant_code=self.ANOTHER_TENANT_CODE,
                                             name=self.ANOTHER_TENANT_NAME,
                                             admin_email=self.ANOTHER_ADMIN_EMAIL,
@@ -590,7 +599,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                   unmanaged_number_to_build=0)
 
         request_parameters = {'unmanaged': 'true', 'prev_cursor': "null",
-                                        "next_cursor": "null"}
+                              "next_cursor": "null"}
 
         uri = application.router.build(None, 'devices-by-tenant', None,
                                        {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
@@ -831,6 +840,62 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     ##################################################################################################################
     # put
     ##################################################################################################################
+    ##################################################################################################################
+    # panel_sleep
+    ##################################################################################################################
+
+    def test_panel_sleep_returns_ok_status(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                                                     any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+        uri = application.router.build(None,
+                                       'panel_sleep',
+                                       None,
+                                       {'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
+        request_body = {"panelSleep": True}
+        response = self.app.put(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        self.assertOK(response)
+
+    def test_panel_sleep_alters_device_value(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                                                     any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+        device_sleep_value = self.chrome_os_device.panel_sleep
+        self.assertFalse(device_sleep_value)
+
+        uri = application.router.build(None,
+                                       'panel_sleep',
+                                       None,
+                                       {'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
+        request_body = {"panelSleep": True}
+        response = self.app.put(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        self.assertOK(response)
+        device_sleep_value = self.chrome_os_device.panel_sleep
+        self.assertTrue(device_sleep_value)
+
+    def test_panel_sleep_with_bogus_device_key_returns_not_found_status(self):
+        when(device_message_processor).change_intent(gcm_registration_id=self.chrome_os_device.gcm_registration_id,
+                                                     payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                                                     device_urlsafe_key=any_matcher(str),
+                                                     host=any_matcher(str),
+                                                     user_identifier=any_matcher(str)).thenReturn(None)
+        bogus_key = '0AXC19Z0DE'
+        uri = application.router.build(None,
+                                       'panel_sleep',
+                                       None,
+                                       {'device_urlsafe_key': bogus_key})
+        request_body = {}
+        try:
+
+            self.app.put(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+            message = 'Bad response: 404 refresh_device_representation command not executed because device not found with key: {1}'.format(
+                bogus_key
+            )
+        except Exception, e:
+            if e.__class__.__name__ == 'ProtocolBufferDecodeError':
+                self.assertTrue(message in Exception.message)
 
     def test_put_no_authorization_header_returns_forbidden(self):
         request_body = {'gcmRegistrationId': self.GCM_REGISTRATION_ID,

@@ -393,9 +393,9 @@
             <hr>
           </section>
           <section name="serialControl">
-            <h3>Serial control</h3>
+            <h3>Panel controls</h3>
             <div class="form-group">
-              <div class="col-sm-5">
+              <div class="col-sm-3">
                 <label>Panel model</label>
                 <select
                   id="panelModel"
@@ -404,7 +404,7 @@
                   ng-options="p.displayName for p in deviceDetailsCtrl.panelModels track by p.id">
                 </select>
               </div>
-              <div class="col-sm-5">
+              <div class="col-sm-3">
                 <label>Panel input</label>
                 <select
                   id="panelInput"
@@ -413,6 +413,13 @@
                   ng-model="deviceDetailsCtrl.currentDevice.panelInput"
                   ng-options="c.id for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">
                 </select>
+              </div>
+              <div class="col-sm-3">
+
+                <label>Panel sleep</label>
+                <md-switch class="device-properties-switch" ng-model="deviceDetailsCtrl.currentDevice.panelSleep"
+                           ng-change="deviceDetailsCtrl.onPanelSleep(deviceDetailsCtrl.currentDevice.panelSleep)" aria-label="Panel Sleep">
+                </md-switch>
               </div>
             </div>
             <hr>

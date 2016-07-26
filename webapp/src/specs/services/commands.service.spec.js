@@ -24,6 +24,22 @@ describe('CommandsService', function () {
     return spyOn($cookies, 'get').and.returnValue(userEmail);
   }));
 
+
+  describe('.panelSleep', () =>
+    it('prepares a device panel sleep command, returning a promise', function () {
+      let commandsRestangularService = {
+        customPUT() {
+        }
+      };
+      spyOn(Restangular, 'oneUrl').and.returnValue(commandsRestangularService);
+      spyOn(commandsRestangularService, 'customPUT').and.returnValue(promise);
+      let actual = CommandsService.panelSleep(key, 'someValue');
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `api/v1/devices/${key}/panel-sleep`);
+      expect(commandsRestangularService.customPUT).toHaveBeenCalled();
+      return expect(actual).toBe(promise);
+    })
+  );
+
   describe('.reset', () =>
     it('prepares a device reset command, returning a promise', function () {
       let commandsRestangularService = {

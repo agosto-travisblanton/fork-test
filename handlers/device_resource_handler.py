@@ -21,7 +21,7 @@ from workflow.refresh_device import refresh_device
 from workflow.refresh_device_by_mac_address import refresh_device_by_mac_address
 from workflow.register_device import register_device
 from workflow.update_chrome_os_device import update_chrome_os_device
-
+from device_commands_handler import DeviceCommandsHandler
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
 
@@ -884,6 +884,29 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             device.archived = True
             device.put()
             self.response.headers.pop('Content-Type', None)
+        self.response.set_status(status, message)
+
+    @requires_api_token
+    def panel_sleep(self, device_urlsafe_key):
+        status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
+        if device:
+            user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
+            if user_identifier is None or user_identifier == '':
+                user_identifier = 'system'
+
+            request_json = json.loads(self.request.body)
+            panel_sleep = request_json["panelSleep"]
+            device = ndb.Key(urlsafe=device_urlsafe_key).get()
+            device.panel_sleep = panel_sleep
+            device.put()
+
+            change_intent(
+                gcm_registration_id=device.gcm_registration_id,
+                payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                device_urlsafe_key=device_urlsafe_key,
+                host=self.request.host_url,
+                user_identifier=user_identifier)
+
         self.response.set_status(status, message)
 
     @staticmethod

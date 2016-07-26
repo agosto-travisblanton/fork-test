@@ -6,6 +6,16 @@ export default class CommandsService {
     this.SERVICE_NAME = 'devices';
   }
 
+  panelSleep(key, panelSleep) {
+    /** panelSleep: boolean **/
+    let payload = {
+      panelSleep
+    };
+
+    let promise = this.Restangular.oneUrl(this.SERVICE_NAME, `api/v1/devices/${key}/panel-sleep`).customPUT(payload);
+    return promise;
+  }
+
   reset(key) {
     let promise = this.Restangular.oneUrl(this.SERVICE_NAME, `api/v1/devices/${key}/commands/reset`).post();
     return promise;

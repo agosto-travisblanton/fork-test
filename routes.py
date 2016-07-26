@@ -131,15 +131,15 @@ application = WSGIApplication(
               handler_method='get_latest_issues',
               methods=['GET']
               ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/panel-sleep',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='panel_sleep',
+              handler_method='panel_sleep',
+              methods=['PUT']
+              ),
         Route(r'/api/v1/devices/<device_urlsafe_key>/commands',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
               name='device-commands',
-              ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/panel-sleep',
-              handler='handlers.device_commands_handler.DeviceCommandsHandler',
-              name='panel_sleep',
-              handler_method='panel_sleep',
-              methods=['POST']
               ),
         Route(r'/api/v1/devices/<device_urlsafe_key>/commands/reset',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
