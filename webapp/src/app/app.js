@@ -1,6 +1,8 @@
 import angular from 'angular';
 import uiRouter from 'angular-ui-router';
 import moment from 'moment';
+import 'angular-tooltips';
+import 'angular-tooltips/dist/angular-tooltips.css'
 import 'angular-toastr/dist/angular-toastr.css'
 import 'angular-toastr';
 import "font-awesome/css/font-awesome.css";
@@ -39,6 +41,7 @@ window.angular = angular;
 export let app = angular.module('skykitProvisioning', [
   uiRouter,
   'ngAnimate',
+  '720kb.tooltips',
   'ngCookies',
   'ngSanitize',
   'restangular',

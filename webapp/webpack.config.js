@@ -9,7 +9,7 @@ module.exports = {
   module: {
     loaders: [
       {test: /\.js$/, exclude: [/app\/lib/, /node_modules/, /bower_components/], loader: 'ng-annotate!babel'},
-      {test: /\.html$/, loader: 'raw'},
+      {test: /\.html$/, loader: 'html'},
       {test: /\.scss$/, loaders: ['style', 'css', 'sass']},
       {test: /\.styl$/, loader: 'style!css!stylus'},
       {test: /\.css$/, loader: 'style!css'},
@@ -28,7 +28,7 @@ module.exports = {
       inject: 'body',
       hash: true
     }),
-    
+
 
     new webpack.ProvidePlugin({
       $: "jquery",
