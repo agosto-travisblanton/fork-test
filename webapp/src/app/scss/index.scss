@@ -557,3 +557,7 @@ header.dtp-header {
 .device-properties-switch {
   margin-top: -1px;
 }
+
+.md-content-command-override md-content {
+  overflow: unset
+}
