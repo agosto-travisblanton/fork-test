@@ -1,5 +1,5 @@
-import uuid
 import logging
+import uuid
 
 from datetime import datetime
 from google.appengine.ext import ndb
@@ -124,9 +124,14 @@ class ChromeOsDevice(ndb.Model):
         return device
 
     @classmethod
-    def create_unmanaged(cls, gcm_registration_id, mac_address, timezone='America/Chicago'):
+    def create_unmanaged(cls,
+                         gcm_registration_id,
+                         mac_address,
+                         timezone='America/Chicago',
+                         registration_correlation_identifier=None):
         timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
         device = cls(
+            archived=False,
             gcm_registration_id=gcm_registration_id,
             mac_address=mac_address,
             api_key=str(uuid.uuid4().hex),
@@ -139,10 +144,45 @@ class ChromeOsDevice(ndb.Model):
             heartbeat_updated=datetime.utcnow(),
             program='****initial****',
             program_id='****initial****',
+            playlist='****initial playlist****',
+            playlist_id='****initial playlist id****',
             heartbeat_interval_minutes=config.PLAYER_HEARTBEAT_INTERVAL_MINUTES,
             timezone=timezone,
-            timezone_offset=timezone_offset)
+            timezone_offset=timezone_offset,
+            proof_of_play_editable=False,
+            registration_correlation_identifier=registration_correlation_identifier,
+            model='unmanaged device',
+            serial_number='no serial number')
         return device
+
+    @classmethod
+    def get_by_gcm_registration_id(cls, gcm_registration_id):
+        if gcm_registration_id:
+            results = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
+                                           ndb.AND(ChromeOsDevice.archived == False)).fetch()
+            return results
+        else:
+            return None
+
+    @classmethod
+    def get_by_mac_address(cls, mac_address):
+        if mac_address:
+            results = ChromeOsDevice.query(
+                ndb.OR(ChromeOsDevice.mac_address == mac_address,
+                       ChromeOsDevice.ethernet_mac_address == mac_address),
+                ndb.AND(ChromeOsDevice.archived == False)).fetch()
+            return results
+        else:
+            return None
+
+    @classmethod
+    def get_by_pairing_code(cls, pairing_code):
+        if pairing_code:
+            results = ChromeOsDevice.query(ChromeOsDevice.pairing_code == pairing_code,
+                                           ndb.AND(ChromeOsDevice.archived == False)).fetch()
+            return results
+        else:
+            return None
 
     @classmethod
     def get_unmanaged_device_by_mac_address(cls, mac_address):
@@ -171,17 +211,20 @@ class ChromeOsDevice(ndb.Model):
             return None
 
     @classmethod
-    def mac_address_already_assigned(cls, device_mac_address):
-        mac_address_assigned_to_device = ChromeOsDevice.query(
+    def mac_address_already_assigned(cls, device_mac_address, is_unmanaged_device=False):
+        mac_address_already_assigned_to_device = ChromeOsDevice.query(
             ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
                    ChromeOsDevice.ethernet_mac_address == device_mac_address),
-            ndb.AND(ChromeOsDevice.archived == False)).count() > 0
-        return mac_address_assigned_to_device
+            ndb.AND(
+                ChromeOsDevice.is_unmanaged_device == is_unmanaged_device,
+                ChromeOsDevice.archived == False)).count() > 0
+        return mac_address_already_assigned_to_device
 
     @classmethod
-    def gcm_registration_id_already_assigned(cls, gcm_registration_id):
+    def gcm_registration_id_already_assigned(cls, gcm_registration_id, is_unmanaged_device=False):
         gcm_registration_id_already_assigned_to_device = ChromeOsDevice.query(
             ndb.AND(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
+                    ChromeOsDevice.is_unmanaged_device == is_unmanaged_device,
                     ChromeOsDevice.archived == False)).count() > 0
         return gcm_registration_id_already_assigned_to_device
 
