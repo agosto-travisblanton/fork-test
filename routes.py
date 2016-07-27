@@ -284,6 +284,14 @@ application = WSGIApplication(
               ),
 
         Route(
+            r'/api/v1/tenants',
+            handler='handlers.tenants_handler.TenantsHandler',
+            name='search_for_tenant',
+            handler_method='search_for_tenant',
+            methods=['GET', 'PUT', 'DELETE']
+        ),
+
+        Route(
             r'/api/v1/tenants/<tenant_key>',
             handler='handlers.tenants_handler.TenantsHandler',
             name='manage-tenant',
