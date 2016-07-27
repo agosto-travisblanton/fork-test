@@ -273,24 +273,27 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
     @requires_api_token
     def get_device_by_parameter(self):
         pairing_code = self.request.get('pairingCode')
-        if pairing_code:
-            query_results = ChromeOsDevice.query(ChromeOsDevice.pairing_code == pairing_code,
-                                                 ndb.AND(ChromeOsDevice.archived == False)).fetch()
-            if len(query_results) == 1:
-                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
-            elif len(query_results) > 1:
-                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
-                error_message = "Multiple devices have pairing code {0}".format(pairing_code)
-                logging.error(error_message)
-            else:
-                error_message = "Unable to find device by pairing code: {0}".format(pairing_code)
-                self.response.set_status(404, error_message)
-            return
-
         gcm_registration_id = self.request.get('gcmRegistrationId')
-        if gcm_registration_id:
-            query_results = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
-                                                 ndb.AND(ChromeOsDevice.archived == False)).fetch()
+        device_mac_address = self.request.get('macAddress')
+        has_pairing_code = pairing_code is not None and str(pairing_code) is not ''
+        has_gcm_registration_id = gcm_registration_id is not None and str(gcm_registration_id) is not ''
+        has_device_mac_address = device_mac_address is not None and str(device_mac_address) is not ''
+        valid_input = has_pairing_code or (has_gcm_registration_id and has_device_mac_address)
+        if valid_input:
+            if pairing_code:
+                query_results = ChromeOsDevice.get_by_pairing_code(pairing_code)
+                if len(query_results) == 1:
+                    json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+                elif len(query_results) > 1:
+                    json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+                    error_message = "Multiple devices have pairing code {0}".format(pairing_code)
+                    logging.error(error_message)
+                else:
+                    message = "Unable to find device by pairing code: {0}".format(pairing_code)
+                    self.response.set_status(404, message)
+                return
+
+            query_results = ChromeOsDevice.get_by_gcm_registration_id(gcm_registration_id)
             if len(query_results) == 1:
                 json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
             elif len(query_results) > 1:
@@ -298,37 +301,26 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 error_message = "Multiple devices have GCM registration ID {0}".format(gcm_registration_id)
                 logging.error(error_message)
             else:
-                error_message = "Unable to find Chrome OS device by GCM registration ID: {0}".format(
-                    gcm_registration_id)
-                self.response.set_status(404, error_message)
-            return
-
-        device_mac_address = self.request.get('macAddress')
-        if device_mac_address:
-            query_results = ChromeOsDevice.query(
-                ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
-                       ChromeOsDevice.ethernet_mac_address == device_mac_address),
-                ndb.AND(ChromeOsDevice.archived == False)).fetch()
-            if len(query_results) == 1:
-                if ChromeOsDevice.is_rogue_unmanaged_device(device_mac_address):
-                    self.delete(query_results[0].key.urlsafe())
-                    error_message = "Rogue unmanaged device with MAC address: {0} no longer exists.".format(
-                        device_mac_address)
-                    self.response.set_status(404, error_message)
-                else:
+                query_results = ChromeOsDevice.get_by_mac_address(device_mac_address)
+                if len(query_results) == 1:
+                    if ChromeOsDevice.is_rogue_unmanaged_device(device_mac_address):
+                        self.delete(query_results[0].key.urlsafe())
+                        error_message = "Rogue unmanaged device with MAC address: {0} no longer exists.".format(
+                            device_mac_address)
+                        self.response.set_status(404, error_message)
+                    else:
+                        json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
+                elif len(query_results) > 1:
                     json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
-            elif len(query_results) > 1:
-                json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
-                error_message = "Multiple devices have MAC address {0}".format(device_mac_address)
-                logging.error(error_message)
-            else:
-                error_message = "Unable to find Chrome OS device by MAC address: {0}".format(device_mac_address)
-                self.response.set_status(404, error_message)
-            return
-
-        query = ChromeOsDevice.query(ChromeOsDevice.archived == False)
-        query_results = query.fetch()
-        json_response(self.response, query_results, strategy=CHROME_OS_DEVICE_STRATEGY)
+                    error_message = "Multiple devices have MAC address {0}".format(device_mac_address)
+                    logging.error(error_message)
+                else:
+                    error_message = "Unable to find device by GCM registration ID: {0} or MAC address: {1}".format(
+                        gcm_registration_id, device_mac_address)
+                    self.response.set_status(404, error_message)
+        else:
+            self.response.set_status(400)
+        return
 
     @requires_api_token
     def get(self, device_urlsafe_key):
@@ -391,31 +383,60 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             timezone = request_json.get('timezone')
             if timezone is None or timezone == '':
                 timezone = 'America/Chicago'
+            correlation_id = IntegrationEventLog.generate_correlation_id()
             if self.is_unmanaged_device is True:
-                if ChromeOsDevice.gcm_registration_id_already_assigned(gcm_registration_id=gcm_registration_id):
-                    error_message = 'Conflict gcm_registration_id is already assigned.'
+                registration_request_event = IntegrationEventLog.create(
+                    event_category='Registration',
+                    component_name='Player - unmanaged',
+                    workflow_step='Request from Player to create an umanaged device',
+                    mac_address=device_mac_address,
+                    gcm_registration_id=gcm_registration_id,
+                    correlation_identifier=correlation_id)
+                registration_request_event.put()
+                if ChromeOsDevice.gcm_registration_id_already_assigned(
+                        gcm_registration_id=gcm_registration_id,
+                        is_unmanaged_device=True):
+                    error_message = 'Conflict gcm registration id is already assigned to an unmanaged device.'
                     self.response.set_status(409, error_message)
+                    registration_request_event.details = error_message
+                    registration_request_event.put()
                     device = ChromeOsDevice.get_unmanaged_device_by_gcm_registration_id(
                         gcm_registration_id=gcm_registration_id)
-                    if device:  # TODO consider checking if device has a tenant on it yet before sending this...
+                    if device:
                         post_unmanaged_device_info(gcm_registration_id=device.gcm_registration_id,
                                                    device_urlsafe_key=device.key.urlsafe(),
                                                    host=self.request.host_url)
+                    registration_request_event.details = "{0}. Messaging device key to player".format(error_message)
+                    registration_request_event.put()
                     return
-                else:
-                    device = ChromeOsDevice.create_unmanaged(gcm_registration_id=gcm_registration_id,
-                                                             mac_address=device_mac_address,
-                                                             timezone=timezone)
-                    device_key = device.put()
-                    device_uri = self.request.app.router.build(None,
-                                                               'device-pairing-code',
-                                                               None,
-                                                               {'device_urlsafe_key': device_key.urlsafe()})
-                    self.response.headers['Location'] = device_uri
-                    self.response.headers.pop('Content-Type', None)
-                    self.response.set_status(status)
+                if ChromeOsDevice.mac_address_already_assigned(
+                        device_mac_address=device_mac_address,
+                        is_unmanaged_device=True):
+                    error_message = 'Conflict mac address is already assigned to an unmanaged device.'
+                    self.response.set_status(409, error_message)
+                    registration_request_event.details = error_message
+                    registration_request_event.put()
+                    device = ChromeOsDevice.get_unmanaged_device_by_mac_address(mac_address=device_mac_address)
+                    if device:
+                        post_unmanaged_device_info(gcm_registration_id=device.gcm_registration_id,
+                                                   device_urlsafe_key=device.key.urlsafe(),
+                                                   host=self.request.host_url)
+                    registration_request_event.details = "{0}. Messaging device key to player".format(error_message)
+                    registration_request_event.put()
+                    return
+                device = ChromeOsDevice.create_unmanaged(gcm_registration_id=gcm_registration_id,
+                                                         mac_address=device_mac_address,
+                                                         timezone=timezone,
+                                                         registration_correlation_identifier=correlation_id)
+                device_key = device.put()
+                device_uri = self.request.app.router.build(None,
+                                                           'device-pairing-code',
+                                                           None,
+                                                           {'device_urlsafe_key': device_key.urlsafe()})
+                self.response.headers['Location'] = device_uri
+                self.response.headers.pop('Content-Type', None)
+                self.response.set_status(status)
             else:
-                correlation_id = IntegrationEventLog.generate_correlation_id()
                 registration_request_event = IntegrationEventLog.create(
                     event_category='Registration',
                     component_name='Player',
@@ -424,8 +445,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     gcm_registration_id=gcm_registration_id,
                     correlation_identifier=correlation_id)
                 registration_request_event.put()
-                if ChromeOsDevice.gcm_registration_id_already_assigned(gcm_registration_id=gcm_registration_id):
-                    error_message = 'Conflict gcm_registration_id is already assigned.'
+                if ChromeOsDevice.gcm_registration_id_already_assigned(gcm_registration_id=gcm_registration_id,
+                                                                       is_unmanaged_device=False):
+                    error_message = 'Conflict gcm registration id is already assigned to a managed device.'
                     registration_request_event.details = error_message
                     registration_request_event.put()
                     self.response.set_status(409, error_message)
@@ -569,17 +591,26 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             tenant_code = request_json.get('tenantCode')
             if tenant_code:
                 tenant = Tenant.find_by_tenant_code(tenant_code)
-                if tenant and tenant.key != device.tenant_key:
-                    device.tenant_key = tenant.key
-                    if device.is_unmanaged_device:
-                        post_unmanaged_device_info(gcm_registration_id=device.gcm_registration_id,
-                                                   device_urlsafe_key=device.key.urlsafe(), host=self.request.host_url)
-                    else:
+                if tenant:
+                    if tenant.key != device.tenant_key:
+                        device.tenant_key = tenant.key
                         device.put()
-                        deferred.defer(ContentManagerApi().update_device,
-                                       device_urlsafe_key=device.key.urlsafe(),
-                                       _queue='content-server',
-                                       _countdown=5)
+                        if device.is_unmanaged_device:
+                            post_unmanaged_device_info(gcm_registration_id=device.gcm_registration_id,
+                                                       device_urlsafe_key=device.key.urlsafe(),
+                                                       host=self.request.host_url)
+                        else:
+                            deferred.defer(ContentManagerApi().update_device,
+                                           device_urlsafe_key=device.key.urlsafe(),
+                                           _queue='content-server',
+                                           _countdown=5)
+                else:
+                    status = 400
+                    message = "Attempt to update an invalid tenant code: \"{0}\".".format(
+                        tenant_code)
+                    self.response.set_status(status, message)
+                    return
+
             proof_of_play_logging = request_json.get('proofOfPlayLogging')
             if str(proof_of_play_logging).lower() == 'true' or str(proof_of_play_logging).lower() == 'false':
                 device.proof_of_play_logging = bool(proof_of_play_logging)
@@ -640,7 +671,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 new_log_entry.put()
 
             if mac_address:
-                if not device.is_unmanaged_device and ChromeOsDevice.mac_address_already_assigned(mac_address):
+                if not device.is_unmanaged_device and \
+                        ChromeOsDevice.mac_address_already_assigned(mac_address, is_unmanaged_device=False):
                     if device.ethernet_mac_address == mac_address:
                         device.connection_type = config.ETHERNET_CONNECTION
                     elif device.mac_address == mac_address:
