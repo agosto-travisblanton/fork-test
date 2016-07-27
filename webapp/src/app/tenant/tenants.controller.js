@@ -45,7 +45,7 @@ function TenantsCtrl($state, $log, TenantsService, ProgressBarService, sweet) {
       return []
     }
     let promise = TenantsService.searchAllTenantsByName(tenant_name)
-    promise.then((response) => {
+    return promise.then((response) => {
       vm.searchedTenants = response["matches"]
       if (vm.searchedTenants) {
         return vm.searchedTenants.map((i) => i.name)
@@ -53,7 +53,7 @@ function TenantsCtrl($state, $log, TenantsService, ProgressBarService, sweet) {
         return []
       }
     })
-    promise.catch((response) => {
+    return promise.catch((response) => {
       let errorMessage = `Unable to fetch tenants. Error: ${response.status}`;
       return sweet.show('Oops...', errorMessage, 'error');
     })
