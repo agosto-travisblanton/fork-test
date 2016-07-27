@@ -16,8 +16,7 @@ export default class TenantsService {
   }
 
   searchAllTenantsByName(tenant_name) {
-    let url = `/api/v1/tenants?tenant_name=${tenant_name}`;
-    let promise = this.Restangular.oneUrl('tenants', url).get();
+    let promise = this.Restangular.all('tenants').customGET("", {tenant_name: tenant_name})
     return promise;
   }
 
