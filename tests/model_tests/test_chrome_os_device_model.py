@@ -63,9 +63,9 @@ class TestChromeOsDeviceModel(BaseTest):
 
     def test_get_by_device_id(self):
         device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                                         device_id=self.TESTING_DEVICE_ID,
-                                                         gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
-                                                         mac_address=self.MAC_ADDRESS)
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
         expected_key = device.put()
         actual = ChromeOsDevice.get_by_device_id(self.TESTING_DEVICE_ID)
         self.assertEqual(actual.key, expected_key)
@@ -383,3 +383,55 @@ class TestChromeOsDeviceModel(BaseTest):
         uniqueness_check = ChromeOsDevice.is_customer_display_code_unique(customer_display_code=display_code,
                                                                           tenant_key=self.tenant_key)
         self.assertTrue(uniqueness_check)
+
+    def test_get_by_gcm_registration_id(self):
+        gcm_registration_id = 'foobar'
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=gcm_registration_id,
+                                               mac_address=self.MAC_ADDRESS,
+                                               serial_number=self.SERIAL_NUMBER,
+                                               model=self.MODEL,
+                                               archived=False)
+        device.put()
+        results = ChromeOsDevice.get_by_gcm_registration_id(gcm_registration_id)
+        self.assertEqual(results[0].gcm_registration_id, gcm_registration_id)
+        device.archived = True
+        device.put()
+        results = ChromeOsDevice.get_by_gcm_registration_id(gcm_registration_id)
+        self.assertEmpty(results)
+
+    def test_get_by_mac_address(self):
+        mac_address = 'foobar'
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=mac_address,
+                                               serial_number=self.SERIAL_NUMBER,
+                                               model=self.MODEL,
+                                               archived=False)
+        device.put()
+        results = ChromeOsDevice.get_by_mac_address(mac_address)
+        self.assertEqual(results[0].mac_address, mac_address)
+        device.archived = True
+        device.put()
+        results = ChromeOsDevice.get_by_mac_address(mac_address)
+        self.assertEmpty(results)
+
+    def test_get_by_pairing_code(self):
+        pairing_code = 'foobar'
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS,
+                                               serial_number=self.SERIAL_NUMBER,
+                                               model=self.MODEL,
+                                               archived=False)
+        device.pairing_code = pairing_code
+        device.put()
+        results = ChromeOsDevice.get_by_pairing_code(pairing_code)
+        self.assertEqual(results[0].pairing_code, pairing_code)
+        device.archived = True
+        device.put()
+        results = ChromeOsDevice.get_by_pairing_code(pairing_code)
+        self.assertEmpty(results)

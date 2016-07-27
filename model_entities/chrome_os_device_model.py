@@ -1,5 +1,5 @@
-import uuid
 import logging
+import uuid
 
 from datetime import datetime
 from google.appengine.ext import ndb
@@ -154,6 +154,35 @@ class ChromeOsDevice(ndb.Model):
             model='unmanaged device',
             serial_number='no serial number')
         return device
+
+    @classmethod
+    def get_by_gcm_registration_id(cls, gcm_registration_id):
+        if gcm_registration_id:
+            results = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
+                                           ndb.AND(ChromeOsDevice.archived == False)).fetch()
+            return results
+        else:
+            return None
+
+    @classmethod
+    def get_by_mac_address(cls, mac_address):
+        if mac_address:
+            results = ChromeOsDevice.query(
+                ndb.OR(ChromeOsDevice.mac_address == mac_address,
+                       ChromeOsDevice.ethernet_mac_address == mac_address),
+                ndb.AND(ChromeOsDevice.archived == False)).fetch()
+            return results
+        else:
+            return None
+
+    @classmethod
+    def get_by_pairing_code(cls, pairing_code):
+        if pairing_code:
+            results = ChromeOsDevice.query(ChromeOsDevice.pairing_code == pairing_code,
+                                           ndb.AND(ChromeOsDevice.archived == False)).fetch()
+            return results
+        else:
+            return None
 
     @classmethod
     def get_unmanaged_device_by_mac_address(cls, mac_address):

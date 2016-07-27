@@ -282,8 +282,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         valid_input = has_pairing_code or (has_gcm_registration_id and has_device_mac_address)
         if valid_input:
             if pairing_code:
-                query_results = ChromeOsDevice.query(ChromeOsDevice.pairing_code == pairing_code,
-                                                     ndb.AND(ChromeOsDevice.archived == False)).fetch()
+                query_results = ChromeOsDevice.get_by_pairing_code(pairing_code)
                 if len(query_results) == 1:
                     json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
                 elif len(query_results) > 1:
@@ -295,8 +294,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     self.response.set_status(404, message)
                 return
 
-            query_results = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
-                                                 ndb.AND(ChromeOsDevice.archived == False)).fetch()
+            query_results = ChromeOsDevice.get_by_gcm_registration_id(gcm_registration_id)
             if len(query_results) == 1:
                 json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
             elif len(query_results) > 1:
@@ -304,10 +302,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 error_message = "Multiple devices have GCM registration ID {0}".format(gcm_registration_id)
                 logging.error(error_message)
             else:
-                query_results = ChromeOsDevice.query(
-                    ndb.OR(ChromeOsDevice.mac_address == device_mac_address,
-                           ChromeOsDevice.ethernet_mac_address == device_mac_address),
-                    ndb.AND(ChromeOsDevice.archived == False)).fetch()
+                query_results = ChromeOsDevice.get_by_mac_address(device_mac_address)
                 if len(query_results) == 1:
                     if ChromeOsDevice.is_rogue_unmanaged_device(device_mac_address):
                         self.delete(query_results[0].key.urlsafe())
@@ -326,7 +321,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                     self.response.set_status(404, error_message)
         else:
             self.response.set_status(400)
-
         return
 
     @requires_api_token
