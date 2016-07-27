@@ -3,9 +3,12 @@ function TenantsCtrl($state, $log, TenantsService, ProgressBarService, sweet) {
 
   let vm = this;
 
+  // Paginated Tenants
   vm.tenants = [];
+  // All Tenants
+  vm.allTenants = [];
 
-  vm.getTenants = function (page_size, offset) {
+  vm.getTenantsPaginated = function (page_size, offset) {
     vm.offset = offset;
     vm.loading = true;
     ProgressBarService.start();
@@ -13,9 +16,14 @@ function TenantsCtrl($state, $log, TenantsService, ProgressBarService, sweet) {
     return promise.then((response => vm.getFetchSuccess(response)), response => vm.getFetchFailure(response));
   };
 
+  vm.getAllTenants = function () {
+    let promise = TenantsService.fetchAllTenants();
+    return promise.then((response => vm.getFetchSuccess(response)), response => vm.getFetchFailure(response));
+  }
+
   vm.initialize = function () {
     vm.offset = 0;
-    return vm.getTenants(100, vm.offset);
+    return vm.getTenantsPaginated(100, vm.offset);
   };
 
   vm.getFetchSuccess = function (response) {

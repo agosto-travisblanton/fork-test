@@ -55,6 +55,7 @@ class TenantsHandler(RequestHandler):
                 tenant.proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
                 tenant.put()
             result = tenant
+
         json_response(self.response, result, strategy=TENANT_STRATEGY)
 
     @requires_api_token
