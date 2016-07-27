@@ -208,7 +208,6 @@ application = WSGIApplication(
               methods=['POST']
               ),
 
-
         ############################################################
         # (DISTRIBUTOR) DEVICE ROUTES
         ############################################################
@@ -282,14 +281,6 @@ application = WSGIApplication(
               name='tenants',
               methods=['GET', 'POST']
               ),
-
-        Route(
-            r'/api/v1/tenants',
-            handler='handlers.tenants_handler.TenantsHandler',
-            name='search_for_tenant',
-            handler_method='search_for_tenant',
-            methods=['GET', 'PUT', 'DELETE']
-        ),
 
         Route(
             r'/api/v1/tenants/<tenant_key>',
@@ -433,7 +424,6 @@ application = WSGIApplication(
               handler_method='get_enrollment_events',
               methods=['GET']
               ),
-
 
         ############################################################
         # Google Directory API Interrogation
