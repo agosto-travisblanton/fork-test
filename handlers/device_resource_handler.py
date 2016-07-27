@@ -9,6 +9,7 @@ from webapp2 import RequestHandler
 from app_config import config
 from content_manager_api import ContentManagerApi
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
+from device_commands_handler import DeviceCommandsHandler
 from device_message_processor import post_unmanaged_device_info, change_intent
 from model_entities.integration_events_log_model import IntegrationEventLog
 from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup, DeviceIssueLog
@@ -21,7 +22,7 @@ from workflow.refresh_device import refresh_device
 from workflow.refresh_device_by_mac_address import refresh_device_by_mac_address
 from workflow.register_device import register_device
 from workflow.update_chrome_os_device import update_chrome_os_device
-from device_commands_handler import DeviceCommandsHandler
+
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
 
@@ -389,43 +390,60 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             timezone = request_json.get('timezone')
             if timezone is None or timezone == '':
                 timezone = 'America/Chicago'
+            correlation_id = IntegrationEventLog.generate_correlation_id()
             if self.is_unmanaged_device is True:
+                registration_request_event = IntegrationEventLog.create(
+                    event_category='Registration',
+                    component_name='Player - unmanaged',
+                    workflow_step='Request from Player to create an umanaged device',
+                    mac_address=device_mac_address,
+                    gcm_registration_id=gcm_registration_id,
+                    correlation_identifier=correlation_id)
+                registration_request_event.put()
                 if ChromeOsDevice.gcm_registration_id_already_assigned(
                         gcm_registration_id=gcm_registration_id,
                         is_unmanaged_device=True):
-                    error_message = 'Conflict gcm_registration_id is already assigned to unmanaged device.'
+                    error_message = 'Conflict gcm registration id is already assigned to an unmanaged device.'
                     self.response.set_status(409, error_message)
+                    registration_request_event.details = error_message
+                    registration_request_event.put()
                     device = ChromeOsDevice.get_unmanaged_device_by_gcm_registration_id(
                         gcm_registration_id=gcm_registration_id)
                     if device:
                         post_unmanaged_device_info(gcm_registration_id=device.gcm_registration_id,
                                                    device_urlsafe_key=device.key.urlsafe(),
                                                    host=self.request.host_url)
+                    registration_request_event.details = "{0}. Messaging device key to player".format(error_message)
+                    registration_request_event.put()
                     return
                 if ChromeOsDevice.mac_address_already_assigned(
                         device_mac_address=device_mac_address,
                         is_unmanaged_device=True):
-                    error_message = 'Conflict mac_address is already assigned to unmanaged device.'
+                    error_message = 'Conflict mac address is already assigned to an unmanaged device.'
                     self.response.set_status(409, error_message)
+                    registration_request_event.details = error_message
+                    registration_request_event.put()
                     device = ChromeOsDevice.get_unmanaged_device_by_mac_address(mac_address=device_mac_address)
                     if device:
                         post_unmanaged_device_info(gcm_registration_id=device.gcm_registration_id,
                                                    device_urlsafe_key=device.key.urlsafe(),
                                                    host=self.request.host_url)
+                    registration_request_event.details = "{0}. Messaging device key to player".format(error_message)
+                    registration_request_event.put()
                     return
                 device = ChromeOsDevice.create_unmanaged(gcm_registration_id=gcm_registration_id,
                                                          mac_address=device_mac_address,
-                                                         timezone=timezone)
+                                                         timezone=timezone,
+                                                         registration_correlation_identifier=correlation_id)
                 device_key = device.put()
                 device_uri = self.request.app.router.build(None,
-                                                               'device-pairing-code',
-                                                               None,
-                                                               {'device_urlsafe_key': device_key.urlsafe()})
+                                                           'device-pairing-code',
+                                                           None,
+                                                           {'device_urlsafe_key': device_key.urlsafe()})
                 self.response.headers['Location'] = device_uri
                 self.response.headers.pop('Content-Type', None)
                 self.response.set_status(status)
             else:
-                correlation_id = IntegrationEventLog.generate_correlation_id()
                 registration_request_event = IntegrationEventLog.create(
                     event_category='Registration',
                     component_name='Player',
@@ -436,7 +454,7 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 registration_request_event.put()
                 if ChromeOsDevice.gcm_registration_id_already_assigned(gcm_registration_id=gcm_registration_id,
                                                                        is_unmanaged_device=False):
-                    error_message = 'Conflict gcm_registration_id is already assigned.'
+                    error_message = 'Conflict gcm registration id is already assigned to a managed device.'
                     registration_request_event.details = error_message
                     registration_request_event.put()
                     self.response.set_status(409, error_message)
