@@ -6,7 +6,7 @@
  * file for the Webpack tests. Similarly to how Webpack creates a
  * `bundle.js` file for the compressed app source files, when we
  * run our tests, Webpack, likewise, compiles and bundles those tests here.
-*/
+ */
 
 import './src/app/index.js'
 
@@ -30,6 +30,10 @@ window.skykitProvisioning.q.Mock = class Mock {
     this.resolveFunc = resolveFunc;
     this.rejectFunc = rejectFunc;
     return;
+  }
+
+  catch(args) {
+    return this.resolveFunc(args);
   }
 
   resolve(args) {

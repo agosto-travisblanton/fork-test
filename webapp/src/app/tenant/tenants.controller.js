@@ -44,22 +44,26 @@ function TenantsCtrl($state, $log, TenantsService, ProgressBarService, sweet) {
     if (!tenant_name || tenant_name.length < 3) {
       return []
     }
-    return TenantsService.searchAllTenantsByName(tenant_name)
-      .then((response) => {
-        vm.searchedTenants = response["matches"]
+    let promise = TenantsService.searchAllTenantsByName(tenant_name)
+    promise.then((response) => {
+      vm.searchedTenants = response["matches"]
+      if (vm.searchedTenants) {
         return vm.searchedTenants.map((i) => i.name)
-      })
-      .catch((response) => {
-        let errorMessage = `Unable to fetch tenants. Error: ${response.status}`;
-        return sweet.show('Oops...', errorMessage, 'error');
-      })
+      } else {
+        return []
+      }
+    })
+    promise.catch((response) => {
+      let errorMessage = `Unable to fetch tenants. Error: ${response.status}`;
+      return sweet.show('Oops...', errorMessage, 'error');
+    })
   }
 
   vm.isTenantValid = (tenant_name) => {
     if (!tenant_name || tenant_name.length < 3) {
       return []
     }
-    TenantsService.searchAllTenantsByName(tenant_name)
+    let promise = TenantsService.searchAllTenantsByName(tenant_name)
       .then((response) => {
         let match = response["matches"][0]
         if (match) {
