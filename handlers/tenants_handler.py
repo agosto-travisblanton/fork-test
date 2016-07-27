@@ -43,10 +43,6 @@ class TenantsHandler(RequestHandler):
             strategy=TENANT_STRATEGY)
 
     @requires_api_token
-    def search_for_tenant(self, tenant_code):
-        pass
-
-    @requires_api_token
     def get(self, tenant_key=None):
         if not tenant_key:
             tenant_search_code = self.request.get("tenant_name")
