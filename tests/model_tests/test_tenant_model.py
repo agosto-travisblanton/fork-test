@@ -65,6 +65,11 @@ class TestTenantModel(BaseTest):
         self.assertEqual(actual.key, self.tenant_key)
         self.assertEqual(actual.name, self.NAME)
 
+    def test_find_by_partial_name_returns_list_of_matching_tenants(self):
+        actual = Tenant.find_by_partial_name(self.NAME)
+        self.assertEqual(actual[0].key, self.tenant_key)
+        self.assertEqual(actual[0].name, self.NAME)
+
     def test_find_by_name_returns_none_when_no_matching_tenant_found(self):
         actual = Tenant.find_by_name('barfood tenant')
         self.assertIsNone(actual)

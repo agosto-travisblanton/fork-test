@@ -208,7 +208,6 @@ application = WSGIApplication(
               methods=['POST']
               ),
 
-
         ############################################################
         # (DISTRIBUTOR) DEVICE ROUTES
         ############################################################
@@ -425,7 +424,6 @@ application = WSGIApplication(
               handler_method='get_enrollment_events',
               methods=['GET']
               ),
-
 
         ############################################################
         # Google Directory API Interrogation
