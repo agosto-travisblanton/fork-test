@@ -3,19 +3,19 @@ function TenantsCtrl($state, $log, TenantsService, ProgressBarService, sweet) {
 
   let vm = this;
 
+  // Paginated Tenants
   vm.tenants = [];
+  // Current Search of Tenants Results
+  vm.searchedTenants = [];
+  vm.searchMatch = null;
+  vm.searchDisabled = true;
 
-  vm.getTenants = function (page_size, offset) {
+  vm.getTenantsPaginated = function (page_size, offset) {
     vm.offset = offset;
     vm.loading = true;
     ProgressBarService.start();
     let promise = TenantsService.fetchAllTenantsPaginated(page_size, offset);
     return promise.then((response => vm.getFetchSuccess(response)), response => vm.getFetchFailure(response));
-  };
-
-  vm.initialize = function () {
-    vm.offset = 0;
-    return vm.getTenants(100, vm.offset);
   };
 
   vm.getFetchSuccess = function (response) {
@@ -32,6 +32,44 @@ function TenantsCtrl($state, $log, TenantsService, ProgressBarService, sweet) {
     let errorMessage = `Unable to fetch tenants. Error: ${response.status} ${response.statusText}.`;
     return sweet.show('Oops...', errorMessage, 'error');
   };
+
+
+  vm.initialize = function () {
+    vm.offset = 0;
+    vm.searchAllTenantsByName('my')
+    return vm.getTenantsPaginated(100, vm.offset);
+  };
+
+  vm.searchAllTenantsByName = function (tenant_name) {
+    if (!tenant_name || tenant_name.length < 3) {
+      return []
+    }
+    return TenantsService.searchAllTenantsByName(tenant_name)
+      .then((response) => {
+        vm.searchedTenants = response["matches"]
+        return vm.searchedTenants.map((i) => i.name)
+      })
+      .catch((response) => {
+        let errorMessage = `Unable to fetch tenants. Error: ${response.status}`;
+        return sweet.show('Oops...', errorMessage, 'error');
+      })
+  }
+
+  vm.isTenantValid = (tenant_name) => {
+    if (!tenant_name || tenant_name.length < 3) {
+      return []
+    }
+    TenantsService.searchAllTenantsByName(tenant_name)
+      .then((response) => {
+        let match = response["matches"][0]
+        if (match) {
+          vm.searchMatch = match
+          vm.searchDisabled = !(tenant_name === match.name)
+        } else {
+          vm.searchDisabled = true;
+        }
+      })
+  }
 
   vm.editItem = item => $state.go('tenantDetails', {tenantKey: item.key});
 
