@@ -62,15 +62,15 @@ describe('TenantsService', function () {
   describe('.searchAllTenantsByName', () =>
     it('fetch all tenants by name, returning a promise', function () {
       let tenantRestangularService = {
-        customGET() {
+        customGETLIST() {
         }
       };
       spyOn(Restangular, 'all').and.returnValue(tenantRestangularService);
-      spyOn(tenantRestangularService, 'customGET').and.returnValue(promise);
+      spyOn(tenantRestangularService, 'customGETLIST').and.returnValue(promise);
       let tenant_name = "someTenant"
       let actual = TenantsService.searchAllTenantsByName(tenant_name);
       expect(Restangular.all).toHaveBeenCalledWith('tenants');
-      expect(tenantRestangularService.customGET).toHaveBeenCalled();
+      expect(tenantRestangularService.customGETLIST).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
   );

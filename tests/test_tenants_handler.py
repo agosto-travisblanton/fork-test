@@ -90,7 +90,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         response = self.app.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 1)
-        self.assertTrue(filtering_on in response_json["matches"][0]["name"])
+        self.assertTrue(filtering_on in response_json[0]["name"])
 
     def test_get_returns_json_resources_paginated(self):
         self.load_tenants(amount=100)

@@ -46,7 +46,7 @@ function TenantsCtrl($state, $log, TenantsService, ProgressBarService, sweet) {
     }
     let promise = TenantsService.searchAllTenantsByName(tenant_name)
     return promise.then((response) => {
-      vm.searchedTenants = response["matches"]
+      vm.searchedTenants = response
       if (vm.searchedTenants) {
         return vm.searchedTenants.map((i) => i.name)
       } else {
@@ -65,7 +65,7 @@ function TenantsCtrl($state, $log, TenantsService, ProgressBarService, sweet) {
     }
     let promise = TenantsService.searchAllTenantsByName(tenant_name)
       .then((response) => {
-        let match = response["matches"][0]
+        let match = response[0]
         if (match) {
           vm.searchMatch = match
           vm.searchDisabled = !(tenant_name === match.name)
