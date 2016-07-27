@@ -38,6 +38,13 @@ class Tenant(ndb.Model):
                 return key.get()
 
     @classmethod
+    def find_by_partial_name(cls, partial_name):
+        # search for all tenants because datastore does not support wildcard searches
+        all_tenants = Tenant.query().fetch()
+        # returns wildcard matches for partial_name
+        return [item for item in all_tenants if partial_name in item.name]
+
+    @classmethod
     def find_by_tenant_code(cls, tenant_code):
         if tenant_code:
             tenant_key = Tenant.query(Tenant.tenant_code == tenant_code, Tenant.active == True).get(keys_only=True)
