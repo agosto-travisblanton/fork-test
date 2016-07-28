@@ -45,11 +45,14 @@ var writeNewSpecBundleWithPath = function (path) {
 
 module.exports = function (config) {
 
-  if (determineIfValidDirectoryOrFile(config.path)) {
-    writeNewSpecBundleWithPath(config.path)
-  } else {
-    console.log("THIS IS NOT A VALID PATH")
-    process.exit(1)
+  if (config.path) {
+
+    if (determineIfValidDirectoryOrFile(config.path)) {
+      writeNewSpecBundleWithPath(config.path)
+    } else {
+      console.log("THIS IS NOT A VALID PATH")
+      process.exit(1)
+    }
   }
 
   var fileToUse = determineFileToUse(config)
