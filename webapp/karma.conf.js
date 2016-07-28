@@ -1,10 +1,9 @@
 var webpack = require("webpack")
 var path = require('path')
+var fs = require('fs');
 
 var root = 'src';
-var fs = require('fs');
 var modifiedSpecBundleName = 'spec.bundle.specific.js'
-
 
 var determineIfValidDirectoryOrFile = function (path) {
   var stats = fs.lstatSync('./src/specs/' + path);
