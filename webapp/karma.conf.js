@@ -7,19 +7,8 @@ var modifiedSpecBundleName = 'spec.bundle.specific.js'
 
 
 var determineIfValidDirectoryOrFile = function (path) {
-  try {
-    // Query the entry
-    var stats = fs.lstatSync('./src/specs/' + path);
-    // Is it a directory?
-    if (stats.isDirectory() || stats.isFile()) {
-      return true
-    } else {
-      return false
-    }
-  }
-  catch (e) {
-    // ...
-  }
+  var stats = fs.lstatSync('./src/specs/' + path);
+  return (stats.isDirectory() || stats.isFile())
 }
 
 var determineFileToUse = function (config) {
@@ -44,9 +33,7 @@ var writeNewSpecBundleWithPath = function (path) {
 
 
 module.exports = function (config) {
-
   if (config.path) {
-
     if (determineIfValidDirectoryOrFile(config.path)) {
       writeNewSpecBundleWithPath(config.path)
     } else {
@@ -56,11 +43,8 @@ module.exports = function (config) {
   }
 
   var fileToUse = determineFileToUse(config)
-
   var preproccesors = {}
-
   preproccesors[fileToUse] = ['webpack', 'sourcemap']
-
 
   config.set({
     // base path used to resolve all patterns
@@ -119,7 +103,6 @@ module.exports = function (config) {
 
     logLevel: config.LOG_INFO,
 
-
     webpackServer: {
       noInfo: true // prevent console spamming when running in Karma!
     },
@@ -147,5 +130,4 @@ module.exports = function (config) {
     // if true, Karma runs tests once and exits
     singleRun: true
   });
-}
-;
+};
