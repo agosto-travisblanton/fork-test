@@ -71,7 +71,7 @@ describe('TenantsCtrl', function () {
       return expect(TenantsService.fetchAllTenantsPaginated).toHaveBeenCalled();
     });
 
-    return it("the 'then' handler caches the retrieved tenants in the controller", function () {
+    it("the 'then' handler caches the retrieved tenants in the controller", function () {
       controller.initialize();
       promise.resolve(tenants);
       return expect(controller.tenants).toBe(tenants.tenants);
@@ -118,7 +118,7 @@ describe('TenantsCtrl', function () {
     });
   });
 
-  return describe('.deleteItem', function () {
+  describe('.deleteItem', function () {
     let tenant = {
       key: 'dhjad897d987fadafg708fg7d',
       name: 'Foobar3',
@@ -151,5 +151,50 @@ describe('TenantsCtrl', function () {
       return expect(sweet.show).toHaveBeenCalled;
     });
   });
+
+  describe('.searchAllTenantsByName', function () {
+    let tenants = [
+      {
+        key: 'dhjad897d987fadafg708fg7d',
+        name: 'Foobar1',
+        created: '2015-05-10 22:15:10',
+        updated: '2015-05-10 22:15:10'
+      },
+      {
+        key: 'dhjad897d987fadafg708y67d',
+        name: 'Foobar2',
+        created: '2015-05-10 22:15:10',
+        updated: '2015-05-10 22:15:10'
+      },
+      {
+        key: 'dhjad897d987fadafg708hb55',
+        name: 'Foobar3',
+        created: '2015-05-10 22:15:10',
+        updated: '2015-05-10 22:15:10'
+      }
+    ]
+
+    beforeEach(function () {
+      promise = new skykitProvisioning.q.Mock();
+      spyOn(TenantsService, 'searchAllTenantsByName').and.returnValue(promise);
+    });
+
+    it('call TenantsService.searchAllTenantsByName to retrieve all tenants with matching name', function () {
+      controller.searchedTenants = tenants;
+      controller.searchAllTenantsByName('Foobar');
+      controller.searchedTenants = tenants;
+      promise.resolve(tenants);
+      expect(TenantsService.searchAllTenantsByName).toHaveBeenCalled();
+    });
+
+    return it("isTenantValid changes searchDisabled based on if the tenant is valid", function () {
+      let tenant_name = "Foobar1"
+      controller.isTenantValid(tenant_name);
+      promise.resolve(tenants);
+      expect(controller.searchDisabled).toBe(false);
+    });
+  });
+
+
 });
 

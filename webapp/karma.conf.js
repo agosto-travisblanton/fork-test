@@ -8,7 +8,7 @@ module.exports = function (config) {
   config.set({
     // base path used to resolve all patterns
     basePath: '',
-    
+
     browserNoActivityTimeout: 60000, // 60 seconds
 
     // frameworks to use
