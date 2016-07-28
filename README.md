@@ -64,5 +64,11 @@ $ gulp serve
 
 ### Test Front-End
 ```sh
-$ gulp test
+$ karma start
+OR 
+$ karma start --file services
+OR 
+$ karma start --file services/some-service.js
+OR 
+$ npm run test
 ```

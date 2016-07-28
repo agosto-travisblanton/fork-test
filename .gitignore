@@ -11,4 +11,4 @@ coverage_html_report
 .coverage
 backup/
 webapp/node_modules
-web/node_modules
+webapp/spec.bundle.specific.js

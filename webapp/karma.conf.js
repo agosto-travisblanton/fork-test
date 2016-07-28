@@ -1,10 +1,50 @@
 var webpack = require("webpack")
 var path = require('path')
+var fs = require('fs');
 
 var root = 'src';
+var modifiedSpecBundleName = 'spec.bundle.specific.js'
+
+var determineIfValidDirectoryOrFile = function (path) {
+  var stats = fs.lstatSync('./src/specs/' + path);
+  return (stats.isDirectory() || stats.isFile())
+}
+
+var determineFileToUse = function (config) {
+  if (config.path) {
+    return modifiedSpecBundleName
+  } else {
+    return 'spec.bundle.js'
+  }
+}
+
+var writeNewSpecBundleWithPath = function (path) {
+  var data = fs.readFileSync('./spec.bundle.js', {encoding: 'utf8'});
+  if (!(path.includes(".js"))) {
+    var newData = data.replace("./src/specs", "./src/specs/" + path);
+    fs.writeFileSync(modifiedSpecBundleName, newData);
+  } else {
+    var newData = data.replace("require.context('./src/specs', true, /\\.js/", "require('./src/specs/" + path + "'");
+    newData = newData.replace('context.keys().forEach(context);', "")
+    fs.writeFileSync(modifiedSpecBundleName, newData);
+  }
+}
 
 
 module.exports = function (config) {
+  if (config.path) {
+    if (determineIfValidDirectoryOrFile(config.path)) {
+      writeNewSpecBundleWithPath(config.path)
+    } else {
+      console.log("THIS IS NOT A VALID PATH")
+      process.exit(1)
+    }
+  }
+
+  var fileToUse = determineFileToUse(config)
+  var preproccesors = {}
+  preproccesors[fileToUse] = ['webpack', 'sourcemap']
+
   config.set({
     // base path used to resolve all patterns
     basePath: '',
@@ -16,7 +56,7 @@ module.exports = function (config) {
     frameworks: ['jasmine'],
 
     // list of files/patterns to load in the browser
-    files: [{pattern: 'spec.bundle.js', watched: false}],
+    files: [{pattern: fileToUse, watched: false}],
 
     // files to exclude
     exclude: [],
@@ -34,9 +74,7 @@ module.exports = function (config) {
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {
-      'spec.bundle.js': ['webpack', 'sourcemap']
-    },
+    preprocessors: preproccesors,
 
     webpack: {
       devtool: 'inline-source-map',
@@ -63,7 +101,6 @@ module.exports = function (config) {
     },
 
     logLevel: config.LOG_INFO,
-
 
     webpackServer: {
       noInfo: true // prevent console spamming when running in Karma!
