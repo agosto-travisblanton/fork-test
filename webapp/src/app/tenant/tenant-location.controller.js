@@ -1,4 +1,4 @@
-function TenantLocationCtrl($stateParams, TenantsService, LocationsService, $state, sweet, ProgressBarService, ToastsService) {
+function TenantLocationsCtrl($stateParams, TenantsService, LocationsService, $state, sweet, ProgressBarService, ToastsService) {
   "ngInject";
 
   let vm = this;
@@ -86,4 +86,4 @@ function TenantLocationCtrl($stateParams, TenantsService, LocationsService, $sta
 
   return vm;
 }
-export {TenantLocationCtrl}
+export {TenantLocationsCtrl}
