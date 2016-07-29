@@ -3,8 +3,13 @@ function TenantLocationsCtrl($scope, $stateParams, TenantsService, LocationsServ
 
   let vm = this;
   let {tenantKey} = $stateParams;
-  vm.currentTenant = undefined;
   $scope.tabIndex = 3;
+  vm.locations = [];
+
+  let tenantPromise = TenantsService.getTenantByKey(tenantKey);
+  tenantPromise.then(data => {
+    vm.currentTenant = data
+  });
 
   $scope.$watch('tabIndex', function (selectedIndex) {
     if (selectedIndex !== undefined) {
@@ -21,7 +26,6 @@ function TenantLocationsCtrl($scope, $stateParams, TenantsService, LocationsServ
     }
   });
 
-
   vm.getLocations = function (tenantKey, prev, next) {
     ProgressBarService.start();
     let locationsPromise = LocationsService.getLocationsByTenantKeyPaginated(tenantKey, prev, next);
@@ -33,21 +37,15 @@ function TenantLocationsCtrl($scope, $stateParams, TenantsService, LocationsServ
     });
   };
 
-
   vm.paginateCall = function (forward) {
     if (forward) {
       return vm.getLocations(tenantKey, null, vm.next_cursor);
-
     } else {
       return vm.getLocations(tenantKey, vm.prev_cursor, null);
     }
   };
 
-
   vm.initialize = function () {
-    vm.locations = [];
-    let tenantPromise = TenantsService.getTenantByKey(tenantKey);
-    tenantPromise.then(data => vm.currentTenant = data);
     return vm.getLocations(tenantKey);
   };
 

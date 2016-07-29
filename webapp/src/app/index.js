@@ -42,7 +42,8 @@ import VersionsService from './services/versions.service'
 // Tenant
 import {TenantAddCtrl} from './tenant/tenant-add.controller'
 import {TenantDetailsCtrl} from './tenant/tenant-details.controller'
-import {TenantLocationsCtrl} from './tenant/tenant-location.controller'
+import {TenantLocationCtrl} from './tenant/tenant-location.controller'
+import {TenantLocationsCtrl} from './tenant/tenant-locations.controller'
 import {TenantManagedDevicesCtrl} from './tenant/tenant-managed-devices.controller'
 import {TenantUnmanagedDevicesCtrl} from './tenant/tenant-unmanaged-devices.controller'
 import {TenantsCtrl} from './tenant/tenants.controller'
@@ -98,6 +99,7 @@ app
   // Tenants
   .controller("TenantAddCtrl", TenantAddCtrl)
   .controller("TenantDetailsCtrl", TenantDetailsCtrl)
+  .controller("TenantLocationCtrl", TenantLocationCtrl)
   .controller("TenantLocationsCtrl", TenantLocationsCtrl)
   .controller("TenantManagedDevicesCtrl", TenantManagedDevicesCtrl)
   .controller("TenantUnmanagedDevicesCtrl", TenantUnmanagedDevicesCtrl)
