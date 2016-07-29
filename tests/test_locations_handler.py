@@ -77,6 +77,47 @@ class TestLocationsHandler(BaseTest, WebTest):
             self.assertEqual(response_json[x].get('customerLocationCode'), 'store_{0}'.format(x))
             self.assertTrue(response_json[x].get('active'))
 
+
+    ##################################################################################################################
+    # get_locations_by_tenant (search)
+    ##################################################################################################################
+    def test_get_locations_by_tenant_search_by_name(self):
+        tenant = Tenant.create(tenant_code='acme_inc',
+                               name='Acme, Inc.',
+                               admin_email=self.ADMIN_EMAIL,
+                               content_server_url=self.CONTENT_SERVER_URL,
+                               content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                               domain_key=self.domain_key,
+                               active=True)
+        tenant_key = tenant.put()
+        number_of_locations = 3
+        self.load_tenant_locations(number_of_locations, tenant_key)
+        request_parameters = {'customer_location_name': 'Store #2'}
+        uri = application.router.build(None, 'locations-list-retrieval', None,
+                                       {'tenant_urlsafe_key': tenant_key.urlsafe()})
+        response = self.get(uri, params=request_parameters, headers=self.headers)
+        response_json = json.loads(response.body)
+        self.assertEqual(len(response_json), 1)
+
+    def test_get_locations_by_tenant_search_by_name(self):
+        tenant = Tenant.create(tenant_code='acme_inc',
+                               name='Acme, Inc.',
+                               admin_email=self.ADMIN_EMAIL,
+                               content_server_url=self.CONTENT_SERVER_URL,
+                               content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                               domain_key=self.domain_key,
+                               active=True)
+        tenant_key = tenant.put()
+        number_of_locations = 3
+        self.load_tenant_locations(number_of_locations, tenant_key)
+        request_parameters = {'customer_location_name': 'Store '}
+        uri = application.router.build(None, 'locations-list-retrieval', None,
+                                       {'tenant_urlsafe_key': tenant_key.urlsafe()})
+        response = self.get(uri, params=request_parameters, headers=self.headers)
+        response_json = json.loads(response.body)
+        self.assertEqual(len(response_json), number_of_locations + 1) # another location is created elsewhere
+
+
     def test_get_locations_by_tenant_returns_location_list_paginated(self):
         tenant = Tenant.create(tenant_code='acme_inc',
                                name='Acme, Inc.',
