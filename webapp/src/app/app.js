@@ -14,11 +14,11 @@ import './components/angularBreadcrumb/angularBreadcrumb';
 import './components/angular-material-datetimepicker/js/angular-material-datetimepicker'
 import './components/angular-material-datetimepicker/css/material-datetimepicker.css'
 import './components/angular-directive.g-signin/google-plus-signin'
-import './components/angular-h-sweetalert/ngSweetAlert.min'
 import 'restangular';
 import 'angular-material'
 import 'sweetalert';
 import 'angular-h-sweetalert';
+import 'sweetalert/dist/sweetalert.css';
 import 'angular-toastr';
 import 'angular-cookies';
 import 'angular-sanitize';
@@ -45,7 +45,6 @@ export let app = angular.module('skykitProvisioning', [
   'ngCookies',
   'ngSanitize',
   'restangular',
-  'hSweetAlert',
   'ui.bootstrap',
   'ngMaterialDatePicker',
   'hSweetAlert',
