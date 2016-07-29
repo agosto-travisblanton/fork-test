@@ -668,6 +668,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                       up=True,
                                                       storage_utilization=storage,
                                                       memory_utilization=memory,
+                                                      program=program,
+                                                      program_id=program_id,
+                                                      playlist=playlist,
+                                                      playlist_id=playlist_id,
+                                                      last_error=last_error,
                                                       resolved=True,
                                                       resolved_datetime=utc_now)
                 new_log_entry.put()
@@ -726,6 +731,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                           memory_utilization=memory,
                                                           program=program,
                                                           program_id=program_id,
+                                                          playlist=playlist,
+                                                          playlist_id=playlist_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -746,6 +753,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                           memory_utilization=memory,
                                                           program=program,
                                                           program_id=program_id,
+                                                          playlist=playlist,
+                                                          playlist_id=playlist_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -761,6 +770,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                           memory_utilization=memory,
                                                           program=program,
                                                           program_id=program_id,
+                                                          playlist=playlist,
+                                                          playlist_id=playlist_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -776,6 +787,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                           memory_utilization=memory,
                                                           program=program,
                                                           program_id=program_id,
+                                                          playlist=playlist,
+                                                          playlist_id=playlist_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -791,6 +804,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                           memory_utilization=memory,
                                                           program=program,
                                                           program_id=program_id,
+                                                          playlist=playlist,
+                                                          playlist_id=playlist_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -811,6 +826,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                       memory_utilization=memory,
                                                       program=program,
                                                       program_id=program_id,
+                                                      playlist=playlist,
+                                                      playlist_id=playlist_id,
                                                       last_error=last_error,
                                                       resolved=True,
                                                       resolved_datetime=utc_now)
@@ -826,6 +843,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                       memory_utilization=memory,
                                                       program=program,
                                                       program_id=program_id,
+                                                      playlist=playlist,
+                                                      playlist_id=playlist_id,
                                                       last_error=last_error,
                                                       resolved=True,
                                                       resolved_datetime=utc_now)
@@ -841,6 +860,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                       memory_utilization=memory,
                                                       program=program,
                                                       program_id=program_id,
+                                                      playlist=playlist,
+                                                      playlist_id=playlist_id,
                                                       last_error=last_error,
                                                       resolved=True,
                                                       resolved_datetime=utc_now)
