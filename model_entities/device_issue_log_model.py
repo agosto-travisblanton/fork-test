@@ -41,9 +41,19 @@ class DeviceIssueLog(ndb.Model):
     class_version = ndb.IntegerProperty()
 
     @classmethod
-    def create(cls, device_key, category, up=True, storage_utilization=0, memory_utilization=0,
-               program=None, program_id=None, last_error=None, playlist=None, playlist_id=None,
-               resolved=False, resolved_datetime=None):
+    def create(cls,
+               device_key,
+               category,
+               up=True,
+               storage_utilization=0,
+               memory_utilization=0,
+               program=None,
+               program_id=None,
+               last_error=None,
+               playlist=None,
+               playlist_id=None,
+               resolved=False,
+               resolved_datetime=None):
         if category in [config.DEVICE_ISSUE_MEMORY_HIGH, config.DEVICE_ISSUE_STORAGE_LOW]:
             level = IssueLevel.Warning
             level_descriptor = IssueLevel.stringify(IssueLevel.Warning)

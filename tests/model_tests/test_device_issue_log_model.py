@@ -27,6 +27,7 @@ class TestDeviceIssueLogModel(BaseTest):
     STORAGE_UTILIZATION = 99
     MEMORY_UTILIZATION = 8
     PROGRAM = 'some program'
+    PLAYLIST = 'some playlist'
     CURRENT_CLASS_VERSION = 1
 
     def setUp(self):
@@ -60,7 +61,8 @@ class TestDeviceIssueLogModel(BaseTest):
                                       up=False,
                                       storage_utilization=self.STORAGE_UTILIZATION,
                                       memory_utilization=self.MEMORY_UTILIZATION,
-                                      program=self.PROGRAM)
+                                      program=self.PROGRAM,
+                                      playlist=self.PLAYLIST)
         self.assertEqual(issue.device_key, self.device_key)
         self.assertEqual(issue.category, config.DEVICE_ISSUE_PLAYER_DOWN)
         self.assertEqual(issue.level, IssueLevel.Danger)
@@ -71,6 +73,7 @@ class TestDeviceIssueLogModel(BaseTest):
         self.assertEqual(issue.storage_utilization, self.STORAGE_UTILIZATION)
         self.assertEqual(issue.memory_utilization, self.MEMORY_UTILIZATION)
         self.assertEqual(issue.program, self.PROGRAM)
+        self.assertEqual(issue.playlist, self.PLAYLIST)
         self.assertIsNone(issue.program_id)
         self.assertIsNone(issue.last_error)
         self.assertIsNone(issue.created)
