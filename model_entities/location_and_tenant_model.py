@@ -413,6 +413,12 @@ class Location(ndb.Model):
             if key:
                 return key.get()
 
+
+    @classmethod
+    def find_by_partial_location_name(cls, partial_name):
+        all_locations = Location.query().fetch()
+        return [item for item in all_locations if partial_name.lower() in item.customer_location_name.lower()]
+
     @classmethod
     def is_customer_location_code_unique(cls, customer_location_code, tenant_key):
         return not Location.query(
