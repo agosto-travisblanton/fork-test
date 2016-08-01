@@ -10,6 +10,7 @@ describe('TenantLocationsCtrl', function () {
   let TenantsService = undefined;
   let LocationsService = undefined;
   let serviceInjection = undefined;
+  let promise = undefined;
 
   beforeEach(module('skykitProvisioning'));
 
@@ -21,7 +22,7 @@ describe('TenantLocationsCtrl', function () {
     TenantsService = _TenantsService_;
     LocationsService = _LocationsService_;
     scope = $rootScope.$new();
-    return serviceInjection = {
+    serviceInjection = {
       $scope: scope,
       $stateParams,
       TenantsService,
@@ -42,9 +43,57 @@ describe('TenantLocationsCtrl', function () {
 
       it('calls TenantsService.getTenantByKey with tenantKey', () => expect(TenantsService.getTenantByKey).toHaveBeenCalledWith(tenantKey));
 
-      return it('calls LocationsService.getLocationsByTenantKey with tenantKey', () => expect(LocationsService.getLocationsByTenantKey).toHaveBeenCalledWith(tenantKey));
+      it('calls LocationsService.getLocationsByTenantKey with tenantKey', () => expect(LocationsService.getLocationsByTenantKey).toHaveBeenCalledWith(tenantKey));
     });
   });
+
+
+  describe('.searchAllTenantLocationsByName', function () {
+    let tenants = [
+      {
+        key: 'dhjad897d987fadafg708fg7d',
+        customerLocationName: 'Foobar1',
+        created: '2015-05-10 22:15:10',
+        updated: '2015-05-10 22:15:10'
+      },
+      {
+        key: 'dhjad897d987fadafg708y67d',
+        customerLocationName: 'Foobar2',
+        created: '2015-05-10 22:15:10',
+        updated: '2015-05-10 22:15:10'
+      },
+      {
+        key: 'dhjad897d987fadafg708hb55',
+        customerLocationName: 'Foobar3',
+        created: '2015-05-10 22:15:10',
+        updated: '2015-05-10 22:15:10'
+      }
+    ]
+
+    beforeEach(function () {
+      promise = new skykitProvisioning.q.Mock();
+      spyOn(LocationsService, 'searchAllTenantLocationsByName').and.returnValue(promise);
+    });
+
+    it('call LocationsService.searchAllTenantLocationsByName to retrieve all tenant locations with matching name', function () {
+      let controller = $controller('TenantLocationsCtrl', serviceInjection);
+
+      controller.searchedTenantLocations = tenants;
+      controller.searchAllTenantLocationsByName('Foobar');
+      controller.searchedTenantLocations = tenants;
+      promise.resolve(tenants);
+      expect(LocationsService.searchAllTenantLocationsByName).toHaveBeenCalled();
+    });
+
+    return it("isTenantLocationValid changes searchDisabled based on if the tenant is valid", function () {
+      let controller = $controller('TenantLocationsCtrl', serviceInjection);
+      let tenant_name = "Foobar1"
+      controller.isTenantLocationValid(tenant_name);
+      promise.resolve(tenants);
+      expect(controller.searchDisabled).toBe(false);
+    });
+  });
+
 });
 
 
