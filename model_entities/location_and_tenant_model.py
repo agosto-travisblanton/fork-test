@@ -42,7 +42,7 @@ class Tenant(ndb.Model):
         # search for all tenants because datastore does not support wildcard searches
         all_tenants = Tenant.query().fetch()
         # returns wildcard matches for partial_name
-        return [item for item in all_tenants if partial_name in item.name]
+        return [item for item in all_tenants if partial_name.lower() in item.name.lower()]
 
     @classmethod
     def find_by_tenant_code(cls, tenant_code):

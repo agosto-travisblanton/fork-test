@@ -16,6 +16,23 @@ describe('LocationsService', function () {
     return promise = new skykitProvisioning.q.Mock();
   }));
 
+    describe('.searchAllTenantLocationsByName', () =>
+    it('fetch all tenant locations by name, returning a promise', function () {
+      let locationsRestangularService = {
+        customGETLIST() {
+        }
+      };
+      spyOn(Restangular, 'all').and.returnValue(locationsRestangularService);
+      spyOn(locationsRestangularService, 'customGETLIST').and.returnValue(promise);
+      let tenant_name = "someTenant"
+      let location_code = "someCode"
+      let actual = LocationsService.searchAllTenantLocationsByName(tenant_name, location_code);
+      expect(Restangular.all).toHaveBeenCalledWith('tenants');
+      expect(locationsRestangularService.customGETLIST).toHaveBeenCalled();
+      return expect(actual).toBe(promise);
+    })
+  );
+
   describe('.save', function () {
     it('updates an existing location, returning a promise', function () {
       let location = {
