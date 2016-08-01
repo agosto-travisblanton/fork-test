@@ -14,6 +14,11 @@ export default class LocationsService {
     return promise;
   }
 
+  searchAllTenantLocationsByName(tenantKey, customer_location_name) {
+    let promise = this.Restangular.all('tenants').customGETLIST(tenantKey + "/locations", {customer_location_name: customer_location_name})
+    return promise;
+  }
+
   getLocationsByTenantKey(tenantKey) {
     let promise = this.Restangular.oneUrl('tenants', `api/v1/tenants/${tenantKey}/locations`).get();
     return promise;

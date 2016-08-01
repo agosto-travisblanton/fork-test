@@ -5,6 +5,8 @@ function TenantLocationsCtrl($scope, $stateParams, TenantsService, LocationsServ
   let {tenantKey} = $stateParams;
   $scope.tabIndex = 3;
   vm.locations = [];
+  vm.searchDisabled = true;
+  vm.tenantKey = $stateParams.tenantKey;
 
   let tenantPromise = TenantsService.getTenantByKey(tenantKey);
   tenantPromise.then(data => {
@@ -37,6 +39,48 @@ function TenantLocationsCtrl($scope, $stateParams, TenantsService, LocationsServ
     });
   };
 
+  vm.searchAllTenantLocationsByName = (name) => {
+    if (!name || name.length < 3) {
+      return []
+    }
+    let promise = LocationsService.searchAllTenantLocationsByName(vm.tenantKey, name)
+    return promise.then((response) => {
+      vm.searchedTenantLocations = response
+      if (vm.searchedTenantLocations) {
+        return vm.searchedTenantLocations.map((i) => i.customerLocationName)
+      } else {
+        return []
+      }
+    })
+    return promise.catch((response) => {
+      let errorMessage = `Unable to fetch locations. Error: ${response.status}`;
+      return sweet.show('Oops...', errorMessage, 'error');
+    })
+  };
+
+  vm.isTenantLocationValid = (name) => {
+    if (!name || name.length < 3) {
+      return []
+    }
+    let promise = LocationsService.searchAllTenantLocationsByName(vm.tenantKey, name)
+      .then((response) => {
+        let match = response
+        if (match) {
+          for (let eachLocationName of match) {
+            if (name === eachLocationName.customerLocationName) {
+              vm.searchDisabled = false;
+              vm.searchMatch = eachLocationName
+              return;
+            } else {
+              vm.searchDisabled = true;
+            }
+          }
+        } else {
+          vm.searchDisabled = true;
+        }
+      })
+  };
+
   vm.paginateCall = function (forward) {
     if (forward) {
       return vm.getLocations(tenantKey, null, vm.next_cursor);
@@ -54,4 +98,5 @@ function TenantLocationsCtrl($scope, $stateParams, TenantsService, LocationsServ
 
   return vm;
 }
+
 export {TenantLocationsCtrl}

@@ -34,7 +34,43 @@
                 </md-button>
               </div>
 
-              <div class="col-md-1 col-md-offset-7">
+              <div class="col-sm-3 col-sm-offset-1">
+                <md-autocomplete
+                  md-no-cache="true"
+                  md-selected-item="vm.selectedItem"
+                  md-search-text="vm.searchText"
+                  md-items="item in vm.searchAllTenantLocationsByName(vm.searchText)"
+                  md-item-text="item"
+                  md-min-length="0"
+                  md-search-text-change="vm.isTenantLocationValid(vm.searchText)"
+                  md-selected-item-change="vm.isTenantLocationValid(vm.searchText)"
+                  placeholder="Make A Search">
+
+                  <md-item-template>
+                  <span md-highlight-text="vm.searchText"
+                        md-highlight-flags="^i">{{item}}</span>
+                  </md-item-template>
+                  <md-not-found>
+                    <div ng-if="vm.searchText !== '' && vm.searchText.length > 2">
+                      No results for "{{vm.searchText}}" were
+                      found.
+                    </div>
+                    <div
+                      ng-if="vm.searchText !== '' && vm.searchText.length <= 2">
+                      Please enter at least 3 characters.
+                    </div>
+                  </md-not-found>
+                </md-autocomplete>
+              </div>
+              <div class="col-md-1">
+                <md-button ng-click="vm.editItem(vm.searchMatch)"
+                           ng-disabled="vm.searchDisabled"
+                           class="md-raised md-primary md-button md-ink-ripple">
+                  OPEN
+                </md-button>
+              </div>
+
+              <div class="col-md-1 col-md-offset-2">
                 <md-button href="#/tenants/{{ vm.currentTenant.key }}/location"
                            class="md-raised md-primary md-button md-ink-ripple">
                   <i class="fa fa-fw fa-plus"></i> Add</a>
