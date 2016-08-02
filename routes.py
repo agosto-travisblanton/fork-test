@@ -337,6 +337,24 @@ application = WSGIApplication(
               ),
 
         ############################################################
+        # IMAGE
+        ############################################################
+
+        Route(r'/api/v1/image/<image_urlsafe_key>',
+              handler='handlers.image_handler.ImageHandler',
+              name='get_by_key',
+              handler_method='get_by_key',
+              methods=['GET'],
+              ),
+
+        Route(r'/api/v1/image',
+              handler='handlers.image_handler.ImageHandler',
+              name='post',
+              handler_method='post',
+              methods=['GET'],
+              ),
+
+        ############################################################
         # DEVICE MONITORING
         ############################################################
 

@@ -8,7 +8,8 @@ from models import (Tenant,
                     DeviceIssueLog,
                     PlayerCommandEvent,
                     Location,
-                    IntegrationEventLog)
+                    IntegrationEventLog,
+                    Image)
 from restler.serializers import ModelStrategy
 from utils.datetime_util import elapsed_time_message
 
@@ -205,3 +206,12 @@ INTEGRATION_EVENT_LOG_STRATEGY += [
     {'macAddress': lambda o, field_name, context: o.key.get().mac_address},
     {'details': lambda o, field_name, context: o.key.get().details}
 ]
+
+
+
+IMAGE_STRATEGY = ModelStrategy(Image)
+IMAGE_STRATEGY += [
+    {'key': lambda o, field_name, context: o.key.urlsafe()},
+    {'base64rep': lambda o, field_name, context: o.key.get().base64rep},
+]
+
