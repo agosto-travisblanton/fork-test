@@ -5,22 +5,22 @@ from restler.decorators import ae_ndb_serializer
 
 @ae_ndb_serializer
 class Image(ndb.Model):
-    base64rep = ndb.TextProperty(required=True, indexed=False)
+    svg_rep = ndb.TextProperty(required=True, indexed=False)
 
     @staticmethod
-    def exists(base64rep):
-        images = Image.query(Image.base64rep == base64rep).fetch()
+    def exists(svg_rep):
+        images = Image.query(Image.svg_rep == svg_rep).fetch()
         if len(images) > 0:
             return images[0]
         else:
             return False
 
     @staticmethod
-    def create(base64rep):
-        existing_image = Image.exists(base64rep=base64rep)
+    def create(svg_rep):
+        existing_image = Image.exists(svg_rep=svg_rep)
         if not existing_image:
             image = Image(
-                base64rep=base64rep
+                svg_rep=svg_rep
             )
             image.put()
             return image
