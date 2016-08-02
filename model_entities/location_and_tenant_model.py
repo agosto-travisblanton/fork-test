@@ -65,28 +65,6 @@ class Tenant(ndb.Model):
             ).fetch()
 
     @classmethod
-    def match_device_with_full_mac(cls, tenant_keys, unmanaged, full_mac):
-        return ChromeOsDevice.query(ChromeOsDevice.archived == False,
-                                    ndb.OR(ChromeOsDevice.mac_address == full_mac,
-                                           ChromeOsDevice.ethernet_mac_address == full_mac)).filter(
-            ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
-            ChromeOsDevice.is_unmanaged_device == unmanaged).count() > 0
-
-    @classmethod
-    def match_device_with_full_serial(cls, tenant_keys, unmanaged, full_serial):
-        return ChromeOsDevice.query(ChromeOsDevice.archived == False).filter(
-            ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
-            ChromeOsDevice.is_unmanaged_device == unmanaged).filter(
-            ChromeOsDevice.serial_number == full_serial).count() > 0
-
-    @classmethod
-    def match_device_with_full_gcmid(cls, tenant_keys, unmanaged, full_gcmid):
-        return ChromeOsDevice.query(ChromeOsDevice.archived == False).filter(
-            ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
-            ChromeOsDevice.is_unmanaged_device == unmanaged).filter(
-            ChromeOsDevice.gcm_registration_id == full_gcmid).count() > 0
-
-    @classmethod
     def find_devices_with_partial_serial(cls, tenant_keys, unmanaged, partial_serial):
         q = ChromeOsDevice.query(ChromeOsDevice.archived == False).filter(
             ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
@@ -412,7 +390,6 @@ class Location(ndb.Model):
             key = Location.query(Location.customer_location_code == customer_location_code).get(keys_only=True)
             if key:
                 return key.get()
-
 
     @classmethod
     def find_by_partial_location_name(cls, partial_name):

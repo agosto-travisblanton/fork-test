@@ -41,45 +41,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         else:
             return device.ethernet_mac_address
 
-
     ############################################################################################
     # TENANTS VIEW
     ############################################################################################
-    @requires_api_token
-    def match_for_device_by_tenant(self, tenant_urlsafe_key):
-        unmanaged = self.request.get("unmanaged") == "true"
-        full_gcmid = self.request.get("full_gcmid")
-        full_serial = self.request.get("full_serial")
-        full_mac = self.request.get("full_mac")
-        tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
-
-        if full_gcmid:
-            is_match = Tenant.match_device_with_full_gcmid(
-                tenant_keys=[tenant_key],
-                unmanaged=unmanaged,
-                full_gcmid=full_gcmid
-            )
-
-        elif full_serial:
-            is_match = Tenant.match_device_with_full_serial(
-                tenant_keys=[tenant_key],
-                unmanaged=unmanaged,
-                full_serial=full_serial
-            )
-        elif full_mac:
-            is_match = Tenant.match_device_with_full_mac(
-                tenant_keys=[tenant_key],
-                unmanaged=unmanaged,
-                full_mac=full_mac
-            )
-
-        json_response(
-            self.response,
-            {
-                "is_match": is_match
-            },
-        )
-
     @requires_api_token
     def search_for_device_by_tenant(self, tenant_urlsafe_key):
         unmanaged = self.request.get("unmanaged") == "true"
@@ -187,43 +151,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         )
 
     @requires_api_token
-    def match_for_device(self, distributor_urlsafe_key):
-        unmanaged = self.request.get("unmanaged") == "true"
-        full_gcmid = self.request.get("full_gcmid")
-        full_serial = self.request.get("full_serial")
-        full_mac = self.request.get("full_mac")
-
-        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
-        tenant_keys = [tenant.key for tenant in domain_tenant_list]
-
-        if full_gcmid:
-            is_match = Tenant.match_device_with_full_gcmid(
-                tenant_keys=tenant_keys,
-                unmanaged=unmanaged,
-                full_gcmid=full_gcmid
-            )
-
-        elif full_serial:
-            is_match = Tenant.match_device_with_full_serial(
-                tenant_keys=tenant_keys,
-                unmanaged=unmanaged,
-                full_serial=full_serial
-            )
-        elif full_mac:
-            is_match = Tenant.match_device_with_full_mac(
-                tenant_keys=tenant_keys,
-                unmanaged=unmanaged,
-                full_mac=full_mac
-            )
-
-        json_response(
-            self.response,
-            {
-                "is_match": is_match
-            },
-        )
-
-    @requires_api_token
     def search_for_device(self, distributor_urlsafe_key):
         unmanaged = self.request.get("unmanaged") == "true"
         partial_gcmid = self.request.get("partial_gcmid")
@@ -252,7 +179,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 unmanaged=unmanaged,
                 partial_mac=partial_mac
             )
-
 
         json_response(
             self.response,
@@ -611,7 +537,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                         tenant_code)
                     self.response.set_status(status, message)
                     return
-
 
             proof_of_play_logging = request_json.get('proofOfPlayLogging')
             if str(proof_of_play_logging).lower() == 'true' or str(proof_of_play_logging).lower() == 'false':

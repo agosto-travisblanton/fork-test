@@ -229,15 +229,6 @@ application = WSGIApplication(
               methods=['GET']
               ),
         ############################################################
-        # MATCH
-        ############################################################
-        Route(r'/api/v1/distributors/match/<distributor_urlsafe_key>/devices',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='match_for_device',
-              handler_method='match_for_device',
-              methods=['GET']
-              ),
-        ############################################################
         # TENANT ROUTES
         ############################################################
         # PAGINATED TENANT DEVICE LIST
@@ -255,15 +246,6 @@ application = WSGIApplication(
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='search_for_device_by_tenant',
               handler_method='search_for_device_by_tenant',
-              methods=['GET']
-              ),
-        ############################################################
-        # MATCH
-        ############################################################
-        Route(r'/api/v1/tenants/match/<tenant_urlsafe_key>/devices',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='match_for_device_by_tenant',
-              handler_method='match_for_device_by_tenant',
               methods=['GET']
               ),
         ############################################################
