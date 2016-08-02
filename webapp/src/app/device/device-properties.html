@@ -62,12 +62,21 @@
             {{deviceDetailsCtrl.currentDevice.chromeDeviceDomain}}
           </div>
         </div>
+
         <div class="form-group"
              ng-hide="deviceDetailsCtrl.currentDevice.contentManagerDisplayName == null ||
                                            deviceDetailsCtrl.currentDevice.contentManagerDisplayName == ''">
           <label>Content Manager Display Name</label>
           <div>
             {{deviceDetailsCtrl.currentDevice.contentManagerDisplayName}}
+          </div>
+        </div>
+        <div class="form-group"
+             ng-hide="deviceDetailsCtrl.currentDevice.contentManagerLocationDescription == null ||
+                                           deviceDetailsCtrl.currentDevice.contentManagerLocationDescription == ''">
+          <label>Content Manager Location Description</label>
+          <div>
+            {{deviceDetailsCtrl.currentDevice.contentManagerLocationDescription}}
           </div>
         </div>
         <div class="form-group"

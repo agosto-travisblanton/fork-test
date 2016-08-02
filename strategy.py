@@ -110,6 +110,7 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'customerDisplayCode': lambda o, field_name, context: o.key.get().customer_display_code},
     {'customerDisplayName': lambda o, field_name, context: o.key.get().customer_display_name},
     {'contentManagerDisplayName': lambda o, field_name, context: o.key.get().content_manager_display_name},
+    {'contentManagerLocationDescription': lambda o, field_name, context: o.key.get().content_manager_location_description},
     {'registrationCorrelationIdentifier': lambda o, field_name,
                                                  context: o.key.get().registration_correlation_identifier},
     {'latitude': lambda o, field_name,

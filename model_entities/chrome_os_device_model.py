@@ -63,6 +63,7 @@ class ChromeOsDevice(ndb.Model):
     customer_display_name = ndb.StringProperty(required=False, indexed=True)
     customer_display_code = ndb.StringProperty(required=False, indexed=True)
     content_manager_display_name = ndb.StringProperty(required=False, indexed=True)
+    content_manager_location_description = ndb.StringProperty(required=False, indexed=True)
     location_key = ndb.KeyProperty(required=False, indexed=True)
     timezone = ndb.StringProperty(required=False, indexed=True)
     timezone_offset = ndb.IntegerProperty(required=False, indexed=True)  # computed property

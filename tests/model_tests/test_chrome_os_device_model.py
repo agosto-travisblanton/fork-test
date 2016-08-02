@@ -144,9 +144,11 @@ class TestChromeOsDeviceModel(BaseTest):
         customer_display_name = 'Panel in Reception'
         customer_display_code = 'panel_in_reception'
         content_manager_display_name = 'Foo Panel'
+        content_manager_location_description = 'Lobby'
         device.customer_display_name = customer_display_name
         device.customer_display_code = customer_display_code
         device.content_manager_display_name = content_manager_display_name
+        device.content_manager_location_description = content_manager_location_description
         timezone = 'America/Chicago'
         location = Location.create(tenant_key=self.tenant_key,
                                    customer_location_name=customer_location_name,
@@ -173,6 +175,7 @@ class TestChromeOsDeviceModel(BaseTest):
         self.assertEqual(customer_display_name, json_representation['customerDisplayName'])
         self.assertEqual(customer_display_code, json_representation['customerDisplayCode'])
         self.assertEqual(content_manager_display_name, json_representation['contentManagerDisplayName'])
+        self.assertEqual(content_manager_location_description, json_representation['contentManagerLocationDescription'])
 
         self.assertEqual(self.LATITUDE, json_representation['latitude'])
         self.assertEqual(self.LONGITUDE, json_representation['longitude'])
