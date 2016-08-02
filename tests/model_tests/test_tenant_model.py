@@ -181,58 +181,6 @@ class TestTenantModel(BaseTest):
         domain = self.tenant.get_domain()
         self.assertEqual(domain, self.domain)
 
-    def test_match_device_with_full_mac(self):
-        mac_address = '1231233434'
-        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
-                                               mac_address=mac_address)
-        device.put()
-        is_match = Tenant.match_device_with_full_mac(
-            tenant_keys=[self.tenant_key],
-            unmanaged=False,
-            full_mac=mac_address)
-        self.assertTrue(is_match)
-
-    def test_match_device_with_full_mac_archived(self):
-        mac_address = '1231233434'
-        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
-                                               mac_address=mac_address)
-        device.archived = True
-        device.put()
-        is_match = Tenant.match_device_with_full_mac(
-            tenant_keys=[self.tenant_key],
-            unmanaged=False,
-            full_mac=mac_address)
-        self.assertFalse(is_match)
-
-    def test_match_device_with_full_serial(self):
-        serial_number = 'SN123-123-3434'
-        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
-                                               mac_address='123123123')
-        device.serial_number = serial_number
-        device.put()
-        is_match = Tenant.match_device_with_full_serial(
-            tenant_keys=[self.tenant_key],
-            unmanaged=False,
-            full_serial=serial_number)
-        self.assertTrue(is_match)
-
-    def test_match_device_with_full_serial_archived(self):
-        serial_number = 'SN123-123-3434'
-        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
-                                               mac_address='123123123')
-        device.serial_number = serial_number
-        device.archived = True
-        device.put()
-        is_match = Tenant.match_device_with_full_serial(
-            tenant_keys=[self.tenant_key],
-            unmanaged=False,
-            full_serial=serial_number)
-        self.assertFalse(is_match)
-
     def test_find_devices_with_partial_serial(self):
         serial_number = 'SN445-123-3434'
         partial_serial = 'SN445'
