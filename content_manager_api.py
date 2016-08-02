@@ -62,6 +62,11 @@ class ContentManagerApi(object):
                     "tenant_code": tenant.tenant_code,
                     "serial_number": chrome_os_device.serial_number
                 }
+                if chrome_os_device.content_manager_display_name:
+                    payload['name'] = chrome_os_device.content_manager_display_name
+                if chrome_os_device.content_manager_location_description:
+                    payload['location'] = chrome_os_device.content_manager_location_description
+
                 url = "{content_manager_base_url}/provisioning/v1/displays".format(
                     content_manager_base_url=tenant.content_manager_base_url)
                 if cm_create_device_event_request:
