@@ -361,7 +361,7 @@ describe('DevicesListingCtrl', function () {
       let unmanaged = true;
       controller.unmanagedSelectedButton = "GCM ID";
       controller.isResourceValid(unmanaged, resource);
-      gcmidPromise.resolve(false);
+      promise.resolve({"is_match": false});
       return expect(DevicesService.searchDevices).toHaveBeenCalled()
     });
 
