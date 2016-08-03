@@ -64,7 +64,7 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
         uri = application.router.build(None, 'distributors', None, {})
         response = self.app.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
-        self.assertEqual(len(response_json), 2)
+        self.assertEqual(len(response_json), 3)
         self.assertEqual(response_json[0].get('name'), self.AGOSTO)
         self.assertTrue(response_json[0].get('active'))
         self.assertEqual(response_json[1].get('name'), self.DISTRIBUTOR)
@@ -208,9 +208,9 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
                                        {'distributor_key': self.agosto_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
-        self.assertEqual(response_json[0].get('name'), self.CHROME_DEVICE_DOMAIN_BOB)
+        self.assertEqual(response_json[0].get('name'), self.CHROME_DEVICE_DOMAIN_DEFAULT)
         self.assertEqual(response_json[0].get('impersonation_admin_email_address'), self.IMPERSONATION_EMAIL)
-        self.assertEqual(response_json[1].get('name'), self.CHROME_DEVICE_DOMAIN_FOO)
+        self.assertEqual(response_json[1].get('name'), self.CHROME_DEVICE_DOMAIN_BOB)
         self.assertEqual(response_json[1].get('impersonation_admin_email_address'), self.IMPERSONATION_EMAIL)
 
     def test_get_domains_returns_no_domains_associated_with_tierney_bros(self):

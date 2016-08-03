@@ -20,7 +20,7 @@ class ProvisioningDistributorUserBase(ProvisioningBaseTest):
     MAC_ADDRESS = 'bladfkdkddkdkd'
     TEST_GCM_REGISTRATION_ID = '3k3k3k3k3k3kdldldldld'
     TESTING_DEVICE_ID = '232jmkskkk34k42k3l423k2'
-    CHROME_DEVICE_DOMAIN = 'default.agosto.com'
+    CHROME_DEVICE_DOMAIN_DEFAULT = 'default.agosto.com'
     CHROME_DEVICE_DOMAIN_BOB = 'bob.agosto.com'
     CHROME_DEVICE_DOMAIN_FOO = 'foo.agosto.com'
     IMPERSONATION_EMAIL = 'admin@skykit.com'
@@ -60,7 +60,7 @@ class ProvisioningDistributorUserBase(ProvisioningBaseTest):
         self.inactive_distributor = Distributor.create(name=self.INACTIVE_DISTRIBUTOR, active=False)
         self.inactive_distributor_key = self.inactive_distributor.put()
 
-        self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
+        self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN_DEFAULT,
                                     distributor_key=self.agosto_key,
                                     impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                     active=True)
