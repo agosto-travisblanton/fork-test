@@ -64,7 +64,7 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
         uri = application.router.build(None, 'distributors', None, {})
         response = self.app.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
-        self.assertEqual(len(response_json), 3)
+        self.assertEqual(len(response_json), 2)
         self.assertEqual(response_json[0].get('name'), self.AGOSTO)
         self.assertTrue(response_json[0].get('active'))
         self.assertEqual(response_json[1].get('name'), self.DISTRIBUTOR)
@@ -200,7 +200,7 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
                                        {'distributor_key': self.agosto_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
-        self.assertEqual(len(response_json), 2)
+        self.assertEqual(len(response_json), 3)
 
     def test_get_domains_returns_active_domains_with_expected_properties_associated_with_agosto(self):
         request_parameters = {}
