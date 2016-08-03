@@ -9,7 +9,9 @@ from models import (Tenant,
                     PlayerCommandEvent,
                     Location,
                     IntegrationEventLog,
-                    Image)
+                    Image,
+                    Overlay,
+                    DeviceOverlayAssociation)
 from restler.serializers import ModelStrategy
 from utils.datetime_util import elapsed_time_message
 
@@ -111,7 +113,8 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'customerDisplayCode': lambda o, field_name, context: o.key.get().customer_display_code},
     {'customerDisplayName': lambda o, field_name, context: o.key.get().customer_display_name},
     {'contentManagerDisplayName': lambda o, field_name, context: o.key.get().content_manager_display_name},
-    {'contentManagerLocationDescription': lambda o, field_name, context: o.key.get().content_manager_location_description},
+    {'contentManagerLocationDescription': lambda o, field_name,
+                                                 context: o.key.get().content_manager_location_description},
     {'registrationCorrelationIdentifier': lambda o, field_name,
                                                  context: o.key.get().registration_correlation_identifier},
     {'latitude': lambda o, field_name,
@@ -207,11 +210,18 @@ INTEGRATION_EVENT_LOG_STRATEGY += [
     {'details': lambda o, field_name, context: o.key.get().details}
 ]
 
-
-
 IMAGE_STRATEGY = ModelStrategy(Image)
 IMAGE_STRATEGY += [
     {'key': lambda o, field_name, context: o.key.urlsafe()},
-    {'base64rep': lambda o, field_name, context: o.key.get().base64rep},
+    {'svg_rep': lambda o, field_name, context: o.key.get().svg_rep},
+]
+
+OVERLAY_STRATEGY = ModelStrategy(Overlay)
+OVERLAY_STRATEGY += [
+    {'key': lambda o, field_name, context: o.key.urlsafe()},
+    {'position': lambda o, field_name, context: o.key.get().position},
+    {'type': lambda o, field_name, context: o.key.get().type},
+    {'image': lambda o, field_name, context: o.key.get().image if o.key.get().image else None},
+
 ]
 

@@ -14,9 +14,22 @@ class Overlay(ndb.Model):
     image = ndb.KeyProperty(kind=Image, required=False)
 
     @staticmethod
-    def create_or_get_association(overlay_position, overlay_type, image=None):
+    def create(overlay_position, overlay_type, image=None):
         if (overlay_position in overlay_positions) and (overlay_type in overlay_types):
-            pass
+            if image:
+                overlay = Overlay(
+                    overlay_position=overlay_position,
+                    type=overlay_type,
+                    image=image
+                )
+            else:
+                overlay = Overlay(
+                    overlay_position=overlay_position,
+                    type=overlay_type,
+                )
+            overlay.put()
+            return overlay
+
         else:
             raise ValueError("Unexpected overlay_position or overlay_type")
 

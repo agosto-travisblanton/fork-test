@@ -17,4 +17,4 @@ from model_entities.location_and_tenant_model import Location, Tenant
 from model_entities.entity_groups import (TenantEntityGroup, DistributorEntityGroup, DISTRIBUTOR_ENTITY_GROUP_NAME,
     TENANT_ENTITY_GROUP_NAME)
 
-from model_entities.image_model import Image
+from model_entities.image_and_overlay_model import Image, Overlay, DeviceOverlayAssociation
