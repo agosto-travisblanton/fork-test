@@ -10,8 +10,7 @@ from models import (Tenant,
                     Location,
                     IntegrationEventLog,
                     Image,
-                    Overlay,
-                    DeviceOverlayAssociation)
+                    )
 from restler.serializers import ModelStrategy
 from utils.datetime_util import elapsed_time_message
 
@@ -216,13 +215,4 @@ IMAGE_STRATEGY = ModelStrategy(Image)
 IMAGE_STRATEGY += [
     {'key': lambda o, field_name, context: o.key.urlsafe()},
     {'svg_rep': lambda o, field_name, context: o.svg_rep},
-]
-
-OVERLAY_STRATEGY = ModelStrategy(Overlay)
-OVERLAY_STRATEGY += [
-    {'key': lambda o, field_name, context: o.key.urlsafe()},
-    {'position': lambda o, field_name, context: o.position},
-    {'type': lambda o, field_name, context: o.type},
-    {'image': lambda o, field_name, context: o.image if o.image else None},
-
 ]
