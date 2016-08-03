@@ -2,7 +2,7 @@ from google.appengine.ext import ndb
 
 from app_config import config
 from restler.decorators import ae_ndb_serializer
-from chrome_os_device_model import ChromeOsDevice
+from models import ChromeOsDevice
 
 
 class IssueLevel:
