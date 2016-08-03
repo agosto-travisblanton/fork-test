@@ -5,7 +5,7 @@
 
 from model_entities.domain_model import Domain
 from model_entities.chrome_os_device_model import ChromeOsDevice
-from model_entities.device_issue_log_model import DeviceIssueLog, IssueLevel
+from model_entities.device_issue_log_model import DeviceIssueLog
 from model_entities.player_command_event_model import PlayerCommandEvent
 from model_entities.integration_events_log_model import IntegrationEventLog
 
