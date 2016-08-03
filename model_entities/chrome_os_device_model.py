@@ -7,6 +7,7 @@ from google.appengine.ext import ndb
 from app_config import config
 from restler.decorators import ae_ndb_serializer
 from utils.timezone_util import TimezoneUtil
+from image_and_overlay_model import DeviceOverlayAssociation
 
 
 @ae_ndb_serializer
@@ -80,6 +81,10 @@ class ChromeOsDevice(ndb.Model):
             logging.debug(
                 'Device has no tenant. Most likely an unmanaged device where tenant has not been specified.')
             return None
+
+    @property
+    def overlays(self):
+        return DeviceOverlayAssociation.overlays_with_device_key(self.key)
 
     @classmethod
     def get_by_device_id(cls, device_id):

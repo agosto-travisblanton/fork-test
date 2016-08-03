@@ -71,3 +71,11 @@ class DeviceOverlayAssociation(ndb.Model):
 
         association.put()
         return association
+
+    @staticmethod
+    def overlays_with_device_key(device_key):
+        return [
+            entity.overlay_key.get()
+            for entity in
+            DeviceOverlayAssociation.query(DeviceOverlayAssociation.device_key == device_key).fetch()
+            ]
