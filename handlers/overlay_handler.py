@@ -26,4 +26,3 @@ class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
         return json_response(self.response, {
             "success": True,
         }), 209
-

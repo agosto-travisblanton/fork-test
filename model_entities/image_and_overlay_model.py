@@ -45,6 +45,10 @@ class Overlay(ndb.Model):
     @staticmethod
     def create(overlay_position, overlay_type, image_key=None):
         if (overlay_position in overlay_positions) and (overlay_type in overlay_types):
+            if overlay_type == "LOGO":
+                if image_key == None:
+                    raise ValueError("You must provide an image_key if you are creating an overlay logo")
+
             overlay = Overlay(
                 position=overlay_position,
                 type=overlay_type,
