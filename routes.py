@@ -342,16 +342,16 @@ application = WSGIApplication(
 
         Route(r'/api/v1/image/<image_urlsafe_key>',
               handler='handlers.image_handler.ImageHandler',
-              name='get_by_key',
-              handler_method='get_by_key',
+              name='get_image_by_key',
+              handler_method='get_image_by_key',
               methods=['GET'],
               ),
 
         Route(r'/api/v1/image',
               handler='handlers.image_handler.ImageHandler',
-              name='post',
+              name='post-image',
               handler_method='post',
-              methods=['GET'],
+              methods=['POST'],
               ),
 
         ############################################################
