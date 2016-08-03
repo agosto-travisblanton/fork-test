@@ -8,51 +8,8 @@ overlay_types = ["TIME", "DATE", "DATETIME", "LOGO"]
 
 
 @ae_ndb_serializer
-class Overlay(ndb.Model):
-    position = ndb.StringProperty(required=True, indexed=True)
-    type = ndb.StringProperty(required=True, indexed=True)
-    image = ndb.KeyProperty(kind=Image, required=False)
-
-    @staticmethod
-    def create(overlay_position, overlay_type, image=None):
-        if (overlay_position in overlay_positions) and (overlay_type in overlay_types):
-            if image:
-                overlay = Overlay(
-                    overlay_position=overlay_position,
-                    type=overlay_type,
-                    image=image
-                )
-            else:
-                overlay = Overlay(
-                    overlay_position=overlay_position,
-                    type=overlay_type,
-                )
-            overlay.put()
-            return overlay
-
-        else:
-            raise ValueError("Unexpected overlay_position or overlay_type")
-
-
-@ae_ndb_serializer
-class DeviceOverlayAssociation(ndb.Model):
-    device_key = ndb.KeyProperty(kind=ChromeOsDevice, required=True)
-    overlay_key = ndb.KeyProperty(kind=Overlay, required=True)
-
-    @staticmethod
-    def create_association(device_key, overlay_key):
-        association = DeviceOverlayAssociation(
-            device_key=device_key,
-            overlay_key=overlay_key
-        )
-
-        association.put()
-        return association
-
-
-@ae_ndb_serializer
 class Image(ndb.Model):
-    svg_rep = ndb.TextProperty(required=True, indexed=False)
+    svg_rep = ndb.TextProperty(required=True, indexed=True)
 
     @staticmethod
     def exists(svg_rep):
@@ -76,3 +33,46 @@ class Image(ndb.Model):
 
     def _pre_put_hook(self):
         self.class_version = 1
+
+
+@ae_ndb_serializer
+class Overlay(ndb.Model):
+    position = ndb.StringProperty(required=True, indexed=True)
+    type = ndb.StringProperty(required=True, indexed=True)
+    image_key = ndb.KeyProperty(kind=Image, required=False)
+
+    @staticmethod
+    def create(overlay_position, overlay_type, image=None):
+        if (overlay_position in overlay_positions) and (overlay_type in overlay_types):
+            if image:
+                overlay = Overlay(
+                    position=overlay_position,
+                    type=overlay_type,
+                    image_key=image
+                )
+            else:
+                overlay = Overlay(
+                    position=overlay_position,
+                    type=overlay_type,
+                )
+            overlay.put()
+            return overlay
+
+        else:
+            raise ValueError("Unexpected overlay_position or overlay_type")
+
+
+@ae_ndb_serializer
+class DeviceOverlayAssociation(ndb.Model):
+    device_key = ndb.KeyProperty(kind=ChromeOsDevice, required=True)
+    overlay_key = ndb.KeyProperty(kind=Overlay, required=True)
+
+    @staticmethod
+    def create_association(device_key, overlay_key):
+        association = DeviceOverlayAssociation(
+            device_key=device_key,
+            overlay_key=overlay_key
+        )
+
+        association.put()
+        return association
