@@ -103,3 +103,13 @@ class ProvisioningDistributorUserBase(ProvisioningBaseTest):
                                                     gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
                                                     mac_address=self.MAC_ADDRESS)
         self.device_key = self.device.put()
+
+        self.unmanaged_registration_token_authorization_header = {
+            'Authorization': config.UNMANAGED_REGISTRATION_TOKEN
+        }
+        self.api_token_authorization_header = {
+            'Authorization': config.API_TOKEN
+        }
+        self.unmanaged_api_token_authorization_header = {
+            'Authorization': config.UNMANAGED_API_TOKEN
+        }

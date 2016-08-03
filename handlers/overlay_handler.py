@@ -1,6 +1,6 @@
 from google.appengine.ext import ndb
 from agar.sessions import SessionRequestHandler
-from models import Overlay, DeviceOverlayAssociation
+from models import Overlay, OverlayTemplate
 import json
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
@@ -9,20 +9,25 @@ from restler.serializers import json_response
 class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
     def post(self):
         request_json = json.loads(self.request.body)
-        associated_device_key = ndb.Key(urlsafe=request_json["associated_device_urlsafe"]).get().key
+        associated_device_key = ndb.Key(urlsafe=request_json["device_urlsafe_key"]).get().key
+        # array of dictionaries that contain data about each overlay
+        overlays = request_json["overlays"]
+        overlay_template = OverlayTemplate.create_or_get_by_device_key(associated_device_key)
 
-        position = request_json["position"]
-        overlay_type = request_json["overlay_type"]
-        # expects the front-end to already know the urlsafe_key of a previously posted image
-        associated_image = request_json["associated_image"]
-        if associated_image != None:
-            # gets it first to make sure it is a valid key. Will except if it is not
-            # uses this key instead of
-            associated_image = ndb.Key(urlsafe=associated_image).get().key
+        for overlay_config in overlays:
+            try:
 
-        overlay_key = Overlay.create(overlay_type=overlay_type, overlay_position=position, image_key=associated_image)
-        DeviceOverlayAssociation.create_association(device_key=associated_device_key, overlay_key=overlay_key.key)
+                overlay_template.set_overlay(overlay_config)
+
+            except ValueError as exp:
+                return json_response(self.response, {
+                    "success": False,
+                    "message": exp
+                }, status_code=400)
+
+        overlay_template = OverlayTemplate.create_or_get_by_device_key(associated_device_key)
 
         return json_response(self.response, {
             "success": True,
-        }), 209
+            "overlay": overlay_template
+        }, status_code=200)
