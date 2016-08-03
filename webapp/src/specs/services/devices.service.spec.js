@@ -225,60 +225,6 @@ describe('DevicesService', function () {
     })
   );
 
-  describe('.matchDevicesByFullMac', () =>
-    it('match devices with a full mac address returns an http promise', function () {
-      let distributorKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw';
-      let full_mac = "1234";
-      let unmanaged = false;
-      let deviceRestangularService = {
-        get() {
-        }
-      };
-      spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
-      spyOn(deviceRestangularService, 'get').and.returnValue(promise);
-      let actual = DevicesService.matchDevicesByFullMac(distributorKey, full_mac, unmanaged);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/distributors/match/${distributorKey}/devices?unmanaged=${unmanaged}&full_mac=${full_mac}`);
-      expect(deviceRestangularService.get).toHaveBeenCalled();
-      return expect(actual).toBe(promise);
-    })
-  );
-
-  describe('.matchDevicesByFullSerial', () =>
-    it('match devices with a full mac address returns an http promise', function () {
-      let distributorKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw';
-      let fullSerial = "1234";
-      let unmanaged = false;
-      let deviceRestangularService = {
-        get() {
-        }
-      };
-      spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
-      spyOn(deviceRestangularService, 'get').and.returnValue(promise);
-      let actual = DevicesService.matchDevicesByFullSerial(distributorKey, fullSerial, unmanaged);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/distributors/match/${distributorKey}/devices?unmanaged=${unmanaged}&full_serial=${fullSerial}`);
-      expect(deviceRestangularService.get).toHaveBeenCalled();
-      return expect(actual).toBe(promise);
-    })
-  );
-
-  describe('.matchDevicesByFullGCMid', () =>
-    it('match devices with a full mac address returns an http promise', function () {
-      let distributorKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw';
-      let partialGCMid = "1234";
-      let unmanaged = false;
-      let deviceRestangularService = {
-        get() {
-        }
-      };
-      spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
-      spyOn(deviceRestangularService, 'get').and.returnValue(promise);
-      let actual = DevicesService.matchDevicesByFullGCMid(distributorKey, partialGCMid, unmanaged);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/distributors/match/${distributorKey}/devices?unmanaged=${unmanaged}&full_gcmid=${partialGCMid}`);
-      expect(deviceRestangularService.get).toHaveBeenCalled();
-      return expect(actual).toBe(promise);
-    })
-  );
-
 
   describe('.searchDevicesByPartialMacByTenant', () =>
     it('search devices with a partial mac address returns an http promise', function () {
@@ -316,39 +262,5 @@ describe('DevicesService', function () {
     })
   );
 
-  describe('.matchDevicesByFullMacByTenant', () =>
-    it('match devices with a full mac address returns an http promise', function () {
-      let tenantKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw';
-      let full_mac = "1234";
-      let unmanaged = false;
-      let deviceRestangularService = {
-        get() {
-        }
-      };
-      spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
-      spyOn(deviceRestangularService, 'get').and.returnValue(promise);
-      let actual = DevicesService.matchDevicesByFullMacByTenant(tenantKey, full_mac, unmanaged);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/tenants/match/${tenantKey}/devices?unmanaged=${unmanaged}&full_mac=${full_mac}`);
-      expect(deviceRestangularService.get).toHaveBeenCalled();
-      return expect(actual).toBe(promise);
-    })
-  );
 
-  return describe('.matchDevicesByFullSerialByTenant', () =>
-    it('match devices with a full mac address returns an http promise', function () {
-      let tenantKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw';
-      let full_serial = "1234";
-      let unmanaged = false;
-      let deviceRestangularService = {
-        get() {
-        }
-      };
-      spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
-      spyOn(deviceRestangularService, 'get').and.returnValue(promise);
-      let actual = DevicesService.matchDevicesByFullSerialByTenant(tenantKey, full_serial, unmanaged);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/tenants/match/${tenantKey}/devices?unmanaged=${unmanaged}&full_serial=${full_serial}`);
-      expect(deviceRestangularService.get).toHaveBeenCalled();
-      return expect(actual).toBe(promise);
-    })
-  );
 });

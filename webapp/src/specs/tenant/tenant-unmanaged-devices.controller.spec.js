@@ -154,7 +154,7 @@ describe('TenantUnmanagedDevicesCtrl', function () {
         });
       });
     });
-    
+
     describe('.prepareForEditItem', function () {
       let resourceSearch = "test";
 
@@ -201,22 +201,21 @@ describe('TenantUnmanagedDevicesCtrl', function () {
         };
         controller = $controller('TenantUnmanagedDevicesCtrl', serviceInjection);
         promise = new skykitProvisioning.q.Mock();
-        spyOn(DevicesService, 'matchDevicesByFullMacByTenant').and.returnValue(promise);
-        return spyOn(DevicesService, 'matchDevicesByFullSerialByTenant').and.returnValue(promise);
+        spyOn(DevicesService, 'searchDevices').and.returnValue(promise);
       });
 
-      it("matchDevicesByFullMac called when managed and button is mac", function () {
+      it("searchDevices called when managed and button is mac", function () {
         controller.selectedButton = "MAC";
         controller.isResourceValid(resource);
         promise.resolve(false);
-        return expect(DevicesService.matchDevicesByFullMacByTenant).toHaveBeenCalledWith(controller.tenantKey, resource, true);
+        return expect(DevicesService.searchDevices).toHaveBeenCalled();
       });
 
-      return it("matchDevicesByFullSerial called button is not mac", function () {
+      return it("searchDevices called button is not mac", function () {
         controller.selectedButton = "Serial Number";
         controller.isResourceValid(resource);
         promise.resolve(false);
-        return expect(DevicesService.matchDevicesByFullSerialByTenant).toHaveBeenCalledWith(controller.tenantKey, resource, true);
+        return expect(DevicesService.searchDevices).toHaveBeenCalled();
       });
     });
   });

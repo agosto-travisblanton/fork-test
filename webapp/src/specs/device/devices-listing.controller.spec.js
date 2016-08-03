@@ -338,57 +338,55 @@ describe('DevicesListingCtrl', function () {
       promise = new skykitProvisioning.q.Mock();
       serialPromise = new skykitProvisioning.q.Mock();
       gcmidPromise = new skykitProvisioning.q.Mock();
-      spyOn(DevicesService, 'matchDevicesByFullGCMid').and.returnValue(gcmidPromise);
-      spyOn(DevicesService, 'matchDevicesByFullMac').and.returnValue(promise);
-      spyOn(DevicesService, 'matchDevicesByFullSerial').and.returnValue(serialPromise);
+      spyOn(DevicesService, 'searchDevices').and.returnValue(promise);
     });
 
-    it("matchDevicesByFullMac called when unmanaged and button is mac", function () {
+    it("searchDevices called when unmanaged and button is mac", function () {
       let unmanaged = true;
       controller.unmanagedSelectedButton = "MAC";
       controller.isResourceValid(unmanaged, resource);
       promise.resolve({"is_match": false});
-      return expect(DevicesService.matchDevicesByFullMac).toHaveBeenCalledWith(controller.distributorKey, resource, unmanaged);
+      return expect(DevicesService.searchDevices).toHaveBeenCalled()
     });
 
-    it("matchDevicesByFullSerial called when unmanaged and button is not mac", function () {
+    it("searchDevices called when unmanaged and button is not mac", function () {
       let unmanaged = true;
       controller.unmanagedSelectedButton = "Serial Number";
       controller.isResourceValid(unmanaged, resource);
-      serialPromise.resolve(false);
-      return expect(DevicesService.matchDevicesByFullSerial).toHaveBeenCalledWith(controller.distributorKey, resource, unmanaged);
+      promise.resolve({"is_match": false});
+      return expect(DevicesService.searchDevices).toHaveBeenCalled()
     });
 
-    it("matchDevicesByFullGCMid called when unmanaged and button is gcmid", function () {
+    it("searchDevices called when unmanaged and button is gcmid", function () {
       let unmanaged = true;
       controller.unmanagedSelectedButton = "GCM ID";
       controller.isResourceValid(unmanaged, resource);
-      gcmidPromise.resolve(false);
-      return expect(DevicesService.matchDevicesByFullGCMid).toHaveBeenCalledWith(controller.distributorKey, resource, unmanaged);
+      promise.resolve({"is_match": false});
+      return expect(DevicesService.searchDevices).toHaveBeenCalled()
     });
 
-    it("matchDevicesByFullGCMid called when managed and button is gcmid", function () {
+    it("searchDevices called when managed and button is gcmid", function () {
       let unmanaged = false;
       controller.selectedButton = "GCM ID";
       controller.isResourceValid(unmanaged, resource);
-      gcmidPromise.resolve(false);
-      return expect(DevicesService.matchDevicesByFullGCMid).toHaveBeenCalledWith(controller.distributorKey, resource, unmanaged);
+      promise.resolve({"is_match": false});
+      return expect(DevicesService.searchDevices).toHaveBeenCalled()
     });
 
-    it("matchDevicesByFullMac called when managed and button is mac", function () {
+    it("searchDevices called when managed and button is mac", function () {
       let unmanaged = false;
       controller.selectedButton = "MAC";
       controller.isResourceValid(unmanaged, resource);
-      promise.resolve(false);
-      return expect(DevicesService.matchDevicesByFullMac).toHaveBeenCalledWith(controller.distributorKey, resource, unmanaged);
+      promise.resolve({"is_match": false});
+      return expect(DevicesService.searchDevices).toHaveBeenCalled()
     });
 
-    return it("matchDevicesByFullSerial called when managed and button is not mac", function () {
+    return it("searchDevices called when managed and button is not mac", function () {
       let unmanaged = false;
       controller.selectedButton = "Serial Number";
       controller.isResourceValid(unmanaged, resource);
-      serialPromise.resolve(false);
-      return expect(DevicesService.matchDevicesByFullSerial).toHaveBeenCalledWith(controller.distributorKey, resource, unmanaged);
+      promise.resolve({"is_match": false});
+      return expect(DevicesService.searchDevices).toHaveBeenCalled()
     });
   });
 
@@ -416,7 +414,7 @@ describe('DevicesListingCtrl', function () {
         return deferred.promise
       })
       return spyOn(DevicesService, 'searchDevicesByPartialSerial').and.returnValue(serialPromise);
-      
+
     }));
 
     it("returns every serial name when called as an unmanaged serial", function () {
@@ -470,7 +468,7 @@ describe('DevicesListingCtrl', function () {
     it("returns every gcmid name when called as an managed gcmid", function () {
       let unmanaged = false;
       controller.selectedButton = "GCM ID";
-      
+
       controller.searchDevices(unmanaged, partial)
         .then(function () {
           return expect(controller.gcmidDevices).toEqual(genericMatches);

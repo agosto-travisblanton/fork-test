@@ -96,19 +96,31 @@ function DevicesListingCtrl($stateParams, $log, DevicesService, $state, Sessions
 
 
   vm.isResourceValid = function (unmanaged, resource) {
-    let byTenant = false;
-    let tenantKey = null;
     let button;
-
     if (unmanaged) {
       button = vm.unmanagedSelectedButton;
     } else {
       button = vm.selectedButton;
     }
 
+    let byTenant = false;
+    let tenantKey = null;
 
-    DevicesService.isResourceValid(resource, button, byTenant, tenantKey, vm.distributorKey, unmanaged)
-      .then(res => vm.controlOpenButton(unmanaged, res["is_match"]));
+    return DevicesService.searchDevices(resource, button, byTenant, tenantKey, vm.distributorKey, unmanaged)
+      .then(function (response) {
+        if (response.success) {
+          let devices = response.devices[0];
+          let foundMatch = false;
+          for (let eachDevice of devices) {
+            if (resource === eachDevice) {
+              foundMatch = true;
+            }
+          }
+          return vm.controlOpenButton(unmanaged, foundMatch)
+        } else {
+          return vm.controlOpenButton(unmanaged, false)
+        }
+      })
   };
 
 

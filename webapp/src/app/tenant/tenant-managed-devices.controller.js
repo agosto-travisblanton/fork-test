@@ -122,13 +122,30 @@ function TenantManagedDevicesCtrl($scope, $stateParams, TenantsService, DevicesS
     return vm.loadingDisabled = false;
   };
 
+
   vm.isResourceValid = function (resource) {
     let unmanaged = false;
     let byTenant = true;
-    return DevicesService.isResourceValid(resource, vm.selectedButton, byTenant, vm.tenantKey, vm.distributorKey, unmanaged)
-      .then(res => vm.controlOpenButton(res["is_match"]));
+
+    return DevicesService.searchDevices(resource, vm.selectedButton, byTenant, vm.tenantKey, vm.distributorKey, unmanaged)
+      .then(function (response) {
+        if (response.success) {
+          let devices = response.devices[0];
+          let foundMatch = false;
+          for (let eachDevice of devices) {
+            if (resource === eachDevice) {
+              foundMatch = true;
+            }
+          }
+          return vm.controlOpenButton(foundMatch)
+        } else {
+          return vm.controlOpenButton(false)
+        }
+      })
   };
 
   return vm;
 }
+
+
 export {TenantManagedDevicesCtrl}

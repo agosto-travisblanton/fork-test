@@ -169,40 +169,6 @@ export default class DevicesService {
     return deferred.promise
   }
 
-  isResourceValid(resource, button, byTenant, tenantKey, distributorKey, unmanaged) {
-    let mac, serial, gcmid;
-    let deferred = this.$q.defer();
-    if (resource) {
-      if (resource.length > 2) {
-        mac = button === "MAC";
-        serial = button === "Serial Number";
-        gcmid = button === "GCM ID";
-        if (byTenant) {
-          if (mac) {
-            deferred.resolve(this.matchDevicesByFullMacByTenant(tenantKey, resource, unmanaged))
-          } else if (serial) {
-            deferred.resolve(this.matchDevicesByFullSerialByTenant(tenantKey, resource, unmanaged))
-          } else {
-            deferred.resolve(this.matchDevicesByFullGCMidByTenant(tenantKey, resource, unmanaged))
-          }
-        } else {
-          if (mac) {
-            deferred.resolve(this.matchDevicesByFullMac(distributorKey, resource, unmanaged))
-          } else if (serial) {
-            deferred.resolve(this.matchDevicesByFullSerial(distributorKey, resource, unmanaged))
-          } else {
-            deferred.resolve(this.matchDevicesByFullGCMid(distributorKey, resource, unmanaged))
-          }
-        }
-      } else {
-        deferred.resolve({"is_match": false})
-      }
-    } else {
-      deferred.resolve({"is_match": false})
-    }
-    return deferred.promise
-  };
-
   convertDevicesArrayToDictionaryObj(theArray, mac, gcm) {
     /** Converts array to dictionary with mac, gcmid, or serial as the key **/
     let devices = {};
@@ -306,30 +272,6 @@ export default class DevicesService {
   }
 
 
-  matchDevicesByFullSerialByTenant(tenantKey, full_serial, unmanaged) {
-    if (tenantKey !== undefined) {
-      let url = `/api/v1/tenants/match/${tenantKey}/devices?unmanaged=${unmanaged}&full_serial=${full_serial}`;
-      let promise = this.Restangular.oneUrl(this.SERVICE_NAME, url).get();
-      return promise;
-    }
-  }
-
-  matchDevicesByFullMacByTenant(tenantKey, full_mac, unmanaged) {
-    if (tenantKey !== undefined) {
-      let url = `/api/v1/tenants/match/${tenantKey}/devices?unmanaged=${unmanaged}&full_mac=${full_mac}`;
-      let promise = this.Restangular.oneUrl(this.SERVICE_NAME, url).get();
-      return promise;
-    }
-  }
-
-  matchDevicesByFullGCMidByTenant(tenantKey, full_gcmid, unmanaged) {
-    if (tenantKey !== undefined) {
-      let url = `/api/v1/tenants/match/${tenantKey}/devices?unmanaged=${unmanaged}&full_gcmid=${full_gcmid}`;
-      let promise = this.Restangular.oneUrl(this.SERVICE_NAME, url).get();
-      return promise;
-    }
-  }
-
   /////////////////////////////////////////////////////////////////////////
   // DEVICES VIEW
   /////////////////////////////////////////////////////////////////////////
@@ -352,30 +294,6 @@ export default class DevicesService {
   searchDistributorDevicesByPartialGCMid(distributorKey, partial_gcmid, unmanaged) {
     if (distributorKey !== undefined) {
       let url = `/api/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_gcmid=${partial_gcmid}`;
-      let promise = this.Restangular.oneUrl(this.SERVICE_NAME, url).get();
-      return promise;
-    }
-  }
-
-  matchDevicesByFullSerial(distributorKey, full_serial, unmanaged) {
-    if (distributorKey !== undefined) {
-      let url = `/api/v1/distributors/match/${distributorKey}/devices?unmanaged=${unmanaged}&full_serial=${full_serial}`;
-      let promise = this.Restangular.oneUrl(this.SERVICE_NAME, url).get();
-      return promise;
-    }
-  }
-
-  matchDevicesByFullMac(distributorKey, full_mac, unmanaged) {
-    if (distributorKey !== undefined) {
-      let url = `/api/v1/distributors/match/${distributorKey}/devices?unmanaged=${unmanaged}&full_mac=${full_mac}`;
-      let promise = this.Restangular.oneUrl(this.SERVICE_NAME, url).get();
-      return promise;
-    }
-  }
-
-  matchDevicesByFullGCMid(distributorKey, full_gcmid, unmanaged) {
-    if (distributorKey !== undefined) {
-      let url = `/api/v1/distributors/match/${distributorKey}/devices?unmanaged=${unmanaged}&full_gcmid=${full_gcmid}`;
       let promise = this.Restangular.oneUrl(this.SERVICE_NAME, url).get();
       return promise;
     }
