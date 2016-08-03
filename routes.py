@@ -337,6 +337,17 @@ application = WSGIApplication(
               ),
 
         ############################################################
+        # OVERLAY
+        ############################################################
+
+        Route(r'/api/v1/overlay',
+              handler='handlers.overlay_handler.OverlayHandler',
+              name='post-overlay',
+              handler_method='post',
+              methods=['POST'],
+              ),
+
+        ############################################################
         # IMAGE
         ############################################################
 

@@ -39,22 +39,17 @@ class Image(ndb.Model):
 class Overlay(ndb.Model):
     position = ndb.StringProperty(required=True, indexed=True)
     type = ndb.StringProperty(required=True, indexed=True)
+    # an overlay is optionally associated with an image
     image_key = ndb.KeyProperty(kind=Image, required=False)
 
     @staticmethod
-    def create(overlay_position, overlay_type, image=None):
+    def create(overlay_position, overlay_type, image_key=None):
         if (overlay_position in overlay_positions) and (overlay_type in overlay_types):
-            if image:
-                overlay = Overlay(
-                    position=overlay_position,
-                    type=overlay_type,
-                    image_key=image
-                )
-            else:
-                overlay = Overlay(
-                    position=overlay_position,
-                    type=overlay_type,
-                )
+            overlay = Overlay(
+                position=overlay_position,
+                type=overlay_type,
+                image_key=image_key
+            )
             overlay.put()
             return overlay
 
