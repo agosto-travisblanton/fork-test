@@ -24,6 +24,8 @@ class TestContentManagerApi(BaseTest):
     DISTRIBUTOR_NAME = 'agosto'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     IMPERSONATION_EMAIL = 'test@test.com'
+    CONTENT_MANAGER_DISPLAY_NAME = 'Agosto No. 1'
+    CONTENT_MANAGER_LOCATION_DESCRIPTION = 'Front Reception'
 
     def setUp(self):
         super(TestContentManagerApi, self).setUp()
@@ -49,6 +51,8 @@ class TestContentManagerApi(BaseTest):
                                                     gcm_registration_id='fad7f890ad7f8ad0s7fa8s',
                                                     mac_address='54271e619346',
                                                     serial_number='SN000123')
+        self.device.content_manager_location_description = self.CONTENT_MANAGER_LOCATION_DESCRIPTION
+        self.device.content_manager_display_name = self.CONTENT_MANAGER_DISPLAY_NAME
         self.device_key = self.device.put()
 
     ##################################################################################################################
