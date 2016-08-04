@@ -1,5 +1,4 @@
 import json
-from models import Image, Overlay, ChromeOsDevice
 from routes import application
 from webtest import AppError
 
@@ -63,8 +62,6 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
         overlay =  response_json["overlays"][0]
-        print overlay
         self.assertEqual(overlay["top_left"]["type"], "LOGO")
-
-
+        self.assertEqual(overlay["top_left"]["image_key"]["key"], key)
 

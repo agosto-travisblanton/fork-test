@@ -1,11 +1,11 @@
 from google.appengine.ext import ndb
 from agar.sessions import SessionRequestHandler
-from models import Overlay, OverlayTemplate
+from models import OverlayTemplate
 import json
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
-from strategy import OVERLAY_TEMPLATE
 import ndb_json
+
 
 class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
     def post(self):
@@ -26,12 +26,10 @@ class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
                 }, status_code=400)
 
         overlay_template = OverlayTemplate.create_or_get_by_device_key(associated_device_key)
-        # restler doesn't serialize keyProperties properly, so ndb_json was used
+        # This method is offered because restler doesn't support keyProperty serialization beyond a single child
         overlay_template_intermediate_json = ndb_json.dumps(overlay_template)
-        overlay_template_dict = ndb_json.loads(overlay_template_intermediate_json)
-        overlay_template_json_final = json.dumps(overlay_template_dict)
 
         return json_response(self.response, {
             "success": True,
-            "overlay_template": overlay_template_json_final
+            "overlay_template": overlay_template_intermediate_json
         }, status_code=200)

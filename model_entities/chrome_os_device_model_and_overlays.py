@@ -88,9 +88,10 @@ class ChromeOsDevice(ndb.Model):
 
     @property
     def overlays_as_dict(self):
-        """ This method is offered because restler doesn't support keyProperty serialization """
+        """ This method is offered because restler doesn't support keyProperty serialization beyond a single child"""
         json = ndb_json.dumps(self.overlays)
         return ndb_json.loads(json)
+
 
     def enable_overlays(self):
         self.overlay_available = True
@@ -352,7 +353,15 @@ class OverlayTemplate(ndb.Model):
 
     @staticmethod
     def get_overlay_templates_for_device(device_key):
-        return OverlayTemplate.query(OverlayTemplate.device_key == device_key).fetch()
+        query = OverlayTemplate.query(OverlayTemplate.device_key == device_key).fetch()
+        return [
+            {
+                "top_left": query_result.top_left,
+                "top_right": query_result.top_right,
+                "bottom_left": query_result.bottom_left,
+                "bottom_right": query_result.bottom_right
+            } for query_result in query
+        ]
 
     @staticmethod
     def create_or_get_by_device_key(device_key):
