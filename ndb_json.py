@@ -21,6 +21,12 @@ Dependencies:
   - dateutil: https://pypi.python.org/pypi/python-dateutil
 """
 
+__author__ = 'Eric Higgins'
+__copyright__ = 'Copyright 2013, Eric Higgins'
+__version__ = '0.0.5'
+__email__ = 'erichiggins@gmail.com'
+__status__ = 'Development'
+
 import base64
 import datetime
 import json
