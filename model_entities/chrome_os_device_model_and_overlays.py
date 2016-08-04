@@ -3,6 +3,7 @@ import uuid
 
 from datetime import datetime
 from google.appengine.ext import ndb
+import ndb_json
 
 from app_config import config
 from restler.decorators import ae_ndb_serializer
@@ -70,6 +71,7 @@ class ChromeOsDevice(ndb.Model):
     registration_correlation_identifier = ndb.StringProperty(required=False, indexed=True)
     archived = ndb.BooleanProperty(default=False, required=True, indexed=True)
     panel_sleep = ndb.BooleanProperty(default=False, required=True, indexed=True)
+    overlay_available = ndb.BooleanProperty(default=False, required=True, indexed=True)
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):
@@ -79,6 +81,22 @@ class ChromeOsDevice(ndb.Model):
             logging.debug(
                 'Device has no tenant. Most likely an unmanaged device where tenant has not been specified.')
             return None
+
+    @property
+    def overlays(self):
+        return OverlayTemplate.get_overlay_templates_for_device(self.key)
+
+    @property
+    def overlays_as_dict(self):
+        """ This method is offered because restler doesn't support keyProperty serialization beyond a single child"""
+        json = ndb_json.dumps(self.overlays)
+        return ndb_json.loads(json)
+
+
+    def enable_overlays(self):
+        self.overlay_available = True
+        self.put()
+        return self
 
     @classmethod
     def get_by_device_id(cls, device_id):
@@ -251,3 +269,125 @@ class ChromeOsDevice(ndb.Model):
 
     def get_impersonation_email(self):
         return self.get_tenant().get_domain().impersonation_admin_email_address
+
+
+#####################################################
+# OVERLAYS
+#####################################################
+OVERLAY_POSITIONS = ["TOP_LEFT", "BOTTOM_LEFT", "BOTTOM_RIGHT", "TOP_RIGHT"]
+OVERLAY_TYPES = ["TIME", "DATE", "DATETIME", "LOGO"]
+
+
+@ae_ndb_serializer
+class Image(ndb.Model):
+    svg_rep = ndb.TextProperty(required=True, indexed=True)
+
+    @staticmethod
+    def exists(svg_rep):
+        images = Image.query(Image.svg_rep == svg_rep).fetch()
+        if len(images) > 0:
+            return images[0]
+        else:
+            return False
+
+    @staticmethod
+    def create(svg_rep):
+        existing_image = Image.exists(svg_rep=svg_rep)
+        if not existing_image:
+            image = Image(
+                svg_rep=svg_rep
+            )
+            image.put()
+            return image
+        else:
+            return existing_image
+
+    def _pre_put_hook(self):
+        self.class_version = 1
+
+
+@ae_ndb_serializer
+class Overlay(ndb.Model):
+    type = ndb.StringProperty(required=True, indexed=True)
+    # an overlay is optionally associated with an image
+    image_key = ndb.KeyProperty(kind=Image, required=False)
+
+    @staticmethod
+    def create_or_get(overlay_type, image_urlsafe_key=None):
+        if overlay_type == "LOGO":
+            if image_urlsafe_key == None:
+                print "raise value error"
+                raise ValueError("You must provide an image_key if you are creating an overlay logo")
+
+        # its not an overlay with an image that doesn't have a image_urlsafe_key
+        overlay_query = Overlay.query(Overlay.type == overlay_type).fetch()
+
+        if overlay_query:
+            overlay = overlay_query[0]
+
+
+        # this type of overlay has not been created yet
+        else:
+            if image_urlsafe_key:
+                image_key = ndb.Key(urlsafe=image_urlsafe_key).get().key
+            else:
+                image_key = None
+
+            overlay = Overlay(
+                type=overlay_type,
+                image_key=image_key
+            )
+
+            overlay.put()
+
+        return overlay
+
+
+@ae_ndb_serializer
+class OverlayTemplate(ndb.Model):
+    top_left = ndb.KeyProperty(kind=Overlay, required=False)
+    top_right = ndb.KeyProperty(kind=Overlay, required=False)
+    bottom_left = ndb.KeyProperty(kind=Overlay, required=False)
+    bottom_right = ndb.KeyProperty(kind=Overlay, required=False)
+    device_key = ndb.KeyProperty(kind=ChromeOsDevice, required=True)
+
+    @staticmethod
+    def get_overlay_templates_for_device(device_key):
+        return OverlayTemplate.query(OverlayTemplate.device_key == device_key).fetch()
+
+    @staticmethod
+    def create_or_get_by_device_key(device_key):
+        existing_template_exists = OverlayTemplate.get_overlay_templates_for_device(device_key)
+        if existing_template_exists:
+            return existing_template_exists[0]
+
+        else:
+            overlay_template = OverlayTemplate(
+                device_key=device_key
+            )
+            overlay_template.put()
+            return overlay_template
+
+    # expects a a dictionary with config about overlay
+    def set_overlay(self, overlay):
+        position = overlay["position"]
+        overlay_type = overlay["overlay_type"]
+        # expects the front-end to already know the urlsafe_key of a previously posted image
+        associated_image_urlsafe_key = overlay["associated_image"]
+        overlay = Overlay.create_or_get(overlay_type=overlay_type, image_urlsafe_key=associated_image_urlsafe_key)
+
+        if position == "TOP_LEFT":
+            self.top_left = overlay.key
+            self.put()
+
+        elif position == "BOTTOM_LEFT":
+            self.bottom_left = overlay.key
+            self.put()
+
+        elif position == "BOTTOM_RIGHT":
+            self.bottom_right = overlay.key
+            self.put()
+
+        elif position == "TOP_RIGHT":
+            self.top_right = overlay.key
+            self.put()

@@ -3,7 +3,7 @@ from env_setup import setup_test_paths
 setup_test_paths()
 
 from utils.web_util import build_uri
-from models import Distributor, Domain
+from models import Distributor, Domain, ChromeOsDevice, Tenant
 from routes import application
 from provisioning_base_test import ProvisioningBaseTest
 from app_config import config
@@ -14,10 +14,19 @@ class ProvisioningDistributorUserBase(ProvisioningBaseTest):
     AGOSTO = 'agosto'
     DISTRIBUTOR = 'Distributor'
     INACTIVE_DISTRIBUTOR = 'Inactive Distributor'
+    TENANT_CODE = 'foobar'
+    TENANT_NAME = 'Foobar'
     FORBIDDEN = '403 Forbidden'
+    MAC_ADDRESS = 'bladfkdkddkdkd'
+    TEST_GCM_REGISTRATION_ID = '3k3k3k3k3k3kdldldldld'
+    TESTING_DEVICE_ID = '232jmkskkk34k42k3l423k2'
+    CHROME_DEVICE_DOMAIN_DEFAULT = 'default.agosto.com'
     CHROME_DEVICE_DOMAIN_BOB = 'bob.agosto.com'
     CHROME_DEVICE_DOMAIN_FOO = 'foo.agosto.com'
     IMPERSONATION_EMAIL = 'admin@skykit.com'
+    ADMIN_EMAIL = 'foo@bar.com'
+    CONTENT_SERVER_URL = 'https://www.content.com'
+    CONTENT_MANAGER_BASE_URL = 'https://skykit-contentmanager-int.appspot.com'
 
     def setUp(self):
         super(ProvisioningDistributorUserBase, self).setUp()
@@ -51,6 +60,13 @@ class ProvisioningDistributorUserBase(ProvisioningBaseTest):
         self.inactive_distributor = Distributor.create(name=self.INACTIVE_DISTRIBUTOR, active=False)
         self.inactive_distributor_key = self.inactive_distributor.put()
 
+        self.domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN_DEFAULT,
+                                    distributor_key=self.agosto_key,
+                                    impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
+                                    active=True)
+
+        self.domain.put()
+
         self.domain_bob = Domain.create(name=self.CHROME_DEVICE_DOMAIN_BOB,
                                         distributor_key=self.agosto_key,
                                         impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
@@ -71,3 +87,29 @@ class ProvisioningDistributorUserBase(ProvisioningBaseTest):
         self.login_url = build_uri('login')
         self.logout_url = build_uri('logout')
         self.identity_url = build_uri('identity')
+
+        self.tenant = Tenant.create(tenant_code=self.TENANT_CODE,
+                                    name=self.TENANT_NAME,
+                                    admin_email=self.ADMIN_EMAIL,
+                                    content_server_url=self.CONTENT_SERVER_URL,
+                                    content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                                    domain_key=self.domain.key,
+                                    active=True)
+
+        self.tenant_key = self.tenant.put()
+
+        self.device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                                    device_id=self.TESTING_DEVICE_ID,
+                                                    gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                                    mac_address=self.MAC_ADDRESS)
+        self.device_key = self.device.put()
+
+        self.unmanaged_registration_token_authorization_header = {
+            'Authorization': config.UNMANAGED_REGISTRATION_TOKEN
+        }
+        self.api_token_authorization_header = {
+            'Authorization': config.API_TOKEN
+        }
+        self.unmanaged_api_token_authorization_header = {
+            'Authorization': config.UNMANAGED_API_TOKEN
+        }
