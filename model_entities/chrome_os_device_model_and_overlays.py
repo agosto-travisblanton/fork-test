@@ -327,7 +327,10 @@ class Overlay(ndb.Model):
 
         # this type of overlay has not been created yet
         else:
-            image_key = ndb.Key(urlsafe=image_urlsafe_key).get().key
+            if image_urlsafe_key:
+                image_key = ndb.Key(urlsafe=image_urlsafe_key).get().key
+            else:
+                image_key = None
 
             overlay = Overlay(
                 type=overlay_type,
