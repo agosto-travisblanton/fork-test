@@ -39,4 +39,5 @@ class TestOverlayModel(ProvisioningDistributorUserBase):
         }
         overlay_template.set_overlay(overlay_config)
         overlay_template = OverlayTemplate.create_or_get_by_device_key(self.device_key)
+        print overlay_template
         self.assertTrue(overlay_template.top_left)

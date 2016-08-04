@@ -353,15 +353,7 @@ class OverlayTemplate(ndb.Model):
 
     @staticmethod
     def get_overlay_templates_for_device(device_key):
-        query = OverlayTemplate.query(OverlayTemplate.device_key == device_key).fetch()
-        return [
-            {
-                "top_left": query_result.top_left,
-                "top_right": query_result.top_right,
-                "bottom_left": query_result.bottom_left,
-                "bottom_right": query_result.bottom_right
-            } for query_result in query
-        ]
+        return OverlayTemplate.query(OverlayTemplate.device_key == device_key).fetch()
 
     @staticmethod
     def create_or_get_by_device_key(device_key):
