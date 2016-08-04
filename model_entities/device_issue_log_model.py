@@ -55,14 +55,14 @@ class DeviceIssueLog(ndb.Model):
                resolved=False,
                resolved_datetime=None):
         if category in [config.DEVICE_ISSUE_MEMORY_HIGH, config.DEVICE_ISSUE_STORAGE_LOW]:
-            level = IssueLevel.Warning
-            level_descriptor = IssueLevel.stringify(IssueLevel.Warning)
+            level = 1
+            level_descriptor = 'Warning'
         elif category in [config.DEVICE_ISSUE_PLAYER_DOWN]:
-            level = IssueLevel.Danger
-            level_descriptor = IssueLevel.stringify(IssueLevel.Danger)
+            level = 2
+            level_descriptor = 'Danger'
         else:
-            level = IssueLevel.Normal
-            level_descriptor = IssueLevel.stringify(IssueLevel.Normal)
+            level = 0
+            level_descriptor = 'Normal'
         return cls(device_key=device_key,
                    category=category,
                    up=up,
@@ -139,14 +139,14 @@ class DeviceIssueLog(ndb.Model):
             issue.up = True
             issue.resolved = True
             if category in [config.DEVICE_ISSUE_MEMORY_HIGH, config.DEVICE_ISSUE_STORAGE_LOW]:
-                issue.level = IssueLevel.Warning
+                issue.level = 1
                 issue.level_descriptor = IssueLevel.stringify(IssueLevel.Warning)
             elif category in [config.DEVICE_ISSUE_PLAYER_DOWN]:
-                issue.level = IssueLevel.Danger
-                issue.level_descriptor = IssueLevel.stringify(IssueLevel.Danger)
+                issue.level = 2
+                issue.level_descriptor = 'Danger'
             else:
-                issue.level = IssueLevel.Normal
-                issue.level_descriptor = IssueLevel.stringify(IssueLevel.Normal)
+                issue.level = 0
+                issue.level_descriptor = 'Normal'
             issue.resolved_datetime = resolved_datetime
             issue.put()
 
@@ -161,14 +161,14 @@ class DeviceIssueLog(ndb.Model):
             issue.up = True
             issue.resolved = True
             if category in [config.DEVICE_ISSUE_MEMORY_HIGH, config.DEVICE_ISSUE_STORAGE_LOW]:
-                issue.level = IssueLevel.Warning
-                issue.level_descriptor = IssueLevel.stringify(IssueLevel.Warning)
+                issue.level = 1
+                issue.level_descriptor = 'Warning'
             elif category in [config.DEVICE_ISSUE_PLAYER_DOWN]:
-                issue.level = IssueLevel.Danger
-                issue.level_descriptor = IssueLevel.stringify(IssueLevel.Danger)
+                issue.level = 2
+                issue.level_descriptor = 'Danger'
             else:
-                issue.level = IssueLevel.Normal
-                issue.level_descriptor = IssueLevel.stringify(IssueLevel.Normal)
+                issue.level = 0
+                issue.level_descriptor = 'Normal'
             issue.resolved_datetime = resolved_datetime
             issue.put()
 
