@@ -27,9 +27,11 @@ class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
 
         overlay_template = OverlayTemplate.create_or_get_by_device_key(associated_device_key)
         # restler doesn't serialize keyProperties properly, so ndb_json was used
-        overlay_template_json = ndb_json.dumps(overlay_template)
+        overlay_template_intermediate_json = ndb_json.dumps(overlay_template)
+        overlay_template_dict = ndb_json.loads(overlay_template_intermediate_json)
+        overlay_template_json_final = json.dumps(overlay_template_dict)
 
         return json_response(self.response, {
             "success": True,
-            "overlays": overlay_template_json
+            "overlay_template": overlay_template_json_final
         }, status_code=200)

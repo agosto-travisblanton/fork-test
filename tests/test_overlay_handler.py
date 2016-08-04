@@ -46,7 +46,7 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
         response = self.app.post_json(uri, params=request_parameters)
         response_json = json.loads(response.body)
         self.assertEqual(response_json["success"], True)
-        overlays = json.loads(response_json["overlays"])
+        overlays = json.loads(response_json["overlay_template"])
         self.assertEqual(overlays["top_left"]["type"], "LOGO")
         self.assertEqual(overlays["top_left"]["image_key"]["key"], key)
 
@@ -56,12 +56,15 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
         self.device.enable_overlays()
 
         # check if device get returns newly created overlay
-        # uri = application.router.build(None,
-        #                                'device',
-        #                                None,
-        #                                {'device_urlsafe_key': self.device_key.urlsafe()})
-        # response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
-        # response_json = json.loads(response.body)
-        #
-        # self.assertTrue(response_json["overlays"])
-        # self.assertFalse(response_json["overlays"])
+        uri = application.router.build(None,
+                                       'device',
+                                       None,
+                                       {'device_urlsafe_key': self.device_key.urlsafe()})
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+        overlay =  response_json["overlays"][0]
+        print overlay
+        self.assertEqual(overlay["top_left"]["type"], "LOGO")
+
+
+

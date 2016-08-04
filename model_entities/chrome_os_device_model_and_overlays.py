@@ -3,6 +3,7 @@ import uuid
 
 from datetime import datetime
 from google.appengine.ext import ndb
+import ndb_json
 
 from app_config import config
 from restler.decorators import ae_ndb_serializer
@@ -84,6 +85,12 @@ class ChromeOsDevice(ndb.Model):
     @property
     def overlays(self):
         return OverlayTemplate.get_overlay_templates_for_device(self.key)
+
+    @property
+    def overlays_as_dict(self):
+        """ This method is offered because restler doesn't support keyProperty serialization """
+        json = ndb_json.dumps(self.overlays)
+        return ndb_json.loads(json)
 
     def enable_overlays(self):
         self.overlay_available = True
@@ -310,7 +317,6 @@ class Overlay(ndb.Model):
             if image_urlsafe_key == None:
                 print "raise value error"
                 raise ValueError("You must provide an image_key if you are creating an overlay logo")
-
 
         # its not an overlay with an image that doesn't have a image_urlsafe_key
         overlay_query = Overlay.query(Overlay.type == overlay_type).fetch()

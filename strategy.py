@@ -130,7 +130,7 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'playlistId': lambda o, field_name, context: o.playlist_id},
     {'lastError': lambda o, field_name, context: o.last_error},
     {'archived': lambda o, field_name, context: o.archived},
-    {'overlays': lambda o, field_name, context: o.overlays if o.overlay_available else None}
+    {'overlays': lambda o, field_name, context: o.overlays_as_dict if o.overlay_available else None}
 
 ]
 
