@@ -4,7 +4,7 @@ from google.appengine.ext import ndb
 from app_config import config
 from restler.decorators import ae_ndb_serializer
 from domain_model import Domain
-from chrome_os_device_model import ChromeOsDevice
+from models import ChromeOsDevice
 from device_issue_log_model import DeviceIssueLog
 from entity_groups import TenantEntityGroup
 

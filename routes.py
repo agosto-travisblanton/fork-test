@@ -337,6 +337,35 @@ application = WSGIApplication(
               ),
 
         ############################################################
+        # OVERLAY
+        ############################################################
+
+        Route(r'/api/v1/overlay',
+              handler='handlers.overlay_handler.OverlayHandler',
+              name='post-overlay',
+              handler_method='post',
+              methods=['POST'],
+              ),
+
+        ############################################################
+        # IMAGE
+        ############################################################
+
+        Route(r'/api/v1/image/<image_urlsafe_key>',
+              handler='handlers.image_handler.ImageHandler',
+              name='get_image_by_key',
+              handler_method='get_image_by_key',
+              methods=['GET'],
+              ),
+
+        Route(r'/api/v1/image',
+              handler='handlers.image_handler.ImageHandler',
+              name='post-image',
+              handler_method='post',
+              methods=['POST'],
+              ),
+
+        ############################################################
         # DEVICE MONITORING
         ############################################################
 
