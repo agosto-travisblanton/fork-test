@@ -308,34 +308,37 @@ class Overlay(ndb.Model):
     def create_or_get(overlay_type, image_urlsafe_key=None):
         if overlay_type == "LOGO":
             if image_urlsafe_key == None:
+                print "raise value error"
                 raise ValueError("You must provide an image_key if you are creating an overlay logo")
 
 
         # its not an overlay with an image that doesn't have a image_urlsafe_key
+        overlay_query = Overlay.query(Overlay.type == overlay_type).fetch()
+
+        if overlay_query:
+            overlay = overlay_query[0]
+
+
+        # this type of overlay has not been created yet
         else:
             image_key = ndb.Key(urlsafe=image_urlsafe_key).get().key
-            existing_overlay = Overlay.query(Overlay.type == overlay_type).fetch()
 
-            if existing_overlay:
-                return existing_overlay[0]
+            overlay = Overlay(
+                type=overlay_type,
+                image_key=image_key
+            )
 
-            # this type of overlay has not been created yet
-            else:
-                overlay = Overlay(
-                    type=overlay_type,
-                    image_key=image_key
-                )
+            overlay.put()
 
-                overlay.put()
-                return overlay
+        return overlay
 
 
 @ae_ndb_serializer
 class OverlayTemplate(ndb.Model):
-    top_left = ndb.KeyProperty(kind=Image, required=False)
-    top_right = ndb.KeyProperty(kind=Image, required=False)
-    bottom_left = ndb.KeyProperty(kind=Image, required=False)
-    bottom_right = ndb.KeyProperty(kind=Image, required=False)
+    top_left = ndb.KeyProperty(kind=Overlay, required=False)
+    top_right = ndb.KeyProperty(kind=Overlay, required=False)
+    bottom_left = ndb.KeyProperty(kind=Overlay, required=False)
+    bottom_right = ndb.KeyProperty(kind=Overlay, required=False)
     device_key = ndb.KeyProperty(kind=ChromeOsDevice, required=True)
 
     @staticmethod
@@ -361,7 +364,7 @@ class OverlayTemplate(ndb.Model):
         overlay_type = overlay["overlay_type"]
         # expects the front-end to already know the urlsafe_key of a previously posted image
         associated_image_urlsafe_key = overlay["associated_image"]
-        overlay = Overlay.create_or_get(type=overlay_type, image_urlsafe_key=associated_image_urlsafe_key)
+        overlay = Overlay.create_or_get(overlay_type=overlay_type, image_urlsafe_key=associated_image_urlsafe_key)
 
         if position == "TOP_LEFT":
             self.top_left = overlay.key

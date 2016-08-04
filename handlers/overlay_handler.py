@@ -4,7 +4,8 @@ from models import Overlay, OverlayTemplate
 import json
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
-
+from strategy import OVERLAY_TEMPLATE
+import ndb_json
 
 class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
     def post(self):
@@ -16,7 +17,6 @@ class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
 
         for overlay_config in overlays:
             try:
-
                 overlay_template.set_overlay(overlay_config)
 
             except ValueError as exp:
@@ -26,8 +26,10 @@ class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
                 }, status_code=400)
 
         overlay_template = OverlayTemplate.create_or_get_by_device_key(associated_device_key)
+        # restler doesn't serialize keyProperties properly, so ndb_json was used
+        overlay_template_json = ndb_json.dumps(overlay_template)
 
         return json_response(self.response, {
             "success": True,
-            "overlay": overlay_template
+            "overlays": overlay_template_json
         }, status_code=200)

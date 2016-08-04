@@ -9,7 +9,9 @@ from models import (Tenant,
                     PlayerCommandEvent,
                     Location,
                     IntegrationEventLog,
-                    Image)
+                    Image,
+                    OverlayTemplate
+                    )
 
 from restler.serializers import ModelStrategy
 from utils.datetime_util import elapsed_time_message
@@ -215,4 +217,14 @@ IMAGE_STRATEGY = ModelStrategy(Image)
 IMAGE_STRATEGY += [
     {'key': lambda o, field_name, context: o.key.urlsafe()},
     {'svg_rep': lambda o, field_name, context: o.svg_rep},
+]
+
+OVERLAY_TEMPLATE = ModelStrategy(OverlayTemplate)
+OVERLAY_TEMPLATE += [
+    {'key': lambda o, field_name, context: o.key.urlsafe()},
+    {'top_right': lambda o, field_name, context: o.top_right.get() if o.top_right else None},
+    {'bottom_right': lambda o, field_name, context: o.bottom_right.get() if o.bottom_right else None},
+    {'top_left': lambda o, field_name, context: o.top_left.get() if o.top_left else None},
+    {'bottom_left': lambda o, field_name, context: o.bottom_left.get() if o.bottom_left else None},
+
 ]
