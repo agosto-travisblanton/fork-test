@@ -443,21 +443,21 @@ application = WSGIApplication(
         Route(r'/api/reports/v1/chrome_os_device',
               handler='handlers.reports.chrome_device_management_handler.ChromeDeviceManagementHandler',
               name='chrome-os-device',
-              handler_method='get_by_parameters',
+              handler_method='get_device_by_parameters',
               methods=['GET']
               ),
 
         Route(r'/api/reports/v1/chrome_os_devices',
               handler='handlers.reports.chrome_device_management_handler.ChromeDeviceManagementHandler',
               name='chrome-os-devices',
-              handler_method='get_list',
+              handler_method='get_device_list',
               methods=['GET']
               ),
 
         Route(r'/api/reports/v1/chrome_os_devices/count',
               handler='handlers.reports.chrome_device_management_handler.ChromeDeviceManagementHandler',
-              name='chrome-os-devices',
-              handler_method='get_count',
+              name='chrome-os-devices-count',
+              handler_method='get_devices_count',
               methods=['GET']
               ),
 

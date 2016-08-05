@@ -45,26 +45,32 @@ class ChromeOsDevicesApi(object):
         self.discovery_service = discovery.build('admin', 'directory_v1', http=self.authorized_http)
 
     # https://developers.google.com/admin-sdk/directory/v1/reference/chromeosdevices/list
-    def list(self, customer_id, page_token=None):
+    def list(self, customer_id, page_token=None, projection=None, max_results = None):
         """
         Obtain a list of Chrome OS devices associated with a customer.
 
+        :param max_results:
+        :param projection:
+        :param page_token:
         :param customer_id: An identifier for a customer.
         :return: An array of Chrome OS devices.
         """
+        if projection is None:
+            projection = self.PROJECTION_FULL
+        if max_results is None:
+            max_results = self.MAX_RESULTS
         results = []
         chrome_os_devices_api = self.discovery_service.chromeosdevices()
         while True:
-            # https://google-api-client-libraries.appspot.com/documentation/admin/directory_v1/python/latest/admin_directory_v1.chromeosdevices.html#list
             if page_token is None:
                 request = chrome_os_devices_api.list(customerId=customer_id,
-                                                     projection=self.PROJECTION_FULL,
-                                                     maxResults=self.MAX_RESULTS)
+                                                     projection=projection,
+                                                     maxResults=max_results)
             else:
                 request = chrome_os_devices_api.list(customerId=customer_id,
-                                                     projection=self.PROJECTION_FULL,
+                                                     projection=projection,
                                                      pageToken=page_token,
-                                                     maxResults=self.MAX_RESULTS)
+                                                     maxResults=max_results)
             current_page_json = request.execute()
             chrome_os_devices = current_page_json.get(self.KEY_CHROMEOSDEVICES)
             page_token = current_page_json.get(self.KEY_NEXTPAGETOKEN)

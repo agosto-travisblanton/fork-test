@@ -4,7 +4,7 @@ setup_test_paths()
 
 from models import Tenant, ChromeOsDevice, Distributor, Domain
 from agar.test import BaseTest
-from integrations.device_management.chrome_os_devices_api import ChromeOsDevicesApi
+from integrations.directory_api.chrome_os_devices_api import ChromeOsDevicesApi
 from workflow.get_impersonation_email_from_device_key import get_impersonation_email_from_device_key
 
 

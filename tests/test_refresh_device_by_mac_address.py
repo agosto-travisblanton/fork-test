@@ -4,7 +4,7 @@ setup_test_paths()
 
 from models import Tenant, ChromeOsDevice, Distributor, Domain
 from agar.test import BaseTest
-from integrations.device_management.chrome_os_devices_api import ChromeOsDevicesApi
+from integrations.directory_api.chrome_os_devices_api import ChromeOsDevicesApi
 from workflow.refresh_device_by_mac_address import refresh_device_by_mac_address
 
 class TestRefreshDeviceByMacAddress(BaseTest):
