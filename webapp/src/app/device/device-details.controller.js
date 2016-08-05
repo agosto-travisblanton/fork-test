@@ -13,7 +13,7 @@ function DeviceDetailsCtrl($log,
                            ProgressBarService,
                            $mdDialog,
                            ToastsService,
-                           DateManipulationService) {
+                           DateManipulationService, $scope) {
   "ngInject";
 
 
@@ -30,6 +30,11 @@ function DeviceDetailsCtrl($log,
   vm.selectedTimezone = undefined;
   [vm.startTime, vm.endTime] = DateManipulationService.createFormattedStartAndEndDateFromToday(30);
   vm.enrollmentEvents = [];
+
+  $scope.$watch('selectedFile.length', function (newVal, oldVal) {
+    console.log($scope.selectedFile);
+  });
+
 
   vm.replaceIssueTime = function (issues) {
     for (let i = 0; i < issues.length; i++) {

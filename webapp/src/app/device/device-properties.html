@@ -1,4 +1,5 @@
-<md-content class="md-padding" layout="row" layout-wrap layout-align="left start"
+<md-content ng-controller="DeviceDetailsCtrl as vm" class="md-padding" layout="row" layout-wrap
+            layout-align="left start"
             layout-xs="column">
   <div flex="50" flex-sm="50" flex-xs="50" layout="column">
     <md-card>
@@ -7,273 +8,273 @@
         <h2>Information</h2>
         <hr/>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.serialNumber == null ||
-                                           deviceDetailsCtrl.currentDevice.serialNumber == ''">
+             ng-hide="vm.currentDevice.serialNumber == null ||
+                                           vm.currentDevice.serialNumber == ''">
           <label>Serial number</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.serialNumber}}
+            {{vm.currentDevice.serialNumber}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.annotatedLocation == null ||
-                                           deviceDetailsCtrl.currentDevice.annotatedLocation == ''">
+             ng-hide="vm.currentDevice.annotatedLocation == null ||
+                                           vm.currentDevice.annotatedLocation == ''">
           <label>Annotated location</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.annotatedLocation}}
+            {{vm.currentDevice.annotatedLocation}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.annotatedUser == null ||
-                                           deviceDetailsCtrl.currentDevice.annotatedUser == ''">
+             ng-hide="vm.currentDevice.annotatedUser == null ||
+                                           vm.currentDevice.annotatedUser == ''">
           <label>Annotated user</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.annotatedUser}}
+            {{vm.currentDevice.annotatedUser}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.apiKey == null ||
-                                           deviceDetailsCtrl.currentDevice.apiKey == ''">
+             ng-hide="vm.currentDevice.apiKey == null ||
+                                           vm.currentDevice.apiKey == ''">
           <label>API key</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.apiKey}}
+            {{vm.currentDevice.apiKey}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.annotatedAssetId == null ||
-                                           deviceDetailsCtrl.currentDevice.annotatedAssetId == ''">
+             ng-hide="vm.currentDevice.annotatedAssetId == null ||
+                                           vm.currentDevice.annotatedAssetId == ''">
           <label>Asset Id</label>
           <div class="properties-word-break">
-            {{deviceDetailsCtrl.currentDevice.annotatedAssetId}}
+            {{vm.currentDevice.annotatedAssetId}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.bootMode == null ||
-                                           deviceDetailsCtrl.currentDevice.bootMode == ''">
+             ng-hide="vm.currentDevice.bootMode == null ||
+                                           vm.currentDevice.bootMode == ''">
           <label>Boot mode</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.bootMode}}
+            {{vm.currentDevice.bootMode}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.chromeDeviceDomain == null ||
-                                           deviceDetailsCtrl.currentDevice.chromeDeviceDomain == ''">
+             ng-hide="vm.currentDevice.chromeDeviceDomain == null ||
+                                           vm.currentDevice.chromeDeviceDomain == ''">
           <label>Chrome device domain</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.chromeDeviceDomain}}
+            {{vm.currentDevice.chromeDeviceDomain}}
           </div>
         </div>
 
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.contentManagerDisplayName == null ||
-                                           deviceDetailsCtrl.currentDevice.contentManagerDisplayName == ''">
+             ng-hide="vm.currentDevice.contentManagerDisplayName == null ||
+                                           vm.currentDevice.contentManagerDisplayName == ''">
           <label>Content Manager Display Name</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.contentManagerDisplayName}}
+            {{vm.currentDevice.contentManagerDisplayName}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.contentManagerLocationDescription == null ||
-                                           deviceDetailsCtrl.currentDevice.contentManagerLocationDescription == ''">
+             ng-hide="vm.currentDevice.contentManagerLocationDescription == null ||
+                                           vm.currentDevice.contentManagerLocationDescription == ''">
           <label>Content Manager Location Description</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.contentManagerLocationDescription}}
+            {{vm.currentDevice.contentManagerLocationDescription}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.contentServerUrl == null ||
-                                           deviceDetailsCtrl.currentDevice.contentServerUrl == ''">
+             ng-hide="vm.currentDevice.contentServerUrl == null ||
+                                           vm.currentDevice.contentServerUrl == ''">
           <label>Content server URL</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.contentServerUrl}}
+            {{vm.currentDevice.contentServerUrl}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.created == null ||
-                                           deviceDetailsCtrl.currentDevice.created == ''">
+             ng-hide="vm.currentDevice.created == null ||
+                                           vm.currentDevice.created == ''">
           <label>Created timestamp</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.created}}
+            {{vm.currentDevice.created}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.deviceId == null ||
-                                           deviceDetailsCtrl.currentDevice.deviceId == ''">
+             ng-hide="vm.currentDevice.deviceId == null ||
+                                           vm.currentDevice.deviceId == ''">
           <label>Device ID</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.deviceId}}
+            {{vm.currentDevice.deviceId}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.etag == null ||
-                                           deviceDetailsCtrl.currentDevice.etag == ''">
+             ng-hide="vm.currentDevice.etag == null ||
+                                           vm.currentDevice.etag == ''">
           <label>ETag</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.etag}}
+            {{vm.currentDevice.etag}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.firmwareVersion == null ||
-                                           deviceDetailsCtrl.currentDevice.firmwareVersion == ''">
+             ng-hide="vm.currentDevice.firmwareVersion == null ||
+                                           vm.currentDevice.firmwareVersion == ''">
           <label>Firmware version</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.firmwareVersion}}
+            {{vm.currentDevice.firmwareVersion}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.gcmRegistrationId == null ||
-                                           deviceDetailsCtrl.currentDevice.gcmRegistrationId == ''">
+             ng-hide="vm.currentDevice.gcmRegistrationId == null ||
+                                           vm.currentDevice.gcmRegistrationId == ''">
           <label>GCM registration ID</label>
           <div class="properties-word-break">
-            {{deviceDetailsCtrl.currentDevice.gcmRegistrationId}}
+            {{vm.currentDevice.gcmRegistrationId}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.kind == null ||
-                                           deviceDetailsCtrl.currentDevice.kind == ''">
+             ng-hide="vm.currentDevice.kind == null ||
+                                           vm.currentDevice.kind == ''">
           <label>Kind</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.kind}}
+            {{vm.currentDevice.kind}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.lastEnrollmentTime == null ||
-                                           deviceDetailsCtrl.currentDevice.lastEnrollmentTime == ''">
+             ng-hide="vm.currentDevice.lastEnrollmentTime == null ||
+                                           vm.currentDevice.lastEnrollmentTime == ''">
           <label>Last enrollment</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.lastEnrollmentTime}}
+            {{vm.currentDevice.lastEnrollmentTime}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.lastSync == null ||
-                                           deviceDetailsCtrl.currentDevice.lastSync == ''">
+             ng-hide="vm.currentDevice.lastSync == null ||
+                                           vm.currentDevice.lastSync == ''">
           <label>Last sync</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.lastSync}}
+            {{vm.currentDevice.lastSync}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.logglyLink == null ||
-                                           deviceDetailsCtrl.currentDevice.logglyLink == ''">
-          <div ng-show="deviceDetailsCtrl.logglyForUser()">
+             ng-hide="vm.currentDevice.logglyLink == null ||
+                                           vm.currentDevice.logglyLink == ''">
+          <div ng-show="vm.logglyForUser()">
             <label>Loggly</label>
             <div>
-              <a ng-href="{{deviceDetailsCtrl.currentDevice.logglyLink}}"
+              <a ng-href="{{vm.currentDevice.logglyLink}}"
                  class="md-primary md-ink-ripple">
-                {{deviceDetailsCtrl.currentDevice.logglyLink}}</a>
+                {{vm.currentDevice.logglyLink}}</a>
             </div>
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.macAddress == null ||
-                                           deviceDetailsCtrl.currentDevice.macAddress == ''">
+             ng-hide="vm.currentDevice.macAddress == null ||
+                                           vm.currentDevice.macAddress == ''">
           <label>MAC WiFi</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.macAddress}}
+            {{vm.currentDevice.macAddress}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.ethernetMacAddress == null ||
-                                           deviceDetailsCtrl.currentDevice.ethernetMacAddress == ''">
+             ng-hide="vm.currentDevice.ethernetMacAddress == null ||
+                                           vm.currentDevice.ethernetMacAddress == ''">
           <label>Ethernet MAC</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.ethernetMacAddress}}
+            {{vm.currentDevice.ethernetMacAddress}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.model == null ||
-                                           deviceDetailsCtrl.currentDevice.model == ''">
+             ng-hide="vm.currentDevice.model == null ||
+                                           vm.currentDevice.model == ''">
           <label>Model</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.model}}
+            {{vm.currentDevice.model}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.osVersion == null ||
-                                           deviceDetailsCtrl.currentDevice.osVersion == ''">
+             ng-hide="vm.currentDevice.osVersion == null ||
+                                           vm.currentDevice.osVersion == ''">
           <label>OS version</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.osVersion}}
+            {{vm.currentDevice.osVersion}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.orgUnitPath == null ||
-                                           deviceDetailsCtrl.currentDevice.orgUnitPath == ''">
+             ng-hide="vm.currentDevice.orgUnitPath == null ||
+                                           vm.currentDevice.orgUnitPath == ''">
           <label>OU path</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.orgUnitPath}}
+            {{vm.currentDevice.orgUnitPath}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.platformVersion == null ||
-                                           deviceDetailsCtrl.currentDevice.platformVersion == ''">
+             ng-hide="vm.currentDevice.platformVersion == null ||
+                                           vm.currentDevice.platformVersion == ''">
           <label>Platform version</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.platformVersion}}
+            {{vm.currentDevice.platformVersion}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.playlist == null ||
-                                           deviceDetailsCtrl.currentDevice.playlist == ''">
+             ng-hide="vm.currentDevice.playlist == null ||
+                                           vm.currentDevice.playlist == ''">
           <label>Playlist / Playlist Id</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.playlist}} / {{deviceDetailsCtrl.currentDevice.playlistId}}
+            {{vm.currentDevice.playlist}} / {{vm.currentDevice.playlistId}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.program == null ||
-                                           deviceDetailsCtrl.currentDevice.program == ''">
+             ng-hide="vm.currentDevice.program == null ||
+                                           vm.currentDevice.program == ''">
           <label>Program / Program Id</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.program}} / {{deviceDetailsCtrl.currentDevice.programId}}
+            {{vm.currentDevice.program}} / {{vm.currentDevice.programId}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.registrationCorrelationIdentifier == null ||
-                                           deviceDetailsCtrl.currentDevice.registrationCorrelationIdentifier == ''">
+             ng-hide="vm.currentDevice.registrationCorrelationIdentifier == null ||
+                                           vm.currentDevice.registrationCorrelationIdentifier == ''">
           <label>Registration correlation identifier</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.registrationCorrelationIdentifier}}
+            {{vm.currentDevice.registrationCorrelationIdentifier}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.status == null ||
-                                           deviceDetailsCtrl.currentDevice.status == ''">
+             ng-hide="vm.currentDevice.status == null ||
+                                           vm.currentDevice.status == ''">
           <label>Status</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.status}}
+            {{vm.currentDevice.status}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.tenantCode == null ||
-                                           deviceDetailsCtrl.currentDevice.tenantCode == ''">
+             ng-hide="vm.currentDevice.tenantCode == null ||
+                                           vm.currentDevice.tenantCode == ''">
           <label>Tenant code</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.tenantCode}}
+            {{vm.currentDevice.tenantCode}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.timezone == null ||
-                                           deviceDetailsCtrl.currentDevice.timezone == ''">
+             ng-hide="vm.currentDevice.timezone == null ||
+                                           vm.currentDevice.timezone == ''">
           <label>Timezone</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.timezone}}
+            {{vm.currentDevice.timezone}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.isUnmanagedDevice == null ||
-                                           deviceDetailsCtrl.currentDevice.isUnmanagedDevice == ''">
+             ng-hide="vm.currentDevice.isUnmanagedDevice == null ||
+                                           vm.currentDevice.isUnmanagedDevice == ''">
           <label>Unmanaged</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.isUnmanagedDevice}}
+            {{vm.currentDevice.isUnmanagedDevice}}
           </div>
         </div>
         <div class="form-group"
-             ng-hide="deviceDetailsCtrl.currentDevice.updated == null ||
-                                           deviceDetailsCtrl.currentDevice.updated == ''">
+             ng-hide="vm.currentDevice.updated == null ||
+                                           vm.currentDevice.updated == ''">
 
           <label>Updated timestamp</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.updated}}
+            {{vm.currentDevice.updated}}
           </div>
         </div>
       </md-card-content>
@@ -285,12 +286,12 @@
         <div class="form-group">
           <label>Device key</label>
           <div class="properties-word-break">
-            {{deviceDetailsCtrl.currentDevice.key}}
+            {{vm.currentDevice.key}}
           </div>
           <md-card-actions layout="row" layout-align="end center">
             <button class="md-raised md-primary md-button md-ink-ripple" type="button"
-                    aria-label="Delete" layout-align="right" ng-click="deviceDetailsCtrl.confirmDeviceDelete(
-                              $event, deviceDetailsCtrl.currentDevice.key)">
+                    aria-label="Delete" layout-align="right" ng-click="vm.confirmDeviceDelete(
+                              $event, vm.currentDevice.key)">
               <i class="fa fa-fw fa-trash ng-scope"></i><span class="ng-scope">
                         Delete
                       </span></button>
@@ -305,26 +306,26 @@
         <h2>Edit</h2>
         <hr/>
         <form name="deviceForm" class="form-horizontal"
-              ng-submit="deviceDetailsCtrl.onSaveDevice()"
+              ng-submit="vm.onSaveDevice(deviceForm)"
               novalidate>
-          <section name="proofOfPlay" ng-show="deviceDetailsCtrl.currentDevice.proofOfPlayEditable">
+          <section name="proofOfPlay" ng-show="vm.currentDevice.proofOfPlayEditable">
             <h3>Proof of play</h3>
             <div class="form-group">
               <div class="col-sm-2">
                 <label>Logging</label>
                 <div>
                   <input type="checkbox"
-                         ng-model="deviceDetailsCtrl.currentDevice.proofOfPlayLogging"
-                         ng-change="deviceDetailsCtrl.onProofOfPlayLoggingCheck()">
+                         ng-model="vm.currentDevice.proofOfPlayLogging"
+                         ng-change="vm.onProofOfPlayLoggingCheck()">
                   <span>Enable</span>
                 </div>
               </div>
               <div class="col-sm-2">
                 <md-button class="md-fab md-primary"
                            aria-label="Proof of play logging"
-                           ng-show="deviceDetailsCtrl.currentDevice.proofOfPlayLogging == false &&
-                                      (deviceDetailsCtrl.currentDevice.locationKey == null ||
-                                      deviceDetailsCtrl.currentDevice.customerDisplayCode == null)">
+                           ng-show="vm.currentDevice.proofOfPlayLogging == false &&
+                                      (vm.currentDevice.locationKey == null ||
+                                      vm.currentDevice.customerDisplayCode == null)">
                   <md-tooltip>
                     A device must have a Location and Display code to it to enable Proof of play logging.
                   </md-tooltip>
@@ -348,19 +349,19 @@
                 <select
                   id="customerLocationName"
                   class="form-control"
-                  ng-model="deviceDetailsCtrl.currentDevice.location"
-                  ng-options="i.customerLocationName for i in deviceDetailsCtrl.locations track by i.key"
-                  ng-change="deviceDetailsCtrl.onUpdateLocation()">
+                  ng-model="vm.currentDevice.location"
+                  ng-options="i.customerLocationName for i in vm.locations track by i.key"
+                  ng-change="vm.onUpdateLocation()">
                 </select>
               </div>
               <div class="col-sm-2">
                 <md-button class="md-fab  md-primary"
                            aria-label="Customer Location Name"
-                           ng-hide="deviceDetailsCtrl.currentDevice.proofOfPlayLogging ||
-                                               deviceDetailsCtrl.currentDevice.locationKey != null">
+                           ng-hide="vm.currentDevice.proofOfPlayLogging ||
+                                               vm.currentDevice.locationKey != null">
                   <md-tooltip>
                     Locations may be added or edited in the Locations tab of the tenant view
-                    for the tenant {{deviceDetailsCtrl.currentDevice.tenantName}}.
+                    for the tenant {{vm.currentDevice.tenantName}}.
                   </md-tooltip>
                   <md-icon>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
@@ -385,8 +386,8 @@
                          autofocus
                          name="customerDisplayName"
                          placeholder="e.g., Panel in Front Reception"
-                         ng-change="deviceDetailsCtrl.autoGenerateCustomerDisplayCode()"
-                         ng-model="deviceDetailsCtrl.currentDevice.customerDisplayName">
+                         ng-change="vm.autoGenerateCustomerDisplayCode()"
+                         ng-model="vm.currentDevice.customerDisplayName">
                 </div>
               </div>
               <div class="col-sm-6"
@@ -397,7 +398,7 @@
                          class="form-control"
                          name="customerDisplayCode"
                          placeholder="auto-generated"
-                         ng-model="deviceDetailsCtrl.currentDevice.customerDisplayCode"
+                         ng-model="vm.currentDevice.customerDisplayCode"
                          ng-pattern="/^[a-z0-9_]*$/">
                   <p
                     ng-show="deviceForm.customerDisplayCode.$invalid && !deviceForm.customerDisplayCode.$invalid.$pristine"
@@ -417,8 +418,8 @@
                 <select
                   id="panelModel"
                   class="form-control"
-                  ng-model="deviceDetailsCtrl.currentDevice.panelModel"
-                  ng-options="p.displayName for p in deviceDetailsCtrl.panelModels track by p.id">
+                  ng-model="vm.currentDevice.panelModel"
+                  ng-options="p.displayName for p in vm.panelModels track by p.id">
                 </select>
               </div>
               <div class="col-sm-3">
@@ -426,17 +427,17 @@
                 <select
                   id="panelInput"
                   class="form-control"
-                  ng-required="deviceDetailsCtrl.currentDevice.panelModel !== null"
-                  ng-model="deviceDetailsCtrl.currentDevice.panelInput"
-                  ng-options="c.id for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">
+                  ng-required="vm.currentDevice.panelModel !== null"
+                  ng-model="vm.currentDevice.panelInput"
+                  ng-options="c.id for c in vm.panelInputs | filter:{parentId: vm.currentDevice.panelModel.id}">
                 </select>
               </div>
               <div class="col-sm-3">
                 <label>Panel sleep</label>
 
                 <md-switch class="md-switch device-properties-switch"
-                           ng-model="deviceDetailsCtrl.currentDevice.panelSleep"
-                           ng-change="deviceDetailsCtrl.onPanelSleep(deviceDetailsCtrl.currentDevice.panelSleep)"
+                           ng-model="vm.currentDevice.panelSleep"
+                           ng-change="vm.onPanelSleep(vm.currentDevice.panelSleep)"
                            aria-label="Panel Sleep">
                 </md-switch>
               </div>
@@ -466,9 +467,9 @@
               <div class="col-sm-4">
                 <br>
                 <select id="timezone"
-                        ng-model="deviceDetailsCtrl.selectedTimezone"
+                        ng-model="vm.selectedTimezone"
                         class="form-control"
-                        ng-options="item for item in deviceDetailsCtrl.timezones track by item">
+                        ng-options="item for item in vm.timezones track by item">
                   <option value=''>Select timezone</option>
                 </select>
               </div>
@@ -484,14 +485,14 @@
                        class="form-control"
                        name="checkContentInterval"
                        id="checkContentInterval"
-                       ng-model="deviceDetailsCtrl.currentDevice.checkContentInterval"
+                       ng-model="vm.currentDevice.checkContentInterval"
                        min="0"
                        ng-required="true">minutes
               </div>
               <div class="col-sm-4">
                 <label>Player heartbeat</label>
                 <br>
-                {{deviceDetailsCtrl.currentDevice.heartbeatInterval}} minutes
+                {{vm.currentDevice.heartbeatInterval}} minutes
               </div>
             </div>
             <hr>
@@ -504,7 +505,18 @@
                   <input type="text"
                          class="form-control"
                          name="notes"
-                         ng-model="deviceDetailsCtrl.currentDevice.notes">
+                         ng-model="vm.currentDevice.notes">
+                </div>
+              </div>
+            </div>
+            <hr>
+          </section>
+          <section name="overlay">
+            <h3>Overlay</h3>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <div>
+                  <lf-ng-md-file-input lf-files="selectedFile" preview accept="image/svg+xml"></lf-ng-md-file-input>
                 </div>
               </div>
             </div>

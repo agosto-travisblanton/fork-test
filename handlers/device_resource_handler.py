@@ -545,6 +545,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             if timezone:
                 device.timezone = timezone
                 device.timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
+            overlay_status = request_json.get('overlay_status')
+            if overlay_status:
+                device.overlay_available = overlay_status
             device.put()
             if not device.is_unmanaged_device:
                 deferred.defer(update_chrome_os_device,

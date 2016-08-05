@@ -319,6 +319,7 @@ export default class DevicesService {
   }
 
   save(device) {
+    console.log(device)
     if (device.key !== undefined) {
       var promise = device.put();
     } else {
