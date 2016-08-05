@@ -30,9 +30,18 @@ function DeviceDetailsCtrl($log,
   vm.selectedTimezone = undefined;
   [vm.startTime, vm.endTime] = DateManipulationService.createFormattedStartAndEndDateFromToday(30);
   vm.enrollmentEvents = [];
+  vm.logoChange = false;
 
   $scope.$watch('selectedFile.length', function (newVal, oldVal) {
-    console.log($scope.selectedFile);
+    if ($scope.selectedFile && $scope.selectedFile[0]) {
+      var r = new FileReader();
+      r.onload = function () {
+        vm.selectedFileAsString = JSON.stringify(r.result)
+        vm.logoChange = true;
+        $scope.$apply();
+      }
+      r.readAsText($scope.selectedFile[0].lfFile);
+    }
   });
 
 

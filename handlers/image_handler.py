@@ -11,14 +11,17 @@ class ImageHandler(SessionRequestHandler, KeyValidatorMixin):
         image_entity = ndb.Key(urlsafe=image_urlsafe_key).get()
         return json_response(
             self.response, {
-                "svg_rep": image_entity.svg_rep
+                "svg_rep": image_entity.svg_rep,
+                "name": image_entity.name
+
             }
         ), 200
 
     def post(self):
         request_json = json.loads(self.request.body)
         svg_rep = request_json["svg_rep"]
-        image_entity = Image.create(svg_rep=svg_rep)
+        name = request_json["name"]
+        image_entity = Image.create(svg_rep=svg_rep, name=name)
         return json_response(self.response, {
             "success": True,
             "key": image_entity.key.urlsafe()

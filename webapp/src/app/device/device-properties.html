@@ -525,7 +525,7 @@
           <md-card-actions layout="row" layout-align="end center">
             <md-button type="submit"
                        class="md-raised md-primary"
-                       ng-disabled="deviceForm.$pristine || deviceForm.$invalid">
+                       ng-disabled="(deviceForm.$pristine || deviceForm.$invalid) && (vm.logoChange === false)">
               <i class="fa fa-fw fa-save"></i>
               Save
             </md-button>
