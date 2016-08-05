@@ -1,5 +1,5 @@
 from app_config import config
-from directory_api.chrome_os_devices_api import ChromeOsDevicesApi
+from integrations.device_management.chrome_os_devices_api import ChromeOsDevicesApi
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
