@@ -7,7 +7,7 @@ setup_test_paths()
 from http_client import HttpClient, HttpClientRequest, HttpClientResponse
 from models import Tenant, ChromeOsDevice, Distributor, Domain
 from agar.test import BaseTest
-from content_manager_api import ContentManagerApi
+from integrations.content_manager.content_manager_api import ContentManagerApi
 
 from mockito import when, any as any_matcher
 

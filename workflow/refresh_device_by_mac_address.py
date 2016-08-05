@@ -4,8 +4,8 @@ from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
 from app_config import config
-from chrome_os_devices_api import ChromeOsDevicesApi
-from content_manager_api import ContentManagerApi
+from integrations.content_manager.content_manager_api import ContentManagerApi
+from integrations.device_management.chrome_os_devices_api import ChromeOsDevicesApi
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 

@@ -4,8 +4,8 @@ from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
 from app_config import config
-from chrome_os_devices_api import ChromeOsDevicesApi
-from content_manager_api import ContentManagerApi
+from integrations.content_manager.content_manager_api import ContentManagerApi
+from integrations.device_management.chrome_os_devices_api import ChromeOsDevicesApi
 from model_entities.integration_events_log_model import IntegrationEventLog
 from workflow.update_chrome_os_device import update_chrome_os_device
 

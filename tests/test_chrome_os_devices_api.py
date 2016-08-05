@@ -6,7 +6,7 @@ setup_test_paths()
 
 from models import Tenant, ChromeOsDevice, Distributor, Domain
 from agar.test import BaseTest
-from chrome_os_devices_api import ChromeOsDevicesApi
+from integrations.device_management.chrome_os_devices_api import ChromeOsDevicesApi
 
 
 class TestChromeOsDevicesApi(BaseTest):
