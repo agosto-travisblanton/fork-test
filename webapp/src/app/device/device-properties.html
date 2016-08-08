@@ -516,6 +516,28 @@
             </div>
             <hr>
           </section>
+          <md-card-actions layout="row" layout-align="end center">
+            <md-button type="submit"
+                       class="md-raised md-primary"
+                       ng-disabled="deviceForm.$pristine || deviceForm.$invalid">
+              <i class="fa fa-fw fa-save"></i>
+              Save
+            </md-button>
+          </md-card-actions>
+        </form>
+      </md-card-content>
+    </md-card>
+
+
+
+
+
+    <md-card>
+      <md-card-content>
+        <h2>Edit</h2>
+        <hr/>
+        <form name="overlayForm" class="form-horizontal"
+              novalidate>
           <section name="overlay">
             <h3>Overlay</h3>
             <div class="col-md-12">
@@ -540,10 +562,11 @@
                 <div class="col-md-3 overlay-margin-left">
                   <md-input-container>
                     <label>Top-Left</label>
-                    <md-select ng-model="ctrl.userState">
-                      <md-option ng-repeat="state in deviceDetailsCtrl.states" value="{{state.abbrev}}"
-                                 ng-disabled="$index === 1">
-                        {{state.abbrev}}
+                    <md-select ng-model="deviceDetailsCtrl.currentDevice.top_left">
+                      <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES track by $index"
+                                 value="{{overlay}}"
+                      >
+                        {{overlay}}
                       </md-option>
                     </md-select>
                   </md-input-container>
@@ -551,10 +574,11 @@
                 <div class="col-md-3 overlay-margin-right" style="float: right">
                   <md-input-container>
                     <label>Top-Right</label>
-                    <md-select ng-model="ctrl.userState">
-                      <md-option ng-repeat="state in deviceDetailsCtrl.states" value="{{state.abbrev}}"
-                                 ng-disabled="$index === 1">
-                        {{state.abbrev}}
+                    <md-select ng-model="deviceDetailsCtrl.currentDevice.top_right">
+                      <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES track by $index"
+                                 value="{{overlay}}"
+                      >
+                        {{overlay}}
                       </md-option>
                     </md-select>
                   </md-input-container>
@@ -564,10 +588,11 @@
                 <div class="col-md-3 overlay-margin-left">
                   <md-input-container>
                     <label>Bottom-Left</label>
-                    <md-select ng-model="ctrl.userState">
-                      <md-option ng-repeat="state in deviceDetailsCtrl.states" value="{{state.abbrev}}"
-                                 ng-disabled="$index === 1">
-                        {{state.abbrev}}
+                    <md-select ng-model="deviceDetailsCtrl.currentDevice.bottom_left">
+                      <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES track by $index"
+                                 value="{{overlay}}"
+                      >
+                        {{overlay}}
                       </md-option>
                     </md-select>
                   </md-input-container>
@@ -575,29 +600,30 @@
                 <div class="col-md-3 overlay-margin-right" style="float: right">
                   <md-input-container>
                     <label>Bottom-Right</label>
-                    <md-select ng-model="ctrl.userState">
-                      <md-option ng-repeat="state in deviceDetailsCtrl.states" value="{{state.abbrev}}"
-                                 ng-disabled="$index === 1">
-                        {{state.abbrev}}
+                    <md-select ng-model="deviceDetailsCtrl.currentDevice.bottom_right">
+                      <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES track by $index"
+                                 value="{{overlay}}"
+                      >
+                        {{overlay}}
                       </md-option>
                     </md-select>
                   </md-input-container>
                 </div>
               </div>
-              <br/>
-
-              <div class="col-sm-12">
-                <lf-ng-md-file-input lf-files="selectedFile" preview accept="image/svg+xml"></lf-ng-md-file-input>
-              </div>
             </div>
-            <hr>
+
+            <lf-ng-md-file-input lf-files="selectedFile" preview accept="image/svg+xml"></lf-ng-md-file-input>
+
+
           </section>
+          <hr/>
+
           <md-card-actions layout="row" layout-align="end center">
             <md-button type="submit"
                        class="md-raised md-primary"
-                       ng-disabled="deviceForm.$pristine || deviceForm.$invalid">
+                       ng-disabled="overlayForm.$pristine || overlayForm.$invalid">
               <i class="fa fa-fw fa-save"></i>
-              Save
+              SYNC
             </md-button>
           </md-card-actions>
         </form>
@@ -605,3 +631,4 @@
     </md-card>
   </div>
 </md-content>
+
