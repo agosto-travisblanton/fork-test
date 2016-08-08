@@ -32,10 +32,10 @@ function DeviceDetailsCtrl($log,
   vm.enrollmentEvents = [];
   vm.logoChange = false;
   vm.OVERLAY_TYPES = [
-    {type: "TIME", new: true},
-    {type: "DATE", new: true},
-    {type: "DATETIME", new: true},
-    {type: "LOGO", new: true},
+    {type: "TIME", new: true, image_urlsafe_key: null},
+    {type: "DATE", new: true, image_urlsafe_key: null},
+    {type: "DATETIME", new: true, image_urlsafe_key: null},
+    {type: "LOGO", new: true, image_urlsafe_key: null},
   ]
 
 
@@ -235,13 +235,16 @@ function DeviceDetailsCtrl($log,
   }
 
   vm.submitOverlaySettings = () => {
-    let overlaySettings = vm.currentDevice.overlay
-    console.log(overlaySettings)
+    let overlaySettings = vm.currentDevice.overlay;
+    delete overlaySettings.key;
+    delete overlaySettings.device_key;
+    ProgressBarService.start();
 
-
-    DevicesService.saveOverlaySettings(vm.deviceKey, "top_left",)
-
-
+    DevicesService.saveOverlaySettings(vm.deviceKey, overlaySettings)
+      .then((res) => {
+        console.log(res)
+        ProgressBarService.complete();
+      })
   }
 
 

@@ -376,9 +376,9 @@ class OverlayTemplate(ndb.Model):
             return overlay_template
 
     # expects a a dictionary with config about overlay
-    def set_overlay(self, position, overlay_type, associated_image_urlsafe_key=None):
+    def set_overlay(self, position, overlay_type, image_urlsafe_key=None):
 
-        overlay = Overlay.create_or_get(overlay_type=overlay_type, image_urlsafe_key=associated_image_urlsafe_key)
+        overlay = Overlay.create_or_get(overlay_type=overlay_type, image_urlsafe_key=image_urlsafe_key)
 
         if position.upper() == "TOP_LEFT":
             self.top_left = overlay.key

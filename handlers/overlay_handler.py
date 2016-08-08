@@ -14,8 +14,9 @@ class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
         # array of dictionaries that contain data about each overlay
         overlay_template = OverlayTemplate.create_or_get_by_device_key(associated_device_key)
 
-        for key, value in request_json:
-            OverlayTemplate.set_overlay(position=key, overlay_type=value["overlay_type"], associated_image=value["overlay_type"])
+        # key representes position
+        for key, value in request_json.iteritems():
+            overlay_template.set_overlay(position=key, overlay_type=value["type"], image_urlsafe_key=value["image_urlsafe_key"])
 
         overlay_template = OverlayTemplate.create_or_get_by_device_key(associated_device_key)
         # This method is offered because restler doesn't support keyProperty serialization beyond a single child
