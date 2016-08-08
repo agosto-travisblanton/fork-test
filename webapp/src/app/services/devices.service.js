@@ -327,12 +327,31 @@ export default class DevicesService {
     return promise;
   }
 
+  getImages(tenant_urlsafe_key) {
 
-  saveOverlaySettings(device_urlsafe_key, payload) {
-    console.log(payload)
-    return this.Restangular.oneUrl('overlay', `/api/v1/overlay/device/${device_urlsafe_key}`).customPOST(payload);
+    return this.Restangular.oneUrl('image', `/api/v1/image/tenant/${tenant_urlsafe_key}`).getList()
   }
 
+
+  saveImage(tenant_urlsafe_key, svg_rep, name) {
+    let payload = {
+      svg_rep,
+      name
+    }
+
+    return this.Restangular.oneUrl('image', `/api/v1/image/tenant/${tenant_urlsafe_key}`).customPOST(payload);
+  }
+
+  saveOverlaySettings(device_urlsafe_key, payload) {
+    /**
+     * * payload = {
+      * bottom_left: ...
+      * bottom_right: ...
+      * top_right: ...
+      * top_left: ...
+    **/
+    return this.Restangular.oneUrl('overlay', `/api/v1/overlay/device/${device_urlsafe_key}`).customPOST(payload);
+  }
 
   delete(deviceKey) {
     let promise = this.Restangular.one(this.SERVICE_NAME, deviceKey).remove();

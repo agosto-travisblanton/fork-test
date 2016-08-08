@@ -217,6 +217,8 @@ INTEGRATION_EVENT_LOG_STRATEGY += [
 IMAGE_STRATEGY = ModelStrategy(Image)
 IMAGE_STRATEGY += [
     {'key': lambda o, field_name, context: o.key.urlsafe()},
+    {'tenant_key': lambda o, field_name, context: o.tenant_key},
+    {'name': lambda o, field_name, context: o.name},
     {'svg_rep': lambda o, field_name, context: o.svg_rep},
 ]
 

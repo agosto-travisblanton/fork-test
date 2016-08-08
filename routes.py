@@ -358,11 +358,10 @@ application = WSGIApplication(
               methods=['GET'],
               ),
 
-        Route(r'/api/v1/image',
+        Route(r'/api/v1/image/tenant/<tenant_urlsafe_key>',
               handler='handlers.image_handler.ImageHandler',
-              name='post-image',
-              handler_method='post',
-              methods=['POST'],
+              name='manage-image',
+              methods=['POST', 'GET'],
               ),
 
         ############################################################

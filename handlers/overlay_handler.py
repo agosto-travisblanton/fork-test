@@ -18,6 +18,7 @@ class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
         for key, value in request_json.iteritems():
             overlay_template.set_overlay(position=key, overlay_type=value["type"], image_urlsafe_key=value["image_urlsafe_key"])
 
+        # re-get the template after the changes set_overlay made
         overlay_template = OverlayTemplate.create_or_get_by_device_key(associated_device_key)
         # This method is offered because restler doesn't support keyProperty serialization beyond a single child
         overlay_template_intermediate_json = ndb_json.dumps(overlay_template)

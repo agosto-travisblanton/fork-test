@@ -621,13 +621,27 @@
                 </div>
               </div>
             </div>
-            <lf-ng-md-file-input lf-files="selectedFile" preview accept="image/svg+xml"></lf-ng-md-file-input>
+
+            <div ng-repeat="image in deviceDetailsCtrl.images">
+              <div ng-bind-html="image.svg_rep"></div>
+            </div>
+
+            <lf-ng-md-file-input lf-files="deviceDetailsCtrl.selectedLogo" preview
+                                 accept="image/svg+xml"></lf-ng-md-file-input>
+
+            <md-button class="md-raised md-primary" ng-click="deviceDetailsCtrl.submitImage()" style="float: right;">
+              UPLOAD
+            </md-button>
+
           </section>
+          <br/>
+
+          <br/>
           <hr/>
           <md-card-actions layout="row" layout-align="end center">
             <md-button type="submit"
                        class="md-raised md-primary"
-                       ng-click="deviceDetailsCtrl.submitOverlaySettings()"
+                       ng-click="deviceDetailsCtrl.submitOverlaySettings(overlayForm)"
                        ng-disabled="overlayForm.$pristine || overlayForm.$invalid">
               <i class="fa fa-fw fa-save"></i>
               SYNC

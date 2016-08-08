@@ -14,7 +14,7 @@ function DeviceDetailsCtrl($log,
                            $mdDialog,
                            ToastsService,
                            DateManipulationService,
-                           $scope) {
+                           $sce) {
   "ngInject";
 
   const vm = this;
@@ -37,19 +37,6 @@ function DeviceDetailsCtrl($log,
     {type: "DATETIME", new: true, image_urlsafe_key: null},
     {type: "LOGO", new: true, image_urlsafe_key: null},
   ]
-
-
-  $scope.$watch('selectedFile.length', function (newVal, oldVal) {
-    if ($scope.selectedFile && $scope.selectedFile[0]) {
-      var r = new FileReader();
-      r.onload = function () {
-        vm.selectedFileAsString = JSON.stringify(r.result)
-        vm.logoChange = true;
-        $scope.$apply();
-      }
-      r.readAsText($scope.selectedFile[0].lfFile);
-    }
-  });
 
 
   vm.replaceIssueTime = function (issues) {
@@ -234,17 +221,49 @@ function DeviceDetailsCtrl($log,
     })
   }
 
-  vm.submitOverlaySettings = () => {
+  vm.submitOverlaySettings = (overlayForm) => {
     let overlaySettings = vm.currentDevice.overlay;
     delete overlaySettings.key;
     delete overlaySettings.device_key;
-    ProgressBarService.start();
 
+    ProgressBarService.start();
     DevicesService.saveOverlaySettings(vm.deviceKey, overlaySettings)
       .then((res) => {
         console.log(res)
         ProgressBarService.complete();
       })
+  }
+
+  DevicesService.getImages(vm.tenantKey)
+    .then((res) => {
+      res.forEach((value) => {
+        value.svg_rep = $sce.trustAsHtml(JSON.parse(value.svg_rep))
+      })
+      vm.images = res
+    })
+
+  vm.submitImage = () => {
+
+    if (vm.selectedLogo && vm.selectedLogo[0]) {
+      ProgressBarService.start();
+
+      var r = new FileReader();
+      r.onload = function () {
+
+        vm.selectedLogoFinal = {}
+        vm.selectedLogoFinal.asString = JSON.stringify(r.result)
+        vm.selectedLogoFinal.name = vm.selectedLogo[0].lfFileName
+        vm.selectedLogoChange = true;
+
+        DevicesService.saveImage(vm.tenantKey, vm.selectedLogoFinal.asString, vm.selectedLogoFinal.name)
+          .then((res) => {
+            console.log(res)
+            ProgressBarService.complete();
+
+          })
+      }
+      r.readAsText(vm.selectedLogo[0].lfFile);
+    }
   }
 
 
