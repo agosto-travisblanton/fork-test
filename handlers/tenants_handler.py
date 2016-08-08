@@ -1,11 +1,12 @@
 import json
 import logging
+
 from google.appengine.ext import ndb
 from webapp2 import RequestHandler
 
 from app_config import config
-from content_manager_api import ContentManagerApi
 from decorators import requires_api_token
+from integrations.content_manager.content_manager_api import ContentManagerApi
 from models import Tenant
 from proofplay.database_calls import get_tenant_list_from_distributor_key
 from restler.serializers import json_response

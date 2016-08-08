@@ -7,10 +7,10 @@ from google.appengine.ext.deferred import deferred
 from webapp2 import RequestHandler
 
 from app_config import config
-from content_manager_api import ContentManagerApi
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from device_commands_handler import DeviceCommandsHandler
 from device_message_processor import post_unmanaged_device_info, change_intent
+from integrations.content_manager.content_manager_api import ContentManagerApi
 from model_entities.integration_events_log_model import IntegrationEventLog
 from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup, DeviceIssueLog
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin

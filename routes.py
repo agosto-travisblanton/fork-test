@@ -437,13 +437,27 @@ application = WSGIApplication(
               ),
 
         ############################################################
-        # Google Directory API Interrogation
+        # REPORT API
         ############################################################
 
-        Route(r'/api/v1/chrome-os-devices',
-              handler='handlers.interrogate_directory_api_handler.InterrogateDirectoryApiHandler',
-              name='chrome-os-device-interrogation',
-              handler_method='lookup_device_by_parameter',
+        Route(r'/api/reports/v1/chrome_os_device',
+              handler='handlers.reports.chrome_device_management_handler.ChromeDeviceManagementHandler',
+              name='chrome-os-device',
+              handler_method='get_device_by_parameters',
+              methods=['GET']
+              ),
+
+        Route(r'/api/reports/v1/chrome_os_devices',
+              handler='handlers.reports.chrome_device_management_handler.ChromeDeviceManagementHandler',
+              name='chrome-os-devices',
+              handler_method='get_device_list',
+              methods=['GET']
+              ),
+
+        Route(r'/api/reports/v1/chrome_os_devices/count',
+              handler='handlers.reports.chrome_device_management_handler.ChromeDeviceManagementHandler',
+              name='chrome-os-devices-count',
+              handler_method='get_devices_count',
               methods=['GET']
               ),
 
