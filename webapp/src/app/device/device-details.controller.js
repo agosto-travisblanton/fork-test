@@ -13,9 +13,9 @@ function DeviceDetailsCtrl($log,
                            ProgressBarService,
                            $mdDialog,
                            ToastsService,
-                           DateManipulationService, $scope) {
+                           DateManipulationService,
+                           $scope) {
   "ngInject";
-
 
   let vm = this;
   vm.tenantKey = $stateParams.tenantKey;
@@ -149,6 +149,7 @@ function DeviceDetailsCtrl($log,
 
   vm.onGetDeviceSuccess = function (response) {
     vm.currentDevice = response;
+    console.log(vm.currentDevice);
     if (response.timezone !== vm.selectedTimezone) {
       vm.selectedTimezone = response.timezone;
     }
@@ -173,6 +174,12 @@ function DeviceDetailsCtrl($log,
       return vm.setSelectedOptions();
     });
   };
+
+  vm.states = ('AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS ' +
+  'MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI ' +
+  'WY').split(' ').map(function (state) {
+    return {abbrev: state};
+  });
 
   vm.onGetDeviceFailure = function (response) {
     ToastsService.showErrorToast('Oops. We were unable to fetch the details for this device at this time.');
@@ -214,6 +221,19 @@ function DeviceDetailsCtrl($log,
   //####################
   // Properties Tab
   //####################
+  vm.adjustOverlayStatus = (status) => {
+    vm.currentDevice.overlay_status = status
+    ProgressBarService.start();
+    let promise = DevicesService.save(vm.currentDevice);
+    return promise.then(() => {
+      let devicePromise = DevicesService.getDeviceByKey(vm.deviceKey);
+      devicePromise.then((response => {
+        vm.onGetDeviceSuccess(response)
+        ProgressBarService.complete();
+      }), response => vm.onGetDeviceFailure(response));
+    })
+  }
+
 
   vm.onSaveDevice = function () {
     ProgressBarService.start();

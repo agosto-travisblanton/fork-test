@@ -90,8 +90,8 @@ class ChromeOsDevice(ndb.Model):
     def overlays_as_dict(self):
         """ This method is offered because restler doesn't support keyProperty serialization beyond a single child"""
         json = ndb_json.dumps(self.overlays)
+        print ndb_json.loads(json)
         return ndb_json.loads(json)
-
 
     def enable_overlays(self):
         self.overlay_available = True
@@ -292,14 +292,13 @@ class Image(ndb.Model):
         image.put()
         return image
 
-
     def _pre_put_hook(self):
         self.class_version = 1
 
 
 @ae_ndb_serializer
 class Overlay(ndb.Model):
-    type = ndb.StringProperty(required=True, indexed=True)
+    type = ndb.StringProperty(indexed=True, required=False)
     # an overlay is optionally associated with an image
     image_key = ndb.KeyProperty(kind=Image, required=False)
 
@@ -344,7 +343,21 @@ class OverlayTemplate(ndb.Model):
 
     @staticmethod
     def get_overlay_templates_for_device(device_key):
-        return OverlayTemplate.query(OverlayTemplate.device_key == device_key).fetch()
+        # always 0 index since we are only supporting 1 template per device for now
+        query = OverlayTemplate.query(OverlayTemplate.device_key == device_key).fetch()
+        if len(query) < 1:
+            nullOverlay = Overlay.create_or_get(None)
+            overlay_template = OverlayTemplate(
+                device_key=device_key,
+                top_left=nullOverlay.key,
+                top_right=nullOverlay.key,
+                bottom_left=nullOverlay.key,
+                bottom_right=nullOverlay.key
+            )
+            overlay_template.put()
+            return overlay_template
+        else:
+            return query[0]
 
     @staticmethod
     def create_or_get_by_device_key(device_key):
@@ -353,8 +366,13 @@ class OverlayTemplate(ndb.Model):
             return existing_template_exists[0]
 
         else:
+            nullOverlay = Overlay.create_or_get(None)
             overlay_template = OverlayTemplate(
-                device_key=device_key
+                device_key=device_key,
+                top_left=nullOverlay.key,
+                top_right=nullOverlay.key,
+                bottom_left=nullOverlay.key,
+                bottom_right=nullOverlay.key
             )
             overlay_template.put()
             return overlay_template
