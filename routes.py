@@ -340,7 +340,7 @@ application = WSGIApplication(
         # OVERLAY
         ############################################################
 
-        Route(r'/api/v1/overlay',
+        Route(r'/api/v1/overlay/device/<device_urlsafe_key>',
               handler='handlers.overlay_handler.OverlayHandler',
               name='post-overlay',
               handler_method='post',

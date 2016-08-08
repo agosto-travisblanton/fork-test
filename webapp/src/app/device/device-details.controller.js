@@ -31,7 +31,13 @@ function DeviceDetailsCtrl($log,
   [vm.startTime, vm.endTime] = DateManipulationService.createFormattedStartAndEndDateFromToday(30);
   vm.enrollmentEvents = [];
   vm.logoChange = false;
-  vm.OVERLAY_TYPES = ["TIME", "DATE", "DATETIME", "LOGO"]
+  vm.OVERLAY_TYPES = [
+    {type: "TIME", new: true},
+    {type: "DATE", new: true},
+    {type: "DATETIME", new: true},
+    {type: "LOGO", new: true},
+  ]
+
 
   $scope.$watch('selectedFile.length', function (newVal, oldVal) {
     if ($scope.selectedFile && $scope.selectedFile[0]) {
@@ -150,7 +156,6 @@ function DeviceDetailsCtrl($log,
 
   vm.onGetDeviceSuccess = function (response) {
     vm.currentDevice = response;
-    console.log(vm.currentDevice);
     if (response.timezone !== vm.selectedTimezone) {
       vm.selectedTimezone = response.timezone;
     }
@@ -229,7 +234,15 @@ function DeviceDetailsCtrl($log,
     })
   }
 
-  // vm.
+  vm.submitOverlaySettings = () => {
+    let overlaySettings = vm.currentDevice.overlay
+    console.log(overlaySettings)
+
+
+    DevicesService.saveOverlaySettings(vm.deviceKey, "top_left",)
+
+
+  }
 
 
   vm.onSaveDevice = function () {

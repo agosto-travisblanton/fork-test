@@ -327,6 +327,13 @@ export default class DevicesService {
     return promise;
   }
 
+
+  saveOverlaySettings(device_urlsafe_key, payload) {
+    console.log(payload)
+    return this.Restangular.oneUrl('overlay', `/api/v1/overlay/device/${device_urlsafe_key}`).customPOST(payload);
+  }
+
+
   delete(deviceKey) {
     let promise = this.Restangular.one(this.SERVICE_NAME, deviceKey).remove();
     return promise;

@@ -529,98 +529,105 @@
     </md-card>
 
 
-
-
-
     <md-card>
       <md-card-content>
-        <h2>Edit</h2>
-        <hr/>
         <form name="overlayForm" class="form-horizontal"
               novalidate>
           <section name="overlay">
             <h3>Overlay</h3>
             <div class="col-md-12">
               <div class="col-md-6 col-md-offset-3">
-                <md-button
-                  class="md-raised md-primary"
-                  ng-disabled="deviceDetailsCtrl.currentDevice.overlaysAvailable"
-                  ng-click="deviceDetailsCtrl.adjustOverlayStatus(true)">
+                <md-input-container>
 
-                  ENABLE
-                </md-button>
-                <md-button
-                  class="md-raised md-primary"
-                  ng-disabled="!deviceDetailsCtrl.currentDevice.overlaysAvailable"
-                  ng-click="deviceDetailsCtrl.adjustOverlayStatus(false)">
-                  DISABLE
-                </md-button>
+                  <md-button
+                    class="md-raised md-primary"
+                    ng-disabled="deviceDetailsCtrl.currentDevice.overlaysAvailable"
+                    ng-click="deviceDetailsCtrl.adjustOverlayStatus(true)">
+
+                    ENABLE
+                  </md-button>
+                  <md-button
+                    class="md-raised md-primary"
+                    ng-disabled="!deviceDetailsCtrl.currentDevice.overlaysAvailable"
+                    ng-click="deviceDetailsCtrl.adjustOverlayStatus(false)">
+                    DISABLE
+                  </md-button>
+                </md-input-container>
+
               </div>
+              <br/>
+
             </div>
             <div class="form-group">
+
               <div class="col-md-12">
-                <div class="col-md-3 overlay-margin-left">
+                <div class="col-md-5 overlay-margin-left">
                   <md-input-container>
                     <label>Top-Left</label>
-                    <md-select ng-model="deviceDetailsCtrl.currentDevice.top_left">
+                    <md-select ng-model="deviceDetailsCtrl.currentDevice.overlay.top_left">
                       <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES track by $index"
-                                 value="{{overlay}}"
+                                 ng-value="overlay"
+                                 ng-selected=" overlay.type === deviceDetailsCtrl.currentDevice.overlay.top_left.type ? 'selected' : '' "
                       >
-                        {{overlay}}
+                        {{overlay.type}}
                       </md-option>
                     </md-select>
                   </md-input-container>
                 </div>
-                <div class="col-md-3 overlay-margin-right" style="float: right">
+                <div class="col-md-5 overlay-margin-right" style="float: right">
                   <md-input-container>
                     <label>Top-Right</label>
-                    <md-select ng-model="deviceDetailsCtrl.currentDevice.top_right">
+                    <md-select ng-model="deviceDetailsCtrl.currentDevice.overlay.top_right">
                       <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES track by $index"
-                                 value="{{overlay}}"
+                                 ng-value="overlay"
+                                 ng-selected="overlay.type === deviceDetailsCtrl.currentDevice.overlay.top_right.type ? 'selected' : '' "
+
                       >
-                        {{overlay}}
+                        {{overlay.type}}
                       </md-option>
                     </md-select>
                   </md-input-container>
                 </div>
               </div>
               <div class="col-md-12">
-                <div class="col-md-3 overlay-margin-left">
+                <div class="col-md-5 overlay-margin-left">
                   <md-input-container>
                     <label>Bottom-Left</label>
-                    <md-select ng-model="deviceDetailsCtrl.currentDevice.bottom_left">
+                    <md-select ng-model="deviceDetailsCtrl.currentDevice.overlay.bottom_left"
+                               value="deviceDetailsCtrl.currentDevice.overlay.bottom_left.type">
                       <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES track by $index"
-                                 value="{{overlay}}"
+                                 ng-value="overlay"
+                                 ng-selected=" overlay.type === deviceDetailsCtrl.currentDevice.overlay.bottom_left.type ? 'selected' : ''"
+
                       >
-                        {{overlay}}
+                        {{overlay.type}}
                       </md-option>
                     </md-select>
                   </md-input-container>
                 </div>
-                <div class="col-md-3 overlay-margin-right" style="float: right">
+                <div class="col-md-5 overlay-margin-right" style="float: right">
                   <md-input-container>
                     <label>Bottom-Right</label>
-                    <md-select ng-model="deviceDetailsCtrl.currentDevice.bottom_right">
+                    <md-select ng-model="deviceDetailsCtrl.currentDevice.overlay.bottom_right">
                       <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES track by $index"
-                                 value="{{overlay}}"
+                                 ng-value="overlay"
+                                 ng-selected=" overlay.type === deviceDetailsCtrl.currentDevice.overlay.bottom_right.type ? 'selected' : '' "
+
                       >
-                        {{overlay}}
+                        {{overlay.type}}
                       </md-option>
                     </md-select>
                   </md-input-container>
                 </div>
               </div>
             </div>
-
             <lf-ng-md-file-input lf-files="selectedFile" preview accept="image/svg+xml"></lf-ng-md-file-input>
-
-
           </section>
           <hr/>
-
           <md-card-actions layout="row" layout-align="end center">
             <md-button type="submit"
                        class="md-raised md-primary"
+                       ng-click="deviceDetailsCtrl.submitOverlaySettings()"
                        ng-disabled="overlayForm.$pristine || overlayForm.$invalid">
               <i class="fa fa-fw fa-save"></i>
               SYNC

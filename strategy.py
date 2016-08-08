@@ -131,7 +131,7 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'lastError': lambda o, field_name, context: o.last_error},
     {'archived': lambda o, field_name, context: o.archived},
     {'overlaysAvailable': lambda o, field_name, context: o.overlay_available},
-    {'overlays': lambda o, field_name, context: o.overlays_as_dict if o.overlay_available else None}
+    {'overlay': lambda o, field_name, context: o.overlays_as_dict if o.overlay_available else None}
 
 ]
 

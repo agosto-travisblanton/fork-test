@@ -90,7 +90,6 @@ class ChromeOsDevice(ndb.Model):
     def overlays_as_dict(self):
         """ This method is offered because restler doesn't support keyProperty serialization beyond a single child"""
         json = ndb_json.dumps(self.overlays)
-        print ndb_json.loads(json)
         return ndb_json.loads(json)
 
     def enable_overlays(self):
@@ -304,25 +303,23 @@ class Overlay(ndb.Model):
 
     @staticmethod
     def create_or_get(overlay_type, image_urlsafe_key=None):
+        # not an overlay with an image that doesn't have a image_urlsafe_key
         if overlay_type == "LOGO":
             if image_urlsafe_key == None:
-                print "raise value error"
                 raise ValueError("You must provide an image_key if you are creating an overlay logo")
 
-        # its not an overlay with an image that doesn't have a image_urlsafe_key
-        overlay_query = Overlay.query(Overlay.type == overlay_type).fetch()
+        if image_urlsafe_key:
+            image_key = ndb.Key(urlsafe=image_urlsafe_key).get().key
+        else:
+            image_key = None
+
+        overlay_query = Overlay.query(ndb.AND(Overlay.type == overlay_type, Overlay.image_key == image_key)).fetch()
 
         if overlay_query:
             overlay = overlay_query[0]
 
-
-        # this type of overlay has not been created yet
+        # this type of overlay (or type and logo combination) has not been created yet
         else:
-            if image_urlsafe_key:
-                image_key = ndb.Key(urlsafe=image_urlsafe_key).get().key
-            else:
-                image_key = None
-
             overlay = Overlay(
                 type=overlay_type,
                 image_key=image_key
@@ -345,7 +342,10 @@ class OverlayTemplate(ndb.Model):
     def get_overlay_templates_for_device(device_key):
         # always 0 index since we are only supporting 1 template per device for now
         query = OverlayTemplate.query(OverlayTemplate.device_key == device_key).fetch()
-        if len(query) < 1:
+        if query:
+            return query[0]
+
+        else:
             nullOverlay = Overlay.create_or_get(None)
             overlay_template = OverlayTemplate(
                 device_key=device_key,
@@ -356,14 +356,12 @@ class OverlayTemplate(ndb.Model):
             )
             overlay_template.put()
             return overlay_template
-        else:
-            return query[0]
 
     @staticmethod
     def create_or_get_by_device_key(device_key):
         existing_template_exists = OverlayTemplate.get_overlay_templates_for_device(device_key)
         if existing_template_exists:
-            return existing_template_exists[0]
+            return existing_template_exists
 
         else:
             nullOverlay = Overlay.create_or_get(None)
@@ -378,25 +376,22 @@ class OverlayTemplate(ndb.Model):
             return overlay_template
 
     # expects a a dictionary with config about overlay
-    def set_overlay(self, overlay):
-        position = overlay["position"]
-        overlay_type = overlay["overlay_type"]
-        # expects the front-end to already know the urlsafe_key of a previously posted image
-        associated_image_urlsafe_key = overlay["associated_image"]
+    def set_overlay(self, position, overlay_type, associated_image_urlsafe_key=None):
+
         overlay = Overlay.create_or_get(overlay_type=overlay_type, image_urlsafe_key=associated_image_urlsafe_key)
 
-        if position == "TOP_LEFT":
+        if position.upper() == "TOP_LEFT":
             self.top_left = overlay.key
             self.put()
 
-        elif position == "BOTTOM_LEFT":
+        elif position.upper() == "BOTTOM_LEFT":
             self.bottom_left = overlay.key
             self.put()
 
-        elif position == "BOTTOM_RIGHT":
+        elif position.upper() == "BOTTOM_RIGHT":
             self.bottom_right = overlay.key
             self.put()
 
-        elif position == "TOP_RIGHT":
+        elif position.upper() == "TOP_RIGHT":
             self.top_right = overlay.key
             self.put()
