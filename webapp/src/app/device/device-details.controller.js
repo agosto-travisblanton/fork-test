@@ -31,12 +31,28 @@ function DeviceDetailsCtrl($log,
   [vm.startTime, vm.endTime] = DateManipulationService.createFormattedStartAndEndDateFromToday(30);
   vm.enrollmentEvents = [];
   vm.logoChange = false;
-  vm.OVERLAY_TYPES = [
-    {type: "TIME", new: true, image_urlsafe_key: null},
-    {type: "DATE", new: true, image_urlsafe_key: null},
-    {type: "DATETIME", new: true, image_urlsafe_key: null},
-    {type: "LOGO", new: true, image_urlsafe_key: null},
-  ]
+
+  vm.getTenantImages = () => {
+    vm.OVERLAY_TYPES = [
+      {type: "TIME", name: "TIME", new: true, image_urlsafe_key: null},
+      {type: "DATE", name: "DATE", new: true, image_urlsafe_key: null},
+      {type: "DATETIME", name: "DATETIME", new: true, image_urlsafe_key: null},
+    ]
+
+    DevicesService.getImages(vm.tenantKey)
+      .then((res) => {
+        res.forEach((value) => {
+          value.svg_rep = $sce.trustAsHtml(JSON.parse(value.svg_rep))
+          value.type = "LOGO"
+          value.realName = angular.copy(value.name)
+          console.log(value.realName)
+          value.name = "LOGO: " + value.name
+          value.image_urlsafe_key = value.key
+          vm.OVERLAY_TYPES.push(value)
+        })
+        console.log(vm.OVERLAY_TYPES)
+      })
+  }
 
 
   vm.replaceIssueTime = function (issues) {
@@ -136,6 +152,7 @@ function DeviceDetailsCtrl($log,
     let devicePromise = DevicesService.getDeviceByKey(vm.deviceKey);
     devicePromise.then((response => vm.onGetDeviceSuccess(response)), response => vm.onGetDeviceFailure(response));
 
+    vm.getTenantImages();
     vm.getEvents(vm.deviceKey);
     vm.getIssues(vm.deviceKey, vm.epochStart, vm.epochEnd);
     return vm.getEnrollmentEvents(vm.deviceKey);
@@ -143,6 +160,9 @@ function DeviceDetailsCtrl($log,
 
   vm.onGetDeviceSuccess = function (response) {
     vm.currentDevice = response;
+    console.log(vm.currentDevice.overlays)
+    console.log(vm.currentDevice.overlay)
+
     if (response.timezone !== vm.selectedTimezone) {
       vm.selectedTimezone = response.timezone;
     }
@@ -226,6 +246,7 @@ function DeviceDetailsCtrl($log,
     delete overlaySettings.key;
     delete overlaySettings.device_key;
 
+
     ProgressBarService.start();
     DevicesService.saveOverlaySettings(vm.deviceKey, overlaySettings)
       .then((res) => {
@@ -234,13 +255,6 @@ function DeviceDetailsCtrl($log,
       })
   }
 
-  DevicesService.getImages(vm.tenantKey)
-    .then((res) => {
-      res.forEach((value) => {
-        value.svg_rep = $sce.trustAsHtml(JSON.parse(value.svg_rep))
-      })
-      vm.images = res
-    })
 
   vm.submitImage = () => {
 
@@ -259,6 +273,7 @@ function DeviceDetailsCtrl($log,
           .then((res) => {
             console.log(res)
             ProgressBarService.complete();
+            vm.getTenantImages();
 
           })
       }

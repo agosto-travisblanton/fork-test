@@ -567,9 +567,9 @@
                     <md-select ng-model="deviceDetailsCtrl.currentDevice.overlay.top_left">
                       <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES track by $index"
                                  ng-value="overlay"
-                                 ng-selected=" overlay.type === deviceDetailsCtrl.currentDevice.overlay.top_left.type ? 'selected' : '' "
+                                 ng-selected=" overlay.name === deviceDetailsCtrl.currentDevice.overlay.top_left.type ? 'selected' : '' "
                       >
-                        {{overlay.type}}
+                        {{overlay.name}}
                       </md-option>
                     </md-select>
                   </md-input-container>
@@ -580,10 +580,10 @@
                     <md-select ng-model="deviceDetailsCtrl.currentDevice.overlay.top_right">
                       <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES track by $index"
                                  ng-value="overlay"
-                                 ng-selected="overlay.type === deviceDetailsCtrl.currentDevice.overlay.top_right.type ? 'selected' : '' "
+                                 ng-selected="overlay.name === deviceDetailsCtrl.currentDevice.overlay.top_right.type ? 'selected' : '' "
 
                       >
-                        {{overlay.type}}
+                        {{overlay.name}}
                       </md-option>
                     </md-select>
                   </md-input-container>
@@ -597,10 +597,10 @@
                                value="deviceDetailsCtrl.currentDevice.overlay.bottom_left.type">
                       <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES track by $index"
                                  ng-value="overlay"
-                                 ng-selected=" overlay.type === deviceDetailsCtrl.currentDevice.overlay.bottom_left.type ? 'selected' : ''"
+                                 ng-selected=" (overlay.name === deviceDetailsCtrl.currentDevice.overlay.bottom_left.type)  || (overlay.type === 'LOGO' && overlay.realName === deviceDetailsCtrl.currentDevice.overlay.bottom_left.image_key.name) ? 'selected' : ''"
 
                       >
-                        {{overlay.type}}
+                        {{overlay.name}}
                       </md-option>
                     </md-select>
                   </md-input-container>
@@ -608,13 +608,13 @@
                 <div class="col-md-5 overlay-margin-right" style="float: right">
                   <md-input-container>
                     <label>Bottom-Right</label>
-                    <md-select ng-model="deviceDetailsCtrl.currentDevice.overlay.bottom_right">
+                    <md-select ng-model="deviceDetailsCtrl.currentDevice.overlay.bottom_right" ng-change="vm.checkIfLogoSelected()">
                       <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES track by $index"
                                  ng-value="overlay"
-                                 ng-selected=" overlay.type === deviceDetailsCtrl.currentDevice.overlay.bottom_right.type ? 'selected' : '' "
+                                 ng-selected=" ((overlay.name === deviceDetailsCtrl.currentDevice.overlay.bottom_right.type) || (overlay.realName === deviceDetailsCtrl.currentDevice.overlay.bottom_right.name)) ? 'selected' : '' "
 
                       >
-                        {{overlay.type}}
+                        {{overlay.name}}
                       </md-option>
                     </md-select>
                   </md-input-container>

@@ -904,6 +904,7 @@ class Overlay(ndb.Model):
 
             overlay.put()
 
+        print overlay
         return overlay
 
 
@@ -918,11 +919,9 @@ class OverlayTemplate(ndb.Model):
     @staticmethod
     def get_overlay_templates_for_device(device_key):
         # always 0 index since we are only supporting 1 template per device for now
-        query = OverlayTemplate.query(OverlayTemplate.device_key == device_key).fetch()
-        if query:
-            return query[0]
+        overlay_template = OverlayTemplate.query(OverlayTemplate.device_key == device_key).fetch()
 
-        else:
+        if not overlay_template:
             nullOverlay = Overlay.create_or_get(None)
             overlay_template = OverlayTemplate(
                 device_key=device_key,
@@ -932,7 +931,11 @@ class OverlayTemplate(ndb.Model):
                 bottom_right=nullOverlay.key
             )
             overlay_template.put()
-            return overlay_template
+
+        else:
+            overlay_template = overlay_template[0]
+
+        return overlay_template
 
     @staticmethod
     def create_or_get_by_device_key(device_key):
