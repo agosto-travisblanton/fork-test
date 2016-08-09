@@ -311,7 +311,7 @@ $timeout) {
         DevicesService.saveImage(vm.tenantKey, vm.selectedLogoFinal.asString, vm.selectedLogoFinal.name)
           .then((res) => {
             ProgressBarService.complete();
-            $timeout(vm.getTenantImages(), 1000);
+            $timeout(vm.getTenantImages(), 2000);
             vm.fileApi.removeAll()
             ToastsService.showSuccessToast('We uploaded your image.');
           })
