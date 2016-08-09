@@ -4,7 +4,6 @@ from models import Image
 import json
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
-from strategy import IMAGE_STRATEGY
 
 
 class ImageHandler(SessionRequestHandler, KeyValidatorMixin):
@@ -17,7 +16,7 @@ class ImageHandler(SessionRequestHandler, KeyValidatorMixin):
                     "key": image.key.urlsafe(),
                     "name": image.name
                 } for image in images
-            ], strategy=IMAGE_STRATEGY
+            ]
         )
 
     def get_image_by_key(self, image_urlsafe_key):

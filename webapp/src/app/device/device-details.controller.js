@@ -296,11 +296,9 @@ $timeout) {
 
 
   vm.submitImage = () => {
-
     if (vm.selectedLogo && vm.selectedLogo[0]) {
       ProgressBarService.start();
-
-      var r = new FileReader();
+      let r = new FileReader();
       r.onload = function () {
 
         vm.selectedLogoFinal = {}
