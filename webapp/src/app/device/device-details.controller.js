@@ -1,4 +1,5 @@
 import moment from 'moment';
+import _ from 'lodash';
 
 function DeviceDetailsCtrl($log,
                            $stateParams,
@@ -13,11 +14,12 @@ function DeviceDetailsCtrl($log,
                            ProgressBarService,
                            $mdDialog,
                            ToastsService,
-                           DateManipulationService) {
+                           DateManipulationService,
+                           $scope,
+$timeout) {
   "ngInject";
 
-
-  let vm = this;
+  const vm = this;
   vm.tenantKey = $stateParams.tenantKey;
   vm.deviceKey = $stateParams.deviceKey;
   vm.fromDevices = $stateParams.fromDevices === "true";
@@ -30,6 +32,38 @@ function DeviceDetailsCtrl($log,
   vm.selectedTimezone = undefined;
   [vm.startTime, vm.endTime] = DateManipulationService.createFormattedStartAndEndDateFromToday(30);
   vm.enrollmentEvents = [];
+  vm.logoChange = false;
+
+  vm.getTenantImages = () => {
+    vm.OVERLAY_TYPES = [
+      {type: "TIME", name: "TIME", realName: "TIME", new: true, image_urlsafe_key: null},
+      {type: "DATE", name: "DATE", new: true, realName: "DATE", image_urlsafe_key: null},
+      {type: "DATETIME", name: "DATETIME", realName: "DATETIME", new: true, image_urlsafe_key: null},
+    ]
+
+    ProgressBarService.start();
+    DevicesService.getImages(vm.tenantKey)
+      .then((res) => {
+        console.log(res)
+        ProgressBarService.complete();
+
+        res.forEach((value) => {
+          let newValue = {
+            realName: angular.copy(value.name),
+            name: "LOGO: " + value.name,
+            type: "LOGO",
+            image_urlsafe_key: value.key
+          }
+          vm.OVERLAY_TYPES.push(newValue)
+        })
+      })
+      .catch((res) => {
+        ProgressBarService.complete();
+
+        ToastsService.showErrorStatus("SOMETHING WENT WRONG RETRIEVING YOUR IMAGES")
+      })
+  }
+
 
   vm.replaceIssueTime = function (issues) {
     for (let i = 0; i < issues.length; i++) {
@@ -128,13 +162,32 @@ function DeviceDetailsCtrl($log,
     let devicePromise = DevicesService.getDeviceByKey(vm.deviceKey);
     devicePromise.then((response => vm.onGetDeviceSuccess(response)), response => vm.onGetDeviceFailure(response));
 
+    vm.getTenantImages();
     vm.getEvents(vm.deviceKey);
     vm.getIssues(vm.deviceKey, vm.epochStart, vm.epochEnd);
     return vm.getEnrollmentEvents(vm.deviceKey);
   };
 
+  let attachImageNameToOverlay = (overlays) => {
+    let modifiedOverlays = angular.copy(overlays)
+    if (modifiedOverlays) {
+      delete modifiedOverlays["key"]
+
+      for (let k in modifiedOverlays) {
+        if (modifiedOverlays[k]["image_key"]) {
+          modifiedOverlays[k].name = modifiedOverlays[k]["image_key"]["name"]
+        } else {
+          modifiedOverlays[k].name = modifiedOverlays[k].type
+        }
+      }
+    }
+    return modifiedOverlays
+  }
+
   vm.onGetDeviceSuccess = function (response) {
     vm.currentDevice = response;
+    vm.currentDevice.overlay = attachImageNameToOverlay(vm.currentDevice.overlay)
+
     if (response.timezone !== vm.selectedTimezone) {
       vm.selectedTimezone = response.timezone;
     }
@@ -153,6 +206,7 @@ function DeviceDetailsCtrl($log,
         vm.backUrlText = 'Back to tenant managed devices';
       }
     }
+
     let locationsPromise = LocationsService.getLocationsByTenantKey(vm.tenantKey);
     return locationsPromise.then(function (data) {
       vm.locations = data;
@@ -200,6 +254,75 @@ function DeviceDetailsCtrl($log,
   //####################
   // Properties Tab
   //####################
+  vm.adjustOverlayStatus = (status) => {
+    vm.currentDevice.overlay_status = status
+
+    ProgressBarService.start();
+    let promise = DevicesService.save(vm.currentDevice);
+    return promise.then(() => {
+      let devicePromise = DevicesService.getDeviceByKey(vm.deviceKey);
+      devicePromise.then((response => {
+        vm.onGetDeviceSuccess(response)
+        ProgressBarService.complete();
+      }), response => vm.onGetDeviceFailure(response));
+    })
+
+  }
+
+  vm.submitOverlaySettings = (overlayForm) => {
+    let overlaySettings = vm.currentDevice.overlay;
+    delete overlaySettings.key;
+    delete overlaySettings.device_key;
+
+    let overlaySettingsCopy = {}
+
+    for (let k in overlaySettings) {
+      overlaySettingsCopy[k] = JSON.parse(overlaySettings[k])
+    }
+
+    ProgressBarService.start();
+    DevicesService.saveOverlaySettings(vm.deviceKey, overlaySettingsCopy)
+      .then((res) => {
+        ProgressBarService.complete();
+        return ToastsService.showSuccessToast('We saved your update.');
+
+      })
+      .catch((res) => {
+        ProgressBarService.complete();
+        return ToastsService.showErrorToast('Something went wrong');
+
+      })
+  }
+
+
+  vm.submitImage = () => {
+    if (vm.selectedLogo && vm.selectedLogo[0]) {
+      ProgressBarService.start();
+      let r = new FileReader();
+      r.onload = function () {
+
+        vm.selectedLogoFinal = {}
+        vm.selectedLogoFinal.asString = JSON.stringify(r.result)
+        vm.selectedLogoFinal.name = vm.selectedLogo[0].lfFileName
+        vm.selectedLogoChange = true;
+
+        DevicesService.saveImage(vm.tenantKey, vm.selectedLogoFinal.asString, vm.selectedLogoFinal.name)
+          .then((res) => {
+            ProgressBarService.complete();
+            $timeout(vm.getTenantImages(), 2000);
+            vm.fileApi.removeAll()
+            ToastsService.showSuccessToast('We uploaded your image.');
+          })
+          .catch((res) => {
+            ProgressBarService.complete();
+            return ToastsService.showErrorToast('Something went wrong. You may have already uploaded this image.');
+
+          })
+      }
+      r.readAsText(vm.selectedLogo[0].lfFile);
+    }
+  }
+
 
   vm.onSaveDevice = function () {
     ProgressBarService.start();

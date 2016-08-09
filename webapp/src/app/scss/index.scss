@@ -570,3 +570,72 @@ header.dtp-header {
   float: right;
   flex-direction: row-reverse;
 }
+
+md-select {
+  display: block;
+  margin: 10px 0 8px 0;
+  padding-bottom: 2px;
+  position: relative;
+  min-width: 180px;
+  max-width: 180px;
+
+  [type=button] {
+    background-color: transparent;
+    border-color: rgba(0, 0, 0, 0.12);
+    border-width: 0 0 1px 0;
+    color: rgba(0, 0, 0, 0.73);
+    cursor: default;
+    display: block;
+    line-height: 48px;
+    padding: 2px 0 1px 4px;
+    position: relative;
+    text-align: left;
+    text-shadow: none;
+    width: 100%;
+    z-index: 1;
+
+    &:focus, &:hover {
+      background: rgba(0, 0, 0, 0.1);
+    }
+    &:after {
+      content: '\25be';
+      float: right;
+      padding-right: 16px;
+    }
+  }
+  ul[role=listbox] {
+    background-color: white;
+    cursor: default;
+    list-style: none;
+    line-height: 26px;
+    overflow: hidden;
+    margin: 0;
+    max-height: 0;
+    position: absolute;
+    padding: 0;
+    transform: translateY(-50%);
+    transition: all 0.15s cubic-bezier(0.35, 0, 0.25, 1);
+    width: 100%;
+
+    li {
+      height: 48px;
+      margin: 0;
+      padding: 10px 16px;
+
+      &:focus, &:hover, &.active {
+        background: rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  &.active ul {
+    max-height: 200px;
+    overflow: auto;
+    padding: 8px 0 16px 0px;
+    z-index: 2;
+  }
+}
+
+[md-ink-ripple] {
+  position: relative;
+}
