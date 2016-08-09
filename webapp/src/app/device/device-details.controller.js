@@ -35,6 +35,95 @@ function DeviceDetailsCtrl($log,
   vm.enrollmentEvents = [];
   vm.logoChange = false;
 
+  /////////////////////////////////////////////////
+  // Overlay
+  /////////////////////////////////////////////////
+  let attachImageNameToOverlay = (overlays) => {
+    let modifiedOverlays = angular.copy(overlays)
+    if (modifiedOverlays) {
+      delete modifiedOverlays["key"]
+
+      for (let k in modifiedOverlays) {
+        if (modifiedOverlays[k]["image_key"]) {
+          modifiedOverlays[k].name = modifiedOverlays[k]["image_key"]["name"]
+        } else {
+          modifiedOverlays[k].name = modifiedOverlays[k].type
+        }
+      }
+    }
+    return modifiedOverlays
+  }
+
+  vm.adjustOverlayStatus = (status) => {
+    vm.currentDevice.overlay_status = status
+    ProgressBarService.start();
+    let promise = DevicesService.save(vm.currentDevice);
+    return promise.then(() => {
+      let devicePromise = DevicesService.getDeviceByKey(vm.deviceKey);
+      devicePromise.then((response => {
+        vm.onGetDeviceSuccess(response)
+        ProgressBarService.complete();
+      }), response => vm.onGetDeviceFailure(response));
+    })
+  }
+
+  vm.submitOverlaySettings = (overlayForm) => {
+    let overlaySettings = vm.currentDevice.overlay;
+    delete overlaySettings.key;
+    delete overlaySettings.device_key;
+
+    let overlaySettingsCopy = {}
+    for (let k in overlaySettings) {
+      overlaySettingsCopy[k] = JSON.parse(overlaySettings[k])
+    }
+
+    ProgressBarService.start();
+    DevicesService.saveOverlaySettings(
+      vm.deviceKey,
+      overlaySettingsCopy.bottom_left,
+      overlaySettingsCopy.bottom_right,
+      overlaySettingsCopy.top_right,
+      overlaySettingsCopy.top_left
+    )
+      .then((res) => {
+        ProgressBarService.complete();
+        return ToastsService.showSuccessToast('We saved your update.');
+
+      })
+      .catch((res) => {
+        ProgressBarService.complete();
+        return ToastsService.showErrorToast('Something went wrong');
+
+      })
+  };
+
+  vm.submitImage = () => {
+    if (vm.selectedLogo && vm.selectedLogo[0]) {
+      ProgressBarService.start();
+      let reader = new FileReader();
+      reader.onload = function () {
+        vm.selectedLogoFinal = {}
+        vm.selectedLogoFinal.asString = JSON.stringify(reader.result)
+        vm.selectedLogoFinal.name = vm.selectedLogo[0].lfFileName
+        vm.selectedLogoChange = true;
+
+        TenantsService.saveImage(vm.tenantKey, vm.selectedLogoFinal.asString, vm.selectedLogoFinal.name)
+          .then((res) => {
+            ProgressBarService.complete();
+            $timeout(vm.getTenantImages(), 2000);
+            vm.fileApi.removeAll()
+            ToastsService.showSuccessToast('We uploaded your image.');
+          })
+          .catch((res) => {
+            ProgressBarService.complete();
+            ToastsService.showErrorToast('Something went wrong. You may have already uploaded this image.');
+
+          })
+      }
+      reader.readAsText(vm.selectedLogo[0].lfFile);
+    }
+  }
+
   vm.getTenantImages = () => {
     vm.OVERLAY_TYPES = [
       {type: "TIME", name: "TIME", realName: "TIME", new: true, image_urlsafe_key: null},
@@ -61,6 +150,11 @@ function DeviceDetailsCtrl($log,
         ToastsService.showErrorStatus("SOMETHING WENT WRONG RETRIEVING YOUR IMAGES")
       })
   }
+
+
+  ////////////////////////////////////////////////
+  // Events and Issues Tab
+  ////////////////////////////////////////////////
 
   vm.replaceIssueTime = function (issues) {
     for (let i = 0; i < issues.length; i++) {
@@ -163,22 +257,6 @@ function DeviceDetailsCtrl($log,
     return vm.getEnrollmentEvents(vm.deviceKey);
   };
 
-  let attachImageNameToOverlay = (overlays) => {
-    let modifiedOverlays = angular.copy(overlays)
-    if (modifiedOverlays) {
-      delete modifiedOverlays["key"]
-
-      for (let k in modifiedOverlays) {
-        if (modifiedOverlays[k]["image_key"]) {
-          modifiedOverlays[k].name = modifiedOverlays[k]["image_key"]["name"]
-        } else {
-          modifiedOverlays[k].name = modifiedOverlays[k].type
-        }
-      }
-    }
-    return modifiedOverlays
-  }
-
   vm.onGetDeviceSuccess = function (response) {
     vm.currentDevice = response;
     vm.currentDevice.overlay = attachImageNameToOverlay(vm.currentDevice.overlay)
@@ -190,14 +268,14 @@ function DeviceDetailsCtrl($log,
       vm.tenantKey = vm.currentDevice.tenantKey;
     }
     if ($stateParams.fromDevices === "true") {
-      vm.backUrl = '///devices';
+      vm.backUrl = '/#/devices';
       vm.backUrlText = 'Back to devices';
     } else {
       if (vm.currentDevice.isUnmanagedDevice === true) {
-        vm.backUrl = `///tenants/${vm.tenantKey}/unmanaged`;
+        vm.backUrl = `/#/tenants/${vm.tenantKey}/unmanaged`;
         vm.backUrlText = 'Back to tenant unmanaged devices';
       } else {
-        vm.backUrl = `///tenants/${vm.tenantKey}/managed`;
+        vm.backUrl = `/#/tenants/${vm.tenantKey}/managed`;
         vm.backUrlText = 'Back to tenant managed devices';
       }
     }
@@ -246,83 +324,9 @@ function DeviceDetailsCtrl($log,
     }
   };
 
-  //////////////////////
+  /////////////////////////////////////////////////
   // Properties Tab
-  //////////////////////
-  vm.adjustOverlayStatus = (status) => {
-    vm.currentDevice.overlay_status = status
-
-    ProgressBarService.start();
-    let promise = DevicesService.save(vm.currentDevice);
-    return promise.then(() => {
-      let devicePromise = DevicesService.getDeviceByKey(vm.deviceKey);
-      devicePromise.then((response => {
-        vm.onGetDeviceSuccess(response)
-        ProgressBarService.complete();
-      }), response => vm.onGetDeviceFailure(response));
-    })
-
-  }
-
-  vm.submitOverlaySettings = (overlayForm) => {
-    let overlaySettings = vm.currentDevice.overlay;
-    delete overlaySettings.key;
-    delete overlaySettings.device_key;
-
-    let overlaySettingsCopy = {}
-    for (let k in overlaySettings) {
-      overlaySettingsCopy[k] = JSON.parse(overlaySettings[k])
-    }
-
-    ProgressBarService.start();
-    DevicesService.saveOverlaySettings(
-      vm.deviceKey,
-      overlaySettingsCopy.bottom_left,
-      overlaySettingsCopy.bottom_right,
-      overlaySettingsCopy.top_right,
-      overlaySettingsCopy.top_left
-    )
-      .then((res) => {
-        ProgressBarService.complete();
-        return ToastsService.showSuccessToast('We saved your update.');
-
-      })
-      .catch((res) => {
-        ProgressBarService.complete();
-        return ToastsService.showErrorToast('Something went wrong');
-
-      })
-  };
-
-
-  vm.submitImage = () => {
-    if (vm.selectedLogo && vm.selectedLogo[0]) {
-      ProgressBarService.start();
-      let reader = new FileReader();
-      reader.onload = function () {
-        vm.selectedLogoFinal = {}
-        vm.selectedLogoFinal.asString = JSON.stringify(reader.result)
-        vm.selectedLogoFinal.name = vm.selectedLogo[0].lfFileName
-        vm.selectedLogoChange = true;
-
-        TenantsService.saveImage(vm.tenantKey, vm.selectedLogoFinal.asString, vm.selectedLogoFinal.name)
-          .then((res) => {
-            ProgressBarService.complete();
-            $timeout(vm.getTenantImages(), 2000);
-            vm.fileApi.removeAll()
-            ToastsService.showSuccessToast('We uploaded your image.');
-          })
-          .catch((res) => {
-            ProgressBarService.complete();
-            ToastsService.showErrorToast('Something went wrong. You may have already uploaded this image.');
-
-          })
-      }
-      reader.readAsText(vm.selectedLogo[0].lfFile);
-    }
-  }
-
-
+  /////////////////////////////////////////////////
   vm.onSaveDevice = function () {
     ProgressBarService.start();
     if (vm.currentDevice.location !== undefined && vm.currentDevice.location.key !== undefined) {
