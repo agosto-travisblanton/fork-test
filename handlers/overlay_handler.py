@@ -15,8 +15,8 @@ class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
         overlay_template = OverlayTemplate.create_or_get_by_device_key(associated_device_key)
 
         # key representes position
-        print request_json
         for key, value in request_json.iteritems():
+            print value
             overlay_template.set_overlay(position=key, overlay_type=value["type"], image_urlsafe_key=value["image_urlsafe_key"])
 
         # re-get the template after the changes set_overlay made

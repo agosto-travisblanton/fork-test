@@ -328,7 +328,6 @@ export default class DevicesService {
   }
 
   getImages(tenant_urlsafe_key) {
-
     return this.Restangular.oneUrl('image', `/api/v1/image/tenant/${tenant_urlsafe_key}`).getList()
   }
 
@@ -350,6 +349,7 @@ export default class DevicesService {
       * top_right: ...
       * top_left: ...
     **/
+    console.log(payload)
     return this.Restangular.oneUrl('overlay', `/api/v1/overlay/device/${device_urlsafe_key}`).customPOST(payload);
   }
 

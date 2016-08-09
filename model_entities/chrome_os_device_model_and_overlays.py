@@ -855,14 +855,21 @@ class Image(ndb.Model):
     tenant_key = ndb.KeyProperty(kind=Tenant, required=True)
 
     @staticmethod
+    def exists_within_tenant(tenant_key, name):
+        return Image.query(ndb.AND(Image.tenant_key == tenant_key, Image.name == name)).fetch()
+
+    @staticmethod
     def create(svg_rep, name, tenant_key):
-        image = Image(
-            svg_rep=svg_rep,
-            name=name,
-            tenant_key=tenant_key
-        )
-        image.put()
-        return image
+        if not Image.exists_within_tenant(tenant_key, name):
+            image = Image(
+                svg_rep=svg_rep,
+                name=name,
+                tenant_key=tenant_key
+            )
+            image.put()
+            return image
+        else:
+            return False
 
     @staticmethod
     def get_by_tenant_key(tenant_key):
@@ -904,7 +911,6 @@ class Overlay(ndb.Model):
 
             overlay.put()
 
-        print overlay
         return overlay
 
 

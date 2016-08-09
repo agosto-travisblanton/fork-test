@@ -30,7 +30,13 @@ class ImageHandler(SessionRequestHandler, KeyValidatorMixin):
         svg_rep = request_json["svg_rep"]
         name = request_json["name"]
         image_entity = Image.create(svg_rep=svg_rep, name=name, tenant_key=tenant_key)
-        return json_response(self.response, {
-            "success": True,
-            "key": image_entity.key.urlsafe()
-        })
+
+        if image_entity:
+            json_response(self.response, {
+                "success": True,
+                "key": image_entity.key.urlsafe()
+            })
+        else:
+            json_response(self.response, {
+                "success": False,
+            }, status_code=409)
