@@ -85,7 +85,7 @@ class ChromeOsDevice(ndb.Model):
 
     @property
     def overlays(self):
-        return OverlayTemplate.get_overlay_templates_for_device(self.key)
+        return OverlayTemplate.get_overlay_template_for_device(self.key)
 
     @property
     def overlays_as_dict(self):
@@ -923,8 +923,8 @@ class OverlayTemplate(ndb.Model):
     device_key = ndb.KeyProperty(kind=ChromeOsDevice, required=True)
 
     @staticmethod
-    def get_overlay_templates_for_device(device_key):
-        # always 0 index since we are only supporting 1 template per device for now
+    # plural, but will always return the 0th index since we are only supporting one template per device for now
+    def get_overlay_template_for_device(device_key):
         overlay_template = OverlayTemplate.query(OverlayTemplate.device_key == device_key).fetch()
 
         if not overlay_template:
@@ -945,9 +945,9 @@ class OverlayTemplate(ndb.Model):
 
     @staticmethod
     def create_or_get_by_device_key(device_key):
-        existing_template_exists = OverlayTemplate.get_overlay_templates_for_device(device_key)
-        if existing_template_exists:
-            return existing_template_exists
+        existing_template = OverlayTemplate.get_overlay_template_for_device(device_key)
+        if existing_template:
+            return existing_template
 
         else:
             nullOverlay = Overlay.create_or_get(None)
