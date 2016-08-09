@@ -13,5 +13,5 @@ class SetOverlayStatusToFalse(MigrationBase):
 
         for each_entity in all_device_entities:
             if not each_entity.overlay_available:
-                each_entity.panel_sleep = True
+                each_entity.overlay_available = False
                 each_entity.put()
