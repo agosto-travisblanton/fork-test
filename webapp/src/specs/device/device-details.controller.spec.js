@@ -325,7 +325,7 @@ describe('DeviceDetailsCtrl', function () {
     );
 
     it('logs error to the console', function () {
-      let errorMessage = `No detail for device_key #${controller.deviceKey = 'key'}. Error: 400 Bad Request`;
+      let errorMessage = `No detail for device_key ${controller.deviceKey = 'key'}. Error: 400 Bad Request`;
       return expect($log.error).toHaveBeenCalledWith(errorMessage);
     });
 
