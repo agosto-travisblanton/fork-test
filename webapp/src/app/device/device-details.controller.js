@@ -42,6 +42,7 @@ function DeviceDetailsCtrl($log,
 
     DevicesService.getImages(vm.tenantKey)
       .then((res) => {
+        console.log(res)
         res.forEach((value) => {
           let newValue = {
             realName: angular.copy(value.name),
@@ -267,8 +268,14 @@ function DeviceDetailsCtrl($log,
     delete overlaySettings.key;
     delete overlaySettings.device_key;
 
+    let overlaySettingsCopy = {}
+
+    for (let k in overlaySettings) {
+      overlaySettingsCopy[k] = JSON.parse(overlaySettings[k])
+    }
+
     ProgressBarService.start();
-    DevicesService.saveOverlaySettings(vm.deviceKey, overlaySettings)
+    DevicesService.saveOverlaySettings(vm.deviceKey, overlaySettingsCopy)
       .then((res) => {
         ProgressBarService.complete();
         return ToastsService.showSuccessToast('We saved your update.');
@@ -298,6 +305,7 @@ function DeviceDetailsCtrl($log,
         DevicesService.saveImage(vm.tenantKey, vm.selectedLogoFinal.asString, vm.selectedLogoFinal.name)
           .then((res) => {
             ProgressBarService.complete();
+            vm.fileApi.removeAll()
             ToastsService.showSuccessToast('We uploaded your image.');
             vm.getTenantImages();
           })

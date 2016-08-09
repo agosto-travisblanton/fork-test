@@ -16,7 +16,9 @@ class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
 
         # key representes position
         for key, value in request_json.iteritems():
-            print value
+            if "image_key" in value:
+                value["image_urlsafe_key"] = value["image_key"]
+
             overlay_template.set_overlay(position=key, overlay_type=value["type"], image_urlsafe_key=value["image_urlsafe_key"])
 
         # re-get the template after the changes set_overlay made

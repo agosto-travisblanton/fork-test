@@ -12,7 +12,12 @@ class ImageHandler(SessionRequestHandler, KeyValidatorMixin):
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key).get().key
         images = Image.get_by_tenant_key(tenant_key)
         return json_response(
-            self.response, images, strategy=IMAGE_STRATEGY
+            self.response, [
+                {
+                    "key": image.key.urlsafe(),
+                    "name": image.name
+                } for image in images
+            ], strategy=IMAGE_STRATEGY
         )
 
     def get_image_by_key(self, image_urlsafe_key):

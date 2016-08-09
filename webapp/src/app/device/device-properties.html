@@ -558,7 +558,7 @@
               <br/>
 
             </div>
-            <div class="form-group" ng-if="deviceDetailsCtrl.currentDevice.overlay_status">
+            <div class="form-group" ng-show="deviceDetailsCtrl.currentDevice.overlay_status">
 
               <div class="col-md-12">
                 <div class="col-md-5 overlay-margin-left">
@@ -566,8 +566,8 @@
                     <label>Top-Left</label>
                     <md-select ng-model="deviceDetailsCtrl.currentDevice.overlay.top_left">
                       <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES track by $index"
-                                 ng-value="overlay"
-                                 selected="{{deviceDetailsCtrl.currentDevice && overlay.realName === deviceDetailsCtrl.currentDevice.overlay.top_left.name ? 'selected' : '' }}"
+                                 value="{{overlay}}"
+                                 selected="{{ overlay.realName === deviceDetailsCtrl.currentDevice.overlay.top_left.name ? 'selected' : '' }}"
                       >
                         {{overlay.name}}
                       </md-option>
@@ -579,8 +579,8 @@
                     <label>Top-Right</label>
                     <md-select ng-model="deviceDetailsCtrl.currentDevice.overlay.top_right">
                       <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES track by $index"
-                                 ng-value="overlay"
-                                 selected="{{ deviceDetailsCtrl.currentDevice && overlay.realName === deviceDetailsCtrl.currentDevice.overlay.top_right.name ? 'selected' : '' }}"
+                                 value="{{overlay}}"
+                                 selected="{{ overlay.realName === deviceDetailsCtrl.currentDevice.overlay.top_right.name ? 'selected' : '' }}"
 
                       >
                         {{overlay.name}}
@@ -596,8 +596,8 @@
                     <md-select ng-model="deviceDetailsCtrl.currentDevice.overlay.bottom_left"
                                value="deviceDetailsCtrl.currentDevice.overlay.bottom_left.type">
                       <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES track by $index"
-                                 ng-value="overlay"
-                                 selected="{{ deviceDetailsCtrl.currentDevice && overlay.realName === deviceDetailsCtrl.currentDevice.overlay.bottom_left.name ? 'selected' : '' }}"
+                                 value="{{overlay}}"
+                                 selected="{{ overlay.realName === deviceDetailsCtrl.currentDevice.overlay.bottom_left.name ? 'selected' : '' }}"
 
                       >
                         {{overlay.name}}
@@ -610,8 +610,8 @@
                     <label>Bottom-Right</label>
                     <md-select ng-model="deviceDetailsCtrl.currentDevice.overlay.bottom_right">
                       <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES track by $index"
-                                 ng-value="overlay"
-                                 selected="{{ deviceDetailsCtrl.currentDevice && overlay.realName === deviceDetailsCtrl.currentDevice.overlay.bottom_right.name ? 'selected' : '' }}"
+                                 value="{{overlay}}"
+                                 selected="{{ overlay.realName === deviceDetailsCtrl.currentDevice.overlay.bottom_right.name ? 'selected' : '' }}"
 
                       >
                         {{overlay.name}}
@@ -630,10 +630,10 @@
 
               <div class="col-md-12">
 
-                <lf-ng-md-file-input lf-files="deviceDetailsCtrl.selectedLogo" lf-api="fileApi"preview
+                <lf-ng-md-file-input lf-files="deviceDetailsCtrl.selectedLogo" lf-api="deviceDetailsCtrl.fileApi" preview
                                      accept="image/svg+xml"></lf-ng-md-file-input>
 
-                <md-button class="md-raised md-primary" ng-click="deviceDetailsCtrl.submitImage() && fileApi.removeAll()"
+                <md-button class="md-raised md-primary" ng-click="deviceDetailsCtrl.submitImage()"
                            style="float: right;">
                   UPLOAD
                 </md-button>
