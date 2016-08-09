@@ -5,7 +5,7 @@ from webtest import AppError
 setup_test_paths()
 
 import json
-from content_manager_api import ContentManagerApi
+from integrations.content_manager.content_manager_api import ContentManagerApi
 from agar.test import BaseTest, WebTest
 from models import Tenant, TENANT_ENTITY_GROUP_NAME, Distributor, Domain, ChromeOsDevice
 from routes import application
