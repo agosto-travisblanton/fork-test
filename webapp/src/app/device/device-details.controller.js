@@ -15,7 +15,8 @@ function DeviceDetailsCtrl($log,
                            $mdDialog,
                            ToastsService,
                            DateManipulationService,
-                           $scope) {
+                           $scope,
+$timeout) {
   "ngInject";
 
   const vm = this;
@@ -40,9 +41,12 @@ function DeviceDetailsCtrl($log,
       {type: "DATETIME", name: "DATETIME", realName: "DATETIME", new: true, image_urlsafe_key: null},
     ]
 
+    ProgressBarService.start();
     DevicesService.getImages(vm.tenantKey)
       .then((res) => {
         console.log(res)
+        ProgressBarService.complete();
+
         res.forEach((value) => {
           let newValue = {
             realName: angular.copy(value.name),
@@ -54,6 +58,8 @@ function DeviceDetailsCtrl($log,
         })
       })
       .catch((res) => {
+        ProgressBarService.complete();
+
         ToastsService.showErrorStatus("SOMETHING WENT WRONG RETRIEVING YOUR IMAGES")
       })
   }
@@ -305,9 +311,9 @@ function DeviceDetailsCtrl($log,
         DevicesService.saveImage(vm.tenantKey, vm.selectedLogoFinal.asString, vm.selectedLogoFinal.name)
           .then((res) => {
             ProgressBarService.complete();
+            $timeout(vm.getTenantImages(), 1000);
             vm.fileApi.removeAll()
             ToastsService.showSuccessToast('We uploaded your image.');
-            vm.getTenantImages();
           })
           .catch((res) => {
             ProgressBarService.complete();
