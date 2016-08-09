@@ -14,6 +14,7 @@ class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
         # array of dictionaries that contain data about each overlay
         overlay_template = OverlayTemplate.create_or_get_by_device_key(associated_device_key)
 
+        print request_json
         # key representes position
         for key, value in request_json.iteritems():
             # some requests may use 'image_key' instead of 'image_urlsafe_key'

@@ -40,6 +40,7 @@ class ImageHandler(SessionRequestHandler, KeyValidatorMixin):
                 "success": True,
                 "key": image_entity.key.urlsafe()
             })
+
         else:
             json_response(self.response, {
                 "success": False,
