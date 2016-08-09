@@ -24,8 +24,8 @@ class ImageHandlerTest(ProvisioningDistributorUserBase):
         self.assertTrue(Image.query().fetch())
 
     def _create_image(self):
-        request_parameters = {'svg_rep': self.svg_rep}
-        uri = application.router.build(None, 'post-image', None, {})
+        request_parameters = {'svg_rep': self.svg_rep, 'name': 'some_name'}
+        uri = application.router.build(None, 'manage-image', None, {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
         response = self.app.post_json(uri, params=request_parameters)
         json_response = json.loads(response.body)
         return json_response["key"]
