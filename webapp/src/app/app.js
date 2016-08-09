@@ -2,8 +2,6 @@ import angular from 'angular';
 import uiRouter from 'angular-ui-router';
 import moment from 'moment';
 import 'angular-tooltips';
-import './components/angular-material-fileinput/lf-ng-md-file-input.css'
-import './components/angular-material-fileinput/lf-ng-md-file-input'
 import 'angular-tooltips/dist/angular-tooltips.css'
 import 'angular-toastr/dist/angular-toastr.css'
 import 'angular-toastr';
@@ -55,6 +53,5 @@ export let app = angular.module('skykitProvisioning', [
   'ngProgress',
   'ngMaterial',
   'ngclipboard',
-  'toastr',
-  'lfNgMdFileInput'
+  'toastr'
 ])
