@@ -15,6 +15,19 @@ export default class TenantsService {
     return promise;
   }
 
+  getImages(tenant_urlsafe_key) {
+    return this.Restangular.oneUrl('image', `/api/v1/image/tenant/${tenant_urlsafe_key}`).getList()
+  }
+
+  saveImage(tenant_urlsafe_key, svg_rep, name) {
+    let payload = {
+      svg_rep,
+      name
+    }
+    return this.Restangular.oneUrl('image', `/api/v1/image/tenant/${tenant_urlsafe_key}`).customPOST(payload);
+  }
+
+
   searchAllTenantsByName(tenant_name) {
     let promise = this.Restangular.all('tenants').customGETLIST("", {tenant_name: tenant_name})
     return promise;

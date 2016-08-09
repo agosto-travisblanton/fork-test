@@ -6,6 +6,7 @@ function DeviceDetailsCtrl($log,
                            $state,
                            SessionsService,
                            DevicesService,
+                           TenantsService,
                            LocationsService,
                            CommandsService,
                            TimezonesService,
@@ -16,7 +17,7 @@ function DeviceDetailsCtrl($log,
                            ToastsService,
                            DateManipulationService,
                            $scope,
-$timeout) {
+                           $timeout) {
   "ngInject";
 
   const vm = this;
@@ -42,11 +43,9 @@ $timeout) {
     ]
 
     ProgressBarService.start();
-    DevicesService.getImages(vm.tenantKey)
+    TenantsService.getImages(vm.tenantKey)
       .then((res) => {
-        console.log(res)
         ProgressBarService.complete();
-
         res.forEach((value) => {
           let newValue = {
             realName: angular.copy(value.name),
@@ -59,11 +58,9 @@ $timeout) {
       })
       .catch((res) => {
         ProgressBarService.complete();
-
         ToastsService.showErrorStatus("SOMETHING WENT WRONG RETRIEVING YOUR IMAGES")
       })
   }
-
 
   vm.replaceIssueTime = function (issues) {
     for (let i = 0; i < issues.length; i++) {
@@ -75,7 +72,6 @@ $timeout) {
         each.updated = DateManipulationService.generateLocalFromUTC(each.updated);
       }
     }
-    return;
   };
 
   vm.replaceCommandTime = function (issues) {
@@ -88,7 +84,6 @@ $timeout) {
         each.confirmedTime = DateManipulationService.generateLocalFromUTC(each.confirmedTime);
       }
     }
-    return;
   };
 
   vm.copyDeviceKey = () => ToastsService.showSuccessToast('Device key copied to your clipboard');
@@ -195,14 +190,14 @@ $timeout) {
       vm.tenantKey = vm.currentDevice.tenantKey;
     }
     if ($stateParams.fromDevices === "true") {
-      vm.backUrl = '/#/devices';
+      vm.backUrl = '///devices';
       vm.backUrlText = 'Back to devices';
     } else {
       if (vm.currentDevice.isUnmanagedDevice === true) {
-        vm.backUrl = `/#/tenants/${vm.tenantKey}/unmanaged`;
+        vm.backUrl = `///tenants/${vm.tenantKey}/unmanaged`;
         vm.backUrlText = 'Back to tenant unmanaged devices';
       } else {
-        vm.backUrl = `/#/tenants/${vm.tenantKey}/managed`;
+        vm.backUrl = `///tenants/${vm.tenantKey}/managed`;
         vm.backUrlText = 'Back to tenant managed devices';
       }
     }
@@ -216,7 +211,7 @@ $timeout) {
 
   vm.onGetDeviceFailure = function (response) {
     ToastsService.showErrorToast('Oops. We were unable to fetch the details for this device at this time.');
-    let errorMessage = `No detail for device_key #${vm.deviceKey}. Error: ${response.status} ${response.statusText}`;
+    let errorMessage = `No detail for device_key /${vm.deviceKey}. Error: ${response.status} ${response.statusText}`;
     $log.error(errorMessage);
     return $state.go('devices');
   };
@@ -251,9 +246,9 @@ $timeout) {
     }
   };
 
-  //####################
+  //////////////////////
   // Properties Tab
-  //####################
+  //////////////////////
   vm.adjustOverlayStatus = (status) => {
     vm.currentDevice.overlay_status = status
 
@@ -275,13 +270,18 @@ $timeout) {
     delete overlaySettings.device_key;
 
     let overlaySettingsCopy = {}
-
     for (let k in overlaySettings) {
       overlaySettingsCopy[k] = JSON.parse(overlaySettings[k])
     }
 
     ProgressBarService.start();
-    DevicesService.saveOverlaySettings(vm.deviceKey, overlaySettingsCopy)
+    DevicesService.saveOverlaySettings(
+      vm.deviceKey,
+      overlaySettingsCopy.bottom_left,
+      overlaySettingsCopy.bottom_right,
+      overlaySettingsCopy.top_right,
+      overlaySettingsCopy.top_left
+    )
       .then((res) => {
         ProgressBarService.complete();
         return ToastsService.showSuccessToast('We saved your update.');
@@ -292,21 +292,20 @@ $timeout) {
         return ToastsService.showErrorToast('Something went wrong');
 
       })
-  }
+  };
 
 
   vm.submitImage = () => {
     if (vm.selectedLogo && vm.selectedLogo[0]) {
       ProgressBarService.start();
-      let r = new FileReader();
-      r.onload = function () {
-
+      let reader = new FileReader();
+      reader.onload = function () {
         vm.selectedLogoFinal = {}
-        vm.selectedLogoFinal.asString = JSON.stringify(r.result)
+        vm.selectedLogoFinal.asString = JSON.stringify(reader.result)
         vm.selectedLogoFinal.name = vm.selectedLogo[0].lfFileName
         vm.selectedLogoChange = true;
 
-        DevicesService.saveImage(vm.tenantKey, vm.selectedLogoFinal.asString, vm.selectedLogoFinal.name)
+        TenantsService.saveImage(vm.tenantKey, vm.selectedLogoFinal.asString, vm.selectedLogoFinal.name)
           .then((res) => {
             ProgressBarService.complete();
             $timeout(vm.getTenantImages(), 2000);
@@ -315,11 +314,11 @@ $timeout) {
           })
           .catch((res) => {
             ProgressBarService.complete();
-            return ToastsService.showErrorToast('Something went wrong. You may have already uploaded this image.');
+            ToastsService.showErrorToast('Something went wrong. You may have already uploaded this image.');
 
           })
       }
-      r.readAsText(vm.selectedLogo[0].lfFile);
+      reader.readAsText(vm.selectedLogo[0].lfFile);
     }
   }
 

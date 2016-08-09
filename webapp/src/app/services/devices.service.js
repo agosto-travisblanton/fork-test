@@ -327,29 +327,14 @@ export default class DevicesService {
     return promise;
   }
 
-  getImages(tenant_urlsafe_key) {
-    return this.Restangular.oneUrl('image', `/api/v1/image/tenant/${tenant_urlsafe_key}`).getList()
-  }
-
-
-  saveImage(tenant_urlsafe_key, svg_rep, name) {
+  saveOverlaySettings(device_urlsafe_key, bottom_left, bottom_right, top_right, top_left) {
     let payload = {
-      svg_rep,
-      name
+      bottom_left,
+      bottom_right,
+      top_right,
+      top_left,
     }
 
-    return this.Restangular.oneUrl('image', `/api/v1/image/tenant/${tenant_urlsafe_key}`).customPOST(payload);
-  }
-
-  saveOverlaySettings(device_urlsafe_key, payload) {
-    /**
-     * * payload = {
-      * bottom_left: ...
-      * bottom_right: ...
-      * top_right: ...
-      * top_left: ...
-    **/
-    console.log(payload)
     return this.Restangular.oneUrl('overlay', `/api/v1/overlay/device/${device_urlsafe_key}`).customPOST(payload);
   }
 
