@@ -1,5 +1,4 @@
 import moment from 'moment';
-import _ from 'lodash';
 
 function DeviceDetailsCtrl($log,
                            $stateParams,
@@ -16,7 +15,6 @@ function DeviceDetailsCtrl($log,
                            $mdDialog,
                            ToastsService,
                            DateManipulationService,
-                           $scope,
                            $timeout) {
   "ngInject";
 
@@ -289,7 +287,7 @@ function DeviceDetailsCtrl($log,
 
   vm.onGetDeviceFailure = function (response) {
     ToastsService.showErrorToast('Oops. We were unable to fetch the details for this device at this time.');
-    let errorMessage = `No detail for device_key /${vm.deviceKey}. Error: ${response.status} ${response.statusText}`;
+    let errorMessage = `No detail for device_key ${vm.deviceKey}. Error: ${response.status} ${response.statusText}`;
     $log.error(errorMessage);
     return $state.go('devices');
   };
