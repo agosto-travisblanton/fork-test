@@ -15,7 +15,7 @@ class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
         overlay_template = OverlayTemplate.create_or_get_by_device_key(associated_device_key)
 
         for each_key in request_json.keys():
-            if each_key not in ["BOTTOM_LEFT", "BOTTOM_RIGHT", "TOP_RIGHT", "TOP_LEFT"]:
+            if each_key.upper() not in ["BOTTOM_LEFT", "BOTTOM_RIGHT", "TOP_RIGHT", "TOP_LEFT"]:
                 return json_response(self.response, {
                     "success": False,
                     "message": "ONE OF YOUR KEYS WAS NOT VALID."
@@ -24,13 +24,9 @@ class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
         # key representes position
         for key, value in request_json.iteritems():
             overlay_type = value.get("type")
-            image_key = value.get("image_key")
 
-            if not image_key or image_key == '':
-                return json_response(self.response, {
-                    "success": False,
-                    "message": "Missing image_key"
-                }, status_code=400)
+            # image_key can be None, it is optional
+            image_key = value.get("image_key")
 
             if not overlay_type or overlay_type == '':
                 return json_response(self.response, {
