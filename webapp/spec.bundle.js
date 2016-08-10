@@ -28,19 +28,12 @@ window.skykitProvisioning.q.Mock = class Mock {
 
   then(resolveFunc, rejectFunc) {
     this.resolveFunc = resolveFunc;
-    if (rejectFunc) {
-      this.canUseNormalCatch = true;
-    }
     this.rejectFunc = rejectFunc;
     return;
   }
 
   catch(args) {
-    if (this.canUseNormalCatch) {
-      return this.rejectFunc(args);
-    } else{
-      return args
-    }
+    return this.resolveFunc(args);
   }
 
   resolve(args) {

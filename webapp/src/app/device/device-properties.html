@@ -3,6 +3,7 @@
   <div flex="50" flex-sm="50" flex-xs="50" layout="column">
     <md-card>
       <md-card-content>
+
         <h2>Information</h2>
         <hr/>
         <div class="form-group"
@@ -248,12 +249,6 @@
           <label>Tenant code</label>
           <div>
             {{deviceDetailsCtrl.currentDevice.tenantCode}}
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Overlays Available</label>
-          <div>
-            {{deviceDetailsCtrl.currentDevice.overlay_status}}
           </div>
         </div>
         <div class="form-group"
@@ -526,7 +521,5 @@
         </form>
       </md-card-content>
     </md-card>
-    <div ng-include="'webapp/src/app/device/device-properties-overlay.html'"></div>
   </div>
 </md-content>
-
