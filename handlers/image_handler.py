@@ -1,22 +1,13 @@
-from google.appengine.ext import ndb
 from agar.sessions import SessionRequestHandler
-from models import Image
-import logging
 import json
 from ndb_mixins import KeyValidatorMixin
+from models import Tenant, Image
 from restler.serializers import json_response
 
 
 class ImageHandler(SessionRequestHandler, KeyValidatorMixin):
     def get(self, tenant_urlsafe_key):
-        try:
-            tenant = ndb.Key(urlsafe=tenant_urlsafe_key).get()
-        except Exception, e:
-            logging.exception(e)
-        if tenant is None:
-            status = 404
-            message = 'Unrecognized tenant with key: {0}'.format(tenant)
-            return self.response.set_status(status, message)
+        tenant = self.validate_and_get(tenant_urlsafe_key, Tenant, abort_on_not_found=True)
 
         images = Image.get_by_tenant_key(tenant.key)
         return json_response(
@@ -29,20 +20,11 @@ class ImageHandler(SessionRequestHandler, KeyValidatorMixin):
         )
 
     def get_image_by_key(self, image_urlsafe_key):
-        try:
-            image = ndb.Key(urlsafe=image_urlsafe_key).get()
-        except Exception, e:
-            logging.exception(e)
-        if image is None:
-            status = 404
-            message = 'Unrecognized image with key: {0}'.format(image)
-            return self.response.set_status(status, message)
-
-        image_entity = ndb.Key(urlsafe=image_urlsafe_key).get()
+        image = self.validate_and_get(image_urlsafe_key, Image, abort_on_not_found=True)
         return json_response(
             self.response, {
-                "svg_rep": image_entity.svg_rep,
-                "name": image_entity.name
+                "svg_rep": image.svg_rep,
+                "name": image.name
             }
         )
 
@@ -51,14 +33,7 @@ class ImageHandler(SessionRequestHandler, KeyValidatorMixin):
         svg_rep = request_json.get("svg_rep")
         name = request_json.get("name")
 
-        try:
-            tenant = ndb.Key(urlsafe=tenant_urlsafe_key).get()
-        except Exception, e:
-            logging.exception(e)
-        if tenant is None:
-            status = 404
-            message = 'Unrecognized tenant with key: {0}'.format(tenant)
-            return self.response.set_status(status, message)
+        tenant = self.validate_and_get(tenant_urlsafe_key, Tenant, abort_on_not_found=True)
 
         if not name or name == '':
             return json_response(self.response, {
