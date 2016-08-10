@@ -9,6 +9,14 @@ class ImageHandlerTest(ProvisioningDistributorUserBase):
     def setUp(self):
         super(ImageHandlerTest, self).setUp()
         self.svg_rep = '332lk23ljk23jkl243ljk423ljk423jkl423ljk234ljk23jkl243jkl234ljk23jkl234jkl'
+        self.name = 'some_name'
+    def test_get(self):
+        key = self._create_image()
+        request_parameters = {}
+        uri = application.router.build(None, 'manage-image', None, {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
+        response = self.app.get(uri, params=request_parameters)
+        json_response = json.loads(response.body)
+        self.assertEqual(json_response[0]["name"], self.name)
 
     def test_get_by_key(self):
         key = self._create_image()
@@ -24,8 +32,8 @@ class ImageHandlerTest(ProvisioningDistributorUserBase):
         self.assertTrue(Image.query().fetch())
 
     def _create_image(self):
-        request_parameters = {'svg_rep': self.svg_rep}
-        uri = application.router.build(None, 'post-image', None, {})
+        request_parameters = {'svg_rep': self.svg_rep, 'name': self.name}
+        uri = application.router.build(None, 'manage-image', None, {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
         response = self.app.post_json(uri, params=request_parameters)
         json_response = json.loads(response.body)
         return json_response["key"]
