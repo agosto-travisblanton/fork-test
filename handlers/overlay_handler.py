@@ -1,6 +1,7 @@
 from google.appengine.ext import ndb
 from agar.sessions import SessionRequestHandler
 from models import OverlayTemplate
+import logging
 import json
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
@@ -10,9 +11,16 @@ import ndb_json
 class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
     def post(self, device_urlsafe_key):
         request_json = json.loads(self.request.body)
-        associated_device_key = ndb.Key(urlsafe=device_urlsafe_key).get().key
+        try:
+            device = ndb.Key(urlsafe=device_urlsafe_key).get()
+        except Exception, e:
+            logging.exception(e)
+        if device is None:
+            status = 404
+            message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
+            return self.response.set_status(status, message)
         # array of dictionaries that contain data about each overlay
-        overlay_template = OverlayTemplate.create_or_get_by_device_key(associated_device_key)
+        overlay_template = OverlayTemplate.create_or_get_by_device_key(device.key)
 
         for each_key in request_json.keys():
             if each_key.upper() not in ["BOTTOM_LEFT", "BOTTOM_RIGHT", "TOP_RIGHT", "TOP_LEFT"]:
@@ -38,7 +46,7 @@ class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
                                          image_urlsafe_key=image_key)
 
         # re-get the template after the changes set_overlay made
-        overlay_template = OverlayTemplate.create_or_get_by_device_key(associated_device_key)
+        overlay_template = OverlayTemplate.create_or_get_by_device_key(device.key)
         # This method is offered because restler doesn't support keyProperty serialization beyond a single child
         overlay_template_intermediate_json = ndb_json.dumps(overlay_template)
         overlay_template_dict = ndb_json.loads(overlay_template_intermediate_json)
