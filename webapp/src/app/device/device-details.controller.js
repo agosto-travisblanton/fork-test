@@ -123,9 +123,9 @@ function DeviceDetailsCtrl($log,
 
   vm.getTenantImages = () => {
     vm.OVERLAY_TYPES = [
-      {type: "TIME", name: "TIME", realName: "TIME", new: true, image_urlsafe_key: null},
-      {type: "DATE", name: "DATE", new: true, realName: "DATE", image_urlsafe_key: null},
-      {type: "DATETIME", name: "DATETIME", realName: "DATETIME", new: true, image_urlsafe_key: null},
+      {type: "TIME", name: "TIME", realName: "TIME", new: true, image_key: null},
+      {type: "DATE", name: "DATE", new: true, realName: "DATE", image_key: null},
+      {type: "DATETIME", name: "DATETIME", realName: "DATETIME", new: true, image_key: null},
     ]
 
     ProgressBarService.start();
@@ -137,7 +137,7 @@ function DeviceDetailsCtrl($log,
           realName: angular.copy(value.name),
           name: "LOGO: " + value.name,
           type: "LOGO",
-          image_urlsafe_key: value.key
+          image_key: value.key
         }
         vm.OVERLAY_TYPES.push(newValue);
       };

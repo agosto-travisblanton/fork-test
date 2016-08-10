@@ -14,15 +14,32 @@ class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
         # array of dictionaries that contain data about each overlay
         overlay_template = OverlayTemplate.create_or_get_by_device_key(associated_device_key)
 
-        print request_json
+        for each_key in request_json.keys():
+            if each_key not in ["BOTTOM_LEFT", "BOTTOM_RIGHT", "TOP_RIGHT", "TOP_LEFT"]:
+                return json_response(self.response, {
+                    "success": False,
+                    "message": "ONE OF YOUR KEYS WAS NOT VALID."
+                }, status_code=400)
+
         # key representes position
         for key, value in request_json.iteritems():
-            # some requests may use 'image_key' instead of 'image_urlsafe_key'
-            if "image_key" in value:
-                value["image_urlsafe_key"] = value["image_key"]
+            overlay_type = value.get("type")
+            image_key = value.get("image_key")
 
-            overlay_template.set_overlay(position=key, overlay_type=value["type"],
-                                         image_urlsafe_key=value["image_urlsafe_key"])
+            if not image_key or image_key == '':
+                return json_response(self.response, {
+                    "success": False,
+                    "message": "Missing image_key"
+                }, status_code=400)
+
+            if not overlay_type or overlay_type == '':
+                return json_response(self.response, {
+                    "success": False,
+                    "message": "Missing overlay_type"
+                }, status_code=400)
+
+            overlay_template.set_overlay(position=key, overlay_type=overlay_type,
+                                         image_urlsafe_key=image_key)
 
         # re-get the template after the changes set_overlay made
         overlay_template = OverlayTemplate.create_or_get_by_device_key(associated_device_key)

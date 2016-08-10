@@ -274,21 +274,6 @@ class ChromeOsDevice(ndb.Model):
 #####################################################
 # DEVICE ISSUE LOG
 #####################################################
-class IssueLevel:
-    Normal, Warning, Danger = range(3)
-
-    @classmethod
-    def stringify(cls, enumeration):
-        if enumeration == cls.Normal:
-            return 'normal'
-        elif enumeration == cls.Warning:
-            return 'warning'
-        elif enumeration == cls.Danger:
-            return 'danger'
-        else:
-            return None
-
-
 @ae_ndb_serializer
 class DeviceIssueLog(ndb.Model):
     device_key = ndb.KeyProperty(kind=ChromeOsDevice, required=True, indexed=True)
@@ -409,7 +394,7 @@ class DeviceIssueLog(ndb.Model):
             issue.resolved = True
             if category in [config.DEVICE_ISSUE_MEMORY_HIGH, config.DEVICE_ISSUE_STORAGE_LOW]:
                 issue.level = 1
-                issue.level_descriptor = IssueLevel.stringify(IssueLevel.Warning)
+                issue.level_descriptor = 'Warning'
             elif category in [config.DEVICE_ISSUE_PLAYER_DOWN]:
                 issue.level = 2
                 issue.level_descriptor = 'Danger'
