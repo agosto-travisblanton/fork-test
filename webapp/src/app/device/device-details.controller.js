@@ -65,7 +65,7 @@ function DeviceDetailsCtrl($log,
     })
   }
 
-  vm.submitOverlaySettings = (overlayForm) => {
+  vm.submitOverlaySettings = () => {
     let overlaySettings = vm.currentDevice.overlay;
     delete overlaySettings.key;
     delete overlaySettings.device_key;
@@ -76,23 +76,23 @@ function DeviceDetailsCtrl($log,
     }
 
     ProgressBarService.start();
-    DevicesService.saveOverlaySettings(
+    let promise = DevicesService.saveOverlaySettings(
       vm.deviceKey,
       overlaySettingsCopy.bottom_left,
       overlaySettingsCopy.bottom_right,
       overlaySettingsCopy.top_right,
       overlaySettingsCopy.top_left
     )
-      .then((res) => {
-        ProgressBarService.complete();
-        return ToastsService.showSuccessToast('We saved your update.');
+    promise.then((res) => {
+      ProgressBarService.complete();
+      ToastsService.showSuccessToast('We saved your update.');
+    })
 
-      })
-      .catch((res) => {
-        ProgressBarService.complete();
-        return ToastsService.showErrorToast('Something went wrong');
+    promise.catch((res) => {
+      ProgressBarService.complete();
+      ToastsService.showErrorToast('Something went wrong');
 
-      })
+    })
   };
 
   vm.submitImage = () => {
@@ -105,18 +105,17 @@ function DeviceDetailsCtrl($log,
         vm.selectedLogoFinal.name = vm.selectedLogo[0].lfFileName
         vm.selectedLogoChange = true;
 
-        TenantsService.saveImage(vm.tenantKey, vm.selectedLogoFinal.asString, vm.selectedLogoFinal.name)
-          .then((res) => {
-            ProgressBarService.complete();
-            $timeout(vm.getTenantImages(), 2000);
-            vm.fileApi.removeAll()
-            ToastsService.showSuccessToast('We uploaded your image.');
-          })
-          .catch((res) => {
-            ProgressBarService.complete();
-            ToastsService.showErrorToast('Something went wrong. You may have already uploaded this image.');
-
-          })
+        let promise = TenantsService.saveImage(vm.tenantKey, vm.selectedLogoFinal.asString, vm.selectedLogoFinal.name)
+        promise.then((res) => {
+          ProgressBarService.complete();
+          $timeout(vm.getTenantImages(), 2000);
+          vm.fileApi.removeAll()
+          ToastsService.showSuccessToast('We uploaded your image.');
+        })
+        promise.catch((res) => {
+          ProgressBarService.complete();
+          ToastsService.showErrorToast('Something went wrong. You may have already uploaded this image.');
+        })
       }
       reader.readAsText(vm.selectedLogo[0].lfFile);
     }
@@ -130,23 +129,24 @@ function DeviceDetailsCtrl($log,
     ]
 
     ProgressBarService.start();
-    TenantsService.getImages(vm.tenantKey)
-      .then((res) => {
-        ProgressBarService.complete();
-        res.forEach((value) => {
-          let newValue = {
-            realName: angular.copy(value.name),
-            name: "LOGO: " + value.name,
-            type: "LOGO",
-            image_urlsafe_key: value.key
-          }
-          vm.OVERLAY_TYPES.push(newValue)
-        })
-      })
-      .catch((res) => {
-        ProgressBarService.complete();
-        ToastsService.showErrorStatus("SOMETHING WENT WRONG RETRIEVING YOUR IMAGES")
-      })
+    let promise = TenantsService.getImages(vm.tenantKey);
+    promise.then((res) => {
+      ProgressBarService.complete();
+      for (let value of res) {
+        let newValue = {
+          realName: angular.copy(value.name),
+          name: "LOGO: " + value.name,
+          type: "LOGO",
+          image_urlsafe_key: value.key
+        }
+        vm.OVERLAY_TYPES.push(newValue);
+      };
+    });
+
+    promise.catch(() => {
+      ProgressBarService.complete();
+      ToastsService.showErrorStatus("SOMETHING WENT WRONG RETRIEVING YOUR IMAGES")
+    })
   }
 
 
