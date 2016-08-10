@@ -462,6 +462,28 @@ application = WSGIApplication(
               ),
 
         ############################################################
+        # Tenant OU
+        ############################################################
+        Route(r'/api/v1/tenant_organizational_unit',
+              handler='handlers.tenant_organization_units_handler.TenantOrganizationUnitsHandler',
+              name='organization-unit-by-path',
+              handler_method='get_by_ou_path',
+              methods=['GET']
+              ),
+        Route(r'/api/v1/tenant_organizational_units',
+              handler='handlers.tenant_organization_units_handler.TenantOrganizationUnitsHandler',
+              name='organization-units-list',
+              handler_method='get_ou_list',
+              methods=['GET']
+              ),
+        Route(r'/api/v1/tenant_organizational_units',
+              handler='handlers.tenant_organization_units_handler.TenantOrganizationUnitsHandler',
+              name='tenant-organization-units',
+              handler_method='create',
+              methods=['POST']
+              ),
+
+        ############################################################
         # /dev/ routes secured by admin:required
         ############################################################
 
