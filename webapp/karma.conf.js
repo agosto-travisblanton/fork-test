@@ -11,7 +11,7 @@ var determineIfValidDirectoryOrFile = function (path) {
 }
 
 var determineFileToUse = function (config) {
-  if (config.file) {
+  if (config.path) {
     return modifiedSpecBundleName
   } else {
     return 'spec.bundle.js'
@@ -32,17 +32,9 @@ var writeNewSpecBundleWithPath = function (path) {
 
 
 module.exports = function (config) {
-  config.set({
-    client: {
-      args: ['--file', 'file'],
-      // other client-side config
-      captureConsole: false
-    }
-  })
-
-  if (config.file) {
-    if (determineIfValidDirectoryOrFile(config.file)) {
-      writeNewSpecBundleWithPath(config.file)
+  if (config.path) {
+    if (determineIfValidDirectoryOrFile(config.path)) {
+      writeNewSpecBundleWithPath(config.path)
     } else {
       console.log("THIS IS NOT A VALID PATH")
       process.exit(1)
