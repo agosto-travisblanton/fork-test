@@ -3,6 +3,7 @@ from agar.sessions import SessionRequestHandler
 from models import OverlayTemplate
 import logging
 import json
+from models import ChromeOsDevice
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
 import ndb_json
@@ -11,14 +12,8 @@ import ndb_json
 class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
     def post(self, device_urlsafe_key):
         request_json = json.loads(self.request.body)
-        try:
-            device = ndb.Key(urlsafe=device_urlsafe_key).get()
-        except Exception, e:
-            logging.exception(e)
-        if device is None:
-            status = 404
-            message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
-            return self.response.set_status(status, message)
+        device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
+
         # array of dictionaries that contain data about each overlay
         overlay_template = OverlayTemplate.create_or_get_by_device_key(device.key)
 
