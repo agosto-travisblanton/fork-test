@@ -795,7 +795,7 @@ describe('DeviceDetailsCtrl', function () {
           realName: 'blah',
           name: 'LOGO: blah',
           type: 'LOGO',
-          image_urlsafe_key: 'blah2'
+          image_key: 'blah2'
         });
       });
     });
