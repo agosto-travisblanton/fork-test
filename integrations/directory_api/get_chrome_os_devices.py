@@ -6,7 +6,7 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 def get_chrome_os_devices(impersonation_email, status_filter=None):
     devices = []
-    chrome_os_devices_api = ChromeOsDevicesApi(impersonation_email, prod_credentials=True)
+    chrome_os_devices_api = ChromeOsDevicesApi(impersonation_email, int_credentials=True)
     chrome_os_devices = chrome_os_devices_api.list(
         customer_id=config.GOOGLE_CUSTOMER_ID,
         projection='FULL',
@@ -47,7 +47,7 @@ def get_chrome_os_devices_count(impersonation_email, status_filter=None):
 
 
 def get_chrome_os_device_by_mac_address(device_mac_address, impersonation_email):
-    chrome_os_devices_api = ChromeOsDevicesApi(impersonation_email, prod_credentials=True)
+    chrome_os_devices_api = ChromeOsDevicesApi(impersonation_email, int_credentials=True)
     chrome_os_devices = chrome_os_devices_api.list(
         customer_id=config.GOOGLE_CUSTOMER_ID,
         projection='FULL',
