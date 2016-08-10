@@ -16,7 +16,7 @@ class ImageHandler(SessionRequestHandler, KeyValidatorMixin):
                     "key": image.key.urlsafe(),
                     "name": image.name
                 } for image in images
-            ]
+                ]
         )
 
     def get_image_by_key(self, image_urlsafe_key):
@@ -31,8 +31,21 @@ class ImageHandler(SessionRequestHandler, KeyValidatorMixin):
     def post(self, tenant_urlsafe_key):
         request_json = json.loads(self.request.body)
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key).get().key
-        svg_rep = request_json["svg_rep"]
-        name = request_json["name"]
+        svg_rep = request_json.get("svg_rep")
+        name = request_json.get("name")
+
+        if not name or name == '':
+            return json_response(self.response, {
+                "success": False,
+                "message": "Missing name"
+            }, status_code=400)
+
+        if not svg_rep or svg_rep == '':
+            return json_response(self.response, {
+                "success": False,
+                "message": "Missing svg_rep"
+            }, status_code=400)
+
         image_entity = Image.create(svg_rep=svg_rep, name=name, tenant_key=tenant_key)
 
         if image_entity:

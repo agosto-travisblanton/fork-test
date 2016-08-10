@@ -1,6 +1,6 @@
 import mocks from 'angular-mocks';
-let module = angular.mock.module
-let inject = angular.mock.inject
+let module = angular.mock.module;
+let inject = angular.mock.inject;
 import moment from 'moment'
 
 
@@ -12,6 +12,7 @@ describe('DeviceDetailsCtrl', function () {
   let $log = undefined;
   let $mdDialog = undefined;
   let DevicesService = undefined;
+  let TenantsService = undefined;
   let TimezonesService = undefined;
   let getDeviceIssuesPromise = undefined;
   let getPlayerCommandEventsPromise = undefined;
@@ -94,7 +95,7 @@ describe('DeviceDetailsCtrl', function () {
   beforeEach(module('skykitProvisioning'));
 
   beforeEach(inject(function (_$controller_, _DevicesService_, _TimezonesService_, _LocationsService_, _CommandsService_,
-                              _sweet_, _ToastsService_, _$state_, _$mdDialog_, _$log_, _StorageService_) {
+                              _sweet_, _ToastsService_, _$state_, _$mdDialog_, _$log_, _StorageService_, _TenantsService_) {
     $controller = _$controller_;
     $stateParams = {};
     $state = _$state_;
@@ -106,6 +107,7 @@ describe('DeviceDetailsCtrl', function () {
     CommandsService = _CommandsService_;
     ToastsService = _ToastsService_;
     StorageService = _StorageService_;
+    TenantsService = _TenantsService_;
     progressBarService = {
       start() {
       },
@@ -114,7 +116,10 @@ describe('DeviceDetailsCtrl', function () {
     };
     sweet = _sweet_;
     let scope = {};
-    return serviceInjection = {
+    serviceInjection = {
+      $state,
+      DevicesService,
+      TenantsService,
       $scope: scope,
       ToastsService,
       $stateParams,
@@ -184,7 +189,7 @@ describe('DeviceDetailsCtrl', function () {
       return it('declares a selectedTimezone', () => expect(controller.selectedTimezone).toBeUndefined());
     });
 
-    return describe('edit mode', function () {
+    describe('edit mode', function () {
       beforeEach(function () {
         $stateParams = {
           deviceKey: 'fkasdhfjfa9s8udyva7dygoudyg',
@@ -290,7 +295,7 @@ describe('DeviceDetailsCtrl', function () {
       return it('sets the back url according to previous context', () => expect(controller.backUrl).toBe(`/#/tenants/${tenantKey}/unmanaged`));
     });
 
-    return describe('coming from tenant managed devices', function () {
+    describe('coming from tenant managed devices', function () {
       beforeEach(function () {
         $stateParams = {fromDevices: "false"};
         controller = $controller('DeviceDetailsCtrl', {
@@ -325,7 +330,7 @@ describe('DeviceDetailsCtrl', function () {
     );
 
     it('logs error to the console', function () {
-      let errorMessage = `No detail for device_key #${controller.deviceKey = 'key'}. Error: 400 Bad Request`;
+      let errorMessage = `No detail for device_key ${controller.deviceKey = 'key'}. Error: 400 Bad Request`;
       return expect($log.error).toHaveBeenCalledWith(errorMessage);
     });
 
@@ -363,7 +368,7 @@ describe('DeviceDetailsCtrl', function () {
       return it("displays a success toast", () => expect(ToastsService.showSuccessToast).toHaveBeenCalledWith('We saved your update.'));
     });
 
-    return describe('.onFailureDeviceSave', function () {
+    describe('.onFailureDeviceSave', function () {
       beforeEach(function () {
         spyOn($log, 'info');
         spyOn(sweet, 'show');
@@ -414,7 +419,7 @@ describe('DeviceDetailsCtrl', function () {
       spyOn(progressBarService, 'complete');
       promise = new skykitProvisioning.q.Mock();
       spyOn(CommandsService, 'panelSleep').and.returnValue(promise);
-      return controller = $controller('DeviceDetailsCtrl', serviceInjection);
+      controller = $controller('DeviceDetailsCtrl', serviceInjection);
     });
 
     it('calls CommandsService.panelSleep on function call', function () {
@@ -437,6 +442,8 @@ describe('DeviceDetailsCtrl', function () {
     });
 
   });
+
+  ////
 
 
   describe('.confirmDeviceDelete', function () {
@@ -494,7 +501,7 @@ describe('DeviceDetailsCtrl', function () {
       spyOn(ToastsService, 'showErrorToast');
       spyOn($state, 'go');
       spyOn($log, 'error');
-      return controller = $controller('DeviceDetailsCtrl', serviceInjection);
+      controller = $controller('DeviceDetailsCtrl', serviceInjection);
     });
 
     describe('when promise is resolved', function () {
@@ -516,7 +523,7 @@ describe('DeviceDetailsCtrl', function () {
       });
     });
 
-    return describe('when promise is rejected', function () {
+    describe('when promise is rejected', function () {
       it('display an error toast with a friendly message about delete failure', function () {
         controller.onConfirmDelete(device_key);
         promise.reject([]);
@@ -590,7 +597,7 @@ describe('DeviceDetailsCtrl', function () {
       return it('set proofOfPlayLogging to false since the location pre-condition is not met', () => expect(controller.currentDevice.proofOfPlayLogging).toBe(false));
     });
 
-    return describe('proof of play logging is false', function () {
+    describe('proof of play logging is false', function () {
       beforeEach(function () {
         spyOn(controller, 'onSaveDevice');
         controller.currentDevice.proofOfPlayLogging = false;
@@ -618,12 +625,7 @@ describe('DeviceDetailsCtrl', function () {
       spyOn(DevicesService, 'getIssuesByKey').and.returnValue(getDeviceIssuesPromise);
       spyOn(progressBarService, 'start');
       $stateParams.deviceKey = 'fkasdhfjfa9s8udyva7dygoudyg';
-      controller = $controller('DeviceDetailsCtrl', {
-        $stateParams,
-        $state,
-        DevicesService,
-        ProgressBarService: progressBarService
-      });
+      controller = $controller('DeviceDetailsCtrl', serviceInjection);
       controller.prev_cursor = null;
       controller.next_cursor = null;
       return controller.onClickRefreshButton();
@@ -652,7 +654,7 @@ describe('DeviceDetailsCtrl', function () {
       return it('populates the issues array with two records', () => expect(controller.issues.length).toBe(2));
     });
 
-    return describe('.onRefreshIssuesFailure', function () {
+    describe('.onRefreshIssuesFailure', function () {
       let error = {status: 403, statusText: 'Forbidden'};
 
       beforeEach(function () {
@@ -711,7 +713,7 @@ describe('DeviceDetailsCtrl', function () {
     return it('is shows a success toast', () => expect(ToastsService.showSuccessToast).toHaveBeenCalledWith('Device key copied to your clipboard'));
   });
 
-  return describe('.copyCorrelationIdentifier', function () {
+  describe('.copyCorrelationIdentifier', function () {
     beforeEach(function () {
       controller = $controller('DeviceDetailsCtrl', {ToastsService});
       spyOn(ToastsService, 'showSuccessToast');
@@ -722,5 +724,80 @@ describe('DeviceDetailsCtrl', function () {
       expect(ToastsService.showSuccessToast).toHaveBeenCalledWith(
         'Correlation ID copied to your clipboard')
     );
+  });
+
+
+  describe('OverlayFunctionality', function () {
+    let promise;
+    beforeEach(function () {
+      let devicesServicePromise = new skykitProvisioning.q.Mock();
+      promise = new skykitProvisioning.q.Mock();
+
+      spyOn(DevicesService, 'getIssuesByKey').and.returnValue(getDeviceIssuesPromise);
+      spyOn(progressBarService, 'start');
+      spyOn(TenantsService, 'saveImage');
+      $stateParams.deviceKey = 'fkasdhfjfa9s8udyva7dygoudyg';
+      controller = $controller('DeviceDetailsCtrl', serviceInjection)
+    });
+
+
+    describe('.adjustOverlayStatus', function () {
+      beforeEach(function () {
+        spyOn(DevicesService, 'save').and.returnValue(promise);
+      });
+
+
+      it('calls saveDevice after adjusting currentDevice', () => {
+        controller.adjustOverlayStatus(true)
+        promise.resolve()
+        expect(controller.currentDevice.overlay_status).toEqual(true)
+        expect(DevicesService.save).toHaveBeenCalled();
+      });
+    });
+
+    describe('.submitOverlaySettings', function () {
+      beforeEach(function () {
+        spyOn(DevicesService, 'saveOverlaySettings').and.returnValue(promise);
+        spyOn(ToastsService, 'showSuccessToast');
+        spyOn(ToastsService, 'showErrorToast');
+        controller.currentDevice = {
+          overlay: {}
+        }
+      });
+
+      it('calls DevicesService.saveOverlaySettings with values', () => {
+        controller.submitOverlaySettings();
+        promise.resolve(true);
+        expect(DevicesService.saveOverlaySettings).toHaveBeenCalled();
+      })
+    });
+
+
+    describe('.getTenantImages', function () {
+
+      beforeEach(function () {
+        spyOn(TenantsService, 'getImages').and.returnValue(promise);
+      });
+
+
+      it('adds retrived Image values to OVERLAY_TYPES', () => {
+        controller.getTenantImages()
+        let originalOverlayTypes = angular.copy(controller.OVERLAY_TYPES);
+
+        let toResolve = [{
+          name: "blah",
+          key: "blah2"
+        }]
+
+        promise.resolve(toResolve)
+
+        expect(controller.OVERLAY_TYPES.slice(-1)[0]).toEqual({
+          realName: 'blah',
+          name: 'LOGO: blah',
+          type: 'LOGO',
+          image_urlsafe_key: 'blah2'
+        });
+      });
+    });
   });
 });

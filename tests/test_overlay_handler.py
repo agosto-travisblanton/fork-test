@@ -15,7 +15,7 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
         request_parameters = {
             "position": "TOP_LEFT",
             "type": "LOGO",
-            "image_urlsafe_key": None
+            "image_key": None
         }
         with self.assertRaises(AppError) as cm:
             response = self.app.post_json(uri, params=request_parameters)
@@ -36,7 +36,7 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
         request_parameters = {
             "top_left": {
                 "type": "LOGO",
-                "image_urlsafe_key": key
+                "image_key": key
             }
         }
 

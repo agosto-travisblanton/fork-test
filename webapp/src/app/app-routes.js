@@ -334,6 +334,7 @@ export function routes($stateProvider, $urlRouterProvider, RestangularProvider) 
 
   RestangularProvider.setBaseUrl('/api/v1');
 
+
   RestangularProvider.addResponseInterceptor(function (data, operation, resourceType, url, response, deferred) {
     let result = data;
     // Uncomment this for pagination support when using PagingListHandlerMixin on the Python side.
