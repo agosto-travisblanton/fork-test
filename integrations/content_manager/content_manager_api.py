@@ -78,14 +78,24 @@ class ContentManagerApi(object):
                                                         headers=self.HEADERS)
                 http_client_response = HttpClient().post(http_client_request)
                 if http_client_response.status_code == 201:
+                    if chrome_os_device.content_manager_display_name:
+                        display_name = chrome_os_device.content_manager_display_name
+                    else:
+                        display_name = 'Not available'
+                    if chrome_os_device.content_manager_location_description:
+                        location_description = chrome_os_device.content_manager_location_description
+                    else:
+                        location_description = 'Not available'
                     message = 'ContentManagerApi.create_device: http_status={0}, url={1}, device_key={2}, \
-                    api_key={3}, tenant_code={4}, SN={5}. Success!'.format(
+                    api_key={3}, tenant_code={4}, SN={5}, display_name={6}, location_description={7}. Success!'.format(
                         http_client_response.status_code,
                         url,
                         device_urlsafe_key,
                         chrome_os_device.api_key,
                         tenant.tenant_code,
-                        chrome_os_device.serial_number)
+                        chrome_os_device.serial_number,
+                        display_name,
+                        location_description)
                     logging.info(message)
                     cm_create_device_event_response = IntegrationEventLog.create(
                         event_category='Registration',

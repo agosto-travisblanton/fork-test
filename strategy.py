@@ -130,7 +130,8 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'playlistId': lambda o, field_name, context: o.playlist_id},
     {'lastError': lambda o, field_name, context: o.last_error},
     {'archived': lambda o, field_name, context: o.archived},
-    {'overlays': lambda o, field_name, context: o.overlays_as_dict if o.overlay_available else None}
+    {'overlay_status': lambda o, field_name, context: o.overlay_available},
+    {'overlay': lambda o, field_name, context: o.overlays_as_dict if o.overlay_available else None}
 
 ]
 
@@ -216,6 +217,8 @@ INTEGRATION_EVENT_LOG_STRATEGY += [
 IMAGE_STRATEGY = ModelStrategy(Image)
 IMAGE_STRATEGY += [
     {'key': lambda o, field_name, context: o.key.urlsafe()},
+    {'tenant_key': lambda o, field_name, context: o.tenant_key},
+    {'name': lambda o, field_name, context: o.name},
     {'svg_rep': lambda o, field_name, context: o.svg_rep},
 ]
 
