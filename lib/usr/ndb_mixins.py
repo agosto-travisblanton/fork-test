@@ -63,6 +63,24 @@ class KeyValidatorMixin(object):
 
         return obj
 
+    def check_and_get_field(self, key, dictionary):
+        '''
+        Checks to make sure key exists in dictionary, and if not, aborts the request.
+        :param key: a unicode or string
+        :param dictionary: a python dictionary
+        :return: value of key in dictionary
+        '''
+        if type(dictionary) != dict:
+            raise ValueError("You must supply a python dictionary as the second position arguement")
+        if type(key) != str and type(key) != unicode:
+            raise ValueError("You must supply a key with a type of string or type of unicode")
+
+        value = dictionary.get(key)
+        if not value:
+            self.abort(404, "required field {} not found".format(key))
+        else:
+            return value
+
 
 class PagingListHandlerMixin(object):
     @property

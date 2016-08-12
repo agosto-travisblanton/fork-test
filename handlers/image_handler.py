@@ -30,22 +30,9 @@ class ImageHandler(SessionRequestHandler, KeyValidatorMixin):
 
     def post(self, tenant_urlsafe_key):
         request_json = json.loads(self.request.body)
-        svg_rep = request_json.get("svg_rep")
-        name = request_json.get("name")
-
+        name = self.check_and_get_field('name', request_json)
+        svg_rep = self.check_and_get_field('svg_rep', request_json)
         tenant = self.validate_and_get(tenant_urlsafe_key, Tenant, abort_on_not_found=True)
-
-        if not name or name == '':
-            return json_response(self.response, {
-                "success": False,
-                "message": "Missing name"
-            }, status_code=400)
-
-        if not svg_rep or svg_rep == '':
-            return json_response(self.response, {
-                "success": False,
-                "message": "Missing svg_rep"
-            }, status_code=400)
 
         image_entity = Image.create(svg_rep=svg_rep, name=name, tenant_key=tenant.key)
 
