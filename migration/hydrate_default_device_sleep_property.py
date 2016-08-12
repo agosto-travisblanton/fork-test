@@ -12,5 +12,5 @@ class HydrateDefaultDeviceSleepProperty(MigrationBase):
         all_device_entities = ChromeOsDevice.query().fetch()
 
         for each_entity in all_device_entities:
-            each_entity.panel_sleep = True
+            each_entity.panel_sleep = False
             each_entity.put()
