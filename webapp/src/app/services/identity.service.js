@@ -1,12 +1,11 @@
-angular.module('skykitProvisioning').factory('IdentityService', ($log, Restangular) =>
-  new class IdentityService {
+export default class IdentityService {
 
-    constructor() {
-    }
+  constructor(Restangular) {
+    'ngInject';
+    this.Restangular = Restangular;
+  }
 
-    getIdentity() {
-      return Restangular.oneUrl('identity').get();
-    }
-  }()
-);
-
+  getIdentity() {
+    return this.Restangular.oneUrl('identity').get();
+  }
+}

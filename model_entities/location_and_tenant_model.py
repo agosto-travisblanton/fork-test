@@ -4,7 +4,7 @@ from google.appengine.ext import ndb
 from app_config import config
 from restler.decorators import ae_ndb_serializer
 from domain_model import Domain
-from chrome_os_device_model import ChromeOsDevice
+from models import ChromeOsDevice
 from device_issue_log_model import DeviceIssueLog
 from entity_groups import TenantEntityGroup
 
@@ -38,6 +38,13 @@ class Tenant(ndb.Model):
                 return key.get()
 
     @classmethod
+    def find_by_partial_name(cls, partial_name):
+        # search for all tenants because datastore does not support wildcard searches
+        all_tenants = Tenant.query().fetch()
+        # returns wildcard matches for partial_name
+        return [item for item in all_tenants if partial_name.lower() in item.name.lower()]
+
+    @classmethod
     def find_by_tenant_code(cls, tenant_code):
         if tenant_code:
             tenant_key = Tenant.query(Tenant.tenant_code == tenant_code, Tenant.active == True).get(keys_only=True)
@@ -56,28 +63,6 @@ class Tenant(ndb.Model):
                         ChromeOsDevice.tenant_key == tenant_key,
                         ChromeOsDevice.is_unmanaged_device == unmanaged)
             ).fetch()
-
-    @classmethod
-    def match_device_with_full_mac(cls, tenant_keys, unmanaged, full_mac):
-        return ChromeOsDevice.query(ChromeOsDevice.archived == False,
-                                    ndb.OR(ChromeOsDevice.mac_address == full_mac,
-                                           ChromeOsDevice.ethernet_mac_address == full_mac)).filter(
-            ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
-            ChromeOsDevice.is_unmanaged_device == unmanaged).count() > 0
-
-    @classmethod
-    def match_device_with_full_serial(cls, tenant_keys, unmanaged, full_serial):
-        return ChromeOsDevice.query(ChromeOsDevice.archived == False).filter(
-            ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
-            ChromeOsDevice.is_unmanaged_device == unmanaged).filter(
-            ChromeOsDevice.serial_number == full_serial).count() > 0
-
-    @classmethod
-    def match_device_with_full_gcmid(cls, tenant_keys, unmanaged, full_gcmid):
-        return ChromeOsDevice.query(ChromeOsDevice.archived == False).filter(
-            ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
-            ChromeOsDevice.is_unmanaged_device == unmanaged).filter(
-            ChromeOsDevice.gcm_registration_id == full_gcmid).count() > 0
 
     @classmethod
     def find_devices_with_partial_serial(cls, tenant_keys, unmanaged, partial_serial):
@@ -405,6 +390,11 @@ class Location(ndb.Model):
             key = Location.query(Location.customer_location_code == customer_location_code).get(keys_only=True)
             if key:
                 return key.get()
+
+    @classmethod
+    def find_by_partial_location_name(cls, partial_name):
+        all_locations = Location.query().fetch()
+        return [item for item in all_locations if partial_name.lower() in item.customer_location_name.lower()]
 
     @classmethod
     def is_customer_location_code_unique(cls, customer_location_code, tenant_key):

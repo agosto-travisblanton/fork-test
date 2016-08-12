@@ -1,33 +1,35 @@
-angular.module('skykitProvisioning').factory('DomainsService', Restangular =>
-  new class DomainsService {
+export default  class DomainsService {
 
-    constructor() {
+  constructor(Restangular) {
+    'ngInject';
+    this.Restangular = Restangular
+  }
+
+  save(domain) {
+    if (domain.key !== undefined) {
+      var promise = domain.put();
+    } else {
+      var promise = this.Restangular.service('domains').post(domain);
     }
+    return promise;
+  }
 
-    save(domain) {
-      if (domain.key !== undefined) {
-        var promise = domain.put();
-      } else {
-        var promise = Restangular.service('domains').post(domain);
-      }
+  fetchAllDomains() {
+    let promise = this.Restangular.all('domains').getList();
+    return promise;
+  }
+
+  getDomainByKey(domainKey) {
+    let promise = this.Restangular.oneUrl('domains', `api/v1/domains/${domainKey}`).get();
+    return promise;
+  }
+
+  delete(domain) {
+    if (domain.key !== undefined) {
+      let promise = this.Restangular.one("domains", domain.key).remove();
       return promise;
     }
+  }
+}
 
-    fetchAllDomains() {
-      let promise = Restangular.all('domains').getList();
-      return promise;
-    }
 
-    getDomainByKey(domainKey) {
-      let promise = Restangular.oneUrl('domains', `api/v1/domains/${domainKey}`).get();
-      return promise;
-    }
-
-    delete(domain) {
-      if (domain.key !== undefined) {
-        let promise = Restangular.one("domains", domain.key).remove();
-        return promise;
-      }
-    }
-  }()
-);

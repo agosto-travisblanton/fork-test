@@ -1,5 +1,5 @@
-<div ng-controller="DeviceDetailsCommandsCtrl as vm" ng-init="vm.initialize()">
-  <md-content class="md-padding" layout="row" layout-wrap layout-align="left start"
+<div class="md-content-command-override" ng-controller="DeviceDetailsCommandsCtrl as vm" ng-init="vm.initialize()">
+  <md-content class="md-padding" layout="row" layout-align="left start"
               layout-xs="column">
     <div flex="40" flex-sm="70" flex-xs="100" layout="column">
       <md-card>
@@ -16,23 +16,14 @@
                   <form name="resetContentForm" class="form-horizontal"
                         ng-submit="vm.onResetContent()"
                         novalidate>
-                    <div layout="row">
-                      <md-button type="submit"><i
-                        class="fa fa-fw fa-building"></i>
+                    <div layout="row" class="command-button-right">
+                      <button type="submit" class="md-button" tooltips
+                              tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/reset-content.html">
+                        <i
+                          class="fa fa-fw fa-building"></i>
                         Send
-                      </md-button>
-                      <md-button class="md-fab md-primary" aria-label="Reset Content">
-                        <md-tooltip>
-                          skykit.com/skdchromeapp/content/delete
-                        </md-tooltip>
-                        <md-icon>
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                               width="24" height="24">
-                            <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1z"></path>
-                            <path d="M17 12V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"></path>
-                          </svg>
-                        </md-icon>
-                      </md-button>
+                      </button>
                     </div>
                   </form>
                 </div>
@@ -47,24 +38,14 @@
                   <form name="updateContentForm" class="form-horizontal"
                         ng-submit="vm.onUpdateContent()"
                         novalidate>
-                    <div layout="row">
-                      <md-button type="submit"><i
-                        class="fa fa-fw fa-building"></i>
+                    <div layout="row" class="command-button-right">
+                      <button type="submit" class="md-button" tooltips tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/update-content.html"
+                      >
+                        <i
+                          class="fa fa-fw fa-building"></i>
                         Send
-                      </md-button>
-                      <md-button class="md-fab md-primary" aria-label="Update Content">
-                        <md-tooltip>
-                          skykit.com/skdchromeapp/update/content
-                        </md-tooltip>
-                        <md-icon>
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                               width="24" height="24">
-                            <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1z"></path>
-                            <path d="M17 12V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"></path>
-                          </svg>
-                        </md-icon>
-                      </md-button>
-
+                      </button>
                     </div>
                   </form>
                 </div>
@@ -79,23 +60,13 @@
                   <form name="resetPlayerForm" class="form-horizontal"
                         ng-submit="vm.onResetPlayer()"
                         novalidate>
-                    <div layout="row">
-                      <md-button type="submit"><i
+                    <div layout="row" class="command-button-right">
+                      <button type="submit" class="md-button" tooltips tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/reset-player.html"
+                      ><i
                         class="fa fa-fw fa-building"></i>
                         Send
-                      </md-button>
-                      <md-button class="md-fab md-primary" aria-label="Reset Player">
-                        <md-tooltip>
-                          skykit.com/skdchromeapp/reset
-                        </md-tooltip>
-                        <md-icon>
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                               width="24" height="24">
-                            <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1z"></path>
-                            <path d="M17 12V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"></path>
-                          </svg>
-                        </md-icon>
-                      </md-button>
+                      </button>
                     </div>
                   </form>
                 </div>
@@ -110,23 +81,13 @@
                   <form name="panelOnForm" class="form-horizontal"
                         ng-submit="vm.onPanelOn()"
                         novalidate>
-                    <div layout="row">
-                      <md-button type="submit"><i
+                    <div layout="row" class="command-button-right">
+                      <button type="submit" class="md-button" tooltips tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/panel-on.html"
+                      ><i
                         class="fa fa-fw fa-building"></i>
                         Send
-                      </md-button>
-                      <md-button class="md-fab md-primary" aria-label="Panel On">
-                        <md-tooltip>
-                          skykit.com/skdchromeapp/tv/on
-                        </md-tooltip>
-                        <md-icon>
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                               width="24" height="24">
-                            <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1z"></path>
-                            <path d="M17 12V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"></path>
-                          </svg>
-                        </md-icon>
-                      </md-button>
+                      </button>
                     </div>
                   </form>
                 </div>
@@ -141,23 +102,13 @@
                   <form name="panelOffForm" class="form-horizontal"
                         ng-submit="vm.onPanelOff()"
                         novalidate>
-                    <div layout="row">
-                      <md-button type="submit"><i
+                    <div layout="row" class="command-button-right">
+                      <button type="submit" class="md-button" tooltips tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/panel-off.html"
+                      ><i
                         class="fa fa-fw fa-building"></i>
                         Send
-                      </md-button>
-                      <md-button class="md-fab md-primary" aria-label="Panel Off">
-                        <md-tooltip>
-                          skykit.com/skdchromeapp/tv/off
-                        </md-tooltip>
-                        <md-icon>
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                               width="24" height="24">
-                            <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1z"></path>
-                            <path d="M17 12V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"></path>
-                          </svg>
-                        </md-icon>
-                      </md-button>
+                      </button>
                     </div>
                   </form>
                 </div>
@@ -172,23 +123,13 @@
                   <form name="updateDeviceForm" class="form-horizontal"
                         ng-submit="vm.onUpdateDevice()"
                         novalidate>
-                    <div layout="row">
-                      <md-button type="submit"><i
+                    <div layout="row" class="command-button-right">
+                      <button type="submit" class="md-button" tooltips tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/update-device.html"
+                      ><i
                         class="fa fa-fw fa-building"></i>
                         Send
-                      </md-button>
-                      <md-button class="md-fab md-primary" aria-label="Update Device">
-                        <md-tooltip>
-                          skykit.com/skdchromeapp/update/provisioning
-                        </md-tooltip>
-                        <md-icon>
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                               width="24" height="24">
-                            <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1z"></path>
-                            <path d="M17 12V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"></path>
-                          </svg>
-                        </md-icon>
-                      </md-button>
+                      </button>
                     </div>
                   </form>
                 </div>
@@ -203,23 +144,13 @@
                   <form name="updateDeviceForm" class="form-horizontal"
                         ng-submit="vm.onDiagnosticsToggle()"
                         novalidate>
-                    <div layout="row">
-                      <md-button type="submit"><i
+                    <div layout="row" class="command-button-right">
+                      <button type="submit" class="md-button" tooltips tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/diagnostics.html"
+                      ><i
                         class="fa fa-fw fa-building"></i>
                         Send
-                      </md-button>
-                      <md-button class="md-fab md-primary" aria-label="Diagnostics">
-                        <md-tooltip>
-                          skykit.com/skdchromeapp/diagnostics
-                        </md-tooltip>
-                        <md-icon>
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                               width="24" height="24">
-                            <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1z"></path>
-                            <path d="M17 12V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"></path>
-                          </svg>
-                        </md-icon>
-                      </md-button>
+                      </button>
                     </div>
                   </form>
                 </div>
@@ -234,23 +165,13 @@
                   <form name="updateDeviceForm" class="form-horizontal"
                         ng-submit="vm.onRestart()"
                         novalidate>
-                    <div layout="row">
-                      <md-button type="submit"><i
+                    <div layout="row" class="command-button-right">
+                      <button type="submit" class="md-button" tooltips tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/restart.html"
+                      ><i
                         class="fa fa-fw fa-building"></i>
                         Send
-                      </md-button>
-                      <md-button class="md-fab md-primary" aria-label="Restart">
-                        <md-tooltip>
-                          skykit.com/skdchromeapp/restart
-                        </md-tooltip>
-                        <md-icon>
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                               width="24" height="24">
-                            <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1z"></path>
-                            <path d="M17 12V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"></path>
-                          </svg>
-                        </md-icon>
-                      </md-button>
+                      </button>
                     </div>
                   </form>
                 </div>
@@ -265,23 +186,13 @@
                   <form name="updateDeviceForm" class="form-horizontal"
                         ng-submit="vm.onPostLog()"
                         novalidate>
-                    <div layout="row">
-                      <md-button type="submit"><i
+                    <div layout="row" class="command-button-right">
+                      <button type="submit" class="md-button" tooltips tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/post-log.html"
+                      ><i
                         class="fa fa-fw fa-building"></i>
                         Send
-                      </md-button>
-                      <md-button class="md-fab md-primary" aria-label="Restart">
-                        <md-tooltip>
-                          skykit.com/skdchromeapp/postlog
-                        </md-tooltip>
-                        <md-icon>
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                               width="24" height="24">
-                            <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1z"></path>
-                            <path d="M17 12V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"></path>
-                          </svg>
-                        </md-icon>
-                      </md-button>
+                      </button>
                     </div>
                   </form>
                 </div>
@@ -311,11 +222,12 @@
                              ng-required="true">
                     </div>
                     <div flex="60">
-                      <md-button type="submit" class="pull-command-send-button-up"
-                                 ng-disabled="!volumeForm.$dirty || volumeForm.$invalid">
+                      <button type="submit" class="md-button pull-command-send-button-up" tooltips tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/volume.html"
+                              ng-disabled="!volumeForm.$dirty || volumeForm.$invalid">
                         <i class="fa fa-fw fa-building"></i>
                         Send
-                      </md-button>
+                      </button>
                     </div>
                   </div>
                 </form>
@@ -341,11 +253,12 @@
                              ng-required="true">
                     </div>
                     <div flex="30">
-                      <md-button type="submit" class="pull-command-send-button-up"
-                                 ng-disabled="!customForm.$dirty || customForm.$invalid">
+                      <button type="submit" class="md-button pull-command-send-button-up" tooltips tooltip-side="right"
+                              tooltip-template="Send a custom command."
+                              ng-disabled="!customForm.$dirty || customForm.$invalid">
                         <i class="fa fa-fw fa-building"></i>
                         Send
-                      </md-button>
+                      </button>
                     </div>
                   </div>
                 </form>

@@ -7,9 +7,10 @@ from google.appengine.ext.deferred import deferred
 from webapp2 import RequestHandler
 
 from app_config import config
-from content_manager_api import ContentManagerApi
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
+from device_commands_handler import DeviceCommandsHandler
 from device_message_processor import post_unmanaged_device_info, change_intent
+from integrations.content_manager.content_manager_api import ContentManagerApi
 from model_entities.integration_events_log_model import IntegrationEventLog
 from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup, DeviceIssueLog
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
@@ -40,45 +41,9 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         else:
             return device.ethernet_mac_address
 
-
     ############################################################################################
     # TENANTS VIEW
     ############################################################################################
-    @requires_api_token
-    def match_for_device_by_tenant(self, tenant_urlsafe_key):
-        unmanaged = self.request.get("unmanaged") == "true"
-        full_gcmid = self.request.get("full_gcmid")
-        full_serial = self.request.get("full_serial")
-        full_mac = self.request.get("full_mac")
-        tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
-
-        if full_gcmid:
-            is_match = Tenant.match_device_with_full_gcmid(
-                tenant_keys=[tenant_key],
-                unmanaged=unmanaged,
-                full_gcmid=full_gcmid
-            )
-
-        elif full_serial:
-            is_match = Tenant.match_device_with_full_serial(
-                tenant_keys=[tenant_key],
-                unmanaged=unmanaged,
-                full_serial=full_serial
-            )
-        elif full_mac:
-            is_match = Tenant.match_device_with_full_mac(
-                tenant_keys=[tenant_key],
-                unmanaged=unmanaged,
-                full_mac=full_mac
-            )
-
-        json_response(
-            self.response,
-            {
-                "is_match": is_match
-            },
-        )
-
     @requires_api_token
     def search_for_device_by_tenant(self, tenant_urlsafe_key):
         unmanaged = self.request.get("unmanaged") == "true"
@@ -186,43 +151,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         )
 
     @requires_api_token
-    def match_for_device(self, distributor_urlsafe_key):
-        unmanaged = self.request.get("unmanaged") == "true"
-        full_gcmid = self.request.get("full_gcmid")
-        full_serial = self.request.get("full_serial")
-        full_mac = self.request.get("full_mac")
-
-        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
-        tenant_keys = [tenant.key for tenant in domain_tenant_list]
-
-        if full_gcmid:
-            is_match = Tenant.match_device_with_full_gcmid(
-                tenant_keys=tenant_keys,
-                unmanaged=unmanaged,
-                full_gcmid=full_gcmid
-            )
-
-        elif full_serial:
-            is_match = Tenant.match_device_with_full_serial(
-                tenant_keys=tenant_keys,
-                unmanaged=unmanaged,
-                full_serial=full_serial
-            )
-        elif full_mac:
-            is_match = Tenant.match_device_with_full_mac(
-                tenant_keys=tenant_keys,
-                unmanaged=unmanaged,
-                full_mac=full_mac
-            )
-
-        json_response(
-            self.response,
-            {
-                "is_match": is_match
-            },
-        )
-
-    @requires_api_token
     def search_for_device(self, distributor_urlsafe_key):
         unmanaged = self.request.get("unmanaged") == "true"
         partial_gcmid = self.request.get("partial_gcmid")
@@ -251,7 +179,6 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                 unmanaged=unmanaged,
                 partial_mac=partial_mac
             )
-
 
         json_response(
             self.response,
@@ -666,6 +593,11 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                       up=True,
                                                       storage_utilization=storage,
                                                       memory_utilization=memory,
+                                                      program=program,
+                                                      program_id=program_id,
+                                                      playlist=playlist,
+                                                      playlist_id=playlist_id,
+                                                      last_error=last_error,
                                                       resolved=True,
                                                       resolved_datetime=utc_now)
                 new_log_entry.put()
@@ -724,6 +656,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                           memory_utilization=memory,
                                                           program=program,
                                                           program_id=program_id,
+                                                          playlist=playlist,
+                                                          playlist_id=playlist_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -744,6 +678,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                           memory_utilization=memory,
                                                           program=program,
                                                           program_id=program_id,
+                                                          playlist=playlist,
+                                                          playlist_id=playlist_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -759,6 +695,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                           memory_utilization=memory,
                                                           program=program,
                                                           program_id=program_id,
+                                                          playlist=playlist,
+                                                          playlist_id=playlist_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -774,6 +712,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                           memory_utilization=memory,
                                                           program=program,
                                                           program_id=program_id,
+                                                          playlist=playlist,
+                                                          playlist_id=playlist_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -789,6 +729,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                           memory_utilization=memory,
                                                           program=program,
                                                           program_id=program_id,
+                                                          playlist=playlist,
+                                                          playlist_id=playlist_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -809,6 +751,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                       memory_utilization=memory,
                                                       program=program,
                                                       program_id=program_id,
+                                                      playlist=playlist,
+                                                      playlist_id=playlist_id,
                                                       last_error=last_error,
                                                       resolved=True,
                                                       resolved_datetime=utc_now)
@@ -824,6 +768,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                       memory_utilization=memory,
                                                       program=program,
                                                       program_id=program_id,
+                                                      playlist=playlist,
+                                                      playlist_id=playlist_id,
                                                       last_error=last_error,
                                                       resolved=True,
                                                       resolved_datetime=utc_now)
@@ -839,6 +785,8 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
                                                       memory_utilization=memory,
                                                       program=program,
                                                       program_id=program_id,
+                                                      playlist=playlist,
+                                                      playlist_id=playlist_id,
                                                       last_error=last_error,
                                                       resolved=True,
                                                       resolved_datetime=utc_now)
@@ -915,6 +863,29 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
             device.archived = True
             device.put()
             self.response.headers.pop('Content-Type', None)
+        self.response.set_status(status, message)
+
+    @requires_api_token
+    def panel_sleep(self, device_urlsafe_key):
+        status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
+        if device:
+            user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
+            if user_identifier is None or user_identifier == '':
+                user_identifier = 'system'
+
+            request_json = json.loads(self.request.body)
+            panel_sleep = request_json["panelSleep"]
+            device = ndb.Key(urlsafe=device_urlsafe_key).get()
+            device.panel_sleep = panel_sleep
+            device.put()
+
+            change_intent(
+                gcm_registration_id=device.gcm_registration_id,
+                payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                device_urlsafe_key=device_urlsafe_key,
+                host=self.request.host_url,
+                user_identifier=user_identifier)
+
         self.response.set_status(status, message)
 
     @staticmethod

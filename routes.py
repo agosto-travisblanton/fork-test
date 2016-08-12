@@ -131,15 +131,15 @@ application = WSGIApplication(
               handler_method='get_latest_issues',
               methods=['GET']
               ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/panel-sleep',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='panel_sleep',
+              handler_method='panel_sleep',
+              methods=['PUT']
+              ),
         Route(r'/api/v1/devices/<device_urlsafe_key>/commands',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
               name='device-commands',
-              ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/panel-sleep',
-              handler='handlers.device_commands_handler.DeviceCommandsHandler',
-              name='panel_sleep',
-              handler_method='panel_sleep',
-              methods=['POST']
               ),
         Route(r'/api/v1/devices/<device_urlsafe_key>/commands/reset',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
@@ -208,7 +208,6 @@ application = WSGIApplication(
               methods=['POST']
               ),
 
-
         ############################################################
         # (DISTRIBUTOR) DEVICE ROUTES
         ############################################################
@@ -230,15 +229,6 @@ application = WSGIApplication(
               methods=['GET']
               ),
         ############################################################
-        # MATCH
-        ############################################################
-        Route(r'/api/v1/distributors/match/<distributor_urlsafe_key>/devices',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='match_for_device',
-              handler_method='match_for_device',
-              methods=['GET']
-              ),
-        ############################################################
         # TENANT ROUTES
         ############################################################
         # PAGINATED TENANT DEVICE LIST
@@ -256,15 +246,6 @@ application = WSGIApplication(
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='search_for_device_by_tenant',
               handler_method='search_for_device_by_tenant',
-              methods=['GET']
-              ),
-        ############################################################
-        # MATCH
-        ############################################################
-        Route(r'/api/v1/tenants/match/<tenant_urlsafe_key>/devices',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='match_for_device_by_tenant',
-              handler_method='match_for_device_by_tenant',
               methods=['GET']
               ),
         ############################################################
@@ -356,6 +337,35 @@ application = WSGIApplication(
               ),
 
         ############################################################
+        # OVERLAY
+        ############################################################
+
+        Route(r'/api/v1/overlay',
+              handler='handlers.overlay_handler.OverlayHandler',
+              name='post-overlay',
+              handler_method='post',
+              methods=['POST'],
+              ),
+
+        ############################################################
+        # IMAGE
+        ############################################################
+
+        Route(r'/api/v1/image/<image_urlsafe_key>',
+              handler='handlers.image_handler.ImageHandler',
+              name='get_image_by_key',
+              handler_method='get_image_by_key',
+              methods=['GET'],
+              ),
+
+        Route(r'/api/v1/image',
+              handler='handlers.image_handler.ImageHandler',
+              name='post-image',
+              handler_method='post',
+              methods=['POST'],
+              ),
+
+        ############################################################
         # DEVICE MONITORING
         ############################################################
 
@@ -426,15 +436,28 @@ application = WSGIApplication(
               methods=['GET']
               ),
 
-
         ############################################################
-        # Google Directory API Interrogation
+        # REPORT API
         ############################################################
 
-        Route(r'/api/v1/chrome-os-devices',
-              handler='handlers.interrogate_directory_api_handler.InterrogateDirectoryApiHandler',
-              name='chrome-os-device-interrogation',
-              handler_method='lookup_device_by_parameter',
+        Route(r'/api/reports/v1/chrome_os_device',
+              handler='handlers.reports.chrome_device_management_handler.ChromeDeviceManagementHandler',
+              name='chrome-os-device',
+              handler_method='get_device_by_parameters',
+              methods=['GET']
+              ),
+
+        Route(r'/api/reports/v1/chrome_os_devices',
+              handler='handlers.reports.chrome_device_management_handler.ChromeDeviceManagementHandler',
+              name='chrome-os-devices',
+              handler_method='get_device_list',
+              methods=['GET']
+              ),
+
+        Route(r'/api/reports/v1/chrome_os_devices/count',
+              handler='handlers.reports.chrome_device_management_handler.ChromeDeviceManagementHandler',
+              name='chrome-os-devices-count',
+              handler_method='get_devices_count',
               methods=['GET']
               ),
 

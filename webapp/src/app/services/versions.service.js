@@ -1,11 +1,12 @@
-angular.module('skykitProvisioning').factory('VersionsService', Restangular =>
-  new class VersionsService {
-    constructor() {
-    }
+export default class VersionsService {
 
-    getVersions() {
-      let promise = Restangular.oneUrl('versions').get();
-      return promise;
-    }
-  }()
-);
+  constructor(Restangular) {
+    'ngInject';
+    this.Restangular = Restangular
+  }
+
+  getVersions() {
+    let promise = this.Restangular.oneUrl('versions').get();
+    return promise;
+  }
+}

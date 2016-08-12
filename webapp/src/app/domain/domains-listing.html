@@ -1,4 +1,4 @@
-<div ng-controller="DomainsCtrl" ng-init="domainsCtrl.initialize()" layout="column" ng-cloak>
+<div ng-controller="DomainsCtrl as vm" ng-init="vm.initialize()" layout="column" ng-cloak>
   <md-toolbar class="md-hue-2">
     <div class="md-toolbar-tools">
       <h2 class="md-flex"><i class="fa fa-fw fa-cube ng-scope"></i> Domains</h2>
@@ -25,13 +25,13 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-hide="domainsCtrl.domains.length">
+                <tr ng-hide="vm.domains.length">
                   <td class="no-devices text-center text-danger" colspan="4">No domains</td>
                 </tr>
-                <tr ng-repeat="item in domainsCtrl.domains | orderBy:'-created'"
-                    ng-click="domainsCtrl.editItem(item)">
+                <tr ng-repeat="item in vm.domains | orderBy:'-created'"
+                    ng-click="vm.editItem(item)">
                   <td>
-                    <a ng-click="domainsCtrl.editItem(item)" title="Domain detail">
+                    <a ng-click="vm.editItem(item)" title="Domain detail">
                       <ng-md-icon icon="mode_edit" size="48">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24"
                              height="24">
@@ -43,7 +43,7 @@
                     </a>
                   </td>
                   <td class="domain-key"><a name="edit-domain" class="md-primary md-ink-ripple"
-                                            ng-click="domainsCtrl.editItem(item)"
+                                            ng-click="vm.editItem(item)"
                                             title="Edit domain">{{item.name}}</a></td>
                   <td class="domain-impersonation-admin-email-address">
                     {{item.impersonation_admin_email_address}}

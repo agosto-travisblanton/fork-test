@@ -5,7 +5,7 @@ from webtest import AppError
 setup_test_paths()
 
 import json
-from content_manager_api import ContentManagerApi
+from integrations.content_manager.content_manager_api import ContentManagerApi
 from agar.test import BaseTest, WebTest
 from models import Tenant, TENANT_ENTITY_GROUP_NAME, Distributor, Domain, ChromeOsDevice
 from routes import application
@@ -80,6 +80,17 @@ class TestTenantsHandler(BaseTest, WebTest):
         response = self.app.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 5)
+
+    def test_get_with_search_query_param_returns_json_resources(self):
+        amount = 6
+        self.load_tenants(amount=amount)
+        filtering_on = '1'
+        request_parameters = {'tenant_name': filtering_on}
+        uri = application.router.build(None, 'tenants', None, {})
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response_json = json.loads(response.body)
+        self.assertEqual(len(response_json), 1)
+        self.assertTrue(filtering_on in response_json[0]["name"])
 
     def test_get_returns_json_resources_paginated(self):
         self.load_tenants(amount=100)

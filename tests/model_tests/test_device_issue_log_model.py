@@ -6,7 +6,7 @@ from env_setup import setup_test_paths
 setup_test_paths()
 
 from agar.test import BaseTest
-from models import Domain, Distributor, DeviceIssueLog, ChromeOsDevice, Tenant, IssueLevel
+from models import Domain, Distributor, DeviceIssueLog, ChromeOsDevice, Tenant
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -27,7 +27,15 @@ class TestDeviceIssueLogModel(BaseTest):
     STORAGE_UTILIZATION = 99
     MEMORY_UTILIZATION = 8
     PROGRAM = 'some program'
+    PLAYLIST = 'some playlist'
     CURRENT_CLASS_VERSION = 1
+    NORMAL_LEVEL = 0
+    NORMAL_LEVEL_DESCRIPTION = 'Normal'
+    WARNING_LEVEL = 1
+    WARNING_LEVEL_DESCRIPTION = 'Warning'
+    DANGER_LEVEL = 2
+    DANGER_LEVEL_DESCRIPTION = 'Danger'
+
 
     def setUp(self):
         super(TestDeviceIssueLogModel, self).setUp()
@@ -60,17 +68,19 @@ class TestDeviceIssueLogModel(BaseTest):
                                       up=False,
                                       storage_utilization=self.STORAGE_UTILIZATION,
                                       memory_utilization=self.MEMORY_UTILIZATION,
-                                      program=self.PROGRAM)
+                                      program=self.PROGRAM,
+                                      playlist=self.PLAYLIST)
         self.assertEqual(issue.device_key, self.device_key)
         self.assertEqual(issue.category, config.DEVICE_ISSUE_PLAYER_DOWN)
-        self.assertEqual(issue.level, IssueLevel.Danger)
-        self.assertEqual(issue.level_descriptor, IssueLevel.stringify(IssueLevel.Danger))
+        self.assertEqual(issue.level, self.DANGER_LEVEL)
+        self.assertEqual(issue.level_descriptor,self.DANGER_LEVEL_DESCRIPTION)
         self.assertFalse(issue.up)
         self.assertFalse(issue.resolved)
         self.assertIsNone(issue.resolved_datetime)
         self.assertEqual(issue.storage_utilization, self.STORAGE_UTILIZATION)
         self.assertEqual(issue.memory_utilization, self.MEMORY_UTILIZATION)
         self.assertEqual(issue.program, self.PROGRAM)
+        self.assertEqual(issue.playlist, self.PLAYLIST)
         self.assertIsNone(issue.program_id)
         self.assertIsNone(issue.last_error)
         self.assertIsNone(issue.created)
@@ -85,8 +95,8 @@ class TestDeviceIssueLogModel(BaseTest):
                                       program=self.PROGRAM)
         self.assertEqual(issue.device_key, self.device_key)
         self.assertEqual(issue.category, config.DEVICE_ISSUE_PLAYER_UP)
-        self.assertEqual(issue.level, IssueLevel.Normal)
-        self.assertEqual(issue.level_descriptor, IssueLevel.stringify(IssueLevel.Normal))
+        self.assertEqual(issue.level, self.NORMAL_LEVEL)
+        self.assertEqual(issue.level_descriptor, self.NORMAL_LEVEL_DESCRIPTION)
         self.assertTrue(issue.up)
 
     def test_class_version_is_only_set_by_pre_put_hook_method(self):
@@ -168,12 +178,12 @@ class TestDeviceIssueLogModel(BaseTest):
         DeviceIssueLog.resolve_device_storage_issues(self.device_key, resolved_datetime)
         self.assertTrue(issue_1.resolved)
         self.assertEqual(issue_1.resolved_datetime, resolved_datetime)
-        self.assertEqual(issue_1.level, IssueLevel.Warning)
-        self.assertEqual(issue_1.level_descriptor, IssueLevel.stringify(IssueLevel.Warning))
+        self.assertEqual(issue_1.level, self.WARNING_LEVEL)
+        self.assertEqual(issue_1.level_descriptor, self.WARNING_LEVEL_DESCRIPTION)
         self.assertTrue(issue_2.resolved)
         self.assertEqual(issue_2.resolved_datetime, resolved_datetime)
-        self.assertEqual(issue_2.level, IssueLevel.Warning)
-        self.assertEqual(issue_2.level_descriptor, IssueLevel.stringify(IssueLevel.Warning))
+        self.assertEqual(issue_2.level, self.WARNING_LEVEL)
+        self.assertEqual(issue_2.level_descriptor, self.WARNING_LEVEL_DESCRIPTION)
 
     def test_resolve_device_memory_issues(self):
         issue_1 = DeviceIssueLog.create(device_key=self.device_key,
@@ -192,12 +202,12 @@ class TestDeviceIssueLogModel(BaseTest):
         DeviceIssueLog.resolve_device_memory_issues(self.device_key, resolved_datetime)
         self.assertTrue(issue_1.resolved)
         self.assertEqual(issue_1.resolved_datetime, resolved_datetime)
-        self.assertEqual(issue_1.level, IssueLevel.Warning)
-        self.assertEqual(issue_1.level_descriptor, IssueLevel.stringify(IssueLevel.Warning))
+        self.assertEqual(issue_1.level, self.WARNING_LEVEL)
+        self.assertEqual(issue_1.level_descriptor, self.WARNING_LEVEL_DESCRIPTION)
         self.assertTrue(issue_2.resolved)
         self.assertEqual(issue_2.resolved_datetime, resolved_datetime)
-        self.assertEqual(issue_2.level, IssueLevel.Warning)
-        self.assertEqual(issue_2.level_descriptor, IssueLevel.stringify(IssueLevel.Warning))
+        self.assertEqual(issue_2.level, self.WARNING_LEVEL)
+        self.assertEqual(issue_2.level_descriptor, self.WARNING_LEVEL_DESCRIPTION)
 
     def test_resolve_device_down_issues(self):
         issue = DeviceIssueLog.create(device_key=self.device_key,
@@ -211,13 +221,13 @@ class TestDeviceIssueLogModel(BaseTest):
         self.assertFalse(issue.up)
         self.assertFalse(issue.resolved)
         self.assertIsNone(issue.resolved_datetime)
-        self.assertEqual(issue.level, IssueLevel.Danger)
-        self.assertEqual(issue.level_descriptor, IssueLevel.stringify(IssueLevel.Danger))
+        self.assertEqual(issue.level, self.DANGER_LEVEL)
+        self.assertEqual(issue.level_descriptor, self.DANGER_LEVEL_DESCRIPTION)
         resolved_datetime = datetime.utcnow()
         DeviceIssueLog.resolve_device_down_issues(self.device_key, resolved_datetime)
         self.assertTrue(issue.up)
-        self.assertEqual(issue.level, IssueLevel.Danger)
-        self.assertEqual(issue.level_descriptor, IssueLevel.stringify(IssueLevel.Danger))
+        self.assertEqual(issue.level, self.DANGER_LEVEL)
+        self.assertEqual(issue.level_descriptor, self.DANGER_LEVEL_DESCRIPTION)
         self.assertTrue(issue.resolved)
         self.assertEqual(issue.resolved_datetime, resolved_datetime)
 
@@ -261,40 +271,40 @@ class TestDeviceIssueLogModel(BaseTest):
                                       category=config.DEVICE_ISSUE_FIRST_HEARTBEAT,
                                       up=True)
         issue.put()
-        self.assertEqual(issue.level, IssueLevel.Normal)
-        self.assertEqual(issue.level_descriptor, IssueLevel.stringify(IssueLevel.Normal))
+        self.assertEqual(issue.level, self.NORMAL_LEVEL)
+        self.assertEqual(issue.level_descriptor, self.NORMAL_LEVEL_DESCRIPTION)
 
     def test_player_version_change_has_issue_level_normal(self):
         issue = DeviceIssueLog.create(device_key=self.device_key,
                                       category=config.DEVICE_ISSUE_PLAYER_VERSION_CHANGE,
                                       up=True)
         issue.put()
-        self.assertEqual(issue.level, IssueLevel.Normal)
-        self.assertEqual(issue.level_descriptor, IssueLevel.stringify(IssueLevel.Normal))
+        self.assertEqual(issue.level, self.NORMAL_LEVEL)
+        self.assertEqual(issue.level_descriptor, self.NORMAL_LEVEL_DESCRIPTION)
 
     def test_os_change_has_issue_level_normal(self):
         issue = DeviceIssueLog.create(device_key=self.device_key,
                                       category=config.DEVICE_ISSUE_OS_CHANGE,
                                       up=True)
         issue.put()
-        self.assertEqual(issue.level, IssueLevel.Normal)
-        self.assertEqual(issue.level_descriptor, IssueLevel.stringify(IssueLevel.Normal))
+        self.assertEqual(issue.level, self.NORMAL_LEVEL)
+        self.assertEqual(issue.level_descriptor, self.NORMAL_LEVEL_DESCRIPTION)
 
     def test_os_version_change_has_issue_level_normal(self):
         issue = DeviceIssueLog.create(device_key=self.device_key,
                                       category=config.DEVICE_ISSUE_OS_VERSION_CHANGE,
                                       up=True)
         issue.put()
-        self.assertEqual(issue.level, IssueLevel.Normal)
-        self.assertEqual(issue.level_descriptor, IssueLevel.stringify(IssueLevel.Normal))
+        self.assertEqual(issue.level, self.NORMAL_LEVEL)
+        self.assertEqual(issue.level_descriptor, self.NORMAL_LEVEL_DESCRIPTION)
 
     def test_timezone_change_has_issue_level_normal(self):
         issue = DeviceIssueLog.create(device_key=self.device_key,
                                       category=config.DEVICE_ISSUE_TIMEZONE_CHANGE,
                                       up=True)
         issue.put()
-        self.assertEqual(issue.level, IssueLevel.Normal)
-        self.assertEqual(issue.level_descriptor, IssueLevel.stringify(IssueLevel.Normal))
+        self.assertEqual(issue.level, self.NORMAL_LEVEL)
+        self.assertEqual(issue.level_descriptor, self.NORMAL_LEVEL_DESCRIPTION)
 
     def test_device_not_reported_yet_method_when_no_records_retrieved(self):
         mac_address='i3234i03554350'

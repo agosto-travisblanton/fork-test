@@ -1,20 +1,18 @@
-angular.module('skykitProvisioning').factory('ProgressBarService', ngProgressFactory =>
-  new class ProgressBarService {
-    constructor() {
-      this.progressBar = ngProgressFactory.createInstance();
-    }
+export default class ProgressBarService {
 
-    start() {
-      this.progressBar.setColor('#00FCFF');
-      this.progressBar.setHeight('4px');
-      return this.progressBar.start();
-    }
+  constructor(ngProgressFactory) {
+    'ngInject';
+    this.ngProgressFactory = ngProgressFactory
+    this.progressBar = this.ngProgressFactory.createInstance();
+  }
 
-    complete() {
-      return this.progressBar.complete();
-    }
-  }()
-);
+  start() {
+    this.progressBar.setColor('#00FCFF');
+    this.progressBar.setHeight('4px');
+    return this.progressBar.start();
+  }
 
-
-
+  complete() {
+    return this.progressBar.complete();
+  }
+}

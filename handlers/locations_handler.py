@@ -26,7 +26,13 @@ class LocationsHandler(RequestHandler, KeyValidatorMixin):
     @requires_api_token
     def get_locations_by_tenant(self, tenant_urlsafe_key):
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
-        query_results = Location.query(Location.tenant_key == tenant_key).order(Location.customer_location_code).fetch()
+
+        customer_location_name = self.request.get("customer_location_name")
+        if customer_location_name:
+            query_results = Location.find_by_partial_location_name(customer_location_name)
+        else:
+            query_results = Location.query(Location.tenant_key == tenant_key).order(Location.customer_location_code).fetch()
+
         json_response(self.response, query_results, strategy=LOCATION_STRATEGY)
 
     @requires_api_token

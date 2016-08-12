@@ -65,6 +65,11 @@ class TestTenantModel(BaseTest):
         self.assertEqual(actual.key, self.tenant_key)
         self.assertEqual(actual.name, self.NAME)
 
+    def test_find_by_partial_name_returns_list_of_matching_tenants(self):
+        actual = Tenant.find_by_partial_name(self.NAME)
+        self.assertEqual(actual[0].key, self.tenant_key)
+        self.assertEqual(actual[0].name, self.NAME)
+
     def test_find_by_name_returns_none_when_no_matching_tenant_found(self):
         actual = Tenant.find_by_name('barfood tenant')
         self.assertIsNone(actual)
@@ -175,58 +180,6 @@ class TestTenantModel(BaseTest):
     def test_get_domain_returns_domain_representation(self):
         domain = self.tenant.get_domain()
         self.assertEqual(domain, self.domain)
-
-    def test_match_device_with_full_mac(self):
-        mac_address = '1231233434'
-        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
-                                               mac_address=mac_address)
-        device.put()
-        is_match = Tenant.match_device_with_full_mac(
-            tenant_keys=[self.tenant_key],
-            unmanaged=False,
-            full_mac=mac_address)
-        self.assertTrue(is_match)
-
-    def test_match_device_with_full_mac_archived(self):
-        mac_address = '1231233434'
-        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
-                                               mac_address=mac_address)
-        device.archived = True
-        device.put()
-        is_match = Tenant.match_device_with_full_mac(
-            tenant_keys=[self.tenant_key],
-            unmanaged=False,
-            full_mac=mac_address)
-        self.assertFalse(is_match)
-
-    def test_match_device_with_full_serial(self):
-        serial_number = 'SN123-123-3434'
-        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
-                                               mac_address='123123123')
-        device.serial_number = serial_number
-        device.put()
-        is_match = Tenant.match_device_with_full_serial(
-            tenant_keys=[self.tenant_key],
-            unmanaged=False,
-            full_serial=serial_number)
-        self.assertTrue(is_match)
-
-    def test_match_device_with_full_serial_archived(self):
-        serial_number = 'SN123-123-3434'
-        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
-                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
-                                               mac_address='123123123')
-        device.serial_number = serial_number
-        device.archived = True
-        device.put()
-        is_match = Tenant.match_device_with_full_serial(
-            tenant_keys=[self.tenant_key],
-            unmanaged=False,
-            full_serial=serial_number)
-        self.assertFalse(is_match)
 
     def test_find_devices_with_partial_serial(self):
         serial_number = 'SN445-123-3434'
