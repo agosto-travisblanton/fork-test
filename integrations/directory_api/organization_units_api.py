@@ -92,7 +92,7 @@ class OrganizationUnitsApi(object):
 
         sub_org_unit_name = self._get_sub_org_unit_name(screen_rotation=screen_rotation)
         self._add_sub_org_unit(ou_api=ou_api,
-                               parent_org_unit_path=tenant_code,
+                               parent_org_unit_path='{0}/{1}'.format(self.TOP_LEVEL_ORG_UNIT_PATH, tenant_code),
                                sub_org_unit_name=sub_org_unit_name)
 
         return response
