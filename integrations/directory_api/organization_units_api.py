@@ -1,3 +1,5 @@
+import json
+
 from app_config import config
 from googleapiclient import discovery
 from googleapiclient.errors import HttpError
@@ -14,7 +16,7 @@ class OrganizationUnitsApi(object):
         'https://www.googleapis.com/auth/admin.directory.orgunit'
     ]
 
-    PARENT_ORG_UNIT_PATH = '/skykit'
+    TOP_LEVEL_ORG_UNIT_PATH = '/skykit'
 
     def __init__(self,
                  admin_to_impersonate_email_address,
@@ -61,7 +63,7 @@ class OrganizationUnitsApi(object):
     # GET https://www.googleapis.com/admin/directory/v1/customer/my_customer/orgunits?orgUnitPath=skykit&key={API_KEY}
     def list(self, parent_organization_unit_path=None):
         if parent_organization_unit_path is None:
-            parent_organization_unit_path = self.PARENT_ORG_UNIT_PATH
+            parent_organization_unit_path = self.TOP_LEVEL_ORG_UNIT_PATH
         ou_api = self.discovery_service.orgunits()
         request = ou_api.list(customerId=config.GOOGLE_CUSTOMER_ID,
                               orgUnitPath=parent_organization_unit_path)
@@ -73,31 +75,48 @@ class OrganizationUnitsApi(object):
 
     # https://www.googleapis.com/admin/directory/v1/customer/my_customer/orgunits
     def insert(self, tenant_code, screen_rotation=0):
-
-        parent_org_unit_path = self.PARENT_ORG_UNIT_PATH
-        org_unit_path = self._get_org_unit_path(tenant_code=tenant_code, screen_rotation=screen_rotation)
-
         ou_api = self.discovery_service.orgunits()
         request_body = {
             "name": tenant_code,
             "description": 'OU for '.format(tenant_code),
+            "parentOrgUnitPath": self.TOP_LEVEL_ORG_UNIT_PATH
+        }
+        request = ou_api.insert(customerId=config.GOOGLE_CUSTOMER_ID, body=request_body)
+        try:
+            response = request.execute()
+        except HttpError, error:
+            # Note: Directory API returns a 400 if OU exists w/ message "Invalid Ou Id"
+            reason = json.loads(error.content)
+            response = {'statusCode': error.resp.status, 'statusText': reason['error']['message']}
+            return response
+
+        sub_org_unit_name = self._get_sub_org_unit_name(screen_rotation=screen_rotation)
+        self._add_sub_org_unit(ou_api=ou_api,
+                               parent_org_unit_path=tenant_code,
+                               sub_org_unit_name=sub_org_unit_name)
+
+        return response
+
+    @staticmethod
+    def _add_sub_org_unit(ou_api, parent_org_unit_path, sub_org_unit_name):
+        ou_api = ou_api
+        request_body = {
+            "name": sub_org_unit_name,
+            "description": 'Display rotation sub OU for tenant '.format(parent_org_unit_path),
             "parentOrgUnitPath": parent_org_unit_path
         }
         request = ou_api.insert(customerId=config.GOOGLE_CUSTOMER_ID, body=request_body)
         try:
             response = request.execute()
-        except HttpError, err:
-            response = {'statusCode': err.resp.status}
+        except HttpError, error:
+            # Note: Directory API returns a 400 if OU exists w/ message "Invalid Ou Id"
+            reason = json.loads(error.content)
+            response = {'statusCode': error.resp.status, 'statusText': reason['error']['message']}
         return response
 
     @staticmethod
-    def _get_org_unit_path(tenant_code, screen_rotation=0):
-        if screen_rotation is 90:
-            org_unit_path = '/{0}/screen_rotation_90'.format(tenant_code)
-        elif screen_rotation is 180:
-            org_unit_path = '/{0}/screen_rotation_180'.format(tenant_code)
-        elif screen_rotation is 270:
-            org_unit_path = '/{0}/screen_rotation_270'.format(tenant_code)
+    def _get_sub_org_unit_name(screen_rotation=0):
+        if screen_rotation in [90, 180, 270]:
+            return 'screen_rotation_{0}'.format(screen_rotation)
         else:
-            org_unit_path = '/{0}/screen_rotation_0'.format(tenant_code)
-        return org_unit_path
+            return 'screen_rotation_0'

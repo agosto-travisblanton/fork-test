@@ -88,9 +88,8 @@ class TenantOrganizationUnitsHandler(RequestHandler):
                     admin_to_impersonate_email_address=impersonation_email, int_credentials=True)
                 result = organization_units_api.insert(tenant_code=tenant_code,
                                                        screen_rotation=screen_rotation)
-                if 'statusCode' in result.keys():
-                    self.response.set_status(result['statusCode'])
-                    return
+                if 'statusCode' in result.keys() and 'statusText' in result.keys():
+                    self.response.set_status(result['statusCode'], result['statusText'])
             else:
                 self.response.set_status(status, error_message)
         else:
