@@ -791,10 +791,10 @@ describe('DeviceDetailsCtrl', function () {
         promise.resolve(toResolve)
 
         expect(controller.OVERLAY_TYPES.slice(-1)[0]).toEqual({
-          realName: toResolve.name,
-          name: 'LOGO: ' + toResolve.name,
+          realName: toResolve[0].name,
+          name: 'LOGO: ' + toResolve[0].name,
           type: 'LOGO',
-          image_key: toResolve.key
+          image_key: toResolve[0].key
         });
       });
     });
