@@ -26,16 +26,10 @@ class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
 
         # key representes position
         for key, value in request_json.iteritems():
-            overlay_type = value.get("type")
+            overlay_type = self.check_and_get_field('type', value)
 
             # image_key can be None, it is optional
             image_key = value.get("image_key")
-
-            if not overlay_type or overlay_type == '':
-                return json_response(self.response, {
-                    "success": False,
-                    "message": "Missing overlay_type"
-                }, status_code=400)
 
             overlay_template.set_overlay(position=key, overlay_type=overlay_type,
                                          image_urlsafe_key=image_key)
