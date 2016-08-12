@@ -782,7 +782,6 @@ describe('DeviceDetailsCtrl', function () {
 
       it('adds retrived Image values to OVERLAY_TYPES', () => {
         controller.getTenantImages()
-        let originalOverlayTypes = angular.copy(controller.OVERLAY_TYPES);
 
         let toResolve = [{
           name: "blah",
@@ -792,10 +791,10 @@ describe('DeviceDetailsCtrl', function () {
         promise.resolve(toResolve)
 
         expect(controller.OVERLAY_TYPES.slice(-1)[0]).toEqual({
-          realName: 'blah',
-          name: 'LOGO: blah',
+          realName: toResolve.name,
+          name: 'LOGO: ' + toResolve.name,
           type: 'LOGO',
-          image_key: 'blah2'
+          image_key: toResolve.key
         });
       });
     });
