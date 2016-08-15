@@ -512,7 +512,7 @@ def _DEFAULT_PROOF_OF_PLAY_URL():
     elif on_continuous_integration_server:
         return 'https://skykit-display-device-ci.appspot.com/proofplay/api/v1/post_new_program_play'
     elif on_qa_server:
-        return 'https://skykit-display-device-qa.appspot.com/proofplay/api/v1/post_new_program_play'
+        return 'https://skykit-provisioning-qa.appspot.com/proofplay/api/v1/post_new_program_play'
     elif on_stage_server:
         return 'https://skykit-provisioning-stage.appspot.com/proofplay/api/v1/post_new_program_play'
     elif on_gamestop_server:
