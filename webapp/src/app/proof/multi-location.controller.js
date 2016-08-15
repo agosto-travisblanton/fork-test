@@ -48,8 +48,7 @@ function ProofOfPlayMultiLocationCtrl(ProofPlayService, $stateParams, $state, To
     vm.loading = true;
     vm.disabled = true;
     vm.selected_locations = [];
-    ProofPlayService.proofplayCache.removeAll();
-    return vm.initialize();
+    vm.initialize();
   };
 
   vm.addToSelectedLocations = function (searchText) {
