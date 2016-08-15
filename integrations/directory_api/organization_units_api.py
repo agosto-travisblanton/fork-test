@@ -78,7 +78,7 @@ class OrganizationUnitsApi(object):
         ou_api = self.discovery_service.orgunits()
         request_body = {
             "name": tenant_code,
-            "description": 'OU for '.format(tenant_code),
+            "description": 'OU for {0}'.format(tenant_code),
             "parentOrgUnitPath": self.TOP_LEVEL_ORG_UNIT_PATH
         }
         request = ou_api.insert(customerId=config.GOOGLE_CUSTOMER_ID, body=request_body)
@@ -102,7 +102,7 @@ class OrganizationUnitsApi(object):
         ou_api = ou_api
         request_body = {
             "name": sub_org_unit_name,
-            "description": 'Display rotation sub OU for tenant '.format(parent_org_unit_path),
+            "description": 'Display rotation sub OU for tenant {0}'.format(parent_org_unit_path),
             "parentOrgUnitPath": parent_org_unit_path
         }
         request = ou_api.insert(customerId=config.GOOGLE_CUSTOMER_ID, body=request_body)
