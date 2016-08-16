@@ -15,12 +15,15 @@ class ChromeDeviceManagementHandler(RequestHandler):
         if device_mac_address and impersonation_email:
             device = get_chrome_os_device_by_mac_address(device_mac_address=device_mac_address,
                                                          impersonation_email=impersonation_email)
-            print('{0}; {1}; {2}; {3}'.format(
-                device.get('macAddress'),
-                device.get('serialNumber'),
-                device.get('orgUnitPath'),
-                device.get('status')))
-            json_response(self.response, device, strategy=CHROME_OS_DEVICE_STRATEGY)
+            if device is None:
+                return self.response.set_status(404)
+            else:
+                print('{0}; {1}; {2}; {3}'.format(
+                    device.get('macAddress'),
+                    device.get('serialNumber'),
+                    device.get('orgUnitPath'),
+                    device.get('status')))
+                json_response(self.response, device, strategy=CHROME_OS_DEVICE_STRATEGY)
         else:
             message = 'Missing information in request body.'
             return self.response.set_status(400, message)
