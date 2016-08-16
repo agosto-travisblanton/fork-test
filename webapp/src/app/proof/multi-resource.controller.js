@@ -55,8 +55,7 @@ function ProofOfPlayMultiResourceCtrl(ProofPlayService, $stateParams, $state, To
     vm.loading = true;
     vm.disabled = true;
     vm.selected_resources = [];
-    ProofPlayService.proofplayCache.removeAll();
-    return vm.initialize();
+    vm.initialize();
   };
 
   vm.addToSelectedResources = function (searchText) {

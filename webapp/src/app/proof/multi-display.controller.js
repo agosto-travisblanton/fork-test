@@ -50,8 +50,7 @@ function ProofOfPlayMultiDisplayCtrl(ProofPlayService, $stateParams, $state, Toa
     vm.loading = true;
     vm.disabled = true;
     vm.selected_displays = [];
-    ProofPlayService.proofplayCache.removeAll();
-    return vm.initialize();
+    vm.initialize();
   };
 
   vm.addToSelectedDisplays = function (searchText) {

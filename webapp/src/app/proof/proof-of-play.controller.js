@@ -40,8 +40,7 @@ function ProofOfPlayCtrl(ProofPlayService, $stateParams, $state, ToastsService) 
   vm.refreshTenants = function () {
     vm.tenants = null;
     let url = ProofPlayService.makeHTTPURL("/retrieve_my_tenants", '');
-    ProofPlayService.proofplayCache.remove(url);
-    return vm.initialize();
+    vm.initialize();
   };
 
 
