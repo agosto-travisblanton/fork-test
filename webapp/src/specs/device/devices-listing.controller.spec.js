@@ -331,63 +331,31 @@ describe('DevicesListingCtrl', function () {
 
 
   describe('.isResourceValid', function () {
-    let resource = 'my-resource';
 
     beforeEach(function () {
       controller = $controller('DevicesListingCtrl', {});
-      promise = new skykitProvisioning.q.Mock();
-      serialPromise = new skykitProvisioning.q.Mock();
-      gcmidPromise = new skykitProvisioning.q.Mock();
-      spyOn(DevicesService, 'searchDevices').and.returnValue(promise);
     });
 
-    it("searchDevices called when unmanaged and button is mac", function () {
-      let unmanaged = true;
-      controller.unmanagedSelectedButton = "MAC";
-      controller.isResourceValid(unmanaged, resource);
-      promise.resolve({"is_match": false});
-      return expect(DevicesService.searchDevices).toHaveBeenCalled()
-    });
+    it('returns true when called resource is in vm.devicesToMatchOnManaged and managed', function () {
+      controller.devicesToMatchOnManaged = ["one", "two"]
+      expect(controller.isResourceValid(false, "one")).toBeTruthy()
+    })
 
-    it("searchDevices called when unmanaged and button is not mac", function () {
-      let unmanaged = true;
-      controller.unmanagedSelectedButton = "Serial Number";
-      controller.isResourceValid(unmanaged, resource);
-      promise.resolve({"is_match": false});
-      return expect(DevicesService.searchDevices).toHaveBeenCalled()
-    });
+    it('returns false when called resource is not in vm.devicesToMatchOnManaged and managed', function () {
+      controller.devicesToMatchOnManaged = ["one", "two"]
+      expect(controller.isResourceValid(false, "blah")).toBeFalsy();
+    })
 
-    it("searchDevices called when unmanaged and button is gcmid", function () {
-      let unmanaged = true;
-      controller.unmanagedSelectedButton = "GCM ID";
-      controller.isResourceValid(unmanaged, resource);
-      promise.resolve({"is_match": false});
-      return expect(DevicesService.searchDevices).toHaveBeenCalled()
-    });
 
-    it("searchDevices called when managed and button is gcmid", function () {
-      let unmanaged = false;
-      controller.selectedButton = "GCM ID";
-      controller.isResourceValid(unmanaged, resource);
-      promise.resolve({"is_match": false});
-      return expect(DevicesService.searchDevices).toHaveBeenCalled()
-    });
+    it('returns true when called resource is in vm.devicesToMatchOnUnmanaged and unmanaged', function () {
+      controller.devicesToMatchOnUnmanaged = ["one", "two"]
+      expect(controller.isResourceValid(true, "one")).toBeTruthy()
+    })
 
-    it("searchDevices called when managed and button is mac", function () {
-      let unmanaged = false;
-      controller.selectedButton = "MAC";
-      controller.isResourceValid(unmanaged, resource);
-      promise.resolve({"is_match": false});
-      return expect(DevicesService.searchDevices).toHaveBeenCalled()
-    });
-
-    return it("searchDevices called when managed and button is not mac", function () {
-      let unmanaged = false;
-      controller.selectedButton = "Serial Number";
-      controller.isResourceValid(unmanaged, resource);
-      promise.resolve({"is_match": false});
-      return expect(DevicesService.searchDevices).toHaveBeenCalled()
-    });
+    it('returns false when called resource is not in vm.devicesToMatchOnUnmanaged and unmanaged', function () {
+      controller.devicesToMatchOnUnmanaged = ["one", "two"]
+      expect(controller.isResourceValid(true, "blah")).toBeFalsy();
+    })
   });
 
   return describe('.searchDevices', function () {

@@ -126,7 +126,6 @@ function TenantManagedDevicesCtrl($scope, $stateParams, TenantsService, DevicesS
     return vm.loadingDisabled = false;
   };
 
-
   vm.isResourceValid = function (resource) {
     let foundMatch = false;
     for (let item of vm.devicesToMatchOn) {
@@ -135,11 +134,10 @@ function TenantManagedDevicesCtrl($scope, $stateParams, TenantsService, DevicesS
       }
     }
     vm.controlOpenButton(foundMatch)
+    return foundMatch
   };
-
 
   return vm;
 }
-
 
 export {TenantManagedDevicesCtrl}

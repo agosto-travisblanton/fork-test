@@ -47,13 +47,12 @@ function DevicesListingCtrl($stateParams, $log, DevicesService, $state, Sessions
       vm.unmanagedSearchText = '';
       vm.unmanagedDisabled = true;
       vm.unmanagedSerialDevices = {};
-      return vm.unmanagedMacDevices = {};
-
+      vm.unmanagedMacDevices = {};
     } else {
       vm.searchText = '';
       vm.disabled = true;
       vm.serialDevices = {};
-      return vm.macDevices = {};
+      vm.macDevices = {};
     }
   };
 
@@ -91,10 +90,10 @@ function DevicesListingCtrl($stateParams, $log, DevicesService, $state, Sessions
   vm.controlOpenButton = function (unmanaged, isMatch) {
     if (!unmanaged) {
       vm.disabled = !isMatch;
-      return vm.disabledButtonLoading = false;
+      vm.disabledButtonLoading = false;
     } else {
       vm.unmanagedDisabled = !isMatch;
-      return vm.unmanagedDisabledButtonLoading = false;
+      vm.unmanagedDisabledButtonLoading = false;
     }
   };
 
@@ -108,6 +107,7 @@ function DevicesListingCtrl($stateParams, $log, DevicesService, $state, Sessions
       }
     }
     vm.controlOpenButton(unmanaged, foundMatch)
+    return foundMatch
   };
 
 
@@ -149,16 +149,12 @@ function DevicesListingCtrl($stateParams, $log, DevicesService, $state, Sessions
             }
             devicesToReturn = devices[0]
           }
-
-
           if (unmanaged) {
             vm.devicesToMatchOnUnmanaged = devicesToReturn
           } else {
             vm.devicesToMatchOnManaged = devicesToReturn
           }
-
           return devicesToReturn;
-
         } else {
           return []
         }
@@ -210,12 +206,10 @@ function DevicesListingCtrl($stateParams, $log, DevicesService, $state, Sessions
       if (!managed) {
         vm.getUnmanagedDevices(vm.distributorKey, null, vm.unmanagedDevicesNext);
       }
-    }
-    if (!forward) {
+    } else {
       if (managed) {
         vm.getManagedDevices(vm.distributorKey, vm.devicesPrev, null);
       }
-
       if (!managed) {
         return vm.getUnmanagedDevices(vm.distributorKey, vm.unmanagedDevicesPrev, null);
       }
