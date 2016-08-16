@@ -26,13 +26,26 @@ class ChromeOsDevicesApi(object):
     KEY_CHROMEOSDEVICES = 'chromeosdevices'
     KEY_NEXTPAGETOKEN = 'nextPageToken'
 
-    def __init__(self, admin_to_impersonate_email_address, prod_credentials=False):
+    def __init__(self,
+                 admin_to_impersonate_email_address,
+                 prod_credentials=False,
+                 int_credentials=False):
+
         if prod_credentials is True:
             key_file = '{}/privatekeys/skykit-provisioning.pem'.format(config.APP_ROOT)
             with open(key_file) as f:
                 private_key = f.read()
             self.credentials = SignedJwtAssertionCredentials(
                 '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0@developer.gserviceaccount.com',
+                private_key=private_key,
+                scope=self.DIRECTORY_SERVICE_SCOPES,
+                sub=admin_to_impersonate_email_address)
+        elif int_credentials is True:
+            key_file = '{}/privatekeys/skykit-display-device-int.pem'.format(config.APP_ROOT)
+            with open(key_file) as f:
+                private_key = f.read()
+            self.credentials = SignedJwtAssertionCredentials(
+                '390010375778-87capuus77kispm64q27iah4kl0rorv4@developer.gserviceaccount.com',
                 private_key=private_key,
                 scope=self.DIRECTORY_SERVICE_SCOPES,
                 sub=admin_to_impersonate_email_address)
