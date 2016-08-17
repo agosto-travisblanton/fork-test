@@ -25,6 +25,10 @@ function DevicesListingCtrl($stateParams, $log, DevicesService, $state, Sessions
   vm.unmanagedDevices = [];
   vm.unmanagedMacDevices = {};
   vm.unmanagedGCMidDevices = {};
+  vm.devicesToMatchOnUnmanaged = [];
+  vm.devicesToMatchOnManaged = [];
+
+  ////////////////////////////////////////////////////////////////////////////
 
   vm.refreshManagedDevices = function () {
     vm.devicesPrev = null;
@@ -43,13 +47,12 @@ function DevicesListingCtrl($stateParams, $log, DevicesService, $state, Sessions
       vm.unmanagedSearchText = '';
       vm.unmanagedDisabled = true;
       vm.unmanagedSerialDevices = {};
-      return vm.unmanagedMacDevices = {};
-
+      vm.unmanagedMacDevices = {};
     } else {
       vm.searchText = '';
       vm.disabled = true;
       vm.serialDevices = {};
-      return vm.macDevices = {};
+      vm.macDevices = {};
     }
   };
 
@@ -87,40 +90,24 @@ function DevicesListingCtrl($stateParams, $log, DevicesService, $state, Sessions
   vm.controlOpenButton = function (unmanaged, isMatch) {
     if (!unmanaged) {
       vm.disabled = !isMatch;
-      return vm.disabledButtonLoading = false;
+      vm.disabledButtonLoading = false;
     } else {
       vm.unmanagedDisabled = !isMatch;
-      return vm.unmanagedDisabledButtonLoading = false;
+      vm.unmanagedDisabledButtonLoading = false;
     }
   };
 
 
   vm.isResourceValid = function (unmanaged, resource) {
-    let button;
-    if (unmanaged) {
-      button = vm.unmanagedSelectedButton;
-    } else {
-      button = vm.selectedButton;
+    let devicesToMatchOn = unmanaged ? vm.devicesToMatchOnUnmanaged : vm.devicesToMatchOnManaged
+    let foundMatch = false;
+    for (let item of devicesToMatchOn) {
+      if (resource === item) {
+        foundMatch = true;
+      }
     }
-
-    let byTenant = false;
-    let tenantKey = null;
-
-    return DevicesService.searchDevices(resource, button, byTenant, tenantKey, vm.distributorKey, unmanaged)
-      .then(function (response) {
-        if (response.success) {
-          let devices = response.devices[0];
-          let foundMatch = false;
-          for (let eachDevice of devices) {
-            if (resource === eachDevice) {
-              foundMatch = true;
-            }
-          }
-          return vm.controlOpenButton(unmanaged, foundMatch)
-        } else {
-          return vm.controlOpenButton(unmanaged, false)
-        }
-      })
+    vm.controlOpenButton(unmanaged, foundMatch)
+    return foundMatch
   };
 
 
@@ -137,6 +124,7 @@ function DevicesListingCtrl($stateParams, $log, DevicesService, $state, Sessions
 
     return DevicesService.searchDevices(partial, button, byTenant, tenantKey, vm.distributorKey, unmanaged)
       .then(function (response) {
+        let devicesToReturn;
         if (response.success) {
           let devices = response.devices;
           if (button === "Serial Number") {
@@ -145,22 +133,28 @@ function DevicesListingCtrl($stateParams, $log, DevicesService, $state, Sessions
             } else {
               vm.serialDevices = devices[1]
             }
-            return devices[0]
+            devicesToReturn = devices[0]
           } else if (button === "MAC") {
             if (unmanaged) {
               vm.unmanagedMacDevices = devices[1]
             } else {
               vm.macDevices = devices[1]
             }
-            return devices[0]
+            devicesToReturn = devices[0]
           } else {
             if (unmanaged) {
               vm.unmanagedGCMidDevices = devices[1]
             } else {
               vm.gcmidDevices = devices[1]
             }
-            return devices[0]
+            devicesToReturn = devices[0]
           }
+          if (unmanaged) {
+            vm.devicesToMatchOnUnmanaged = devicesToReturn
+          } else {
+            vm.devicesToMatchOnManaged = devicesToReturn
+          }
+          return devicesToReturn;
         } else {
           return []
         }
@@ -212,12 +206,10 @@ function DevicesListingCtrl($stateParams, $log, DevicesService, $state, Sessions
       if (!managed) {
         vm.getUnmanagedDevices(vm.distributorKey, null, vm.unmanagedDevicesNext);
       }
-    }
-    if (!forward) {
+    } else {
       if (managed) {
         vm.getManagedDevices(vm.distributorKey, vm.devicesPrev, null);
       }
-
       if (!managed) {
         return vm.getUnmanagedDevices(vm.distributorKey, vm.unmanagedDevicesPrev, null);
       }
