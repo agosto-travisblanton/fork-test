@@ -2,6 +2,7 @@ from models import OverlayTemplate
 import json
 from models import ChromeOsDevice
 import ndb_json
+from restler.serializers import json_response
 from extended_session_request_handler import ExtendedSessionRequestHandler
 
 
@@ -15,7 +16,7 @@ class OverlayHandler(ExtendedSessionRequestHandler):
 
         for each_key in request_json.keys():
             if each_key.upper() not in ["BOTTOM_LEFT", "BOTTOM_RIGHT", "TOP_RIGHT", "TOP_LEFT"]:
-                return self.json_response(self.response, {
+                return json_response(self.response, {
                     "success": False,
                     "message": "ONE OF YOUR KEYS WAS NOT VALID."
                 }, status_code=400)
@@ -36,7 +37,7 @@ class OverlayHandler(ExtendedSessionRequestHandler):
         overlay_template_intermediate_json = ndb_json.dumps(overlay_template)
         overlay_template_dict = ndb_json.loads(overlay_template_intermediate_json)
 
-        self.json_response(self.response, {
+        json_response(self.response, {
             "success": True,
             "overlay_template": overlay_template_dict
         }, status_code=200)

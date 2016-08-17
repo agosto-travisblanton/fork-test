@@ -4,13 +4,8 @@ from ndb_mixins import KeyValidatorMixin, PagingListHandlerMixin
 from restler.serializers import json_response as restler_json_response
 
 
-class JsonResponseMixin(object):
-    def json_response(self, response, model_or_query, strategy=None, status_code=200, context={}):
-        return restler_json_response(response, model_or_query, strategy, status_code, context)
 
-
-class ExtendedSessionRequestHandler(SessionRequestHandler, KeyValidatorMixin, PagingListHandlerMixin,
-                                    JsonResponseMixin):
+class ExtendedSessionRequestHandler(SessionRequestHandler, KeyValidatorMixin, PagingListHandlerMixin):
     def check_and_get_field(self, key, dictionary=None, abort_on_not_found=True):
         '''
         Checks to make sure key exists in dictionary, and if not, aborts the request.
@@ -22,7 +17,7 @@ class ExtendedSessionRequestHandler(SessionRequestHandler, KeyValidatorMixin, Pa
             if self.request.body is not str('') and self.request.body is not None:
                 dictionary = json.loads(self.request.body)
             else:
-                self.abort(404, "body is empty")
+                self.abort(400, "body is empty")
 
         if type(dictionary) != dict:
             raise ValueError("You must supply a python dictionary as the second position arguement")
@@ -32,7 +27,7 @@ class ExtendedSessionRequestHandler(SessionRequestHandler, KeyValidatorMixin, Pa
         value = dictionary.get(key)
         if value == None or value == '':
             if abort_on_not_found:
-                self.abort(404, "required field {} not found".format(key))
+                self.abort(400, "required field {} not found".format(key))
             else:
                 return value
         else:
@@ -47,7 +42,7 @@ class ExtendedSessionRequestHandler(SessionRequestHandler, KeyValidatorMixin, Pa
         value = request.get(query_param)
         if value == None or value == '':
             if abort_on_not_found:
-                self.abort(404, "required query parameter {} not found".format(query_param))
+                self.abort(400, "required query parameter {} not found".format(query_param))
             else:
                 return value
 
