@@ -13,7 +13,7 @@ class ChromeOsDevicesApi(object):
         'https://www.googleapis.com/auth/admin.directory.device.chromeos'
     ]
 
-    MAX_RESULTS = 100
+    MAX_RESULTS = 1000
     PROJECTION_FULL = 'FULL'
     PROJECTION_BASIC = 'BASIC'
     SORT_ORDER_ASCENDING = 'ASCENDING'
@@ -25,6 +25,8 @@ class ChromeOsDevicesApi(object):
     KEY_NOTES = 'notes'
     KEY_CHROMEOSDEVICES = 'chromeosdevices'
     KEY_NEXTPAGETOKEN = 'nextPageToken'
+    STATUS_FILTER = 'status:provisioned'
+    LAST_SYNC_ORDER_BY = 'lastSync'
 
     def __init__(self,
                  admin_to_impersonate_email_address,
@@ -107,12 +109,18 @@ class ChromeOsDevicesApi(object):
         if next_page_token is None:
             request = chrome_os_devices_api.list(customerId=customer_id,
                                                  projection=self.PROJECTION_FULL,
-                                                 maxResults=self.MAX_RESULTS)
+                                                 maxResults=self.MAX_RESULTS,
+                                                 query=self.STATUS_FILTER,
+                                                 orderBy=self.LAST_SYNC_ORDER_BY,
+                                                 sortOrder=self.SORT_ORDER_DESCENDING)
         else:
             request = chrome_os_devices_api.list(customerId=customer_id,
                                                  projection=self.PROJECTION_FULL,
                                                  pageToken=next_page_token,
-                                                 maxResults=self.MAX_RESULTS)
+                                                 maxResults=self.MAX_RESULTS,
+                                                 query=self.STATUS_FILTER,
+                                                 orderBy=self.LAST_SYNC_ORDER_BY,
+                                                 sortOrder=self.SORT_ORDER_DESCENDING)
         current_page_json = request.execute()
         chrome_os_devices = current_page_json.get(self.KEY_CHROMEOSDEVICES)
         next_page_token = current_page_json.get(self.KEY_NEXTPAGETOKEN)
