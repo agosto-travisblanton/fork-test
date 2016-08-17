@@ -18,6 +18,7 @@
     "angular-ui-router": "^0.2.15",
     "bootstrap-webpack": "0.0.5",
     "font-awesome": "^4.6.3",
+    "javascript-natural-sort": "^0.7.1",
     "jquery": "^3.1.0",
     "karma": "^0.13.22",
     "lf-ng-md-file-input": "^1.4.8",
