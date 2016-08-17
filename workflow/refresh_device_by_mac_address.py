@@ -6,6 +6,7 @@ from google.appengine.ext.deferred import deferred
 from app_config import config
 from integrations.content_manager.content_manager_api import ContentManagerApi
 from integrations.directory_api.chrome_os_devices_api import ChromeOsDevicesApi
+from model_entities.integration_events_log_model import IntegrationEventLog
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -74,11 +75,21 @@ def refresh_device_by_mac_address(device_urlsafe_key, device_mac_address,
             else:
                 correlation_id = 'NA'
             if not device_has_previous_directory_api_info:
+                cm_create_device_event_request = IntegrationEventLog.create(
+                     event_category='Registration',
+                     component_name='Content Manager',
+                     workflow_step='Request to Content Manager for a create_device',
+                     mac_address=device.mac_address,
+                     gcm_registration_id=device.gcm_registration_id,
+                     device_urlsafe_key=device_urlsafe_key,
+                     serial_number=device.serial_number,
+                     correlation_identifier=correlation_id,
+                     details='refresh_device_by_mac_address: Found device. Will notify Content Manager.')
+                cm_create_device_event_request.put()
                 deferred.defer(ContentManagerApi().create_device,
                                device_urlsafe_key=device_urlsafe_key,
                                correlation_id=correlation_id,
-                               _queue='content-server',
-                               _countdown=5)
+                               _queue='content-server')
             return device
         else:
             if new_page_token is not None:
