@@ -15,7 +15,7 @@
               <b>Timestamp</b>
             </div>
             <div class="col-sm-6">
-              Details
+              <b>Details</b>
             </div>
             <md-divider></md-divider>
           </md-list-item>
@@ -26,7 +26,7 @@
               {{ item.workflowStep }}
             </div>
             <div class="col-sm-2 registration-event-column">
-              {{deviceDetailsCtrl.generateLocalFromUTC(item.utcTimestamp)}}
+              {{ item.utcTimestamp }}
             </div>
             <div class="col-sm-6 registration-event-column">
               {{ item.details }}

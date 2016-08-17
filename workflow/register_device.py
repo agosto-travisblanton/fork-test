@@ -119,8 +119,7 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
             deferred.defer(ContentManagerApi().create_device,
                            device_urlsafe_key=device_urlsafe_key,
                            correlation_id=correlation_id,
-                           _queue='content-server',
-                           _countdown=5)
+                           _queue='content-server')
 
             # Update Directory API with the device key in the annotated asset ID.
             if not device.is_unmanaged_device:
@@ -139,6 +138,9 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
                                _countdown=60)
             return device
         else:
+            info = 'register_device: requested device not found in directory API for MAC address = {0}.'.format(
+                lowercase_device_mac_address)
+            logging.info(info)
             device_not_found_event = IntegrationEventLog.create(
                 event_category='Registration',
                 component_name='Chrome Directory API',
@@ -148,6 +150,8 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
                 correlation_identifier=correlation_id)
             device_not_found_event.put()
             if new_page_token:
+                device_not_found_event.details = 'Calling register_device with new page token.'
+                device.put()
                 deferred.defer(register_device,
                                device_urlsafe_key=device_urlsafe_key,
                                device_mac_address=device_mac_address,

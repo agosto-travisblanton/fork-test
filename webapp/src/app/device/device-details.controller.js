@@ -57,6 +57,16 @@ function DeviceDetailsCtrl($log,
     return;
   };
 
+  vm.localFromUtc = function (events) {
+    for (let i = 0; i < events.length; i++) {
+      let each = events[i];
+      if (each.utcTimestamp) {
+        each.utcTimestamp = DateManipulationService.generateLocalFromUTC(each.utcTimestamp);
+      }
+    }
+    return;
+  };
+
   vm.copyDeviceKey = () => ToastsService.showSuccessToast('Device key copied to your clipboard');
 
   vm.copyCorrelationIdentifier = () => ToastsService.showSuccessToast('Correlation ID copied to your clipboard');
@@ -92,6 +102,7 @@ function DeviceDetailsCtrl($log,
     ProgressBarService.start();
     let commandEventsPromise = IntegrationEvents.getEnrollmentEvents(deviceKey);
     return commandEventsPromise.then(function (data) {
+      vm.localFromUtc(data);
       vm.enrollmentEvents = data;
       return ProgressBarService.complete();
     });
