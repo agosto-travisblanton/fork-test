@@ -1,8 +1,6 @@
 from agar.sessions import SessionRequestHandler
 import json
 from ndb_mixins import KeyValidatorMixin, PagingListHandlerMixin
-from restler.serializers import json_response as restler_json_response
-
 
 
 class ExtendedSessionRequestHandler(SessionRequestHandler, KeyValidatorMixin, PagingListHandlerMixin):
