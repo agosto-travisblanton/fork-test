@@ -9,6 +9,7 @@ from integrations.directory_api.chrome_os_devices_api import ChromeOsDevicesApi
 from integrations.directory_api.organization_units_api import OrganizationUnitsApi
 from models import Domain
 from ndb_mixins import KeyValidatorMixin
+from oauth2client.client import AccessTokenRefreshError
 from restler.serializers import json_response
 from strategy import DOMAIN_STRATEGY
 
@@ -119,13 +120,14 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
                 result['devicesAccess'] = True
             else:
                 result['devicesAccess'] = False
-        except Exception as exception:
+        except AccessTokenRefreshError as exception:
             result['devicesAccess'] = False
-            error_message = 'Attempt to access {0} and {1} for devices api access yields {2}'.format(
+            error_message = "{0} and {1}: '{2}'".format(
                 domain.name,
                 domain.impersonation_admin_email_address,
                 exception.message)
             logging.error(error_message)
+            result['devicesAccessException'] = exception.message
 
         try:
             organization_units_api = OrganizationUnitsApi(
@@ -136,12 +138,13 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
                     result['orgUnitsAccess'] = True
                 else:
                     result['orgUnitsAccess'] = False
-        except Exception as exception:
+        except AccessTokenRefreshError as exception:
             result['orgUnitsAccess'] = False
-            error_message = 'Attempt to access {0} and {1} for OU api access yields {2}'.format(
+            error_message = "{0} and {1}: '{2}'".format(
                 domain.name,
                 domain.impersonation_admin_email_address,
                 exception.message)
             logging.error(error_message)
+            result['orgUnitsAccessException'] = exception.message
 
         json_response(self.response, result)
