@@ -55,7 +55,7 @@ describe('DomainDetailsCtrl', function () {
     };
   }));
 
-  describe('.initialization', function () {
+  describe('initialization', function () {
     beforeEach(function () {
       domainsServicePromise = new skykitProvisioning.q.Mock();
       distributorsServicePromise = new skykitProvisioning.q.Mock();
