@@ -5,16 +5,20 @@ from google.appengine.ext import ndb
 from webapp2 import RequestHandler
 
 from decorators import requires_api_token
+from integrations.directory_api.chrome_os_devices_api import ChromeOsDevicesApi
+from integrations.directory_api.organization_units_api import OrganizationUnitsApi
 from models import Domain
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import DOMAIN_STRATEGY
 
-
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 class DomainsHandler(RequestHandler, KeyValidatorMixin):
+    DEVICES_SCOPE = 'https://www.googleapis.com/auth/admin.directory.device.chromeos'
+    OU_SCOPE = 'https://www.googleapis.com/auth/admin.directory.orgunit'
+
     @requires_api_token
     def get(self, domain_key=None):
         if None == domain_key:
@@ -84,7 +88,7 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
             logging.exception(e)
         if domain is None:
             status = 404
-            message = 'Unrecognized device with key: {0}'.format(domain_key)
+            message = 'Unrecognized domain with key: {0}'.format(domain_key)
             return self.response.set_status(status, message)
         else:
             request_json = json.loads(self.request.body)
@@ -102,3 +106,42 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
             device.put()
         self.response.set_status(204)
         self.response.headers.pop('Content-Type', None)
+
+    @requires_api_token
+    def ping_directory_api(self, domain_key):
+        domain = self.validate_and_get(domain_key, Domain, abort_on_not_found=True, use_app_engine_memcache=False)
+        result = {'domainName': domain.name, 'impersonationEmail': domain.impersonation_admin_email_address}
+        try:
+            chrome_os_devices_api = ChromeOsDevicesApi(
+                admin_to_impersonate_email_address=domain.impersonation_admin_email_address)
+            scopes = chrome_os_devices_api.DIRECTORY_SERVICE_SCOPES
+            if any(self.DEVICES_SCOPE in s for s in scopes):
+                result['devicesAccess'] = True
+            else:
+                result['devicesAccess'] = False
+        except Exception as exception:
+            result['devicesAccess'] = False
+            error_message = 'Attempt to access {0} and {1} for devices api access yields {2}'.format(
+                domain.name,
+                domain.impersonation_admin_email_address,
+                exception.message)
+            logging.error(error_message)
+
+        try:
+            organization_units_api = OrganizationUnitsApi(
+                admin_to_impersonate_email_address=domain.impersonation_admin_email_address)
+            if organization_units_api:
+                scopes = organization_units_api.DIRECTORY_SERVICE_SCOPES
+                if any(self.OU_SCOPE in s for s in scopes):
+                    result['orgUnitsAccess'] = True
+                else:
+                    result['orgUnitsAccess'] = False
+        except Exception as exception:
+            result['orgUnitsAccess'] = False
+            error_message = 'Attempt to access {0} and {1} for OU api access yields {2}'.format(
+                domain.name,
+                domain.impersonation_admin_email_address,
+                exception.message)
+            logging.error(error_message)
+
+        json_response(self.response, result)
