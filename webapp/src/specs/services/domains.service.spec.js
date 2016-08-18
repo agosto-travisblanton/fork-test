@@ -91,7 +91,6 @@ describe('DomainsService', function () {
     })
   );
 
-
   return describe('.delete', () =>
     it('delete domain, returning a promise', function () {
       let domain = {key: 'dhYUYdfhdjfhlasddf7898a7sdfdas78d67', name: 'dev.agosto.com'};

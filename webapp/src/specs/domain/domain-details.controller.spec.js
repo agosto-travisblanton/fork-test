@@ -50,11 +50,12 @@ describe('DomainDetailsCtrl', function () {
       ProgressBarService: progressBarService,
       DomainsService,
       DistributorsService,
-      ToastsService
+      ToastsService,
+      $log
     };
   }));
 
-  describe('initialization', function () {
+  describe('.initialization', function () {
     beforeEach(function () {
       domainsServicePromise = new skykitProvisioning.q.Mock();
       distributorsServicePromise = new skykitProvisioning.q.Mock();
@@ -74,6 +75,10 @@ describe('DomainDetailsCtrl', function () {
         return controller = $controller('DomainDetailsCtrl', serviceInjection);
       });
 
+      it('devicesAccess property should be false', () => expect(controller.devicesAccess).toBeFalsy());
+
+      it('orgUnitsAccess property should be false', () => expect(controller.orgUnitsAccess).toBeFalsy());
+
       it('currentDomain property should be defined', () => expect(controller.currentDomain).toBeDefined());
 
       it('call DomainsService.getDomainByKey to retrieve the selected domain', () => expect(DomainsService.getDomainByKey).toHaveBeenCalledWith($stateParams.domainKey));
@@ -85,7 +90,7 @@ describe('DomainDetailsCtrl', function () {
     });
   });
 
-  return describe('.onSaveDomain', function () {
+  describe('.onSaveDomain', function () {
     beforeEach(function () {
       domainsServicePromise = new skykitProvisioning.q.Mock();
       spyOn(DomainsService, 'save').and.returnValue(domainsServicePromise);
@@ -158,5 +163,66 @@ describe('DomainDetailsCtrl', function () {
         });
       });
     });
+  });
+
+  describe('.onSuccessDeterminingConnectivity', function () {
+    let exception = 'unauthorized_client'
+    let response = {'devicesAccess': true, 'orgUnitsAccess': false, 'orgUnitsAccessException': exception};
+
+    beforeEach(function () {
+      spyOn(progressBarService, 'complete');
+      controller = $controller('DomainDetailsCtrl', serviceInjection);
+      return controller.onSuccessDeterminingConnectivity(response);
+    });
+
+    it('stops the progress bar', () => expect(progressBarService.complete).toHaveBeenCalled());
+
+    it('sets devicesAccess', () => expect(controller.devicesAccess).toBeTruthy());
+
+    it('sets orgUnitsAccessException', () => expect(controller.orgUnitsAccessException).toBe(exception));
+
+    it('does not set devicesAccessException', () => expect(controller.devicesAccessException).toBeUndefined());
+
+    return it('sets orgUnitsAccess', () => expect(controller.orgUnitsAccess).toBeFalsy());
+
+  });
+
+  describe('.onFailureDeterminingConnectivity', function () {
+    let response = {'status': 400, 'statusText': 'Something horrific'};
+
+    beforeEach(function () {
+      spyOn(progressBarService, 'complete');
+      controller = $controller('DomainDetailsCtrl', serviceInjection);
+      spyOn($log, 'error');
+      spyOn(ToastsService, 'showErrorToast');
+      return controller.onFailureDeterminingConnectivity(response);
+    });
+
+    it('stops the progress bar', () => expect(progressBarService.complete).toHaveBeenCalled());
+
+    it('logs detailed error to console', () => expect($log.error).toHaveBeenCalledWith('Failure determining directory API connectivity: 400 Something horrific'));
+
+    return it('displays a toast regarding failure to determine device connectivity', function () {
+      let toastMessage = 'Oops. We were unable determine your device connectivity at this time.';
+      return expect(ToastsService.showErrorToast).toHaveBeenCalledWith(toastMessage);
+    });
+  });
+
+  return describe('.initialize', function () {
+    let domainUrlSafeKey = 'ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyEwsSBkRvbWFpbhiAgICgvIm8Cww';
+
+    beforeEach(function () {
+      domainsServicePromise = new skykitProvisioning.q.Mock();
+      spyOn(DomainsService, 'getDirectoryApiConnectivityInformation').and.returnValue(domainsServicePromise);
+      spyOn(progressBarService, 'start');
+      controller = $controller('DomainDetailsCtrl', serviceInjection);
+      $stateParams.domainKey = domainUrlSafeKey;
+      controller.editMode = true;
+      return controller.initialize();
+    });
+
+    it('starts the progress bar', () => expect(progressBarService.start).toHaveBeenCalled());
+
+    return it('calls DevicesService.getDirectoryApiConnectivityInformation', () => expect(DomainsService.getDirectoryApiConnectivityInformation).toHaveBeenCalledWith(domainUrlSafeKey));
   });
 });
