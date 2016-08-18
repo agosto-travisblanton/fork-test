@@ -75,6 +75,23 @@ describe('DomainsService', function () {
     })
   );
 
+  describe('.getDirectoryApiConnectivityInformation', () =>
+    it('retrieve connectivity information for a domain, returning a promise', function () {
+      let domainKey = 'dhYUYdfhdjfhlasddf7898a7sdfdas78d67';
+      let domainRestangularService = {
+        get() {
+        }
+      };
+      spyOn(Restangular, 'oneUrl').and.returnValue(domainRestangularService);
+      spyOn(domainRestangularService, 'get').and.returnValue(promise);
+      let actual = DomainsService.getDirectoryApiConnectivityInformation(domainKey);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('domains', `api/v1/domains/${domainKey}/directory_api`);
+      expect(domainRestangularService.get).toHaveBeenCalled();
+      return expect(actual).toBe(promise);
+    })
+  );
+
+
   return describe('.delete', () =>
     it('delete domain, returning a promise', function () {
       let domain = {key: 'dhYUYdfhdjfhlasddf7898a7sdfdas78d67', name: 'dev.agosto.com'};
