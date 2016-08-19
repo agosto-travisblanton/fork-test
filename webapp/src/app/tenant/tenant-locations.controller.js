@@ -1,3 +1,6 @@
+import naturalSort from 'javascript-natural-sort';
+
+
 function TenantLocationsCtrl($scope, $stateParams, TenantsService, LocationsService, $state, ProgressBarService) {
   "ngInject";
 
@@ -47,7 +50,7 @@ function TenantLocationsCtrl($scope, $stateParams, TenantsService, LocationsServ
     return promise.then((response) => {
       vm.searchedTenantLocations = response
       if (vm.searchedTenantLocations) {
-        return vm.searchedTenantLocations.map((i) => i.customerLocationName)
+        return vm.searchedTenantLocations.map((i) => i.customerLocationName).sort(naturalSort)
       } else {
         return []
       }

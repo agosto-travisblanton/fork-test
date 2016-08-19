@@ -2,8 +2,9 @@ from webapp2 import RequestHandler
 from google.appengine.ext.deferred import deferred
 from app_config import config
 from models import User, Distributor, Domain, Tenant, ChromeOsDevice, PlayerCommandEvent, TenantEntityGroup, \
-    DeviceIssueLog, Location
+    DeviceIssueLog, Location, IntegrationEventLog
 import random
+from datetime import datetime, timedelta
 
 USER_EMAIL = 'daniel.ternyak@agosto.com'
 DISTRIBUTOR_NAME = 'Dunder'
@@ -23,6 +24,169 @@ UNMANAGED_MAC_ADDRESS = '04271e61934b'
 UNMANAGED_GCM_REGISTRATION_ID = '3c70a8d70a6dfa6df76dfas2'
 SERIAL_NUMBER = 'E6MSCX057790'
 array_of_devices_with_values = []
+
+##################################################################
+# ENROLLMENT
+##################################################################
+REGISTRATION = 'Registration'
+PLAYER = 'Player'
+PROVISIONING = 'Provisioning'
+DIRECTORY_API = 'Chrome Directory API'
+CONTENT_MANAGER = 'Content Manager'
+CORRELATION_IDENTIFIER = '0779aec7ae3040dcb8a3a572c356df66'
+GCM_REGISTRATION_ID = 'APA91bGl7nxmJ9JXF0_9e8zEuXIMBxX0S0o9bmmMMkqxZTjjN4hoPsweooggycp1rJonDbszrTIioEI'
+REGISTRATION_WORKFLOW_STEP_1 = 'Request from Player to create a managed device'
+REGISTRATION_WORKFLOW_STEP_2 = 'Response to Player after creating a managed device'
+REGISTRATION_WORKFLOW_STEP_3_REQUEST = 'Request for device information'
+REGISTRATION_WORKFLOW_STEP_3_RESPONSE = 'Response for device information request'
+REGISTRATION_WORKFLOW_NO_DEVICE_INFO = 'Requested device not found'
+REGISTRATION_WORKFLOW_STEP_4_REQUEST = 'Request for device information'
+REGISTRATION_WORKFLOW_STEP_4_RESPONSE = 'Response for device information request'
+REGISTRATION_WORKFLOW_STEP_5_REQUEST = 'Request to Content Manager for a create_device'
+REGISTRATION_WORKFLOW_STEP_5_RESPONSE = 'Response from Content Manager for a create_device'
+timestamp = datetime.utcnow()
+
+
+##################################################################
+
+def create_integration_events_for_device(DEVICE_KEY):
+    #######################################
+    # INTEGRATION EVENTS / ENROLLMENT
+    #######################################
+    registration_event_1 = IntegrationEventLog.create(
+        event_category=REGISTRATION,
+        component_name=PLAYER,
+        workflow_step=REGISTRATION_WORKFLOW_STEP_1,
+        correlation_identifier=CORRELATION_IDENTIFIER,
+        utc_timestamp=timestamp + timedelta(seconds=1),
+        gcm_registration_id=GCM_REGISTRATION_ID,
+        device_urlsafe_key=DEVICE_KEY,
+        details=
+        'register_device with device key ahVzfnNreWtpdC1wcm92aXNpb25pbmdyGwsSDkNocm9tZU9zRGV2aWNlGICAgOCZsP0JDA.'
+    )
+    registration_event_1.put()
+
+    registration_event_2 = IntegrationEventLog.create(
+        event_category=REGISTRATION,
+        component_name=PROVISIONING,
+        workflow_step=REGISTRATION_WORKFLOW_STEP_2,
+        correlation_identifier=CORRELATION_IDENTIFIER,
+        utc_timestamp=timestamp + timedelta(seconds=2),
+        gcm_registration_id=GCM_REGISTRATION_ID,
+        device_urlsafe_key=DEVICE_KEY,
+        details=
+        'Device resource uri '
+        '/api/v1/devices/ahVzfnNreWtpdC1wcm92aXNpb25pbmdyGwsSDkNocm9tZU9zRGV2aWNlGICAgOCZsP0JDA returned '
+        'in response Location header.'
+    )
+    registration_event_2.put()
+
+    registration_event_3 = IntegrationEventLog.create(
+        event_category=REGISTRATION,
+        component_name=DIRECTORY_API,
+        workflow_step=REGISTRATION_WORKFLOW_STEP_3_REQUEST,
+        correlation_identifier=CORRELATION_IDENTIFIER,
+        utc_timestamp=timestamp + timedelta(seconds=3),
+        gcm_registration_id=GCM_REGISTRATION_ID,
+        device_urlsafe_key=DEVICE_KEY,
+    )
+    registration_event_3.put()
+
+    registration_event_4 = IntegrationEventLog.create(
+        event_category=REGISTRATION,
+        component_name=DIRECTORY_API,
+        workflow_step=REGISTRATION_WORKFLOW_STEP_3_RESPONSE,
+        correlation_identifier=CORRELATION_IDENTIFIER,
+        utc_timestamp=timestamp + timedelta(seconds=4),
+        gcm_registration_id=GCM_REGISTRATION_ID,
+        device_urlsafe_key=DEVICE_KEY,
+    )
+    registration_event_4.put()
+
+    registration_event_5 = IntegrationEventLog.create(
+        event_category=REGISTRATION,
+        component_name=DIRECTORY_API,
+        workflow_step=REGISTRATION_WORKFLOW_NO_DEVICE_INFO,
+        correlation_identifier=CORRELATION_IDENTIFIER,
+        utc_timestamp=timestamp + timedelta(seconds=5),
+        gcm_registration_id=GCM_REGISTRATION_ID,
+        device_urlsafe_key=DEVICE_KEY,
+    )
+    registration_event_5.put()
+
+    registration_event_6 = IntegrationEventLog.create(
+        event_category=REGISTRATION,
+        component_name=DIRECTORY_API,
+        workflow_step=REGISTRATION_WORKFLOW_STEP_4_REQUEST,
+        correlation_identifier=CORRELATION_IDENTIFIER,
+        utc_timestamp=timestamp + timedelta(seconds=6),
+        gcm_registration_id=GCM_REGISTRATION_ID,
+        device_urlsafe_key=DEVICE_KEY,
+    )
+    registration_event_6.put()
+
+    registration_event_7 = IntegrationEventLog.create(
+        event_category=REGISTRATION,
+        component_name=DIRECTORY_API,
+        workflow_step=REGISTRATION_WORKFLOW_STEP_4_RESPONSE,
+        correlation_identifier=CORRELATION_IDENTIFIER,
+        utc_timestamp=timestamp + timedelta(seconds=7),
+        gcm_registration_id=GCM_REGISTRATION_ID,
+        device_urlsafe_key=DEVICE_KEY,
+        details='Chrome Directory API call success! Notifying Content Manager.'
+    )
+    registration_event_7.put()
+
+    registration_event_8 = IntegrationEventLog.create(
+        event_category=REGISTRATION,
+        component_name=CONTENT_MANAGER,
+        workflow_step=REGISTRATION_WORKFLOW_STEP_5_REQUEST,
+        correlation_identifier=CORRELATION_IDENTIFIER,
+        utc_timestamp=timestamp + timedelta(seconds=8),
+        gcm_registration_id=GCM_REGISTRATION_ID,
+        device_urlsafe_key=DEVICE_KEY,
+        details=
+        'Request url: https://skykit-contentmanager.appspot.com/provisioning/v1/displays for call to CM.'
+    )
+    registration_event_8.put()
+
+    registration_event_9 = IntegrationEventLog.create(
+        event_category=REGISTRATION,
+        component_name=CONTENT_MANAGER,
+        workflow_step=REGISTRATION_WORKFLOW_STEP_5_RESPONSE,
+        correlation_identifier=CORRELATION_IDENTIFIER,
+        utc_timestamp=timestamp + timedelta(seconds=9),
+        gcm_registration_id=GCM_REGISTRATION_ID,
+        device_urlsafe_key=DEVICE_KEY,
+        details=
+        'ContentManagerApi.create_device: http_status=201, '
+        'url=https://skykit-contentmanager.appspot.com/provisioning/v1/displays, '
+        'device_key=ahVzfnNreWtpdC1wcm92aXNpb25pbmdyGwsSDkNocm9tZU9zRGV2aWNlGICAgOCZsP0JDA, '
+        'api_key=6c522ae93b7b481c9f0485a419194ad4, tenant_code=agosto, SN=FBMACX001373. Success!'
+    )
+    registration_event_9.put()
+
+    registration_event_10 = IntegrationEventLog.create(
+        event_category='Other',
+        component_name='Foobar1',
+        workflow_step='Nothing',
+        gcm_registration_id='jdalskdjfa'
+    )
+    registration_event_10.put()
+
+    registration_event_11 = IntegrationEventLog.create(
+        event_category='Other',
+        component_name='Foobar2',
+        workflow_step='Nothing'
+    )
+    registration_event_11.put()
+
+    registration_event_12 = IntegrationEventLog.create(
+        event_category='Other',
+        component_name='Foobar3',
+        workflow_step='Nothing'
+    )
+    registration_event_12.put()
 
 
 def create_email(first, last):
@@ -217,6 +381,8 @@ def make_data_for_a_distributor():
             if random.randint(1, 10) == 1:
                 global array_of_devices_with_values
                 array_of_devices_with_values.append(str(managed_device.serial_number))
+
+                create_integration_events_for_device(managed_device.key.urlsafe())
 
                 for z in range(1, 78):
                     issue = DeviceIssueLog.create(device_key=managed_device.key,
