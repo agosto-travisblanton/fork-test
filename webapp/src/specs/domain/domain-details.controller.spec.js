@@ -12,7 +12,6 @@ describe('DomainDetailsCtrl', function () {
   let DomainsService = undefined;
   let ToastsService = undefined;
   let domainsServicePromise = undefined;
-  let DistributorsService = undefined;
   let distributorsServicePromise = undefined;
   let progressBarService = undefined;
   let sweet = undefined;
@@ -28,13 +27,12 @@ describe('DomainDetailsCtrl', function () {
 
   beforeEach(module('skykitProvisioning'));
 
-  beforeEach(inject(function (_$controller_, _DomainsService_, _DistributorsService_, _sweet_, _ToastsService_, _$log_) {
+  beforeEach(inject(function (_$controller_, _DomainsService_, _sweet_, _ToastsService_, _$log_) {
     $controller = _$controller_;
     $stateParams = {};
     $state = {};
     $log = _$log_;
     DomainsService = _DomainsService_;
-    DistributorsService = _DistributorsService_;
     progressBarService = {
       start() {
       },
@@ -49,7 +47,6 @@ describe('DomainDetailsCtrl', function () {
       $stateParams,
       ProgressBarService: progressBarService,
       DomainsService,
-      DistributorsService,
       ToastsService,
       $log
     };
@@ -58,9 +55,7 @@ describe('DomainDetailsCtrl', function () {
   describe('initialization', function () {
     beforeEach(function () {
       domainsServicePromise = new skykitProvisioning.q.Mock();
-      distributorsServicePromise = new skykitProvisioning.q.Mock();
       spyOn(DomainsService, 'getDomainByKey').and.returnValue(domainsServicePromise);
-      return spyOn(DistributorsService, 'getByName').and.returnValue(distributorsServicePromise);
     });
 
     describe('new mode', function () {

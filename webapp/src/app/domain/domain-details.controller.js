@@ -1,6 +1,5 @@
 function DomainDetailsCtrl($log,
                            $stateParams,
-                           DistributorsService,
                            DomainsService,
                            $state,
                            sweet,
