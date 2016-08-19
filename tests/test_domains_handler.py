@@ -17,7 +17,7 @@ class TestDomainsHandler(ProvisioningBaseTest):
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     CHROME_DEVICE_DOMAIN_INACTIVE = 'inactive.agosto.com'
     FORBIDDEN = '403 Forbidden'
-    IMPERSONATION_EMAIL = 'test@test.com'
+    IMPERSONATION_EMAIL = 'skykit.api@dev.agosto.com'
 
     def setUp(self):
         super(TestDomainsHandler, self).setUp()
@@ -234,3 +234,33 @@ class TestDomainsHandler(ProvisioningBaseTest):
         response = self.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
         self.assertEqual(response_json.get('active'), False)
+
+    ##################################################################################################################
+    # ping directory api
+    ##################################################################################################################
+
+    def test_ping_directory_api_returns_expected_response_for_valid_impersonation_email(self):
+        uri = application.router.build(None, 'directory-api-ping', None, {'domain_key': self.domain_key.urlsafe()})
+        request_parameters = {}
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response_json = json.loads(response.body)
+        expected = self.domain_key.get()
+        self.assertTrue(response_json.get('devicesAccess'))
+        self.assertTrue(response_json.get('orgUnitsAccess'))
+        self.assertEqual(response_json.get('domainName'), expected.name)
+        self.assertEqual(response_json.get('impersonationEmail'), expected.impersonation_admin_email_address)
+        self.assertOK(response)
+
+    def test_ping_directory_api_returns_expected_response_for_invalid_impersonation_email(self):
+        self.domain.impersonation_admin_email_address = 'no_access@restricted.com'
+        self.domain.put()
+        uri = application.router.build(None, 'directory-api-ping', None, {'domain_key': self.domain_key.urlsafe()})
+        request_parameters = {}
+        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response_json = json.loads(response.body)
+        expected = self.domain_key.get()
+        self.assertFalse(response_json.get('devicesAccess'))
+        self.assertFalse(response_json.get('orgUnitsAccess'))
+        self.assertEqual(response_json.get('domainName'), expected.name)
+        self.assertEqual(response_json.get('impersonationEmail'), expected.impersonation_admin_email_address)
+        self.assertOK(response)

@@ -1,6 +1,5 @@
 function DomainDetailsCtrl($log,
                            $stateParams,
-                           DistributorsService,
                            DomainsService,
                            $state,
                            sweet,
@@ -17,6 +16,8 @@ function DomainDetailsCtrl($log,
     distributor_key: undefined,
     active: true
   };
+  vm.devicesAccess = false;
+  vm.orgUnitsAccess = false;
   vm.currentDomains = [];
   vm.editMode = !!$stateParams.domainKey;
 
@@ -26,6 +27,28 @@ function DomainDetailsCtrl($log,
   } else {
     vm.currentDomain.distributor_key = SessionsService.getCurrentDistributorKey();
   }
+
+  vm.initialize = function () {
+    if (vm.editMode) {
+      ProgressBarService.start();
+      let connectivityPromise = DomainsService.getDirectoryApiConnectivityInformation($stateParams.domainKey);
+      return connectivityPromise.then(vm.onSuccessDeterminingConnectivity, vm.onFailureDeterminingConnectivity);
+    }
+  };
+
+  vm.onSuccessDeterminingConnectivity = function (data) {
+    vm.devicesAccess = data.devicesAccess;
+    vm.orgUnitsAccess = data.orgUnitsAccess;
+    vm.devicesAccessException = data.devicesAccessException;
+    vm.orgUnitsAccessException = data.orgUnitsAccessException;
+    ProgressBarService.complete();
+  };
+
+  vm.onFailureDeterminingConnectivity = function (error) {
+    ProgressBarService.complete();
+    $log.error(`Failure determining directory API connectivity: ${error.status } ${error.statusText}`);
+    return ToastsService.showErrorToast('Oops. We were unable determine your device connectivity at this time.');
+  };
 
   vm.onSaveDomain = function () {
     ProgressBarService.start();
@@ -50,7 +73,6 @@ function DomainDetailsCtrl($log,
   };
 
   vm.editItem = item => $state.go('editDomain', {domainKey: item.key});
-
 
   return vm;
 }

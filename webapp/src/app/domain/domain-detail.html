@@ -1,4 +1,4 @@
-<div layout="column" ng-cloak>
+<div layout="column" ng-cloak ng-init="domainDetailsCtrl.initialize()">
   <md-toolbar class="md-hue-2">
     <div class="md-toolbar-tools">
       <h2 class="md-flex"><i class="fa fa-fw fa-cube ng-scope"></i> Domain</h2>
@@ -67,6 +67,28 @@
                        id="active"
                        ng-model="domainDetailsCtrl.currentDomain.active"> <label
                 for="active">Active</label>
+              </div>
+            </div>
+            <div class="form-group" ng-show="domainDetailsCtrl.editMode==true">
+              <label class="col-sm-3 control-label">Device Management</label>
+              <div class="col-sm-6">
+                <i name="devicesConnectivity" ng-show="domainDetailsCtrl.devicesAccess==true"
+                   style="color:green"
+                   class="fa fa-fw fa-check-circle fa-2x"></i>
+                <i name="devicesConnectivity" ng-show="domainDetailsCtrl.devicesAccess==false"
+                   style="color:red"
+                   class="fa fa-fw fa-stop-circle fa-2x"></i> {{domainDetailsCtrl.devicesAccessException}}
+              </div>
+            </div>
+            <div class="form-group" ng-show="domainDetailsCtrl.editMode==true">
+              <label class="col-sm-3 control-label">Org Unit Management</label>
+              <div class="col-sm-6">
+                <i name="orgUnitsConnectivity" ng-show="domainDetailsCtrl.orgUnitsAccess==true"
+                   style="color:green"
+                   class="fa fa-fw fa-check-circle fa-2x"></i>
+                <i name="orgUnitsConnectivity" ng-show="domainDetailsCtrl.orgUnitsAccess==false"
+                   style="color:red"
+                   class="fa fa-fw fa-stop-circle fa-2x"></i> {{domainDetailsCtrl.orgUnitsAccessException}}
               </div>
             </div>
           </md-card-content>

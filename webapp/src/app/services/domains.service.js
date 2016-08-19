@@ -24,6 +24,11 @@ export default  class DomainsService {
     return promise;
   }
 
+  getDirectoryApiConnectivityInformation(domainKey) {
+    let promise = this.Restangular.oneUrl('domains', `api/v1/domains/${domainKey}/directory_api`).get();
+    return promise;
+  }
+
   delete(domain) {
     if (domain.key !== undefined) {
       let promise = this.Restangular.one("domains", domain.key).remove();
