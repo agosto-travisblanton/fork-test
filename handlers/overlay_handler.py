@@ -1,15 +1,12 @@
-from google.appengine.ext import ndb
-from agar.sessions import SessionRequestHandler
 from models import OverlayTemplate
-import logging
 import json
 from models import ChromeOsDevice
-from ndb_mixins import KeyValidatorMixin
-from restler.serializers import json_response
 import ndb_json
+from restler.serializers import json_response
+from extended_session_request_handler import ExtendedSessionRequestHandler
 
 
-class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
+class OverlayHandler(ExtendedSessionRequestHandler):
     def post(self, device_urlsafe_key):
         request_json = json.loads(self.request.body)
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
@@ -40,7 +37,7 @@ class OverlayHandler(SessionRequestHandler, KeyValidatorMixin):
         overlay_template_intermediate_json = ndb_json.dumps(overlay_template)
         overlay_template_dict = ndb_json.loads(overlay_template_intermediate_json)
 
-        return json_response(self.response, {
+        json_response(self.response, {
             "success": True,
             "overlay_template": overlay_template_dict
         }, status_code=200)

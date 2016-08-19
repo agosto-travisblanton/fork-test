@@ -3,6 +3,7 @@ The configuration file used by :py:mod:`agar.config` implementations and other l
 `google.appengine.api.lib_config`_ configuration library. Configuration overrides go in this file.
 """
 from env_setup import setup
+
 setup()
 
 import os
@@ -528,6 +529,28 @@ proofplay_SQLALCHEMY_DATABASE_URI = _SQLALCHEMY_DATABASE_URI()
 proofplay_DAYS_TO_KEEP_RAW_EVENTS = 30
 
 
+
+##############################################################################
+# DON'T DO DIRECTORY LOOKUP ON DEV. IT CREATES A CASCADING TASK QUEUE FAILURE
+##############################################################################
+if on_development_server:
+    from workflow import refresh_device_by_mac_address
+    from workflow import refresh_device
+
+
+    def _refresh_device_by_mac_address_dud(device_urlsafe_key, device_mac_address,
+                                           device_has_previous_directory_api_info=False, page_token=None):
+        pass
+
+
+    def _refresh_device_dud(device_urlsafe_key):
+        pass
+
+
+    refresh_device_by_mac_address.refresh_device_by_mac_address = _refresh_device_by_mac_address_dud
+    refresh_device.refresh_device = _refresh_device_dud
+
+
 ##############################################################################
 # VERSION  sprint_number.deployment_increment.hotfix_increment e.g., 33.3.0
 ##############################################################################
@@ -537,12 +560,14 @@ def as_int(x):
     except:
         return None
 
+
 def _return_yaml_data():
     with open(os.path.join(basedir, 'snapdeploy.yaml'), 'r') as f:
         data = yaml.load(f.read())["version"]
         array_of_versions = data.split('-')
         array_of_versions_as_int = [as_int(each) for each in array_of_versions]
-        return array_of_versions_as_int 
+        return array_of_versions_as_int
+
 
 snapdeploy_yaml_data = _return_yaml_data()
 app_SPRINT_NUMBER = snapdeploy_yaml_data[0] if len(snapdeploy_yaml_data) > 0 else None
