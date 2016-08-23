@@ -74,14 +74,14 @@ class OrganizationUnitsApi(object):
             response = {'statusCode': err.resp.status}
         return response
 
-    def update_tenant_name(self, old_tenant_code, new_tenant_code):
+    def patch_tenant_name(self, old_tenant_code, new_tenant_code):
         ou_api = self.discovery_service.orgunits()
+        org_unit_path = 'Skykit/' + old_tenant_code
         request_body = {
             "name": new_tenant_code,
-            "parentOrgUnitPath": 'Skykit/' + old_tenant_code
-
         }
-        request = ou_api.insert(customerId=config.GOOGLE_CUSTOMER_ID, body=request_body)
+
+        request = ou_api.insert(customerId=config.GOOGLE_CUSTOMER_ID, orgUnitPath=org_unit_path, body=request_body)
         try:
             response = request.execute()
         except HttpError, error:
@@ -99,10 +99,15 @@ class OrganizationUnitsApi(object):
         return new_tenant_code
 
     def migrate_all_existing_tenant_names(self):
-        all_existing_tenant_names = [each["name"] for each in self.list()["organizationUnits"]]
-        for each_name in all_existing_tenant_names:
-            if self.convert_tenant_name_to_tenant_code(each_name) != each_name:
-                self.update_tenant_name(self.convert_tenant_name_to_tenant_code(each_name))
+        all_existing_tenant_OUs = [
+            {
+                "orgUnitId": each["orgUnitId"],
+                "name": each["name"]
+            } for each in self.list()["organizationUnits"]]
+        # for each_ou in all_existing_tenant_OUs:
+
+            # if self.convert_tenant_name_to_tenant_code(each_ou["name"]) != each_ou["name"]:
+            #     self.patch_tenant_name(self.convert_tenant_name_to_tenant_code(each_name))
 
     # https://www.googleapis.com/admin/directory/v1/customer/my_customer/orgunits
     def insert(self, tenant_code, screen_rotation=0):

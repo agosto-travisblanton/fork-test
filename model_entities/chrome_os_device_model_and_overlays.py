@@ -448,6 +448,7 @@ class Tenant(ndb.Model):
     notification_emails = ndb.StringProperty(repeated=True, indexed=False, required=False)
     proof_of_play_logging = ndb.BooleanProperty(default=False, required=True, indexed=True)
     proof_of_play_url = ndb.StringProperty(required=False)
+    ou_id = ndb.StringProperty(required=True)
     default_timezone = ndb.StringProperty(required=True, indexed=True, default='America/Chicago')
     class_version = ndb.IntegerProperty()
 
