@@ -29,7 +29,7 @@ class LocationsHandler(RequestHandler, KeyValidatorMixin):
 
         customer_location_name = self.request.get("customer_location_name")
         if customer_location_name:
-            query_results = Location.find_by_partial_location_name(customer_location_name)
+            query_results = Location.find_by_partial_location_name(customer_location_name, tenant_key)
         else:
             query_results = Location.query(Location.tenant_key == tenant_key).order(Location.customer_location_code).fetch()
 
