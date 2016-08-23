@@ -418,8 +418,8 @@ class Location(ndb.Model):
                 return key.get()
 
     @classmethod
-    def find_by_partial_location_name(cls, partial_name):
-        all_locations = Location.query().fetch()
+    def find_by_partial_location_name(cls, partial_name, tenant_key):
+        all_locations = Location.query(Location.tenant_key == tenant_key).fetch()
         return [item for item in all_locations if partial_name.lower() in item.customer_location_name.lower()]
 
     @classmethod
