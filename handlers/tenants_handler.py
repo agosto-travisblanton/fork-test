@@ -45,10 +45,11 @@ class TenantsHandler(RequestHandler):
 
     @requires_api_token
     def get(self, tenant_key=None):
+        distributor_urlsafe_key = self.request.headers.get('X-Provisioning-Distributor')
         if not tenant_key:
             tenant_search_code = self.request.get("tenant_name")
             if tenant_search_code:
-                result = Tenant.find_by_partial_name(tenant_search_code)
+                result = Tenant.find_by_partial_name(tenant_search_code, distributor_urlsafe_key)
             else:
                 distributor_key = self.request.headers.get('X-Provisioning-Distributor')
                 result = get_tenant_list_from_distributor_key(distributor_key=distributor_key)
