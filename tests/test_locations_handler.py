@@ -98,7 +98,7 @@ class TestLocationsHandler(BaseTest, WebTest):
         response = self.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 1)
-git
+
     def test_get_locations_by_tenant_search_by_name(self):
         tenant = Tenant.create(tenant_code='acme_inc',
                                name='Acme, Inc.',
