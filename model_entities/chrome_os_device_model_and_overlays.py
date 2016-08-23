@@ -462,11 +462,19 @@ class Tenant(ndb.Model):
                 return key.get()
 
     @classmethod
-    def find_by_partial_name(cls, partial_name):
-        # search for all tenants because datastore does not support wildcard searches
-        all_tenants = Tenant.query().fetch()
-        # returns wildcard matches for partial_name
-        return [item for item in all_tenants if partial_name.lower() in item.name.lower()]
+    def tenants_of_distributor(cls, distributor_urlsafe_key):
+        distributor = ndb.Key(urlsafe=distributor_urlsafe_key)
+        domain_keys = Domain.query(Domain.distributor_key == distributor).fetch(100, keys_only=True)
+        tenant_list = Tenant.query(ancestor=TenantEntityGroup.singleton().key)
+        tenant_list = filter(lambda x: x.active, tenant_list)
+        result = filter(lambda x: x.domain_key in domain_keys, tenant_list)
+        sorted_result = sorted(result, key=lambda k: k.tenant_code)
+        return sorted_result
+
+    @classmethod
+    def find_by_partial_name(cls, partial_name, distributor_urlsafe_key):
+        all_tenants_of_distributor = cls.tenants_of_distributor(distributor_urlsafe_key)
+        return [item for item in all_tenants_of_distributor if partial_name.lower() in item.name.lower()]
 
     @classmethod
     def find_by_tenant_code(cls, tenant_code):
@@ -538,6 +546,24 @@ class Tenant(ndb.Model):
                 filtered_devices.append(item)
 
         return filtered_devices
+
+    @classmethod
+    def find_devices_with_partial_mac_of_distributor(cls, distributor_urlsafe_key, unmanaged, partial_mac):
+        domain_tenant_list = cls.tenants_of_distributor(distributor_urlsafe_key)
+        tenant_keys = [tenant.key for tenant in domain_tenant_list]
+        return cls.find_devices_with_partial_mac(tenant_keys, unmanaged, partial_mac)
+
+    @classmethod
+    def find_devices_with_partial_serial_of_distributor(cls, distributor_urlsafe_key, unmanaged, partial_serial):
+        domain_tenant_list = cls.tenants_of_distributor(distributor_urlsafe_key)
+        tenant_keys = [tenant.key for tenant in domain_tenant_list]
+        return cls.find_devices_with_partial_serial(tenant_keys, unmanaged, partial_serial)
+
+    @classmethod
+    def find_devices_with_partial_gcmid_of_distributor(cls, distributor_urlsafe_key, unmanaged, partial_gcmid):
+        domain_tenant_list = cls.tenants_of_distributor(distributor_urlsafe_key)
+        tenant_keys = [tenant.key for tenant in domain_tenant_list]
+        return cls.find_devices_with_partial_gcmid(tenant_keys, unmanaged, partial_gcmid)
 
     @classmethod
     def find_issues_paginated(cls, start, end, device, fetch_size=25, prev_cursor_str=None,
