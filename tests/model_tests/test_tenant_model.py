@@ -66,7 +66,7 @@ class TestTenantModel(BaseTest):
         self.assertEqual(actual.name, self.NAME)
 
     def test_find_by_partial_name_returns_list_of_matching_tenants(self):
-        actual = Tenant.find_by_partial_name(self.NAME)
+        actual = Tenant.find_by_partial_name(self.NAME, self.distributor.key.urlsafe())
         self.assertEqual(actual[0].key, self.tenant_key)
         self.assertEqual(actual[0].name, self.NAME)
 
@@ -233,6 +233,66 @@ class TestTenantModel(BaseTest):
         device.put()
         devices = Tenant.find_devices_with_partial_mac(
             tenant_keys=[self.tenant_key],
+            unmanaged=False,
+            partial_mac=partial_mac)
+        self.assertLength(0, devices)
+
+
+    ###############################################################
+    # find devices by distributor
+    ###############################################################
+    def test_find_devices_with_partial_serial_of_distributor(self):
+        serial_number = 'SN445-123-3434'
+        partial_serial = 'SN445'
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
+                                               mac_address='123123123')
+        device.serial_number = serial_number
+        device.put()
+        devices = Tenant.find_devices_with_partial_serial_of_distributor(
+            distributor_urlsafe_key=self.distributor.key.urlsafe(),
+            unmanaged=False,
+            partial_serial=partial_serial)
+        self.assertLength(1, devices)
+
+    def test_find_devices_with_partial_serial_archived_of_distributor(self):
+        serial_number = 'SN445-123-3434'
+        partial_serial = 'SN445'
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
+                                               mac_address='123123123')
+        device.serial_number = serial_number
+        device.archived = True
+        device.put()
+        devices = Tenant.find_devices_with_partial_serial_of_distributor(
+            distributor_urlsafe_key=self.distributor.key.urlsafe(),
+            unmanaged=False,
+            partial_serial=partial_serial)
+        self.assertLength(0, devices)
+
+    def test_find_devices_with_partial_mac_of_distributor(self):
+        mac_address = '80324771123'
+        partial_mac = '8032'
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
+                                               mac_address=mac_address)
+        device.put()
+        devices = Tenant.find_devices_with_partial_mac_of_distributor(
+            distributor_urlsafe_key=self.distributor.key.urlsafe(),
+            unmanaged=False,
+            partial_mac=partial_mac)
+        self.assertLength(1, devices)
+
+    def test_find_devices_with_partial_mac_archived_of_distributor(self):
+        mac_address = '80324771123'
+        partial_mac = '8032'
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id='BPA91bHyMJRcN7mj7b0aXGWE7Ae',
+                                               mac_address=mac_address)
+        device.archived = True
+        device.put()
+        devices = Tenant.find_devices_with_partial_mac_of_distributor(
+            distributor_urlsafe_key=self.distributor.key.urlsafe(),
             unmanaged=False,
             partial_mac=partial_mac)
         self.assertLength(0, devices)

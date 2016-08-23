@@ -157,25 +157,22 @@ class DeviceResourceHandler(RequestHandler, PagingListHandlerMixin, KeyValidator
         partial_serial = self.request.get("partial_serial")
         partial_mac = self.request.get("partial_mac")
 
-        domain_tenant_list = DeviceResourceHandler.get_domain_tenant_list_from_distributor(distributor_urlsafe_key)
-        tenant_keys = [tenant.key for tenant in domain_tenant_list]
-
         if partial_gcmid:
-            resulting_devices = Tenant.find_devices_with_partial_gcmid(
-                tenant_keys=tenant_keys,
+            resulting_devices = Tenant.find_devices_with_partial_gcmid_of_distributor(
+                distributor_urlsafe_key=distributor_urlsafe_key,
                 unmanaged=unmanaged,
                 partial_gcmid=partial_gcmid
             )
 
         elif partial_serial:
-            resulting_devices = Tenant.find_devices_with_partial_serial(
-                tenant_keys=tenant_keys,
+            resulting_devices = Tenant.find_devices_with_partial_serial_of_distributor(
+                distributor_urlsafe_key=distributor_urlsafe_key,
                 unmanaged=unmanaged,
                 partial_serial=partial_serial
             )
         elif partial_mac:
-            resulting_devices = Tenant.find_devices_with_partial_mac(
-                tenant_keys=tenant_keys,
+            resulting_devices = Tenant.find_devices_with_partial_mac_of_distributor(
+                distributor_urlsafe_key=distributor_urlsafe_key,
                 unmanaged=unmanaged,
                 partial_mac=partial_mac
             )
