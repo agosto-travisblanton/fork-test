@@ -59,27 +59,6 @@ class ChromeOsDevicesApi(object):
         self.authorized_http = self.credentials.authorize(Http())
         self.discovery_service = discovery.build('admin', 'directory_v1', http=self.authorized_http)
 
-    @staticmethod
-    def list_all_devices(int_credentials=True, prod_credentials=False):
-        cdm_api = ChromeOsDevicesApi('admin@dev.agosto.com', int_credentials=int_credentials,
-                                     prod_credentials=prod_credentials)
-        return cdm_api.list('my_customer')
-
-
-    @staticmethod
-    def list_all_devices_in_path(orgUnitPath, int_credentials=True, prod_credentials=False):
-        cdm_api = ChromeOsDevicesApi('admin@dev.agosto.com', int_credentials=int_credentials,
-                                     prod_credentials=prod_credentials)
-        devices_list = cdm_api.list('my_customer')
-
-        # ensures that patterns like /Skykit/Agosto/Blah/<device> match, but /Skykit/AgostoDevTest does not ...
-        # given an input of /Skykit/Agosto
-        return [
-            device for device in devices_list
-            if orgUnitPath == device["orgUnitPath"]
-            or (orgUnitPath in device["orgUnitPath"] and device["orgUnitPath"].split(orgUnitPath, 1)[1][0] == "/")
-            ]
-
     # https://developers.google.com/admin-sdk/directory/v1/reference/chromeosdevices/list
     def list(self, customer_id, page_token=None, projection=None, max_results=None):
         """

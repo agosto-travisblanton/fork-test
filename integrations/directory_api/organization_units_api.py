@@ -1,13 +1,11 @@
 import json
-import re
 
 from app_config import config
 from googleapiclient import discovery
 from googleapiclient.errors import HttpError
 from httplib2 import Http
 from oauth2client.client import SignedJwtAssertionCredentials
-from chrome_os_devices_api import ChromeOsDevicesApi
-from models import ChromeOsDevice
+
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
@@ -75,9 +73,8 @@ class OrganizationUnitsApi(object):
             response = {'statusCode': err.resp.status}
         return response
 
-    def patch_tenant_name(self, old_tenant_code, new_tenant_code):
+    def patch_tenant_name(self, org_unit_path, new_tenant_code):
         ou_api = self.discovery_service.orgunits()
-        org_unit_path = 'Skykit/' + old_tenant_code
         request_body = {
             "name": new_tenant_code,
         }
@@ -91,39 +88,6 @@ class OrganizationUnitsApi(object):
             response = {'statusCode': error.resp.status, 'statusText': reason['error']['message']}
             return response
         return response
-
-    @staticmethod
-    def convert_tenant_name_to_tenant_code(tenant_name):
-        new_tenant_code = tenant_name.lower()
-        new_tenant_code = new_tenant_code.replace(' ', '_')
-        new_tenant_code = re.sub('[^0-9a-zA-Z_]+', '', new_tenant_code)
-        return new_tenant_code
-
-    def migrate_all_existing_tenant_names(self):
-        all_existing_tenant_OUs = [
-            {
-                "orgUnitPath": each["orgUnitPath"],
-                "orgUnitId": each["orgUnitId"],
-                "name": each["name"]
-            } for each in self.list()["organizationUnits"]]
-        for each_ou in all_existing_tenant_OUs:
-            all_devices_in_OU = ChromeOsDevicesApi.list_all_devices_in_path(each_ou["orgUnitPath"])
-            if len(all_devices_in_OU) == 0:
-                print "THERE ARE NO DEVICES IN THIS TENANT OU. I HAVE NO IDEA HOW TO RENAME IT"
-            else:
-                first_device_serial_code = all_devices_in_OU[0]["serialNumber"]
-                # do get_by_serial_number via searching INT's Provisioning in dev env since we don't have it in datastore
-                device_entity = ChromeOsDevice.get_by_serial_number(first_device_serial_code)
-                if device_entity:
-                    tenant_code_of_device = device_entity.tenant_key.get().tenant_code
-                    print "CORRECTED NAME OF TENANT: {} IS TENANT CODE: {}".format(each_ou["name"], tenant_code_of_device)
-                else:
-                    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-                    print "{} DOES NOT EXIST IN DATASTORE".format(first_device_serial_code)
-
-
-            # if self.convert_tenant_name_to_tenant_code(each_ou["name"]) != each_ou["name"]:
-            #     self.patch_tenant_name(self.convert_tenant_name_to_tenant_code(each_name))
 
     # https://www.googleapis.com/admin/directory/v1/customer/my_customer/orgunits
     def insert(self, tenant_code, screen_rotation=0):
