@@ -115,7 +115,7 @@ class TestLocationsHandler(BaseTest, WebTest):
                                        {'tenant_urlsafe_key': tenant_key.urlsafe()})
         response = self.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
-        self.assertEqual(len(response_json), number_of_locations + 1) # another location is created elsewhere
+        self.assertEqual(len(response_json), number_of_locations)
 
 
     def test_get_locations_by_tenant_returns_location_list_paginated(self):

@@ -335,6 +335,12 @@ application = WSGIApplication(
               name='manage-domain',
               methods=['GET', 'PUT', 'DELETE']
               ),
+        Route(r'/api/v1/domains/<domain_key>/directory_api',
+              handler='handlers.domains_handler.DomainsHandler',
+              name='directory-api-ping',
+              handler_method='ping_directory_api',
+              methods=['GET']
+              ),
 
         ############################################################
         # OVERLAY
