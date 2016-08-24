@@ -185,6 +185,15 @@ class ChromeOsDevice(ndb.Model):
             return None
 
     @classmethod
+    def get_by_serial_number(cls, serial_number):
+        if serial_number:
+            results = ChromeOsDevice.query(ChromeOsDevice.serial_number == serial_number,
+                                           ndb.AND(ChromeOsDevice.archived == False)).fetch()
+            return results[0] if results else  None  # there should never be multiple multiple serials in this query
+        else:
+            return None
+
+    @classmethod
     def get_by_mac_address(cls, mac_address):
         if mac_address:
             results = ChromeOsDevice.query(

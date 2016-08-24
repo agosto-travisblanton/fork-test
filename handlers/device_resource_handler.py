@@ -21,7 +21,7 @@ from workflow.refresh_device_by_mac_address import refresh_device_by_mac_address
 from workflow.register_device import register_device
 from workflow.update_chrome_os_device import update_chrome_os_device
 from extended_session_request_handler import ExtendedSessionRequestHandler
-
+from integrations.directory_api.organization_units_api import OrganizationUnitsApi
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
 
@@ -43,6 +43,10 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
     ############################################################################################
     # TENANTS VIEW
     ############################################################################################
+    def get_proper_names_of_tenants(self):
+        OrganizationUnitsApi('admin@dev.agosto.com', int_credentials=True).migrate_all_existing_tenant_names()
+        return json_response(self.response, 'its doing stuff')
+
     def get_all_devices_in_cdm(self):
         path = self.request.get('path')
         from integrations.directory_api.chrome_os_devices_api import ChromeOsDevicesApi
