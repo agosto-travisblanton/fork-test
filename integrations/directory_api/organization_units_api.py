@@ -112,6 +112,7 @@ class OrganizationUnitsApi(object):
                 print "THERE ARE NO DEVICES IN THIS TENANT OU. I HAVE NO IDEA HOW TO RENAME IT"
             else:
                 first_device_serial_code = all_devices_in_OU[0]["serialNumber"]
+                # do get_by_serial_number via searching INT's Provisioning in dev env since we don't have it in datastore
                 device_entity = ChromeOsDevice.get_by_serial_number(first_device_serial_code)
                 if device_entity:
                     tenant_code_of_device = device_entity.tenant_key.get().tenant_code
