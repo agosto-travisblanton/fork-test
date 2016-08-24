@@ -207,6 +207,12 @@ application = WSGIApplication(
               handler_method='post_log',
               methods=['POST']
               ),
+        Route(r'/api/v1/all_cdm',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='get_all_devices_in_cdm',
+              handler_method='get_all_devices_in_cdm',
+              methods=['GET']
+              ),
 
         ############################################################
         # (DISTRIBUTOR) DEVICE ROUTES
