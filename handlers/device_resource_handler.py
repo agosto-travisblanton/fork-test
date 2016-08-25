@@ -43,6 +43,13 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
     ############################################################################################
     # TENANTS VIEW
     ############################################################################################
+    def get_proper_names_of_tenants(self):
+        from integrations.directory_api.tenant_ou_name_migration import TenantOUNameMigration
+        tenant_ou_migration = TenantOUNameMigration()
+        tenant_ou_migration.migrate_all_existing_tenant_names()
+        return json_response(self.response, 'its doing stuff')
+
+
     @requires_api_token
     def search_for_device_by_tenant(self, tenant_urlsafe_key):
         unmanaged = self.request.get("unmanaged") == "true"

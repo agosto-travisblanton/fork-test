@@ -30,28 +30,25 @@ class TenantOUNameMigration(object):
             else:
                 # any device in this OU will have a serial number that corresponds to a device entity
                 # in provisioning that will have the tenant_code associated with the tenant_key KeyProperty
-                first_device_serial_code = all_devices_in_OU[0]["serialNumber"]
-
-                # if on_development_server:
-                # REPLACE ChromeOsDevice.get_by_serial_number with searching INT's Provisioning in dev env
-                device_entity = ChromeOsDevice.get_by_serial_number(first_device_serial_code)
-
-                # else:
-                #     device_entity = ChromeOsDevice.get_by_serial_number(first_device_serial_code)
-
-                # if we find the device by serial_code
-                if device_entity:
-                    tenant_code_of_device = device_entity.tenant_key.get().tenant_code
-                    print "CORRECTED NAME OF TENANT OU NAME: {} IS TENANT CODE: {}".format(each_ou["name"],
-                                                                                           tenant_code_of_device)
-                else:
-                    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-                    print "{} DOES NOT EXIST IN DATASTORE".format(first_device_serial_code)
-                    print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                for each_device in all_devices_in_OU:
+                    device_entity = ChromeOsDevice.get_by_serial_number(each_device["serialNumber"])
+                    if device_entity:
+                        tenant_code_of_device = device_entity.tenant_key.get().tenant_code
+                        if tenant_code_of_device != each_ou["name"]:
+                            print "CORRECTED NAME OF TENANT OU NAME: {} IS TENANT CODE: {}".format(each_ou["name"],
+                                                                                               tenant_code_of_device)
+                        else:
+                            print "TENANT NAME: {} IS ALREADY CORRECT. NO MIGRATION NEEDED".format(each_ou["name"])
+                        break  # we don't need to keep looping through devices now that we found the tenant name                                                                  tenant_code_of_device)
+                    else:
+                        print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                        print "TENANT: {} DEVICE {} DOES NOT EXIST IN DATASTORE".format(each_ou["name"],
+                                                                                        each_device["serialNumber"])
+                        print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
 
-                    # if self.convert_tenant_name_to_tenant_code(each_ou["name"]) != each_ou["name"]:
-                    #     self.patch_tenant_name(self.convert_tenant_name_to_tenant_code(each_name))
+                        # if self.convert_tenant_name_to_tenant_code(each_ou["name"]) != each_ou["name"]:
+                        #     self.patch_tenant_name(self.convert_tenant_name_to_tenant_code(each_name))
 
     @staticmethod
     def convert_tenant_name_to_tenant_code(tenant_name):

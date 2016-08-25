@@ -14,7 +14,7 @@ from utils.web_util import build_uri
 from webapp2 import RequestHandler
 import logging
 import traceback
-
+from hydate_ou_id_to_none import HydrateOUIdToNone
 from migrate_tenant_ou_names import MigrateTenantOUNames
 from hydrate_tenant_key_on_devices import HydrateTenantKeyOnDevices
 from refresh_chrome_device_properties_from_directory_api import RefreshChromeDevicePropertiesFromDirectoryApi
@@ -36,7 +36,8 @@ MIGRATIONS = [
     UpdateChromeOsDeviceAnnotatedAssetId(),
     HydrateDefaultDeviceSleepProperty(),
     SetOverlayStatusToFalse(),
-    MigrateTenantOUNames()
+    MigrateTenantOUNames(),
+    HydrateOUIdToNone()
 ]
 
 MIGRATIONS_MAP = {migration.name: migration for migration in MIGRATIONS}
