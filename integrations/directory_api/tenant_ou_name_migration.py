@@ -2,6 +2,7 @@ from chrome_os_devices_api import ChromeOsDevicesApi
 from organization_units_api import OrganizationUnitsApi
 from models import ChromeOsDevice
 import re
+import json
 
 
 class TenantOUNameMigration(object):
@@ -20,35 +21,40 @@ class TenantOUNameMigration(object):
                 "name": each["name"]
             } for each in self.ou_api.list()["organizationUnits"]]
 
+        final_translation_dict = {}
+
         for each_ou in all_tenant_OUs:
+            final_translation_dict[each_ou["name"]] = {}
             all_devices_in_OU = self.cod_api.list_all_devices_in_path(each_ou["orgUnitPath"])
 
             if len(all_devices_in_OU) == 0:
-                print "THERE ARE NO DEVICES IN TENANT: {}".format(each_ou["name"])
-                print "RENAME FOR {} FAILED".format(each_ou["name"])
+                final_translation_dict[each_ou["name"]]["tenant_code"] = "No Devices in Path / No Match"
 
             else:
-                # any device in this OU will have a serial number that corresponds to a device entity
-                # in provisioning that will have the tenant_code associated with the tenant_key KeyProperty
+                devices_that_werent_found = []
+                final_translation_dict[each_ou["name"]]["not_found_devices"] = devices_that_werent_found
+                device_found = False
                 for each_device in all_devices_in_OU:
                     device_entity = ChromeOsDevice.get_by_serial_number(each_device["serialNumber"])
                     if device_entity:
+                        device_found = True
                         tenant_code_of_device = device_entity.tenant_key.get().tenant_code
                         if tenant_code_of_device != each_ou["name"]:
-                            print "CORRECTED NAME OF TENANT OU NAME: {} IS TENANT CODE: {}".format(each_ou["name"],
-                                                                                               tenant_code_of_device)
+                            final_translation_dict[each_ou["name"]]["tenant_code"] = tenant_code_of_device
                         else:
-                            print "TENANT NAME: {} IS ALREADY CORRECT. NO MIGRATION NEEDED".format(each_ou["name"])
+                            final_translation_dict[each_ou["name"]]["tenant_code"] = each_ou["name"]
+                        del final_translation_dict[each_ou["name"]]["not_found_devices"]
                         break  # we don't need to keep looping through devices now that we found the tenant name                                                                  tenant_code_of_device)
+
                     else:
-                        print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-                        print "TENANT: {} DEVICE {} DOES NOT EXIST IN DATASTORE".format(each_ou["name"],
-                                                                                        each_device["serialNumber"])
-                        print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                        devices_that_werent_found.append(each_device["serialNumber"])
 
-
-                        # if self.convert_tenant_name_to_tenant_code(each_ou["name"]) != each_ou["name"]:
-                        #     self.patch_tenant_name(self.convert_tenant_name_to_tenant_code(each_name))
+                if not device_found:
+                    final_translation_dict[each_ou["name"]][
+                        "tenant_code"] = "At least one device was found, but none match in datastore."
+                    # if self.convert_tenant_name_to_tenant_code(each_ou["name"]) != each_ou["name"]:
+                    #     self.patch_tenant_name(self.convert_tenant_name_to_tenant_code(each_name))
+        print json.dumps(final_translation_dict, sort_keys=True, indent=4)
 
     @staticmethod
     def convert_tenant_name_to_tenant_code(tenant_name):
