@@ -175,3 +175,14 @@ class ChromeOsDevicesApi(object):
                                                        deviceId=device_id,
                                                        body=resource_json)
                 request.execute()
+
+    def list_all_devices_in_path(self, orgUnitPath):
+        devices_list = self.list('my_customer')
+
+        # ensures that patterns like /Skykit/Agosto/Blah/<device> match, but /Skykit/AgostoDevTest does not ...
+        # given an input of /Skykit/Agosto
+        return [
+            device for device in devices_list
+            if orgUnitPath == device["orgUnitPath"]
+            or (orgUnitPath in device["orgUnitPath"] and device["orgUnitPath"].split(orgUnitPath, 1)[1][0] == "/")
+            ]
