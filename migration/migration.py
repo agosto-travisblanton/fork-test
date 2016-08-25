@@ -15,6 +15,7 @@ from webapp2 import RequestHandler
 import logging
 import traceback
 
+from migrate_tenant_ou_names import MigrateTenantOUNames
 from hydrate_tenant_key_on_devices import HydrateTenantKeyOnDevices
 from refresh_chrome_device_properties_from_directory_api import RefreshChromeDevicePropertiesFromDirectoryApi
 from set_content_manager_base_url_on_tenant import SetContentManagerBaseUrlOnTenant
@@ -34,7 +35,8 @@ MIGRATIONS = [
     SetDefaultAdminUsers(),
     UpdateChromeOsDeviceAnnotatedAssetId(),
     HydrateDefaultDeviceSleepProperty(),
-    SetOverlayStatusToFalse()
+    SetOverlayStatusToFalse(),
+    MigrateTenantOUNames()
 ]
 
 MIGRATIONS_MAP = {migration.name: migration for migration in MIGRATIONS}

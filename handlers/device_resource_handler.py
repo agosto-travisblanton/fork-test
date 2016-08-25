@@ -43,15 +43,6 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
     ############################################################################################
     # TENANTS VIEW
     ############################################################################################
-    def get_proper_names_of_tenants(self):
-        OrganizationUnitsApi('admin@dev.agosto.com', int_credentials=True).migrate_all_existing_tenant_names()
-        return json_response(self.response, 'its doing stuff')
-
-    def get_all_devices_in_cdm(self):
-        path = self.request.get('path')
-        from integrations.directory_api.chrome_os_devices_api import ChromeOsDevicesApi
-        return json_response(self.response, ChromeOsDevicesApi.list_all_devices_in_path(path))
-
     @requires_api_token
     def search_for_device_by_tenant(self, tenant_urlsafe_key):
         unmanaged = self.request.get("unmanaged") == "true"

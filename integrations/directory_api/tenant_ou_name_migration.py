@@ -2,9 +2,6 @@ from chrome_os_devices_api import ChromeOsDevicesApi
 from organization_units_api import OrganizationUnitsApi
 from models import ChromeOsDevice
 import re
-from provisioning_env import (
-    on_development_server,
-)
 
 
 class TenantOUNameMigration(object):
@@ -13,7 +10,7 @@ class TenantOUNameMigration(object):
         self.ou_api = OrganizationUnitsApi('admin@dev.agosto.com', prod_credentials=prod_credentials,
                                            int_credentials=int_credentials)
         self.cod_api = ChromeOsDevicesApi('admin@dev.agosto.com', prod_credentials=prod_credentials,
-                                           int_credentials=int_credentials)
+                                          int_credentials=int_credentials)
 
     def migrate_all_existing_tenant_names(self):
         all_tenant_OUs = [
@@ -35,18 +32,18 @@ class TenantOUNameMigration(object):
                 # in provisioning that will have the tenant_code associated with the tenant_key KeyProperty
                 first_device_serial_code = all_devices_in_OU[0]["serialNumber"]
 
-                if on_development_server:
-                    # REPLACE ChromeOsDevice.get_by_serial_number with searching INT's Provisioning in dev env
-                    device_entity = ChromeOsDevice.get_by_serial_number(first_device_serial_code)
+                # if on_development_server:
+                # REPLACE ChromeOsDevice.get_by_serial_number with searching INT's Provisioning in dev env
+                device_entity = ChromeOsDevice.get_by_serial_number(first_device_serial_code)
 
-                else:
-                    device_entity = ChromeOsDevice.get_by_serial_number(first_device_serial_code)
+                # else:
+                #     device_entity = ChromeOsDevice.get_by_serial_number(first_device_serial_code)
 
                 # if we find the device by serial_code
                 if device_entity:
                     tenant_code_of_device = device_entity.tenant_key.get().tenant_code
                     print "CORRECTED NAME OF TENANT OU NAME: {} IS TENANT CODE: {}".format(each_ou["name"],
-                                                                                   tenant_code_of_device)
+                                                                                           tenant_code_of_device)
                 else:
                     print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                     print "{} DOES NOT EXIST IN DATASTORE".format(first_device_serial_code)
