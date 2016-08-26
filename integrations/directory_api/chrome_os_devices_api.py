@@ -80,10 +80,12 @@ class ChromeOsDevicesApi(object):
             if page_token is None:
                 request = chrome_os_devices_api.list(customerId=customer_id,
                                                      projection=projection,
+                                                     query=self.STATUS_FILTER,
                                                      maxResults=max_results)
             else:
                 request = chrome_os_devices_api.list(customerId=customer_id,
                                                      projection=projection,
+                                                     query=self.STATUS_FILTER,
                                                      pageToken=page_token,
                                                      maxResults=max_results)
             current_page_json = request.execute()

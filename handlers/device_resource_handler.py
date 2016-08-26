@@ -21,7 +21,6 @@ from workflow.refresh_device_by_mac_address import refresh_device_by_mac_address
 from workflow.register_device import register_device
 from workflow.update_chrome_os_device import update_chrome_os_device
 from extended_session_request_handler import ExtendedSessionRequestHandler
-from integrations.directory_api.organization_units_api import OrganizationUnitsApi
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
 
@@ -43,13 +42,6 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
     ############################################################################################
     # TENANTS VIEW
     ############################################################################################
-    def get_proper_names_of_tenants(self):
-        from integrations.directory_api.tenant_ou_name_migration import TenantOUNameMigration
-        tenant_ou_migration = TenantOUNameMigration()
-        tenant_ou_migration.migrate_all_existing_tenant_names()
-        return json_response(self.response, 'its doing stuff')
-
-
     @requires_api_token
     def search_for_device_by_tenant(self, tenant_urlsafe_key):
         unmanaged = self.request.get("unmanaged") == "true"

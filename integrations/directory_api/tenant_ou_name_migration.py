@@ -43,7 +43,18 @@ class TenantOUNameMigration(object):
                             final_translation_dict[each_ou["name"]]["tenant_code"] = tenant_code_of_device
                         else:
                             final_translation_dict[each_ou["name"]]["tenant_code"] = each_ou["name"]
+
                         del final_translation_dict[each_ou["name"]]["not_found_devices"]
+
+                        # updates org unit path (tenant OU's) name with new with new_tenant_code argument
+                        # WE DON'T WANT TO DO THIS YET!!!
+                        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        # self.ou_api.patch_tenant_name(
+                        #     org_unit_path=each_ou["orgUnitPath"],
+                        #     new_tenant_code=tenant_code_of_device
+                        # )
+                        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
                         break  # we don't need to keep looping through devices now that we found the tenant name                                                                  tenant_code_of_device)
 
                     else:
@@ -52,8 +63,7 @@ class TenantOUNameMigration(object):
                 if not device_found:
                     final_translation_dict[each_ou["name"]][
                         "tenant_code"] = "At least one device was found, but none match in datastore."
-                    # if self.convert_tenant_name_to_tenant_code(each_ou["name"]) != each_ou["name"]:
-                    #     self.patch_tenant_name(self.convert_tenant_name_to_tenant_code(each_name))
+
         print json.dumps(final_translation_dict, sort_keys=True, indent=4)
 
     @staticmethod

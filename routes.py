@@ -207,14 +207,6 @@ application = WSGIApplication(
               handler_method='post_log',
               methods=['POST']
               ),
-
-        Route(r'/api/v1/all_tenants',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='get_proper_names_of_tenants',
-              handler_method='get_proper_names_of_tenants',
-              methods=['GET']
-              ),
-
         ############################################################
         # (DISTRIBUTOR) DEVICE ROUTES
         ############################################################
