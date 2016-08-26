@@ -31,5 +31,9 @@ def create_enrollment_user(impersonation_email,
     if 'statusCode' in result.keys() and 'statusText' in result.keys():
         status_code = result['statusCode']
         status_text = result['statusText']
-        # TODO add integration event logging here using correlation_id for response (status code and status text)
+        # TODO add integration event logging using correlation_id for failure response (status code and status text)
+    else:
+        # TODO add integration event logging using correlation_id for success!
+        is_created = result['primaryEmail'].strip().lower() == enrollment_email
+
     return result

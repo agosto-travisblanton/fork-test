@@ -29,15 +29,18 @@ def create_tenant_org_unit(impersonation_email,
     if 'statusCode' in result.keys() and 'statusText' in result.keys():
         status_code = result['statusCode']
         status_text = result['statusText']
-        # TODO add integration event logging here using correlation_id for response (status code and status text)
+        # TODO add integration event logging  using correlation_id for failure response (status code and status text)
+    else:
+        # TODO add integration event logging using correlation_id for success!
+        # TODO create_enrollment_user should be done on a deferred thread
+        is_created = result['orgUnitPath'].strip().lower() == org_unit_path
+        enrollment_user_result = create_enrollment_user(impersonation_email=impersonation_email,
+                                                        org_unit_path=org_unit_path,
+                                                        enrollment_email=enrollment_email,
+                                                        enrollment_password=enrollment_password,
+                                                        enrollment_family_name=enrollment_family_name,
+                                                        enrollment_given_name=enrollment_given_name,
+                                                        correlation_id=correlation_id)
 
-    # TODO create_enrollment_user should be done on a deferred thread
-    enrollment_user_result = create_enrollment_user(impersonation_email=impersonation_email,
-                                                    org_unit_path=org_unit_path,
-                                                    primary_email=enrollment_email,
-                                                    password=enrollment_password,
-                                                    enrollment_family_name=enrollment_family_name,
-                                                    enrollment_given_name=enrollment_given_name,
-                                                    correlation_id=correlation_id)
     return result
 
