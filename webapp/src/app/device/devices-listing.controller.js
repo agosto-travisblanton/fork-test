@@ -48,11 +48,13 @@ function DevicesListingCtrl($stateParams, $log, DevicesService, $state, Sessions
       vm.unmanagedDisabled = true;
       vm.unmanagedSerialDevices = {};
       vm.unmanagedMacDevices = {};
+      vm.devicesToMatchOnUnmanaged = [];
     } else {
       vm.searchText = '';
       vm.disabled = true;
       vm.serialDevices = {};
       vm.macDevices = {};
+      vm.devicesToMatchOnManaged = [];
     }
   };
 
