@@ -29,6 +29,7 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
         component_name='Chrome Directory API',
         workflow_step='Request for device information',
         mac_address=device_mac_address,
+        device_urlsafe_key=device_urlsafe_key,
         gcm_registration_id=gcm_registration_id,
         correlation_identifier=correlation_id)
     api_request_event.put()
@@ -68,6 +69,7 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
         component_name='Chrome Directory API',
         workflow_step='Response for device information request',
         mac_address=device_mac_address,
+        device_urlsafe_key=device_urlsafe_key,
         gcm_registration_id=gcm_registration_id,
         correlation_identifier=correlation_id)
     api_response_event.put()
@@ -147,6 +149,7 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
                 workflow_step='Requested device not found',
                 mac_address=device_mac_address,
                 gcm_registration_id=gcm_registration_id,
+                device_urlsafe_key=device_urlsafe_key,
                 correlation_identifier=correlation_id)
             device_not_found_event.put()
             if new_page_token:
