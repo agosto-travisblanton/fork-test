@@ -21,50 +21,58 @@ class TenantOUNameMigration(object):
                 "name": each["name"]
             } for each in self.ou_api.list()["organizationUnits"]]
 
-        final_translation_dict = {}
+        translation_map = {}
 
         for each_ou in all_tenant_OUs:
-            final_translation_dict[each_ou["name"]] = {}
+            translation_map[each_ou["name"]] = {}
             all_devices_in_OU = self.cod_api.list_all_devices_in_path(each_ou["orgUnitPath"])
 
             if len(all_devices_in_OU) == 0:
-                final_translation_dict[each_ou["name"]]["tenant_code"] = "No Devices in Path / No Match"
+                message = "No Devices in OrgUnitPath. No match to a Provisioning Tenant can be made."
+                translation_map[each_ou["name"]]["tenant_code"] = message
 
             else:
-                devices_that_werent_found = []
-                final_translation_dict[each_ou["name"]]["not_found_devices"] = devices_that_werent_found
+                translation_map[each_ou["name"]]["not_found_devices"] = []
                 device_found = False
+
                 for each_device in all_devices_in_OU:
                     device_entity = ChromeOsDevice.get_by_serial_number(each_device["serialNumber"])
                     if device_entity:
-                        device_found = True
-                        tenant_code_of_device = device_entity.tenant_key.get().tenant_code
-                        if tenant_code_of_device != each_ou["name"]:
-                            final_translation_dict[each_ou["name"]]["tenant_code"] = tenant_code_of_device
-                        else:
-                            final_translation_dict[each_ou["name"]]["tenant_code"] = each_ou["name"]
+                        # we would have already identified the tenant of the tenant_ou if a previous device was found.
+                        # however, there could be other devices in the Tenant OU that provisioning doesn't know about.
+                        # it will be helpful to collect all of these devices.
+                        if not device_found:
+                            device_found = True
+                            tenant_entity = device_entity.tenant_key.get()
+                            tenant_code = tenant_entity.tenant_code
 
-                        del final_translation_dict[each_ou["name"]]["not_found_devices"]
+                            if tenant_code != each_ou["name"]:
+                                translation_map[each_ou["name"]]["tenant_code"] = tenant_code
+                            else:
+                                translation_map[each_ou["name"]]["tenant_code"] = each_ou["name"]
 
-                        # updates org unit path (tenant OU's) name with new with new_tenant_code argument
-                        # WE DON'T WANT TO DO THIS YET!!!
-                        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                        # self.ou_api.patch_tenant_name(
-                        #     org_unit_path=each_ou["orgUnitPath"],
-                        #     new_tenant_code=tenant_code_of_device
-                        # )
-                        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                            del translation_map[each_ou["name"]]["not_found_devices"]
 
-                        break  # we don't need to keep looping through devices now that we found the tenant name                                                                  tenant_code_of_device)
+                            tenant_entity.ou_id = each_ou["orgUnitId"]
+                            tenant_entity.put()
+
+                            # updates org unit path (tenant OU's) name with new with new_tenant_code argument
+                            # WE DON'T WANT TO DO THIS YET!!!
+                            # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                            # self.ou_api.patch_tenant_name(
+                            #     org_unit_path=each_ou["orgUnitPath"],
+                            #     new_tenant_code=tenant_code_of_device
+                            # )
+                            # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
                     else:
-                        devices_that_werent_found.append(each_device["serialNumber"])
+                        translation_map[each_ou["name"]]["not_found_devices"].append(each_device["serialNumber"])
 
                 if not device_found:
-                    final_translation_dict[each_ou["name"]][
-                        "tenant_code"] = "At least one device was found, but none match in datastore."
+                    message = "No match for device(s) found in datastore. No match to a Provisioning Tenant can be made"
+                    translation_map[each_ou["name"]]["tenant_code"] = message
 
-        print json.dumps(final_translation_dict, sort_keys=True, indent=4)
+        print json.dumps(translation_map, sort_keys=True, indent=4)
 
     @staticmethod
     def convert_tenant_name_to_tenant_code(tenant_name):
