@@ -411,7 +411,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                                    gcm_registration_id=gcm_registration_id,
                                    correlation_id=correlation_id,
                                    _queue='directory-api',
-                                   _countdown=3)
+                                   _countdown=60)
                     device_uri = self.request.app.router.build(None,
                                                                'device',
                                                                None,

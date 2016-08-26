@@ -72,7 +72,8 @@ function TenantManagedDevicesCtrl($scope, $stateParams, TenantsService, DevicesS
     vm.searchText = '';
     vm.disabled = true;
     vm.serialDevices = {};
-    return vm.macDevices = {};
+    vm.macDevices = {};
+    vm.devicesToMatchOn = [];
   };
 
   vm.searchDevices = function (partial) {
