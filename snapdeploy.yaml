@@ -5,6 +5,6 @@ module_yaml_files:
 - proofplay.yaml
 - backup.yaml
 pre-deploy-script: (echo '\n++++++++ RUNNING DEPLOYJS.PY ++++++++\n' && echo '\n++++++++
-  YOU SHOULD HAVE BOWER AND NPM PACKAGES INSTALLED BEFORE THIS STEPP ++++++++\n' &&
+  YOU SHOULD HAVE BOWER AND NPM PACKAGES INSTALLED BEFORE THIS STEP ++++++++\n' &&
   python deployjs.py && (echo '\n++++++++ STARTING DEPLOY ++++++++\n'))
 version: 42-0-0
