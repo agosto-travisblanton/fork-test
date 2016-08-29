@@ -2,7 +2,6 @@ from uuid import uuid4
 
 from extended_session_request_handler import ExtendedSessionRequestHandler
 from integrations.directory_api.organization_units_api import OrganizationUnitsApi
-from integrations.directory_api.users_api import UsersApi
 from restler.serializers import json_response
 from workflow.create_tenant_org_unit import create_tenant_org_unit
 
