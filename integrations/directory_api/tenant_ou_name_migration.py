@@ -53,6 +53,7 @@ class TenantOUNameMigration(object):
 
                             del translation_map[each_ou["name"]]["not_found_devices"]
 
+                            # insert the ou_id for the tenant 
                             tenant_entity.ou_id = each_ou["orgUnitId"]
                             tenant_entity.put()
 
