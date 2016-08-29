@@ -31,7 +31,9 @@ class ChromeOsDevicesApi(object):
     def __init__(self,
                  admin_to_impersonate_email_address,
                  prod_credentials=False,
-                 int_credentials=False):
+                 int_credentials=False,
+                 stage_credentials=False,
+                 qa_credentials=False):
 
         if prod_credentials is True:
             key_file = '{}/privatekeys/skykit-provisioning.pem'.format(config.APP_ROOT)
@@ -42,6 +44,7 @@ class ChromeOsDevicesApi(object):
                 private_key=private_key,
                 scope=self.DIRECTORY_SERVICE_SCOPES,
                 sub=admin_to_impersonate_email_address)
+
         elif int_credentials is True:
             key_file = '{}/privatekeys/skykit-display-device-int.pem'.format(config.APP_ROOT)
             with open(key_file) as f:
@@ -51,6 +54,27 @@ class ChromeOsDevicesApi(object):
                 private_key=private_key,
                 scope=self.DIRECTORY_SERVICE_SCOPES,
                 sub=admin_to_impersonate_email_address)
+
+        elif stage_credentials is True:
+            key_file = '{}/privatekeys/skykit-provisioning-stage.pem'.format(config.APP_ROOT)
+            with open(key_file) as f:
+                private_key = f.read()
+            self.credentials = SignedJwtAssertionCredentials(
+                'service-247@skykit-provisioning-stage.iam.gserviceaccount.com',
+                private_key=private_key,
+                scope=self.DIRECTORY_SERVICE_SCOPES,
+                sub=admin_to_impersonate_email_address)
+
+        elif qa_credentials is True:
+            key_file = '{}/privatekeys/skykit-provisioning-qa.pem'.format(config.APP_ROOT)
+            with open(key_file) as f:
+                private_key = f.read()
+            self.credentials = SignedJwtAssertionCredentials(
+                'service@skykit-provisioning-qa.iam.gserviceaccount.com',
+                private_key=private_key,
+                scope=self.DIRECTORY_SERVICE_SCOPES,
+                sub=admin_to_impersonate_email_address)
+
         else:
             self.credentials = SignedJwtAssertionCredentials(config.SERVICE_ACCOUNT_EMAIL,
                                                              private_key=config.PRIVATE_KEY,

@@ -7,10 +7,24 @@ import json
 
 class TenantOUNameMigration(object):
     def __init__(self, prod_credentials=False,
-                 int_credentials=False):
-        self.ou_api = OrganizationUnitsApi('admin@dev.agosto.com', prod_credentials=prod_credentials,
+                 int_credentials=False,
+                 stage_credentials=False,
+                 qa_credentials=False):
+        if not prod_credentials and not int_credentials and not stage_credentials and not qa_credentials:
+            raise ValueError("You must provide an environment")
+
+        if int_credentials:
+            email = 'admin@dev.agosto.com'
+        elif prod_credentials:
+            email = 'skykit.api@skykit.agosto.com'
+        elif stage_credentials:
+            email = 'skykit.api@devstage.skykit.com'
+        elif qa_credentials:
+            email = 'skykit.api@devqa.skykit.com'
+
+        self.ou_api = OrganizationUnitsApi(email, prod_credentials=prod_credentials,
                                            int_credentials=int_credentials)
-        self.cod_api = ChromeOsDevicesApi('admin@dev.agosto.com', prod_credentials=prod_credentials,
+        self.cod_api = ChromeOsDevicesApi(email, prod_credentials=prod_credentials,
                                           int_credentials=int_credentials)
 
     def migrate_all_existing_tenant_names(self):
