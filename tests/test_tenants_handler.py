@@ -23,6 +23,7 @@ class TestTenantsHandler(BaseTest, WebTest):
     DISTRIBUTOR_NAME = 'agosto'
     IMPERSONATION_EMAIL = 'test@test.com'
     ORIGINAL_NOTIFICATION_EMAILS = ['test@skykit.com', 'admin@skykit.com']
+    BAD_REQUEST = 'Bad response: 400 Bad Request'
 
     def setUp(self):
         super(TestTenantsHandler, self).setUp()
@@ -256,8 +257,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         uri = application.router.build(None, 'tenants', None, {})
         with self.assertRaises(AppError) as context:
             self.app.post_json(uri, params=request_parameters, headers=self.headers)
-        self.assertTrue('Bad response: 400 The domain key parameter is invalid.'
-                        in context.exception.message)
+        self.assertTrue(self.BAD_REQUEST in context.exception.message)
 
     def test_post_returns_conflict_when_encountering_an_existing_tenant_code(self):
         existing_tenant_code = 'acme_inc'
@@ -304,8 +304,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         uri = application.router.build(None, 'tenants', None, {})
         with self.assertRaises(AppError) as context:
             self.app.post_json(uri, params=request_parameters, headers=self.headers)
-        self.assertTrue('Bad response: 400 The proof_of_play_logging parameter is invalid.'
-                        in context.exception.message)
+        self.assertTrue(self.BAD_REQUEST in context.exception.message)
 
     def test_post_returns_bad_request_when_active_is_invalid(self):
         name = u'ABC'
@@ -325,8 +324,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         uri = application.router.build(None, 'tenants', None, {})
         with self.assertRaises(AppError) as context:
             self.app.post_json(uri, params=request_parameters, headers=self.headers)
-        self.assertTrue('Bad response: 400 The active parameter is invalid.'
-                        in context.exception.message)
+        self.assertTrue(self.BAD_REQUEST in context.exception.message)
 
     ##################################################################################################################
     # put

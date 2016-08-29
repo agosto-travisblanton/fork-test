@@ -1,13 +1,15 @@
 import logging
 import uuid
-import ndb_json
+
 from datetime import datetime
 from google.appengine.datastore.datastore_query import Cursor
 from google.appengine.ext import ndb
+
+import ndb_json
 from app_config import config
-from restler.decorators import ae_ndb_serializer
 from domain_model import Domain
 from entity_groups import TenantEntityGroup
+from restler.decorators import ae_ndb_serializer
 from utils.timezone_util import TimezoneUtil
 
 
@@ -449,10 +451,22 @@ class Tenant(ndb.Model):
     proof_of_play_logging = ndb.BooleanProperty(default=False, required=True, indexed=True)
     proof_of_play_url = ndb.StringProperty(required=False)
     default_timezone = ndb.StringProperty(required=True, indexed=True, default='America/Chicago')
+    enrollment_email = ndb.StringProperty(required=False, indexed=True)
+    enrollment_password = ndb.StringProperty(required=False, indexed=False)
+    organization_unit_path = ndb.StringProperty(required=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
     def get_domain(self):
         return self.domain_key.get()
+
+    @staticmethod
+    def generate_enrollment_password(length):
+        if not isinstance(length, int) or length < config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE:
+            raise ValueError('enrollment_password must be greater than {0} in length'.format(
+                config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE - 1))
+        chars = config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_CHARS
+        from os import urandom
+        return ''.join([chars[ord(c) % len(chars)] for c in urandom(length)])
 
     @classmethod
     def find_by_name(cls, name):

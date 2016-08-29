@@ -2,10 +2,10 @@ import json
 import logging
 
 from google.appengine.ext import ndb
-from webapp2 import RequestHandler
 
 from app_config import config
 from decorators import requires_api_token
+from extended_session_request_handler import ExtendedSessionRequestHandler
 from integrations.content_manager.content_manager_api import ContentManagerApi
 from models import Tenant
 from proofplay.database_calls import get_tenant_list_from_distributor_key
@@ -16,7 +16,7 @@ from utils.iterable_util import delimited_string_to_list
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 
-class TenantsHandler(RequestHandler):
+class TenantsHandler(ExtendedSessionRequestHandler):
     @requires_api_token
     def get_tenants_paginated(self, offset, page_size):
         offset = int(offset)
@@ -69,48 +69,24 @@ class TenantsHandler(RequestHandler):
             status = 201
             error_message = None
             request_json = json.loads(self.request.body)
-            name = request_json.get('name')
-            if name is None or name == '':
-                status = 400
-                error_message = 'The name parameter is invalid.'
-            admin_email = request_json.get('admin_email')
-            if admin_email is None or admin_email == '':
-                status = 400
-                error_message = 'The admin email parameter is invalid.'
-            else:
-                admin_email = admin_email.strip().lower()
-            tenant_code = request_json.get('tenant_code')
-            if tenant_code is None or tenant_code == '':
-                status = 400
-                error_message = 'The tenant code parameter is invalid.'
-            else:
-                tenant_code = tenant_code.strip().lower()
-            content_server_url = request_json.get('content_server_url')
-            if content_server_url is None or content_server_url == '':
-                status = 400
-                error_message = 'The content server url parameter is invalid.'
-            else:
-                content_server_url = content_server_url.strip().lower()
-            content_manager_base_url = request_json.get('content_manager_base_url')
-            if content_manager_base_url is None or content_manager_base_url == '':
-                status = 400
-                error_message = 'The content manager base url parameter is invalid.'
-            else:
-                content_manager_base_url = content_manager_base_url.strip().lower()
+            name = self.check_and_get_field('name')
+            admin_email =  self.check_and_get_field('admin_email')
+            admin_email = admin_email.strip().lower()
+            tenant_code =  self.check_and_get_field('tenant_code')
+            tenant_code = tenant_code.strip().lower()
+            content_server_url =  self.check_and_get_field('content_server_url')
+            content_server_url = content_server_url.strip().lower()
+            content_manager_base_url =  self.check_and_get_field('content_manager_base_url')
+            content_manager_base_url = content_manager_base_url.strip().lower()
             notification_emails = delimited_string_to_list(request_json.get('notification_emails'))
-            domain_key_input = request_json.get('domain_key')
-            domain_key = None
-            if domain_key_input is None or domain_key_input == '':
+            domain_key_input = self.check_and_get_field('domain_key')
+            try:
+                domain_key = ndb.Key(urlsafe=domain_key_input)
+            except Exception, e:
+                logging.exception(e)
+            if None is domain_key:
                 status = 400
-                error_message = 'The domain key parameter is invalid.'
-            else:
-                try:
-                    domain_key = ndb.Key(urlsafe=domain_key_input)
-                except Exception, e:
-                    logging.exception(e)
-                if None is domain_key:
-                    status = 400
-                    error_message = 'The domain did not resolve.'
+                error_message = 'The domain did not resolve.'
             active = request_json.get('active')
             if active is None or active == '' or (str(active).lower() != 'true' and str(active).lower() != 'false'):
                 status = 400
