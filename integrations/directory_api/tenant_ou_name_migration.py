@@ -23,9 +23,13 @@ class TenantOUNameMigration(object):
             email = 'skykit.api@devqa.skykit.com'
 
         self.ou_api = OrganizationUnitsApi(email, prod_credentials=prod_credentials,
-                                           int_credentials=int_credentials)
+                                           int_credentials=int_credentials,
+                                           stage_credentials=stage_credentials,
+                                           qa_credentials=qa_credentials)
         self.cod_api = ChromeOsDevicesApi(email, prod_credentials=prod_credentials,
-                                          int_credentials=int_credentials)
+                                          int_credentials=int_credentials,
+                                          stage_credentials=stage_credentials,
+                                          qa_credentials=qa_credentials)
 
     def migrate_all_existing_tenant_names(self):
         all_tenant_OUs = [
@@ -65,7 +69,8 @@ class TenantOUNameMigration(object):
                             else:
                                 translation_map[each_ou["name"]]["tenant_code"] = each_ou["name"]
 
-                            del translation_map[each_ou["name"]]["not_found_devices"]
+                            if 'not_found_devices' in translation_map[each_ou["name"]]:
+                                del translation_map[each_ou["name"]]["not_found_devices"]
 
                             # insert the ou_id for the tenant 
                             tenant_entity.ou_id = each_ou["orgUnitId"]
@@ -81,6 +86,8 @@ class TenantOUNameMigration(object):
                             # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
                     else:
+                        if not 'not_found_devices' in translation_map[each_ou["name"]]:
+                            translation_map[each_ou["name"]]["not_found_devices"] = []
                         translation_map[each_ou["name"]]["not_found_devices"].append(each_device["serialNumber"])
 
                 if not device_found:

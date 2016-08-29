@@ -68,7 +68,7 @@ class OrganizationUnitsApi(object):
         else:
             self.credentials = SignedJwtAssertionCredentials(config.SERVICE_ACCOUNT_EMAIL,
                                                              private_key=config.PRIVATE_KEY,
-                                                             scopeqa=self.DIRECTORY_SERVICE_SCOPES,
+                                                             scope=self.DIRECTORY_SERVICE_SCOPES,
                                                              sub=admin_to_impersonate_email_address)
         self.authorized_http = self.credentials.authorize(Http())
         self.discovery_service = discovery.build('admin', 'directory_v1', http=self.authorized_http)
