@@ -122,7 +122,7 @@ class TestTenantModel(BaseTest):
         self.assertEqual(self.CONTENT_MANAGER_BASE_URL, tenant_created.content_manager_base_url)
         self.assertEqual(self.NAME, tenant_created.name)
         self.assertEqual(self.domain_key, tenant_created.domain_key)
-        self.assertEqual(tenant_created.default_timezone, 'America/Chicago')
+        self.assertEqual(tenant_created.default_timezone, config.DEFAULT_TIMEZONE)
         self.assertLength(0, tenant_created.notification_emails)
 
     def test_create_gives_default_proof_of_play_url(self):

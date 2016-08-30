@@ -370,7 +370,7 @@ app_ACCEPTABLE_ENROLLMENT_USER_PASSWORD_CHARS = "!$AaBbCcDdEeFfGgHhJjKkLlMmNnPpQ
 
 app_ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE = 8
 
-
+app_DEFAULT_TIMEZONE = 'America/Chicago'
 
 def _DEFAULT_CONTENT_MANAGER_URL():
     if on_development_server or not on_server:

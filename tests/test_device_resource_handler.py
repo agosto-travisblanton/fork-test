@@ -209,7 +209,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                  headers=self.api_token_authorization_header)
         location_uri_components = str(response.headers['Location']).split('/')
         device = ndb.Key(urlsafe=location_uri_components[6]).get()
-        default_timezone = 'America/Chicago'
+        default_timezone = config.DEFAULT_TIMEZONE
         self.assertEqual(device.timezone_offset, TimezoneUtil.get_timezone_offset(default_timezone))
         self.assertEqual(device.timezone, default_timezone)
 
@@ -1092,7 +1092,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(config.CHECK_FOR_CONTENT_INTERVAL_MINUTES, updated_display.check_for_content_interval_minutes)
 
     def test_put_updates_timezone_from_default_to_explicit(self):
-        default_timezone = 'America/Chicago'
+        default_timezone = config.DEFAULT_TIMEZONE
         explicit_timezone = 'America/Denver'
         self.assertEqual(self.managed_device.timezone_offset, TimezoneUtil.get_timezone_offset(default_timezone))
         request_body = {'timezone': explicit_timezone}
@@ -1574,7 +1574,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             gcm_registration_id=self.GCM_REGISTRATION_ID,
             device_id='1231231',
             mac_address='2313412341233')
-        device.timezone = 'America/Chicago'
+        device.timezone = config.DEFAULT_TIMEZONE
         device_key = device.put()
         request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
@@ -1583,8 +1583,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'lastError': self.LAST_ERROR,
                         'macAddress': '2313412341233',
                         'osVersion': '10.0',
-                        'timezone': 'America/Chicago',
-                        'timezoneOffset': TimezoneUtil.get_timezone_offset('America/Chicago') + 3}
+                        'timezone': config.DEFAULT_TIMEZONE,
+                        'timezoneOffset': TimezoneUtil.get_timezone_offset(config.DEFAULT_TIMEZONE) + 3}
         uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': device_key.urlsafe()})
         when(device_message_processor).change_intent(
             any_matcher(), config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND).thenReturn(None)

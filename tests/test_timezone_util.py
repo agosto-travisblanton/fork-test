@@ -1,4 +1,5 @@
 from agar.test import BaseTest
+from app_config import config
 from env_setup import setup_test_paths
 from utils.timezone_util import TimezoneUtil
 
@@ -18,7 +19,7 @@ class TestTimezoneUtil(BaseTest):
         super(TestTimezoneUtil, self).setUp()
 
     def test_get_timezone_offset_returns_expected_offset_for_chicago(self):
-        timezone_offset = TimezoneUtil.get_timezone_offset('America/Chicago')
+        timezone_offset = TimezoneUtil.get_timezone_offset(config.DEFAULT_TIMEZONE)
         self.assertGreaterEqual(timezone_offset, self.CHICAGO_OFFSET_CST)
         self.assertLessEqual(timezone_offset, self.CHICAGO_OFFSET_CDT)
 

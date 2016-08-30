@@ -76,7 +76,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
             tenant_code = tenant_code.strip().lower()
             content_server_url =  self.check_and_get_field('content_server_url')
             content_server_url = content_server_url.strip().lower()
-            content_manager_base_url =  self.check_and_get_field('content_manager_base_url')
+            content_manager_base_url = self.check_and_get_field('content_manager_base_url')
             content_manager_base_url = content_manager_base_url.strip().lower()
             notification_emails = delimited_string_to_list(request_json.get('notification_emails'))
             domain_key_input = self.check_and_get_field('domain_key')
@@ -87,16 +87,14 @@ class TenantsHandler(ExtendedSessionRequestHandler):
             if None is domain_key:
                 status = 400
                 error_message = 'The domain did not resolve.'
-            active = request_json.get('active')
-            if active is None or active == '' or (str(active).lower() != 'true' and str(active).lower() != 'false'):
+            active = self.check_and_get_field('active')
+            if str(active).lower() != 'true' and str(active).lower() != 'false':
                 status = 400
                 error_message = 'The active parameter is invalid.'
             else:
                 active = bool(active)
-            proof_of_play_logging = request_json.get('proof_of_play_logging')
-            if proof_of_play_logging is None or active == '' or (
-                            str(proof_of_play_logging).lower() != 'true' and str(
-                        proof_of_play_logging).lower() != 'false'):
+            proof_of_play_logging = self.check_and_get_field('proof_of_play_logging')
+            if str(proof_of_play_logging).lower() != 'true' and str(proof_of_play_logging).lower() != 'false':
                 status = 400
                 error_message = 'The proof_of_play_logging parameter is invalid.'
             else:

@@ -90,4 +90,6 @@ class AppConfig(Config):
     ACCEPTABLE_ENROLLMENT_USER_PASSWORD_CHARS = None
     ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE = None
 
+    DEFAULT_TIMEZONE = None
+
 config = AppConfig.get_config()
