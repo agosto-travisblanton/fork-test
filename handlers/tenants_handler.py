@@ -2,11 +2,14 @@ import json
 import logging
 
 from google.appengine.ext import ndb
-from webapp2 import RequestHandler
 
 from app_config import config
 from decorators import requires_api_token
+from extended_session_request_handler import ExtendedSessionRequestHandler
 from integrations.content_manager.content_manager_api import ContentManagerApi
+from integrations.directory_api.organization_units_api import OrganizationUnitsApi
+from integrations.directory_api.users_api import UsersApi
+from model_entities.domain_model import Domain
 from models import Tenant
 from proofplay.database_calls import get_tenant_list_from_distributor_key
 from restler.serializers import json_response
@@ -16,7 +19,7 @@ from utils.iterable_util import delimited_string_to_list
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 
-class TenantsHandler(RequestHandler):
+class TenantsHandler(ExtendedSessionRequestHandler):
     @requires_api_token
     def get_tenants_paginated(self, offset, page_size):
         offset = int(offset)
@@ -69,58 +72,28 @@ class TenantsHandler(RequestHandler):
             status = 201
             error_message = None
             request_json = json.loads(self.request.body)
-            name = request_json.get('name')
-            if name is None or name == '':
-                status = 400
-                error_message = 'The name parameter is invalid.'
-            admin_email = request_json.get('admin_email')
-            if admin_email is None or admin_email == '':
-                status = 400
-                error_message = 'The admin email parameter is invalid.'
-            else:
-                admin_email = admin_email.strip().lower()
-            tenant_code = request_json.get('tenant_code')
-            if tenant_code is None or tenant_code == '':
-                status = 400
-                error_message = 'The tenant code parameter is invalid.'
-            else:
-                tenant_code = tenant_code.strip().lower()
-            content_server_url = request_json.get('content_server_url')
-            if content_server_url is None or content_server_url == '':
-                status = 400
-                error_message = 'The content server url parameter is invalid.'
-            else:
-                content_server_url = content_server_url.strip().lower()
-            content_manager_base_url = request_json.get('content_manager_base_url')
-            if content_manager_base_url is None or content_manager_base_url == '':
-                status = 400
-                error_message = 'The content manager base url parameter is invalid.'
-            else:
-                content_manager_base_url = content_manager_base_url.strip().lower()
+            name = self.check_and_get_field('name')
+            admin_email = self.check_and_get_field('admin_email')
+            admin_email = admin_email.strip().lower()
+            tenant_code = self.check_and_get_field('tenant_code')
+            tenant_code = tenant_code.strip().lower()
+            content_server_url = self.check_and_get_field('content_server_url')
+            content_server_url = content_server_url.strip().lower()
+            content_manager_base_url = self.check_and_get_field('content_manager_base_url')
+            content_manager_base_url = content_manager_base_url.strip().lower()
             notification_emails = delimited_string_to_list(request_json.get('notification_emails'))
-            domain_key_input = request_json.get('domain_key')
-            domain_key = None
-            if domain_key_input is None or domain_key_input == '':
-                status = 400
-                error_message = 'The domain key parameter is invalid.'
-            else:
-                try:
-                    domain_key = ndb.Key(urlsafe=domain_key_input)
-                except Exception, e:
-                    logging.exception(e)
-                if None is domain_key:
-                    status = 400
-                    error_message = 'The domain did not resolve.'
-            active = request_json.get('active')
-            if active is None or active == '' or (str(active).lower() != 'true' and str(active).lower() != 'false'):
+            domain_urlsafe_key = self.check_and_get_field('domain_key')
+            domain = self.validate_and_get(urlsafe_key=domain_urlsafe_key,
+                                           kind_cls=Domain,
+                                           abort_on_not_found=True)
+            active = self.check_and_get_field('active')
+            if str(active).lower() != 'true' and str(active).lower() != 'false':
                 status = 400
                 error_message = 'The active parameter is invalid.'
             else:
                 active = bool(active)
-            proof_of_play_logging = request_json.get('proof_of_play_logging')
-            if proof_of_play_logging is None or active == '' or (
-                            str(proof_of_play_logging).lower() != 'true' and str(
-                        proof_of_play_logging).lower() != 'false'):
+            proof_of_play_logging = self.check_and_get_field('proof_of_play_logging')
+            if str(proof_of_play_logging).lower() != 'true' and str(proof_of_play_logging).lower() != 'false':
                 status = 400
                 error_message = 'The proof_of_play_logging parameter is invalid.'
             else:
@@ -137,37 +110,83 @@ class TenantsHandler(RequestHandler):
             else:
                 default_timezone = default_timezone
             if status == 201:
-                if Tenant.is_tenant_code_unique(tenant_code):
+                if Tenant.is_tenant_code_unique(tenant_code):  # could also check if tenant OU exists
                     tenant = Tenant.create(name=name,
                                            tenant_code=tenant_code,
                                            admin_email=admin_email,
                                            content_server_url=content_server_url,
                                            content_manager_base_url=content_manager_base_url,
-                                           domain_key=domain_key,
+                                           domain_key=domain.key,
                                            active=active,
                                            notification_emails=notification_emails,
                                            proof_of_play_logging=proof_of_play_logging,
                                            proof_of_play_url=proof_of_play_url,
                                            default_timezone=default_timezone)
-                    tenant_key = tenant.put()
-                    content_manager_api = ContentManagerApi()
-                    notify_content_manager = content_manager_api.create_tenant(tenant)
-                    if not notify_content_manager:
-                        logging.info('Failed to notify content manager about new tenant {0}'.format(name))
-                    tenant_uri = self.request.app.router.build(None,
-                                                               'manage-tenant',
-                                                               None,
-                                                               {'tenant_key': tenant_key.urlsafe()})
-                    self.response.headers['Location'] = tenant_uri
-                    self.response.headers.pop('Content-Type', None)
-                    self.response.set_status(201)
+
+                    # Bust out the tenant OU
+                    impersonation_email = domain.impersonation_admin_email_address
+                    organization_units_api = OrganizationUnitsApi(
+                        admin_to_impersonate_email_address=impersonation_email)
+                    ou_result = organization_units_api.insert(ou_container_name=tenant.tenant_code)
+                    if 'statusCode' in ou_result.keys() and 'statusText' in ou_result.keys():
+                        status_code = ou_result['statusCode']
+                        status_text = ou_result['statusText']
+                        if 'Invalid Ou Id' in status_text:
+                            status_code = 412
+                            error_message = 'Precondition Failed. {0}'.format(status_code, status_text)
+                            # We return 412 Precondition Failed so UI knows error occurred due to dupe OU in CDM
+                        else:
+                            error_message = 'Unable to create tenant OU. {0} {1}'.format(status_code, status_text)
+                        self.response.set_status(status_code, error_message)
+                        # TODO add integration event logging using correlation_id for failure response
+                        return
+                    else:
+                        tenant.organization_unit_id = ou_result['orgUnitId']
+                        # Bust out the enrollment user
+                        users_api = UsersApi(
+                            admin_to_impersonate_email_address=impersonation_email)
+                        user_result = users_api.insert(
+                            family_name=tenant.tenant_code,
+                            given_name='enrollment',
+                            password=tenant.enrollment_password,
+                            primary_email=tenant.enrollment_email,
+                            org_unit_path=tenant.organization_unit_path)
+                        if 'statusCode' in user_result.keys() and 'statusText' in user_result.keys():
+                            status_code = user_result['statusCode']
+                            status_text = user_result['statusText']
+                            if 'Entity already exists' in status_text:
+                                status_code = 412
+                                error_message = 'Precondition Failed. {0}'.format(status_code, status_text)
+                                # We return 412 Precondition Failed so UI knows error occurred due to dupe user in CDM
+                            else:
+                                error_message = 'Unable to create enrollment user. {0} {1}'.format(status_code,
+                                                                                                   status_text)
+                            self.response.set_status(status_code, error_message)
+                            # TODO add integration event logging using correlation_id for failure response
+                            return
+                        else:
+                            # TODO add integration event logging using correlation_id for success!
+                            # is_created = ou_result['primaryEmail'].strip().lower() == tenant.enrollment_email
+                            tenant_key = tenant.put()
+                            content_manager_api = ContentManagerApi()
+                            notify_content_manager = content_manager_api.create_tenant(tenant)
+                            if not notify_content_manager:
+                                logging.info('Failed to notify content manager about new tenant {0}'.format(name))
+
+                            tenant_uri = self.request.app.router.build(None,
+                                                                       'manage-tenant',
+                                                                       None,
+                                                                       {'tenant_key': tenant_key.urlsafe()})
+                            self.response.headers['Location'] = tenant_uri
+                            self.response.headers.pop('Content-Type', None)
+                            self.response.set_status(201)
                 else:
                     error_message = "Conflict. Tenant code \"{0}\" is already assigned to a tenant.".format(tenant_code)
                     self.response.set_status(409, error_message)
             else:
                 self.response.set_status(status, error_message)
         else:
-            logging.info("Problem creating Domain. No request body.")
+            logging.info("Problem creating Tenant. No request body.")
             self.response.set_status(400, 'Did not receive request body.')
 
     @requires_api_token

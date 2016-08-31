@@ -55,6 +55,19 @@ class TestTenantModel(BaseTest):
                                                                    mac_address='98d2247f2101')
         self.device_to_be_archived_key = self.device_to_be_archived.put()
 
+    def test_generate_enrollment_password_has_acceptable_random_characters(self):
+        enrollment_password = Tenant.generate_enrollment_password(config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE)
+        self.assertTrue(len(enrollment_password), config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE)
+        for p in enrollment_password:
+            self.assertTrue(p in config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_CHARS)
+
+    def test_generate_enrollment_password_length_too_small_throws_value_error(self):
+        with self.assertRaises(ValueError) as context:
+            Tenant.generate_enrollment_password(config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE - 1)
+        error_message = 'enrollment_password must be greater than {0} in length'.format(
+            config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE - 1)
+        self.assertTrue(error_message in context.exception.message)
+
     def test_create_sets_tenant_entity_group_as_parent(self):
         actual = Tenant.find_by_name(self.NAME)
         parent = actual.key.parent().get()
@@ -109,7 +122,7 @@ class TestTenantModel(BaseTest):
         self.assertEqual(self.CONTENT_MANAGER_BASE_URL, tenant_created.content_manager_base_url)
         self.assertEqual(self.NAME, tenant_created.name)
         self.assertEqual(self.domain_key, tenant_created.domain_key)
-        self.assertEqual(tenant_created.default_timezone, 'America/Chicago')
+        self.assertEqual(tenant_created.default_timezone, config.DEFAULT_TIMEZONE)
         self.assertLength(0, tenant_created.notification_emails)
 
     def test_create_gives_default_proof_of_play_url(self):

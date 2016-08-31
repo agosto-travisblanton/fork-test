@@ -149,7 +149,7 @@ class TestChromeOsDeviceModel(BaseTest):
         device.customer_display_code = customer_display_code
         device.content_manager_display_name = content_manager_display_name
         device.content_manager_location_description = content_manager_location_description
-        timezone = 'America/Chicago'
+        timezone = config.DEFAULT_TIMEZONE
         location = Location.create(tenant_key=self.tenant_key,
                                    customer_location_name=customer_location_name,
                                    customer_location_code=customer_location_code)
@@ -207,7 +207,7 @@ class TestChromeOsDeviceModel(BaseTest):
         device.panel_input = self.DISPLAY_PANEL_INPUT
         customer_location_name = 'Store 445'
         customer_location_code = 'store_445'
-        timezone = 'America/Chicago'
+        timezone = config.DEFAULT_TIMEZONE
         location = Location.create(tenant_key=self.tenant_key,
                                    customer_location_name=customer_location_name,
                                    customer_location_code=customer_location_code)
