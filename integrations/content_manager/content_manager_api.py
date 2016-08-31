@@ -20,6 +20,7 @@ class ContentManagerApi(object):
 
     def create_tenant(self, tenant):
         payload = {
+            "tenant_name": tenant.name,
             "tenant_code": tenant.tenant_code,
             "admin_email": tenant.admin_email
         }

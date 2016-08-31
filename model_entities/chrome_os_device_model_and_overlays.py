@@ -770,11 +770,20 @@ class Tenant(ndb.Model):
             return domain.impersonation_admin_email_address
 
     @classmethod
-    def create(cls, tenant_code, name, admin_email, content_server_url, domain_key, active,
-               content_manager_base_url, notification_emails=[], proof_of_play_logging=False,
-               proof_of_play_url=config.DEFAULT_PROOF_OF_PLAY_URL, default_timezone=config.DEFAULT_TIMEZONE):
+    def create(cls,
+               tenant_code,
+               name,
+               admin_email,
+               content_server_url,
+               domain_key,
+               active,
+               content_manager_base_url,
+               notification_emails=[],
+               proof_of_play_logging=False,
+               proof_of_play_url=config.DEFAULT_PROOF_OF_PLAY_URL,
+               default_timezone=config.DEFAULT_TIMEZONE):
         enrollment_password = cls.generate_enrollment_password(config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE)
-        enrollment_email = '{0}.enrollment@{1}'.format(tenant_code,domain_key.get().name)
+        enrollment_email = '{0}.enrollment@{1}'.format(tenant_code, domain_key.get().name)
         organization_unit_path = '/skykit/{0}'.format(tenant_code)
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
