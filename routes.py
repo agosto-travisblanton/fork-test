@@ -335,12 +335,18 @@ application = WSGIApplication(
               name='manage-domain',
               methods=['GET', 'PUT', 'DELETE']
               ),
+        Route(r'/api/v1/domains/<domain_key>/directory_api',
+              handler='handlers.domains_handler.DomainsHandler',
+              name='directory-api-ping',
+              handler_method='ping_directory_api',
+              methods=['GET']
+              ),
 
         ############################################################
         # OVERLAY
         ############################################################
 
-        Route(r'/api/v1/overlay',
+        Route(r'/api/v1/overlay/device/<device_urlsafe_key>',
               handler='handlers.overlay_handler.OverlayHandler',
               name='post-overlay',
               handler_method='post',
@@ -358,11 +364,10 @@ application = WSGIApplication(
               methods=['GET'],
               ),
 
-        Route(r'/api/v1/image',
+        Route(r'/api/v1/image/tenant/<tenant_urlsafe_key>',
               handler='handlers.image_handler.ImageHandler',
-              name='post-image',
-              handler_method='post',
-              methods=['POST'],
+              name='manage-image',
+              methods=['POST', 'GET'],
               ),
 
         ############################################################
@@ -459,6 +464,28 @@ application = WSGIApplication(
               name='chrome-os-devices-count',
               handler_method='get_devices_count',
               methods=['GET']
+              ),
+
+        ############################################################
+        # Tenant OU
+        ############################################################
+        Route(r'/api/v1/tenant_organizational_unit',
+              handler='handlers.tenant_organization_units_handler.TenantOrganizationUnitsHandler',
+              name='organization-unit-by-path',
+              handler_method='get_by_ou_path',
+              methods=['GET']
+              ),
+        Route(r'/api/v1/tenant_organizational_units',
+              handler='handlers.tenant_organization_units_handler.TenantOrganizationUnitsHandler',
+              name='organization-units-list',
+              handler_method='get_ou_list',
+              methods=['GET']
+              ),
+        Route(r'/api/v1/tenant_organizational_units',
+              handler='handlers.tenant_organization_units_handler.TenantOrganizationUnitsHandler',
+              name='tenant-organization-units',
+              handler_method='create',
+              methods=['POST']
               ),
 
         ############################################################

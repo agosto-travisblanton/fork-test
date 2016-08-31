@@ -263,4 +263,27 @@ describe('DevicesService', function () {
   );
 
 
+  describe('.saveOverlaySettings', () =>
+    it('posts an overlay via Restangular', function () {
+      let deviceRestangularService = {
+        customPOST() {
+        }
+      };
+      spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
+      spyOn(deviceRestangularService, 'customPOST').and.returnValue(promise);
+
+      let device_urlsafe_key = 'someKey'
+      let bottom_right = 'dwight'
+      let bottom_left = 'pam'
+      let top_right = 'toby'
+      let top_left = 'angela'
+
+      let search = DevicesService.saveOverlaySettings(device_urlsafe_key, bottom_right, bottom_left, top_right, top_left);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('overlay', `/api/v1/overlay/device/${device_urlsafe_key}`);
+      expect(deviceRestangularService.customPOST).toHaveBeenCalled();
+      return expect(search).toBe(promise);
+    })
+  );
+
+
 });

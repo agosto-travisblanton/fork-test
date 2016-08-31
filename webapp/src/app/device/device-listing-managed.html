@@ -60,7 +60,9 @@
               md-min-length="0"
               md-search-text-change="vm.isResourceValid(false, vm.searchText)"
               md-selected-item-change="vm.isResourceValid(false, vm.searchText)"
-              placeholder="Make A Search">
+              placeholder="Make A Search"
+              md-select-on-match="true"
+            >
 
               <md-item-template>
                   <span md-highlight-text="vm.searchText"

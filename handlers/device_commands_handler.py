@@ -3,17 +3,16 @@ import json
 import logging
 
 from google.appengine.ext import ndb
-from webapp2 import RequestHandler
+from extended_session_request_handler import ExtendedSessionRequestHandler
 
 from app_config import config
 from decorators import requires_api_token
 from device_message_processor import change_intent
-from ndb_mixins import KeyValidatorMixin
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>. Bob MacNeal <bob.macneal@agosto.com>'
 
 
-class DeviceCommandsHandler(RequestHandler, KeyValidatorMixin):
+class DeviceCommandsHandler(ExtendedSessionRequestHandler):
     @requires_api_token
     def post(self, device_urlsafe_key):
         method_name = inspect.stack()[0][3]

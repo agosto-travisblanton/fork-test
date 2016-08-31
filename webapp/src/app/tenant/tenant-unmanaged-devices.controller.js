@@ -22,6 +22,7 @@ function TenantUnmanagedDevicesCtrl($scope, $stateParams, TenantsService, Device
   vm.serialDevices = {};
   vm.disabled = true;
   vm.macDevices = {};
+  vm.devicesToMatchOn = [];
   vm.editMode = !!$stateParams.tenantKey;
   vm.tenantKey = $stateParams.tenantKey;
 
@@ -72,7 +73,8 @@ function TenantUnmanagedDevicesCtrl($scope, $stateParams, TenantsService, Device
     vm.searchText = '';
     vm.disabled = true;
     vm.serialDevices = {};
-    return vm.macDevices = {};
+    vm.macDevices = {};
+    vm.devicesToMatchOn = [];
   };
 
   vm.searchDevices = function (partial) {
@@ -80,18 +82,21 @@ function TenantUnmanagedDevicesCtrl($scope, $stateParams, TenantsService, Device
     let byTenant = true;
     return DevicesService.searchDevices(partial, vm.selectedButton, byTenant, vm.tenantKey, vm.distributorKey, unmanaged)
       .then(function (response) {
+        let devicesToReturn;
         if (response.success) {
           let devices = response.devices
           if (vm.selectedButton === "Serial Number") {
             vm.serialDevices = devices[1]
-            return devices[0]
+            devicesToReturn = devices[0]
           } else if (vm.selectedButton === "MAC") {
             vm.macDevices = devices[1]
-            return devices[0]
+            devicesToReturn = devices[0]
           } else {
             vm.gcmidDevices = devices[1]
-            return devices[0]
+            devicesToReturn = devices[0]
           }
+          vm.devicesToMatchOn = devicesToReturn
+          return devicesToReturn
         } else {
           return []
         }
@@ -118,29 +123,18 @@ function TenantUnmanagedDevicesCtrl($scope, $stateParams, TenantsService, Device
 
   vm.controlOpenButton = function (isMatch) {
     vm.disabled = !isMatch;
-    return vm.loadingDisabled = false;
+    vm.loadingDisabled = false;
   };
 
-
   vm.isResourceValid = function (resource) {
-    let unmanaged = true;
-    let byTenant = true;
-
-    return DevicesService.searchDevices(resource, vm.selectedButton, byTenant, vm.tenantKey, vm.distributorKey, unmanaged)
-      .then(function (response) {
-        if (response.success) {
-          let devices = response.devices[0];
-          let foundMatch = false;
-          for (let eachDevice of devices) {
-            if (resource === eachDevice) {
-              foundMatch = true;
-            }
-          }
-          return vm.controlOpenButton(foundMatch)
-        } else {
-          return vm.controlOpenButton(false)
-        }
-      })
+    let foundMatch = false;
+    for (let item of vm.devicesToMatchOn) {
+      if (resource === item) {
+        foundMatch = true;
+      }
+    }
+    vm.controlOpenButton(foundMatch)
+    return foundMatch
   };
 
   return vm;

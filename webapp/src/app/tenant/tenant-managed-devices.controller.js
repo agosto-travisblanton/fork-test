@@ -20,6 +20,7 @@ function TenantManagedDevicesCtrl($scope, $stateParams, TenantsService, DevicesS
   vm.selectedButton = "Serial Number";
   vm.serialDevices = {};
   vm.disabled = true;
+  vm.devicesToMatchOn = [];
   vm.macDevices = {};
   vm.editMode = !!$stateParams.tenantKey;
   vm.tenantKey = $stateParams.tenantKey;
@@ -71,7 +72,8 @@ function TenantManagedDevicesCtrl($scope, $stateParams, TenantsService, DevicesS
     vm.searchText = '';
     vm.disabled = true;
     vm.serialDevices = {};
-    return vm.macDevices = {};
+    vm.macDevices = {};
+    vm.devicesToMatchOn = [];
   };
 
   vm.searchDevices = function (partial) {
@@ -81,18 +83,21 @@ function TenantManagedDevicesCtrl($scope, $stateParams, TenantsService, DevicesS
     let tenantKey = vm.tenantKey;
     return DevicesService.searchDevices(partial, button, byTenant, tenantKey, vm.distributorKey, unmanaged)
       .then(function (response) {
+        let devicesToReturn;
         if (response.success) {
           let devices = response.devices
           if (button === "Serial Number") {
             vm.serialDevices = devices[1]
-            return devices[0]
+            devicesToReturn = devices[0]
           } else if (button === "MAC") {
             vm.macDevices = devices[1]
-            return devices[0]
+            devicesToReturn = devices[0]
           } else {
             vm.gcmidDevices = devices[1]
-            return devices[0]
+            devicesToReturn = devices[0]
           }
+          vm.devicesToMatchOn = devicesToReturn
+          return devicesToReturn
         } else {
           return []
         }
@@ -122,30 +127,18 @@ function TenantManagedDevicesCtrl($scope, $stateParams, TenantsService, DevicesS
     return vm.loadingDisabled = false;
   };
 
-
   vm.isResourceValid = function (resource) {
-    let unmanaged = false;
-    let byTenant = true;
-
-    return DevicesService.searchDevices(resource, vm.selectedButton, byTenant, vm.tenantKey, vm.distributorKey, unmanaged)
-      .then(function (response) {
-        if (response.success) {
-          let devices = response.devices[0];
-          let foundMatch = false;
-          for (let eachDevice of devices) {
-            if (resource === eachDevice) {
-              foundMatch = true;
-            }
-          }
-          return vm.controlOpenButton(foundMatch)
-        } else {
-          return vm.controlOpenButton(false)
-        }
-      })
+    let foundMatch = false;
+    for (let item of vm.devicesToMatchOn) {
+      if (resource === item) {
+        foundMatch = true;
+      }
+    }
+    vm.controlOpenButton(foundMatch)
+    return foundMatch
   };
 
   return vm;
 }
-
 
 export {TenantManagedDevicesCtrl}

@@ -189,9 +189,7 @@ describe('TenantUnmanagedDevicesCtrl', function () {
       });
     });
 
-    return describe('.isResourceValid', function () {
-      let resource = 'my-resource';
-
+    describe('.isResourceValid', function () {
       beforeEach(function () {
         let tenantKey = 'bhjad897d987fa32fg708fg72';
         $stateParams = {tenantKey};
@@ -200,23 +198,18 @@ describe('TenantUnmanagedDevicesCtrl', function () {
           $stateParams
         };
         controller = $controller('TenantUnmanagedDevicesCtrl', serviceInjection);
-        promise = new skykitProvisioning.q.Mock();
-        spyOn(DevicesService, 'searchDevices').and.returnValue(promise);
       });
 
-      it("searchDevices called when managed and button is mac", function () {
-        controller.selectedButton = "MAC";
-        controller.isResourceValid(resource);
-        promise.resolve(false);
-        return expect(DevicesService.searchDevices).toHaveBeenCalled();
+      it("returns true when resource in devicesToMatchOn", function () {
+        controller.devicesToMatchOn = ["one", "two"]
+        expect(controller.isResourceValid("one")).toBeTruthy();
       });
 
-      return it("searchDevices called button is not mac", function () {
-        controller.selectedButton = "Serial Number";
-        controller.isResourceValid(resource);
-        promise.resolve(false);
-        return expect(DevicesService.searchDevices).toHaveBeenCalled();
+      it("returns false when resource in devicesToMatchOn", function () {
+        controller.devicesToMatchOn = ["one", "two"]
+        expect(controller.isResourceValid("dkdkdk")).toBeFalsy();
       });
+
     });
   });
 

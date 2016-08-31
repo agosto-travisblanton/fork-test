@@ -55,7 +55,9 @@ def refresh_device_by_mac_address(device_urlsafe_key, device_mac_address,
             device.org_unit_path = chrome_os_device.get('orgUnitPath')
             device.annotated_user = chrome_os_device.get('annotatedUser')
             device.annotated_location = chrome_os_device.get('annotatedLocation')
+            device.content_manager_location_description = chrome_os_device.get('annotatedLocation')
             device.annotated_asset_id = chrome_os_device.get('annotatedAssetId')
+            device.content_manager_display_name = chrome_os_device.get('annotatedAssetId')
             device.notes = chrome_os_device.get('notes')
             device.boot_mode = chrome_os_device.get('bootMode')
             device.last_enrollment_time = chrome_os_device.get('lastEnrollmentTime')
@@ -74,17 +76,16 @@ def refresh_device_by_mac_address(device_urlsafe_key, device_mac_address,
                 correlation_id = 'NA'
             if not device_has_previous_directory_api_info:
                 cm_create_device_event_request = IntegrationEventLog.create(
-                    event_category='Registration',
-                    component_name='Content Manager',
-                    workflow_step='Request to Content Manager for a create_device',
-                    mac_address=device.mac_address,
-                    gcm_registration_id=device.gcm_registration_id,
-                    device_urlsafe_key=device_urlsafe_key,
-                    serial_number=device.serial_number,
-                    correlation_identifier=correlation_id,
-                    details='refresh_device_by_mac_address: Found device. Will notify Content Manager.')
+                     event_category='Registration',
+                     component_name='Content Manager',
+                     workflow_step='Request to Content Manager for a create_device',
+                     mac_address=device.mac_address,
+                     gcm_registration_id=device.gcm_registration_id,
+                     device_urlsafe_key=device_urlsafe_key,
+                     serial_number=device.serial_number,
+                     correlation_identifier=correlation_id,
+                     details='refresh_device_by_mac_address: Found device. Will notify Content Manager.')
                 cm_create_device_event_request.put()
-
                 deferred.defer(ContentManagerApi().create_device,
                                device_urlsafe_key=device_urlsafe_key,
                                correlation_id=correlation_id,
