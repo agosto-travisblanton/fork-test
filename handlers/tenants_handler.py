@@ -129,8 +129,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                     # Bust out the tenant OU
                     impersonation_email = domain_key.get().impersonation_admin_email_address
                     organization_units_api = OrganizationUnitsApi(
-                        admin_to_impersonate_email_address=impersonation_email,
-                        int_credentials=True)
+                        admin_to_impersonate_email_address=impersonation_email)
                     ou_result = organization_units_api.insert(ou_container_name=tenant.tenant_code)
                     if 'statusCode' in ou_result.keys() and 'statusText' in ou_result.keys():
                         status_code = ou_result['statusCode']
@@ -148,8 +147,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                         tenant.organization_unit_id = ou_result['orgUnitId']
                         # Bust out the enrollment user
                         users_api = UsersApi(
-                            admin_to_impersonate_email_address=impersonation_email,
-                            int_credentials=True)
+                            admin_to_impersonate_email_address=impersonation_email)
                         user_result = users_api.insert(
                             family_name=tenant.tenant_code,
                             given_name='enrollment',
