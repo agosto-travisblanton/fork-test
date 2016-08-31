@@ -2,9 +2,7 @@ from chrome_os_devices_api import ChromeOsDevicesApi
 from organization_units_api import OrganizationUnitsApi
 from models import ChromeOsDevice
 import re
-import json
 from google.appengine.ext import deferred
-import pprint
 from google.appengine.api import mail
 
 
@@ -32,6 +30,7 @@ def migrate_all_existing_tenant_names(prod_credentials=False,
                                   int_credentials=int_credentials,
                                   stage_credentials=stage_credentials,
                                   qa_credentials=qa_credentials)
+
     cod_api = ChromeOsDevicesApi(email, prod_credentials=prod_credentials,
                                  int_credentials=int_credentials,
                                  stage_credentials=stage_credentials,
@@ -42,7 +41,8 @@ def migrate_all_existing_tenant_names(prod_credentials=False,
             "orgUnitPath": each["orgUnitPath"],
             "orgUnitId": each["orgUnitId"],
             "name": each["name"]
-        } for each in ou_api.list()["organizationUnits"]]
+        } for each in ou_api.list()["organizationUnits"]
+        ]
 
     translation_map = {}
 
@@ -57,7 +57,6 @@ def migrate_all_existing_tenant_names(prod_credentials=False,
         else:
             translation_map[each_ou["name"]]["not_found_devices"] = []
             device_found = False
-
             for each_device in all_devices_in_OU:
                 device_entity = ChromeOsDevice.get_by_serial_number(each_device["serialNumber"])
                 if device_entity:
@@ -74,9 +73,6 @@ def migrate_all_existing_tenant_names(prod_credentials=False,
                         else:
                             translation_map[each_ou["name"]]["tenant_code"] = each_ou["name"]
 
-                        if 'not_found_devices' in translation_map[each_ou["name"]]:
-                            del translation_map[each_ou["name"]]["not_found_devices"]
-
                         # insert the ou_id for the tenant
                         tenant_entity.ou_id = each_ou["orgUnitId"]
                         tenant_entity.put()
@@ -91,8 +87,6 @@ def migrate_all_existing_tenant_names(prod_credentials=False,
                         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
                 else:
-                    if not 'not_found_devices' in translation_map[each_ou["name"]]:
-                        translation_map[each_ou["name"]]["not_found_devices"] = []
                     translation_map[each_ou["name"]]["not_found_devices"].append(each_device["serialNumber"])
 
             if not device_found:
