@@ -104,7 +104,7 @@ class TestTenantsHandler(BaseTest, WebTest):
     ##################################################################################################################
     # post
     ##################################################################################################################
-    # TODO figure out how to mock the create_tenant_org_unit so these can be uncommented
+    # TODO figure out how to mock api calls so these can be uncommented
 
     # def test_post_returns_created_status(self):
     #     name = u'ABC'
