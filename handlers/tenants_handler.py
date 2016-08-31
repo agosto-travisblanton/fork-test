@@ -9,6 +9,7 @@ from extended_session_request_handler import ExtendedSessionRequestHandler
 from integrations.content_manager.content_manager_api import ContentManagerApi
 from integrations.directory_api.organization_units_api import OrganizationUnitsApi
 from integrations.directory_api.users_api import UsersApi
+from model_entities.domain_model import Domain
 from models import Tenant
 from proofplay.database_calls import get_tenant_list_from_distributor_key
 from restler.serializers import json_response
@@ -81,14 +82,10 @@ class TenantsHandler(ExtendedSessionRequestHandler):
             content_manager_base_url = self.check_and_get_field('content_manager_base_url')
             content_manager_base_url = content_manager_base_url.strip().lower()
             notification_emails = delimited_string_to_list(request_json.get('notification_emails'))
-            domain_key_input = self.check_and_get_field('domain_key')
-            try:
-                domain_key = ndb.Key(urlsafe=domain_key_input)
-            except Exception, e:
-                logging.exception(e)
-            if None is domain_key:
-                status = 400
-                error_message = 'The domain did not resolve.'
+            domain_urlsafe_key = self.check_and_get_field('domain_key')
+            domain = self.validate_and_get(urlsafe_key=domain_urlsafe_key,
+                                           kind_cls=Domain,
+                                           abort_on_not_found=True)
             active = self.check_and_get_field('active')
             if str(active).lower() != 'true' and str(active).lower() != 'false':
                 status = 400
@@ -119,7 +116,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                                            admin_email=admin_email,
                                            content_server_url=content_server_url,
                                            content_manager_base_url=content_manager_base_url,
-                                           domain_key=domain_key,
+                                           domain_key=domain.key,
                                            active=active,
                                            notification_emails=notification_emails,
                                            proof_of_play_logging=proof_of_play_logging,
@@ -127,14 +124,14 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                                            default_timezone=default_timezone)
 
                     # Bust out the tenant OU
-                    impersonation_email = domain_key.get().impersonation_admin_email_address
+                    impersonation_email = domain.impersonation_admin_email_address
                     organization_units_api = OrganizationUnitsApi(
                         admin_to_impersonate_email_address=impersonation_email)
                     ou_result = organization_units_api.insert(ou_container_name=tenant.tenant_code)
                     if 'statusCode' in ou_result.keys() and 'statusText' in ou_result.keys():
                         status_code = ou_result['statusCode']
                         status_text = ou_result['statusText']
-                        if status_text == 'Invalid Ou Id':
+                        if 'Invalid Ou Id' in status_text:
                             status_code = 412
                             error_message = 'Precondition Failed. {0}'.format(status_code, status_text)
                             # We return 412 Precondition Failed so UI knows error occurred due to dupe OU in CDM
@@ -157,7 +154,13 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                         if 'statusCode' in user_result.keys() and 'statusText' in user_result.keys():
                             status_code = user_result['statusCode']
                             status_text = user_result['statusText']
-                            error_message = 'Unable to create enrollment user. {0} {1}'.format(status_code, status_text)
+                            if 'Entity already exists' in status_text:
+                                status_code = 412
+                                error_message = 'Precondition Failed. {0}'.format(status_code, status_text)
+                                # We return 412 Precondition Failed so UI knows error occurred due to dupe user in CDM
+                            else:
+                                error_message = 'Unable to create enrollment user. {0} {1}'.format(status_code,
+                                                                                                   status_text)
                             self.response.set_status(status_code, error_message)
                             # TODO add integration event logging using correlation_id for failure response
                             return
