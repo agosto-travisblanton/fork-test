@@ -165,7 +165,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                             return
                         else:
                             # TODO add integration event logging using correlation_id for success!
-                            is_created = ou_result['primaryEmail'].strip().lower() == tenant.enrollment_email
+                            # is_created = ou_result['primaryEmail'].strip().lower() == tenant.enrollment_email
                             tenant_key = tenant.put()
                             content_manager_api = ContentManagerApi()
                             notify_content_manager = content_manager_api.create_tenant(tenant)
