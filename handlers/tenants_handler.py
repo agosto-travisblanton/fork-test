@@ -1,3 +1,4 @@
+import httplib
 import json
 import logging
 
@@ -110,7 +111,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
             else:
                 default_timezone = default_timezone
             if status == 201:
-                if Tenant.is_tenant_code_unique(tenant_code):  # could also check if tenant OU exists
+                if Tenant.is_tenant_code_unique(tenant_code):
                     tenant = Tenant.create(name=name,
                                            tenant_code=tenant_code,
                                            admin_email=admin_email,
@@ -122,72 +123,80 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                                            proof_of_play_logging=proof_of_play_logging,
                                            proof_of_play_url=proof_of_play_url,
                                            default_timezone=default_timezone)
-
-                    # Bust out the tenant OU
+                    # 1. Check if the tenant OU exists in CDM
                     impersonation_email = domain.impersonation_admin_email_address
                     organization_units_api = OrganizationUnitsApi(
                         admin_to_impersonate_email_address=impersonation_email)
-                    ou_result = organization_units_api.insert(ou_container_name=tenant.tenant_code)
-                    if 'statusCode' in ou_result.keys() and 'statusText' in ou_result.keys():
-                        status_code = ou_result['statusCode']
-                        status_text = ou_result['statusText']
-                        if 'Invalid Ou Id' in status_text:
-                            status_code = 412
-                            error_message = 'Precondition Failed. {0}'.format(status_code, status_text)
-                            # We return 412 Precondition Failed so UI knows error occurred due to dupe OU in CDM
-                        else:
-                            error_message = 'Unable to create tenant OU. {0} {1}'.format(status_code, status_text)
-                        self.response.set_status(status_code, error_message)
-                        # TODO add integration event logging using correlation_id for failure response
-                        return
-                    else:
-                        tenant.organization_unit_id = ou_result['orgUnitId']
-                        # Bust out the enrollment user
-                        users_api = UsersApi(
-                            admin_to_impersonate_email_address=impersonation_email)
-                        user_result = users_api.insert(
-                            family_name=tenant.tenant_code,
-                            given_name='enrollment',
-                            password=tenant.enrollment_password,
-                            primary_email=tenant.enrollment_email,
-                            org_unit_path=tenant.organization_unit_path)
-                        if 'statusCode' in user_result.keys() and 'statusText' in user_result.keys():
-                            status_code = user_result['statusCode']
-                            status_text = user_result['statusText']
-                            if 'Entity already exists' in status_text:
-                                status_code = 412
-                                error_message = 'Precondition Failed. {0}'.format(status_code, status_text)
-                                # We return 412 Precondition Failed so UI knows error occurred due to dupe user in CDM
+                    result = organization_units_api.get(organization_unit_path=tenant.organization_unit_path)
+                    if 'statusCode' in result.keys():
+                        if result['statusCode'] == httplib.NOT_FOUND:
+                            # 2. Tenant OU doesn't exist, so it's okay to create it
+                            ou_result = organization_units_api.insert(ou_container_name=tenant.tenant_code)
+                            if 'statusCode' in ou_result.keys() and 'statusText' in ou_result.keys():
+                                status_code = ou_result['statusCode']
+                                status_text = ou_result['statusText']
+                                if 'Invalid Ou Id' in status_text:
+                                    # We return 412 Precondition Failed so UI knows error occurred due to dupe OU in CDM
+                                    error_message = 'Precondition Failed. {0} {1}'.format(
+                                        httplib.PRECONDITION_FAILED, status_text)
+                                else:
+                                    error_message = 'Unable to create tenant OU. {0} {1}'.format(
+                                        status_code, status_text)
+                                # TODO add integration event logging using correlation_id for failure response
+                                self.response.set_status(status_code, error_message)
+                                return
                             else:
-                                error_message = 'Unable to create enrollment user. {0} {1}'.format(status_code,
-                                                                                                   status_text)
-                            self.response.set_status(status_code, error_message)
-                            # TODO add integration event logging using correlation_id for failure response
-                            return
-                        else:
-                            # TODO add integration event logging using correlation_id for success!
-                            # is_created = ou_result['primaryEmail'].strip().lower() == tenant.enrollment_email
-                            tenant_key = tenant.put()
-                            content_manager_api = ContentManagerApi()
-                            notify_content_manager = content_manager_api.create_tenant(tenant)
-                            if not notify_content_manager:
-                                logging.info('Failed to notify content manager about new tenant {0}'.format(name))
+                                tenant.organization_unit_id = ou_result['orgUnitId']
+                                # 3. Tenant OU created, so create an enrollment user
+                                users_api = UsersApi(
+                                    admin_to_impersonate_email_address=impersonation_email)
+                                user_result = users_api.insert(
+                                    family_name=tenant.tenant_code,
+                                    given_name='enrollment',
+                                    password=tenant.enrollment_password,
+                                    primary_email=tenant.enrollment_email,
+                                    org_unit_path=tenant.organization_unit_path)
+                                if 'statusCode' in user_result.keys() and 'statusText' in user_result.keys():
+                                    status_code = user_result['statusCode']
+                                    status_text = user_result['statusText']
+                                    if 'Entity already exists' in status_text:
+                                        # Return 412 Precondition Failed so UI knows error is due to dupe user in CDM
+                                        error_message = 'Precondition Failed. {0} {1}'.format(
+                                            httplib.PRECONDITION_FAILED, status_text)
+                                    else:
+                                        error_message = 'Unable to create enrollment user. {0} {1}'.format(status_code,
+                                                                                                           status_text)
+                                    # TODO add integration event logging using correlation_id for failure response
+                                    self.response.set_status(status_code, error_message)
+                                    return
+                                else:
+                                    # TODO add integration event logging using correlation_id for success!
+                                    is_created = user_result['primaryEmail'].strip().lower() == tenant.enrollment_email
+                                    tenant_key = tenant.put()
+                                    content_manager_api = ContentManagerApi()
+                                    notify_content_manager = content_manager_api.create_tenant(tenant)
+                                    if not notify_content_manager:
+                                        logging.info(
+                                            'Failed to notify content manager about new tenant {0}'.format(name))
 
-                            tenant_uri = self.request.app.router.build(None,
-                                                                       'manage-tenant',
-                                                                       None,
-                                                                       {'tenant_key': tenant_key.urlsafe()})
-                            self.response.headers['Location'] = tenant_uri
-                            self.response.headers.pop('Content-Type', None)
-                            self.response.set_status(201)
+                                    tenant_uri = self.request.app.router.build(None,
+                                                                               'manage-tenant',
+                                                                               None,
+                                                                               {'tenant_key': tenant_key.urlsafe()})
+                                    self.response.headers['Location'] = tenant_uri
+                                    self.response.headers.pop('Content-Type', None)
+                                    self.response.set_status(httplib.CREATED)
+                    else:
+                        error_message = "Conflict. Tenant code \"{0}\" already assigned an OU.".format(tenant_code)
+                        self.response.set_status(httplib.PRECONDITION_FAILED, error_message)
                 else:
                     error_message = "Conflict. Tenant code \"{0}\" is already assigned to a tenant.".format(tenant_code)
-                    self.response.set_status(409, error_message)
+                    self.response.set_status(httplib.CONFLICT, error_message)
             else:
                 self.response.set_status(status, error_message)
         else:
             logging.info("Problem creating Tenant. No request body.")
-            self.response.set_status(400, 'Did not receive request body.')
+            self.response.set_status(httplib.BAD_REQUEST, 'Did not receive request body.')
 
     @requires_api_token
     def put(self, tenant_key):
