@@ -40,7 +40,6 @@ class OrganizationUnitsApi(object):
                                                              private_key=config.PRIVATE_KEY,
                                                              scope=self.DIRECTORY_SERVICE_SCOPES,
                                                              sub=admin_to_impersonate_email_address)
-
         self.authorized_http = self.credentials.authorize(Http())
         self.discovery_service = discovery.build('admin', 'directory_v1', http=self.authorized_http)
 
@@ -67,6 +66,8 @@ class OrganizationUnitsApi(object):
 
     # GET https://www.googleapis.com/admin/directory/v1/customer/my_customer/orgunits/<org_unit_path>?key={API_KEY}
     def get(self, organization_unit_path):
+        if organization_unit_path.startswith('/'):
+            organization_unit_path =  organization_unit_path[1:]
         ou_api = self.discovery_service.orgunits()
         request = ou_api.get(customerId=config.GOOGLE_CUSTOMER_ID,
                              orgUnitPath=organization_unit_path)

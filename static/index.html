@@ -24,9 +24,11 @@
 </head>
 <body ng-app="skykitProvisioning" ng-cloak layout="row"
       ng-controller="AppController as appController">
-<md-sidenav class="site-sidenav md-sidenav-left md-whiteframe-z2"
+
+<md-sidenav ng-hide="!appController.getIdentity().email || appController.isCurrentURLDistributorSelector() == true"
+            class="site-sidenav md-sidenav-left md-whiteframe-z2"
             md-component-id="left"
-            md-is-locked-open="$mdMedia('gt-lg')" style="margin-top:-50px">
+            md-is-locked-open="$mdMedia('gt-lg')" style="margin-top:-50px;">
   <md-list>
     <md-list-item>
       <span class="md-headline">{{ appController.getIdentity().distributorName }}</span>
@@ -54,7 +56,8 @@
       <md-button ng-click="appController.goTo('welcome')"><i class="fa fa-fw fa fa-play"></i> Home
       </md-button>
     </md-list-item>
-    <md-list-item ng-if="appController.getIdentity().admin || appController.getIdentity().admin_of_current_distributor">
+    <md-list-item
+      ng-if="appController.getIdentity().admin || appController.getIdentity().admin_of_current_distributor">
       <md-button ng-click="appController.goTo('admin')"><i class="fa fa-fw fa fa-lock"></i> Admin
       </md-button>
     </md-list-item>
@@ -64,6 +67,7 @@
     </md-list-item>
   </md-list>
 </md-sidenav>
+
 
 <div flex layout="column" tabIndex="-1" role="main" class="md-whiteframe-z2" style="margin-top:-50px">
   <md-toolbar layout="row" class="md-whiteframe-z1">
@@ -97,5 +101,5 @@
   ga('create', 'UA-71073175-2', 'auto');
   ga('send', 'pageview');
 </script>
-<script src="static/vendor.bundle.js?0dc34c7707a787d8fe7e"></script><script src="static/app.bundle.js?0dc34c7707a787d8fe7e"></script></body>
+<script src="static/vendor.bundle.js?a313b64ca99f62496699"></script><script src="static/app.bundle.js?a313b64ca99f62496699"></script></body>
 </html>
