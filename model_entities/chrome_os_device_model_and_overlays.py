@@ -246,8 +246,7 @@ class ChromeOsDevice(ndb.Model):
     def gcm_registration_id_already_assigned(cls, gcm_registration_id, is_unmanaged_device=False):
         gcm_registration_id_already_assigned_to_device = ChromeOsDevice.query(
             ndb.AND(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
-                    ChromeOsDevice.is_unmanaged_device == is_unmanaged_device,
-                    ChromeOsDevice.archived == False)).count() > 0
+                    ChromeOsDevice.is_unmanaged_device == is_unmanaged_device)).count() > 0
         return gcm_registration_id_already_assigned_to_device
 
     @classmethod

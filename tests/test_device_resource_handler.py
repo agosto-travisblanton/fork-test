@@ -1155,6 +1155,30 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertTrue('Bad response: 404 Device with key: {0} archived.'.format(device_key.urlsafe())
                         in context.exception.message)
 
+    def test_archived_device_is_prevented_from_registering_again__with_same_gcm_registration_id(self):
+        gcm_registration_id = 'APA91bH3BQC-a4VjIsHmXd7ZsP_CXCZcyJQdP0lHS_4qaNYcg'
+        device = ChromeOsDevice.create_managed(
+            tenant_key=self.tenant_key,
+            gcm_registration_id=gcm_registration_id,
+            mac_address=self.MAC_ADDRESS)
+        device.put()
+        request_body = {}
+        self.assertFalse(device.archived)
+        when(device_message_processor).change_intent(any_matcher(), config.PLAYER_RESET_COMMAND).thenReturn(None)
+        self.app.delete('/api/v1/devices/{0}'.format(device.key.urlsafe()),
+                        json.dumps(request_body),
+                        headers=self.api_token_authorization_header)
+        updated_device = device.key.get()
+        self.assertTrue(updated_device.archived)
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': gcm_registration_id,
+                        'tenantCode': self.TENANT_CODE}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body),
+                          headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 409 Conflict gcm registration id is already assigned to a managed device.'
+                        in context.exception.message)
+
     ##################################################################################################################
     # heartbeat
     ##################################################################################################################
