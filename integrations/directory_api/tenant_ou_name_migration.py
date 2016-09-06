@@ -16,7 +16,8 @@ def convert_tenant_name_to_tenant_code(tenant_name):
 def migrate_all_existing_tenant_names(prod_credentials=False,
                                       int_credentials=False,
                                       stage_credentials=False,
-                                      qa_credentials=False):
+                                      qa_credentials=False,
+                                      email_to_send_to="Daniel Ternyak <daniel.ternyak@agosto.com>"):
     if int_credentials:
         email = 'admin@dev.agosto.com'
     elif prod_credentials:
@@ -86,21 +87,19 @@ def migrate_all_existing_tenant_names(prod_credentials=False,
                     convert_tenant_name_to_tenant_code(each_ou["name"]))
 
                 if tenant_by_ou_name:
-                    translation_map[each_ou["name"]]["tenant_code"] = tenant_code + " (found via exact match)"
-                    tenant_by_ou_name.ou_id = each_ou["orgUnitId"]
-                    tenant_entity.put()
+                    translation_map[each_ou["name"]]["tenant_code"] = tenant_code
+                    translation_map[each_ou["name"]]["info"] = "found via converted ou name. OU_ID was NOT ingested"
 
                 elif tenant_by_converted_ou_name:
-                    translation_map[each_ou["name"]]["tenant_code"] = tenant_code + " (found via converted ou name)"
-                    tenant_by_ou_name.ou_id = each_ou["orgUnitId"]
-                    tenant_entity.put()
+                    translation_map[each_ou["name"]]["tenant_code"] = tenant_code
+                    translation_map[each_ou["name"]]["info"] = "found via converted ou name. OU_ID was NOT ingested"
 
                 else:
                     message = "No match for device(s) found in datastore. No match to a Provisioning Tenant can be made"
                     translation_map[each_ou["name"]]["tenant_code"] = message
 
     mail.send_mail(sender='gcp.admin@agosto.com',
-                   to="Daniel Ternyak <daniel.ternyak@agosto.com>",
+                   to=email_to_send_to,
                    subject='Migration',
                    body=str(translation_map))
 
@@ -110,9 +109,11 @@ def migrate_all_existing_tenant_names(prod_credentials=False,
 def migrate(prod_credentials=False,
             int_credentials=False,
             stage_credentials=False,
-            qa_credentials=False):
+            qa_credentials=False,
+            email_to_send_to=None):
     print "MIGRATION BEGIN"
     deferred.defer(migrate_all_existing_tenant_names, prod_credentials=prod_credentials,
                    int_credentials=int_credentials,
                    stage_credentials=stage_credentials,
-                   qa_credentials=qa_credentials)
+                   qa_credentials=qa_credentials,
+                   email_to_send_to=email_to_send_to)
