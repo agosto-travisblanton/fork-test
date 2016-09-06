@@ -487,6 +487,13 @@ application = WSGIApplication(
               methods=['POST']
               ),
 
+        Route(r'/api/v1/tenant_enrollment_users',
+              handler='handlers.tenant_organization_units_handler.TenantOrganizationUnitsHandler',
+              name='tenant-enrollment-user',
+              handler_method='create_enrollment_user',
+              methods=['POST']
+              ),
+
         ############################################################
         # /dev/ routes secured by admin:required
         ############################################################

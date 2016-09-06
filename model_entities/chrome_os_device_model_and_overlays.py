@@ -1,13 +1,15 @@
 import logging
 import uuid
-import ndb_json
+
 from datetime import datetime
 from google.appengine.datastore.datastore_query import Cursor
 from google.appengine.ext import ndb
+
+import ndb_json
 from app_config import config
-from restler.decorators import ae_ndb_serializer
 from domain_model import Domain
 from entity_groups import TenantEntityGroup
+from restler.decorators import ae_ndb_serializer
 from utils.timezone_util import TimezoneUtil
 
 
@@ -110,7 +112,7 @@ class ChromeOsDevice(ndb.Model):
     @classmethod
     def create_managed(cls, tenant_key, gcm_registration_id, mac_address, ethernet_mac_address=None, device_id=None,
                        serial_number=None, archived=False,
-                       model=None, timezone='America/Chicago', registration_correlation_identifier=None):
+                       model=None, timezone=config.DEFAULT_TIMEZONE, registration_correlation_identifier=None):
         timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
         proof_of_play_editable = False
         tenant = tenant_key.get()
@@ -147,7 +149,7 @@ class ChromeOsDevice(ndb.Model):
     def create_unmanaged(cls,
                          gcm_registration_id,
                          mac_address,
-                         timezone='America/Chicago',
+                         timezone=config.DEFAULT_TIMEZONE,
                          registration_correlation_identifier=None):
         timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
         device = cls(
@@ -252,8 +254,7 @@ class ChromeOsDevice(ndb.Model):
     def gcm_registration_id_already_assigned(cls, gcm_registration_id, is_unmanaged_device=False):
         gcm_registration_id_already_assigned_to_device = ChromeOsDevice.query(
             ndb.AND(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
-                    ChromeOsDevice.is_unmanaged_device == is_unmanaged_device,
-                    ChromeOsDevice.archived == False)).count() > 0
+                    ChromeOsDevice.is_unmanaged_device == is_unmanaged_device)).count() > 0
         return gcm_registration_id_already_assigned_to_device
 
     @classmethod
@@ -458,10 +459,24 @@ class Tenant(ndb.Model):
     proof_of_play_url = ndb.StringProperty(required=False)
     ou_id = ndb.StringProperty(required=False)
     default_timezone = ndb.StringProperty(required=True, indexed=True, default='America/Chicago')
+    default_timezone = ndb.StringProperty(required=True, indexed=True, default=config.DEFAULT_TIMEZONE)
+    enrollment_email = ndb.StringProperty(required=False, indexed=True)
+    enrollment_password = ndb.StringProperty(required=False, indexed=False)
+    organization_unit_id = ndb.StringProperty(required=False, indexed=True)
+    organization_unit_path = ndb.StringProperty(required=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
     def get_domain(self):
         return self.domain_key.get()
+
+    @staticmethod
+    def generate_enrollment_password(length):
+        if not isinstance(length, int) or length < config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE:
+            raise ValueError('enrollment_password must be greater than {0} in length'.format(
+                config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE - 1))
+        chars = config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_CHARS
+        from os import urandom
+        return ''.join([chars[ord(c) % len(chars)] for c in urandom(length)])
 
     @classmethod
     def find_by_name(cls, name):
@@ -764,12 +779,22 @@ class Tenant(ndb.Model):
             return domain.impersonation_admin_email_address
 
     @classmethod
-    def create(cls, tenant_code, name, admin_email, content_server_url, domain_key, active,
-               content_manager_base_url, notification_emails=[], proof_of_play_logging=False,
-               proof_of_play_url=config.DEFAULT_PROOF_OF_PLAY_URL, default_timezone='America/Chicago'):
-
+    def create(cls,
+               tenant_code,
+               name,
+               admin_email,
+               content_server_url,
+               domain_key,
+               active,
+               content_manager_base_url,
+               notification_emails=[],
+               proof_of_play_logging=False,
+               proof_of_play_url=config.DEFAULT_PROOF_OF_PLAY_URL,
+               default_timezone=config.DEFAULT_TIMEZONE):
+        enrollment_password = cls.generate_enrollment_password(config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE)
+        enrollment_email = '{0}.enrollment@{1}'.format(tenant_code, domain_key.get().name)
+        organization_unit_path = '/skykit/{0}'.format(tenant_code)
         tenant_entity_group = TenantEntityGroup.singleton()
-
         return cls(parent=tenant_entity_group.key,
                    tenant_code=tenant_code,
                    name=name,
@@ -781,7 +806,10 @@ class Tenant(ndb.Model):
                    notification_emails=notification_emails,
                    proof_of_play_logging=proof_of_play_logging,
                    proof_of_play_url=proof_of_play_url,
-                   default_timezone=default_timezone)
+                   default_timezone=default_timezone,
+                   enrollment_password=enrollment_password,
+                   enrollment_email=enrollment_email,
+                   organization_unit_path=organization_unit_path)
 
     @classmethod
     def toggle_proof_of_play_on_tenant_devices(cls, should_be_enabled, tenant_code, tenant_key=None):

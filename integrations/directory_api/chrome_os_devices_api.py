@@ -2,6 +2,7 @@ from app_config import config
 from googleapiclient import discovery
 from httplib2 import Http
 from oauth2client.client import SignedJwtAssertionCredentials
+from credential_creator import credential_creator, determine_env_string
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
@@ -32,48 +33,17 @@ class ChromeOsDevicesApi(object):
                  admin_to_impersonate_email_address,
                  prod_credentials=False,
                  int_credentials=False,
-                 stage_credentials=False,
-                 qa_credentials=False):
+                 qa_credentials=False,
+                 stage_credentials=False):
 
-        if prod_credentials is True:
-            key_file = '{}/privatekeys/skykit-provisioning.pem'.format(config.APP_ROOT)
-            with open(key_file) as f:
-                private_key = f.read()
-            self.credentials = SignedJwtAssertionCredentials(
-                '613606096818-3hehucjfgbtj56pu8dduuo36uccccen0@developer.gserviceaccount.com',
-                private_key=private_key,
-                scope=self.DIRECTORY_SERVICE_SCOPES,
-                sub=admin_to_impersonate_email_address)
+        env_string = determine_env_string(prod_credentials=prod_credentials,
+                                          int_credentials=int_credentials,
+                                          qa_credentials=qa_credentials,
+                                          stage_credentials=stage_credentials)
 
-        elif int_credentials is True:
-            key_file = '{}/privatekeys/skykit-display-device-int.pem'.format(config.APP_ROOT)
-            with open(key_file) as f:
-                private_key = f.read()
-            self.credentials = SignedJwtAssertionCredentials(
-                '390010375778-87capuus77kispm64q27iah4kl0rorv4@developer.gserviceaccount.com',
-                private_key=private_key,
-                scope=self.DIRECTORY_SERVICE_SCOPES,
-                sub=admin_to_impersonate_email_address)
-
-        elif stage_credentials is True:
-            key_file = '{}/privatekeys/skykit-provisioning-stage.pem'.format(config.APP_ROOT)
-            with open(key_file) as f:
-                private_key = f.read()
-            self.credentials = SignedJwtAssertionCredentials(
-                'service-247@skykit-provisioning-stage.iam.gserviceaccount.com',
-                private_key=private_key,
-                scope=self.DIRECTORY_SERVICE_SCOPES,
-                sub=admin_to_impersonate_email_address)
-
-        elif qa_credentials is True:
-            key_file = '{}/privatekeys/skykit-provisioning-qa.pem'.format(config.APP_ROOT)
-            with open(key_file) as f:
-                private_key = f.read()
-            self.credentials = SignedJwtAssertionCredentials(
-                'service@skykit-provisioning-qa.iam.gserviceaccount.com',
-                private_key=private_key,
-                scope=self.DIRECTORY_SERVICE_SCOPES,
-                sub=admin_to_impersonate_email_address)
+        if prod_credentials or int_credentials or qa_credentials or stage_credentials:
+            self.credentials = credential_creator(env_string, self.DIRECTORY_SERVICE_SCOPES,
+                                                  admin_to_impersonate_email_address)
 
         else:
             self.credentials = SignedJwtAssertionCredentials(config.SERVICE_ACCOUNT_EMAIL,

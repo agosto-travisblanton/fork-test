@@ -26,6 +26,10 @@ TENANT_FIELDS = [
     'proof_of_play_url',
     'default_timezone',
     'active',
+    'enrollment_email',
+    'enrollment_password',
+    'organization_unit_id',
+    'organization_unit_path',
     'created',
     'updated'
 ]

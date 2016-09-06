@@ -211,6 +211,23 @@
               </md-button>
             </md-card-actions>
           </form>
+          <md-card class="margin-top-25">
+            <md-card-title>
+              <md-card-title-text>
+                <span class="md-headline">Chrome Device Management</span>
+              </md-card-title-text>
+            </md-card-title>
+            <md-card-content>
+              <div class="col-sm-9">
+                <label>Organization unit path</label><br>
+                {{tenantDetailsCtrl.currentTenant.organization_unit_path}}<br>
+                <label class="margin-top-15">Enrollment user email</label><br>
+                {{tenantDetailsCtrl.currentTenant.enrollment_email}}<br>
+                <label class="margin-top-15">Enrollment user password</label><br>
+                {{tenantDetailsCtrl.currentTenant.enrollment_password}}
+              </div>
+            </md-card-content>
+          </md-card>
         </md-card-content>
       </md-card>
     </div>

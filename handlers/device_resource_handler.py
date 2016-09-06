@@ -9,6 +9,7 @@ from app_config import config
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from device_commands_handler import DeviceCommandsHandler
 from device_message_processor import post_unmanaged_device_info, change_intent
+from extended_session_request_handler import ExtendedSessionRequestHandler
 from integrations.content_manager.content_manager_api import ContentManagerApi
 from model_entities.integration_events_log_model import IntegrationEventLog
 from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup, DeviceIssueLog
@@ -20,7 +21,7 @@ from workflow.refresh_device import refresh_device
 from workflow.refresh_device_by_mac_address import refresh_device_by_mac_address
 from workflow.register_device import register_device
 from workflow.update_chrome_os_device import update_chrome_os_device
-from extended_session_request_handler import ExtendedSessionRequestHandler
+
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
 
 
@@ -255,7 +256,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
         if device.timezone:
             device.timezone_offset = TimezoneUtil.get_timezone_offset(device.timezone)
         else:
-            device.timezone_offset = TimezoneUtil.get_timezone_offset('America/Chicago')
+            device.timezone_offset = TimezoneUtil.get_timezone_offset(config.DEFAULT_TIMEZONE)
         if self.is_unmanaged_device is False:
             if not device.device_id:
                 deferred.defer(refresh_device_by_mac_address,
@@ -304,7 +305,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                 return
             timezone = request_json.get('timezone')
             if timezone is None or timezone == '':
-                timezone = 'America/Chicago'
+                timezone = config.DEFAULT_TIMEZONE
             correlation_id = IntegrationEventLog.generate_correlation_id()
             if self.is_unmanaged_device is True:
                 registration_request_event = IntegrationEventLog.create(
@@ -838,11 +839,9 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
     def delete(self, device_urlsafe_key):
         status = 204
         message = None
-        device = None
-        try:
-            device = ndb.Key(urlsafe=device_urlsafe_key).get()
-        except Exception, e:
-            logging.exception(e)
+        device = self.validate_and_get(urlsafe_key=device_urlsafe_key,
+                                       kind_cls=ChromeOsDevice,
+                                       abort_on_not_found=False)
         if device is None:
             status = 404
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
@@ -853,14 +852,14 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
             if user_identifier is None or user_identifier == '':
                 user_identifier = 'system'
+            device.archived = True
+            device.put()
             change_intent(
                 gcm_registration_id=device.gcm_registration_id,
                 payload=config.PLAYER_RESET_COMMAND,
                 device_urlsafe_key=device_urlsafe_key,
                 host=self.request.host_url,
                 user_identifier=user_identifier)
-            device.archived = True
-            device.put()
             self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
 
