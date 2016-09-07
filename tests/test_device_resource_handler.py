@@ -919,7 +919,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                        {'device_urlsafe_key': bogus_key})
         request_body = {}
         try:
-
             self.app.put(uri, json.dumps(request_body), headers=self.valid_authorization_header)
             message = 'Bad response: 404 refresh_device_representation command not executed because device not found with key: {1}'.format(
                 bogus_key
