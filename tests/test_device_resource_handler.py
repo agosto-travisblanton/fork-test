@@ -870,6 +870,65 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             if e.__class__.__name__ == 'ProtocolBufferDecodeError':
                 self.assertTrue(message in Exception.message)
 
+
+    ##################################################################################################################
+    # controls_mode
+    ##################################################################################################################
+
+    def test_controls_mode_returns_ok_status(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                                                     any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+        uri = application.router.build(None,
+                                       'controls_mode',
+                                       None,
+                                       {'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
+        request_body = {"controlsMode": 'invisible'}
+        response = self.app.put(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        self.assertOK(response)
+
+    def test_controls_mode_alters_device_value(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                                                     any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+        device_controls_mode = self.chrome_os_device.controls_mode
+        self.assertEqual('invisible', device_controls_mode)
+
+        uri = application.router.build(None,
+                                       'controls_mode',
+                                       None,
+                                       {'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
+        request_body = {"controlsMode": 'visible'}
+        response = self.app.put(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        self.assertOK(response)
+        device_controls_mode = self.chrome_os_device.controls_mode
+        self.assertEqual(device_controls_mode, 'visible')
+
+    def test_controls_mode_with_bogus_device_key_returns_not_found_status(self):
+        when(device_message_processor).change_intent(gcm_registration_id=self.chrome_os_device.gcm_registration_id,
+                                                     payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                                                     device_urlsafe_key=any_matcher(str),
+                                                     host=any_matcher(str),
+                                                     user_identifier=any_matcher(str)).thenReturn(None)
+        bogus_key = '0AXC19Z0DE'
+        uri = application.router.build(None,
+                                       'controls_mode',
+                                       None,
+                                       {'device_urlsafe_key': bogus_key})
+        request_body = {}
+        try:
+
+            self.app.put(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+            message = 'Bad response: 404 refresh_device_representation command not executed because device not found with key: {1}'.format(
+                bogus_key
+            )
+        except Exception, e:
+            if e.__class__.__name__ == 'ProtocolBufferDecodeError':
+                self.assertTrue(message in Exception.message)
+
+
     def test_put_no_authorization_header_returns_forbidden(self):
         request_body = {'gcmRegistrationId': self.GCM_REGISTRATION_ID,
                         'tenantCode': self.TENANT_CODE,

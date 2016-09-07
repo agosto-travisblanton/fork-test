@@ -137,7 +137,7 @@ application = WSGIApplication(
               handler_method='panel_sleep',
               methods=['PUT']
               ),
-Route(r'/api/v1/devices/<device_urlsafe_key>/controls-mode',
+        Route(r'/api/v1/devices/<device_urlsafe_key>/controls-mode',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='controls_mode',
               handler_method='controls_mode',
