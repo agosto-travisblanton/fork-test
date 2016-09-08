@@ -56,15 +56,15 @@ function DeviceDetailsCtrl($log,
   vm.adjustControlsMode = () => {
     let controlsMode = vm.currentDevice.controlsMode;
     ProgressBarService.start();
-    DevicesService.adjustControlsMode(vm.deviceKey, controlsMode)
-      .then(() => {
-        ProgressBarService.complete();
-        ToastsService.showSuccessToast(`Your controls mode selection was succesfully changed to: ${controlsMode}`);
-      })
-      .catch(() => {
-        ProgressBarService.complete();
-        ToastsService.showErrorStatus("Your controls mode change failed to save. Please contact support.")
-      })
+    let controlsPromise = DevicesService.adjustControlsMode(vm.deviceKey, controlsMode)
+    controlsPromise.then(() => {
+      ProgressBarService.complete();
+      ToastsService.showSuccessToast(`Your controls mode selection was succesfully changed to: ${controlsMode}`);
+    })
+    controlsPromise.catch(() => {
+      ProgressBarService.complete();
+      ToastsService.showErrorStatus("Your controls mode change failed to save. Please contact support.")
+    })
   }
 
   vm.adjustOverlayStatus = (status) => {
