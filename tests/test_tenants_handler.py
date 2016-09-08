@@ -112,11 +112,11 @@ class TestTenantsHandler(BaseTest, WebTest):
         name = u'ABC'
         admin_email = u'foo@bar.com'
 
-        ou_method_replacer = MethodReplacer('handlers.tenants_handler.OrganizationUnitsApi')
+        ou_method_replacer = MethodReplacer(OrganizationUnitsApi)
         OrganizationUnitsApi.__init__ = ou_method_replacer.return_value(None)
         OrganizationUnitsApi.insert = ou_method_replacer.return_value({'orgUnitId': 'blah'})
 
-        users_method_replacer = MethodReplacer('handlers.tenants_handler.UsersApi')
+        users_method_replacer = MethodReplacer(UsersApi)
         UsersApi.__init__ = users_method_replacer.return_value(None)
         UsersApi.insert = users_method_replacer.return_value({})
 
@@ -136,8 +136,8 @@ class TestTenantsHandler(BaseTest, WebTest):
         uri = application.router.build(None, 'tenants', None, {})
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
         self.assertEqual(201, response.status_int)
-        tenants_handler.UsersApi = UsersApiOriginal
-        tenants_handler.OrganizationUnitsApi = OrganizationUnitsApiOriginal
+        ou_method_replacer.stop()
+        users_method_replacer.stop()
 
     def test_post_create_new_tenant_persists_object(self):
         name = u'ABC'
@@ -146,13 +146,11 @@ class TestTenantsHandler(BaseTest, WebTest):
         email_2 = 'admin2@skykit.com'
         emails = "{0},{1}".format(email_1, email_2)
 
-        from handlers.tenants_handler import OrganizationUnitsApi, UsersApi, ContentManagerApi
-
-        ou_method_replacer = MethodReplacer('handlers.tenants_handler.OrganizationUnitsApi')
+        ou_method_replacer = MethodReplacer(OrganizationUnitsApi)
         OrganizationUnitsApi.__init__ = ou_method_replacer.return_value(None)
         OrganizationUnitsApi.insert = ou_method_replacer.return_value({'orgUnitId': 'blah'})
 
-        users_method_replacer = MethodReplacer('handlers.tenants_handler.UsersApi')
+        users_method_replacer = MethodReplacer(UsersApi)
         UsersApi.__init__ = users_method_replacer.return_value(None)
         UsersApi.insert = users_method_replacer.return_value({})
 
@@ -177,8 +175,8 @@ class TestTenantsHandler(BaseTest, WebTest):
         email_list = delimited_string_to_list(emails)
         self.assertEqual(actual.notification_emails, email_list)
         self.assertIsNotNone(actual)
-        tenants_handler.UsersApi = UsersApiOriginal
-        tenants_handler.OrganizationUnitsApi = OrganizationUnitsApiOriginal
+        ou_method_replacer.stop()
+        users_method_replacer.stop()
 
     def test_post_trims_and_lowercase_url_and_email(self):
         name = u'ABC'
@@ -187,13 +185,11 @@ class TestTenantsHandler(BaseTest, WebTest):
         valid_admin_email = u'foo@bar.com'
         valid_content_server_url = u'https://skykit-contentmanager-int.appspot.com/content'
 
-        from handlers.tenants_handler import OrganizationUnitsApi, UsersApi, ContentManagerApi
-
-        ou_method_replacer = MethodReplacer('handlers.tenants_handler.OrganizationUnitsApi')
+        ou_method_replacer = MethodReplacer(OrganizationUnitsApi)
         OrganizationUnitsApi.__init__ = ou_method_replacer.return_value(None)
         OrganizationUnitsApi.insert = ou_method_replacer.return_value({'orgUnitId': 'blah'})
 
-        users_method_replacer = MethodReplacer('handlers.tenants_handler.UsersApi')
+        users_method_replacer = MethodReplacer(UsersApi)
         UsersApi.__init__ = users_method_replacer.return_value(None)
         UsersApi.insert = users_method_replacer.return_value({})
 
@@ -216,20 +212,18 @@ class TestTenantsHandler(BaseTest, WebTest):
         actual = Tenant.find_by_name(request_parameters['name'])
         self.assertEqual(actual.admin_email, valid_admin_email)
         self.assertEqual(actual.content_server_url, valid_content_server_url)
-        tenants_handler.UsersApi = UsersApiOriginal
-        tenants_handler.OrganizationUnitsApi = OrganizationUnitsApiOriginal
+        ou_method_replacer.stop()
+        users_method_replacer.stop()
 
     def test_post_create_new_tenant_sets_location_header(self):
         name = u'ABC'
         admin_email = u'foo@bar.com'
 
-        from handlers.tenants_handler import OrganizationUnitsApi, UsersApi, ContentManagerApi
-
-        ou_method_replacer = MethodReplacer('handlers.tenants_handler.OrganizationUnitsApi')
+        ou_method_replacer = MethodReplacer(OrganizationUnitsApi)
         OrganizationUnitsApi.__init__ = ou_method_replacer.return_value(None)
         OrganizationUnitsApi.insert = ou_method_replacer.return_value({'orgUnitId': 'blah'})
 
-        users_method_replacer = MethodReplacer('handlers.tenants_handler.UsersApi')
+        users_method_replacer = MethodReplacer(UsersApi)
         UsersApi.__init__ = users_method_replacer.return_value(None)
         UsersApi.insert = users_method_replacer.return_value({})
 
@@ -254,16 +248,14 @@ class TestTenantsHandler(BaseTest, WebTest):
                                               None,
                                               {'tenant_key': actual.key.urlsafe()})
         self.assertTrue(tenant_uri in response.headers.get('Location'))
-        tenants_handler.UsersApi = UsersApiOriginal
-        tenants_handler.OrganizationUnitsApi = OrganizationUnitsApiOriginal
+        ou_method_replacer.stop()
+        users_method_replacer.stop()
 
     def test_post_create_object_has_expected_parent(self):
         name = u'ABC'
         admin_email = u'foo@bar.com'
 
-        from handlers.tenants_handler import OrganizationUnitsApi, UsersApi, ContentManagerApi
-
-        ou_method_replacer = MethodReplacer('handlers.tenants_handler.OrganizationUnitsApi')
+        ou_method_replacer = MethodReplacer(OrganizationUnitsApi)
         OrganizationUnitsApi.__init__ = ou_method_replacer.return_value(None)
         OrganizationUnitsApi.insert = ou_method_replacer.return_value({'orgUnitId': 'blah'})
 
@@ -289,18 +281,18 @@ class TestTenantsHandler(BaseTest, WebTest):
         actual = Tenant.find_by_name(request_parameters['name'])
         parent = actual.key.parent().get()
         self.assertEqual(parent.name, TENANT_ENTITY_GROUP_NAME)
-        tenants_handler.UsersApi = UsersApiOriginal
-        tenants_handler.OrganizationUnitsApi = OrganizationUnitsApiOriginal
+        ou_method_replacer.stop()
+        users_method_replacer.stop()
 
     def test_post_content_manager_api_collaboration(self):
         name = u'acme'
         admin_email = u'foo@bar.com'
 
-        ou_method_replacer = MethodReplacer('handlers.tenants_handler.OrganizationUnitsApi')
+        ou_method_replacer = MethodReplacer(OrganizationUnitsApi)
         OrganizationUnitsApi.__init__ = ou_method_replacer.return_value(None)
         OrganizationUnitsApi.insert = ou_method_replacer.return_value({'orgUnitId': 'blah'})
 
-        users_method_replacer = MethodReplacer('handlers.tenants_handler.UsersApi')
+        users_method_replacer = MethodReplacer(UsersApi)
         UsersApi.__init__ = users_method_replacer.return_value(None)
         UsersApi.insert = users_method_replacer.return_value({})
 
@@ -320,9 +312,8 @@ class TestTenantsHandler(BaseTest, WebTest):
         uri = application.router.build(None, 'tenants', None, {})
         self.app.post(uri, json.dumps(request_parameters), headers=self.headers)
         verify(ContentManagerApi, times=1).create_tenant(any_matcher(''))
-        tenants_handler.UsersApi = UsersApiOriginal
-        tenants_handler.OrganizationUnitsApi = OrganizationUnitsApiOriginal
-        self.assertEqual(True, False)
+        ou_method_replacer.stop()
+        users_method_replacer.stop()
 
     def test_post_fails_without_domain_key_parameter(self):
         name = u'ABC'
