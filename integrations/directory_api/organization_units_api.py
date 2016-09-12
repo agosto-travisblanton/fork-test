@@ -43,6 +43,22 @@ class OrganizationUnitsApi(object):
         self.authorized_http = self.credentials.authorize(Http())
         self.discovery_service = discovery.build('admin', 'directory_v1', http=self.authorized_http)
 
+    def patch_tenant_name(self, org_unit_path, new_tenant_code):
+        ou_api = self.discovery_service.orgunits()
+        request_body = {
+            "name": new_tenant_code,
+        }
+
+        request = ou_api.insert(customerId=config.GOOGLE_CUSTOMER_ID, orgUnitPath=org_unit_path, body=request_body)
+        try:
+            response = request.execute()
+        except HttpError, error:
+            # Note: Directory API returns a 400 if OU exists w/ message "Invalid Ou Id"
+            reason = json.loads(error.content)
+            response = {'statusCode': error.resp.status, 'statusText': reason['error']['message']}
+            return response
+        return response
+
     # https://www.googleapis.com/admin/directory/v1/customer/my_customer/orgunits
     def insert(self, ou_container_name, parent_org_unit_path=None):
         if parent_org_unit_path is None:
@@ -67,7 +83,7 @@ class OrganizationUnitsApi(object):
     # GET https://www.googleapis.com/admin/directory/v1/customer/my_customer/orgunits/<org_unit_path>?key={API_KEY}
     def get(self, organization_unit_path):
         if organization_unit_path.startswith('/'):
-            organization_unit_path =  organization_unit_path[1:]
+            organization_unit_path = organization_unit_path[1:]
         ou_api = self.discovery_service.orgunits()
         request = ou_api.get(customerId=config.GOOGLE_CUSTOMER_ID,
                              orgUnitPath=organization_unit_path)
@@ -89,68 +105,3 @@ class OrganizationUnitsApi(object):
         except HttpError, err:
             response = {'statusCode': err.resp.status}
         return response
-
-    def patch_tenant_name(self, org_unit_path, new_tenant_code):
-        ou_api = self.discovery_service.orgunits()
-        request_body = {
-            "name": new_tenant_code,
-        }
-
-        request = ou_api.insert(customerId=config.GOOGLE_CUSTOMER_ID, orgUnitPath=org_unit_path, body=request_body)
-        try:
-            response = request.execute()
-        except HttpError, error:
-            # Note: Directory API returns a 400 if OU exists w/ message "Invalid Ou Id"
-            reason = json.loads(error.content)
-            response = {'statusCode': error.resp.status, 'statusText': reason['error']['message']}
-            return response
-        return response
-
-    # https://www.googleapis.com/admin/directory/v1/customer/my_customer/orgunits
-    def insert(self, tenant_code, screen_rotation=0):
-        ou_api = self.discovery_service.orgunits()
-        request_body = {
-            "name": tenant_code,
-            "description": 'OU for {0}'.format(tenant_code),
-            "parentOrgUnitPath": self.TOP_LEVEL_ORG_UNIT_PATH
-        }
-        request = ou_api.insert(customerId=config.GOOGLE_CUSTOMER_ID, body=request_body)
-        try:
-            response = request.execute()
-        except HttpError, error:
-            # Note: Directory API returns a 400 if OU exists w/ message "Invalid Ou Id"
-            reason = json.loads(error.content)
-            response = {'statusCode': error.resp.status, 'statusText': reason['error']['message']}
-            return response
-
-        sub_org_unit_name = self._get_sub_org_unit_name(screen_rotation=screen_rotation)
-        # insert sub OU's (in this case, the screen rotation sub OUs)
-        self._add_sub_org_unit(ou_api=ou_api,
-                               parent_org_unit_path='{0}/{1}'.format(self.TOP_LEVEL_ORG_UNIT_PATH, tenant_code),
-                               sub_org_unit_name=sub_org_unit_name)
-
-        return response
-
-    @staticmethod
-    def _add_sub_org_unit(ou_api, parent_org_unit_path, sub_org_unit_name):
-        ou_api = ou_api
-        request_body = {
-            "name": sub_org_unit_name,
-            "description": 'Display rotation sub OU for tenant {0}'.format(parent_org_unit_path),
-            "parentOrgUnitPath": parent_org_unit_path
-        }
-        request = ou_api.insert(customerId=config.GOOGLE_CUSTOMER_ID, body=request_body)
-        try:
-            response = request.execute()
-        except HttpError, error:
-            # Note: Directory API returns a 400 if OU exists w/ message "Invalid Ou Id"
-            reason = json.loads(error.content)
-            response = {'statusCode': error.resp.status, 'statusText': reason['error']['message']}
-        return response
-
-    @staticmethod
-    def _get_sub_org_unit_name(screen_rotation=0):
-        if screen_rotation in [90, 180, 270]:
-            return 'screen_rotation_{0}'.format(screen_rotation)
-        else:
-            return 'screen_rotation_0'

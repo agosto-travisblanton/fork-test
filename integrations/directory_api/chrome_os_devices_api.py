@@ -54,7 +54,7 @@ class ChromeOsDevicesApi(object):
         self.discovery_service = discovery.build('admin', 'directory_v1', http=self.authorized_http)
 
     # https://developers.google.com/admin-sdk/directory/v1/reference/chromeosdevices/list
-    def list(self, customer_id, page_token=None, projection=None, max_results=None):
+    def list(self, customer_id, page_token=None, projection=None, max_results=None, query=None):
         """
         Obtain a list of Chrome OS devices associated with a customer.
 
@@ -74,12 +74,12 @@ class ChromeOsDevicesApi(object):
             if page_token is None:
                 request = chrome_os_devices_api.list(customerId=customer_id,
                                                      projection=projection,
-                                                     query=self.STATUS_FILTER,
+                                                     query=query or self.STATUS_FILTER,
                                                      maxResults=max_results)
             else:
                 request = chrome_os_devices_api.list(customerId=customer_id,
                                                      projection=projection,
-                                                     query=self.STATUS_FILTER,
+                                                     query=query or self.STATUS_FILTER,
                                                      pageToken=page_token,
                                                      maxResults=max_results)
             current_page_json = request.execute()
