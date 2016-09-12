@@ -15,7 +15,8 @@ function DeviceDetailsCtrl($log,
                            $mdDialog,
                            ToastsService,
                            DateManipulationService,
-                           $timeout) {
+                           $timeout,
+                           $http) {
   "ngInject";
 
   const vm = this;
@@ -97,27 +98,22 @@ function DeviceDetailsCtrl($log,
 
   vm.submitImage = () => {
     if (vm.selectedLogo && vm.selectedLogo[0]) {
-      ProgressBarService.start();
-      let reader = new FileReader();
-      reader.onload = function () {
-        vm.selectedLogoFinal = {}
-        vm.selectedLogoFinal.asString = JSON.stringify(reader.result)
-        vm.selectedLogoFinal.name = vm.selectedLogo[0].lfFileName
-        vm.selectedLogoChange = true;
+      var formData = new FormData();
+      angular.forEach(vm.selectedLogo, function (obj) {
+        formData.append('files', obj.lfFile);
+      });
 
-        let promise = TenantsService.saveImage(vm.tenantKey, vm.selectedLogoFinal.asString, vm.selectedLogoFinal.name)
-        promise.then((res) => {
-          ProgressBarService.complete();
-          $timeout(vm.getTenantImages(), 2000);
-          vm.fileApi.removeAll()
-          ToastsService.showSuccessToast('We uploaded your image.');
-        })
-        promise.catch((res) => {
-          ProgressBarService.complete();
-          ToastsService.showErrorToast('Something went wrong. You may have already uploaded this image.');
-        })
-      }
-      reader.readAsText(vm.selectedLogo[0].lfFile);
+      let promise = TenantsService.saveImage(vm.tenantKey, vm.selectedLogoFinal.asString, vm.selectedLogoFinal.name)
+      promise.then((res) => {
+        ProgressBarService.complete();
+        $timeout(vm.getTenantImages(), 2000);
+        vm.fileApi.removeAll()
+        ToastsService.showSuccessToast('We uploaded your image.');
+      })
+      promise.catch((res) => {
+        ProgressBarService.complete();
+        ToastsService.showErrorToast('Something went wrong. You may have already uploaded this image.');
+      })
     }
   }
 
@@ -140,7 +136,8 @@ function DeviceDetailsCtrl($log,
           image_key: value.key
         }
         vm.OVERLAY_TYPES.push(newValue);
-      };
+      }
+      ;
     });
 
     promise.catch(() => {

@@ -19,12 +19,15 @@ export default class TenantsService {
     return this.Restangular.oneUrl('image', `/api/v1/image/tenant/${tenant_urlsafe_key}`).getList()
   }
 
-  saveImage(tenant_urlsafe_key, svg_rep, name) {
-    let payload = {
-      svg_rep,
-      name
-    }
-    return this.Restangular.oneUrl('image', `/api/v1/image/tenant/${tenant_urlsafe_key}`).customPOST(payload);
+  saveImage(tenant_urlsafe_key, formData) {
+    $.ajax({
+      type: "POST",
+      url: `/api/v1/image/tenant/${vm.tenant_urlsafe_key}`,
+      data: formData,
+      processData: false,
+      contentType: false
+    });
+
   }
 
   searchAllTenantsByName(tenant_name) {

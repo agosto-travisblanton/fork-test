@@ -1,10 +1,13 @@
 from extended_session_request_handler import ExtendedSessionRequestHandler
-
+import json
 from models import Tenant, Image
 from restler.serializers import json_response
+import urllib
+import cgi
+from google.appengine.ext.webapp import blobstore_handlers
 
 
-class ImageHandler(ExtendedSessionRequestHandler):
+class ImageHandler(ExtendedSessionRequestHandler, blobstore_handlers.BlobstoreUploadHandler):
     def get(self, tenant_urlsafe_key):
         tenant = self.validate_and_get(tenant_urlsafe_key, Tenant, abort_on_not_found=True)
 
@@ -28,7 +31,16 @@ class ImageHandler(ExtendedSessionRequestHandler):
         )
 
     def post(self, tenant_urlsafe_key):
-        name = self.check_and_get_field('name')
+
+        files = self.request.POST.getall('files')
+
+        _files = [{'content': f.file.read(),
+                         'filename': f.filename} for f in files]
+
+        print _files
+
+
+        return
         svg_rep = self.check_and_get_field('svg_rep')
         tenant = self.validate_and_get(tenant_urlsafe_key, Tenant, abort_on_not_found=True)
 
