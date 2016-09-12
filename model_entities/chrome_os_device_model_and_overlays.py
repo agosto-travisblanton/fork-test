@@ -458,7 +458,6 @@ class Tenant(ndb.Model):
     proof_of_play_logging = ndb.BooleanProperty(default=False, required=True, indexed=True)
     proof_of_play_url = ndb.StringProperty(required=False)
     ou_id = ndb.StringProperty(required=False)
-    default_timezone = ndb.StringProperty(required=True, indexed=True, default='America/Chicago')
     default_timezone = ndb.StringProperty(required=True, indexed=True, default=config.DEFAULT_TIMEZONE)
     enrollment_email = ndb.StringProperty(required=False, indexed=True)
     enrollment_password = ndb.StringProperty(required=False, indexed=False)
