@@ -888,7 +888,6 @@ class Location(ndb.Model):
 #####################################################
 @ae_ndb_serializer
 class Image(ndb.Model):
-    svg_rep = ndb.TextProperty(required=True)
     name = ndb.StringProperty(required=True, indexed=True)
     tenant_key = ndb.KeyProperty(kind=Tenant, required=True)
 

@@ -1,9 +1,7 @@
 from extended_session_request_handler import ExtendedSessionRequestHandler
-import json
 from models import Tenant, Image
 from restler.serializers import json_response
-import urllib
-import cgi
+from integrations.cloud_storage.cloud_storage_api import create_file
 from google.appengine.ext.webapp import blobstore_handlers
 
 
@@ -31,18 +29,30 @@ class ImageHandler(ExtendedSessionRequestHandler, blobstore_handlers.BlobstoreUp
         )
 
     def post(self, tenant_urlsafe_key):
+        tenant = self.validate_and_get(tenant_urlsafe_key, Tenant, abort_on_not_found=True)
+        tenant_code = tenant.tenant_code
+        files = [
+            {
+                'content': f.file.read(),
+                'filename': f.filename,
+                'content_type': f.type
+            } for f in self.request.POST.getall('files')
+            ]
 
-        files = self.request.POST.getall('files')
+        if len(files) > 1 or len(files) < 1:
+            return json_response(self.response, {
+                "message": "At this time, you must include exactly one image to upload.",
+            }, status_code=400)
 
-        _files = [{'content': f.file.read(),
-                         'filename': f.filename} for f in files]
-
-        print _files
-
+        try:
+            create_file(files[0]["content"], files[0]["filename"], files[0]["content_type"], tenant_code)
+        except ValueError:
+            json_response(self.response, {
+                "success": False,
+            }, status_code=409)
 
         return
         svg_rep = self.check_and_get_field('svg_rep')
-        tenant = self.validate_and_get(tenant_urlsafe_key, Tenant, abort_on_not_found=True)
 
         image_entity = Image.create(svg_rep=svg_rep, name=name, tenant_key=tenant.key)
 

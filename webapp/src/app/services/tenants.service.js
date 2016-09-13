@@ -20,9 +20,9 @@ export default class TenantsService {
   }
 
   saveImage(tenant_urlsafe_key, formData) {
-    $.ajax({
+    return $.ajax({
       type: "POST",
-      url: `/api/v1/image/tenant/${vm.tenant_urlsafe_key}`,
+      url: `/api/v1/image/tenant/${tenant_urlsafe_key}`,
       data: formData,
       processData: false,
       contentType: false

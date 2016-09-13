@@ -103,7 +103,7 @@ function DeviceDetailsCtrl($log,
         formData.append('files', obj.lfFile);
       });
 
-      let promise = TenantsService.saveImage(vm.tenantKey, vm.selectedLogoFinal.asString, vm.selectedLogoFinal.name)
+      let promise = TenantsService.saveImage(vm.tenantKey, formData)
       promise.then((res) => {
         ProgressBarService.complete();
         $timeout(vm.getTenantImages(), 2000);
