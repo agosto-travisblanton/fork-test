@@ -172,7 +172,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
                           headers=self.api_token_authorization_header)
-        self.assertTrue('Bad response: 400 The gcmRegistrationId parameter is invalid.'
+        self.assertTrue('required field gcmRegistrationId not found'
                         in context.exception.message)
 
     def test_device_resource_handler_post_no_returns_bad_response_for_empty_mac_address(self):
@@ -182,7 +182,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
                           headers=self.api_token_authorization_header)
-        self.assertTrue('Bad response: 400 The macAddress parameter is invalid.'
+        print context.exception.message
+        self.assertTrue('required field macAddress not found'
                         in context.exception.message)
 
     def test_post_managed_device_when_cannot_resolve_tenant(self):
@@ -192,7 +193,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
                           headers=self.api_token_authorization_header)
-        self.assertTrue('Bad response: 400 Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
+        print context.exception.message
+        self.assertTrue('400 Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
                         in context.exception.message)
 
     def test_post_managed_device_creates_device_with_default_timezone_and_expected_offset(self):
@@ -269,7 +271,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
                           headers=self.unmanaged_registration_token_authorization_header)
-        self.assertTrue('Bad response: 400 The gcmRegistrationId parameter is invalid.'
+        self.assertTrue('required field gcmRegistrationId not found'
                         in context.exception.message)
 
     def test_device_resource_handler_unmanaged_post_returns_bad_response_for_empty_mac_address(self):
@@ -278,7 +280,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
                           headers=self.unmanaged_registration_token_authorization_header)
-        self.assertTrue('Bad response: 400 The macAddress parameter is invalid.'
+        self.assertTrue('required field macAddress not found'
                         in context.exception.message)
 
     def test_device_resource_handler_unmanaged_post_populates_location_header(self):

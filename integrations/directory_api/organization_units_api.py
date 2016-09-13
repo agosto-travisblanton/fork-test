@@ -43,6 +43,22 @@ class OrganizationUnitsApi(object):
         self.authorized_http = self.credentials.authorize(Http())
         self.discovery_service = discovery.build('admin', 'directory_v1', http=self.authorized_http)
 
+    def patch_tenant_name(self, org_unit_path, new_tenant_code):
+        ou_api = self.discovery_service.orgunits()
+        request_body = {
+            "name": new_tenant_code,
+        }
+
+        request = ou_api.insert(customerId=config.GOOGLE_CUSTOMER_ID, orgUnitPath=org_unit_path, body=request_body)
+        try:
+            response = request.execute()
+        except HttpError, error:
+            # Note: Directory API returns a 400 if OU exists w/ message "Invalid Ou Id"
+            reason = json.loads(error.content)
+            response = {'statusCode': error.resp.status, 'statusText': reason['error']['message']}
+            return response
+        return response
+
     # https://www.googleapis.com/admin/directory/v1/customer/my_customer/orgunits
     def insert(self, ou_container_name, parent_org_unit_path=None):
         if parent_org_unit_path is None:
@@ -67,7 +83,7 @@ class OrganizationUnitsApi(object):
     # GET https://www.googleapis.com/admin/directory/v1/customer/my_customer/orgunits/<org_unit_path>?key={API_KEY}
     def get(self, organization_unit_path):
         if organization_unit_path.startswith('/'):
-            organization_unit_path =  organization_unit_path[1:]
+            organization_unit_path = organization_unit_path[1:]
         ou_api = self.discovery_service.orgunits()
         request = ou_api.get(customerId=config.GOOGLE_CUSTOMER_ID,
                              orgUnitPath=organization_unit_path)

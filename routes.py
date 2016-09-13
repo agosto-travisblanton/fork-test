@@ -207,7 +207,6 @@ application = WSGIApplication(
               handler_method='post_log',
               methods=['POST']
               ),
-
         ############################################################
         # (DISTRIBUTOR) DEVICE ROUTES
         ############################################################

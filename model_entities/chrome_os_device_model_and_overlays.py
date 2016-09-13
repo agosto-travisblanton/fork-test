@@ -187,6 +187,14 @@ class ChromeOsDevice(ndb.Model):
             return None
 
     @classmethod
+    def get_by_serial_number(cls, serial_number):
+        if serial_number:
+            results = ChromeOsDevice.query(ChromeOsDevice.serial_number == serial_number).fetch()
+            return results[0] if results else  None  # there should never be multiple multiple serials in this query
+        else:
+            return None
+
+    @classmethod
     def get_by_mac_address(cls, mac_address):
         if mac_address:
             results = ChromeOsDevice.query(
@@ -449,6 +457,7 @@ class Tenant(ndb.Model):
     notification_emails = ndb.StringProperty(repeated=True, indexed=False, required=False)
     proof_of_play_logging = ndb.BooleanProperty(default=False, required=True, indexed=True)
     proof_of_play_url = ndb.StringProperty(required=False)
+    ou_id = ndb.StringProperty(required=False)
     default_timezone = ndb.StringProperty(required=True, indexed=True, default=config.DEFAULT_TIMEZONE)
     enrollment_email = ndb.StringProperty(required=False, indexed=True)
     enrollment_password = ndb.StringProperty(required=False, indexed=False)
@@ -492,10 +501,11 @@ class Tenant(ndb.Model):
 
     @classmethod
     def find_by_tenant_code(cls, tenant_code):
-        if tenant_code:
-            tenant_key = Tenant.query(Tenant.tenant_code == tenant_code, Tenant.active == True).get(keys_only=True)
-            if tenant_key:
-                return tenant_key.get()
+        tenant_entity = Tenant.query(Tenant.tenant_code == tenant_code, Tenant.active == True).fetch()
+        if tenant_entity:
+            return tenant_entity[0]
+        else:
+            return None
 
     @classmethod
     def is_tenant_code_unique(cls, tenant_code):
