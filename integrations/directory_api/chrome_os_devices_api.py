@@ -54,7 +54,7 @@ class ChromeOsDevicesApi(object):
         self.discovery_service = discovery.build('admin', 'directory_v1', http=self.authorized_http)
 
     # https://developers.google.com/admin-sdk/directory/v1/reference/chromeosdevices/list
-    def list(self, customer_id, page_token=None, projection=None, max_results=None):
+    def list(self, customer_id, page_token=None, projection=None, max_results=None, query=None):
         """
         Obtain a list of Chrome OS devices associated with a customer.
 
@@ -74,10 +74,12 @@ class ChromeOsDevicesApi(object):
             if page_token is None:
                 request = chrome_os_devices_api.list(customerId=customer_id,
                                                      projection=projection,
+                                                     query=query or self.STATUS_FILTER,
                                                      maxResults=max_results)
             else:
                 request = chrome_os_devices_api.list(customerId=customer_id,
                                                      projection=projection,
+                                                     query=query or self.STATUS_FILTER,
                                                      pageToken=page_token,
                                                      maxResults=max_results)
             current_page_json = request.execute()
@@ -169,3 +171,14 @@ class ChromeOsDevicesApi(object):
                                                        deviceId=device_id,
                                                        body=resource_json)
                 request.execute()
+
+    def list_all_devices_in_path(self, orgUnitPath):
+        devices_list = self.list('my_customer')
+
+        # ensures that patterns like /Skykit/Agosto/Blah/<device> match, but /Skykit/AgostoDevTest does not ...
+        # given an input of /Skykit/Agosto
+        return [
+            device for device in devices_list
+            if orgUnitPath == device["orgUnitPath"]
+            or (orgUnitPath in device["orgUnitPath"] and device["orgUnitPath"].split(orgUnitPath, 1)[1][0] == "/")
+            ]

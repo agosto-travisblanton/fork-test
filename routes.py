@@ -137,6 +137,12 @@ application = WSGIApplication(
               handler_method='panel_sleep',
               methods=['PUT']
               ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/controls-mode',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='controls_mode',
+              handler_method='controls_mode',
+              methods=['PUT']
+              ),
         Route(r'/api/v1/devices/<device_urlsafe_key>/commands',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
               name='device-commands',
@@ -207,7 +213,6 @@ application = WSGIApplication(
               handler_method='post_log',
               methods=['POST']
               ),
-
         ############################################################
         # (DISTRIBUTOR) DEVICE ROUTES
         ############################################################

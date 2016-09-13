@@ -291,23 +291,14 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             status = 201
             error_message = None
             request_json = json.loads(self.request.body)
-            device_mac_address = request_json.get('macAddress')
-            if device_mac_address is None or device_mac_address == '':
-                status = 400
-                error_message = 'The macAddress parameter is invalid.'
-                self.response.set_status(status, error_message)
-                return
-            gcm_registration_id = request_json.get('gcmRegistrationId')
-            if gcm_registration_id is None or gcm_registration_id == '':
-                status = 400
-                error_message = 'The gcmRegistrationId parameter is invalid.'
-                self.response.set_status(status, error_message)
-                return
+            device_mac_address = self.check_and_get_field('macAddress')
+            gcm_registration_id = self.check_and_get_field('gcmRegistrationId')
             timezone = request_json.get('timezone')
             if timezone is None or timezone == '':
                 timezone = config.DEFAULT_TIMEZONE
+
             correlation_id = IntegrationEventLog.generate_correlation_id()
-            if self.is_unmanaged_device is True:
+            if self.is_unmanaged_device:
                 registration_request_event = IntegrationEventLog.create(
                     event_category='Registration',
                     component_name='Player - unmanaged',
@@ -359,6 +350,8 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                 self.response.headers['Location'] = device_uri
                 self.response.headers.pop('Content-Type', None)
                 self.response.set_status(status)
+
+            # not an unmanaged device (so its a managed device)
             else:
                 registration_request_event = IntegrationEventLog.create(
                     event_category='Registration',
@@ -377,6 +370,12 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                     return
                 tenant_code = request_json.get('tenantCode')
                 if tenant_code is None or tenant_code == '':
+                    # attempt to get tenant_code via OU_ID
+                    # start psudeocode
+                    # device = chrome_os_devices_api.get(device_id)
+                    # ou_id = device["ou"]["id"]
+                    # tenant_entity = Tenant.get_by_ou_id(ou_id)
+                    # if not tenant_entity: "ERROR"
                     status = 400
                     error_message = 'The tenantCode parameter is invalid.'
                     self.response.set_status(status, error_message)
@@ -444,16 +443,8 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
     def put(self, device_urlsafe_key):
         status = 204
         message = None
-        device = None
-        try:
-            device = ndb.Key(urlsafe=device_urlsafe_key).get()
-        except Exception, e:
-            logging.exception(e)
-        if device is None:
-            status = 404
-            message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
-            return self.response.set_status(status, message)
-        elif device.archived:
+        device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
+        if device.archived:
             status = 404
             message = 'Device with key: {0} archived.'.format(device_urlsafe_key)
             return self.response.set_status(status, message)
@@ -544,6 +535,9 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             overlay_status = request_json.get('overlay_status')
             if overlay_status != None:
                 device.overlay_available = overlay_status
+            controls_mode = request_json.get('controlsMode')
+            if controls_mode != None:
+                device.controls_mode = controls_mode
             device.put()
             if not device.is_unmanaged_device:
                 deferred.defer(update_chrome_os_device,
@@ -861,6 +855,29 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                 host=self.request.host_url,
                 user_identifier=user_identifier)
             self.response.headers.pop('Content-Type', None)
+        self.response.set_status(status, message)
+
+    @requires_api_token
+    def controls_mode(self, device_urlsafe_key):
+        status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
+        if device:
+            user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
+            if user_identifier is None or user_identifier == '':
+                user_identifier = 'system'
+
+            request_json = json.loads(self.request.body)
+            controls_mode = request_json["controlsMode"]
+            device = ndb.Key(urlsafe=device_urlsafe_key).get()
+            device.controls_mode = controls_mode
+            device.put()
+
+            change_intent(
+                gcm_registration_id=device.gcm_registration_id,
+                payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                device_urlsafe_key=device_urlsafe_key,
+                host=self.request.host_url,
+                user_identifier=user_identifier)
+
         self.response.set_status(status, message)
 
     @requires_api_token

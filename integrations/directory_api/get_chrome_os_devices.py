@@ -4,9 +4,10 @@ from integrations.directory_api.chrome_os_devices_api import ChromeOsDevicesApi
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
-def get_chrome_os_devices(impersonation_email, status_filter=None):
+def get_chrome_os_devices(impersonation_email, status_filter=None, int_credentials=True, prod_credentials=False):
     devices = []
-    chrome_os_devices_api = ChromeOsDevicesApi(impersonation_email, int_credentials=True)
+    chrome_os_devices_api = ChromeOsDevicesApi(impersonation_email, int_credentials=int_credentials,
+                                               prod_credentials=prod_credentials)
     chrome_os_devices = chrome_os_devices_api.list(
         customer_id=config.GOOGLE_CUSTOMER_ID,
         projection='FULL',

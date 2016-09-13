@@ -33,6 +33,7 @@ function DeviceDetailsCtrl($log,
   [vm.startTime, vm.endTime] = DateManipulationService.createFormattedStartAndEndDateFromToday(30);
   vm.enrollmentEvents = [];
   vm.logoChange = false;
+  vm.controlsModeOptions = ["visible", "invisible", "disabled"]
 
   /////////////////////////////////////////////////
   // Overlay
@@ -51,6 +52,20 @@ function DeviceDetailsCtrl($log,
       }
     }
     return modifiedOverlays
+  }
+
+  vm.adjustControlsMode = () => {
+    let controlsMode = vm.currentDevice.controlsMode;
+    ProgressBarService.start();
+    let controlsPromise = DevicesService.adjustControlsMode(vm.deviceKey, controlsMode)
+    controlsPromise.then(() => {
+      ProgressBarService.complete();
+      ToastsService.showSuccessToast(`Your controls mode selection was succesfully changed to: ${controlsMode}`);
+    })
+    controlsPromise.catch(() => {
+      ProgressBarService.complete();
+      ToastsService.showErrorStatus("Your controls mode change failed to save. Please contact support.")
+    })
   }
 
   vm.adjustOverlayStatus = (status) => {
