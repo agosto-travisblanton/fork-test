@@ -75,6 +75,7 @@ class ChromeOsDevice(ndb.Model):
     archived = ndb.BooleanProperty(default=False, required=True, indexed=True)
     panel_sleep = ndb.BooleanProperty(default=False, required=True, indexed=True)
     overlay_available = ndb.BooleanProperty(default=False, required=True, indexed=True)
+    controls_mode = ndb.StringProperty(required=False, indexed=True, default='invisible')
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):
