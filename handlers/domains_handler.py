@@ -7,6 +7,7 @@ from webapp2 import RequestHandler
 from decorators import requires_api_token
 from integrations.directory_api.chrome_os_devices_api import ChromeOsDevicesApi
 from integrations.directory_api.organization_units_api import OrganizationUnitsApi
+from integrations.directory_api.users_api import UsersApi
 from models import Domain
 from ndb_mixins import KeyValidatorMixin
 from oauth2client.client import AccessTokenRefreshError
@@ -19,6 +20,7 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 class DomainsHandler(RequestHandler, KeyValidatorMixin):
     DEVICES_SCOPE = 'https://www.googleapis.com/auth/admin.directory.device.chromeos'
     OU_SCOPE = 'https://www.googleapis.com/auth/admin.directory.orgunit'
+    USERS_SCOPE = 'https://www.googleapis.com/auth/admin.directory.user'
 
     @requires_api_token
     def get(self, domain_key=None):
@@ -122,12 +124,13 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
                 result['devicesAccess'] = False
         except AccessTokenRefreshError as exception:
             result['devicesAccess'] = False
-            error_message = "{0} and {1}: '{2}'".format(
-                domain.name,
+            error_message = "'{0}' for {1} on {2}".format(
+                exception.message,
                 domain.impersonation_admin_email_address,
-                exception.message)
-            logging.error(error_message)
-            result['devicesAccessException'] = exception.message
+                domain.name
+                )
+            logging.info(error_message)
+            result['devicesAccessException'] = error_message
 
         try:
             organization_units_api = OrganizationUnitsApi(
@@ -140,11 +143,31 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
                     result['orgUnitsAccess'] = False
         except AccessTokenRefreshError as exception:
             result['orgUnitsAccess'] = False
-            error_message = "{0} and {1}: '{2}'".format(
-                domain.name,
+            error_message = "'{0}' for {1} on {2}".format(
+                exception.message,
                 domain.impersonation_admin_email_address,
-                exception.message)
-            logging.error(error_message)
-            result['orgUnitsAccessException'] = exception.message
+                domain.name
+                )
+            logging.info(error_message)
+            result['orgUnitsAccessException'] = error_message
+
+        try:
+            users_api = UsersApi(
+                admin_to_impersonate_email_address=domain.impersonation_admin_email_address)
+            if users_api:
+                scopes = users_api.DIRECTORY_SERVICE_SCOPES
+                if any(self.USERS_SCOPE in s for s in scopes):
+                    result['usersAccess'] = True
+                else:
+                    result['usersAccess'] = False
+        except AccessTokenRefreshError as exception:
+            result['usersAccess'] = False
+            error_message = "'{0}' for {1} on {2}".format(
+                exception.message,
+                domain.impersonation_admin_email_address,
+                domain.name
+                )
+            logging.info(error_message)
+            result['usersAccessException'] = error_message
 
         json_response(self.response, result)
