@@ -38,22 +38,6 @@ function DeviceDetailsCtrl($log,
   /////////////////////////////////////////////////
   // Overlay
   /////////////////////////////////////////////////
-  let attachImageNameToOverlay = (overlays) => {
-    let modifiedOverlays = angular.copy(overlays)
-    if (modifiedOverlays) {
-      delete modifiedOverlays["key"]
-
-      for (let k in modifiedOverlays) {
-        if (modifiedOverlays[k]["image_key"]) {
-          modifiedOverlays[k].name = modifiedOverlays[k]["image_key"]["name"]
-        } else {
-          modifiedOverlays[k].name = modifiedOverlays[k].type
-        }
-      }
-    }
-    return modifiedOverlays
-  }
-
   vm.adjustControlsMode = () => {
     let controlsMode = vm.currentDevice.controlsMode;
     ProgressBarService.start();
@@ -82,13 +66,17 @@ function DeviceDetailsCtrl($log,
   }
 
   vm.submitOverlaySettings = () => {
-    let overlaySettings = vm.currentDevice.overlay;
+    let overlaySettings = vm.currentDeviceCopy.overlay;
     delete overlaySettings.key;
     delete overlaySettings.device_key;
 
     let overlaySettingsCopy = {}
     for (let k in overlaySettings) {
-      overlaySettingsCopy[k] = JSON.parse(overlaySettings[k])
+      if (typeof overlaySettings[k] === 'string' || overlaySettings[k] instanceof String) {
+        overlaySettingsCopy[k] = JSON.parse(overlaySettings[k])
+      } else {
+        overlaySettingsCopy[k] = overlaySettings[k]
+      }
     }
 
     ProgressBarService.start();
@@ -134,9 +122,8 @@ function DeviceDetailsCtrl($log,
 
   vm.getTenantImages = () => {
     vm.OVERLAY_TYPES = [
-      {type: "TIME", name: "TIME", realName: "TIME", new: true, image_key: null},
-      {type: "DATE", name: "DATE", new: true, realName: "DATE", image_key: null},
-      {type: "DATETIME", name: "DATETIME", realName: "DATETIME", new: true, image_key: null},
+      {type: null, name: "none", realName: "none", new: false, image_key: null},
+      {type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
     ]
 
     ProgressBarService.start();
@@ -146,8 +133,8 @@ function DeviceDetailsCtrl($log,
       for (let value of res) {
         let newValue = {
           realName: angular.copy(value.name),
-          name: "LOGO: " + value.name,
-          type: "LOGO",
+          name: "logo: " + value.name,
+          type: "logo",
           image_key: value.key
         }
         vm.OVERLAY_TYPES.push(newValue);
@@ -279,8 +266,9 @@ function DeviceDetailsCtrl($log,
   };
 
   vm.onGetDeviceSuccess = function (response) {
-    vm.currentDevice = response;
-    vm.currentDevice.overlay = attachImageNameToOverlay(vm.currentDevice.overlay)
+    vm.currentDevice = response
+    vm.currentDeviceCopy = angular.copy(vm.currentDevice)
+    console.log(vm.currentDevice)
 
     if (response.timezone !== vm.selectedTimezone) {
       vm.selectedTimezone = response.timezone;

@@ -9,7 +9,6 @@ from extended_session_request_handler import ExtendedSessionRequestHandler
 class OverlayHandler(ExtendedSessionRequestHandler):
     def post(self, device_urlsafe_key):
         request_json = json.loads(self.request.body)
-        print request_json
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
 
         # array of dictionaries that contain data about each overlay

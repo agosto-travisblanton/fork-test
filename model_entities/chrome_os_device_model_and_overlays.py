@@ -94,7 +94,21 @@ class ChromeOsDevice(ndb.Model):
     def overlays_as_dict(self):
         """ This method is offered because restler doesn't support keyProperty serialization beyond a single child"""
         json = ndb_json.dumps(self.overlays)
-        return ndb_json.loads(json)
+        python_dict =  ndb_json.loads(json)
+        del python_dict["device_key"]
+        for key, value in python_dict.iteritems():
+            if key != "key":
+                # Player team wants the positional key to also be in a field called "gravity"
+                python_dict[key]["gravity"] = key
+                if python_dict[key]["type"] == "logo":
+                    python_dict[key]["name"] = python_dict[key]["image_key"]["name"]
+                    del python_dict[key]["image_key"]["tenant_key"]
+                else:
+                    python_dict[key]["name"] = python_dict[key]["type"]
+                    if python_dict[key]["name"] == None:
+                        python_dict[key]["name"] = "none"
+
+        return python_dict
 
     def enable_overlays(self):
         self.overlay_available = True
@@ -899,6 +913,7 @@ class Location(ndb.Model):
 #####################################################
 @ae_ndb_serializer
 class Image(ndb.Model):
+    filepath = ndb.StringProperty(required=True, indexed=True)
     name = ndb.StringProperty(required=True, indexed=True)
     tenant_key = ndb.KeyProperty(kind=Tenant, required=True)
 
@@ -907,17 +922,17 @@ class Image(ndb.Model):
         return Image.query(ndb.AND(Image.tenant_key == tenant_key, Image.name == name)).fetch()
 
     @staticmethod
-    def create(svg_rep, name, tenant_key):
+    def create(filepath, name, tenant_key):
         if not Image.exists_within_tenant(tenant_key, name):
             image = Image(
-                svg_rep=svg_rep,
+                filepath=filepath,
                 name=name,
                 tenant_key=tenant_key
             )
             image.put()
             return image
         else:
-            return False
+            raise ValueError("This filename already exists in this tenant")
 
     @staticmethod
     def get_by_tenant_key(tenant_key):

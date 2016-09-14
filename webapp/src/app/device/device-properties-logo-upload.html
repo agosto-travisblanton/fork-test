@@ -1,0 +1,23 @@
+<md-card>
+  <md-card-content>
+    <form class="form-horizontal"
+          novalidate>
+      <section name="logo">
+        <h3>Logo Upload</h3>
+        <hr/>
+
+        <div class="row">
+          <div class="col-md-12">
+            <lf-ng-md-file-input lf-files="deviceDetailsCtrl.selectedLogo" lf-api="deviceDetailsCtrl.fileApi"
+                                 accept="image/svg+xml"></lf-ng-md-file-input>
+
+            <md-button class="md-raised md-primary" ng-click="deviceDetailsCtrl.submitImage()"
+                       style="float: right;">
+              UPLOAD
+            </md-button>
+          </div>
+        </div>
+      </section>
+    </form>
+  </md-card-content>
+</md-card>
