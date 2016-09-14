@@ -74,8 +74,8 @@ def migrate_all_existing_tenant_names(prod_credentials=False,
                         else:
                             translation_map[each_ou["name"]]["tenant_code"] = each_ou["name"]
 
-                        # insert the ou_id for the tenant
-                        tenant_entity.ou_id = each_ou["orgUnitId"]
+                        # insert the organization_unit_id for the tenant
+                        tenant_entity.organization_unit_id = each_ou["orgUnitId"]
                         tenant_entity.put()
 
                 else:
