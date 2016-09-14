@@ -65,7 +65,7 @@ class ImageHandler(ExtendedSessionRequestHandler):
                         "success": False,
                     }, status_code=409)
 
-            except ValueError:
+            except ValueError as e:
                 json_response(self.response, {
                     "success": False,
                 }, status_code=409)
