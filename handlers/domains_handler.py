@@ -114,60 +114,66 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
     def ping_directory_api(self, domain_key):
         domain = self.validate_and_get(domain_key, Domain, abort_on_not_found=True, use_app_engine_memcache=False)
         result = {'domainName': domain.name, 'impersonationEmail': domain.impersonation_admin_email_address}
-        try:
-            chrome_os_devices_api = ChromeOsDevicesApi(
-                admin_to_impersonate_email_address=domain.impersonation_admin_email_address)
-            scopes = chrome_os_devices_api.DIRECTORY_SERVICE_SCOPES
-            if any(self.DEVICES_SCOPE in s for s in scopes):
-                result['devicesAccess'] = True
-            else:
-                result['devicesAccess'] = False
-        except AccessTokenRefreshError as exception:
-            result['devicesAccess'] = False
-            error_message = "'{0}' for {1} on {2}".format(
-                exception.message,
-                domain.impersonation_admin_email_address,
-                domain.name
-                )
-            logging.info(error_message)
-            result['devicesAccessException'] = error_message
-
-        try:
-            organization_units_api = OrganizationUnitsApi(
-                admin_to_impersonate_email_address=domain.impersonation_admin_email_address)
-            if organization_units_api:
-                scopes = organization_units_api.DIRECTORY_SERVICE_SCOPES
-                if any(self.OU_SCOPE in s for s in scopes):
-                    result['orgUnitsAccess'] = True
-                else:
-                    result['orgUnitsAccess'] = False
-        except AccessTokenRefreshError as exception:
-            result['orgUnitsAccess'] = False
-            error_message = "'{0}' for {1} on {2}".format(
-                exception.message,
-                domain.impersonation_admin_email_address,
-                domain.name
-                )
-            logging.info(error_message)
-            result['orgUnitsAccessException'] = error_message
-
-        try:
-            users_api = UsersApi(
-                admin_to_impersonate_email_address=domain.impersonation_admin_email_address)
-            if users_api:
-                scopes = users_api.DIRECTORY_SERVICE_SCOPES
-                if any(self.USERS_SCOPE in s for s in scopes):
-                    result['usersAccess'] = True
-                else:
-                    result['usersAccess'] = False
-        except AccessTokenRefreshError as exception:
-            result['usersAccess'] = False
-            error_message = "'{0}' for {1} on {2}".format(
-                exception.message,
-                domain.impersonation_admin_email_address,
-                domain.name
-                )
-            logging.info(error_message)
-            result['usersAccessException'] = error_message
-
+        _check_devices_scope(self.DEVICES_SCOPE, domain.name, domain.impersonation_admin_email_address, result)
+        _check_ou_scope(self.OU_SCOPE, domain.name, domain.impersonation_admin_email_address, result)
+        _check_users_scope(self.USERS_SCOPE, domain.name, domain.impersonation_admin_email_address, result)
         json_response(self.response, result)
+
+
+def _check_devices_scope(scope, domain_name, impersonation_email, result):
+    try:
+        chrome_os_devices_api = ChromeOsDevicesApi(admin_to_impersonate_email_address=impersonation_email)
+        scopes = chrome_os_devices_api.DIRECTORY_SERVICE_SCOPES
+        if any(scope in s for s in scopes):
+            result['devicesAccess'] = True
+        else:
+            result['devicesAccess'] = False
+    except AccessTokenRefreshError as exception:
+        result['devicesAccess'] = False
+        error_message = "'{0}' for {1} on {2}".format(
+            exception.message,
+            impersonation_email,
+            domain_name
+        )
+        logging.info(error_message)
+        result['devicesAccessException'] = error_message
+
+
+def _check_ou_scope(scope, domain_name, impersonation_email, result):
+    try:
+        organization_units_api = OrganizationUnitsApi(admin_to_impersonate_email_address=impersonation_email)
+        if organization_units_api:
+            scopes = organization_units_api.DIRECTORY_SERVICE_SCOPES
+            if any(scope in s for s in scopes):
+                result['orgUnitsAccess'] = True
+            else:
+                result['orgUnitsAccess'] = False
+    except AccessTokenRefreshError as exception:
+        result['orgUnitsAccess'] = False
+        error_message = "'{0}' for {1} on {2}".format(
+            exception.message,
+            impersonation_email,
+            domain_name
+        )
+        logging.info(error_message)
+        result['orgUnitsAccessException'] = error_message
+
+
+def _check_users_scope(scope, domain_name, impersonation_email, result):
+    try:
+        users_api = UsersApi(admin_to_impersonate_email_address=impersonation_email)
+        if users_api:
+            scopes = users_api.DIRECTORY_SERVICE_SCOPES
+            if any(scope in s for s in scopes):
+                result['usersAccess'] = True
+            else:
+                result['usersAccess'] = False
+    except AccessTokenRefreshError as exception:
+        result['usersAccess'] = False
+        error_message = "'{0}' for {1} on {2}".format(
+            exception.message,
+            impersonation_email,
+            domain_name
+        )
+        logging.info(error_message)
+        result['usersAccessException'] = error_message
