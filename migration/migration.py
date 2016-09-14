@@ -25,6 +25,7 @@ from update_chrome_os_device_annotated_asset_id import UpdateChromeOsDeviceAnnot
 from hydrate_default_device_sleep_property import HydrateDefaultDeviceSleepProperty
 from set_overlay_status_to_false import SetOverlayStatusToFalse
 from set_controls_mode_to_invisible import SetControlsModeToInvisible
+from hydrate_organization_unit_id_to_none import HydrateOrganizationUnitIdToNone
 
 MIGRATIONS = [
     HydrateTenantKeyOnDevices(),
@@ -36,7 +37,8 @@ MIGRATIONS = [
     UpdateChromeOsDeviceAnnotatedAssetId(),
     HydrateDefaultDeviceSleepProperty(),
     SetOverlayStatusToFalse(),
-    SetControlsModeToInvisible()
+    SetControlsModeToInvisible(),
+    HydrateOrganizationUnitIdToNone(),
 ]
 
 MIGRATIONS_MAP = {migration.name: migration for migration in MIGRATIONS}
