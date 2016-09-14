@@ -13,25 +13,23 @@ def create_file(file_data, filename, content_type, tenant_code):
     existing_file = read_file(tenant_code, filename)
     # we don't want to overwrite an existing file
     if not existing_file:
-        final_filename = "/" + tenant_code + "/" + filename
+        final_filepath = "/" + tenant_code + "/" + filename
 
         write_retry_params = gcs.RetryParams(backoff_factor=1.1)
-        gcs_file = gcs.open(final_filename,
+        gcs_file = gcs.open(final_filepath,
                             'w',
                             content_type=content_type,
                             retry_params=write_retry_params)
         gcs_file.write(file_data)
         gcs_file.close()
-        return final_filename
+        return final_filepath
     else:
         raise ValueError("This filename already exists in this tenant")
 
 def read_file(tenant_code, filename):
-    print read_bucket("/" + tenant_code)
-    final_filename = "/" + tenant_code + "/" + filename
-
+    final_filepath = "/" + tenant_code + "/" + filename
     try:
-        gcs_file = gcs.open(final_filename)
+        gcs_file = gcs.open(final_filepath)
     except gcs.NotFoundError:
         return None
     return gcs_file

@@ -9,6 +9,7 @@ from extended_session_request_handler import ExtendedSessionRequestHandler
 class OverlayHandler(ExtendedSessionRequestHandler):
     def post(self, device_urlsafe_key):
         request_json = json.loads(self.request.body)
+        print request_json
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
 
         # array of dictionaries that contain data about each overlay
@@ -23,8 +24,8 @@ class OverlayHandler(ExtendedSessionRequestHandler):
 
         # key representes position
         for key, value in request_json.iteritems():
-            overlay_type = self.check_and_get_field('type', value)
-
+            # type can be None, but its not optional. None is an overlay Type
+            overlay_type = value.get('type')
             # image_key can be None, it is optional
             image_key = value.get("image_key")
 
