@@ -122,6 +122,17 @@ function DeviceDetailsCtrl($log,
     }
   }
 
+  vm.deleteImage = (key) => {
+    console.log(key)
+    // ProgressBarService.start();
+    //
+    // TenantsService.deleteImage(key)
+    //   .then((res) => {
+    //     ProgressBarService.complete();
+    //
+    //   })
+  }
+
   vm.getTenantImages = () => {
     vm.OVERLAY_TYPES = [
       {type: null, name: "none", realName: "none", new: false, image_key: null},

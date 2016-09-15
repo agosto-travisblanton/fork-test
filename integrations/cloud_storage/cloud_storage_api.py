@@ -18,6 +18,7 @@ def create_file(file_data, filename, content_type, tenant_code):
                             retry_params=write_retry_params)
         gcs_file.write(file_data)
         gcs_file.close()
+        # signed cloud storage url with no expiry
         return sign_cloud_storage_url(final_filepath)
     else:
         raise ValueError("This filename already exists in this tenant")
@@ -38,3 +39,14 @@ def read_bucket(tenant_code):
                                        retry_params=None)
     convereted_objects_in_bucket = [e for e in objects_in_bucket]
     return convereted_objects_in_bucket
+
+
+def delete_file(filepath):
+    final_filepath = default_bucket + "/" + filepath
+    if final_filepath:
+        try:
+            gcs.delete(final_filepath)
+            return True
+        except gcs.errors.NotFoundError:
+            return True
+    return False

@@ -94,7 +94,7 @@ class ChromeOsDevice(ndb.Model):
     def overlays_as_dict(self):
         """ This method is offered because restler doesn't support keyProperty serialization beyond a single child"""
         json = ndb_json.dumps(self.overlays)
-        python_dict =  ndb_json.loads(json)
+        python_dict = ndb_json.loads(json)
         del python_dict["device_key"]
         for key, value in python_dict.iteritems():
             if key != "key":
@@ -918,6 +918,10 @@ class Image(ndb.Model):
     name = ndb.StringProperty(required=True, indexed=True)
     tenant_key = ndb.KeyProperty(kind=Tenant, required=True)
 
+    @property
+    def gcs_path(self):
+        return self.tenant_key.get().tenant_code + "/" + self.name
+
     @staticmethod
     def exists_within_tenant(tenant_key, name):
         return Image.query(ndb.AND(Image.tenant_key == tenant_key, Image.name == name)).fetch()
@@ -985,6 +989,35 @@ class OverlayTemplate(ndb.Model):
     bottom_left = ndb.KeyProperty(kind=Overlay, required=False)
     bottom_right = ndb.KeyProperty(kind=Overlay, required=False)
     device_key = ndb.KeyProperty(kind=ChromeOsDevice, required=True)
+
+    def image_in_use(self, image_key):
+        in_use = False
+
+        top_left = self.top_left.get()
+        top_left_image = top_left.image_key
+        if top_left_image:
+            if top_left_image.get().key == image_key:
+                in_use = True
+
+        top_right = self.top_right.get()
+        top_right_image = top_right.image_key
+        if top_right_image:
+            if top_right_image.get().key == image_key:
+                in_use = True
+
+        bottom_left = self.bottom_left.get()
+        bottom_left_image = bottom_left.image_key
+        if bottom_left_image:
+            if bottom_left_image.get().key == image_key:
+                in_use = True
+
+        bottom_right = self.bottom_right.get()
+        bottom_right_image = bottom_right.image_key
+        if bottom_right_image:
+            if bottom_right_image.get().key == image_key:
+                in_use = True
+
+        return in_use
 
     @staticmethod
     # plural, but will always return the 0th index since we are only supporting one template per device for now

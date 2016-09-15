@@ -1,10 +1,45 @@
 from extended_session_request_handler import ExtendedSessionRequestHandler
-from models import Tenant, Image
+from models import Tenant, Image, ChromeOsDevice, OverlayTemplate
 from restler.serializers import json_response
-from integrations.cloud_storage.cloud_storage_api import create_file
+from integrations.cloud_storage.cloud_storage_api import create_file, delete_file
+import logging
 
 
 class ImageHandler(ExtendedSessionRequestHandler):
+    def delete(self, image_urlsafe_key, device_urlsafe_key):
+        device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
+        device_overlay_template = OverlayTemplate.get_overlay_template_for_device(device.key)
+
+        image = self.validate_and_get(image_urlsafe_key, Tenant, abort_on_not_found=True)
+        image_in_use = device_overlay_template.image_in_use(image.key)
+
+        if image_in_use:
+            json_response(self.response,
+                          {
+                              "success": False,
+                              "message": "Image is currently in use"
+                          },
+                          status_code=400)
+
+        else:
+            deleted_file = delete_file(image.gcs_path)
+            if deleted_file:
+                image.key.delete()
+                json_response(self.response,
+                              {
+                                  "success": True,
+                                  "message": "Image was succesfully deleted"
+                              })
+            else:
+                message = "Image key {} could not be deleted".format(image.key)
+                logging.error(message)
+                json_response(self.response,
+                              {
+                                  "success": False,
+                                  "message": message
+                              },
+                              status_code=400)
+
     def get(self, tenant_urlsafe_key):
         tenant = self.validate_and_get(tenant_urlsafe_key, Tenant, abort_on_not_found=True)
 
