@@ -993,28 +993,33 @@ class OverlayTemplate(ndb.Model):
         in_use = False
 
         top_left = self.top_left.get()
-        top_left_image = top_left.image_key
-        if top_left_image:
-            if top_left_image.get().key == image_key:
-                in_use = True
+        if top_left:
+            top_left_image = top_left.image_key
+            if top_left_image:
+                if top_left_image.get().key == image_key:
+                    in_use = True
+
 
         top_right = self.top_right.get()
-        top_right_image = top_right.image_key
-        if top_right_image:
-            if top_right_image.get().key == image_key:
-                in_use = True
+        if top_right:
+            top_right_image = top_right.image_key
+            if top_right_image:
+                if top_right_image.get().key == image_key:
+                    in_use = True
 
         bottom_left = self.bottom_left.get()
-        bottom_left_image = bottom_left.image_key
-        if bottom_left_image:
-            if bottom_left_image.get().key == image_key:
-                in_use = True
+        if bottom_left:
+            bottom_left_image = bottom_left.image_key
+            if bottom_left_image:
+                if bottom_left_image.get().key == image_key:
+                    in_use = True
 
         bottom_right = self.bottom_right.get()
-        bottom_right_image = bottom_right.image_key
-        if bottom_right_image:
-            if bottom_right_image.get().key == image_key:
-                in_use = True
+        if bottom_right:
+            bottom_right_image = bottom_right.image_key
+            if bottom_right_image:
+                if bottom_right_image.get().key == image_key:
+                    in_use = True
 
         return in_use
 

@@ -1,23 +1,31 @@
 from extended_session_request_handler import ExtendedSessionRequestHandler
-from models import Tenant, Image, ChromeOsDevice, OverlayTemplate
+from models import Tenant, Image, OverlayTemplate
 from restler.serializers import json_response
 from integrations.cloud_storage.cloud_storage_api import create_file, delete_file
 import logging
 
 
 class ImageHandler(ExtendedSessionRequestHandler):
-    def delete(self, image_urlsafe_key, device_urlsafe_key):
-        device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
-        device_overlay_template = OverlayTemplate.get_overlay_template_for_device(device.key)
+    def delete(self, image_urlsafe_key):
+        image = self.validate_and_get(image_urlsafe_key, Image, abort_on_not_found=True)
+        image_tenant = image.tenant_key.get()
+        tenant_devices_managed = [e for e in Tenant.find_devices(image_tenant.key, unmanaged=False)]
+        tenant_devices_unmanged = [e for e in Tenant.find_devices(image_tenant.key, unmanaged=True)]
+        tenant_devices = tenant_devices_managed + tenant_devices_unmanged
+        image_in_use_for_devices = []
 
-        image = self.validate_and_get(image_urlsafe_key, Tenant, abort_on_not_found=True)
-        image_in_use = device_overlay_template.image_in_use(image.key)
+        for each_device in tenant_devices:
+            device_overlay_template = OverlayTemplate.get_overlay_template_for_device(each_device.key)
+            image_in_use = device_overlay_template.image_in_use(image.key)
+            if image_in_use:
+                image_in_use_for_devices.append(each_device.serial_number)
 
-        if image_in_use:
+        if image_in_use_for_devices:
             json_response(self.response,
                           {
                               "success": False,
-                              "message": "Image is currently in use"
+                              "message": "Image is currently in use",
+                              "devices_in_use": image_in_use_for_devices
                           },
                           status_code=400)
 

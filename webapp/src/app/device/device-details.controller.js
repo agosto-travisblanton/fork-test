@@ -18,7 +18,8 @@ function DeviceDetailsCtrl($log,
                            ToastsService,
                            DateManipulationService,
                            $timeout,
-                           $http) {
+                           $http,
+                           ImageService) {
   "ngInject";
 
   const vm = this;
@@ -108,7 +109,7 @@ function DeviceDetailsCtrl($log,
         formData.append('files', obj.lfFile);
       });
 
-      let promise = TenantsService.saveImage(vm.tenantKey, formData)
+      let promise = ImageService.saveImage(vm.tenantKey, formData)
       promise.then((res) => {
         ProgressBarService.complete();
         $timeout(vm.getTenantImages(), 2000);
@@ -124,13 +125,20 @@ function DeviceDetailsCtrl($log,
 
   vm.deleteImage = (key) => {
     console.log(key)
-    // ProgressBarService.start();
-    //
-    // TenantsService.deleteImage(key)
-    //   .then((res) => {
-    //     ProgressBarService.complete();
-    //
-    //   })
+    ProgressBarService.start();
+
+    ImageService.deleteImage(key)
+      .then((res) => {
+        console.log(res)
+        $timeout(vm.getTenantImages(), 2000);
+        ProgressBarService.complete();
+
+      })
+      .catch((res) => {
+        console.log(res)
+        $timeout(vm.getTenantImages(), 2000);
+        ProgressBarService.complete();
+      })
   }
 
   vm.getTenantImages = () => {
@@ -140,7 +148,7 @@ function DeviceDetailsCtrl($log,
     ]
 
     ProgressBarService.start();
-    let promise = TenantsService.getImages(vm.tenantKey);
+    let promise = ImageService.getImages(vm.tenantKey);
     promise.then((res) => {
       vm.tenantImages = res
       ProgressBarService.complete();
