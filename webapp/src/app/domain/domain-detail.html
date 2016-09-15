@@ -91,6 +91,17 @@
                    class="fa fa-fw fa-stop-circle fa-2x"></i> {{domainDetailsCtrl.orgUnitsAccessException}}
               </div>
             </div>
+            <div class="form-group" ng-show="domainDetailsCtrl.editMode==true">
+              <label class="col-sm-3 control-label">Users Management</label>
+              <div class="col-sm-6">
+                <i name="orgUnitsConnectivity" ng-show="domainDetailsCtrl.usersAccess==true"
+                   style="color:green"
+                   class="fa fa-fw fa-check-circle fa-2x"></i>
+                <i name="orgUnitsConnectivity" ng-show="domainDetailsCtrl.usersAccess==false"
+                   style="color:red"
+                   class="fa fa-fw fa-stop-circle fa-2x"></i> {{domainDetailsCtrl.usersAccessException}}
+              </div>
+            </div>
           </md-card-content>
           <md-card-actions layout="row" layout-align="end center">
             <md-button class="md-raised md-primary md-button md-ink-ripple"

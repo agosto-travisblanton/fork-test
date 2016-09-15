@@ -1,14 +1,13 @@
 import json
 
-from credential_creator import credential_creator, determine_env_string
 from app_config import config
+from credential_creator import credential_creator, determine_env_string
 from googleapiclient import discovery
 from googleapiclient.errors import HttpError
 from httplib2 import Http
 from oauth2client.client import SignedJwtAssertionCredentials
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
-
 
 
 class UsersApi(object):
