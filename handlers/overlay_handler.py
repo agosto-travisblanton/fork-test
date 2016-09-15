@@ -5,10 +5,11 @@ import ndb_json
 from restler.serializers import json_response
 from extended_session_request_handler import ExtendedSessionRequestHandler
 
-
 class OverlayHandler(ExtendedSessionRequestHandler):
     def post(self, device_urlsafe_key):
         request_json = json.loads(self.request.body)
+        print "REQUEST JSON IS: "
+        print request_json
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
 
         # array of dictionaries that contain data about each overlay
@@ -37,7 +38,7 @@ class OverlayHandler(ExtendedSessionRequestHandler):
         overlay_template_intermediate_json = ndb_json.dumps(overlay_template)
         overlay_template_dict = ndb_json.loads(overlay_template_intermediate_json)
 
-        json_response(self.response, {
+        return json_response(self.response, {
             "success": True,
             "overlay_template": overlay_template_dict
         }, status_code=200)

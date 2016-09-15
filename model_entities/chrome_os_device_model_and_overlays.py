@@ -98,15 +98,16 @@ class ChromeOsDevice(ndb.Model):
         del python_dict["device_key"]
         for key, value in python_dict.iteritems():
             if key != "key":
-                # Player team wants the positional key to also be in a field called "gravity"
-                python_dict[key]["gravity"] = key
-                if python_dict[key]["type"] == "logo":
-                    python_dict[key]["name"] = python_dict[key]["image_key"]["name"]
-                    del python_dict[key]["image_key"]["tenant_key"]
-                else:
-                    python_dict[key]["name"] = python_dict[key]["type"]
-                    if python_dict[key]["name"] == None:
-                        python_dict[key]["name"] = "none"
+                if python_dict[key]:
+                    # Player team wants the positional key to also be in a field called "gravity"
+                    python_dict[key]["gravity"] = key
+                    if python_dict[key]["type"] == "logo":
+                        python_dict[key]["name"] = python_dict[key]["image_key"]["name"]
+                        del python_dict[key]["image_key"]["tenant_key"]
+                    else:
+                        python_dict[key]["name"] = python_dict[key]["type"]
+                        if python_dict[key]["name"] == None:
+                            python_dict[key]["name"] = "none"
 
         return python_dict
 

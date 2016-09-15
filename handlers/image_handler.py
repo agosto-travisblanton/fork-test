@@ -13,7 +13,8 @@ class ImageHandler(ExtendedSessionRequestHandler):
             self.response, [
                 {
                     "key": image.key.urlsafe(),
-                    "name": image.name
+                    "name": image.name,
+                    "filepath": image.filepath
                 } for image in images
                 ]
         )
@@ -22,7 +23,7 @@ class ImageHandler(ExtendedSessionRequestHandler):
         image = self.validate_and_get(image_urlsafe_key, Image, abort_on_not_found=True)
         return json_response(
             self.response, {
-                "svg_rep": image.svg_rep,
+                "filepath": image.filepath,
                 "name": image.name
             }
         )

@@ -1,4 +1,6 @@
 import moment from 'moment';
+import naturalSort from 'javascript-natural-sort';
+
 
 function DeviceDetailsCtrl($log,
                            $stateParams,
@@ -66,7 +68,7 @@ function DeviceDetailsCtrl($log,
   }
 
   vm.submitOverlaySettings = () => {
-    let overlaySettings = vm.currentDeviceCopy.overlay;
+    let overlaySettings = angular.copy(vm.currentDeviceCopy.overlay)
     delete overlaySettings.key;
     delete overlaySettings.device_key;
 
@@ -129,8 +131,9 @@ function DeviceDetailsCtrl($log,
     ProgressBarService.start();
     let promise = TenantsService.getImages(vm.tenantKey);
     promise.then((res) => {
+      vm.tenantImages = res
       ProgressBarService.complete();
-      for (let value of res) {
+      for (let value of vm.tenantImages) {
         let newValue = {
           realName: angular.copy(value.name),
           name: "logo: " + value.name,
@@ -139,6 +142,7 @@ function DeviceDetailsCtrl($log,
         }
         vm.OVERLAY_TYPES.push(newValue);
       }
+      vm.OVERLAY_TYPES.sort(naturalSort)
       ;
     });
 
@@ -268,7 +272,6 @@ function DeviceDetailsCtrl($log,
   vm.onGetDeviceSuccess = function (response) {
     vm.currentDevice = response
     vm.currentDeviceCopy = angular.copy(vm.currentDevice)
-    console.log(vm.currentDevice)
 
     if (response.timezone !== vm.selectedTimezone) {
       vm.selectedTimezone = response.timezone;

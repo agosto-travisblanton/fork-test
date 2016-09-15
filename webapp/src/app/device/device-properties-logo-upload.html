@@ -17,6 +17,39 @@
             </md-button>
           </div>
         </div>
+
+        <div class="col-md-12">
+          <div class="col-md-6" ng-repeat="tenantImage in deviceDetailsCtrl.tenantImages">
+
+            <md-card>
+              <md-card-title>
+                <md-card-title-text>
+                  <p style="display:block;
+    margin:auto;">{{tenantImage.name}}</p>
+                </md-card-title-text>
+              </md-card-title>
+              <md-card-content layout="row" layout-align="space-between">
+                <img style="height: 70px; width: auto; max-width:150;  display:block;
+    margin:auto; margin-bottom: 25px" ng-src="{{tenantImage.filepath}}" class="md-card-image"
+                     alt="Washed Out">
+
+              </md-card-content>
+            </md-card>
+
+
+            <!--<md-card>-->
+            <!--<md-card-title>-->
+            <!--<md-card-title-text>-->
+            <!--<p style="display:block;-->
+            <!--margin:auto;">{{tenantImage.name}}</p>-->
+            <!--</md-card-title-text>-->
+            <!--</md-card-title>-->
+            <!--<img style="height: 50px; width: auto;  display:block;-->
+            <!--margin:auto; margin-bottom: 25px" ng-src="{{tenantImage.filepath}}" class="md-card-image"-->
+            <!--alt="Washed Out">-->
+            <!--</md-card>-->
+          </div>
+        </div>
       </section>
     </form>
   </md-card-content>
