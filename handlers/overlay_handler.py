@@ -2,8 +2,11 @@ from models import OverlayTemplate
 import json
 from models import ChromeOsDevice
 import ndb_json
+from app_config import config
+from device_message_processor import  change_intent
 from restler.serializers import json_response
 from extended_session_request_handler import ExtendedSessionRequestHandler
+
 
 class OverlayHandler(ExtendedSessionRequestHandler):
     def post(self, device_urlsafe_key):
@@ -38,6 +41,14 @@ class OverlayHandler(ExtendedSessionRequestHandler):
         # This method is offered because restler doesn't support keyProperty serialization beyond a single child
         overlay_template_intermediate_json = ndb_json.dumps(overlay_template)
         overlay_template_dict = ndb_json.loads(overlay_template_intermediate_json)
+
+        change_intent(
+            gcm_registration_id=device.gcm_registration_id,
+            payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+            device_urlsafe_key=device_urlsafe_key,
+            host=self.request.host_url,
+            user_identifier='system (overlay update)'
+        )
 
         return json_response(self.response, {
             "success": True,

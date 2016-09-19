@@ -18,7 +18,6 @@ function DeviceDetailsCtrl($log,
                            ToastsService,
                            DateManipulationService,
                            $timeout,
-                           $http,
                            ImageService) {
   "ngInject";
 
@@ -82,8 +81,6 @@ function DeviceDetailsCtrl($log,
       }
     }
 
-    console.log(overlaySettingsCopy)
-
     ProgressBarService.start();
     let promise = DevicesService.saveOverlaySettings(
       vm.deviceKey,
@@ -125,22 +122,45 @@ function DeviceDetailsCtrl($log,
     }
   }
 
-  vm.deleteImage = (key) => {
-    console.log(key)
-    ProgressBarService.start();
+  vm.getTenantImagesAndRefreshDevice = () => {
+    let devicePromise = DevicesService.getDeviceByKey(vm.deviceKey);
+    devicePromise.then((res) => {
+      vm.onGetDeviceSuccess(res)
+      vm.getTenantImages()
 
-    ImageService.deleteImage(key)
-      .then((res) => {
-        console.log(res)
-        $timeout(vm.getTenantImages(), 2000);
-        ProgressBarService.complete();
+    });
+    devicePromise.catch((res) => {
+      vm.onGetDeviceFailure(res)
+    })
 
-      })
-      .catch((res) => {
-        console.log(res)
-        $timeout(vm.getTenantImages(), 2000);
-        ProgressBarService.complete();
-      })
+  }
+
+  vm.deleteImage = (ev, name, key) => {
+
+    let confirm = $mdDialog.confirm(
+      {
+        title: `Are you sure?`,
+        textContent: `If you proceed, ${name} will be deleted and removed from all devices that use it.`,
+        targetEvent: ev,
+        ariaLabel: 'Lucky day',
+        ok: 'Confirm',
+        cancel: 'Nevermind'
+      }
+    );
+    $mdDialog.show(confirm).then((function () {
+      ProgressBarService.start();
+
+      ImageService.deleteImage(key)
+        .then((res) => {
+          $timeout(vm.getTenantImagesAndRefreshDevice(), 2000);
+          ProgressBarService.complete();
+
+        })
+        .catch((res) => {
+          $timeout(vm.getTenantImagesAndRefreshDevice(), 2000);
+          ProgressBarService.complete();
+        })
+    }))
   }
 
   vm.getTenantImages = () => {
@@ -165,11 +185,11 @@ function DeviceDetailsCtrl($log,
             size: sizeOption,
             image_key: value.key
           }
-          vm.OVERLAY_TYPES.push(newValueSmall);
+          vm.OVERLAY_TYPES.push(newValue);
         }
       }
-      vm.OVERLAY_TYPES.sort(naturalSort)
-      ;
+      vm.OVERLAY_TYPES.sort(naturalSort);
+
     });
 
     promise.catch(() => {
@@ -298,7 +318,6 @@ function DeviceDetailsCtrl($log,
   vm.onGetDeviceSuccess = function (response) {
     vm.currentDevice = response
     vm.currentDeviceCopy = angular.copy(vm.currentDevice)
-    console.log(vm.currentDeviceCopy.overlay)
     if (response.timezone !== vm.selectedTimezone) {
       vm.selectedTimezone = response.timezone;
     }

@@ -1,8 +1,11 @@
 from extended_session_request_handler import ExtendedSessionRequestHandler
-from models import Tenant, Image, OverlayTemplate
+from models import Tenant, Image, OverlayTemplate, Overlay
 from restler.serializers import json_response
 from integrations.cloud_storage.cloud_storage_api import create_file, delete_file
 import logging
+from device_message_processor import change_intent
+from google.appengine.ext.deferred import deferred
+from app_config import config
 
 
 class ImageHandler(ExtendedSessionRequestHandler):
@@ -12,41 +15,48 @@ class ImageHandler(ExtendedSessionRequestHandler):
         tenant_devices_managed = [e for e in Tenant.find_devices(image_tenant.key, unmanaged=False)]
         tenant_devices_unmanged = [e for e in Tenant.find_devices(image_tenant.key, unmanaged=True)]
         tenant_devices = tenant_devices_managed + tenant_devices_unmanged
-        image_in_use_for_devices = []
 
         for each_device in tenant_devices:
             device_overlay_template = OverlayTemplate.get_overlay_template_for_device(each_device.key)
-            image_in_use = device_overlay_template.image_in_use(image.key)
-            if image_in_use:
-                image_in_use_for_devices.append(each_device.serial_number)
+            image_in_use_in_posititions = device_overlay_template.image_in_use(image.key)
+            for position, in_use in image_in_use_in_posititions.iteritems():
+                none_overlay = Overlay.create_or_get(None)
+                if in_use:
+                    if position == "top_left":
+                        device_overlay_template.top_left = none_overlay.key
+                    elif position == "top_right":
+                        device_overlay_template.top_right = none_overlay.key
+                    elif position == "bottom_left":
+                        device_overlay_template.bottom_left = none_overlay.key
+                    elif position == "bottom_right":
+                        device_overlay_template.bottom_right = none_overlay.key
 
-        if image_in_use_for_devices:
+            device_overlay_template.put()
+
+            deferred.defer(change_intent, gcm_registration_id=each_device.gcm_registration_id,
+                           payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                           device_urlsafe_key=each_device.key.urlsafe(),
+                           host=self.request.host_url,
+                           user_identifier='system (overlay update)'
+                           )
+
+        deleted_file = delete_file(image.gcs_path)
+        if deleted_file:
+            image.key.delete()
+            json_response(self.response,
+                          {
+                              "success": True,
+                              "message": "Image was succesfully deleted"
+                          })
+        else:
+            message = "Image key {} could not be deleted".format(image.key)
+            logging.error(message)
             json_response(self.response,
                           {
                               "success": False,
-                              "message": "Image is currently in use",
-                              "devices_in_use": image_in_use_for_devices
+                              "message": message
                           },
                           status_code=400)
-
-        else:
-            deleted_file = delete_file(image.gcs_path)
-            if deleted_file:
-                image.key.delete()
-                json_response(self.response,
-                              {
-                                  "success": True,
-                                  "message": "Image was succesfully deleted"
-                              })
-            else:
-                message = "Image key {} could not be deleted".format(image.key)
-                logging.error(message)
-                json_response(self.response,
-                              {
-                                  "success": False,
-                                  "message": message
-                              },
-                              status_code=400)
 
     def get(self, tenant_urlsafe_key):
         tenant = self.validate_and_get(tenant_urlsafe_key, Tenant, abort_on_not_found=True)

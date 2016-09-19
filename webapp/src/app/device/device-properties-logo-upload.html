@@ -24,7 +24,8 @@
                   <p style="display:block;
     margin:auto; margin-top:-8px">{{tenantImage.name}}</p>
                 </md-card-title-text>
-                <md-button ng-click="deviceDetailsCtrl.deleteImage(tenantImage.key) " class="small-delete-button">X
+                <md-button ng-click="deviceDetailsCtrl.deleteImage($event, temantImage.name, tenantImage.key) "
+                           class="small-delete-button">X
                 </md-button>
               </md-card-title>
               <md-card-content layout="row" layout-align="space-between">

@@ -996,37 +996,42 @@ class OverlayTemplate(ndb.Model):
     device_key = ndb.KeyProperty(kind=ChromeOsDevice, required=True)
 
     def image_in_use(self, image_key):
-        in_use = False
+        in_use_dict = {
+            "top_left": False,
+            "top_right": False,
+            "bottom_left": False,
+            "bottom_right": False
+        }
 
         top_left = self.top_left.get()
         if top_left:
             top_left_image = top_left.image_key
             if top_left_image:
                 if top_left_image.get().key == image_key:
-                    in_use = True
+                    in_use_dict["top_left"] = True
 
         top_right = self.top_right.get()
         if top_right:
             top_right_image = top_right.image_key
             if top_right_image:
                 if top_right_image.get().key == image_key:
-                    in_use = True
+                    in_use_dict["top_right"] = True
 
         bottom_left = self.bottom_left.get()
         if bottom_left:
             bottom_left_image = bottom_left.image_key
             if bottom_left_image:
                 if bottom_left_image.get().key == image_key:
-                    in_use = True
+                    in_use_dict["bottom_left"] = True
 
         bottom_right = self.bottom_right.get()
         if bottom_right:
             bottom_right_image = bottom_right.image_key
             if bottom_right_image:
                 if bottom_right_image.get().key == image_key:
-                    in_use = True
+                    in_use_dict["bottom_right"] = True
 
-        return in_use
+        return in_use_dict
 
     @staticmethod
     # plural, but will always return the 0th index since we are only supporting one template per device for now
