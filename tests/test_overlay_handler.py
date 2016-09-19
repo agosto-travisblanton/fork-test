@@ -1,6 +1,8 @@
 import json
 from routes import application
 from webtest import AppError
+from models import Image
+from integrations.cloud_storage.cloud_storage_api import create_file
 
 from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
@@ -8,7 +10,6 @@ from provisioning_distributor_user_base_test import ProvisioningDistributorUserB
 class OverlayHandlerTest(ProvisioningDistributorUserBase):
     def setUp(self):
         super(OverlayHandlerTest, self).setUp()
-        self.svg_rep = "ffdkfdkfsklfsljkflksfjlkfsa"
 
     def test_post_overlay_fails_without_associated_image_key(self):
         uri = application.router.build(None, 'post-overlay', None, {"device_urlsafe_key": self.device_key.urlsafe()})
@@ -22,11 +23,17 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
             self.assertEqual(response.status_int, 400)
 
     def _create_image(self):
-        request_parameters = {'svg_rep': self.svg_rep, 'name': 'some_name'}
-        uri = application.router.build(None, 'manage-image', None, {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
-        response = self.app.post_json(uri, params=request_parameters)
-        json_response = json.loads(response.body)
-        return json_response["key"]
+        fileContent = open('testFile.png').read()
+        fileName = "aFile.png"
+        contentType = "image/png"
+        filepath = create_file(fileContent,
+                               fileName,
+                               contentType,
+                               self.tenant.tenant_code)
+
+        image_entity = Image.create(filepath=filepath, name=fileName,
+                                    tenant_key=self.tenant.key)
+        return image_entity.key.urlsafe()
 
     def test_post_overlay_succeeds_with_associated_image_key(self):
         key = self._create_image()
