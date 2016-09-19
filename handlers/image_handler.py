@@ -12,8 +12,8 @@ class ImageHandler(ExtendedSessionRequestHandler):
     def delete(self, image_urlsafe_key):
         image = self.validate_and_get(image_urlsafe_key, Image, abort_on_not_found=True)
         image_tenant = image.tenant_key.get()
-        tenant_devices_managed = [e for e in Tenant.find_devices(image_tenant.key, unmanaged=False)]
-        tenant_devices_unmanged = [e for e in Tenant.find_devices(image_tenant.key, unmanaged=True)]
+        tenant_devices_managed = list(Tenant.find_devices(image_tenant.key, unmanaged=False))
+        tenant_devices_unmanged = list(Tenant.find_devices(image_tenant.key, unmanaged=True))
         tenant_devices = tenant_devices_managed + tenant_devices_unmanged
 
         for each_device in tenant_devices:
