@@ -1,8 +1,14 @@
 import cloudstorage as gcs
 from google.appengine.api import app_identity as identity
 from utils.url_sign import sign_cloud_storage_url
+from app_config import config
 
-default_bucket = "/" + identity.get_default_gcs_bucket_name()
+try:
+    identity_bucket_name = identity.get_default_gcs_bucket_name()
+except AssertionError:
+    identity_bucket_name = config.APP_NAME
+
+default_bucket = "/" + identity_bucket_name
 
 
 def create_file(file_data, filename, content_type, tenant_code):
