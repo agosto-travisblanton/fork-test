@@ -157,32 +157,16 @@ function DeviceDetailsCtrl($log,
       vm.tenantImages = res
       ProgressBarService.complete();
       for (let value of vm.tenantImages) {
-        let newValueSmall = {
-          realName: angular.copy(value.name),
-          name: "logo: " + value.name,
-          type: "logo",
-          size: "small",
-          image_key: value.key
+        for (let sizeOption of ["small", "large", "original"]) {
+          let newValue = {
+            realName: angular.copy(value.name),
+            name: "logo: " + value.name,
+            type: "logo",
+            size: sizeOption,
+            image_key: value.key
+          }
+          vm.OVERLAY_TYPES.push(newValueSmall);
         }
-        vm.OVERLAY_TYPES.push(newValueSmall);
-
-        let newValueLarge = {
-          realName: angular.copy(value.name),
-          name: "logo: " + value.name,
-          type: "logo",
-          size: "large",
-          image_key: value.key
-        }
-        vm.OVERLAY_TYPES.push(newValueLarge);
-
-        let newValueOriginal = {
-          realName: angular.copy(value.name),
-          name: "logo: " + value.name,
-          type: "logo",
-          size: "original",
-          image_key: value.key
-        }
-        vm.OVERLAY_TYPES.push(newValueOriginal);
       }
       vm.OVERLAY_TYPES.sort(naturalSort)
       ;
