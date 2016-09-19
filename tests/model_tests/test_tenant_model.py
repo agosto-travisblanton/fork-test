@@ -320,7 +320,7 @@ class TestTenantModel(BaseTest):
                                active=True)
         tenant_key = tenant.put()
 
-        device_1 = ChromeOsDevice.create_managed(tenant_key,
+        device_1 = ChromeOsDevice.create_managed(tenant_key=tenant_key,
                                                  gcm_registration_id='1PA91bHyMJRcN7mj7b0aXGWE7Ae', archived=False,
                                                  mac_address='1')
         device_1.put()
@@ -345,7 +345,7 @@ class TestTenantModel(BaseTest):
                                active=True)
         tenant_key = tenant.put()
 
-        device_1 = ChromeOsDevice.create_managed(tenant_key,
+        device_1 = ChromeOsDevice.create_managed(tenant_key=tenant_key,
                                                  gcm_registration_id='1PA91bHyMJRcN7mj7b0aXGWE7Ae', archived=False,
                                                  mac_address='1')
         device_1.put()
@@ -527,3 +527,30 @@ class TestTenantModel(BaseTest):
         for device in devices:
             self.assertFalse(device.proof_of_play_logging)
             self.assertFalse(device.proof_of_play_editable)
+
+    ##################################################################################################################
+    # find_by_organization_unit_path
+    ##################################################################################################################
+    def test_find_by_organization_unit_path_when_stored_on_tenant_object(self):
+        tenant = Tenant.find_by_organization_unit_path('/skykit/foobar')
+        self.assertTrue(tenant.tenant_code, self.TENANT_CODE)
+
+    def test_find_by_organization_unit_path_when_not_stored_on_tenant_object_with_leading_forward_slash(self):
+        self.tenant.organization_unit_path = None
+        self.tenant.put()
+        tenant = Tenant.find_by_organization_unit_path('/something/Skykit/foobar/some_device_property')
+        self.assertTrue(tenant.tenant_code, self.TENANT_CODE)
+        tenant = Tenant.find_by_organization_unit_path('/something/skykit/foobar/some_device_property')
+        self.assertTrue(tenant.tenant_code, self.TENANT_CODE)
+        tenant = Tenant.find_by_organization_unit_path('/something/skykit/Foobar/some_device_property')
+        self.assertTrue(tenant.tenant_code, self.TENANT_CODE)
+
+    def test_find_by_organization_unit_path_when_not_stored_on_tenant_object_without_leading_forward_slash(self):
+        self.tenant.organization_unit_path = None
+        self.tenant.put()
+        tenant = Tenant.find_by_organization_unit_path('something/Skykit/foobar/some_device_property')
+        self.assertTrue(tenant.tenant_code, self.TENANT_CODE)
+        tenant = Tenant.find_by_organization_unit_path('something/skykit/foobar/some_device_property')
+        self.assertTrue(tenant.tenant_code, self.TENANT_CODE)
+        tenant = Tenant.find_by_organization_unit_path('something/skykit/Foobar/some_device_property')
+        self.assertTrue(tenant.tenant_code, self.TENANT_CODE)
