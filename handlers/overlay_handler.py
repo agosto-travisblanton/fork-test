@@ -23,11 +23,14 @@ class OverlayHandler(ExtendedSessionRequestHandler):
         # key representes position
         for key, value in request_json.iteritems():
             # type can be None, but its not optional. None is an overlay Type
-            overlay_type = value.get('type')
+            overlay_type = value.get("type")
             # image_key can be None, it is optional
             image_key = value.get("image_key")
+            size = value.get("size")
 
-            overlay_template.set_overlay(position=key, overlay_type=overlay_type,
+            overlay_template.set_overlay(position=key,
+                                         size=size.upper(),
+                                         overlay_type=overlay_type,
                                          image_urlsafe_key=image_key)
 
         # re-get the template after the changes set_overlay made

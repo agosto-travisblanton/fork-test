@@ -12,7 +12,6 @@
                 class="md-raised md-primary"
                 ng-disabled="deviceDetailsCtrl.currentDevice.overlay_status"
                 ng-click="deviceDetailsCtrl.adjustOverlayStatus(true)">
-
                 ENABLE
               </md-button>
               <md-button
@@ -26,7 +25,6 @@
           <br/>
         </div>
         <div class="form-group" ng-show="deviceDetailsCtrl.currentDevice.overlay_status">
-
           <div class="col-md-12">
             <div class="col-md-5 col-sm-12">
               <md-input-container>
@@ -34,9 +32,13 @@
                 <md-select ng-model="deviceDetailsCtrl.currentDeviceCopy.overlay.top_left">
                   <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES"
                              ng-value="overlay"
-                             ng-selected=" overlay.realName === deviceDetailsCtrl.currentDevice.overlay.top_left.name ? 'selected' : '' "
+                             ng-selected="
+                             (overlay.realName === deviceDetailsCtrl.currentDevice.overlay.top_left.name)
+                              &&
+                             (overlay.size.toUpperCase() === deviceDetailsCtrl.currentDevice.overlay.top_left.size)
+                              ? 'selected' : ''"
                   >
-                    {{overlay.name.toUpperCase()}}
+                    {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" + overlay.size.toUpperCase() + ")" : '') }}
                   </md-option>
                 </md-select>
               </md-input-container>
@@ -45,11 +47,15 @@
               <md-input-container>
                 <label>Top-Right</label>
                 <md-select ng-model="deviceDetailsCtrl.currentDeviceCopy.overlay.top_right">
-                  <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES "
+                  <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES"
                              ng-value="overlay"
-                             ng-selected="overlay.realName === deviceDetailsCtrl.currentDevice.overlay.top_right.name ? 'selected' : ''"
+                             ng-selected="
+                             (overlay.realName === deviceDetailsCtrl.currentDevice.overlay.top_right.name)
+                              &&
+                             (overlay.size.toUpperCase() === deviceDetailsCtrl.currentDevice.overlay.top_right.size)
+                              ? 'selected' : ''"
                   >
-                    {{overlay.name.toUpperCase()}}
+                    {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" + overlay.size.toUpperCase() + ")" : '') }}
                   </md-option>
                 </md-select>
               </md-input-container>
@@ -62,23 +68,30 @@
                 <md-select ng-model="deviceDetailsCtrl.currentDeviceCopy.overlay.bottom_left">
                   <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES"
                              ng-value="overlay"
-                             ng-selected=" overlay.realName === deviceDetailsCtrl.currentDevice.overlay.bottom_left.name ? 'selected' : '' "
+                             ng-selected="
+                             (overlay.realName === deviceDetailsCtrl.currentDevice.overlay.bottom_left.name)
+                              &&
+                             (overlay.size.toUpperCase() === deviceDetailsCtrl.currentDevice.overlay.bottom_left.size)
+                              ? 'selected' : ''"
                   >
-                    {{overlay.name.toUpperCase()}}
+                    {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" + overlay.size.toUpperCase() + ")" : '') }}
                   </md-option>
                 </md-select>
               </md-input-container>
             </div>
             <div class="col-md-5  col-sm-12" style="float: right">
-
               <md-input-container>
                 <label>Bottom-Right</label>
                 <md-select ng-model="deviceDetailsCtrl.currentDeviceCopy.overlay.bottom_right">
                   <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES"
                              ng-value="overlay"
-                             ng-selected=" overlay.realName === deviceDetailsCtrl.currentDevice.overlay.bottom_right.name ? 'selected' : '' "
+                             ng-selected="
+                             (overlay.realName === deviceDetailsCtrl.currentDevice.overlay.bottom_right.name)
+                              &&
+                             (overlay.size.toUpperCase() === deviceDetailsCtrl.currentDevice.overlay.bottom_right.size)
+                              ? 'selected' : ''"
                   >
-                    {{overlay.name.toUpperCase()}}
+                    {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" + overlay.size.toUpperCase() + ")" : '') }}
                   </md-option>
                 </md-select>
               </md-input-container>

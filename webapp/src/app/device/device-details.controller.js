@@ -82,6 +82,8 @@ function DeviceDetailsCtrl($log,
       }
     }
 
+    console.log(overlaySettingsCopy)
+
     ProgressBarService.start();
     let promise = DevicesService.saveOverlaySettings(
       vm.deviceKey,
@@ -143,8 +145,10 @@ function DeviceDetailsCtrl($log,
 
   vm.getTenantImages = () => {
     vm.OVERLAY_TYPES = [
-      {type: null, name: "none", realName: "none", new: false, image_key: null},
-      {type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
+      {size: "original", type: null, name: "none", realName: "none", new: false, image_key: null},
+      {size: "small", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
+      {size: "large", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
+      {size: "original", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
     ]
 
     ProgressBarService.start();
@@ -153,13 +157,32 @@ function DeviceDetailsCtrl($log,
       vm.tenantImages = res
       ProgressBarService.complete();
       for (let value of vm.tenantImages) {
-        let newValue = {
+        let newValueSmall = {
           realName: angular.copy(value.name),
           name: "logo: " + value.name,
           type: "logo",
+          size: "small",
           image_key: value.key
         }
-        vm.OVERLAY_TYPES.push(newValue);
+        vm.OVERLAY_TYPES.push(newValueSmall);
+
+        let newValueLarge = {
+          realName: angular.copy(value.name),
+          name: "logo: " + value.name,
+          type: "logo",
+          size: "large",
+          image_key: value.key
+        }
+        vm.OVERLAY_TYPES.push(newValueLarge);
+
+        let newValueOriginal = {
+          realName: angular.copy(value.name),
+          name: "logo: " + value.name,
+          type: "logo",
+          size: "original",
+          image_key: value.key
+        }
+        vm.OVERLAY_TYPES.push(newValueOriginal);
       }
       vm.OVERLAY_TYPES.sort(naturalSort)
       ;
@@ -291,7 +314,7 @@ function DeviceDetailsCtrl($log,
   vm.onGetDeviceSuccess = function (response) {
     vm.currentDevice = response
     vm.currentDeviceCopy = angular.copy(vm.currentDevice)
-
+    console.log(vm.currentDeviceCopy.overlay)
     if (response.timezone !== vm.selectedTimezone) {
       vm.selectedTimezone = response.timezone;
     }
