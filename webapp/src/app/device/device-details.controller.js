@@ -1,4 +1,6 @@
 import moment from 'moment';
+import naturalSort from 'javascript-natural-sort';
+
 
 function DeviceDetailsCtrl($log,
                            $stateParams,
@@ -15,7 +17,8 @@ function DeviceDetailsCtrl($log,
                            $mdDialog,
                            ToastsService,
                            DateManipulationService,
-                           $timeout) {
+                           $timeout,
+                           ImageService) {
   "ngInject";
 
   const vm = this;
@@ -37,22 +40,6 @@ function DeviceDetailsCtrl($log,
   /////////////////////////////////////////////////
   // Overlay
   /////////////////////////////////////////////////
-  let attachImageNameToOverlay = (overlays) => {
-    let modifiedOverlays = angular.copy(overlays)
-    if (modifiedOverlays) {
-      delete modifiedOverlays["key"]
-
-      for (let k in modifiedOverlays) {
-        if (modifiedOverlays[k]["image_key"]) {
-          modifiedOverlays[k].name = modifiedOverlays[k]["image_key"]["name"]
-        } else {
-          modifiedOverlays[k].name = modifiedOverlays[k].type
-        }
-      }
-    }
-    return modifiedOverlays
-  }
-
   vm.adjustControlsMode = () => {
     let controlsMode = vm.currentDevice.controlsMode;
     ProgressBarService.start();
@@ -81,13 +68,17 @@ function DeviceDetailsCtrl($log,
   }
 
   vm.submitOverlaySettings = () => {
-    let overlaySettings = vm.currentDevice.overlay;
+    let overlaySettings = angular.copy(vm.currentDeviceCopy.overlay)
     delete overlaySettings.key;
     delete overlaySettings.device_key;
 
     let overlaySettingsCopy = {}
     for (let k in overlaySettings) {
-      overlaySettingsCopy[k] = JSON.parse(overlaySettings[k])
+      if (typeof overlaySettings[k] === 'string' || overlaySettings[k] instanceof String) {
+        overlaySettingsCopy[k] = JSON.parse(overlaySettings[k])
+      } else {
+        overlaySettingsCopy[k] = overlaySettings[k]
+      }
     }
 
     ProgressBarService.start();
@@ -112,51 +103,92 @@ function DeviceDetailsCtrl($log,
 
   vm.submitImage = () => {
     if (vm.selectedLogo && vm.selectedLogo[0]) {
-      ProgressBarService.start();
-      let reader = new FileReader();
-      reader.onload = function () {
-        vm.selectedLogoFinal = {}
-        vm.selectedLogoFinal.asString = JSON.stringify(reader.result)
-        vm.selectedLogoFinal.name = vm.selectedLogo[0].lfFileName
-        vm.selectedLogoChange = true;
+      var formData = new FormData();
+      angular.forEach(vm.selectedLogo, function (obj) {
+        formData.append('files', obj.lfFile);
+      });
 
-        let promise = TenantsService.saveImage(vm.tenantKey, vm.selectedLogoFinal.asString, vm.selectedLogoFinal.name)
-        promise.then((res) => {
-          ProgressBarService.complete();
-          $timeout(vm.getTenantImages(), 2000);
-          vm.fileApi.removeAll()
-          ToastsService.showSuccessToast('We uploaded your image.');
-        })
-        promise.catch((res) => {
-          ProgressBarService.complete();
-          ToastsService.showErrorToast('Something went wrong. You may have already uploaded this image.');
-        })
-      }
-      reader.readAsText(vm.selectedLogo[0].lfFile);
+      let promise = ImageService.saveImage(vm.tenantKey, formData)
+      promise.then((res) => {
+        ProgressBarService.complete();
+        $timeout(vm.getTenantImages(), 2000);
+        vm.fileApi.removeAll()
+        ToastsService.showSuccessToast('We uploaded your image.');
+      })
+      promise.catch((res) => {
+        ProgressBarService.complete();
+        ToastsService.showErrorToast('Something went wrong. You may have already uploaded this image.');
+      })
     }
+  }
+
+  vm.getTenantImagesAndRefreshDevice = () => {
+    let devicePromise = DevicesService.getDeviceByKey(vm.deviceKey);
+    devicePromise.then((res) => {
+      vm.onGetDeviceSuccess(res)
+      vm.getTenantImages()
+
+    });
+    devicePromise.catch((res) => {
+      vm.onGetDeviceFailure(res)
+    })
+
+  }
+
+  vm.deleteImage = (ev, name, key) => {
+    let confirm = $mdDialog.confirm(
+      {
+        title: `Are you sure?`,
+        textContent: `If you proceed, ${name} will be deleted and removed from all devices that use it.`,
+        targetEvent: ev,
+        ariaLabel: 'Lucky day',
+        ok: 'Confirm',
+        cancel: 'Nevermind'
+      }
+    );
+    $mdDialog.show(confirm).then((function () {
+      ProgressBarService.start();
+
+      ImageService.deleteImage(key)
+        .then((res) => {
+          $timeout(vm.getTenantImagesAndRefreshDevice(), 2000);
+          ProgressBarService.complete();
+
+        })
+        .catch((res) => {
+          $timeout(vm.getTenantImagesAndRefreshDevice(), 2000);
+          ProgressBarService.complete();
+        })
+    }))
   }
 
   vm.getTenantImages = () => {
     vm.OVERLAY_TYPES = [
-      {type: "TIME", name: "TIME", realName: "TIME", new: true, image_key: null},
-      {type: "DATE", name: "DATE", new: true, realName: "DATE", image_key: null},
-      {type: "DATETIME", name: "DATETIME", realName: "DATETIME", new: true, image_key: null},
+      {size: "original", type: null, name: "none", realName: "none", new: false, image_key: null},
+      {size: "small", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
+      {size: "large", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
+      {size: "original", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
     ]
 
     ProgressBarService.start();
-    let promise = TenantsService.getImages(vm.tenantKey);
+    let promise = ImageService.getImages(vm.tenantKey);
     promise.then((res) => {
+      vm.tenantImages = res
       ProgressBarService.complete();
-      for (let value of res) {
-        let newValue = {
-          realName: angular.copy(value.name),
-          name: "LOGO: " + value.name,
-          type: "LOGO",
-          image_key: value.key
+      for (let value of vm.tenantImages) {
+        for (let sizeOption of ["small", "large", "original"]) {
+          let newValue = {
+            realName: angular.copy(value.name),
+            name: "logo: " + value.name,
+            type: "logo",
+            size: sizeOption,
+            image_key: value.key
+          }
+          vm.OVERLAY_TYPES.push(newValue);
         }
-        vm.OVERLAY_TYPES.push(newValue);
       }
-      ;
+      vm.OVERLAY_TYPES.sort(naturalSort);
+
     });
 
     promise.catch(() => {
@@ -283,9 +315,8 @@ function DeviceDetailsCtrl($log,
   };
 
   vm.onGetDeviceSuccess = function (response) {
-    vm.currentDevice = response;
-    vm.currentDevice.overlay = attachImageNameToOverlay(vm.currentDevice.overlay)
-
+    vm.currentDevice = response
+    vm.currentDeviceCopy = angular.copy(vm.currentDevice)
     if (response.timezone !== vm.selectedTimezone) {
       vm.selectedTimezone = response.timezone;
     }
