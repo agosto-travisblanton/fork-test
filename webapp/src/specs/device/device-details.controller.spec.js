@@ -764,10 +764,10 @@ describe('DeviceDetailsCtrl', function () {
         spyOn(ToastsService, 'showSuccessToast');
         spyOn(ToastsService, 'showErrorToast');
         controller.currentDevice = {
-          overlay: {}
+          overlays: {}
         }
         controller.currentDeviceCopy = {
-          overlay: {}
+          overlays: {}
         }
       });
 
@@ -818,7 +818,7 @@ describe('DeviceDetailsCtrl', function () {
           realName: toResolve[0].name,
           name: 'logo: ' + toResolve[0].name,
           type: 'logo',
-          size: 'original',
+          size: 'default',
           image_key: toResolve[0].key
         });
       });
