@@ -21,7 +21,6 @@ import {ProofOfPlayMultiDisplayCtrl} from './proof/multi-display.controller'
 import {ProofOfPlayMultiResourceCtrl} from './proof/multi-resource.controller'
 import {ProofOfPlayCtrl} from './proof/proof-of-play.controller'
 // Services
-import ImageService from './services/image.service'
 import AdminService from './services/admin.service'
 import AuthorizationService from './services/authorization.service'
 import CommandsService from './services/commands.service'
@@ -76,7 +75,6 @@ app
   .service("TimezonesService", TimezonesService)
   .service("ToastsService", ToastsService)
   .service("VersionsService", VersionsService)
-  .service("ImageService", ImageService)
   // Device
   .controller("DeviceDetailsCommandsCtrl", DeviceDetailsCommandsCtrl)
   .controller("DeviceDetailsCtrl", DeviceDetailsCtrl)

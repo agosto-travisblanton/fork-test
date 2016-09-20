@@ -12,6 +12,7 @@ describe('DomainDetailsCtrl', function () {
   let DomainsService = undefined;
   let ToastsService = undefined;
   let domainsServicePromise = undefined;
+  let distributorsServicePromise = undefined;
   let progressBarService = undefined;
   let sweet = undefined;
   let serviceInjection = undefined;
@@ -72,8 +73,6 @@ describe('DomainDetailsCtrl', function () {
       it('devicesAccess property should be false', () => expect(controller.devicesAccess).toBeFalsy());
 
       it('orgUnitsAccess property should be false', () => expect(controller.orgUnitsAccess).toBeFalsy());
-
-      it('usersAccess property should be false', () => expect(controller.usersAccess).toBeFalsy());
 
       it('currentDomain property should be defined', () => expect(controller.currentDomain).toBeDefined());
 
@@ -163,11 +162,7 @@ describe('DomainDetailsCtrl', function () {
 
   describe('.onSuccessDeterminingConnectivity', function () {
     let exception = 'unauthorized_client'
-    let response = {
-      'devicesAccess': true,
-      'orgUnitsAccess': false,
-      'usersAccess': true,
-      'orgUnitsAccessException': exception};
+    let response = {'devicesAccess': true, 'orgUnitsAccess': false, 'orgUnitsAccessException': exception};
 
     beforeEach(function () {
       spyOn(progressBarService, 'complete');
@@ -179,13 +174,9 @@ describe('DomainDetailsCtrl', function () {
 
     it('sets devicesAccess', () => expect(controller.devicesAccess).toBeTruthy());
 
-    it('sets usersAccess', () => expect(controller.usersAccess).toBeTruthy());
-
     it('sets orgUnitsAccessException', () => expect(controller.orgUnitsAccessException).toBe(exception));
 
     it('does not set devicesAccessException', () => expect(controller.devicesAccessException).toBeUndefined());
-
-    it('does not set usersAccessException', () => expect(controller.usersAccessException).toBeUndefined());
 
     return it('sets orgUnitsAccess', () => expect(controller.orgUnitsAccess).toBeFalsy());
 
