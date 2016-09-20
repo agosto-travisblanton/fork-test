@@ -1,0 +1,19 @@
+<div ng-controller="DevicesListingCtrl as vm" ng-init="vm.initialize()" layout="column" ng-cloak>
+  <md-toolbar class="md-hue-2">
+    <div class="md-toolbar-tools">
+      <h2 class="md-flex"><i class="fa fa-fw fa-desktop ng-scope"></i> Devices</h2>
+    </div>
+  </md-toolbar>
+  <md-content>
+    <div flex="100" flex-sm="100" flex-xs="100" layout="column">
+      <md-tabs md-dynamic-height md-border-bottom>
+        <md-tab label="Managed">
+          <div ng-include="'webapp/src/app/device/device-listing-managed.html'"></div>
+        </md-tab>
+        <md-tab label="Unmanaged">
+          <div ng-include="'webapp/src/app/device/device-listing-unmanaged.html'"></div>
+        </md-tab>
+      </md-tabs>
+    </div>
+  </md-content>
+</div>
