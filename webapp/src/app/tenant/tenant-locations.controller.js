@@ -16,17 +16,19 @@ function TenantLocationsCtrl($scope, $stateParams, TenantsService, LocationsServ
     vm.currentTenant = data
   });
 
-  $scope.$watch('tabIndex', function (selectedIndex) {
-    if (selectedIndex !== undefined) {
-      switch (selectedIndex) {
+  $scope.$watch('tabIndex', function (toTab, fromTab) {
+    if (toTab !== undefined) {
+      switch (toTab) {
         case 0:
-          return $state.go('tenantDetails', {tenantKey});
+          return $state.go('tenantDetails', {tenantKey: $stateParams.tenantKey});
         case 1:
-          return $state.go('tenantManagedDevices', {tenantKey});
+          return $state.go('tenantManagedDevices', {tenantKey: $stateParams.tenantKey});
         case 2:
-          return $state.go('tenantUnmanagedDevices', {tenantKey});
+          return $state.go('tenantUnmanagedDevices', {tenantKey: $stateParams.tenantKey});
         case 3:
-          return $state.go('tenantLocations', {tenantKey});
+          return $state.go('tenantLocations', {tenantKey: $stateParams.tenantKey});
+        case 4:
+          return $state.go('tenantOverlays', {tenantKey: $stateParams.tenantKey});
       }
     }
   });

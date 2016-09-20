@@ -95,6 +95,9 @@ function TenantDetailsCtrl($stateParams, TenantsService, DomainsService, Timezon
           return $state.go('tenantUnmanagedDevices', {tenantKey: $stateParams.tenantKey});
         case 3:
           return $state.go('tenantLocations', {tenantKey: $stateParams.tenantKey});
+        case 4:
+          return $state.go('tenantOverlays', {tenantKey: $stateParams.tenantKey});
+
       }
     }
   });

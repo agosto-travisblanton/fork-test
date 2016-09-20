@@ -41,6 +41,7 @@ import TimezonesService from './services/timezones.service'
 import ToastsService from './services/toasts.service'
 import VersionsService from './services/versions.service'
 // Tenant
+import {TenantOverlaysCtrl} from './tenant/tenant-overlays.controller'
 import {TenantAddCtrl} from './tenant/tenant-add.controller'
 import {TenantDetailsCtrl} from './tenant/tenant-details.controller'
 import {TenantLocationCtrl} from './tenant/tenant-location.controller'
@@ -99,6 +100,7 @@ app
   .controller("ProofOfPlayMultiResourceCtrl", ProofOfPlayMultiResourceCtrl)
   .controller("ProofOfPlayCtrl", ProofOfPlayCtrl)
   // Tenants
+  .controller("TenantOverlaysCtrl", TenantOverlaysCtrl)
   .controller("TenantAddCtrl", TenantAddCtrl)
   .controller("TenantDetailsCtrl", TenantDetailsCtrl)
   .controller("TenantLocationCtrl", TenantLocationCtrl)
