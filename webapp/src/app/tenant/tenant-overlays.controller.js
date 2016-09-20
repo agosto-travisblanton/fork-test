@@ -1,10 +1,23 @@
-function TenantOverlaysCtrl($stateParams, TenantsService, DomainsService, TimezonesService, DistributorsService, $state, sweet,
-                            ProgressBarService, ToastsService, SessionsService, $scope, $location) {
+function TenantOverlaysCtrl($stateParams,
+                            TenantsService,
+                            DomainsService,
+                            TimezonesService,
+                            DistributorsService,
+                            $state,
+                            sweet,
+                            ProgressBarService,
+                            ToastsService,
+                            SessionsService,
+                            $scope,
+                            $location,
+                            ImageService,
+                            $timeout) {
   "ngInject";
 
   let vm = this;
 
   $scope.tabIndex = 4;
+  vm.tenantKey = $stateParams.tenantKey;
   vm.editMode = !!$stateParams.tenantKey;
 
   // Images
@@ -46,12 +59,12 @@ function TenantOverlaysCtrl($stateParams, TenantsService, DomainsService, Timezo
 
       ImageService.deleteImage(key)
         .then((res) => {
-          $timeout(vm.getTenantImagesAndRefreshDevice(), 2000);
+          $timeout(vm.getTenantImages(), 2000);
           ProgressBarService.complete();
 
         })
         .catch((res) => {
-          $timeout(vm.getTenantImagesAndRefreshDevice(), 2000);
+          $timeout(vm.getTenantImages(), 2000);
           ProgressBarService.complete();
         })
     }))
