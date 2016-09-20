@@ -68,7 +68,7 @@ function DeviceDetailsCtrl($log,
   }
 
   vm.submitOverlaySettings = () => {
-    let overlaySettings = angular.copy(vm.currentDeviceCopy.overlay)
+    let overlaySettings = angular.copy(vm.currentDeviceCopy.overlays)
     delete overlaySettings.key;
     delete overlaySettings.device_key;
 
