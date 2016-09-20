@@ -518,29 +518,29 @@ class Tenant(ndb.Model):
 
     @classmethod
     def find_by_organization_unit_path(cls, organization_unit_path):
-        tenant_entity = Tenant.query(Tenant.organization_unit_path == organization_unit_path,
-                                     Tenant.active == True).fetch()
-        if tenant_entity:
-            return tenant_entity[0]
+        tenant = Tenant.query(Tenant.organization_unit_path == organization_unit_path,
+                              Tenant.active == True).fetch()
+        if tenant:
+            return tenant[0]
         else:
             organization_unit_path_components = organization_unit_path.split('/')
             last_index = len(organization_unit_path_components) - 1
-            if organization_unit_path[0][0] == '/': # leading forward slash
+            if organization_unit_path[0][0] == '/':  # leading forward slash
                 for i in range(1, last_index):
                     if organization_unit_path_components[i].lower() == 'skykit':
                         if organization_unit_path_components[i + 1]:
                             tenant_code = organization_unit_path_components[i + 1].lower()
-                            tenant_entity = Tenant.find_by_tenant_code(tenant_code)
+                            tenant = Tenant.find_by_tenant_code(tenant_code)
                             break
             else:
-                for i in range(0, last_index): # no leading forward slash
+                for i in range(0, last_index):  # no leading forward slash
                     if organization_unit_path_components[i].lower() == 'skykit':
                         if organization_unit_path_components[i + 1]:
                             tenant_code = organization_unit_path_components[i + 1].lower()
-                            tenant_entity = Tenant.find_by_tenant_code(tenant_code)
+                            tenant = Tenant.find_by_tenant_code(tenant_code)
                             break
 
-        return tenant_entity
+        return tenant
 
     @classmethod
     def is_tenant_code_unique(cls, tenant_code):
