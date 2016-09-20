@@ -16,22 +16,12 @@
       <md-tab label="Overlays"></md-tab>
     </md-tabs>
     <div flex="60" flex-sm="50" flex-xs="30" layout="column">
-      <md-card>
-        <md-card-title>
-          <md-card-title-text>
-            <span class="md-headline">{{ vm.currentTenant.name }}</span>
-            <hr/>
-          </md-card-title-text>
-        </md-card-title>
-        <md-card-content>
-          <div class="col-md-12">
-            <div ng-include="'webapp/src/app/tenant/tenant-overlays/overlay.html'"></div>
 
-            <div ng-include="'webapp/src/app/tenant/tenant-overlays/logo-upload.html'"></div>
-          </div>
-          <!--</div>-->
-        </md-card-content>
-      </md-card>
+      <div class="col-md-12">
+        <div ng-include="'webapp/src/app/tenant/tenant-overlays/overlay.html'"></div>
+        <div ng-include="'webapp/src/app/tenant/tenant-overlays/logo-upload.html'"></div>
+      </div>
+
     </div>
   </md-content>
 </div>

@@ -11,7 +11,8 @@ function TenantOverlaysCtrl($stateParams,
                             $scope,
                             $location,
                             ImageService,
-                            $timeout) {
+                            $timeout,
+                            $mdDialog) {
   "ngInject";
 
   let vm = this;
@@ -31,7 +32,7 @@ function TenantOverlaysCtrl($stateParams,
       let promise = ImageService.saveImage(vm.tenantKey, formData)
       promise.then((res) => {
         ProgressBarService.complete();
-        $timeout(vm.getTenantImages(), 2000);
+        $timeout(vm.getTenantImages, 1000);
         vm.fileApi.removeAll()
         ToastsService.showSuccessToast('We uploaded your image.');
       })
@@ -59,12 +60,14 @@ function TenantOverlaysCtrl($stateParams,
 
       ImageService.deleteImage(key)
         .then((res) => {
-          $timeout(vm.getTenantImages(), 2000);
+          $timeout(vm.getTenantImages, 1000);
+          ToastsService.showSuccessToast('We deleted your image.');
           ProgressBarService.complete();
-
         })
         .catch((res) => {
-          $timeout(vm.getTenantImages(), 2000);
+          $timeout(vm.getTenantImages, 1000);
+          ToastsService.showErrorToast('Something went wrong while deleting your image.');
+
           ProgressBarService.complete();
         })
     }))
@@ -76,6 +79,7 @@ function TenantOverlaysCtrl($stateParams,
     let promise = ImageService.getImages(vm.tenantKey);
     promise.then((res) => {
       vm.tenantImages = res
+      console.log(vm.tenantImages)
       ProgressBarService.complete();
     });
 
@@ -84,7 +88,6 @@ function TenantOverlaysCtrl($stateParams,
       ToastsService.showErrorStatus("SOMETHING WENT WRONG RETRIEVING YOUR IMAGES")
     })
   }
-
 
   // Setup
 
@@ -96,6 +99,7 @@ function TenantOverlaysCtrl($stateParams,
   };
 
   if (vm.editMode) {
+    vm.getTenantImages()
     let tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey);
     tenantPromise.then(function (tenant) {
       vm.currentTenant = tenant;
