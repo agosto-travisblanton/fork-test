@@ -1,6 +1,7 @@
+import random
+
 from app_config import config
 from env_setup import setup_test_paths
-import random
 
 setup_test_paths()
 import datetime
@@ -143,6 +144,36 @@ class TestTenantModel(BaseTest):
         tenant_created = Tenant.find_by_name('FOOBAR_TENANT')
         self.assertNotEqual(tenant_created.proof_of_play_url, config.DEFAULT_PROOF_OF_PLAY_URL)
         self.assertEqual(tenant_created.proof_of_play_url, proof_of_play_url)
+
+    def test_create_sets_organization_unit_path(self):
+        expected_organization_unit_path = '/skykit/{0}'.format(self.TENANT_CODE)
+        self.assertEqual(expected_organization_unit_path, self.tenant.organization_unit_path)
+
+    def test_create_sets_organization_unit_path_with_prefix(self):
+        ou_prefix = '/abc/123'
+        domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
+                               distributor_key=self.distributor_key,
+                               impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
+                               active=True,
+                               organization_path_prefix=ou_prefix)
+        domain_key = domain.put()
+        tenant_with_prefix_on_domain = Tenant.create(tenant_code=self.TENANT_CODE,
+                                                     name=self.NAME,
+                                                     admin_email=self.ADMIN_EMAIL,
+                                                     content_server_url=self.CONTENT_SERVER_URL,
+                                                     content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                                                     domain_key=domain_key,
+                                                     active=False)
+        tenant_with_prefix_on_domain.put()
+        expected_organization_unit_path = '{0}/skykit/{1}'.format(ou_prefix, self.TENANT_CODE)
+        self.assertEqual(expected_organization_unit_path, tenant_with_prefix_on_domain.organization_unit_path)
+
+    def test_create_sets_enrollment_password(self):
+        self.assertIsNotNone(self.tenant.enrollment_password)
+
+    def test_create_sets_expected_enrollment_email_format(self):
+        expected_enrollment_email_format = '{0}.enrollment@{1}'.format(self.TENANT_CODE, self.domain_key.get().name)
+        self.assertEqual(expected_enrollment_email_format, self.tenant.enrollment_email)
 
     def test_is_tenant_code_unique_returns_false_when_code_found(self):
         uniqueness_check = Tenant.is_tenant_code_unique(self.TENANT_CODE)

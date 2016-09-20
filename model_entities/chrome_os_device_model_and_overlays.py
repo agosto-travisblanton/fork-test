@@ -9,6 +9,7 @@ import ndb_json
 from app_config import config
 from domain_model import Domain
 from entity_groups import TenantEntityGroup
+from ndb_mixins import KeyValidatorMixin
 from restler.decorators import ae_ndb_serializer
 from utils.timezone_util import TimezoneUtil
 
@@ -477,6 +478,48 @@ class Tenant(ndb.Model):
     def get_domain(self):
         return self.domain_key.get()
 
+    @classmethod
+    def create(cls,
+               tenant_code,
+               name,
+               admin_email,
+               content_server_url,
+               domain_key,
+               active,
+               content_manager_base_url,
+               notification_emails=[],
+               proof_of_play_logging=False,
+               proof_of_play_url=config.DEFAULT_PROOF_OF_PLAY_URL,
+               default_timezone=config.DEFAULT_TIMEZONE):
+
+        validator = KeyValidatorMixin()
+        domain = validator.validate_and_get(
+            urlsafe_key=domain_key.urlsafe(),
+            kind_cls=Domain,
+            abort_on_not_found=True)
+        if domain.organization_path_prefix:
+            organization_unit_path = '{0}/skykit/{1}'.format(domain.organization_path_prefix, tenant_code)
+        else:
+            organization_unit_path = '/skykit/{0}'.format(tenant_code)
+        enrollment_password = cls.generate_enrollment_password(config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE)
+        enrollment_email = '{0}.enrollment@{1}'.format(tenant_code, domain_key.get().name)
+        tenant_entity_group = TenantEntityGroup.singleton()
+        return cls(parent=tenant_entity_group.key,
+                   tenant_code=tenant_code,
+                   name=name,
+                   admin_email=admin_email,
+                   content_server_url=content_server_url,
+                   domain_key=domain_key,
+                   active=active,
+                   content_manager_base_url=content_manager_base_url,
+                   notification_emails=notification_emails,
+                   proof_of_play_logging=proof_of_play_logging,
+                   proof_of_play_url=proof_of_play_url,
+                   default_timezone=default_timezone,
+                   enrollment_password=enrollment_password,
+                   enrollment_email=enrollment_email,
+                   organization_unit_path=organization_unit_path)
+
     @staticmethod
     def generate_enrollment_password(length):
         if not isinstance(length, int) or length < config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE:
@@ -812,39 +855,6 @@ class Tenant(ndb.Model):
             urlsafe_domain_key = tenant.domain_key.urlsafe()
             domain = ndb.Key(urlsafe=urlsafe_domain_key).get()
             return domain.impersonation_admin_email_address
-
-    @classmethod
-    def create(cls,
-               tenant_code,
-               name,
-               admin_email,
-               content_server_url,
-               domain_key,
-               active,
-               content_manager_base_url,
-               notification_emails=[],
-               proof_of_play_logging=False,
-               proof_of_play_url=config.DEFAULT_PROOF_OF_PLAY_URL,
-               default_timezone=config.DEFAULT_TIMEZONE):
-        enrollment_password = cls.generate_enrollment_password(config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE)
-        enrollment_email = '{0}.enrollment@{1}'.format(tenant_code, domain_key.get().name)
-        organization_unit_path = '/skykit/{0}'.format(tenant_code)
-        tenant_entity_group = TenantEntityGroup.singleton()
-        return cls(parent=tenant_entity_group.key,
-                   tenant_code=tenant_code,
-                   name=name,
-                   admin_email=admin_email,
-                   content_server_url=content_server_url,
-                   domain_key=domain_key,
-                   active=active,
-                   content_manager_base_url=content_manager_base_url,
-                   notification_emails=notification_emails,
-                   proof_of_play_logging=proof_of_play_logging,
-                   proof_of_play_url=proof_of_play_url,
-                   default_timezone=default_timezone,
-                   enrollment_password=enrollment_password,
-                   enrollment_email=enrollment_email,
-                   organization_unit_path=organization_unit_path)
 
     @classmethod
     def toggle_proof_of_play_on_tenant_devices(cls, should_be_enabled, tenant_code, tenant_key=None):
