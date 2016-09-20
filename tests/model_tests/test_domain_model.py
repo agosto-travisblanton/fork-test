@@ -14,6 +14,7 @@ class TestDomainModel(BaseTest):
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
     CURRENT_CLASS_VERSION = 1
     IMPERSONATION_EMAIL = 'test@test.com'
+    OU_PATH_PREFIX = '/abc/123'
 
     def setUp(self):
         super(TestDomainModel, self).setUp()
@@ -32,10 +33,12 @@ class TestDomainModel(BaseTest):
 
     def test_find_by_name_returns_expected_domain_representation(self):
         domain = Domain.find_by_name(self.CHROME_DEVICE_DOMAIN)
+        domain.organization_path_prefix = self.OU_PATH_PREFIX
         self.assertEqual(domain.distributor_key, self.distributor_key)
         self.assertEqual(domain.name, self.CHROME_DEVICE_DOMAIN)
         self.assertEqual(domain.impersonation_admin_email_address, self.IMPERSONATION_EMAIL)
         self.assertTrue(domain.active)
+        self.assertEqual(self.OU_PATH_PREFIX, domain.organization_path_prefix)
         self.assertIsNotNone(domain.created)
 
     def test_create_sets_an_inactive_domain(self):
