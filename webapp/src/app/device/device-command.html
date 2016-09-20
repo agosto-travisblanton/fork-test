@@ -1,0 +1,272 @@
+<div class="md-content-command-override" ng-controller="DeviceDetailsCommandsCtrl as vm" ng-init="vm.initialize()">
+  <md-content class="md-padding" layout="row" layout-align="left start"
+              layout-xs="column">
+    <div flex="40" flex-sm="70" flex-xs="100" layout="column">
+      <md-card>
+        <md-card-content>
+          <h3>Commands</h3>
+          <hr/>
+          <md-content class="md-padding" layout="row" layout-wrap layout-xs="column">
+            <md-card flex="100">
+              <div layout="row">
+                <div flex="55">
+                  <h5 class="md-headline" style="padding-left: 15px">Reset Content</h5>
+                </div>
+                <div flex="55">
+                  <form name="resetContentForm" class="form-horizontal"
+                        ng-submit="vm.onResetContent()"
+                        novalidate>
+                    <div layout="row" class="command-button-right">
+                      <button type="submit" class="md-button" tooltips
+                              tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/reset-content.html">
+                        <i
+                          class="fa fa-fw fa-building"></i>
+                        Send
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </md-card>
+            <md-card flex="100">
+              <div layout="row">
+                <div flex="55">
+                  <h5 class="md-headline" style="padding-left: 15px">Update Content</h5>
+                </div>
+                <div flex="55">
+                  <form name="updateContentForm" class="form-horizontal"
+                        ng-submit="vm.onUpdateContent()"
+                        novalidate>
+                    <div layout="row" class="command-button-right">
+                      <button type="submit" class="md-button" tooltips tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/update-content.html"
+                      >
+                        <i
+                          class="fa fa-fw fa-building"></i>
+                        Send
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </md-card>
+            <md-card flex="100">
+              <div layout="row">
+                <div flex="55">
+                  <h5 class="md-headline" style="padding-left: 15px">Reset Player</h5>
+                </div>
+                <div flex="55">
+                  <form name="resetPlayerForm" class="form-horizontal"
+                        ng-submit="vm.onResetPlayer()"
+                        novalidate>
+                    <div layout="row" class="command-button-right">
+                      <button type="submit" class="md-button" tooltips tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/reset-player.html"
+                      ><i
+                        class="fa fa-fw fa-building"></i>
+                        Send
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </md-card>
+            <md-card flex="100">
+              <div layout="row">
+                <div flex="55">
+                  <h5 class="md-headline" style="padding-left: 15px">Panel On</h5>
+                </div>
+                <div flex="55">
+                  <form name="panelOnForm" class="form-horizontal"
+                        ng-submit="vm.onPanelOn()"
+                        novalidate>
+                    <div layout="row" class="command-button-right">
+                      <button type="submit" class="md-button" tooltips tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/panel-on.html"
+                      ><i
+                        class="fa fa-fw fa-building"></i>
+                        Send
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </md-card>
+            <md-card flex="100">
+              <div layout="row">
+                <div flex="55">
+                  <h5 class="md-headline" style="padding-left: 15px">Panel Off</h5>
+                </div>
+                <div flex="55">
+                  <form name="panelOffForm" class="form-horizontal"
+                        ng-submit="vm.onPanelOff()"
+                        novalidate>
+                    <div layout="row" class="command-button-right">
+                      <button type="submit" class="md-button" tooltips tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/panel-off.html"
+                      ><i
+                        class="fa fa-fw fa-building"></i>
+                        Send
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </md-card>
+            <md-card flex="100">
+              <div layout="row">
+                <div flex="55">
+                  <h5 class="md-headline" style="padding-left: 15px">Update Device</h5>
+                </div>
+                <div flex="55">
+                  <form name="updateDeviceForm" class="form-horizontal"
+                        ng-submit="vm.onUpdateDevice()"
+                        novalidate>
+                    <div layout="row" class="command-button-right">
+                      <button type="submit" class="md-button" tooltips tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/update-device.html"
+                      ><i
+                        class="fa fa-fw fa-building"></i>
+                        Send
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </md-card>
+            <md-card flex="100">
+              <div layout="row">
+                <div flex="55">
+                  <h5 class="md-headline" style="padding-left: 15px">Diagnostics</h5>
+                </div>
+                <div flex="55">
+                  <form name="updateDeviceForm" class="form-horizontal"
+                        ng-submit="vm.onDiagnosticsToggle()"
+                        novalidate>
+                    <div layout="row" class="command-button-right">
+                      <button type="submit" class="md-button" tooltips tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/diagnostics.html"
+                      ><i
+                        class="fa fa-fw fa-building"></i>
+                        Send
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </md-card>
+            <md-card flex="100">
+              <div layout="row">
+                <div flex="55">
+                  <h5 class="md-headline" style="padding-left: 15px">Restart</h5>
+                </div>
+                <div flex="55">
+                  <form name="updateDeviceForm" class="form-horizontal"
+                        ng-submit="vm.onRestart()"
+                        novalidate>
+                    <div layout="row" class="command-button-right">
+                      <button type="submit" class="md-button" tooltips tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/restart.html"
+                      ><i
+                        class="fa fa-fw fa-building"></i>
+                        Send
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </md-card>
+            <md-card flex="100">
+              <div layout="row">
+                <div flex="55">
+                  <h5 class="md-headline" style="padding-left: 15px">Post log</h5>
+                </div>
+                <div flex="55">
+                  <form name="updateDeviceForm" class="form-horizontal"
+                        ng-submit="vm.onPostLog()"
+                        novalidate>
+                    <div layout="row" class="command-button-right">
+                      <button type="submit" class="md-button" tooltips tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/post-log.html"
+                      ><i
+                        class="fa fa-fw fa-building"></i>
+                        Send
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </md-card>
+            <md-card flex="100">
+              <md-card-title>
+                <md-card-title-text>
+                  <span class="md-headline">Volume</span>
+                </md-card-title-text>
+              </md-card-title>
+              <md-card-content>
+                <form name="volumeForm" class="form-horizontal"
+                      ng-submit="vm.onVolumeChange()"
+                      novalidate>
+                  <div layout="row">
+                    <div flex="40">
+                      <input type="number"
+                             class="form-control"
+                             name="volume"
+                             id="volume"
+                             ng-model="vm.currentDevice.volume"
+                             min="1"
+                             max="100"
+                             ngMinlength="1"
+                             ngMaxlength="3"
+                             ng-required="true">
+                    </div>
+                    <div flex="60">
+                      <button type="submit" class="md-button pull-command-send-button-up" tooltips tooltip-side="right"
+                              tooltip-template-url="webapp/src/app/tooltip/volume.html"
+                              ng-disabled="!volumeForm.$dirty || volumeForm.$invalid">
+                        <i class="fa fa-fw fa-building"></i>
+                        Send
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </md-card-content>
+            </md-card>
+            <md-card flex="100">
+              <md-card-title>
+                <md-card-title-text>
+                  <span class="md-headline">Custom</span>
+                </md-card-title-text>
+              </md-card-title>
+              <md-card-content>
+                <form name="customForm" class="form-horizontal"
+                      ng-submit="vm.onCustomCommand()"
+                      novalidate>
+                  <div layout="row">
+                    <div flex="70">
+                      <input type="text"
+                             class="form-control"
+                             name="custom"
+                             id="custom"
+                             ng-model="vm.currentDevice.custom"
+                             ng-required="true">
+                    </div>
+                    <div flex="30">
+                      <button type="submit" class="md-button pull-command-send-button-up" tooltips tooltip-side="right"
+                              tooltip-template="Send a custom command."
+                              ng-disabled="!customForm.$dirty || customForm.$invalid">
+                        <i class="fa fa-fw fa-building"></i>
+                        Send
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </md-card-content>
+            </md-card>
+          </md-content>
+        </md-card-content>
+      </md-card>
+    </div>
+  </md-content>
+</div>

@@ -1,0 +1,135 @@
+<div ng-controller="TenantsCtrl as vm" ng-init="vm.initialize()" layout="column" ng-cloak>
+  <md-toolbar class="md-hue-2">
+    <div class="md-toolbar-tools">
+      <h2 class="md-flex"><i class="fa fa-fw fa-group ng-scope"></i> Tenants</h2>
+    </div>
+  </md-toolbar>
+  <md-content>
+    <div flex="100" flex-sm="100" flex-xs="100" layout="column">
+      <md-card>
+        <md-card-content>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="col-sm-3" style="float: left">
+
+                {{offset}}
+                <md-button class="md-raised"
+                           ng-disabled="vm.is_first_page || vm.loading"
+                           ng-click="vm.getTenantsPaginated(100, vm.offset - 100)">
+                  Prev
+                </md-button>
+                <md-button class="md-raised"
+                           ng-disabled="vm.is_last_page || vm.loading"
+                           ng-click="vm.getTenantsPaginated(100, vm.offset + 100)">
+                  Next
+                </md-button>
+              </div>
+              <div class="col-sm-3 col-sm-offset-1">
+                <md-autocomplete
+                  md-no-cache="true"
+                  md-selected-item="vm.selectedItem"
+                  md-search-text="vm.searchText"
+                  md-items="item in vm.searchAllTenantsByName(vm.searchText)"
+                  md-item-text="item"
+                  md-min-length="0"
+                  md-search-text-change="vm.isTenantValid(vm.searchText)"
+                  md-selected-item-change="vm.isTenantValid(vm.searchText)"
+                  placeholder="Make A Search">
+
+                  <md-item-template>
+                  <span md-highlight-text="vm.searchText"
+                        md-highlight-flags="^i">{{item}}</span>
+                  </md-item-template>
+                  <md-not-found>
+                    <div ng-if="vm.searchText !== '' && vm.searchText.length > 2">
+                      No results for "{{vm.searchText}}" were
+                      found.
+                    </div>
+                    <div
+                      ng-if="vm.searchText !== '' && vm.searchText.length <= 2">
+                      Please enter at least 3 characters.
+                    </div>
+                  </md-not-found>
+                </md-autocomplete>
+              </div>
+              <div class="col-md-1">
+                <md-button ng-click="vm.editItem(vm.searchMatch)"
+                           ng-disabled="vm.searchDisabled"
+                           class="md-raised md-primary md-button md-ink-ripple">
+                  OPEN
+                </md-button>
+              </div>
+              <div class="col-md-1 col-md-offset-2">
+                <md-button href="#/tenants/add"
+                           class="md-raised md-primary md-button md-ink-ripple">
+                  <i class="fa fa-fw fa-plus"></i> Add
+                </md-button>
+              </div>
+            </div>
+          </div>
+        </md-card-content>
+      </md-card>
+      <md-card>
+        <md-card-content>
+          <table name="tenant-table" class="table table-responsive table-striped">
+            <thead>
+            <tr>
+              <th></th>
+              <th>Name</th>
+              <th>Code</th>
+              <th>Content Server URL</th>
+              <th>Admin email</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-hide="vm.tenants.length">
+              <td class="no-devices text-center text-danger" colspan="5">No tenants</td>
+            </tr>
+            <tr ng-repeat="item in vm.tenants | orderBy:'name' "
+                ng-click="vm.editItem(item)">
+              <td>
+                <a ng-click="vm.editItem(item)" title="Tenant detail">
+                  <ng-md-icon icon="mode_edit" size="48">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24"
+                         height="24">
+                      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"></path>
+                      <path
+                        d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+                    </svg>
+                  </ng-md-icon>
+                </a>
+              </td>
+              <td>{{item.name}}</td>
+              <td>{{item.tenant_code}}</td>
+              <td>{{item.content_server_url}}</td>
+              <td>{{item.admin_email}}</td>
+            </tr>
+            </tbody>
+          </table>
+          <md-card-actions layout="row" ng-if="vm.tenants.length > 25">
+            <div class="col-sm-3" style="float: left">
+
+              {{offset}}
+              <md-button class="md-raised"
+                         ng-disabled="vm.is_first_page || vm.loading"
+                         ng-click="vm.getTenantsPaginated(100, vm.offset - 100)">
+                Prev
+              </md-button>
+              <md-button class="md-raised"
+                         ng-disabled="vm.is_last_page || vm.loading"
+                         ng-click="vm.getTenantsPaginated(100, vm.offset + 100)">
+                Next
+              </md-button>
+            </div>
+            <div class="col-md-1 col-md-offset-7">
+              <md-button href="#/tenants/add"
+                         class="md-raised md-primary md-button md-ink-ripple">
+                <i class="fa fa-fw fa-plus"></i> Add
+              </md-button>
+            </div>
+          </md-card-actions>
+        </md-card-content>
+      </md-card>
+    </div>
+  </md-content>
+</div>
