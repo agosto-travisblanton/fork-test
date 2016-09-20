@@ -7,6 +7,75 @@ function TenantOverlaysCtrl($stateParams, TenantsService, DomainsService, Timezo
   $scope.tabIndex = 4;
   vm.editMode = !!$stateParams.tenantKey;
 
+  // Images
+  vm.submitImage = () => {
+    if (vm.selectedLogo && vm.selectedLogo[0]) {
+      var formData = new FormData();
+      angular.forEach(vm.selectedLogo, function (obj) {
+        formData.append('files', obj.lfFile);
+      });
+
+      let promise = ImageService.saveImage(vm.tenantKey, formData)
+      promise.then((res) => {
+        ProgressBarService.complete();
+        $timeout(vm.getTenantImages(), 2000);
+        vm.fileApi.removeAll()
+        ToastsService.showSuccessToast('We uploaded your image.');
+      })
+      promise.catch((res) => {
+        ProgressBarService.complete();
+        ToastsService.showErrorToast('Something went wrong. You may have already uploaded this image.');
+      })
+    }
+  }
+
+
+  vm.deleteImage = (ev, name, key) => {
+    let confirm = $mdDialog.confirm(
+      {
+        title: `Are you sure?`,
+        textContent: `If you proceed, ${name} will be deleted and removed from all devices that use it.`,
+        targetEvent: ev,
+        ariaLabel: 'Lucky day',
+        ok: 'Confirm',
+        cancel: 'Nevermind'
+      }
+    );
+    $mdDialog.show(confirm).then((function () {
+      ProgressBarService.start();
+
+      ImageService.deleteImage(key)
+        .then((res) => {
+          $timeout(vm.getTenantImagesAndRefreshDevice(), 2000);
+          ProgressBarService.complete();
+
+        })
+        .catch((res) => {
+          $timeout(vm.getTenantImagesAndRefreshDevice(), 2000);
+          ProgressBarService.complete();
+        })
+    }))
+  }
+
+
+  vm.getTenantImages = () => {
+    ProgressBarService.start();
+    let promise = ImageService.getImages(vm.tenantKey);
+    promise.then((res) => {
+      vm.tenantImages = res
+      ProgressBarService.complete();
+    });
+
+    promise.catch(() => {
+      ProgressBarService.complete();
+      ToastsService.showErrorStatus("SOMETHING WENT WRONG RETRIEVING YOUR IMAGES")
+    })
+  }
+
+
+  // Setup
+
+
   vm.onSuccessResolvingTenant = function (tenant) {
     vm.selectedTimezone = tenant.default_timezone;
     let domainPromise = DomainsService.getDomainByKey(tenant.domain_key);
