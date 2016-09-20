@@ -42,6 +42,7 @@ app_APP_NAME = _APP_NAME()
 
 app_SECRET_KEY_FILE = '{}/privatekeys/{}.pem'.format(app_APP_ROOT, app_APP_NAME)
 
+
 def _PRIVATE_KEY():
     with open(app_SECRET_KEY_FILE) as f:
         private_key = f.read()

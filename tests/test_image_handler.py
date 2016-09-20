@@ -1,5 +1,5 @@
 import json
-from models import Image
+from models import Image, Overlay, OverlayTemplate
 from routes import application
 from integrations.cloud_storage.cloud_storage_api import create_file
 
@@ -33,6 +33,23 @@ class ImageHandlerTest(ProvisioningDistributorUserBase):
         self.assertFalse(Image.query().fetch())
         self._create_image()
         self.assertTrue(Image.query().fetch())
+
+    def test_delete(self):
+        key = self._create_image()
+        overlay_type = "logo"
+        Overlay.create_or_get(overlay_type, image_urlsafe_key=key)
+        overlay_template = OverlayTemplate.get_overlay_template_for_device(self.device.key)
+        overlay_template.set_overlay("top_left", overlay_type, image_urlsafe_key=key)
+        request_parameters = {}
+        uri = application.router.build(None, 'delete_image', None, {'image_urlsafe_key': key})
+        response = self.app.delete(uri, params=request_parameters)
+        self.assertOK(response)
+        tasks = self.taskqueue_stub.GetTasks("default")
+        self.assertEqual(len(tasks), 1)
+        self.run_all_tasks()
+        overlay_template_new = OverlayTemplate.get_overlay_template_for_device(self.device.key)
+        none_overlay = Overlay.create_or_get(None)
+        self.assertEqual(overlay_template_new.top_left.get(), none_overlay)
 
     def _create_image(self):
         fileContent = open('testFile.png').read()

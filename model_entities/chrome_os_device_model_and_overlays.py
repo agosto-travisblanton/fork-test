@@ -104,6 +104,8 @@ class ChromeOsDevice(ndb.Model):
                     if python_dict[key]["type"] == "logo":
                         python_dict[key]["name"] = python_dict[key]["image_key"]["name"]
                         del python_dict[key]["image_key"]["tenant_key"]
+                        python_dict[key]["imageKey"] = python_dict[key]["image_key"]
+                        del python_dict[key]["image_key"]
                     else:
                         python_dict[key]["name"] = python_dict[key]["type"]
                         if python_dict[key]["name"] == None:

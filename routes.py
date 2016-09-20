@@ -364,8 +364,8 @@ application = WSGIApplication(
         ############################################################
         Route(r'/api/v1/image/<image_urlsafe_key>',
               handler='handlers.image_handler.ImageHandler',
-              name='delete',
-              handler_method='delete',
+              name='delete_image',
+              handler_method='delete_image',
               methods=['DELETE'],
               ),
 

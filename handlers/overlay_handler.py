@@ -36,11 +36,8 @@ class OverlayHandler(ExtendedSessionRequestHandler):
                                          overlay_type=overlay_type,
                                          image_urlsafe_key=image_key)
 
-        # re-get the template after the changes set_overlay made
-        overlay_template = OverlayTemplate.create_or_get_by_device_key(device.key)
-        # This method is offered because restler doesn't support keyProperty serialization beyond a single child
-        overlay_template_intermediate_json = ndb_json.dumps(overlay_template)
-        overlay_template_dict = ndb_json.loads(overlay_template_intermediate_json)
+
+
 
         change_intent(
             gcm_registration_id=device.gcm_registration_id,
@@ -52,5 +49,5 @@ class OverlayHandler(ExtendedSessionRequestHandler):
 
         return json_response(self.response, {
             "success": True,
-            "overlay_template": overlay_template_dict
+            "overlay_template": device.overlays_as_dict
         }, status_code=200)

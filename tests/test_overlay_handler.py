@@ -53,7 +53,8 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
         self.assertEqual(response_json["success"], True)
         overlays = response_json["overlay_template"]
         self.assertEqual(overlays["top_left"]["type"], "logo")
-        self.assertEqual(overlays["top_left"]["image_key"]["key"], key)
+        print overlays["top_left"]
+        self.assertEqual(overlays["top_left"]["imageKey"]["key"], key)
         self.assertEqual(response.status_int, 200)
 
         # ensure get chromeosdevice does not yet respond with overlays
@@ -63,7 +64,7 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
                                        {'device_urlsafe_key': self.device_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        overlay = response_json["overlay"]
+        overlay = response_json["overlays"]
         self.assertFalse(overlay)
 
         # enable overlays for device so that the posted overlay will be included in the device representation
@@ -76,6 +77,7 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
                                        {'device_urlsafe_key': self.device_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        overlay = response_json["overlay"]
+        overlay = response_json["overlays"]
         self.assertEqual(overlay["top_left"]["type"], "logo")
-        self.assertEqual(overlay["top_left"]["image_key"]["key"], key)
+        print overlay["top_left"]
+        self.assertEqual(overlay["top_left"]["imageKey"]["key"], key)

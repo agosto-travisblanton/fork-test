@@ -15,6 +15,11 @@ from models import (
     Distributor,
     User,
 )
+import unittest
+from google.appengine.ext import testbed
+from google.appengine.ext import deferred
+
+from appengine_config import basedir
 
 
 class MockStormpathResponse:
@@ -23,7 +28,31 @@ class MockStormpathResponse:
         self.href = 'https://fake.stormpath.com/{}'.format(email)
 
 
-class ProvisioningBaseTest(BaseTest, WebTest, KeyValidatorMixin):
+class TaskQueueTestCase(unittest.TestCase):
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+        self.testbed.init_app_identity_stub()
+        self.testbed.init_app_identity_stub()
+        self.testbed.init_urlfetch_stub()
+        self.testbed.init_blobstore_stub()
+
+        self.testbed.init_taskqueue_stub(
+            root_path=basedir)
+        self.taskqueue_stub = self.testbed.get_stub(
+            testbed.TASKQUEUE_SERVICE_NAME)
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
+    def run_all_tasks(self):
+        for task in self.taskqueue_stub.get_filtered_tasks():
+            deferred.run(task.payload)
+
+
+class ProvisioningBaseTest(TaskQueueTestCase, BaseTest, WebTest, KeyValidatorMixin):
     APPLICATION = application
 
     def setUp(self):

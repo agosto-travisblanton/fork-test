@@ -9,13 +9,12 @@ from app_config import config
 
 
 class ImageHandler(ExtendedSessionRequestHandler):
-    def delete(self, image_urlsafe_key):
+    def delete_image(self, image_urlsafe_key):
         image = self.validate_and_get(image_urlsafe_key, Image, abort_on_not_found=True)
         image_tenant = image.tenant_key.get()
         tenant_devices_managed = list(Tenant.find_devices(image_tenant.key, unmanaged=False))
         tenant_devices_unmanged = list(Tenant.find_devices(image_tenant.key, unmanaged=True))
         tenant_devices = tenant_devices_managed + tenant_devices_unmanged
-
         for each_device in tenant_devices:
             device_overlay_template = OverlayTemplate.get_overlay_template_for_device(each_device.key)
             image_in_use_in_posititions = device_overlay_template.image_in_use(image.key)
@@ -31,14 +30,14 @@ class ImageHandler(ExtendedSessionRequestHandler):
                     elif position == "bottom_right":
                         device_overlay_template.bottom_right = none_overlay.key
 
-            device_overlay_template.put()
+                    device_overlay_template.put()
 
-            deferred.defer(change_intent, gcm_registration_id=each_device.gcm_registration_id,
-                           payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
-                           device_urlsafe_key=each_device.key.urlsafe(),
-                           host=self.request.host_url,
-                           user_identifier='system (overlay update)'
-                           )
+                    deferred.defer(change_intent, gcm_registration_id=each_device.gcm_registration_id,
+                                   payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                                   device_urlsafe_key=each_device.key.urlsafe(),
+                                   host=self.request.host_url,
+                                   user_identifier='system (overlay update)'
+                                   )
 
         deleted_file = delete_file(image.gcs_path)
         if deleted_file:
