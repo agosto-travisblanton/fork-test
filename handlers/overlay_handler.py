@@ -1,7 +1,6 @@
 from models import OverlayTemplate
 import json
 from models import ChromeOsDevice
-import ndb_json
 from app_config import config
 from device_message_processor import  change_intent
 from restler.serializers import json_response
@@ -32,7 +31,7 @@ class OverlayHandler(ExtendedSessionRequestHandler):
             size = value.get("size")
 
             overlay_template.set_overlay(position=key,
-                                         size=size.lower() if size else "original",
+                                         size=size.lower() if size else "default",
                                          overlay_type=overlay_type,
                                          image_urlsafe_key=image_key)
 

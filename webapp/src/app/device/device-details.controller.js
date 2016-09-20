@@ -164,10 +164,10 @@ function DeviceDetailsCtrl($log,
 
   vm.getTenantImages = () => {
     vm.OVERLAY_TYPES = [
-      {size: "original", type: null, name: "none", realName: "none", new: false, image_key: null},
+      {size: "default", type: null, name: "none", realName: "none", new: false, image_key: null},
       {size: "small", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
       {size: "large", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
-      {size: "original", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
+      {size: "default", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
     ]
 
     ProgressBarService.start();
@@ -176,7 +176,7 @@ function DeviceDetailsCtrl($log,
       vm.tenantImages = res
       ProgressBarService.complete();
       for (let value of vm.tenantImages) {
-        for (let sizeOption of ["small", "large", "original"]) {
+        for (let sizeOption of ["small", "large", "default"]) {
           let newValue = {
             realName: angular.copy(value.name),
             name: "logo: " + value.name,
