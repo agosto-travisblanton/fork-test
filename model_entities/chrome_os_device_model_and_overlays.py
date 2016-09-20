@@ -954,13 +954,13 @@ class Overlay(ndb.Model):
     image_key = ndb.KeyProperty(kind=Image, required=False)
 
     @staticmethod
-    def create_or_get(overlay_type, size="ORIGINAL", image_urlsafe_key=None):
-        size_options = ["ORIGINAL", "LARGE", "SMALL"]
-        if size.upper() not in size_options:
+    def create_or_get(overlay_type, size="original", image_urlsafe_key=None):
+        size_options = ["original", "large", "small"]
+        if size and size.lower() not in size_options:
             raise ValueError("Overlay size must be in {}".format(size_options))
 
         # not an overlay with an image that doesn't have a image_urlsafe_key
-        if overlay_type == "LOGO":
+        if overlay_type and overlay_type.lower() == "logo":
             if image_urlsafe_key == None:
                 raise ValueError("You must provide an image_key if you are creating an overlay logo")
 
@@ -977,9 +977,9 @@ class Overlay(ndb.Model):
         # this type of overlay (or type and logo combination) has not been created yet
         else:
             overlay = Overlay(
-                type=overlay_type,
+                type=overlay_type.lower() if overlay_type else overlay_type,
                 image_key=image_key,
-                size=size
+                size=size.lower() if size else size
             )
 
             overlay.put()
@@ -1073,22 +1073,22 @@ class OverlayTemplate(ndb.Model):
             return overlay_template
 
     # expects a a dictionary with config about overlay
-    def set_overlay(self, position, overlay_type, size="ORIGINAL", image_urlsafe_key=None):
+    def set_overlay(self, position, overlay_type, size="original", image_urlsafe_key=None):
 
         overlay = Overlay.create_or_get(overlay_type=overlay_type, size=size, image_urlsafe_key=image_urlsafe_key)
 
-        if position.upper() == "TOP_LEFT":
+        if position.lower() == "top_left":
             self.top_left = overlay.key
             self.put()
 
-        elif position.upper() == "BOTTOM_LEFT":
+        elif position.upper() == "bottom_left":
             self.bottom_left = overlay.key
             self.put()
 
-        elif position.upper() == "BOTTOM_RIGHT":
+        elif position.upper() == "bottom_right":
             self.bottom_right = overlay.key
             self.put()
 
-        elif position.upper() == "TOP_RIGHT":
+        elif position.upper() == "top_right":
             self.top_right = overlay.key
             self.put()

@@ -14,8 +14,8 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
     def test_post_overlay_fails_without_associated_image_key(self):
         uri = application.router.build(None, 'post-overlay', None, {"device_urlsafe_key": self.device_key.urlsafe()})
         request_parameters = {
-            "position": "TOP_LEFT",
-            "type": "LOGO",
+            "position": "top_left",
+            "type": "logo",
             "image_key": None
         }
         with self.assertRaises(AppError) as cm:
@@ -42,7 +42,7 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
 
         request_parameters = {
             "top_left": {
-                "type": "LOGO",
+                "type": "logo",
                 "image_key": key
             }
         }
@@ -52,7 +52,7 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
         response_json = json.loads(response.body)
         self.assertEqual(response_json["success"], True)
         overlays = response_json["overlay_template"]
-        self.assertEqual(overlays["top_left"]["type"], "LOGO")
+        self.assertEqual(overlays["top_left"]["type"], "logo")
         self.assertEqual(overlays["top_left"]["image_key"]["key"], key)
         self.assertEqual(response.status_int, 200)
 
@@ -77,5 +77,5 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
         overlay = response_json["overlay"]
-        self.assertEqual(overlay["top_left"]["type"], "LOGO")
+        self.assertEqual(overlay["top_left"]["type"], "logo")
         self.assertEqual(overlay["top_left"]["image_key"]["key"], key)

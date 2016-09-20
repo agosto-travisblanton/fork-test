@@ -17,7 +17,7 @@ class OverlayHandler(ExtendedSessionRequestHandler):
         overlay_template = OverlayTemplate.create_or_get_by_device_key(device.key)
 
         for each_key in request_json.keys():
-            if each_key.upper() not in ["BOTTOM_LEFT", "BOTTOM_RIGHT", "TOP_RIGHT", "TOP_LEFT"]:
+            if each_key.lower() not in ["bottom_left", "bottom_right", "top_right", "top_left"]:
                 return json_response(self.response, {
                     "success": False,
                     "message": "ONE OF YOUR KEYS WAS NOT VALID."
@@ -32,7 +32,7 @@ class OverlayHandler(ExtendedSessionRequestHandler):
             size = value.get("size")
 
             overlay_template.set_overlay(position=key,
-                                         size=size.upper() if size else "ORIGINAL",
+                                         size=size.lower() if size else "original",
                                          overlay_type=overlay_type,
                                          image_urlsafe_key=image_key)
 

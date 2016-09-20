@@ -35,7 +35,7 @@
                              ng-selected="
                              (overlay.realName === deviceDetailsCtrl.currentDevice.overlay.top_left.name)
                               &&
-                             (overlay.size.toUpperCase() === deviceDetailsCtrl.currentDevice.overlay.top_left.size)
+                             (overlay.size.toLowerCase() === deviceDetailsCtrl.currentDevice.overlay.top_left.size)
                               ? 'selected' : ''"
                   >
                     {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" + overlay.size.toUpperCase() + ")" : '') }}
@@ -52,7 +52,7 @@
                              ng-selected="
                              (overlay.realName === deviceDetailsCtrl.currentDevice.overlay.top_right.name)
                               &&
-                             (overlay.size.toUpperCase() === deviceDetailsCtrl.currentDevice.overlay.top_right.size)
+                             (overlay.size.toLowerCase() === deviceDetailsCtrl.currentDevice.overlay.top_right.size)
                               ? 'selected' : ''"
                   >
                     {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" + overlay.size.toUpperCase() + ")" : '') }}
@@ -71,7 +71,7 @@
                              ng-selected="
                              (overlay.realName === deviceDetailsCtrl.currentDevice.overlay.bottom_left.name)
                               &&
-                             (overlay.size.toUpperCase() === deviceDetailsCtrl.currentDevice.overlay.bottom_left.size)
+                             (overlay.size.toLowerCase() === deviceDetailsCtrl.currentDevice.overlay.bottom_left.size)
                               ? 'selected' : ''"
                   >
                     {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" + overlay.size.toUpperCase() + ")" : '') }}
@@ -88,7 +88,7 @@
                              ng-selected="
                              (overlay.realName === deviceDetailsCtrl.currentDevice.overlay.bottom_right.name)
                               &&
-                             (overlay.size.toUpperCase() === deviceDetailsCtrl.currentDevice.overlay.bottom_right.size)
+                             (overlay.size.toLowerCase() === deviceDetailsCtrl.currentDevice.overlay.bottom_right.size)
                               ? 'selected' : ''"
                   >
                     {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" + overlay.size.toUpperCase() + ")" : '') }}

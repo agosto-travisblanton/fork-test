@@ -136,7 +136,6 @@ function DeviceDetailsCtrl($log,
   }
 
   vm.deleteImage = (ev, name, key) => {
-
     let confirm = $mdDialog.confirm(
       {
         title: `Are you sure?`,
