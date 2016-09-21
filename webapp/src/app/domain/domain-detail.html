@@ -61,6 +61,27 @@
                 </p>
               </div>
             </div>
+            <div class="form-group"
+                 ng-class="{ 'has-error' : domainForm.org_unit_path.$invalid && !domainForm.org_unit_path.$pristine }">
+              <label for="impersonationAdminEmailAddress" class="col-sm-3 control-label">
+                Chrome Organization Unit Path</label>
+              <div class="col-sm-3">
+                <input type="text"
+                       class="form-control"
+                       name="orgUnitPath"
+                       id="orgUnitPath"
+                       ng-readonly="domainDetailsCtrl.editMode"
+                       ng-model="domainDetailsCtrl.currentDomain.org_init_path">
+              </div>
+              <div class="col-sm-1" style="margin-left:-20px; margin-top:5px;">/skykit</div>
+              <div class="col-sm-4">
+                <p
+                  ng-show="domainForm.org_unit_path.$invalid"  class="help-block">
+                  Invalid Chrome Organization Unit Path
+                </p>
+              </div>
+            </div>
+
             <div class="form-group">
               <div class="col-sm-offset-3 col-sm-9">
                 <input type="checkbox"
