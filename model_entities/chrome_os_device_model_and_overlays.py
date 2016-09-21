@@ -88,14 +88,19 @@ class ChromeOsDevice(ndb.Model):
 
     @property
     def overlays(self):
-        return OverlayTemplate.get_overlay_template_for_device(self.key)
+        tenant_entity = self.tenant_key.get()
+        if tenant_entity.overlays_override:
+            return OverlayTemplate.get_overlay_template_for_tenant(tenant_entity.key)
+        else:
+            return OverlayTemplate.get_overlay_template_for_device(self.key)
 
     @property
     def overlays_as_dict(self):
         """ This method is offered because restler doesn't support keyProperty serialization beyond a single child"""
         json = ndb_json.dumps(self.overlays)
         python_dict = ndb_json.loads(json)
-        del python_dict["device_key"]
+        if "device_key" in python_dict:
+            del python_dict["device_key"]
         for key, value in python_dict.iteritems():
             if key != "key":
                 if python_dict[key]:
@@ -480,7 +485,13 @@ class Tenant(ndb.Model):
     enrollment_password = ndb.StringProperty(required=False, indexed=False)
     organization_unit_id = ndb.StringProperty(required=False, indexed=True)
     organization_unit_path = ndb.StringProperty(required=False, indexed=True)
+    overlays_available = ndb.BooleanProperty(default=False, required=True, indexed=True)
+    overlays_override = ndb.BooleanProperty(default=False, required=True, indexed=True)
     class_version = ndb.IntegerProperty()
+
+    @property
+    def overlays(self):
+        OverlayTemplate.create_or_get_by_tenant_key(self.key)
 
     def get_domain(self):
         return self.domain_key.get()
@@ -995,7 +1006,9 @@ class OverlayTemplate(ndb.Model):
     top_right = ndb.KeyProperty(kind=Overlay, required=False)
     bottom_left = ndb.KeyProperty(kind=Overlay, required=False)
     bottom_right = ndb.KeyProperty(kind=Overlay, required=False)
-    device_key = ndb.KeyProperty(kind=ChromeOsDevice, required=True)
+    # an OverlayTemplate may be associated with either a device or a tenant
+    device_key = ndb.KeyProperty(kind=ChromeOsDevice, required=False)
+    tenant_key = ndb.KeyProperty(kind=ChromeOsDevice, required=False)
 
     def image_in_use(self, image_key):
         in_use_dict = {
@@ -1041,16 +1054,7 @@ class OverlayTemplate(ndb.Model):
         overlay_template = OverlayTemplate.query(OverlayTemplate.device_key == device_key).fetch()
 
         if not overlay_template:
-            nullOverlay = Overlay.create_or_get(None)
-            overlay_template = OverlayTemplate(
-                device_key=device_key,
-                top_left=nullOverlay.key,
-                top_right=nullOverlay.key,
-                bottom_left=nullOverlay.key,
-                bottom_right=nullOverlay.key
-            )
-            overlay_template.put()
-
+            overlay_template = None
         else:
             overlay_template = overlay_template[0]
 
@@ -1066,6 +1070,37 @@ class OverlayTemplate(ndb.Model):
             nullOverlay = Overlay.create_or_get(None)
             overlay_template = OverlayTemplate(
                 device_key=device_key,
+                top_left=nullOverlay.key,
+                top_right=nullOverlay.key,
+                bottom_left=nullOverlay.key,
+                bottom_right=nullOverlay.key
+            )
+            overlay_template.put()
+            return overlay_template
+
+    @staticmethod
+    # plural, but will always return the 0th index since we are only supporting one template per device for now
+    def get_overlay_template_for_tenant(tenant_key):
+        overlay_template = OverlayTemplate.query(OverlayTemplate.tenant_key == tenant_key).fetch()
+
+        if not overlay_template:
+            overlay_template = None
+
+        else:
+            overlay_template = overlay_template[0]
+
+        return overlay_template
+
+    @staticmethod
+    def create_or_get_by_tenant_key(tenant_key):
+        existing_template = OverlayTemplate.get_overlay_template_for_tenant(tenant_key)
+        if existing_template:
+            return existing_template
+
+        else:
+            nullOverlay = Overlay.create_or_get(None)
+            overlay_template = OverlayTemplate(
+                tenant_key=tenant_key,
                 top_left=nullOverlay.key,
                 top_right=nullOverlay.key,
                 bottom_left=nullOverlay.key,
