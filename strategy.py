@@ -134,9 +134,9 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'playlistId': lambda o, field_name, context: o.playlist_id},
     {'lastError': lambda o, field_name, context: o.last_error},
     {'archived': lambda o, field_name, context: o.archived},
-    {'overlay_status': lambda o, field_name, context: o.overlay_available},
-    {'controlsMode': lambda  o, field_name, context: o.controls_mode},
-    {'overlay': lambda o, field_name, context: o.overlays_as_dict if o.overlay_available else None}
+    {'controlsMode': lambda o, field_name, context: o.controls_mode},
+    {'overlayStatus': lambda o, field_name, context: o.overlay_available},
+    {'overlays': lambda o, field_name, context: o.overlays_as_dict if o.overlay_available else None}
 
 ]
 

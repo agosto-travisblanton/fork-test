@@ -95,7 +95,24 @@ class ChromeOsDevice(ndb.Model):
     def overlays_as_dict(self):
         """ This method is offered because restler doesn't support keyProperty serialization beyond a single child"""
         json = ndb_json.dumps(self.overlays)
-        return ndb_json.loads(json)
+        python_dict = ndb_json.loads(json)
+        del python_dict["device_key"]
+        for key, value in python_dict.iteritems():
+            if key != "key":
+                if python_dict[key]:
+                    # Player team wants the positional key to also be in a field called "gravity"
+                    python_dict[key]["gravity"] = key
+                    if python_dict[key]["type"] == "logo":
+                        python_dict[key]["name"] = python_dict[key]["image_key"]["name"]
+                        del python_dict[key]["image_key"]["tenant_key"]
+                        python_dict[key]["imageKey"] = python_dict[key]["image_key"]
+                        del python_dict[key]["image_key"]
+                    else:
+                        python_dict[key]["name"] = python_dict[key]["type"]
+                        if python_dict[key]["name"] == None:
+                            python_dict[key]["name"] = "none"
+
+        return python_dict
 
     def enable_overlays(self):
         self.overlay_available = True
@@ -943,26 +960,30 @@ class Location(ndb.Model):
 #####################################################
 @ae_ndb_serializer
 class Image(ndb.Model):
-    svg_rep = ndb.TextProperty(required=True)
+    filepath = ndb.StringProperty(required=True, indexed=True)
     name = ndb.StringProperty(required=True, indexed=True)
     tenant_key = ndb.KeyProperty(kind=Tenant, required=True)
+
+    @property
+    def gcs_path(self):
+        return self.tenant_key.get().tenant_code + "/" + self.name
 
     @staticmethod
     def exists_within_tenant(tenant_key, name):
         return Image.query(ndb.AND(Image.tenant_key == tenant_key, Image.name == name)).fetch()
 
     @staticmethod
-    def create(svg_rep, name, tenant_key):
+    def create(filepath, name, tenant_key):
         if not Image.exists_within_tenant(tenant_key, name):
             image = Image(
-                svg_rep=svg_rep,
+                filepath=filepath,
                 name=name,
                 tenant_key=tenant_key
             )
             image.put()
             return image
         else:
-            return False
+            raise ValueError("This filename already exists in this tenant")
 
     @staticmethod
     def get_by_tenant_key(tenant_key):
@@ -975,13 +996,18 @@ class Image(ndb.Model):
 @ae_ndb_serializer
 class Overlay(ndb.Model):
     type = ndb.StringProperty(indexed=True, required=False)
+    size = ndb.StringProperty(indexed=True, required=False)
     # an overlay is optionally associated with an image
     image_key = ndb.KeyProperty(kind=Image, required=False)
 
     @staticmethod
-    def create_or_get(overlay_type, image_urlsafe_key=None):
+    def create_or_get(overlay_type, size="original", image_urlsafe_key=None):
+        size_options = ["original", "large", "small"]
+        if size and size.lower() not in size_options:
+            raise ValueError("Overlay size must be in {}".format(size_options))
+
         # not an overlay with an image that doesn't have a image_urlsafe_key
-        if overlay_type == "LOGO":
+        if overlay_type and overlay_type.lower() == "logo":
             if image_urlsafe_key == None:
                 raise ValueError("You must provide an image_key if you are creating an overlay logo")
 
@@ -998,8 +1024,9 @@ class Overlay(ndb.Model):
         # this type of overlay (or type and logo combination) has not been created yet
         else:
             overlay = Overlay(
-                type=overlay_type,
-                image_key=image_key
+                type=overlay_type.lower() if overlay_type else overlay_type,
+                image_key=image_key,
+                size=size.lower() if size else size
             )
 
             overlay.put()
@@ -1014,6 +1041,44 @@ class OverlayTemplate(ndb.Model):
     bottom_left = ndb.KeyProperty(kind=Overlay, required=False)
     bottom_right = ndb.KeyProperty(kind=Overlay, required=False)
     device_key = ndb.KeyProperty(kind=ChromeOsDevice, required=True)
+
+    def image_in_use(self, image_key):
+        in_use_dict = {
+            "top_left": False,
+            "top_right": False,
+            "bottom_left": False,
+            "bottom_right": False
+        }
+
+        top_left = self.top_left.get()
+        if top_left:
+            top_left_image = top_left.image_key
+            if top_left_image:
+                if top_left_image.get().key == image_key:
+                    in_use_dict["top_left"] = True
+
+        top_right = self.top_right.get()
+        if top_right:
+            top_right_image = top_right.image_key
+            if top_right_image:
+                if top_right_image.get().key == image_key:
+                    in_use_dict["top_right"] = True
+
+        bottom_left = self.bottom_left.get()
+        if bottom_left:
+            bottom_left_image = bottom_left.image_key
+            if bottom_left_image:
+                if bottom_left_image.get().key == image_key:
+                    in_use_dict["bottom_left"] = True
+
+        bottom_right = self.bottom_right.get()
+        if bottom_right:
+            bottom_right_image = bottom_right.image_key
+            if bottom_right_image:
+                if bottom_right_image.get().key == image_key:
+                    in_use_dict["bottom_right"] = True
+
+        return in_use_dict
 
     @staticmethod
     # plural, but will always return the 0th index since we are only supporting one template per device for now
@@ -1055,22 +1120,22 @@ class OverlayTemplate(ndb.Model):
             return overlay_template
 
     # expects a a dictionary with config about overlay
-    def set_overlay(self, position, overlay_type, image_urlsafe_key=None):
+    def set_overlay(self, position, overlay_type, size="original", image_urlsafe_key=None):
 
-        overlay = Overlay.create_or_get(overlay_type=overlay_type, image_urlsafe_key=image_urlsafe_key)
+        overlay = Overlay.create_or_get(overlay_type=overlay_type, size=size, image_urlsafe_key=image_urlsafe_key)
 
-        if position.upper() == "TOP_LEFT":
+        if position.lower() == "top_left":
             self.top_left = overlay.key
             self.put()
 
-        elif position.upper() == "BOTTOM_LEFT":
+        elif position.upper() == "bottom_left":
             self.bottom_left = overlay.key
             self.put()
 
-        elif position.upper() == "BOTTOM_RIGHT":
+        elif position.upper() == "bottom_right":
             self.bottom_right = overlay.key
             self.put()
 
-        elif position.upper() == "TOP_RIGHT":
+        elif position.upper() == "top_right":
             self.top_right = overlay.key
             self.put()

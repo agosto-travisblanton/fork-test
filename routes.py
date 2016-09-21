@@ -2,7 +2,8 @@ from env_setup import setup
 from provisioning_env import (
     on_development_server,
     on_integration_server,
-    on_qa_server
+    on_qa_server,
+    on_test_harness
 )
 
 setup()
@@ -361,6 +362,12 @@ application = WSGIApplication(
         ############################################################
         # IMAGE
         ############################################################
+        Route(r'/api/v1/image/<image_urlsafe_key>',
+              handler='handlers.image_handler.ImageHandler',
+              name='delete_image',
+              handler_method='delete_image',
+              methods=['DELETE'],
+              ),
 
         Route(r'/api/v1/image/<image_urlsafe_key>',
               handler='handlers.image_handler.ImageHandler',
@@ -513,3 +520,9 @@ if on_development_server or on_integration_server or on_qa_server:
 
     for route in dev_routes:
         application.router.add(route)
+
+if on_development_server or on_test_harness:
+    application.router.add(Route(r'/_gcs/download/<base64_filename>',
+                                 handler='handlers.gcs.DownloadFileHandler',
+                                 name='gcs-download'
+                                 ))
