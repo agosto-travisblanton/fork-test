@@ -514,8 +514,8 @@ class Tenant(ndb.Model):
             urlsafe_key=domain_key.urlsafe(),
             kind_cls=Domain,
             abort_on_not_found=True)
-        if domain.organization_path_prefix:
-            organization_unit_path = '{0}/skykit/{1}'.format(domain.organization_path_prefix, tenant_code)
+        if domain.organization_unit_path:
+            organization_unit_path = '{0}/{1}'.format(domain.organization_unit_path, tenant_code)
         else:
             organization_unit_path = '/skykit/{0}'.format(tenant_code)
         enrollment_password = cls.generate_enrollment_password(config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE)

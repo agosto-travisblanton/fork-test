@@ -9,7 +9,7 @@ class Domain(ndb.Model):
     name = ndb.StringProperty(required=True, indexed=True)
     distributor_key = ndb.KeyProperty(kind=Distributor, required=True, indexed=True)
     impersonation_admin_email_address = ndb.StringProperty(required=True, indexed=True)
-    organization_path_prefix = ndb.StringProperty(required=False, indexed=True)
+    organization_unit_path = ndb.StringProperty(required=False, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     active = ndb.BooleanProperty(default=True, required=True, indexed=True)
@@ -27,11 +27,11 @@ class Domain(ndb.Model):
 
     @classmethod
     def create(cls, name, distributor_key, impersonation_admin_email_address, active=True,
-               organization_path_prefix=None):
+               organization_unit_path=None):
         return cls(distributor_key=distributor_key,
                    name=name.strip().lower(),
                    impersonation_admin_email_address=impersonation_admin_email_address,
-                   organization_path_prefix=organization_path_prefix,
+                   organization_unit_path=organization_unit_path,
                    active=active)
 
     @classmethod
