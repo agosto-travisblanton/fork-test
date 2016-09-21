@@ -1,6 +1,8 @@
 import json
 from routes import application
 from webtest import AppError
+from models import Image
+from integrations.cloud_storage.cloud_storage_api import create_file
 
 from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
@@ -8,13 +10,12 @@ from provisioning_distributor_user_base_test import ProvisioningDistributorUserB
 class OverlayHandlerTest(ProvisioningDistributorUserBase):
     def setUp(self):
         super(OverlayHandlerTest, self).setUp()
-        self.svg_rep = "ffdkfdkfsklfsljkflksfjlkfsa"
 
     def test_post_overlay_fails_without_associated_image_key(self):
         uri = application.router.build(None, 'post-overlay', None, {"device_urlsafe_key": self.device_key.urlsafe()})
         request_parameters = {
-            "position": "TOP_LEFT",
-            "type": "LOGO",
+            "position": "top_left",
+            "type": "logo",
             "image_key": None
         }
         with self.assertRaises(AppError) as cm:
@@ -22,11 +23,17 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
             self.assertEqual(response.status_int, 400)
 
     def _create_image(self):
-        request_parameters = {'svg_rep': self.svg_rep, 'name': 'some_name'}
-        uri = application.router.build(None, 'manage-image', None, {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
-        response = self.app.post_json(uri, params=request_parameters)
-        json_response = json.loads(response.body)
-        return json_response["key"]
+        fileContent = open('testFile.png').read()
+        fileName = "aFile.png"
+        contentType = "image/png"
+        filepath = create_file(fileContent,
+                               fileName,
+                               contentType,
+                               self.tenant.tenant_code)
+
+        image_entity = Image.create(filepath=filepath, name=fileName,
+                                    tenant_key=self.tenant.key)
+        return image_entity.key.urlsafe()
 
     def test_post_overlay_succeeds_with_associated_image_key(self):
         key = self._create_image()
@@ -35,7 +42,7 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
 
         request_parameters = {
             "top_left": {
-                "type": "LOGO",
+                "type": "logo",
                 "image_key": key
             }
         }
@@ -45,8 +52,9 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
         response_json = json.loads(response.body)
         self.assertEqual(response_json["success"], True)
         overlays = response_json["overlay_template"]
-        self.assertEqual(overlays["top_left"]["type"], "LOGO")
-        self.assertEqual(overlays["top_left"]["image_key"]["key"], key)
+        self.assertEqual(overlays["top_left"]["type"], "logo")
+        print overlays["top_left"]
+        self.assertEqual(overlays["top_left"]["imageKey"]["key"], key)
         self.assertEqual(response.status_int, 200)
 
         # ensure get chromeosdevice does not yet respond with overlays
@@ -56,7 +64,7 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
                                        {'device_urlsafe_key': self.device_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        overlay = response_json["overlay"]
+        overlay = response_json["overlays"]
         self.assertFalse(overlay)
 
         # enable overlays for device so that the posted overlay will be included in the device representation
@@ -69,6 +77,7 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
                                        {'device_urlsafe_key': self.device_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        overlay = response_json["overlay"]
-        self.assertEqual(overlay["top_left"]["type"], "LOGO")
-        self.assertEqual(overlay["top_left"]["image_key"]["key"], key)
+        overlay = response_json["overlays"]
+        self.assertEqual(overlay["top_left"]["type"], "logo")
+        print overlay["top_left"]
+        self.assertEqual(overlay["top_left"]["imageKey"]["key"], key)
