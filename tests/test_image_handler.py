@@ -2,8 +2,9 @@ import json
 from models import Image, Overlay, OverlayTemplate
 from routes import application
 from integrations.cloud_storage.cloud_storage_api import create_file
-
+import device_message_processor
 from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
+from mockito import when, any as any_matcher
 
 
 class ImageHandlerTest(ProvisioningDistributorUserBase):
@@ -36,6 +37,8 @@ class ImageHandlerTest(ProvisioningDistributorUserBase):
 
     def test_delete(self):
         key = self._create_image()
+        when(device_message_processor).change_intent(any_matcher(str), any_matcher(str), any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
         overlay_type = "logo"
         Overlay.create_or_get(overlay_type, image_urlsafe_key=key)
         overlay_template = OverlayTemplate.get_overlay_template_for_device(self.device.key)
