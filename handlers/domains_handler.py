@@ -4,6 +4,7 @@ import logging
 from google.appengine.ext import ndb
 from webapp2 import RequestHandler
 
+from app_config import config
 from decorators import requires_api_token
 from integrations.directory_api.chrome_os_devices_api import ChromeOsDevicesApi
 from integrations.directory_api.organization_units_api import OrganizationUnitsApi
@@ -57,6 +58,9 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
             if impersonation_admin_email_address is None or impersonation_admin_email_address == '':
                 status = 400
                 error_message = 'The impersonation_admin_email_address parameter is invalid.'
+            organization_unit_path = request_json.get('organization_unit_path')
+            if organization_unit_path is None or organization_unit_path == '':
+                organization_unit_path = config.DEFAULT_OU_PATH
             distributor_urlsafe_key = self.request.headers.get('X-Provisioning-Distributor')
             if distributor_urlsafe_key is None or distributor_urlsafe_key == '':
                 status = 400
@@ -65,6 +69,7 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
                 domain = Domain.create(distributor_key=ndb.Key(urlsafe=distributor_urlsafe_key),
                                        name=name,
                                        impersonation_admin_email_address=impersonation_admin_email_address,
+                                       organization_unit_path=organization_unit_path,
                                        active=active)
                 domain_key = domain.put()
                 domain_uri = self.request.app.router.build(None,
@@ -96,6 +101,10 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
         else:
             request_json = json.loads(self.request.body)
             domain.active = request_json.get('active')
+            organization_unit_path = request_json.get('organization_unit_path')
+            if organization_unit_path is None or organization_unit_path == '':
+                organization_unit_path = config.DEFAULT_OU_PATH
+            domain.organization_unit_path = organization_unit_path
             domain.put()
             self.response.headers.pop('Content-Type', None)
             self.response.set_status(status, message)

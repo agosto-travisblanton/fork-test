@@ -155,7 +155,7 @@ class TestTenantModel(BaseTest):
                                distributor_key=self.distributor_key,
                                impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                active=True,
-                               organization_path=organization_unit_path)
+                               organization_unit_path=organization_unit_path)
         domain_key = domain.put()
         tenant_with_prefix_on_domain = Tenant.create(tenant_code=self.TENANT_CODE,
                                                      name=self.NAME,
@@ -165,7 +165,7 @@ class TestTenantModel(BaseTest):
                                                      domain_key=domain_key,
                                                      active=False)
         tenant_with_prefix_on_domain.put()
-        expected_organization_unit_path = '{0}/skykit/{1}'.format(organization_unit_path, self.TENANT_CODE)
+        expected_organization_unit_path = '{0}/{1}'.format(organization_unit_path, self.TENANT_CODE)
         self.assertEqual(expected_organization_unit_path, tenant_with_prefix_on_domain.organization_unit_path)
 
     def test_create_sets_enrollment_password(self):

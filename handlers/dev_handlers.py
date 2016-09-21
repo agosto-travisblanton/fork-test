@@ -278,6 +278,7 @@ def make_data_for_a_distributor():
         domain = Domain.create(name=DOMAIN,
                                distributor_key=distributor.key,
                                impersonation_admin_email_address='test@skykit.com',
+                               organization_unit_path=config.DEFAULT_OU_PATH,
                                active=True)
         domain.put()
         print 'Domain ' + domain.name + ' created'
