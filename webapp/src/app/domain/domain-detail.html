@@ -61,23 +61,24 @@
                 </p>
               </div>
             </div>
+
             <div class="form-group"
-                 ng-class="{ 'has-error' : domainForm.org_unit_path.$invalid && !domainForm.org_unit_path.$pristine }">
-              <label for="impersonationAdminEmailAddress" class="col-sm-3 control-label">
-                Chrome Organization Unit Path</label>
-              <div class="col-sm-3">
+                 ng-class="{ 'has-error' : domainForm.organization_unit_path.$invalid }">
+              <label for="organizationUnitPath" class="col-sm-3 control-label">Organization Unit Path</label>
+              <div class="col-sm-4">
                 <input type="text"
                        class="form-control"
-                       name="orgUnitPath"
-                       id="orgUnitPath"
+                       name="organizationUnitPath"
+                       id="organizationUnitPath"
+                       ng-model="domainDetailsCtrl.currentDomain.organization_unit_path"
                        ng-readonly="domainDetailsCtrl.editMode"
-                       ng-model="domainDetailsCtrl.currentDomain.org_init_path">
+                       required>
               </div>
-              <div class="col-sm-1" style="margin-left:-20px; margin-top:5px;">/skykit</div>
-              <div class="col-sm-4">
+              <div class="col-sm-5">
                 <p
-                  ng-show="domainForm.org_unit_path.$invalid"  class="help-block">
-                  Invalid Chrome Organization Unit Path
+                  ng-show="domainForm.organization_unit_path.$invalid && !domainForm.name.$pristine"
+                  class="help-block">
+                  Invalid Organization Unit Path.
                 </p>
               </div>
             </div>
