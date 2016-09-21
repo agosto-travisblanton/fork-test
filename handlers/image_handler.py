@@ -3,17 +3,15 @@ from models import Tenant, Image, OverlayTemplate, Overlay
 from restler.serializers import json_response
 from integrations.cloud_storage.cloud_storage_api import create_file, delete_file
 import logging
-from device_message_processor import change_intent
 from google.appengine.ext.deferred import deferred
 from app_config import config
 
 
-def update_device_rep_in_tenant_devices(host_url, tenant_devices):
-    for each_device in tenant_devices:
+def update_device_rep_in_tenant_devices(host_url, device):
         change_intent(
-            gcm_registration_id=each_device.gcm_registration_id,
+            gcm_registration_id=device.gcm_registration_id,
             payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
-            device_urlsafe_key=each_device.key.urlsafe(),
+            device_urlsafe_key=device.key.urlsafe(),
             host=host_url,
             user_identifier='system (overlay update)'
         )
@@ -23,9 +21,7 @@ class ImageHandler(ExtendedSessionRequestHandler):
     def delete_image(self, image_urlsafe_key):
         image = self.validate_and_get(image_urlsafe_key, Image, abort_on_not_found=True)
         image_tenant = image.tenant_key.get()
-        tenant_devices_managed = list(Tenant.find_devices(image_tenant.key, unmanaged=False))
-        tenant_devices_unmanged = list(Tenant.find_devices(image_tenant.key, unmanaged=True))
-        tenant_devices = tenant_devices_managed + tenant_devices_unmanged
+        tenant_devices = image_tenant.devices
         for each_device in tenant_devices:
             device_overlay_template = OverlayTemplate.get_overlay_template_for_device(each_device.key)
             image_in_use_in_posititions = device_overlay_template.image_in_use(image.key)
@@ -42,10 +38,10 @@ class ImageHandler(ExtendedSessionRequestHandler):
                         device_overlay_template.bottom_right = none_overlay.key
 
                     device_overlay_template.put()
-
-        deferred.defer(update_device_rep_in_tenant_devices, self.request.host_url, tenant_devices)
+                    deferred.defer(update_device_rep_in_tenant_devices, self.request.host_url, each_device)
 
         deleted_file = delete_file(image.gcs_path)
+
         if deleted_file:
             image.key.delete()
             json_response(self.response,

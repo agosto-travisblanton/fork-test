@@ -359,6 +359,13 @@ application = WSGIApplication(
               methods=['POST'],
               ),
 
+        Route(r'/api/v1/overlay/tenant/<tenant_urlsafe_key>',
+              handler='handlers.overlay_handler.OverlayHandler',
+              name='post_tenant_overlay',
+              handler_method='post_tenant_overlay',
+              methods=['POST'],
+              ),
+
         ############################################################
         # IMAGE
         ############################################################

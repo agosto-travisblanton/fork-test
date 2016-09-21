@@ -117,9 +117,7 @@ function DeviceDetailsCtrl($log,
   vm.getTenantImages = () => {
     vm.OVERLAY_TYPES = [
       {size: "default", type: null, name: "none", realName: "none", new: false, image_key: null},
-      {size: "small", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
-      {size: "large", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
-      {size: "default", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
+      {size: null, type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
     ]
 
     ProgressBarService.start();

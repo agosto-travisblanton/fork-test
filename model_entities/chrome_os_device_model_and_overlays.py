@@ -4,8 +4,9 @@ import uuid
 from datetime import datetime
 from google.appengine.datastore.datastore_query import Cursor
 from google.appengine.ext import ndb
-
+from google.appengine.ext.deferred import deferred
 import ndb_json
+from device_message_processor import change_intent
 from app_config import config
 from domain_model import Domain
 from entity_groups import TenantEntityGroup
@@ -74,7 +75,7 @@ class ChromeOsDevice(ndb.Model):
     registration_correlation_identifier = ndb.StringProperty(required=False, indexed=True)
     archived = ndb.BooleanProperty(default=False, required=True, indexed=True)
     panel_sleep = ndb.BooleanProperty(default=False, required=True, indexed=True)
-    overlay_available = ndb.BooleanProperty(default=False, required=True, indexed=True)
+    overlays_available = ndb.BooleanProperty(default=False, required=True, indexed=True)
     controls_mode = ndb.StringProperty(required=False, indexed=True, default='invisible')
     class_version = ndb.IntegerProperty()
 
@@ -90,9 +91,9 @@ class ChromeOsDevice(ndb.Model):
     def overlays(self):
         tenant_entity = self.tenant_key.get()
         if tenant_entity.overlays_override:
-            return OverlayTemplate.get_overlay_template_for_tenant(tenant_entity.key)
+            return OverlayTemplate.create_or_get_by_tenant_key(tenant_entity.key)
         else:
-            return OverlayTemplate.get_overlay_template_for_device(self.key)
+            return OverlayTemplate.create_or_get_by_device_key(self.key)
 
     @property
     def overlays_as_dict(self):
@@ -488,6 +489,38 @@ class Tenant(ndb.Model):
     overlays_available = ndb.BooleanProperty(default=False, required=True, indexed=True)
     overlays_override = ndb.BooleanProperty(default=False, required=True, indexed=True)
     class_version = ndb.IntegerProperty()
+
+    @property
+    def devices(self, unmanaged=True, managed=True):
+        if unmanaged and managed:
+            return ChromeOsDevice.query(ChromeOsDevice.tenant_key == self.key).fetch()
+        elif unmanaged and not managed:
+            return ChromeOsDevice.query(ChromeOsDevice.tenant_key == self.key,
+                                        ChromeOsDevice.is_unmanaged_device == True).fetch()
+        elif managed and not managed:
+            return ChromeOsDevice.query(ChromeOsDevice.tenant_key == self.key,
+                                        ChromeOsDevice.is_unmanaged_device == False).fetch()
+        else:
+            raise ValueError("You must choose either an unmanaged player, a managed player, or both.")
+
+    def gcm_update_devices(self, host, user_identifier, deferred_call=True):
+        for each_device in self.devices:
+            if deferred_call:
+                deferred.defer(
+                    change_intent,
+                    gcm_registration_id=each_device.gcm_registration_id,
+                    payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                    device_urlsafe_key=each_device.key.urlsafe(),
+                    host=host,
+                    user_identifier=user_identifier
+                )
+            else:
+                change_intent(
+                    gcm_registration_id=each_device.gcm_registration_id,
+                    payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                    device_urlsafe_key=each_device.key.urlsafe(),
+                    host=host,
+                    user_identifier=user_identifier)
 
     @property
     def overlays(self):
@@ -1050,7 +1083,7 @@ class OverlayTemplate(ndb.Model):
 
     @staticmethod
     # plural, but will always return the 0th index since we are only supporting one template per device for now
-    def get_overlay_template_for_device(device_key):
+    def __get_overlay_template_for_device(device_key):
         overlay_template = OverlayTemplate.query(OverlayTemplate.device_key == device_key).fetch()
 
         if not overlay_template:
@@ -1062,7 +1095,7 @@ class OverlayTemplate(ndb.Model):
 
     @staticmethod
     def create_or_get_by_device_key(device_key):
-        existing_template = OverlayTemplate.get_overlay_template_for_device(device_key)
+        existing_template = OverlayTemplate.__get_overlay_template_for_device(device_key)
         if existing_template:
             return existing_template
 
@@ -1079,13 +1112,11 @@ class OverlayTemplate(ndb.Model):
             return overlay_template
 
     @staticmethod
-    # plural, but will always return the 0th index since we are only supporting one template per device for now
-    def get_overlay_template_for_tenant(tenant_key):
+    def __get_overlay_template_for_tenant(tenant_key):
         overlay_template = OverlayTemplate.query(OverlayTemplate.tenant_key == tenant_key).fetch()
 
         if not overlay_template:
             overlay_template = None
-
         else:
             overlay_template = overlay_template[0]
 
@@ -1093,9 +1124,9 @@ class OverlayTemplate(ndb.Model):
 
     @staticmethod
     def create_or_get_by_tenant_key(tenant_key):
-        existing_template = OverlayTemplate.get_overlay_template_for_tenant(tenant_key)
+        existing_template = OverlayTemplate.__get_overlay_template_for_tenant(tenant_key)
         if existing_template:
-            return existing_template
+            return existing_template[0]
 
         else:
             nullOverlay = Overlay.create_or_get(None)
