@@ -38,7 +38,6 @@ class TaskQueueTestCase(unittest.TestCase):
         self.testbed.init_app_identity_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_blobstore_stub()
-
         self.testbed.init_taskqueue_stub(
             root_path=basedir)
         self.taskqueue_stub = self.testbed.get_stub(
