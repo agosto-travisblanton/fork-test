@@ -8,6 +8,17 @@ from google.appengine.ext.deferred import deferred
 from app_config import config
 
 
+def update_device_rep_in_tenant_devices(host_url, tenant_devices):
+    for each_device in tenant_devices:
+        change_intent(
+            gcm_registration_id=each_device.gcm_registration_id,
+            payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+            device_urlsafe_key=each_device.key.urlsafe(),
+            host=host_url,
+            user_identifier='system (overlay update)'
+        )
+
+
 class ImageHandler(ExtendedSessionRequestHandler):
     def delete_image(self, image_urlsafe_key):
         image = self.validate_and_get(image_urlsafe_key, Image, abort_on_not_found=True)
@@ -32,12 +43,7 @@ class ImageHandler(ExtendedSessionRequestHandler):
 
                     device_overlay_template.put()
 
-                    deferred.defer(change_intent, gcm_registration_id=each_device.gcm_registration_id,
-                                   payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
-                                   device_urlsafe_key=each_device.key.urlsafe(),
-                                   host=self.request.host_url,
-                                   user_identifier='system (overlay update)'
-                                   )
+        deferred.defer(update_device_rep_in_tenant_devices, self.request.host_url, tenant_devices)
 
         deleted_file = delete_file(image.gcs_path)
         if deleted_file:
