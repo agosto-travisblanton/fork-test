@@ -92,4 +92,6 @@ class AppConfig(Config):
 
     DEFAULT_TIMEZONE = None
 
+    DEFAULT_OU_PATH = None
+
 config = AppConfig.get_config()

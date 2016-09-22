@@ -1,4 +1,5 @@
 from env_setup import setup
+from migration.set_default_organization_unit_path_on_domains import SetDefaultOrganizationUnitPathOnDomains
 
 setup()
 
@@ -39,6 +40,7 @@ MIGRATIONS = [
     SetOverlayStatusToFalse(),
     SetControlsModeToInvisible(),
     HydrateOrganizationUnitIdToNone(),
+    SetDefaultOrganizationUnitPathOnDomains()
 ]
 
 MIGRATIONS_MAP = {migration.name: migration for migration in MIGRATIONS}

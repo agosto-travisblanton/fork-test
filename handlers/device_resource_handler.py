@@ -369,40 +369,33 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                     self.response.set_status(409, error_message)
                     return
                 tenant_code = request_json.get('tenantCode')
-                if tenant_code is None or tenant_code == '':
-                    # attempt to get tenant_code via OU_ID
-                    # start psudeocode
-                    # device = chrome_os_devices_api.get(device_id)
-                    # ou_id = device["ou"]["id"]
-                    # tenant_entity = Tenant.get_by_ou_id(ou_id)
-                    # if not tenant_entity: "ERROR"
-                    status = 400
-                    error_message = 'The tenantCode parameter is invalid.'
-                    self.response.set_status(status, error_message)
-                    registration_request_event.details = error_message
-                    registration_request_event.put()
-                    self.response.set_status(status, error_message)
-                    return
-                tenant = Tenant.find_by_tenant_code(tenant_code)
-                if tenant is None:
-                    status = 400
-                    error_message = 'Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
-                    self.response.set_status(status, error_message)
-                    registration_request_event.details = error_message
-                    registration_request_event.put()
-                    self.response.set_status(status, error_message)
-                    return
+                if tenant_code:
+                    tenant = Tenant.find_by_tenant_code(tenant_code)
+                    if tenant is None:
+                        status = 400
+                        error_message = 'Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
+                        self.response.set_status(status, error_message)
+                        registration_request_event.details = error_message
+                        registration_request_event.put()
+                        self.response.set_status(status, error_message)
+                        logging.error('Cannot resolve tenant_code {0}. Bad tenant code or inactive tenant.'.format(
+                            tenant_code))
+                        return
+                    else:
+                        tenant_key = tenant.key
+                else:
+                    tenant_key = None
                 if status == 201:
-                    device = ChromeOsDevice.create_managed(tenant_key=tenant.key,
+                    device = ChromeOsDevice.create_managed(tenant_key=tenant_key,
                                                            gcm_registration_id=gcm_registration_id,
                                                            mac_address=device_mac_address,
                                                            timezone=timezone,
                                                            registration_correlation_identifier=correlation_id)
                     key = device.put()
                     registration_request_event.device_urlsafe_key = key.urlsafe()
-                    registration_request_event.details = 'register_device: tenant code={0}, mac address={1}, ' \
-                                                         'gcm id = {2}, ' \
-                                                         'device key = {3}'.format(tenant_code, device_mac_address,
+                    registration_request_event.details = 'register_device: mac address={0}, ' \
+                                                         'gcm id = {1}, ' \
+                                                         'device key = {2}'.format(device_mac_address,
                                                                                    gcm_registration_id, key.urlsafe())
                     registration_request_event.put()
                     deferred.defer(register_device,

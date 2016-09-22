@@ -182,6 +182,7 @@ DEVICE_ISSUE_LOG_STRATEGY += [
 DOMAIN_FIELDS = [
     'name',
     'impersonation_admin_email_address',
+    'organization_unit_path',
     'active',
     'created',
     'updated'

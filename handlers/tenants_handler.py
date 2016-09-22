@@ -84,21 +84,17 @@ class TenantsHandler(ExtendedSessionRequestHandler):
             content_manager_base_url = content_manager_base_url.strip().lower()
             notification_emails = delimited_string_to_list(request_json.get('notification_emails'))
             domain_urlsafe_key = self.check_and_get_field('domain_key')
-            domain = self.validate_and_get(urlsafe_key=domain_urlsafe_key,
-                                           kind_cls=Domain,
-                                           abort_on_not_found=True)
+            domain = self.validate_and_get(urlsafe_key=domain_urlsafe_key, kind_cls=Domain, abort_on_not_found=True)
             active = self.check_and_get_field('active')
-            if str(active).lower() != 'true' and str(active).lower() != 'false':
-                status = 400
-                error_message = 'The active parameter is invalid.'
+            if str(active).lower() == 'false':
+                active = False
             else:
-                active = bool(active)
+                active = True
             proof_of_play_logging = self.check_and_get_field('proof_of_play_logging')
-            if str(proof_of_play_logging).lower() != 'true' and str(proof_of_play_logging).lower() != 'false':
-                status = 400
-                error_message = 'The proof_of_play_logging parameter is invalid.'
+            if str(proof_of_play_logging).lower() == 'true':
+                proof_of_play_logging = True
             else:
-                proof_of_play_logging = bool(proof_of_play_logging)
+                proof_of_play_logging = False
             proof_of_play_url = request_json.get('proof_of_play_url')
             if proof_of_play_url is None or proof_of_play_url == '':
                 proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
@@ -147,6 +143,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                                 return
                             else:
                                 tenant.organization_unit_id = ou_result['orgUnitId']
+                                tenant.put()
                                 # 3. Tenant OU created, so create an enrollment user
                                 users_api = UsersApi(
                                     admin_to_impersonate_email_address=impersonation_email)

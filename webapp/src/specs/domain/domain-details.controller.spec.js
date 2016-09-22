@@ -69,6 +69,9 @@ describe('DomainDetailsCtrl', function () {
         return controller = $controller('DomainDetailsCtrl', serviceInjection);
       });
 
+      it('currentDomain.organization_unit_path property should be set to default value', () =>
+        expect(controller.currentDomain.organization_unit_path).toBe('/skykit'));
+
       it('devicesAccess property should be false', () => expect(controller.devicesAccess).toBeFalsy());
 
       it('orgUnitsAccess property should be false', () => expect(controller.orgUnitsAccess).toBeFalsy());

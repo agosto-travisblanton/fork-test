@@ -155,16 +155,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertTrue('Bad response: 409 Conflict gcm registration id is already assigned to a managed device.'
                         in context.exception.message)
 
-    def test_device_resource_handler_post_no_returns_bad_response_for_empty_tenant_code(self):
-        request_body = {'macAddress': self.MAC_ADDRESS,
-                        'gcmRegistrationId': 'foobar',
-                        'tenantCode': None}
-        with self.assertRaises(AppError) as context:
-            self.app.post('/api/v1/devices', json.dumps(request_body),
-                          headers=self.api_token_authorization_header)
-        self.assertTrue('Bad response: 400 The tenantCode parameter is invalid.'
-                        in context.exception.message)
-
     def test_device_resource_handler_post_no_returns_bad_response_for_empty_gcm(self):
         request_body = {'macAddress': self.MAC_ADDRESS,
                         'gcmRegistrationId': None,

@@ -372,6 +372,8 @@ app_ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE = 8
 
 app_DEFAULT_TIMEZONE = 'America/Chicago'
 
+app_DEFAULT_OU_PATH = '/skykit'
+
 def _DEFAULT_CONTENT_MANAGER_URL():
     if on_development_server or not on_server:
         return 'https://skykit-contentmanager-int.appspot.com'

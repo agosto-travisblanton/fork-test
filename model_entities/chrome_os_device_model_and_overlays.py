@@ -9,6 +9,7 @@ import ndb_json
 from app_config import config
 from domain_model import Domain
 from entity_groups import TenantEntityGroup
+from ndb_mixins import KeyValidatorMixin
 from restler.decorators import ae_ndb_serializer
 from utils.timezone_util import TimezoneUtil
 
@@ -128,15 +129,24 @@ class ChromeOsDevice(ndb.Model):
                 return chrome_os_device_key.get()
 
     @classmethod
-    def create_managed(cls, tenant_key, gcm_registration_id, mac_address, ethernet_mac_address=None, device_id=None,
-                       serial_number=None, archived=False,
-                       model=None, timezone=config.DEFAULT_TIMEZONE, registration_correlation_identifier=None):
+    def create_managed(cls,
+                       gcm_registration_id,
+                       mac_address,
+                       tenant_key=None,
+                       ethernet_mac_address=None,
+                       device_id=None,
+                       serial_number=None,
+                       archived=False,
+                       model=None,
+                       timezone=config.DEFAULT_TIMEZONE,
+                       registration_correlation_identifier=None):
         timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
         proof_of_play_editable = False
-        tenant = tenant_key.get()
-        if tenant:
-            if tenant.proof_of_play_logging:
-                proof_of_play_editable = True
+        if tenant_key:
+            tenant = tenant_key.get()
+            if tenant:
+                if tenant.proof_of_play_logging:
+                    proof_of_play_editable = True
         device = cls(
             device_id=device_id,
             archived=archived,
@@ -485,6 +495,48 @@ class Tenant(ndb.Model):
     def get_domain(self):
         return self.domain_key.get()
 
+    @classmethod
+    def create(cls,
+               tenant_code,
+               name,
+               admin_email,
+               content_server_url,
+               domain_key,
+               active,
+               content_manager_base_url,
+               notification_emails=[],
+               proof_of_play_logging=False,
+               proof_of_play_url=config.DEFAULT_PROOF_OF_PLAY_URL,
+               default_timezone=config.DEFAULT_TIMEZONE):
+
+        validator = KeyValidatorMixin()
+        domain = validator.validate_and_get(
+            urlsafe_key=domain_key.urlsafe(),
+            kind_cls=Domain,
+            abort_on_not_found=True)
+        if domain.organization_unit_path:
+            organization_unit_path = '{0}/{1}'.format(domain.organization_unit_path, tenant_code)
+        else:
+            organization_unit_path = '/skykit/{0}'.format(tenant_code)
+        enrollment_password = cls.generate_enrollment_password(config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE)
+        enrollment_email = '{0}.enrollment@{1}'.format(tenant_code, domain_key.get().name)
+        tenant_entity_group = TenantEntityGroup.singleton()
+        return cls(parent=tenant_entity_group.key,
+                   tenant_code=tenant_code,
+                   name=name,
+                   admin_email=admin_email,
+                   content_server_url=content_server_url,
+                   domain_key=domain_key,
+                   active=active,
+                   content_manager_base_url=content_manager_base_url,
+                   notification_emails=notification_emails,
+                   proof_of_play_logging=proof_of_play_logging,
+                   proof_of_play_url=proof_of_play_url,
+                   default_timezone=default_timezone,
+                   enrollment_password=enrollment_password,
+                   enrollment_email=enrollment_email,
+                   organization_unit_path=organization_unit_path)
+
     @staticmethod
     def generate_enrollment_password(length):
         if not isinstance(length, int) or length < config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE:
@@ -523,6 +575,32 @@ class Tenant(ndb.Model):
             return tenant_entity[0]
         else:
             return None
+
+    @classmethod
+    def find_by_organization_unit_path(cls, organization_unit_path):
+        tenant = Tenant.query(Tenant.organization_unit_path == organization_unit_path,
+                              Tenant.active == True).fetch()
+        if tenant:
+            return tenant[0]
+        else:
+            organization_unit_path_components = organization_unit_path.split('/')
+            last_index = len(organization_unit_path_components) - 1
+            if organization_unit_path[0][0] == '/':  # leading forward slash
+                for i in range(1, last_index):
+                    if organization_unit_path_components[i].lower() == 'skykit':
+                        if organization_unit_path_components[i + 1]:
+                            tenant_code = organization_unit_path_components[i + 1].lower()
+                            tenant = Tenant.find_by_tenant_code(tenant_code)
+                            break
+            else:
+                for i in range(0, last_index):  # no leading forward slash
+                    if organization_unit_path_components[i].lower() == 'skykit':
+                        if organization_unit_path_components[i + 1]:
+                            tenant_code = organization_unit_path_components[i + 1].lower()
+                            tenant = Tenant.find_by_tenant_code(tenant_code)
+                            break
+
+        return tenant
 
     @classmethod
     def is_tenant_code_unique(cls, tenant_code):
@@ -794,39 +872,6 @@ class Tenant(ndb.Model):
             urlsafe_domain_key = tenant.domain_key.urlsafe()
             domain = ndb.Key(urlsafe=urlsafe_domain_key).get()
             return domain.impersonation_admin_email_address
-
-    @classmethod
-    def create(cls,
-               tenant_code,
-               name,
-               admin_email,
-               content_server_url,
-               domain_key,
-               active,
-               content_manager_base_url,
-               notification_emails=[],
-               proof_of_play_logging=False,
-               proof_of_play_url=config.DEFAULT_PROOF_OF_PLAY_URL,
-               default_timezone=config.DEFAULT_TIMEZONE):
-        enrollment_password = cls.generate_enrollment_password(config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE)
-        enrollment_email = '{0}.enrollment@{1}'.format(tenant_code, domain_key.get().name)
-        organization_unit_path = '/skykit/{0}'.format(tenant_code)
-        tenant_entity_group = TenantEntityGroup.singleton()
-        return cls(parent=tenant_entity_group.key,
-                   tenant_code=tenant_code,
-                   name=name,
-                   admin_email=admin_email,
-                   content_server_url=content_server_url,
-                   domain_key=domain_key,
-                   active=active,
-                   content_manager_base_url=content_manager_base_url,
-                   notification_emails=notification_emails,
-                   proof_of_play_logging=proof_of_play_logging,
-                   proof_of_play_url=proof_of_play_url,
-                   default_timezone=default_timezone,
-                   enrollment_password=enrollment_password,
-                   enrollment_email=enrollment_email,
-                   organization_unit_path=organization_unit_path)
 
     @classmethod
     def toggle_proof_of_play_on_tenant_devices(cls, should_be_enabled, tenant_code, tenant_key=None):
