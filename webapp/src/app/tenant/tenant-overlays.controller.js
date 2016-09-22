@@ -41,31 +41,22 @@ function TenantOverlaysCtrl($stateParams,
     })
     promise.catch((err) => {
       ProgressBarService.complete();
+      // TODO: CHANGE THIS TO USE ToastsService
+      alert("error")
       console.log(err)
     })
   }
 
   vm.submitOverlaySettings = () => {
     let overlaySettings = angular.copy(vm.currentTenantCopy.overlays)
-    delete overlaySettings.key;
-    delete overlaySettings.device_key;
-
-    let overlaySettingsCopy = {}
-    for (let k in overlaySettings) {
-      if (typeof overlaySettings[k] === 'string' || overlaySettings[k] instanceof String) {
-        overlaySettingsCopy[k] = JSON.parse(overlaySettings[k])
-      } else {
-        overlaySettingsCopy[k] = overlaySettings[k]
-      }
-    }
 
     ProgressBarService.start();
     let promise = TenantsService.saveOverlaySettings(
       vm.tenantKey,
-      overlaySettingsCopy.bottom_left,
-      overlaySettingsCopy.bottom_right,
-      overlaySettingsCopy.top_right,
-      overlaySettingsCopy.top_left
+      overlaySettings.bottom_left,
+      overlaySettings.bottom_right,
+      overlaySettings.top_right,
+      overlaySettings.top_left
     )
     promise.then((res) => {
       ProgressBarService.complete();
@@ -138,8 +129,6 @@ function TenantOverlaysCtrl($stateParams,
     vm.OVERLAY_TYPES = [
       {size: null, type: null, name: "none", realName: "none", new: false, image_key: null},
       {size: null, type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
-      // {size: "large", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
-      // {size: "default", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
     ]
 
     ProgressBarService.start();

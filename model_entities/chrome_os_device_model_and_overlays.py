@@ -1175,15 +1175,15 @@ class OverlayTemplate(ndb.Model):
             self.top_left = overlay.key
             self.put()
 
-        elif position.upper() == "bottom_left":
+        elif position.lower() == "bottom_left":
             self.bottom_left = overlay.key
             self.put()
 
-        elif position.upper() == "bottom_right":
+        elif position.lower() == "bottom_right":
             self.bottom_right = overlay.key
             self.put()
 
-        elif position.upper() == "top_right":
+        elif position.lower() == "top_right":
             self.top_right = overlay.key
             self.put()
 

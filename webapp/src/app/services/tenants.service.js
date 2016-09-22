@@ -23,7 +23,6 @@ export default class TenantsService {
       top_right,
       top_left,
     }
-
     return this.Restangular.oneUrl('overlay', `/api/v1/overlay/tenant/${tenant_urlsafe_key}`).customPOST(payload);
   }
 

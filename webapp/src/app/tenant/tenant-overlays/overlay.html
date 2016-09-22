@@ -29,7 +29,7 @@
             <div class="col-md-5 col-sm-12">
               <md-input-container>
                 <label>Top-Left</label>
-                <md-select ng-model="vm.currentTenantCopy.overlay.top_left">
+                <md-select ng-model="vm.currentTenantCopy.overlays.top_left">
                   <md-option ng-repeat="overlay in vm.OVERLAY_TYPES"
                              ng-value="overlay"
                              ng-selected="
@@ -46,7 +46,7 @@
             <div class="col-md-5   col-sm-12" style="float: right">
               <md-input-container>
                 <label>Top-Right</label>
-                <md-select ng-model="vm.currentTenantCopy.overlay.top_right">
+                <md-select ng-model="vm.currentTenantCopy.overlays.top_right">
                   <md-option ng-repeat="overlay in vm.OVERLAY_TYPES"
                              ng-value="overlay"
                              ng-selected="
@@ -65,7 +65,7 @@
             <div class="col-md-5  col-sm-12">
               <md-input-container>
                 <label>Bottom-Left</label>
-                <md-select ng-model="vm.currentTenantCopy.overlay.bottom_left">
+                <md-select ng-model="vm.currentTenantCopy.overlays.bottom_left">
                   <md-option ng-repeat="overlay in vm.OVERLAY_TYPES"
                              ng-value="overlay"
                              ng-selected="
@@ -82,7 +82,7 @@
             <div class="col-md-5  col-sm-12" style="float: right">
               <md-input-container>
                 <label>Bottom-Right</label>
-                <md-select ng-model="vm.currentTenantCopy.overlay.bottom_right">
+                <md-select ng-model="vm.currentTenantCopy.overlays.bottom_right">
                   <md-option ng-repeat="overlay in vm.OVERLAY_TYPES"
                              ng-value="overlay"
                              ng-selected="
