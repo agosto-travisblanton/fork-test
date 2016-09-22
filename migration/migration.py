@@ -1,5 +1,4 @@
 from env_setup import setup
-from migration.set_default_organization_unit_path_on_domains import SetDefaultOrganizationUnitPathOnDomains
 
 setup()
 
@@ -27,6 +26,8 @@ from hydrate_default_device_sleep_property import HydrateDefaultDeviceSleepPrope
 from set_overlay_status_to_false import SetOverlayStatusToFalse
 from set_controls_mode_to_invisible import SetControlsModeToInvisible
 from hydrate_organization_unit_id_to_none import HydrateOrganizationUnitIdToNone
+from set_default_organization_unit_path_on_domains import SetDefaultOrganizationUnitPathOnDomains
+
 
 MIGRATIONS = [
     HydrateTenantKeyOnDevices(),
