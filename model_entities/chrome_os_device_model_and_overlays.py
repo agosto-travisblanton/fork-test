@@ -6,7 +6,6 @@ from google.appengine.datastore.datastore_query import Cursor
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 import ndb_json
-from device_message_processor import change_intent
 from app_config import config
 from domain_model import Domain
 from entity_groups import TenantEntityGroup
@@ -89,11 +88,7 @@ class ChromeOsDevice(ndb.Model):
 
     @property
     def overlays(self):
-        tenant_entity = self.tenant_key.get()
-        if tenant_entity.overlays_override:
-            return OverlayTemplate.create_or_get_by_tenant_key(tenant_entity.key)
-        else:
-            return OverlayTemplate.create_or_get_by_device_key(self.key)
+        return OverlayTemplate.create_or_get_by_device_key(self.key)
 
     @property
     def overlays_as_dict(self):
@@ -487,7 +482,7 @@ class Tenant(ndb.Model):
     organization_unit_id = ndb.StringProperty(required=False, indexed=True)
     organization_unit_path = ndb.StringProperty(required=False, indexed=True)
     overlays_available = ndb.BooleanProperty(default=False, required=True, indexed=True)
-    overlays_override = ndb.BooleanProperty(default=False, required=True, indexed=True)
+    overlays_override = ndb.BooleanProperty(default=False, required=False)
     class_version = ndb.IntegerProperty()
 
     @property
@@ -504,6 +499,7 @@ class Tenant(ndb.Model):
             raise ValueError("You must choose either an unmanaged player, a managed player, or both.")
 
     def gcm_update_devices(self, host, user_identifier, deferred_call=True):
+        from device_message_processor import change_intent
         for each_device in self.devices:
             if deferred_call:
                 deferred.defer(
@@ -525,6 +521,32 @@ class Tenant(ndb.Model):
     @property
     def overlays(self):
         OverlayTemplate.create_or_get_by_tenant_key(self.key)
+
+    @property
+    def overlays_as_dict(self):
+        """ This method is offered because restler doesn't support keyProperty serialization beyond a single child"""
+        json = ndb_json.dumps(self.overlays)
+        python_dict = ndb_json.loads(json)
+        if "device_key" in python_dict:
+            del python_dict["device_key"]
+        if "tenant_key" in python_dict:
+            del python_dict["tenant_key"]
+        for key, value in python_dict.iteritems():
+            if key != "key":
+                if python_dict[key]:
+                    # Player team wants the positional key to also be in a field called "gravity"
+                    python_dict[key]["gravity"] = key
+                    if python_dict[key]["type"] == "logo":
+                        python_dict[key]["name"] = python_dict[key]["image_key"]["name"]
+                        del python_dict[key]["image_key"]["tenant_key"]
+                        python_dict[key]["imageKey"] = python_dict[key]["image_key"]
+                        del python_dict[key]["image_key"]
+                    else:
+                        python_dict[key]["name"] = python_dict[key]["type"]
+                        if python_dict[key]["name"] == None:
+                            python_dict[key]["name"] = "none"
+
+        return python_dict
 
     def get_domain(self):
         return self.domain_key.get()
@@ -1040,6 +1062,7 @@ class OverlayTemplate(ndb.Model):
     bottom_left = ndb.KeyProperty(kind=Overlay, required=False)
     bottom_right = ndb.KeyProperty(kind=Overlay, required=False)
     # an OverlayTemplate may be associated with either a device or a tenant
+    # you should never associate an OverlayTemplate with both a device and a tenant at the same time
     device_key = ndb.KeyProperty(kind=ChromeOsDevice, required=False)
     tenant_key = ndb.KeyProperty(kind=ChromeOsDevice, required=False)
 
@@ -1102,6 +1125,7 @@ class OverlayTemplate(ndb.Model):
         else:
             nullOverlay = Overlay.create_or_get(None)
             overlay_template = OverlayTemplate(
+                tenant_key=None,
                 device_key=device_key,
                 top_left=nullOverlay.key,
                 top_right=nullOverlay.key,
@@ -1131,6 +1155,7 @@ class OverlayTemplate(ndb.Model):
         else:
             nullOverlay = Overlay.create_or_get(None)
             overlay_template = OverlayTemplate(
+                device_key=None,
                 tenant_key=tenant_key,
                 top_left=nullOverlay.key,
                 top_right=nullOverlay.key,
@@ -1142,7 +1167,6 @@ class OverlayTemplate(ndb.Model):
 
     # expects a a dictionary with config about overlay
     def set_overlay(self, position, overlay_type, size="default", image_urlsafe_key=None):
-
         overlay = Overlay.create_or_get(overlay_type=overlay_type, size=size, image_urlsafe_key=image_urlsafe_key)
 
         if position.lower() == "top_left":
@@ -1160,3 +1184,19 @@ class OverlayTemplate(ndb.Model):
         elif position.upper() == "top_right":
             self.top_right = overlay.key
             self.put()
+
+    def apply_overlay_template_to_all_tenant_devices(self):
+        if not self.tenant_key:
+            raise ValueError("This OverlayTemplate is not associated with a tenant_key. {}".format(self.key.urlsafe()))
+        else:
+            tenant_entity = self.tenant_key.get()
+            tenant_overlay_template = OverlayTemplate.create_or_get_by_tenant_key(tenant_entity.key)
+            tenant_devices = tenant_entity.devices
+
+            for device in tenant_devices:
+                device_overlay_template = OverlayTemplate.create_or_get_by_device_key(device.key)
+                device_overlay_template.top_left = tenant_overlay_template.top_left
+                device_overlay_template.top_right = tenant_overlay_template.top_right
+                device_overlay_template.bottom_left = tenant_overlay_template.bottom_left
+                device_overlay_template.bottom_right = tenant_overlay_template.bottom_right
+                device_overlay_template.put()
