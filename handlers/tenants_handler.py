@@ -243,7 +243,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
             tenant.default_timezone = default_timezone
         overlay_status = request_json.get('overlayStatus')
         if overlay_status != (None or ''):
-            tenant.overlay_status = overlay_status
+            tenant.overlays_available = overlay_status
         email_list = delimited_string_to_list(request_json.get('notification_emails'))
         tenant.notification_emails = email_list
         domain_key_input = request_json.get('domain_key')

@@ -78,9 +78,9 @@ class OverlayHandler(ExtendedSessionRequestHandler):
                                          overlay_type=overlay_type,
                                          image_urlsafe_key=image_key)
 
-        if tenant.overlays_override:
+        # if tenant.overlays_override:
             # !!! SENDS GCM UPDATE TO ALL DEVICES IN TENANT
-            tenant.gcm_update_devices(host=self.request.host_url, user_identifier="system (overlay override)")
+            # tenant.gcm_update_devices(host=self.request.host_url, user_identifier="system (overlay override)")
 
         return json_response(self.response, {
             "success": True,

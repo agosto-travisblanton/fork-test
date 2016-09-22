@@ -10,13 +10,13 @@
             <md-input-container>
               <md-button
                 class="md-raised md-primary"
-                ng-disabled="vm.currentDevice.overlayStatus"
+                ng-disabled="vm.currentTenant.overlayStatus"
                 ng-click="vm.adjustOverlayStatus(true)">
                 ENABLE
               </md-button>
               <md-button
                 class="md-raised md-primary"
-                ng-disabled="!vm.currentDevice.overlayStatus"
+                ng-disabled="!vm.currentTenant.overlayStatus"
                 ng-click="vm.adjustOverlayStatus(false)">
                 DISABLE
               </md-button>
@@ -24,18 +24,18 @@
           </div>
           <br/>
         </div>
-        <div class="form-group" ng-show="vm.currentDevice.overlayStatus">
+        <div class="form-group" ng-show="vm.currentTenant.overlayStatus">
           <div class="col-md-12">
             <div class="col-md-5 col-sm-12">
               <md-input-container>
                 <label>Top-Left</label>
-                <md-select ng-model="vm.currentDeviceCopy.overlay.top_left">
+                <md-select ng-model="vm.currentTenantCopy.overlay.top_left">
                   <md-option ng-repeat="overlay in vm.OVERLAY_TYPES"
                              ng-value="overlay"
                              ng-selected="
-                             (overlay.realName === vm.currentDevice.overlays.top_left.name)
+                             (overlay.realName === vm.currentTenant.overlays.top_left.name)
                               &&
-                             (overlay.size.toLowerCase() === vm.currentDevice.overlays.top_left.size)
+                             (overlay.size === vm.currentTenant.overlays.top_left.size)
                               ? 'selected' : ''"
                   >
                     {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" + overlay.size.toUpperCase() + ")" : '') }}
@@ -46,13 +46,13 @@
             <div class="col-md-5   col-sm-12" style="float: right">
               <md-input-container>
                 <label>Top-Right</label>
-                <md-select ng-model="vm.currentDeviceCopy.overlay.top_right">
+                <md-select ng-model="vm.currentTenantCopy.overlay.top_right">
                   <md-option ng-repeat="overlay in vm.OVERLAY_TYPES"
                              ng-value="overlay"
                              ng-selected="
-                             (overlay.realName === vm.currentDevice.overlays.top_right.name)
+                             (overlay.realName === vm.currentTenant.overlays.top_right.name)
                               &&
-                             (overlay.size.toLowerCase() === vm.currentDevice.overlays.top_right.size)
+                             (overlay.size === vm.currentTenant.overlays.top_right.size)
                               ? 'selected' : ''"
                   >
                     {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" + overlay.size.toUpperCase() + ")" : '') }}
@@ -65,13 +65,13 @@
             <div class="col-md-5  col-sm-12">
               <md-input-container>
                 <label>Bottom-Left</label>
-                <md-select ng-model="vm.currentDeviceCopy.overlay.bottom_left">
+                <md-select ng-model="vm.currentTenantCopy.overlay.bottom_left">
                   <md-option ng-repeat="overlay in vm.OVERLAY_TYPES"
                              ng-value="overlay"
                              ng-selected="
-                             (overlay.realName === vm.currentDevice.overlays.bottom_left.name)
+                             (overlay.realName === vm.currentTenant.overlays.bottom_left.name)
                               &&
-                             (overlay.size.toLowerCase() === vm.currentDevice.overlays.bottom_left.size)
+                             (overlay.size === vm.currentTenant.overlays.bottom_left.size)
                               ? 'selected' : ''"
                   >
                     {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" + overlay.size.toUpperCase() + ")" : '') }}
@@ -82,13 +82,13 @@
             <div class="col-md-5  col-sm-12" style="float: right">
               <md-input-container>
                 <label>Bottom-Right</label>
-                <md-select ng-model="vm.currentDeviceCopy.overlay.bottom_right">
+                <md-select ng-model="vm.currentTenantCopy.overlay.bottom_right">
                   <md-option ng-repeat="overlay in vm.OVERLAY_TYPES"
                              ng-value="overlay"
                              ng-selected="
-                             (overlay.realName === vm.currentDevice.overlays.bottom_right.name)
+                             (overlay.realName === vm.currentTenant.overlays.bottom_right.name)
                               &&
-                             (overlay.size.toLowerCase() === vm.currentDevice.overlays.bottom_right.size)
+                             (overlay.size === vm.currentTenant.overlays.bottom_right.size)
                               ? 'selected' : ''"
                   >
                     {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" + overlay.size.toUpperCase() + ")" : '') }}

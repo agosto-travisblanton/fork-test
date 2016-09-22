@@ -520,7 +520,7 @@ class Tenant(ndb.Model):
 
     @property
     def overlays(self):
-        OverlayTemplate.create_or_get_by_tenant_key(self.key)
+        return OverlayTemplate.create_or_get_by_tenant_key(self.key)
 
     @property
     def overlays_as_dict(self):
@@ -1066,7 +1066,7 @@ class OverlayTemplate(ndb.Model):
     # an OverlayTemplate may be associated with either a device or a tenant
     # you should never associate an OverlayTemplate with both a device and a tenant at the same time
     device_key = ndb.KeyProperty(kind=ChromeOsDevice, required=False)
-    tenant_key = ndb.KeyProperty(kind=ChromeOsDevice, required=False)
+    tenant_key = ndb.KeyProperty(kind=Tenant, required=False)
 
     def image_in_use(self, image_key):
         in_use_dict = {
@@ -1152,7 +1152,7 @@ class OverlayTemplate(ndb.Model):
     def create_or_get_by_tenant_key(tenant_key):
         existing_template = OverlayTemplate.__get_overlay_template_for_tenant(tenant_key)
         if existing_template:
-            return existing_template[0]
+            return existing_template
 
         else:
             nullOverlay = Overlay.create_or_get(None)

@@ -1,3 +1,6 @@
+import naturalSort from 'javascript-natural-sort';
+
+
 function TenantOverlaysCtrl($stateParams,
                             TenantsService,
                             DomainsService,
@@ -29,12 +32,16 @@ function TenantOverlaysCtrl($stateParams,
     vm.currentTenant.overlayStatus = status
     ProgressBarService.start();
     let promise = TenantsService.save(vm.currentTenant);
-    return promise.then(() => {
+    promise.then(() => {
+      ProgressBarService.complete()
       let tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey);
       tenantPromise.then(function (tenant) {
-        vm.currentTenant = tenant;
         return vm.onSuccessResolvingTenant(tenant);
       });
+    })
+    promise.catch((err) => {
+      ProgressBarService.complete();
+      console.log(err)
     })
   }
 
@@ -128,12 +135,32 @@ function TenantOverlaysCtrl($stateParams,
   };
 
   vm.getTenantImages = () => {
+    vm.OVERLAY_TYPES = [
+      {size: null, type: null, name: "none", realName: "none", new: false, image_key: null},
+      {size: null, type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
+      // {size: "large", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
+      // {size: "default", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
+    ]
+
     ProgressBarService.start();
     let promise = ImageService.getImages(vm.tenantKey);
     promise.then((res) => {
       vm.tenantImages = res
-      console.log(vm.tenantImages)
       ProgressBarService.complete();
+      for (let value of vm.tenantImages) {
+        for (let sizeOption of ["small", "large"]) {
+          let newValue = {
+            realName: angular.copy(value.name),
+            name: "logo: " + value.name,
+            type: "logo",
+            size: sizeOption,
+            image_key: value.key
+          }
+          vm.OVERLAY_TYPES.push(newValue);
+        }
+      }
+      vm.OVERLAY_TYPES.sort(naturalSort);
+
     });
 
     promise.catch(() => {
@@ -146,7 +173,6 @@ function TenantOverlaysCtrl($stateParams,
   // Setup
   //////////////////////////////////////////////////////////////
   vm.onSuccessResolvingTenant = function (tenant) {
-    console.log(tenant)
     vm.currentTenant = tenant;
     vm.currentTenantCopy = angular.copy(vm.currentTenant);
     vm.selectedTimezone = tenant.default_timezone;
@@ -154,14 +180,16 @@ function TenantOverlaysCtrl($stateParams,
     return domainPromise.then(data => vm.selectedDomain = data);
   };
 
-  if (vm.editMode) {
+  vm.initialize = () => {
     vm.getTenantImages()
     let tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey);
     tenantPromise.then(function (tenant) {
       vm.currentTenant = tenant;
+      vm.currentTenantCopy = angular.copy(vm.currentTenant);
       return vm.onSuccessResolvingTenant(tenant);
     });
   }
+
 
   $scope.$watch('tabIndex', function (toTab, fromTab) {
     if (toTab !== undefined) {

@@ -69,7 +69,6 @@ function DeviceDetailsCtrl($log,
 
   vm.submitOverlaySettings = () => {
     let overlaySettings = angular.copy(vm.currentDeviceCopy.overlays)
-    console.log(overlaySettings)
     ProgressBarService.start();
     let promise = DevicesService.saveOverlaySettings(
       vm.deviceKey,
