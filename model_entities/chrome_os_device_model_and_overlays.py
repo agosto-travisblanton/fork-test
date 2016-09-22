@@ -1025,7 +1025,6 @@ class Overlay(ndb.Model):
     def create_or_get(overlay_type, size=None, image_urlsafe_key=None):
         size_options = ["large", "small"]
         if size != None:
-            print size
             if (size.lower() not in size_options) and (overlay_type.lower() != "logo"):
                 raise ValueError("Overlay size must be in {}".format(size_options))
 

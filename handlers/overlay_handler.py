@@ -44,8 +44,6 @@ class OverlayHandler(ExtendedSessionRequestHandler):
                 user_identifier='system (overlay update)'
             )
 
-        print device.overlays_as_dict
-
         return json_response(self.response, {
             "success": True,
             "overlay_template": device.overlays_as_dict
