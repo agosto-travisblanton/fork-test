@@ -69,25 +69,14 @@ function DeviceDetailsCtrl($log,
 
   vm.submitOverlaySettings = () => {
     let overlaySettings = angular.copy(vm.currentDeviceCopy.overlays)
-    delete overlaySettings.key;
-    delete overlaySettings.device_key;
-
-    let overlaySettingsCopy = {}
-    for (let k in overlaySettings) {
-      if (typeof overlaySettings[k] === 'string' || overlaySettings[k] instanceof String) {
-        overlaySettingsCopy[k] = JSON.parse(overlaySettings[k])
-      } else {
-        overlaySettingsCopy[k] = overlaySettings[k]
-      }
-    }
-
+    console.log(overlaySettings)
     ProgressBarService.start();
     let promise = DevicesService.saveOverlaySettings(
       vm.deviceKey,
-      overlaySettingsCopy.bottom_left,
-      overlaySettingsCopy.bottom_right,
-      overlaySettingsCopy.top_right,
-      overlaySettingsCopy.top_left
+      overlaySettings.bottom_left,
+      overlaySettings.bottom_right,
+      overlaySettings.top_right,
+      overlaySettings.top_left
     )
     promise.then((res) => {
       ProgressBarService.complete();
@@ -118,6 +107,8 @@ function DeviceDetailsCtrl($log,
     vm.OVERLAY_TYPES = [
       {size: null, type: null, name: "none", realName: "none", new: false, image_key: null},
       {size: null, type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
+      // {size: "large", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
+      // {size: "default", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
     ]
 
     ProgressBarService.start();
@@ -138,7 +129,6 @@ function DeviceDetailsCtrl($log,
         }
       }
       vm.OVERLAY_TYPES.sort(naturalSort);
-      console.log("overlay types", vm.OVERLAY_TYPES)
 
     });
 
@@ -267,8 +257,6 @@ function DeviceDetailsCtrl($log,
 
   vm.onGetDeviceSuccess = function (response) {
     vm.currentDevice = response
-    console.log(vm.currentDevice.overlays);
-
     vm.currentDeviceCopy = angular.copy(vm.currentDevice)
     if (response.timezone !== vm.selectedTimezone) {
       vm.selectedTimezone = response.timezone;

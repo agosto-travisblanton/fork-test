@@ -29,13 +29,13 @@
             <div class="col-md-5 col-sm-12">
               <md-input-container>
                 <label>Top-Left</label>
-                <md-select ng-model="deviceDetailsCtrl.currentDeviceCopy.overlay.top_left">
+                <md-select ng-model="deviceDetailsCtrl.currentDeviceCopy.overlays.top_left">
                   <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES"
                              ng-value="overlay"
                              ng-selected="
                              (overlay.realName === deviceDetailsCtrl.currentDevice.overlays.top_left.name)
                               &&
-                  (!overlay.size)   ||     (overlay.size.toLowerCase() === deviceDetailsCtrl.currentDevice.overlays.top_left.size)
+                             (overlay.size === deviceDetailsCtrl.currentDevice.overlays.top_left.size)
                               ? 'selected' : ''"
                   >
                     {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" +
@@ -47,13 +47,13 @@
             <div class="col-md-5   col-sm-12" style="float: right">
               <md-input-container>
                 <label>Top-Right</label>
-                <md-select ng-model="deviceDetailsCtrl.currentDeviceCopy.overlay.top_right">
+                <md-select ng-model="deviceDetailsCtrl.currentDeviceCopy.overlays.top_right">
                   <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES"
                              ng-value="overlay"
                              ng-selected="
                              (overlay.realName === deviceDetailsCtrl.currentDevice.overlays.top_right.name)
                               &&
-                      (!overlay.size)   ||         (overlay.size.toLowerCase() === deviceDetailsCtrl.currentDevice.overlays.top_right.size)
+                             (overlay.size  === deviceDetailsCtrl.currentDevice.overlays.top_right.size)
                               ? 'selected' : ''"
                   >
                     {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" +
@@ -67,13 +67,13 @@
             <div class="col-md-5  col-sm-12">
               <md-input-container>
                 <label>Bottom-Left</label>
-                <md-select ng-model="deviceDetailsCtrl.currentDeviceCopy.overlay.bottom_left">
+                <md-select ng-model="deviceDetailsCtrl.currentDeviceCopy.overlays.bottom_left">
                   <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES"
                              ng-value="overlay"
                              ng-selected="
                              (overlay.realName === deviceDetailsCtrl.currentDevice.overlays.bottom_left.name)
                               &&
-                    (!overlay.size)   ||           (overlay.size.toLowerCase() === deviceDetailsCtrl.currentDevice.overlays.bottom_left.size)
+                             (overlay.size === deviceDetailsCtrl.currentDevice.overlays.bottom_left.size)
                               ? 'selected' : ''"
                   >
                     {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" +
@@ -85,13 +85,13 @@
             <div class="col-md-5  col-sm-12" style="float: right">
               <md-input-container>
                 <label>Bottom-Right</label>
-                <md-select ng-model="deviceDetailsCtrl.currentDeviceCopy.overlay.bottom_right">
+                <md-select ng-model="deviceDetailsCtrl.currentDeviceCopy.overlays.bottom_right">
                   <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES"
                              ng-value="overlay"
                              ng-selected="
                              (overlay.realName === deviceDetailsCtrl.currentDevice.overlays.bottom_right.name)
                               &&
-                        (!overlay.size)   ||   (overlay.size.toLowerCase() === deviceDetailsCtrl.currentDevice.overlays.bottom_right.size)
+                             (overlay.size === deviceDetailsCtrl.currentDevice.overlays.bottom_right.size)
                               ? 'selected' : ''"
                   >
                     {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" +
