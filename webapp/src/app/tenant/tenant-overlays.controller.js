@@ -20,8 +20,62 @@ function TenantOverlaysCtrl($stateParams,
   $scope.tabIndex = 4;
   vm.tenantKey = $stateParams.tenantKey;
   vm.editMode = !!$stateParams.tenantKey;
+  vm.currentTenant = null;
 
+  ////////////////////////////////////////////////////////////////
+  // Overlays
+  ////////////////////////////////////////////////////////////////
+  vm.adjustOverlayStatus = (status) => {
+    vm.currentTenant.overlayStatus = status
+    ProgressBarService.start();
+    let promise = TenantsService.save(vm.currentTenant);
+    return promise.then(() => {
+      let tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey);
+      tenantPromise.then(function (tenant) {
+        vm.currentTenant = tenant;
+        return vm.onSuccessResolvingTenant(tenant);
+      });
+    })
+  }
+
+  vm.submitOverlaySettings = () => {
+    let overlaySettings = angular.copy(vm.currentTenantCopy.overlays)
+    delete overlaySettings.key;
+    delete overlaySettings.device_key;
+
+    let overlaySettingsCopy = {}
+    for (let k in overlaySettings) {
+      if (typeof overlaySettings[k] === 'string' || overlaySettings[k] instanceof String) {
+        overlaySettingsCopy[k] = JSON.parse(overlaySettings[k])
+      } else {
+        overlaySettingsCopy[k] = overlaySettings[k]
+      }
+    }
+
+    ProgressBarService.start();
+    let promise = TenantsService.saveOverlaySettings(
+      vm.tenantKey,
+      overlaySettingsCopy.bottom_left,
+      overlaySettingsCopy.bottom_right,
+      overlaySettingsCopy.top_right,
+      overlaySettingsCopy.top_left
+    )
+    promise.then((res) => {
+      ProgressBarService.complete();
+      ToastsService.showSuccessToast('We saved your update.');
+    })
+
+    promise.catch((res) => {
+      ProgressBarService.complete();
+      ToastsService.showErrorToast('Something went wrong');
+
+    })
+  };
+
+
+  ////////////////////////////////////////////////////////////////
   // Images
+  ////////////////////////////////////////////////////////////////
   vm.submitImage = () => {
     if (vm.selectedLogo && vm.selectedLogo[0]) {
       var formData = new FormData();
@@ -43,7 +97,6 @@ function TenantOverlaysCtrl($stateParams,
     }
   }
 
-
   vm.deleteImage = (ev, name, key) => {
     let confirm = $mdDialog.confirm(
       {
@@ -55,6 +108,7 @@ function TenantOverlaysCtrl($stateParams,
         cancel: 'Nevermind'
       }
     );
+
     $mdDialog.show(confirm).then((function () {
       ProgressBarService.start();
 
@@ -71,8 +125,7 @@ function TenantOverlaysCtrl($stateParams,
           ProgressBarService.complete();
         })
     }))
-  }
-
+  };
 
   vm.getTenantImages = () => {
     ProgressBarService.start();
@@ -87,12 +140,15 @@ function TenantOverlaysCtrl($stateParams,
       ProgressBarService.complete();
       ToastsService.showErrorStatus("SOMETHING WENT WRONG RETRIEVING YOUR IMAGES")
     })
-  }
+  };
 
+  //////////////////////////////////////////////////////////////
   // Setup
-
-
+  //////////////////////////////////////////////////////////////
   vm.onSuccessResolvingTenant = function (tenant) {
+    console.log(tenant)
+    vm.currentTenant = tenant;
+    vm.currentTenantCopy = angular.copy(vm.currentTenant);
     vm.selectedTimezone = tenant.default_timezone;
     let domainPromise = DomainsService.getDomainByKey(tenant.domain_key);
     return domainPromise.then(data => vm.selectedDomain = data);
@@ -120,11 +176,11 @@ function TenantOverlaysCtrl($stateParams,
           return $state.go('tenantLocations', {tenantKey: $stateParams.tenantKey});
         case 4:
           return $state.go('tenantOverlays', {tenantKey: $stateParams.tenantKey});
-
       }
     }
   });
 
   return vm;
 }
+
 export {TenantOverlaysCtrl}

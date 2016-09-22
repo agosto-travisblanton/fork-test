@@ -31,7 +31,7 @@ class OverlayHandler(ExtendedSessionRequestHandler):
             size = value.get("size")
 
             overlay_template.set_overlay(position=key,
-                                         size=size.lower() if size else "default",
+                                         size=size.lower() if size else None,
                                          overlay_type=overlay_type,
                                          image_urlsafe_key=image_key)
 
@@ -72,7 +72,7 @@ class OverlayHandler(ExtendedSessionRequestHandler):
             size = value.get("size")
 
             overlay_template.set_overlay(position=key,
-                                         size=size.lower() if size else "default",
+                                         size=size.lower() if size else None,
                                          overlay_type=overlay_type,
                                          image_urlsafe_key=image_key)
 

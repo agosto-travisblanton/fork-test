@@ -63,6 +63,14 @@ DEVICE_PAIRING_CODE_STRATEGY += [
     {'macAddress': lambda o, field_name, context: o.mac_address}
 ]
 
+
+def overlay_status(o):
+    if (o.tenant_key.get().overlays_override == False):
+        return o.overlays_available
+    else:
+        return o.tenant_key.get().overlays_available
+
+
 CHROME_OS_DEVICE_STRATEGY = ModelStrategy(ChromeOsDevice)
 CHROME_OS_DEVICE_STRATEGY += [
     {'panelSleep': lambda o, field_name, context: o.panel_sleep if o.panel_sleep is not None else None},
@@ -139,8 +147,8 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'archived': lambda o, field_name, context: o.archived},
     {'controlsMode': lambda o, field_name, context: o.controls_mode},
     {'overlayStatus': lambda o, field_name,
-                             context:
-    o.overlays_available if not o.tenant_key.get().overlays_override else o.tenant_key.get().overlays_available},
+                             context: overlay_status(o)},
+    # o.overlays_available if (o.tenant_key.get().overlays_override == False) else gah(o)},
     {'overlays': lambda o, field_name, context: (o.overlays_as_dict if o.overlays_available else None)
     if not o.tenant_key.get().overlays_override
     # if overlays are being overriden at the tenant level

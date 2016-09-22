@@ -1022,10 +1022,12 @@ class Overlay(ndb.Model):
     image_key = ndb.KeyProperty(kind=Image, required=False)
 
     @staticmethod
-    def create_or_get(overlay_type, size="default", image_urlsafe_key=None):
-        size_options = ["default", "large", "small"]
-        if size and size.lower() not in size_options:
-            raise ValueError("Overlay size must be in {}".format(size_options))
+    def create_or_get(overlay_type, size=None, image_urlsafe_key=None):
+        size_options = ["large", "small"]
+        if size != None:
+            print size
+            if (size.lower() not in size_options) and (overlay_type.lower() != "logo"):
+                raise ValueError("Overlay size must be in {}".format(size_options))
 
         # not an overlay with an image that doesn't have a image_urlsafe_key
         if overlay_type and overlay_type.lower() == "logo":
@@ -1166,7 +1168,7 @@ class OverlayTemplate(ndb.Model):
             return overlay_template
 
     # expects a a dictionary with config about overlay
-    def set_overlay(self, position, overlay_type, size="default", image_urlsafe_key=None):
+    def set_overlay(self, position, overlay_type, size=None, image_urlsafe_key=None):
         overlay = Overlay.create_or_get(overlay_type=overlay_type, size=size, image_urlsafe_key=image_urlsafe_key)
 
         if position.lower() == "top_left":

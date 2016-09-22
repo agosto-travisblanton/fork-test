@@ -55,7 +55,7 @@ function DeviceDetailsCtrl($log,
   }
 
   vm.adjustOverlayStatus = (status) => {
-    vm.currentDevice.overlay_status = status
+    vm.currentDevice.overlayStatus = status
     ProgressBarService.start();
     let promise = DevicesService.save(vm.currentDevice);
     return promise.then(() => {
@@ -116,7 +116,7 @@ function DeviceDetailsCtrl($log,
 
   vm.getTenantImages = () => {
     vm.OVERLAY_TYPES = [
-      {size: "default", type: null, name: "none", realName: "none", new: false, image_key: null},
+      {size: null, type: null, name: "none", realName: "none", new: false, image_key: null},
       {size: null, type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
     ]
 
@@ -126,7 +126,7 @@ function DeviceDetailsCtrl($log,
       vm.tenantImages = res
       ProgressBarService.complete();
       for (let value of vm.tenantImages) {
-        for (let sizeOption of ["small", "large", "default"]) {
+        for (let sizeOption of ["small", "large"]) {
           let newValue = {
             realName: angular.copy(value.name),
             name: "logo: " + value.name,
@@ -138,6 +138,7 @@ function DeviceDetailsCtrl($log,
         }
       }
       vm.OVERLAY_TYPES.sort(naturalSort);
+      console.log("overlay types", vm.OVERLAY_TYPES)
 
     });
 
@@ -266,6 +267,8 @@ function DeviceDetailsCtrl($log,
 
   vm.onGetDeviceSuccess = function (response) {
     vm.currentDevice = response
+    console.log(vm.currentDevice.overlays);
+
     vm.currentDeviceCopy = angular.copy(vm.currentDevice)
     if (response.timezone !== vm.selectedTimezone) {
       vm.selectedTimezone = response.timezone;

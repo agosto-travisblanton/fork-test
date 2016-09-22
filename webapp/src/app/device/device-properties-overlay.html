@@ -35,10 +35,11 @@
                              ng-selected="
                              (overlay.realName === deviceDetailsCtrl.currentDevice.overlays.top_left.name)
                               &&
-                             (overlay.size.toLowerCase() === deviceDetailsCtrl.currentDevice.overlays.top_left.size)
+                  (!overlay.size)   ||     (overlay.size.toLowerCase() === deviceDetailsCtrl.currentDevice.overlays.top_left.size)
                               ? 'selected' : ''"
                   >
-                    {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" + overlay.size.toUpperCase() + ")" : '') }}
+                    {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" +
+                    overlay.size.toUpperCase() + ")" : '') }}
                   </md-option>
                 </md-select>
               </md-input-container>
@@ -52,10 +53,11 @@
                              ng-selected="
                              (overlay.realName === deviceDetailsCtrl.currentDevice.overlays.top_right.name)
                               &&
-                             (overlay.size.toLowerCase() === deviceDetailsCtrl.currentDevice.overlays.top_right.size)
+                      (!overlay.size)   ||         (overlay.size.toLowerCase() === deviceDetailsCtrl.currentDevice.overlays.top_right.size)
                               ? 'selected' : ''"
                   >
-                    {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" + overlay.size.toUpperCase() + ")" : '') }}
+                    {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" +
+                    overlay.size.toUpperCase() + ")" : '') }}
                   </md-option>
                 </md-select>
               </md-input-container>
@@ -71,10 +73,11 @@
                              ng-selected="
                              (overlay.realName === deviceDetailsCtrl.currentDevice.overlays.bottom_left.name)
                               &&
-                             (overlay.size.toLowerCase() === deviceDetailsCtrl.currentDevice.overlays.bottom_left.size)
+                    (!overlay.size)   ||           (overlay.size.toLowerCase() === deviceDetailsCtrl.currentDevice.overlays.bottom_left.size)
                               ? 'selected' : ''"
                   >
-                    {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" + overlay.size.toUpperCase() + ")" : '') }}
+                    {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" +
+                    overlay.size.toUpperCase() + ")" : '') }}
                   </md-option>
                 </md-select>
               </md-input-container>
@@ -88,10 +91,11 @@
                              ng-selected="
                              (overlay.realName === deviceDetailsCtrl.currentDevice.overlays.bottom_right.name)
                               &&
-                             (overlay.size.toLowerCase() === deviceDetailsCtrl.currentDevice.overlays.bottom_right.size)
+                        (!overlay.size)   ||   (overlay.size.toLowerCase() === deviceDetailsCtrl.currentDevice.overlays.bottom_right.size)
                               ? 'selected' : ''"
                   >
-                    {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" + overlay.size.toUpperCase() + ")" : '') }}
+                    {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" +
+                    overlay.size.toUpperCase() + ")" : '') }}
                   </md-option>
                 </md-select>
               </md-input-container>

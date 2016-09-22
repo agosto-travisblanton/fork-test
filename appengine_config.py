@@ -540,7 +540,7 @@ proofplay_DAYS_TO_KEEP_RAW_EVENTS = 30
 ##############################################################################
 if on_development_server:
     from workflow import refresh_device_by_mac_address, refresh_device, update_chrome_os_device
-
+    from workflow import update_chrome_os_device
 
     def _refresh_device_by_mac_address_dud(device_urlsafe_key, device_mac_address,
                                            device_has_previous_directory_api_info=False, page_token=None):
@@ -550,13 +550,13 @@ if on_development_server:
     def _refresh_device_dud(device_urlsafe_key):
         pass
 
-    def _update_chrome_os_device():
+    def _update_chrome_os_device(device_urlsafe_key):
         pass
 
 
     refresh_device_by_mac_address.refresh_device_by_mac_address = _refresh_device_by_mac_address_dud
     refresh_device.refresh_device = _refresh_device_dud
-    refresh_device.update_chrome_os_device = _update_chrome_os_device
+    update_chrome_os_device.update_chrome_os_device = _update_chrome_os_device
 
 
 ##############################################################################
