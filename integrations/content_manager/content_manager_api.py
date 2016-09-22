@@ -58,9 +58,6 @@ class ContentManagerApi(KeyValidatorMixin, object):
         tenant = None
         if chrome_os_device.tenant_key:
             tenant = self.validate_and_get(chrome_os_device.tenant_key.urlsafe(), Tenant, abort_on_not_found=True)
-        else:
-            if chrome_os_device.org_unit_path:
-                tenant = Tenant.find_by_organization_unit_path(chrome_os_device.org_unit_path)
         if tenant:
             cms_payload = {
                 "device_key": device_urlsafe_key,

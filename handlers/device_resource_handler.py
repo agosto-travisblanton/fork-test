@@ -378,6 +378,8 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                         registration_request_event.details = error_message
                         registration_request_event.put()
                         self.response.set_status(status, error_message)
+                        logging.error('Cannot resolve tenant_code {0}. Bad tenant code or inactive tenant.'.format(
+                            tenant_code))
                         return
                     else:
                         tenant_key = tenant.key
@@ -391,9 +393,9 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                                                            registration_correlation_identifier=correlation_id)
                     key = device.put()
                     registration_request_event.device_urlsafe_key = key.urlsafe()
-                    registration_request_event.details = 'register_device: tenant code={0}, mac address={1}, ' \
-                                                         'gcm id = {2}, ' \
-                                                         'device key = {3}'.format(tenant_code, device_mac_address,
+                    registration_request_event.details = 'register_device: mac address={0}, ' \
+                                                         'gcm id = {1}, ' \
+                                                         'device key = {2}'.format(device_mac_address,
                                                                                    gcm_registration_id, key.urlsafe())
                     registration_request_event.put()
                     deferred.defer(register_device,
