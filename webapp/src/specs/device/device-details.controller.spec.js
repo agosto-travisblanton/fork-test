@@ -753,7 +753,7 @@ describe('DeviceDetailsCtrl', function () {
       it('calls saveDevice after adjusting currentDevice', () => {
         controller.adjustOverlayStatus(true)
         promise.resolve()
-        expect(controller.currentDevice.overlay_status).toEqual(true)
+        expect(controller.currentDevice.overlayStatus).toEqual(true)
         expect(DevicesService.save).toHaveBeenCalled();
       });
     });
@@ -818,7 +818,7 @@ describe('DeviceDetailsCtrl', function () {
           realName: toResolve[0].name,
           name: 'logo: ' + toResolve[0].name,
           type: 'logo',
-          size: 'default',
+          size: 'large',
           image_key: toResolve[0].key
         });
       });
