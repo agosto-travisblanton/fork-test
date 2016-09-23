@@ -519,7 +519,7 @@ class Tenant(ndb.Model):
         else:
             organization_unit_path = '/skykit/{0}'.format(tenant_code)
         enrollment_password = cls.generate_enrollment_password(config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE)
-        enrollment_email = '{0}.enrollment@{1}'.format(tenant_code, domain_key.get().name)
+        enrollment_email = 'en.{0}@{1}'.format(tenant_code, domain_key.get().name)
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
                    tenant_code=tenant_code,

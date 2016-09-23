@@ -172,7 +172,7 @@ class TestTenantModel(BaseTest):
         self.assertIsNotNone(self.tenant.enrollment_password)
 
     def test_create_sets_expected_enrollment_email_format(self):
-        expected_enrollment_email_format = '{0}.enrollment@{1}'.format(self.TENANT_CODE, self.domain_key.get().name)
+        expected_enrollment_email_format = 'en.{0}@{1}'.format(self.TENANT_CODE, self.domain_key.get().name)
         self.assertEqual(expected_enrollment_email_format, self.tenant.enrollment_email)
 
     def test_is_tenant_code_unique_returns_false_when_code_found(self):
