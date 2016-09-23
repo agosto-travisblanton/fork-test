@@ -115,9 +115,8 @@ class ChromeOsDevice(ndb.Model):
         return python_dict
 
     def enable_overlays(self):
-        self.overlay_available = True
+        self.overlays_available = True
         self.put()
-        return self
 
     @classmethod
     def get_by_device_id(cls, device_id):
@@ -481,7 +480,7 @@ class Tenant(ndb.Model):
     enrollment_password = ndb.StringProperty(required=False, indexed=False)
     organization_unit_id = ndb.StringProperty(required=False, indexed=True)
     organization_unit_path = ndb.StringProperty(required=False, indexed=True)
-    overlays_available = ndb.BooleanProperty(default=False, required=True, indexed=True)
+    overlays_available = ndb.BooleanProperty(default=False, required=False, indexed=True)
     overlays_override = ndb.BooleanProperty(default=False, required=False)
     class_version = ndb.IntegerProperty()
 
@@ -871,6 +870,8 @@ class Tenant(ndb.Model):
                active,
                content_manager_base_url,
                notification_emails=[],
+               overlays_available=False,
+               overlays_override=False,
                proof_of_play_logging=False,
                proof_of_play_url=config.DEFAULT_PROOF_OF_PLAY_URL,
                default_timezone=config.DEFAULT_TIMEZONE):
@@ -882,6 +883,8 @@ class Tenant(ndb.Model):
                    tenant_code=tenant_code,
                    name=name,
                    admin_email=admin_email,
+                   overlays_available=overlays_available,
+                   overlays_override=overlays_override,
                    content_server_url=content_server_url,
                    domain_key=domain_key,
                    active=active,

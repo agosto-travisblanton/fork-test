@@ -23,7 +23,7 @@ class ImageHandler(ExtendedSessionRequestHandler):
         image_tenant = image.tenant_key.get()
         tenant_devices = image_tenant.devices
         for each_device in tenant_devices:
-            device_overlay_template = OverlayTemplate.get_overlay_template_for_device(each_device.key)
+            device_overlay_template = OverlayTemplate.create_or_get_by_device_key(each_device.key)
             image_in_use_in_posititions = device_overlay_template.image_in_use(image.key)
             for position, in_use in image_in_use_in_posititions.iteritems():
                 none_overlay = Overlay.create_or_get(None)
