@@ -50,7 +50,7 @@ function DeviceDetailsCtrl($log,
     })
     controlsPromise.catch(() => {
       ProgressBarService.complete();
-      ToastsService.showErrorStatus("Your controls mode change failed to save. Please contact support.")
+      //ToastsService.showErrorToast("Your controls mode change failed to save. Please contact support.")
     })
   }
 
@@ -133,7 +133,7 @@ function DeviceDetailsCtrl($log,
 
     promise.catch(() => {
       ProgressBarService.complete();
-      ToastsService.showErrorStatus("SOMETHING WENT WRONG RETRIEVING YOUR IMAGES")
+      //ToastsService.showErrorToast("SOMETHING WENT WRONG RETRIEVING YOUR IMAGES")
     })
   }
 

@@ -14,6 +14,7 @@ function DomainDetailsCtrl($log,
     name: undefined,
     impersonation_admin_email_address: undefined,
     distributor_key: undefined,
+    organization_unit_path: '/skykit',
     active: true
   };
   vm.devicesAccess = false;

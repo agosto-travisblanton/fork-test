@@ -6,6 +6,7 @@ from google.appengine.ext.deferred import deferred
 from app_config import config
 from integrations.content_manager.content_manager_api import ContentManagerApi
 from integrations.directory_api.chrome_os_devices_api import ChromeOsDevicesApi
+from model_entities.chrome_os_device_model_and_overlays import Tenant
 from model_entities.integration_events_log_model import IntegrationEventLog
 from workflow.update_chrome_os_device import update_chrome_os_device
 
@@ -119,6 +120,12 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
             info = 'register_device: retrieved directory API for MAC address = {0}. Notifying Content Manager.' \
                 .format(lowercase_device_mac_address)
             logging.info(info)
+
+            if device.tenant_key is None:
+                if device.org_unit_path:
+                    tenant = Tenant.find_by_organization_unit_path(device.org_unit_path)
+                    device.tenant_key = tenant.key
+                    device.put()
 
             deferred.defer(ContentManagerApi().create_device,
                            device_urlsafe_key=device_urlsafe_key,
