@@ -5,16 +5,17 @@ from integrations.cloud_storage.cloud_storage_api import create_file, delete_fil
 import logging
 from google.appengine.ext.deferred import deferred
 from app_config import config
+from device_message_processor import change_intent
 
 
 def update_device_rep_in_tenant_devices(host_url, device):
-        change_intent(
-            gcm_registration_id=device.gcm_registration_id,
-            payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
-            device_urlsafe_key=device.key.urlsafe(),
-            host=host_url,
-            user_identifier='system (overlay update)'
-        )
+    change_intent(
+        gcm_registration_id=device.gcm_registration_id,
+        payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+        device_urlsafe_key=device.key.urlsafe(),
+        host=host_url,
+        user_identifier='system (overlay update)'
+    )
 
 
 class ImageHandler(ExtendedSessionRequestHandler):

@@ -65,10 +65,34 @@ DEVICE_PAIRING_CODE_STRATEGY += [
 
 
 def overlay_status(o):
-    if (o.tenant_key.get().overlays_override == False):
-        return o.overlays_available
+    if o.tenant_key:
+        if (o.tenant_key.get().overlays_override == False):
+            return o.overlays_available
+        else:
+            return o.tenant_key.get().overlays_available
     else:
-        return o.tenant_key.get().overlays_available
+        return o.overlays_available
+
+
+def overlays(o):
+    if o.tenant_key:
+        if not o.tenant_key.get().overlays_override:
+            if o.overlays_available:
+                return o.overlays_as_dict
+            else:
+                return None
+
+        # if overlays are being overriden at the tenant level
+        else:
+            if o.tenant_key.get().overlays_available:
+                return o.tenant_key.get().overlays
+            else:
+                return None
+    else:
+        if o.overlays_available:
+            return o.overlays_as_dict
+        else:
+            return None
 
 
 CHROME_OS_DEVICE_STRATEGY = ModelStrategy(ChromeOsDevice)
@@ -149,11 +173,7 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'overlayStatus': lambda o, field_name,
                              context: overlay_status(o)},
     # o.overlays_available if (o.tenant_key.get().overlays_override == False) else gah(o)},
-    {'overlays': lambda o, field_name, context: (o.overlays_as_dict if o.overlays_available else None)
-    if not o.tenant_key.get().overlays_override
-    # if overlays are being overriden at the tenant level
-    else (o.tenant_key.get().overlays if o.tenant_key.get().overlays_available else None)}
-
+    {'overlays': lambda o, field_name, context: overlays(o)}
 ]
 
 LOCATION_STRATEGY = ModelStrategy(Location)
