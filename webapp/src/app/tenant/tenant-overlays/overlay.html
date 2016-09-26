@@ -14,7 +14,7 @@
                 <md-button type="submit"
                            class="md-raised"
                            ng-click="vm.applyTenantOverlay($event)"
-                           ng-disabled="vm.overlayChanged">
+                           ng-disabled="vm.overlayChanged || vm.loading">
 
                   Apply
                 </md-button>
@@ -37,7 +37,12 @@
         </div>
         <div ng-if="vm.currentTenant.overlayStatus || vm.loading">
           <hr/>
-          <md-progress-circular ng-if="vm.loading" md-mode="indeterminate"></md-progress-circular>
+          <div ng-if="vm.loading">
+            <div layout="row" layout-sm="column" layout-align="space-around">
+              <p>Please wait while your "Apply" takes effect.</p>
+              <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+            </div>
+          </div>
           <div class="form-group" ng-if="!vm.loading" ng-show="vm.currentTenant.overlayStatus">
 
             <div class="col-md-12">

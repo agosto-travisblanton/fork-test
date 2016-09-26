@@ -11,15 +11,14 @@ function TenantOverlaysCtrl($stateParams,
                             ProgressBarService,
                             ToastsService,
                             SessionsService,
-                            $scope,
                             $location,
+                            $scope,
                             ImageService,
                             $timeout,
                             $mdDialog) {
   "ngInject";
 
   let vm = this;
-
   $scope.tabIndex = 4;
   vm.tenantKey = $stateParams.tenantKey;
   vm.editMode = !!$stateParams.tenantKey;
@@ -59,21 +58,19 @@ function TenantOverlaysCtrl($stateParams,
     );
 
     vm.loading = true;
-
     promise.then((res) => {
-      let tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey);
-      tenantPromise.then(function (tenant) {
-        ProgressBarService.complete();
+      let tenantPromise = vm.getTenant();
+      tenantPromise.then((tenant) => {
         vm.overlayChanged = false;
         ToastsService.showSuccessToast('We saved your update.');
         vm.currentTenant.overlays = tenant.overlays;
         vm.currentTenantCopy.overlays = angular.copy(vm.currentTenant);
-        console.log(vm.currentTenant);
-        console.log(vm.currentTenantCopy);
         vm.loading = false;
+        ProgressBarService.complete();
       });
 
-    })
+
+    });
 
     promise.catch((res) => {
       ProgressBarService.complete();
@@ -100,6 +97,8 @@ function TenantOverlaysCtrl($stateParams,
       promise.then((res) => {
         let message = 'Your Tenant Overlay Settings are being applied to each device in your Tenant. Please wait patiently for this process to complete.'
         ToastsService.showSuccessToast(message);
+        vm.loading = true;
+        vm.getTenant();
         ProgressBarService.complete()
       })
       promise.catch((res) => {
@@ -235,14 +234,24 @@ function TenantOverlaysCtrl($stateParams,
     return domainPromise.then(data => vm.selectedDomain = data);
   };
 
-  vm.initialize = () => {
-    vm.getTenantImages()
+  vm.getTenant = () => {
     let tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey);
     tenantPromise.then(function (tenant) {
       vm.currentTenant = tenant;
+      if (vm.currentTenant.overlaysUpdateInProgress) {
+        vm.loading = true;
+        $timeout(vm.getTenant, 3000);
+      } else {
+        vm.loading = false;
+      }
       vm.currentTenantCopy = angular.copy(vm.currentTenant);
-    });
-    return tenantPromise;
+    })
+    return tenantPromise
+  }
+
+  vm.initialize = () => {
+    vm.getTenantImages()
+    vm.getTenant()
   }
 
 
