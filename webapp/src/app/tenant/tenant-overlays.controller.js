@@ -24,6 +24,7 @@ function TenantOverlaysCtrl($stateParams,
   vm.tenantKey = $stateParams.tenantKey;
   vm.editMode = !!$stateParams.tenantKey;
   vm.currentTenant = null;
+  vm.overlayChanged = false;
 
   ////////////////////////////////////////////////////////////////
   // Overlays
@@ -41,15 +42,13 @@ function TenantOverlaysCtrl($stateParams,
     })
     promise.catch((err) => {
       ProgressBarService.complete();
-      // TODO: CHANGE THIS TO USE ToastsService
-      alert("error")
+      ToastsService.showErrorToast('Something went wrong');
       console.log(err)
     })
   }
 
   vm.submitOverlaySettings = () => {
     let overlaySettings = angular.copy(vm.currentTenantCopy.overlays)
-
     ProgressBarService.start();
     let promise = TenantsService.saveOverlaySettings(
       vm.tenantKey,
@@ -57,10 +56,23 @@ function TenantOverlaysCtrl($stateParams,
       overlaySettings.bottom_right,
       overlaySettings.top_right,
       overlaySettings.top_left
-    )
+    );
+
+    vm.loading = true;
+
     promise.then((res) => {
-      ProgressBarService.complete();
-      ToastsService.showSuccessToast('We saved your update.');
+      let tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey);
+      tenantPromise.then(function (tenant) {
+        ProgressBarService.complete();
+        vm.overlayChanged = false;
+        ToastsService.showSuccessToast('We saved your update.');
+        vm.currentTenant.overlays = tenant.overlays;
+        vm.currentTenantCopy.overlays = angular.copy(vm.currentTenant);
+        console.log(vm.currentTenant);
+        console.log(vm.currentTenantCopy);
+        vm.loading = false;
+      });
+
     })
 
     promise.catch((res) => {
@@ -69,6 +81,60 @@ function TenantOverlaysCtrl($stateParams,
 
     })
   };
+
+  vm.applyTenantOverlay = (ev) => {
+    let confirm = $mdDialog.confirm(
+      {
+        title: `Are you sure?`,
+        textContent: `Each device in your Tenant will have the current Overlay Template applied as its settings.`,
+        targetEvent: ev,
+        ariaLabel: 'Lucky day',
+        ok: 'Confirm',
+        cancel: 'Nevermind'
+      }
+    );
+
+    $mdDialog.show(confirm).then((function () {
+      ProgressBarService.start();
+      let promise = TenantsService.overlayApplyTenant(vm.tenantKey)
+      promise.then((res) => {
+        let message = 'Your Tenant Overlay Settings are being applied to each device in your Tenant. Please wait patiently for this process to complete.'
+        ToastsService.showSuccessToast(message);
+        ProgressBarService.complete()
+      })
+      promise.catch((res) => {
+        ProgressBarService.complete()
+        ToastsService.showErrorToast('Something went wrong');
+
+      })
+    }))
+
+  }
+
+  vm.checkForOverlayChanges = () => {
+    let changed = false;
+    let currentTenantOverlays = vm.currentTenant.overlays;
+    let currentTenantCopyOverlays = vm.currentTenantCopy.overlays;
+    let positions = ['top_left', 'top_right', 'bottom_right', 'bottom_left'];
+
+    for (let pos of positions) {
+      if (currentTenantOverlays[pos].size !== currentTenantCopyOverlays[pos].size) {
+        changed = true;
+      }
+      if (currentTenantOverlays[pos].type !== currentTenantCopyOverlays[pos].type) {
+        changed = true;
+      }
+
+      if (currentTenantOverlays[pos].type === 'logo') {
+        if ((currentTenantOverlays[pos].type + ": " + currentTenantOverlays[pos].name) !== currentTenantCopyOverlays[pos].name) {
+          changed = true;
+        }
+      }
+    }
+
+    vm.overlayChanged = changed;
+
+  }
 
 
   ////////////////////////////////////////////////////////////////
@@ -175,8 +241,8 @@ function TenantOverlaysCtrl($stateParams,
     tenantPromise.then(function (tenant) {
       vm.currentTenant = tenant;
       vm.currentTenantCopy = angular.copy(vm.currentTenant);
-      return vm.onSuccessResolvingTenant(tenant);
     });
+    return tenantPromise;
   }
 
 

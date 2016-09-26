@@ -85,22 +85,11 @@ class OverlayHandler(ExtendedSessionRequestHandler):
             "overlay_template": tenant.overlays_as_dict
         }, status_code=200)
 
-
-    def tenant_override_device_overlays(self, tenant_urlsafe_key):
-        tenant = self.validate_and_get(tenant_urlsafe_key, Tenant, abort_on_not_found=True)
-        tenant.overlays_override = True
-        tenant.put()
-        tenant.gcm_update_devices(host=self.request.host_url, user_identifier="system (overlay override)")
-        return json_response(self.response, {
-            "success": True,
-            "overlay_template": tenant.overlays_as_dict
-        }, status_code=200)
-
     def tenant_apply_overlay_to_devices(self, tenant_urlsafe_key):
         tenant = self.validate_and_get(tenant_urlsafe_key, Tenant, abort_on_not_found=True)
         tenant_overlay_template = OverlayTemplate.create_or_get_by_tenant_key(tenant.key)
         tenant_overlay_template.apply_overlay_template_to_all_tenant_devices(host=self.request.host_url, user_identifier="system (overlay override)")
-        tenant.gcm_update_devices(host=self.request.host_url, user_identifier="system (overlay override)")
+
         return json_response(self.response, {
             "success": True,
             "overlay_template": tenant.overlays_as_dict

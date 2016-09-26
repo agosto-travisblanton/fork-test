@@ -39,7 +39,8 @@ TENANT_STRATEGY += [
     {'domain_key': lambda o, field_name, context: o.domain_key.urlsafe() if o.domain_key else None},
     {'notification_emails': lambda o, field_name, context: ', '.join(o.notification_emails).strip(', ')},
     {'overlayStatus': lambda o, field_name, context: o.overlays_available},
-    {'overlays': lambda o, field_name, context: o.overlays_as_dict if o.overlays_available else None}
+    {'overlays': lambda o, field_name, context: o.overlays_as_dict if o.overlays_available else None},
+    {'overlaysUpdateInProgress': lambda o, field_name, context: o.overlays_update_in_progress}
 
 ]
 
@@ -62,37 +63,6 @@ DEVICE_PAIRING_CODE_STRATEGY += [
     {'gcmRegistrationId': lambda o, field_name, context: o.gcm_registration_id},
     {'macAddress': lambda o, field_name, context: o.mac_address}
 ]
-
-
-def overlay_status(o):
-    if o.tenant_key:
-        if (o.tenant_key.get().overlays_override == False):
-            return o.overlays_available
-        else:
-            return o.tenant_key.get().overlays_available
-    else:
-        return o.overlays_available
-
-
-def overlays(o):
-    if o.tenant_key:
-        if not o.tenant_key.get().overlays_override:
-            if o.overlays_available:
-                return o.overlays_as_dict
-            else:
-                return None
-
-        # if overlays are being overriden at the tenant level
-        else:
-            if o.tenant_key.get().overlays_available:
-                return o.tenant_key.get().overlays
-            else:
-                return None
-    else:
-        if o.overlays_available:
-            return o.overlays_as_dict
-        else:
-            return None
 
 
 CHROME_OS_DEVICE_STRATEGY = ModelStrategy(ChromeOsDevice)
@@ -171,9 +141,8 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'archived': lambda o, field_name, context: o.archived},
     {'controlsMode': lambda o, field_name, context: o.controls_mode},
     {'overlayStatus': lambda o, field_name,
-                             context: overlay_status(o)},
-    # o.overlays_available if (o.tenant_key.get().overlays_override == False) else gah(o)},
-    {'overlays': lambda o, field_name, context: overlays(o)}
+                             context: o.overlays_available},
+    {'overlays': lambda o, field_name, context: o.overlays_as_dict if o.overlays_available else None}
 ]
 
 LOCATION_STRATEGY = ModelStrategy(Location)

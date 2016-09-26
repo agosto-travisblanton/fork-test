@@ -21,8 +21,31 @@ def update_device_rep_in_tenant_devices(host_url, device):
 class ImageHandler(ExtendedSessionRequestHandler):
     def delete_image(self, image_urlsafe_key):
         image = self.validate_and_get(image_urlsafe_key, Image, abort_on_not_found=True)
-        image_tenant = image.tenant_key.get()
-        tenant_devices = image_tenant.devices
+        tenant_entity = image.tenant_key.get()
+        tenant_devices = tenant_entity.devices
+
+        #######################################################
+        # TENANT
+        #######################################################
+        tenant_overlay_template = OverlayTemplate.create_or_get_by_tenant_key(tenant_entity.key)
+        image_in_use_in_posititions = tenant_overlay_template.image_in_use(image.key)
+        for position, in_use in image_in_use_in_posititions.iteritems():
+            none_overlay = Overlay.create_or_get(None)
+            if in_use:
+                if position == "top_left":
+                    tenant_overlay_template.top_left = none_overlay.key
+                elif position == "top_right":
+                    tenant_overlay_template.top_right = none_overlay.key
+                elif position == "bottom_left":
+                    tenant_overlay_template.bottom_left = none_overlay.key
+                elif position == "bottom_right":
+                    tenant_overlay_template.bottom_right = none_overlay.key
+
+                tenant_overlay_template.put()
+
+        #######################################################
+        # DEVICES
+        #######################################################
         for each_device in tenant_devices:
             device_overlay_template = OverlayTemplate.create_or_get_by_device_key(each_device.key)
             image_in_use_in_posititions = device_overlay_template.image_in_use(image.key)

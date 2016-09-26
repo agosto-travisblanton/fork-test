@@ -254,11 +254,6 @@ class TenantsHandler(ExtendedSessionRequestHandler):
             tenant.overlays_available = overlay_status
         else:
             tenant.overlays_available = False
-        overlays_override = request_json.get('overlaysOverride')
-        if overlays_override != (None or ''):
-            tenant.overlays_override = overlays_override
-        else:
-            tenant.overlays_override = False
 
         email_list = delimited_string_to_list(request_json.get('notification_emails'))
         tenant.notification_emails = email_list

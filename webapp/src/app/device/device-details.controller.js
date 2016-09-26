@@ -141,7 +141,6 @@ function DeviceDetailsCtrl($log,
   ////////////////////////////////////////////////
   // Events and Issues Tab
   ////////////////////////////////////////////////
-
   vm.replaceIssueTime = function (issues) {
     for (let i = 0; i < issues.length; i++) {
       let each = issues[i];
@@ -256,6 +255,7 @@ function DeviceDetailsCtrl($log,
 
   vm.onGetDeviceSuccess = function (response) {
     vm.currentDevice = response
+    console.log(response.overlays)
     vm.currentDeviceCopy = angular.copy(vm.currentDevice)
     if (response.timezone !== vm.selectedTimezone) {
       vm.selectedTimezone = response.timezone;

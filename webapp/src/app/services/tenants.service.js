@@ -26,6 +26,10 @@ export default class TenantsService {
     return this.Restangular.oneUrl('overlay', `/api/v1/overlay/tenant/${tenant_urlsafe_key}`).customPOST(payload);
   }
 
+  overlayApplyTenant(tenant_urlsafe_key) {
+    return this.Restangular.oneUrl('overlay', `/api/v1/overlay/tenant/${tenant_urlsafe_key}/apply`).post();
+  }
+
   searchAllTenantsByName(tenant_name) {
     let promise = this.Restangular.all('tenants').customGETLIST("", {tenant_name: tenant_name})
     return promise;

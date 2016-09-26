@@ -491,7 +491,7 @@ class Tenant(ndb.Model):
     organization_unit_id = ndb.StringProperty(required=False, indexed=True)
     organization_unit_path = ndb.StringProperty(required=False, indexed=True)
     overlays_available = ndb.BooleanProperty(default=False, required=False, indexed=True)
-    overlays_override = ndb.BooleanProperty(default=False, required=False)
+    overlays_update_in_progress = ndb.BooleanProperty(default=False, required=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
     @property
@@ -573,7 +573,6 @@ class Tenant(ndb.Model):
                content_manager_base_url,
                notification_emails=[],
                overlays_available=False,
-               overlays_override=False,
                proof_of_play_logging=False,
                proof_of_play_url=config.DEFAULT_PROOF_OF_PLAY_URL,
                default_timezone=config.DEFAULT_TIMEZONE):
@@ -598,7 +597,6 @@ class Tenant(ndb.Model):
                    domain_key=domain_key,
                    active=active,
                    overlays_available=overlays_available,
-                   overlays_override=overlays_override,
                    content_manager_base_url=content_manager_base_url,
                    notification_emails=notification_emails,
                    proof_of_play_logging=proof_of_play_logging,
@@ -1236,40 +1234,55 @@ class OverlayTemplate(ndb.Model):
             self.top_right = overlay.key
             self.put()
 
-    def apply_overlay_template_to_all_tenant_devices(self, host, user_identifier):
-        if not self.tenant_key:
-            raise ValueError("This OverlayTemplate is not associated with a tenant_key. {}".format(self.key.urlsafe()))
+    def apply_overlay_template_to_all_tenant_devices(self, host, user_identifier, as_deferred=True, calledRecursivly=False):
+        if as_deferred and not calledRecursivly:
+            deferred.defer(self.apply_overlay_template_to_all_tenant_devices, host, user_identifier, calledRecursivly=True)
         else:
-            tenant_entity = self.tenant_key.get()
-            tenant_overlay_template = OverlayTemplate.create_or_get_by_tenant_key(tenant_entity.key)
-            tenant_devices = tenant_entity.devices
-            device_modified = []
+            from device_message_processor import change_intent
 
-            for device in tenant_devices:
-                device_overlay_template = OverlayTemplate.create_or_get_by_device_key(device.key)
-                devices_appended = False
+            if not self.tenant_key:
+                raise ValueError("This OverlayTemplate is not associated with a tenant_key. {}".format(self.key.urlsafe()))
+            else:
+                tenant_entity = self.tenant_key.get()
+                tenant_entity.overlays_update_in_progress = True
+                tenant_entity.put()
+                tenant_overlay_template = OverlayTemplate.create_or_get_by_tenant_key(tenant_entity.key)
+                tenant_devices = tenant_entity.devices
 
-                if device.top_left.get().key != tenant_overlay_template.top_left.get().key:
-                    device_overlay_template.top_left = tenant_overlay_template.top_left
-                    if not devices_appended:
-                        device_modified.append(device)
+                for device in tenant_devices:
+                    device_overlay_template = OverlayTemplate.create_or_get_by_device_key(device.key)
+                    device_modified = False
 
-                if device_overlay_template.top_right.get().key != tenant_overlay_template.top_right.get().key:
-                    device_overlay_template.top_right = tenant_overlay_template.top_right
-                    if not devices_appended:
-                        device_modified.append(device)
+                    if device.overlays_available != tenant_entity.overlays_available:
+                        device.overlays_available = tenant_entity.overlays_available
+                        device_modified = True
 
-                if device_overlay_template.bottom_left.get().key != tenant_overlay_template.bottom_left.get().key:
-                    device_overlay_template.bottom_left = tenant_overlay_template.bottom_left
-                    if not devices_appended:
-                        device_modified.append(device)
+                    if device_overlay_template.top_left.get().key != tenant_overlay_template.top_left.get().key:
+                        device_overlay_template.top_left = tenant_overlay_template.top_left
+                        device_modified = True
 
+                    if device_overlay_template.top_right.get().key != tenant_overlay_template.top_right.get().key:
+                        device_overlay_template.top_right = tenant_overlay_template.top_right
+                        device_modified = True
 
-                if device_overlay_template.bottom_right.get().key != tenant_overlay_template.bottom_right.get().key:
-                    device_overlay_template.bottom_right = tenant_overlay_template.bottom_right
-                    if not devices_appended:
-                        device_modified.append(device)
+                    if device_overlay_template.bottom_left.get().key != tenant_overlay_template.bottom_left.get().key:
+                        device_overlay_template.bottom_left = tenant_overlay_template.bottom_left
+                        device_modified = True
 
-                device_overlay_template.put()
+                    if device_overlay_template.bottom_right.get().key != tenant_overlay_template.bottom_right.get().key:
+                        device_overlay_template.bottom_right = tenant_overlay_template.bottom_right
+                        device_modified = True
 
-            tenant_entity.gcm_update_devices(host=host, user_identifier=user_identifier, devices=device_modified)
+                    if device_modified:
+                        device_overlay_template.put()
+                        device.put()
+
+                        change_intent(
+                            gcm_registration_id=device.gcm_registration_id,
+                            payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                            device_urlsafe_key=device.key.urlsafe(),
+                            host=host,
+                            user_identifier=user_identifier)
+
+                tenant_entity.overlays_update_in_progress = False
+                tenant_entity.put()
