@@ -233,6 +233,8 @@ function TenantOverlaysCtrl($stateParams,
       ProgressBarService.complete();
       ToastsService.showErrorStatus("SOMETHING WENT WRONG RETRIEVING YOUR IMAGES")
     })
+
+    return promise
   };
 
   //////////////////////////////////////////////////////////////
