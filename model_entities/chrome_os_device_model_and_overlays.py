@@ -507,9 +507,11 @@ class Tenant(ndb.Model):
         else:
             raise ValueError("You must choose either an unmanaged player, a managed player, or both.")
 
-    def gcm_update_devices(self, host, user_identifier, deferred_call=True):
+    def gcm_update_devices(self, host, user_identifier, devices=None, deferred_call=True):
         from device_message_processor import change_intent
-        for each_device in self.devices:
+        if not devices:
+            devices = self.devices
+        for each_device in devices:
             if deferred_call:
                 deferred.defer(
                     change_intent,
@@ -1234,18 +1236,40 @@ class OverlayTemplate(ndb.Model):
             self.top_right = overlay.key
             self.put()
 
-    def apply_overlay_template_to_all_tenant_devices(self):
+    def apply_overlay_template_to_all_tenant_devices(self, host, user_identifier):
         if not self.tenant_key:
             raise ValueError("This OverlayTemplate is not associated with a tenant_key. {}".format(self.key.urlsafe()))
         else:
             tenant_entity = self.tenant_key.get()
             tenant_overlay_template = OverlayTemplate.create_or_get_by_tenant_key(tenant_entity.key)
             tenant_devices = tenant_entity.devices
+            device_modified = []
 
             for device in tenant_devices:
                 device_overlay_template = OverlayTemplate.create_or_get_by_device_key(device.key)
-                device_overlay_template.top_left = tenant_overlay_template.top_left
-                device_overlay_template.top_right = tenant_overlay_template.top_right
-                device_overlay_template.bottom_left = tenant_overlay_template.bottom_left
-                device_overlay_template.bottom_right = tenant_overlay_template.bottom_right
+                devices_appended = False
+
+                if device.top_left.get().key != tenant_overlay_template.top_left.get().key:
+                    device_overlay_template.top_left = tenant_overlay_template.top_left
+                    if not devices_appended:
+                        device_modified.append(device)
+
+                if device_overlay_template.top_right.get().key != tenant_overlay_template.top_right.get().key:
+                    device_overlay_template.top_right = tenant_overlay_template.top_right
+                    if not devices_appended:
+                        device_modified.append(device)
+
+                if device_overlay_template.bottom_left.get().key != tenant_overlay_template.bottom_left.get().key:
+                    device_overlay_template.bottom_left = tenant_overlay_template.bottom_left
+                    if not devices_appended:
+                        device_modified.append(device)
+
+
+                if device_overlay_template.bottom_right.get().key != tenant_overlay_template.bottom_right.get().key:
+                    device_overlay_template.bottom_right = tenant_overlay_template.bottom_right
+                    if not devices_appended:
+                        device_modified.append(device)
+
                 device_overlay_template.put()
+
+            tenant_entity.gcm_update_devices(host=host, user_identifier=user_identifier, devices=device_modified)

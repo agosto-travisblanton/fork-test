@@ -63,7 +63,7 @@ class OverlayHandler(ExtendedSessionRequestHandler):
                     "message": "ONE OF YOUR KEYS WAS NOT VALID."
                 }, status_code=400)
 
-        # key representes position
+        # key represents position
         for key, value in request_json.iteritems():
             # type can be None, but its not optional. None is an overlay Type
             overlay_type = value.get("type")
@@ -99,7 +99,7 @@ class OverlayHandler(ExtendedSessionRequestHandler):
     def tenant_apply_overlay_to_devices(self, tenant_urlsafe_key):
         tenant = self.validate_and_get(tenant_urlsafe_key, Tenant, abort_on_not_found=True)
         tenant_overlay_template = OverlayTemplate.create_or_get_by_tenant_key(tenant.key)
-        tenant_overlay_template.apply_overlay_template_to_all_tenant_devices()
+        tenant_overlay_template.apply_overlay_template_to_all_tenant_devices(host=self.request.host_url, user_identifier="system (overlay override)")
         tenant.gcm_update_devices(host=self.request.host_url, user_identifier="system (overlay override)")
         return json_response(self.response, {
             "success": True,
