@@ -6,7 +6,9 @@
   </md-toolbar>
   <md-content class="md-padding">
     <div flex="80" flex-xs="100" layout="column">
-      <div ncy-breadcrumb></div>
+      <div ncy-breadcrumb>
+      </div>
+
     </div>
     <md-tabs md-stretch-tabs md-selected="tabIndex" md-border-bottom>
       <md-tab label="General"></md-tab>
@@ -16,12 +18,10 @@
       <md-tab label="Overlays"></md-tab>
     </md-tabs>
     <div flex="60" flex-sm="100" flex-xs="30" layout="column">
-
       <div class="col-md-12">
         <div ng-include="'webapp/src/app/tenant/tenant-overlays/overlay.html'"></div>
         <div ng-include="'webapp/src/app/tenant/tenant-overlays/logo-upload.html'"></div>
       </div>
-
     </div>
   </md-content>
 </div>

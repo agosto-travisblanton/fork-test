@@ -60,6 +60,8 @@ function TenantOverlaysCtrl($stateParams,
   }
 
   vm.submitOverlaySettings = () => {
+    vm.loadingOverlays = true;
+
     let overlaySettings = angular.copy(vm.currentTenantCopy.overlays)
     ProgressBarService.start();
     let promise = TenantsService.saveOverlaySettings(
@@ -77,7 +79,11 @@ function TenantOverlaysCtrl($stateParams,
       });
     };
 
-    $timeout(updateOverlayPromiseDeferred, 1000)
+    promise.then(() => {
+      $timeout(updateOverlayPromiseDeferred, 1000)
+
+    })
+
 
     promise.catch((res) => {
       ProgressBarService.complete();

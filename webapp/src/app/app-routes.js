@@ -215,9 +215,9 @@ export function routes($stateProvider, $urlRouterProvider, RestangularProvider) 
     url: "/tenants/:tenantKey/overlays",
     templateUrl: "app/tenant/tenant-overlays.html",
     controller: "TenantOverlaysCtrl",
-    controllerAs: 'tenantOverlaysCtrl',
+    controllerAs: 'vm',
     ncyBreadcrumb: {
-      label: '{{ tenantOverlaysCtrl.currentTenant.name }}',
+      label: '{{ vm.currentTenant.name }}',
       parent: 'tenants'
     }
   });

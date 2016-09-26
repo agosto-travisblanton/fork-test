@@ -7,7 +7,6 @@ export default class TenantsService {
   }
 
   save(tenant) {
-    console.log("tenant", tenant)
     if (tenant.key !== undefined) {
       var promise = tenant.put();
     } else {

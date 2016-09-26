@@ -255,7 +255,6 @@ function DeviceDetailsCtrl($log,
 
   vm.onGetDeviceSuccess = function (response) {
     vm.currentDevice = response
-    console.log(response.overlays)
     vm.currentDeviceCopy = angular.copy(vm.currentDevice)
     if (response.timezone !== vm.selectedTimezone) {
       vm.selectedTimezone = response.timezone;
@@ -263,6 +262,7 @@ function DeviceDetailsCtrl($log,
     if (vm.tenantKey === undefined) {
       vm.tenantKey = vm.currentDevice.tenantKey;
     }
+
     if ($stateParams.fromDevices === "true") {
       vm.backUrl = '/#/devices';
       vm.backUrlText = 'Back to devices';
