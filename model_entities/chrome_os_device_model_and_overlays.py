@@ -1072,7 +1072,7 @@ class Overlay(ndb.Model):
     @staticmethod
     def create_or_get(overlay_type, size=None, image_urlsafe_key=None):
         size_options = ["large", "small"]
-        if size != None:
+        if size:
             if (size.lower() not in size_options) and (overlay_type.lower() != "logo"):
                 raise ValueError("Overlay size must be in {}".format(size_options))
 
@@ -1086,7 +1086,8 @@ class Overlay(ndb.Model):
         else:
             image_key = None
 
-        overlay_query = Overlay.query(ndb.AND(Overlay.type == overlay_type, Overlay.image_key == image_key)).fetch()
+        overlay_query = Overlay.query(
+            ndb.AND(Overlay.type == overlay_type, Overlay.image_key == image_key, Overlay.size == size)).fetch()
 
         if overlay_query:
             overlay = overlay_query[0]
@@ -1234,14 +1235,17 @@ class OverlayTemplate(ndb.Model):
             self.top_right = overlay.key
             self.put()
 
-    def apply_overlay_template_to_all_tenant_devices(self, host, user_identifier, as_deferred=True, calledRecursivly=False):
+    def apply_overlay_template_to_all_tenant_devices(self, host, user_identifier, as_deferred=True,
+                                                     calledRecursivly=False):
         if as_deferred and not calledRecursivly:
-            deferred.defer(self.apply_overlay_template_to_all_tenant_devices, host, user_identifier, calledRecursivly=True)
+            deferred.defer(self.apply_overlay_template_to_all_tenant_devices, host, user_identifier,
+                           calledRecursivly=True)
         else:
             from device_message_processor import change_intent
 
             if not self.tenant_key:
-                raise ValueError("This OverlayTemplate is not associated with a tenant_key. {}".format(self.key.urlsafe()))
+                raise ValueError(
+                    "This OverlayTemplate is not associated with a tenant_key. {}".format(self.key.urlsafe()))
             else:
                 tenant_entity = self.tenant_key.get()
                 tenant_entity.overlays_update_in_progress = True

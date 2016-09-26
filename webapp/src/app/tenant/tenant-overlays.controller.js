@@ -46,6 +46,19 @@ function TenantOverlaysCtrl($stateParams,
     })
   }
 
+  vm.updateOverlays = () => {
+    vm.loadingOverlays = true;
+    let tenantPromise = vm.getTenant();
+    tenantPromise.then((tenant) => {
+      vm.overlayChanged = false;
+      ToastsService.showSuccessToast('We saved your update.');
+      vm.currentTenant.overlays = tenant.overlays;
+      vm.currentTenantCopy.overlays = angular.copy(vm.currentTenant);
+      vm.loadingOverlays = false;
+    })
+    return tenantPromise;
+  }
+
   vm.submitOverlaySettings = () => {
     let overlaySettings = angular.copy(vm.currentTenantCopy.overlays)
     ProgressBarService.start();
@@ -57,20 +70,14 @@ function TenantOverlaysCtrl($stateParams,
       overlaySettings.top_left
     );
 
-    vm.loading = true;
-    promise.then((res) => {
-      let tenantPromise = vm.getTenant();
-      tenantPromise.then((tenant) => {
-        vm.overlayChanged = false;
-        ToastsService.showSuccessToast('We saved your update.');
-        vm.currentTenant.overlays = tenant.overlays;
-        vm.currentTenantCopy.overlays = angular.copy(vm.currentTenant);
-        vm.loading = false;
+    let updateOverlayPromiseDeferred = () => {
+      let updateOverlayPromise = vm.updateOverlays();
+      updateOverlayPromise.then((res) => {
         ProgressBarService.complete();
       });
+    };
 
-
-    });
+    $timeout(updateOverlayPromiseDeferred, 1000)
 
     promise.catch((res) => {
       ProgressBarService.complete();
@@ -123,7 +130,6 @@ function TenantOverlaysCtrl($stateParams,
       if (currentTenantOverlays[pos].type !== currentTenantCopyOverlays[pos].type) {
         changed = true;
       }
-
       if (currentTenantOverlays[pos].type === 'logo') {
         if ((currentTenantOverlays[pos].type + ": " + currentTenantOverlays[pos].name) !== currentTenantCopyOverlays[pos].name) {
           changed = true;
@@ -160,6 +166,17 @@ function TenantOverlaysCtrl($stateParams,
     }
   }
 
+  vm.getTenantImagesAndReloadTenantAfterDelete = () => {
+    let tenantImagePromise = vm.getTenantImages();
+    tenantImagePromise.then(() => {
+      let updateOverlayPromise = vm.updateOverlays();
+      updateOverlayPromise.then(() => {
+        ToastsService.showSuccessToast('We deleted your image.');
+        ProgressBarService.complete();
+      })
+    })
+  }
+
   vm.deleteImage = (ev, name, key) => {
     let confirm = $mdDialog.confirm(
       {
@@ -174,17 +191,12 @@ function TenantOverlaysCtrl($stateParams,
 
     $mdDialog.show(confirm).then((function () {
       ProgressBarService.start();
-
       ImageService.deleteImage(key)
         .then((res) => {
-          $timeout(vm.getTenantImages, 1000);
-          ToastsService.showSuccessToast('We deleted your image.');
-          ProgressBarService.complete();
+          $timeout(vm.getTenantImagesAndReloadTenantAfterDelete, 1000);
         })
         .catch((res) => {
-          $timeout(vm.getTenantImages, 1000);
           ToastsService.showErrorToast('Something went wrong while deleting your image.');
-
           ProgressBarService.complete();
         })
     }))

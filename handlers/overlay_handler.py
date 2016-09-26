@@ -54,7 +54,7 @@ class OverlayHandler(ExtendedSessionRequestHandler):
         tenant = self.validate_and_get(tenant_urlsafe_key, Tenant, abort_on_not_found=True)
 
         # array of dictionaries that contain data about each overlay
-        overlay_template = OverlayTemplate.create_or_get_by_tenant_key(tenant.key)
+        tenant_overlay_template = OverlayTemplate.create_or_get_by_tenant_key(tenant.key)
 
         for each_key in request_json.keys():
             if each_key.lower() not in ["bottom_left", "bottom_right", "top_right", "top_left"]:
@@ -71,14 +71,11 @@ class OverlayHandler(ExtendedSessionRequestHandler):
             image_key = value.get("image_key")
             size = value.get("size")
 
-            overlay_template.set_overlay(position=key,
-                                         size=size.lower() if size else None,
-                                         overlay_type=overlay_type,
-                                         image_urlsafe_key=image_key)
-
-        # if tenant.overlays_override:
-            # !!! SENDS GCM UPDATE TO ALL DEVICES IN TENANT
-            # tenant.gcm_update_devices(host=self.request.host_url, user_identifier="system (overlay override)")
+            tenant_overlay_template.set_overlay(
+                position=key,
+                size=size.lower() if size else None,
+                overlay_type=overlay_type,
+                image_urlsafe_key=image_key)
 
         return json_response(self.response, {
             "success": True,
@@ -88,7 +85,8 @@ class OverlayHandler(ExtendedSessionRequestHandler):
     def tenant_apply_overlay_to_devices(self, tenant_urlsafe_key):
         tenant = self.validate_and_get(tenant_urlsafe_key, Tenant, abort_on_not_found=True)
         tenant_overlay_template = OverlayTemplate.create_or_get_by_tenant_key(tenant.key)
-        tenant_overlay_template.apply_overlay_template_to_all_tenant_devices(host=self.request.host_url, user_identifier="system (overlay override)")
+        tenant_overlay_template.apply_overlay_template_to_all_tenant_devices(host=self.request.host_url,
+                                                                             user_identifier="system (overlay override)")
 
         return json_response(self.response, {
             "success": True,

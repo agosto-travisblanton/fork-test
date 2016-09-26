@@ -43,8 +43,12 @@
               <md-progress-circular md-mode="indeterminate"></md-progress-circular>
             </div>
           </div>
-          <div class="form-group" ng-if="!vm.loading" ng-show="vm.currentTenant.overlayStatus">
-
+          <div ng-if="vm.loadingOverlays">
+            <div layout="row" layout-sm="column" layout-align="space-around">
+              <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+            </div>
+          </div>
+          <div class="form-group" ng-if="!vm.loading && vm.currentTenant.overlayStatus && !vm.loadingOverlays">
             <div class="col-md-12">
               <div class="col-md-5 col-sm-12">
                 <md-input-container>
