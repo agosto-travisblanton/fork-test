@@ -5,38 +5,36 @@
       <section name="overlay">
         <div class="row">
           <div class="col-md-12">
-            <div class="col-md-2">
-              <h3>Overlay</h3>
-            </div>
-            <div class="col-md-7 col-md-offset-3">
+              <h3>Overlays</h3>
+            <hr/>
+            <div class="row">
+              <div class="col-md-8 col-md-offset-2">
+                <md-input-container>
+                  <md-button type="submit"
+                             class="md-raised"
+                             ng-click="vm.applyTenantOverlay($event)"
+                             ng-disabled="vm.overlayChanged || vm.loading">
 
-              <md-input-container>
-                <md-button type="submit"
-                           class="md-raised"
-                           ng-click="vm.applyTenantOverlay($event)"
-                           ng-disabled="vm.overlayChanged || vm.loading">
-
-                  Apply
-                </md-button>
-                <md-button
-                  class="md-raised md-primary"
-                  ng-disabled="vm.currentTenant.overlayStatus"
-                  ng-click="vm.adjustOverlayStatus(true)">
-                  ENABLE
-                </md-button>
-                <md-button
-                  class="md-raised md-primary"
-                  ng-disabled="!vm.currentTenant.overlayStatus"
-                  ng-click="vm.adjustOverlayStatus(false)">
-                  DISABLE
-                </md-button>
-              </md-input-container>
+                    Apply
+                  </md-button>
+                  <md-button
+                    class="md-raised md-primary"
+                    ng-disabled="vm.currentTenant.overlayStatus"
+                    ng-click="vm.adjustOverlayStatus(true)">
+                    ENABLE
+                  </md-button>
+                  <md-button
+                    class="md-raised md-primary"
+                    ng-disabled="!vm.currentTenant.overlayStatus"
+                    ng-click="vm.adjustOverlayStatus(false)">
+                    DISABLE
+                  </md-button>
+                </md-input-container>
+              </div>
             </div>
           </div>
-          <hr/>
         </div>
         <div ng-if="vm.currentTenant.overlayStatus || vm.loading">
-          <hr/>
           <div ng-if="vm.loading">
             <div layout="row" layout-sm="column" layout-align="space-around">
               <p>Please wait while your "Apply" takes effect.</p>
