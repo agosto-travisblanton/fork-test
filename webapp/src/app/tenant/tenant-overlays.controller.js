@@ -31,11 +31,13 @@ function TenantOverlaysCtrl($stateParams,
   vm.adjustOverlayStatus = (status) => {
     vm.currentTenant.overlayStatus = status
     ProgressBarService.start();
+    vm.loadingOverlays = true;
     let promise = TenantsService.save(vm.currentTenant);
     promise.then(() => {
       ProgressBarService.complete()
       let tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey);
       tenantPromise.then(function (tenant) {
+        vm.loadingOverlays = false;
         return vm.onSuccessResolvingTenant(tenant);
       });
     })
@@ -53,7 +55,7 @@ function TenantOverlaysCtrl($stateParams,
       vm.overlayChanged = false;
       ToastsService.showSuccessToast('We saved your update.');
       vm.currentTenant.overlays = tenant.overlays;
-      vm.currentTenantCopy.overlays = angular.copy(vm.currentTenant);
+      vm.currentTenantCopy.overlays = angular.copy(vm.currentTenant.overlays);
       vm.loadingOverlays = false;
     })
     return tenantPromise;

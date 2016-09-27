@@ -36,10 +36,34 @@ function DeviceDetailsCtrl($log,
   vm.enrollmentEvents = [];
   vm.logoChange = false;
   vm.controlsModeOptions = ["visible", "invisible", "disabled"]
+  vm.overlayChanged = false;
+
 
   /////////////////////////////////////////////////
   // Overlay
   /////////////////////////////////////////////////
+  vm.checkForOverlayChanges = () => {
+    let changed = false;
+    let currentDeviceOverlays = vm.currentDevice.overlays;
+    let currentDeviceCopyOverlays = vm.currentDeviceCopy.overlays;
+    let positions = ['top_left', 'top_right', 'bottom_right', 'bottom_left'];
+
+    for (let pos of positions) {
+      if (currentDeviceOverlays[pos].size !== currentDeviceCopyOverlays[pos].size) {
+        changed = true;
+      }
+      if (currentDeviceOverlays[pos].type !== currentDeviceCopyOverlays[pos].type) {
+        changed = true;
+      }
+      if (currentDeviceOverlays[pos].type === 'logo') {
+        if ((currentDeviceOverlays[pos].type + ": " + currentDeviceOverlays[pos].name) !== currentDeviceCopyOverlays[pos].name) {
+          changed = true;
+        }
+      }
+    }
+    vm.overlayChanged = changed;
+  }
+
   vm.adjustControlsMode = () => {
     let controlsMode = vm.currentDevice.controlsMode;
     ProgressBarService.start();
@@ -70,6 +94,7 @@ function DeviceDetailsCtrl($log,
   vm.submitOverlaySettings = () => {
     let overlaySettings = angular.copy(vm.currentDeviceCopy.overlays)
     ProgressBarService.start();
+    vm.loadingOverlays = true;
     let promise = DevicesService.saveOverlaySettings(
       vm.deviceKey,
       overlaySettings.bottom_left,
@@ -78,8 +103,14 @@ function DeviceDetailsCtrl($log,
       overlaySettings.top_left
     )
     promise.then((res) => {
-      ProgressBarService.complete();
-      ToastsService.showSuccessToast('We saved your update.');
+      let devicePromise = DevicesService.getDeviceByKey(vm.deviceKey);
+      devicePromise.then((currentDevice) => {
+        vm.currentDevice.overlays = currentDevice.overlays;
+        vm.currentDeviceCopy.overlays = angular.copy(vm.currentDevice.overlays)
+        vm.loadingOverlays = false;
+        ProgressBarService.complete();
+        ToastsService.showSuccessToast('We saved your update.');
+      })
     })
 
     promise.catch((res) => {
@@ -106,8 +137,6 @@ function DeviceDetailsCtrl($log,
     vm.OVERLAY_TYPES = [
       {size: null, type: null, name: "none", realName: "none", new: false, image_key: null},
       {size: null, type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
-      // {size: "large", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
-      // {size: "default", type: "datetime", name: "datetime", realName: "datetime", new: true, image_key: null},
     ]
 
     ProgressBarService.start();

@@ -5,42 +5,51 @@
       <section name="overlay">
         <div class="row">
           <div class="col-md-12">
-            <div class="col-md-2">
-              <h3>Overlays</h3>
-            </div>
-            <div class="col-md-9 col-md-offset-2">
+            <h3>Overlays</h3>
+            <hr/>
+            <div class="row">
+              <div class="col-md-8 col-md-offset-2" style="margin-top: -1.5em">
+                <md-input-container>
+                  <md-button type="submit"
+                             class="md-raised"
+                             ng-click="vm.applyTenantOverlay($event)"
+                             ng-disabled="vm.overlayChanged || vm.loading">
 
-              <md-input-container>
-                <md-button type="submit"
-                           class="md-raised"
-                           ng-click="vm.applyTenantOverlay($event)"
-                           ng-disabled="vm.overlayChanged || vm.loading">
-
-                  REVERT
-                </md-button>
-                <md-button
-                  class="md-raised md-primary"
-                  ng-disabled="deviceDetailsCtrl.currentDevice.overlayStatus"
-                  ng-click="deviceDetailsCtrl.adjustOverlayStatus(true)">
-                  ENABLE
-                </md-button>
-                <md-button
-                  class="md-raised md-primary"
-                  ng-disabled="!deviceDetailsCtrl.currentDevice.overlayStatus"
-                  ng-click="deviceDetailsCtrl.adjustOverlayStatus(false)">
-                  DISABLE
-                </md-button>
-              </md-input-container>
+                    REVERT
+                  </md-button>
+                  <md-button
+                    class="md-raised md-primary"
+                    ng-disabled="deviceDetailsCtrl.currentDevice.overlayStatus"
+                    ng-click="deviceDetailsCtrl.adjustOverlayStatus(true)">
+                    ENABLE
+                  </md-button>
+                  <md-button
+                    class="md-raised md-primary"
+                    ng-disabled="!deviceDetailsCtrl.currentDevice.overlayStatus"
+                    ng-click="deviceDetailsCtrl.adjustOverlayStatus(false)">
+                    DISABLE
+                  </md-button>
+                </md-input-container>
+              </div>
             </div>
           </div>
           <hr/>
         </div>
-        <div class="form-group" ng-show="deviceDetailsCtrl.currentDevice.overlayStatus">
+
+        <div ng-if="deviceDetailsCtrl.loadingOverlays">
+          <div layout="row" layout-sm="column" layout-align="space-around" style="margin-bottom: 12em;">
+            <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+          </div>
+        </div>
+
+        <div class="form-group"
+             ng-if="deviceDetailsCtrl.currentDevice.overlayStatus && !deviceDetailsCtrl.loadingOverlays">
           <div class="col-md-12">
             <div class="col-md-5 col-sm-12">
               <md-input-container>
                 <label>Top-Left</label>
-                <md-select ng-model="deviceDetailsCtrl.currentDeviceCopy.overlays.top_left">
+                <md-select md-on-close="deviceDetailsCtrl.checkForOverlayChanges()"
+                           ng-model="deviceDetailsCtrl.currentDeviceCopy.overlays.top_left">
                   <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES"
                              ng-value="overlay"
                              ng-selected="
@@ -58,7 +67,8 @@
             <div class="col-md-5   col-sm-12" style="float: right">
               <md-input-container>
                 <label>Top-Right</label>
-                <md-select ng-model="deviceDetailsCtrl.currentDeviceCopy.overlays.top_right">
+                <md-select md-on-close="deviceDetailsCtrl.checkForOverlayChanges()"
+                           ng-model="deviceDetailsCtrl.currentDeviceCopy.overlays.top_right">
                   <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES"
                              ng-value="overlay"
                              ng-selected="
@@ -78,7 +88,8 @@
             <div class="col-md-5  col-sm-12">
               <md-input-container>
                 <label>Bottom-Left</label>
-                <md-select ng-model="deviceDetailsCtrl.currentDeviceCopy.overlays.bottom_left">
+                <md-select md-on-close="deviceDetailsCtrl.checkForOverlayChanges()"
+                           ng-model="deviceDetailsCtrl.currentDeviceCopy.overlays.bottom_left">
                   <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES"
                              ng-value="overlay"
                              ng-selected="
@@ -96,7 +107,8 @@
             <div class="col-md-5  col-sm-12" style="float: right">
               <md-input-container>
                 <label>Bottom-Right</label>
-                <md-select ng-model="deviceDetailsCtrl.currentDeviceCopy.overlays.bottom_right">
+                <md-select md-on-close="deviceDetailsCtrl.checkForOverlayChanges()"
+                           ng-model="deviceDetailsCtrl.currentDeviceCopy.overlays.bottom_right">
                   <md-option ng-repeat="overlay in deviceDetailsCtrl.OVERLAY_TYPES"
                              ng-value="overlay"
                              ng-selected="
@@ -117,7 +129,7 @@
               <md-button type="submit"
                          class="md-raised md-primary"
                          ng-click="deviceDetailsCtrl.submitOverlaySettings(overlayForm)"
-                         ng-disabled="overlayForm.$pristine || overlayForm.$invalid">
+                         ng-disabled="!deviceDetailsCtrl.overlayChanged || overlayForm.$invalid">
                 <i class="fa fa-fw fa-save"></i>
                 SYNC
               </md-button>
