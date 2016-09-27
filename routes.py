@@ -2,7 +2,8 @@ from env_setup import setup
 from provisioning_env import (
     on_development_server,
     on_integration_server,
-    on_qa_server
+    on_qa_server,
+    on_test_harness
 )
 
 setup()
@@ -137,6 +138,12 @@ application = WSGIApplication(
               handler_method='panel_sleep',
               methods=['PUT']
               ),
+        Route(r'/api/v1/devices/<device_urlsafe_key>/controls-mode',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='controls_mode',
+              handler_method='controls_mode',
+              methods=['PUT']
+              ),
         Route(r'/api/v1/devices/<device_urlsafe_key>/commands',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
               name='device-commands',
@@ -207,7 +214,6 @@ application = WSGIApplication(
               handler_method='post_log',
               methods=['POST']
               ),
-
         ############################################################
         # (DISTRIBUTOR) DEVICE ROUTES
         ############################################################
@@ -356,6 +362,12 @@ application = WSGIApplication(
         ############################################################
         # IMAGE
         ############################################################
+        Route(r'/api/v1/image/<image_urlsafe_key>',
+              handler='handlers.image_handler.ImageHandler',
+              name='delete_image',
+              handler_method='delete_image',
+              methods=['DELETE'],
+              ),
 
         Route(r'/api/v1/image/<image_urlsafe_key>',
               handler='handlers.image_handler.ImageHandler',
@@ -481,12 +493,6 @@ application = WSGIApplication(
               handler_method='get_ou_list',
               methods=['GET']
               ),
-        Route(r'/api/v1/tenant_organizational_units',
-              handler='handlers.tenant_organization_units_handler.TenantOrganizationUnitsHandler',
-              name='tenant-organization-units',
-              handler_method='create',
-              methods=['POST']
-              ),
 
         ############################################################
         # /dev/ routes secured by admin:required
@@ -514,3 +520,9 @@ if on_development_server or on_integration_server or on_qa_server:
 
     for route in dev_routes:
         application.router.add(route)
+
+if on_development_server or on_test_harness:
+    application.router.add(Route(r'/_gcs/download/<base64_filename>',
+                                 handler='handlers.gcs.DownloadFileHandler',
+                                 name='gcs-download'
+                                 ))

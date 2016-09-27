@@ -50,10 +50,17 @@ function TenantAddCtrl($log, $location, TenantsService, DistributorsService, Tim
 
   vm.onFailureTenantSave = function (errorObject) {
     ProgressBarService.complete();
-    if (errorObject.status === 409) {
+    if(errorObject.status === 409) {
       return sweet.show('Oops...',
-        'Tenant code unavailable. Please modify tenant name to generate a unique tenant code.', 'error');
-    } else {
+        'Tenant code unavailable in Provisioning. Please modify tenant name to generate a unique tenant code.',
+        'error');
+    }
+    else if(errorObject.status === 412) {
+      return sweet.show('Oops...',
+        'Tenant code unavailable in Chrome Device Management. Modify tenant name to generate a unique tenant code.',
+        'error');
+    }
+    else {
       $log.error(errorObject);
       return sweet.show('Oops...', 'Unable to save the tenant.', 'error');
     }

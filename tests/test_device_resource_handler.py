@@ -155,16 +155,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertTrue('Bad response: 409 Conflict gcm registration id is already assigned to a managed device.'
                         in context.exception.message)
 
-    def test_device_resource_handler_post_no_returns_bad_response_for_empty_tenant_code(self):
-        request_body = {'macAddress': self.MAC_ADDRESS,
-                        'gcmRegistrationId': 'foobar',
-                        'tenantCode': None}
-        with self.assertRaises(AppError) as context:
-            self.app.post('/api/v1/devices', json.dumps(request_body),
-                          headers=self.api_token_authorization_header)
-        self.assertTrue('Bad response: 400 The tenantCode parameter is invalid.'
-                        in context.exception.message)
-
     def test_device_resource_handler_post_no_returns_bad_response_for_empty_gcm(self):
         request_body = {'macAddress': self.MAC_ADDRESS,
                         'gcmRegistrationId': None,
@@ -172,7 +162,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
                           headers=self.api_token_authorization_header)
-        self.assertTrue('Bad response: 400 The gcmRegistrationId parameter is invalid.'
+        self.assertTrue('required field gcmRegistrationId not found'
                         in context.exception.message)
 
     def test_device_resource_handler_post_no_returns_bad_response_for_empty_mac_address(self):
@@ -182,7 +172,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
                           headers=self.api_token_authorization_header)
-        self.assertTrue('Bad response: 400 The macAddress parameter is invalid.'
+        print context.exception.message
+        self.assertTrue('required field macAddress not found'
                         in context.exception.message)
 
     def test_post_managed_device_when_cannot_resolve_tenant(self):
@@ -192,7 +183,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
                           headers=self.api_token_authorization_header)
-        self.assertTrue('Bad response: 400 Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
+        print context.exception.message
+        self.assertTrue('400 Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
                         in context.exception.message)
 
     def test_post_managed_device_creates_device_with_default_timezone_and_expected_offset(self):
@@ -209,7 +201,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                                  headers=self.api_token_authorization_header)
         location_uri_components = str(response.headers['Location']).split('/')
         device = ndb.Key(urlsafe=location_uri_components[6]).get()
-        default_timezone = 'America/Chicago'
+        default_timezone = config.DEFAULT_TIMEZONE
         self.assertEqual(device.timezone_offset, TimezoneUtil.get_timezone_offset(default_timezone))
         self.assertEqual(device.timezone, default_timezone)
 
@@ -269,7 +261,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
                           headers=self.unmanaged_registration_token_authorization_header)
-        self.assertTrue('Bad response: 400 The gcmRegistrationId parameter is invalid.'
+        self.assertTrue('required field gcmRegistrationId not found'
                         in context.exception.message)
 
     def test_device_resource_handler_unmanaged_post_returns_bad_response_for_empty_mac_address(self):
@@ -278,7 +270,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         with self.assertRaises(AppError) as context:
             self.app.post('/api/v1/devices', json.dumps(request_body),
                           headers=self.unmanaged_registration_token_authorization_header)
-        self.assertTrue('Bad response: 400 The macAddress parameter is invalid.'
+        self.assertTrue('required field macAddress not found'
                         in context.exception.message)
 
     def test_device_resource_handler_unmanaged_post_populates_location_header(self):
@@ -870,6 +862,64 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             if e.__class__.__name__ == 'ProtocolBufferDecodeError':
                 self.assertTrue(message in Exception.message)
 
+
+    ##################################################################################################################
+    # controls_mode
+    ##################################################################################################################
+
+    def test_controls_mode_returns_ok_status(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                                                     any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+        uri = application.router.build(None,
+                                       'controls_mode',
+                                       None,
+                                       {'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
+        request_body = {"controlsMode": 'invisible'}
+        response = self.app.put(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        self.assertOK(response)
+
+    def test_controls_mode_alters_device_value(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                                                     any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+        device_controls_mode = self.chrome_os_device.controls_mode
+        self.assertEqual('invisible', device_controls_mode)
+
+        uri = application.router.build(None,
+                                       'controls_mode',
+                                       None,
+                                       {'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
+        request_body = {"controlsMode": 'visible'}
+        response = self.app.put(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+        self.assertOK(response)
+        device_controls_mode = self.chrome_os_device.controls_mode
+        self.assertEqual(device_controls_mode, 'visible')
+
+    def test_controls_mode_with_bogus_device_key_returns_not_found_status(self):
+        when(device_message_processor).change_intent(gcm_registration_id=self.chrome_os_device.gcm_registration_id,
+                                                     payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                                                     device_urlsafe_key=any_matcher(str),
+                                                     host=any_matcher(str),
+                                                     user_identifier=any_matcher(str)).thenReturn(None)
+        bogus_key = '0AXC19Z0DE'
+        uri = application.router.build(None,
+                                       'controls_mode',
+                                       None,
+                                       {'device_urlsafe_key': bogus_key})
+        request_body = {}
+        try:
+            self.app.put(uri, json.dumps(request_body), headers=self.valid_authorization_header)
+            message = 'Bad response: 404 refresh_device_representation command not executed because device not found with key: {1}'.format(
+                bogus_key
+            )
+        except Exception, e:
+            if e.__class__.__name__ == 'ProtocolBufferDecodeError':
+                self.assertTrue(message in Exception.message)
+
+
     def test_put_no_authorization_header_returns_forbidden(self):
         request_body = {'gcmRegistrationId': self.GCM_REGISTRATION_ID,
                         'tenantCode': self.TENANT_CODE,
@@ -1092,7 +1142,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(config.CHECK_FOR_CONTENT_INTERVAL_MINUTES, updated_display.check_for_content_interval_minutes)
 
     def test_put_updates_timezone_from_default_to_explicit(self):
-        default_timezone = 'America/Chicago'
+        default_timezone = config.DEFAULT_TIMEZONE
         explicit_timezone = 'America/Denver'
         self.assertEqual(self.managed_device.timezone_offset, TimezoneUtil.get_timezone_offset(default_timezone))
         request_body = {'timezone': explicit_timezone}
@@ -1153,6 +1203,30 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                             json.dumps(request_body),
                             headers=self.api_token_authorization_header)
         self.assertTrue('Bad response: 404 Device with key: {0} archived.'.format(device_key.urlsafe())
+                        in context.exception.message)
+
+    def test_archived_device_is_prevented_from_registering_again__with_same_gcm_registration_id(self):
+        gcm_registration_id = 'APA91bH3BQC-a4VjIsHmXd7ZsP_CXCZcyJQdP0lHS_4qaNYcg'
+        device = ChromeOsDevice.create_managed(
+            tenant_key=self.tenant_key,
+            gcm_registration_id=gcm_registration_id,
+            mac_address=self.MAC_ADDRESS)
+        device.put()
+        request_body = {}
+        self.assertFalse(device.archived)
+        when(device_message_processor).change_intent(any_matcher(), config.PLAYER_RESET_COMMAND).thenReturn(None)
+        self.app.delete('/api/v1/devices/{0}'.format(device.key.urlsafe()),
+                        json.dumps(request_body),
+                        headers=self.api_token_authorization_header)
+        updated_device = device.key.get()
+        self.assertTrue(updated_device.archived)
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': gcm_registration_id,
+                        'tenantCode': self.TENANT_CODE}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body),
+                          headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 409 Conflict gcm registration id is already assigned to a managed device.'
                         in context.exception.message)
 
     ##################################################################################################################
@@ -1574,7 +1648,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             gcm_registration_id=self.GCM_REGISTRATION_ID,
             device_id='1231231',
             mac_address='2313412341233')
-        device.timezone = 'America/Chicago'
+        device.timezone = config.DEFAULT_TIMEZONE
         device_key = device.put()
         request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
@@ -1583,8 +1657,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
                         'lastError': self.LAST_ERROR,
                         'macAddress': '2313412341233',
                         'osVersion': '10.0',
-                        'timezone': 'America/Chicago',
-                        'timezoneOffset': TimezoneUtil.get_timezone_offset('America/Chicago') + 3}
+                        'timezone': config.DEFAULT_TIMEZONE,
+                        'timezoneOffset': TimezoneUtil.get_timezone_offset(config.DEFAULT_TIMEZONE) + 3}
         uri = build_uri('devices-heartbeat', params_dict={'device_urlsafe_key': device_key.urlsafe()})
         when(device_message_processor).change_intent(
             any_matcher(), config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND).thenReturn(None)

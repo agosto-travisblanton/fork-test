@@ -1,13 +1,16 @@
 import logging
 import uuid
-import ndb_json
+
 from datetime import datetime
 from google.appengine.datastore.datastore_query import Cursor
 from google.appengine.ext import ndb
+
+import ndb_json
 from app_config import config
-from restler.decorators import ae_ndb_serializer
 from domain_model import Domain
 from entity_groups import TenantEntityGroup
+from ndb_mixins import KeyValidatorMixin
+from restler.decorators import ae_ndb_serializer
 from utils.timezone_util import TimezoneUtil
 
 
@@ -73,6 +76,7 @@ class ChromeOsDevice(ndb.Model):
     archived = ndb.BooleanProperty(default=False, required=True, indexed=True)
     panel_sleep = ndb.BooleanProperty(default=False, required=True, indexed=True)
     overlay_available = ndb.BooleanProperty(default=False, required=True, indexed=True)
+    controls_mode = ndb.StringProperty(required=False, indexed=True, default='invisible')
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):
@@ -91,7 +95,24 @@ class ChromeOsDevice(ndb.Model):
     def overlays_as_dict(self):
         """ This method is offered because restler doesn't support keyProperty serialization beyond a single child"""
         json = ndb_json.dumps(self.overlays)
-        return ndb_json.loads(json)
+        python_dict = ndb_json.loads(json)
+        del python_dict["device_key"]
+        for key, value in python_dict.iteritems():
+            if key != "key":
+                if python_dict[key]:
+                    # Player team wants the positional key to also be in a field called "gravity"
+                    python_dict[key]["gravity"] = key
+                    if python_dict[key]["type"] == "logo":
+                        python_dict[key]["name"] = python_dict[key]["image_key"]["name"]
+                        del python_dict[key]["image_key"]["tenant_key"]
+                        python_dict[key]["imageKey"] = python_dict[key]["image_key"]
+                        del python_dict[key]["image_key"]
+                    else:
+                        python_dict[key]["name"] = python_dict[key]["type"]
+                        if python_dict[key]["name"] == None:
+                            python_dict[key]["name"] = "none"
+
+        return python_dict
 
     def enable_overlays(self):
         self.overlay_available = True
@@ -108,15 +129,24 @@ class ChromeOsDevice(ndb.Model):
                 return chrome_os_device_key.get()
 
     @classmethod
-    def create_managed(cls, tenant_key, gcm_registration_id, mac_address, ethernet_mac_address=None, device_id=None,
-                       serial_number=None, archived=False,
-                       model=None, timezone='America/Chicago', registration_correlation_identifier=None):
+    def create_managed(cls,
+                       gcm_registration_id,
+                       mac_address,
+                       tenant_key=None,
+                       ethernet_mac_address=None,
+                       device_id=None,
+                       serial_number=None,
+                       archived=False,
+                       model=None,
+                       timezone=config.DEFAULT_TIMEZONE,
+                       registration_correlation_identifier=None):
         timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
         proof_of_play_editable = False
-        tenant = tenant_key.get()
-        if tenant:
-            if tenant.proof_of_play_logging:
-                proof_of_play_editable = True
+        if tenant_key:
+            tenant = tenant_key.get()
+            if tenant:
+                if tenant.proof_of_play_logging:
+                    proof_of_play_editable = True
         device = cls(
             device_id=device_id,
             archived=archived,
@@ -147,7 +177,7 @@ class ChromeOsDevice(ndb.Model):
     def create_unmanaged(cls,
                          gcm_registration_id,
                          mac_address,
-                         timezone='America/Chicago',
+                         timezone=config.DEFAULT_TIMEZONE,
                          registration_correlation_identifier=None):
         timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
         device = cls(
@@ -181,6 +211,14 @@ class ChromeOsDevice(ndb.Model):
             results = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
                                            ndb.AND(ChromeOsDevice.archived == False)).fetch()
             return results
+        else:
+            return None
+
+    @classmethod
+    def get_by_serial_number(cls, serial_number):
+        if serial_number:
+            results = ChromeOsDevice.query(ChromeOsDevice.serial_number == serial_number).fetch()
+            return results[0] if results else  None  # there should never be multiple multiple serials in this query
         else:
             return None
 
@@ -244,8 +282,7 @@ class ChromeOsDevice(ndb.Model):
     def gcm_registration_id_already_assigned(cls, gcm_registration_id, is_unmanaged_device=False):
         gcm_registration_id_already_assigned_to_device = ChromeOsDevice.query(
             ndb.AND(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
-                    ChromeOsDevice.is_unmanaged_device == is_unmanaged_device,
-                    ChromeOsDevice.archived == False)).count() > 0
+                    ChromeOsDevice.is_unmanaged_device == is_unmanaged_device)).count() > 0
         return gcm_registration_id_already_assigned_to_device
 
     @classmethod
@@ -448,11 +485,66 @@ class Tenant(ndb.Model):
     notification_emails = ndb.StringProperty(repeated=True, indexed=False, required=False)
     proof_of_play_logging = ndb.BooleanProperty(default=False, required=True, indexed=True)
     proof_of_play_url = ndb.StringProperty(required=False)
-    default_timezone = ndb.StringProperty(required=True, indexed=True, default='America/Chicago')
+    default_timezone = ndb.StringProperty(required=True, indexed=True, default=config.DEFAULT_TIMEZONE)
+    enrollment_email = ndb.StringProperty(required=False, indexed=True)
+    enrollment_password = ndb.StringProperty(required=False, indexed=False)
+    organization_unit_id = ndb.StringProperty(required=False, indexed=True)
+    organization_unit_path = ndb.StringProperty(required=False, indexed=True)
     class_version = ndb.IntegerProperty()
 
     def get_domain(self):
         return self.domain_key.get()
+
+    @classmethod
+    def create(cls,
+               tenant_code,
+               name,
+               admin_email,
+               content_server_url,
+               domain_key,
+               active,
+               content_manager_base_url,
+               notification_emails=[],
+               proof_of_play_logging=False,
+               proof_of_play_url=config.DEFAULT_PROOF_OF_PLAY_URL,
+               default_timezone=config.DEFAULT_TIMEZONE):
+
+        validator = KeyValidatorMixin()
+        domain = validator.validate_and_get(
+            urlsafe_key=domain_key.urlsafe(),
+            kind_cls=Domain,
+            abort_on_not_found=True)
+        if domain.organization_unit_path:
+            organization_unit_path = '{0}/{1}'.format(domain.organization_unit_path, tenant_code)
+        else:
+            organization_unit_path = '/skykit/{0}'.format(tenant_code)
+        enrollment_password = cls.generate_enrollment_password(config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE)
+        enrollment_email = 'en.{0}@{1}'.format(tenant_code, domain_key.get().name)
+        tenant_entity_group = TenantEntityGroup.singleton()
+        return cls(parent=tenant_entity_group.key,
+                   tenant_code=tenant_code,
+                   name=name,
+                   admin_email=admin_email,
+                   content_server_url=content_server_url,
+                   domain_key=domain_key,
+                   active=active,
+                   content_manager_base_url=content_manager_base_url,
+                   notification_emails=notification_emails,
+                   proof_of_play_logging=proof_of_play_logging,
+                   proof_of_play_url=proof_of_play_url,
+                   default_timezone=default_timezone,
+                   enrollment_password=enrollment_password,
+                   enrollment_email=enrollment_email,
+                   organization_unit_path=organization_unit_path)
+
+    @staticmethod
+    def generate_enrollment_password(length):
+        if not isinstance(length, int) or length < config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE:
+            raise ValueError('enrollment_password must be greater than {0} in length'.format(
+                config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE - 1))
+        chars = config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_CHARS
+        from os import urandom
+        return ''.join([chars[ord(c) % len(chars)] for c in urandom(length)])
 
     @classmethod
     def find_by_name(cls, name):
@@ -478,10 +570,37 @@ class Tenant(ndb.Model):
 
     @classmethod
     def find_by_tenant_code(cls, tenant_code):
-        if tenant_code:
-            tenant_key = Tenant.query(Tenant.tenant_code == tenant_code, Tenant.active == True).get(keys_only=True)
-            if tenant_key:
-                return tenant_key.get()
+        tenant_entity = Tenant.query(Tenant.tenant_code == tenant_code, Tenant.active == True).fetch()
+        if tenant_entity:
+            return tenant_entity[0]
+        else:
+            return None
+
+    @classmethod
+    def find_by_organization_unit_path(cls, organization_unit_path):
+        tenant = Tenant.query(Tenant.organization_unit_path == organization_unit_path,
+                              Tenant.active == True).fetch()
+        if tenant:
+            return tenant[0]
+        else:
+            organization_unit_path_components = organization_unit_path.split('/')
+            last_index = len(organization_unit_path_components) - 1
+            if organization_unit_path[0][0] == '/':  # leading forward slash
+                for i in range(1, last_index):
+                    if organization_unit_path_components[i].lower() == 'skykit':
+                        if organization_unit_path_components[i + 1]:
+                            tenant_code = organization_unit_path_components[i + 1].lower()
+                            tenant = Tenant.find_by_tenant_code(tenant_code)
+                            break
+            else:
+                for i in range(0, last_index):  # no leading forward slash
+                    if organization_unit_path_components[i].lower() == 'skykit':
+                        if organization_unit_path_components[i + 1]:
+                            tenant_code = organization_unit_path_components[i + 1].lower()
+                            tenant = Tenant.find_by_tenant_code(tenant_code)
+                            break
+
+        return tenant
 
     @classmethod
     def is_tenant_code_unique(cls, tenant_code):
@@ -755,26 +874,6 @@ class Tenant(ndb.Model):
             return domain.impersonation_admin_email_address
 
     @classmethod
-    def create(cls, tenant_code, name, admin_email, content_server_url, domain_key, active,
-               content_manager_base_url, notification_emails=[], proof_of_play_logging=False,
-               proof_of_play_url=config.DEFAULT_PROOF_OF_PLAY_URL, default_timezone='America/Chicago'):
-
-        tenant_entity_group = TenantEntityGroup.singleton()
-
-        return cls(parent=tenant_entity_group.key,
-                   tenant_code=tenant_code,
-                   name=name,
-                   admin_email=admin_email,
-                   content_server_url=content_server_url,
-                   domain_key=domain_key,
-                   active=active,
-                   content_manager_base_url=content_manager_base_url,
-                   notification_emails=notification_emails,
-                   proof_of_play_logging=proof_of_play_logging,
-                   proof_of_play_url=proof_of_play_url,
-                   default_timezone=default_timezone)
-
-    @classmethod
     def toggle_proof_of_play_on_tenant_devices(cls, should_be_enabled, tenant_code, tenant_key=None):
         if tenant_key:
             tenant = tenant_key.get()
@@ -861,26 +960,30 @@ class Location(ndb.Model):
 #####################################################
 @ae_ndb_serializer
 class Image(ndb.Model):
-    svg_rep = ndb.TextProperty(required=True)
+    filepath = ndb.StringProperty(required=True, indexed=True)
     name = ndb.StringProperty(required=True, indexed=True)
     tenant_key = ndb.KeyProperty(kind=Tenant, required=True)
+
+    @property
+    def gcs_path(self):
+        return self.tenant_key.get().tenant_code + "/" + self.name
 
     @staticmethod
     def exists_within_tenant(tenant_key, name):
         return Image.query(ndb.AND(Image.tenant_key == tenant_key, Image.name == name)).fetch()
 
     @staticmethod
-    def create(svg_rep, name, tenant_key):
+    def create(filepath, name, tenant_key):
         if not Image.exists_within_tenant(tenant_key, name):
             image = Image(
-                svg_rep=svg_rep,
+                filepath=filepath,
                 name=name,
                 tenant_key=tenant_key
             )
             image.put()
             return image
         else:
-            return False
+            raise ValueError("This filename already exists in this tenant")
 
     @staticmethod
     def get_by_tenant_key(tenant_key):
@@ -893,13 +996,18 @@ class Image(ndb.Model):
 @ae_ndb_serializer
 class Overlay(ndb.Model):
     type = ndb.StringProperty(indexed=True, required=False)
+    size = ndb.StringProperty(indexed=True, required=False)
     # an overlay is optionally associated with an image
     image_key = ndb.KeyProperty(kind=Image, required=False)
 
     @staticmethod
-    def create_or_get(overlay_type, image_urlsafe_key=None):
+    def create_or_get(overlay_type, size="original", image_urlsafe_key=None):
+        size_options = ["original", "large", "small"]
+        if size and size.lower() not in size_options:
+            raise ValueError("Overlay size must be in {}".format(size_options))
+
         # not an overlay with an image that doesn't have a image_urlsafe_key
-        if overlay_type == "LOGO":
+        if overlay_type and overlay_type.lower() == "logo":
             if image_urlsafe_key == None:
                 raise ValueError("You must provide an image_key if you are creating an overlay logo")
 
@@ -916,8 +1024,9 @@ class Overlay(ndb.Model):
         # this type of overlay (or type and logo combination) has not been created yet
         else:
             overlay = Overlay(
-                type=overlay_type,
-                image_key=image_key
+                type=overlay_type.lower() if overlay_type else overlay_type,
+                image_key=image_key,
+                size=size.lower() if size else size
             )
 
             overlay.put()
@@ -932,6 +1041,44 @@ class OverlayTemplate(ndb.Model):
     bottom_left = ndb.KeyProperty(kind=Overlay, required=False)
     bottom_right = ndb.KeyProperty(kind=Overlay, required=False)
     device_key = ndb.KeyProperty(kind=ChromeOsDevice, required=True)
+
+    def image_in_use(self, image_key):
+        in_use_dict = {
+            "top_left": False,
+            "top_right": False,
+            "bottom_left": False,
+            "bottom_right": False
+        }
+
+        top_left = self.top_left.get()
+        if top_left:
+            top_left_image = top_left.image_key
+            if top_left_image:
+                if top_left_image.get().key == image_key:
+                    in_use_dict["top_left"] = True
+
+        top_right = self.top_right.get()
+        if top_right:
+            top_right_image = top_right.image_key
+            if top_right_image:
+                if top_right_image.get().key == image_key:
+                    in_use_dict["top_right"] = True
+
+        bottom_left = self.bottom_left.get()
+        if bottom_left:
+            bottom_left_image = bottom_left.image_key
+            if bottom_left_image:
+                if bottom_left_image.get().key == image_key:
+                    in_use_dict["bottom_left"] = True
+
+        bottom_right = self.bottom_right.get()
+        if bottom_right:
+            bottom_right_image = bottom_right.image_key
+            if bottom_right_image:
+                if bottom_right_image.get().key == image_key:
+                    in_use_dict["bottom_right"] = True
+
+        return in_use_dict
 
     @staticmethod
     # plural, but will always return the 0th index since we are only supporting one template per device for now
@@ -973,22 +1120,22 @@ class OverlayTemplate(ndb.Model):
             return overlay_template
 
     # expects a a dictionary with config about overlay
-    def set_overlay(self, position, overlay_type, image_urlsafe_key=None):
+    def set_overlay(self, position, overlay_type, size="original", image_urlsafe_key=None):
 
-        overlay = Overlay.create_or_get(overlay_type=overlay_type, image_urlsafe_key=image_urlsafe_key)
+        overlay = Overlay.create_or_get(overlay_type=overlay_type, size=size, image_urlsafe_key=image_urlsafe_key)
 
-        if position.upper() == "TOP_LEFT":
+        if position.lower() == "top_left":
             self.top_left = overlay.key
             self.put()
 
-        elif position.upper() == "BOTTOM_LEFT":
+        elif position.upper() == "bottom_left":
             self.bottom_left = overlay.key
             self.put()
 
-        elif position.upper() == "BOTTOM_RIGHT":
+        elif position.upper() == "bottom_right":
             self.bottom_right = overlay.key
             self.put()
 
-        elif position.upper() == "TOP_RIGHT":
+        elif position.upper() == "top_right":
             self.top_right = overlay.key
             self.put()

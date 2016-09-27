@@ -1,6 +1,7 @@
+import random
+
 from app_config import config
 from env_setup import setup_test_paths
-import random
 
 setup_test_paths()
 import datetime
@@ -54,6 +55,19 @@ class TestTenantModel(BaseTest):
                                                                    gcm_registration_id='f090d7348d78b6cfa6df76dfa1b',
                                                                    mac_address='98d2247f2101')
         self.device_to_be_archived_key = self.device_to_be_archived.put()
+
+    def test_generate_enrollment_password_has_acceptable_random_characters(self):
+        enrollment_password = Tenant.generate_enrollment_password(config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE)
+        self.assertTrue(len(enrollment_password), config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE)
+        for p in enrollment_password:
+            self.assertTrue(p in config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_CHARS)
+
+    def test_generate_enrollment_password_length_too_small_throws_value_error(self):
+        with self.assertRaises(ValueError) as context:
+            Tenant.generate_enrollment_password(config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE - 1)
+        error_message = 'enrollment_password must be greater than {0} in length'.format(
+            config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE - 1)
+        self.assertTrue(error_message in context.exception.message)
 
     def test_create_sets_tenant_entity_group_as_parent(self):
         actual = Tenant.find_by_name(self.NAME)
@@ -109,7 +123,7 @@ class TestTenantModel(BaseTest):
         self.assertEqual(self.CONTENT_MANAGER_BASE_URL, tenant_created.content_manager_base_url)
         self.assertEqual(self.NAME, tenant_created.name)
         self.assertEqual(self.domain_key, tenant_created.domain_key)
-        self.assertEqual(tenant_created.default_timezone, 'America/Chicago')
+        self.assertEqual(tenant_created.default_timezone, config.DEFAULT_TIMEZONE)
         self.assertLength(0, tenant_created.notification_emails)
 
     def test_create_gives_default_proof_of_play_url(self):
@@ -130,6 +144,36 @@ class TestTenantModel(BaseTest):
         tenant_created = Tenant.find_by_name('FOOBAR_TENANT')
         self.assertNotEqual(tenant_created.proof_of_play_url, config.DEFAULT_PROOF_OF_PLAY_URL)
         self.assertEqual(tenant_created.proof_of_play_url, proof_of_play_url)
+
+    def test_create_sets_organization_unit_path(self):
+        expected_organization_unit_path = '/skykit/{0}'.format(self.TENANT_CODE)
+        self.assertEqual(expected_organization_unit_path, self.tenant.organization_unit_path)
+
+    def test_create_sets_organization_unit_path_with_prefix(self):
+        organization_unit_path = '/abc/123/skykit'
+        domain = Domain.create(name=self.CHROME_DEVICE_DOMAIN,
+                               distributor_key=self.distributor_key,
+                               impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
+                               active=True,
+                               organization_unit_path=organization_unit_path)
+        domain_key = domain.put()
+        tenant_with_prefix_on_domain = Tenant.create(tenant_code=self.TENANT_CODE,
+                                                     name=self.NAME,
+                                                     admin_email=self.ADMIN_EMAIL,
+                                                     content_server_url=self.CONTENT_SERVER_URL,
+                                                     content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                                                     domain_key=domain_key,
+                                                     active=False)
+        tenant_with_prefix_on_domain.put()
+        expected_organization_unit_path = '{0}/{1}'.format(organization_unit_path, self.TENANT_CODE)
+        self.assertEqual(expected_organization_unit_path, tenant_with_prefix_on_domain.organization_unit_path)
+
+    def test_create_sets_enrollment_password(self):
+        self.assertIsNotNone(self.tenant.enrollment_password)
+
+    def test_create_sets_expected_enrollment_email_format(self):
+        expected_enrollment_email_format = 'en.{0}@{1}'.format(self.TENANT_CODE, self.domain_key.get().name)
+        self.assertEqual(expected_enrollment_email_format, self.tenant.enrollment_email)
 
     def test_is_tenant_code_unique_returns_false_when_code_found(self):
         uniqueness_check = Tenant.is_tenant_code_unique(self.TENANT_CODE)
@@ -307,7 +351,7 @@ class TestTenantModel(BaseTest):
                                active=True)
         tenant_key = tenant.put()
 
-        device_1 = ChromeOsDevice.create_managed(tenant_key,
+        device_1 = ChromeOsDevice.create_managed(tenant_key=tenant_key,
                                                  gcm_registration_id='1PA91bHyMJRcN7mj7b0aXGWE7Ae', archived=False,
                                                  mac_address='1')
         device_1.put()
@@ -332,7 +376,7 @@ class TestTenantModel(BaseTest):
                                active=True)
         tenant_key = tenant.put()
 
-        device_1 = ChromeOsDevice.create_managed(tenant_key,
+        device_1 = ChromeOsDevice.create_managed(tenant_key=tenant_key,
                                                  gcm_registration_id='1PA91bHyMJRcN7mj7b0aXGWE7Ae', archived=False,
                                                  mac_address='1')
         device_1.put()
@@ -514,3 +558,30 @@ class TestTenantModel(BaseTest):
         for device in devices:
             self.assertFalse(device.proof_of_play_logging)
             self.assertFalse(device.proof_of_play_editable)
+
+    ##################################################################################################################
+    # find_by_organization_unit_path
+    ##################################################################################################################
+    def test_find_by_organization_unit_path_when_stored_on_tenant_object(self):
+        tenant = Tenant.find_by_organization_unit_path('/skykit/foobar')
+        self.assertTrue(tenant.tenant_code, self.TENANT_CODE)
+
+    def test_find_by_organization_unit_path_when_not_stored_on_tenant_object_with_leading_forward_slash(self):
+        self.tenant.organization_unit_path = None
+        self.tenant.put()
+        tenant = Tenant.find_by_organization_unit_path('/something/Skykit/foobar/some_device_property')
+        self.assertTrue(tenant.tenant_code, self.TENANT_CODE)
+        tenant = Tenant.find_by_organization_unit_path('/something/skykit/foobar/some_device_property')
+        self.assertTrue(tenant.tenant_code, self.TENANT_CODE)
+        tenant = Tenant.find_by_organization_unit_path('/something/skykit/Foobar/some_device_property')
+        self.assertTrue(tenant.tenant_code, self.TENANT_CODE)
+
+    def test_find_by_organization_unit_path_when_not_stored_on_tenant_object_without_leading_forward_slash(self):
+        self.tenant.organization_unit_path = None
+        self.tenant.put()
+        tenant = Tenant.find_by_organization_unit_path('something/Skykit/foobar/some_device_property')
+        self.assertTrue(tenant.tenant_code, self.TENANT_CODE)
+        tenant = Tenant.find_by_organization_unit_path('something/skykit/foobar/some_device_property')
+        self.assertTrue(tenant.tenant_code, self.TENANT_CODE)
+        tenant = Tenant.find_by_organization_unit_path('something/skykit/Foobar/some_device_property')
+        self.assertTrue(tenant.tenant_code, self.TENANT_CODE)

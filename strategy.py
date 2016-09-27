@@ -26,6 +26,10 @@ TENANT_FIELDS = [
     'proof_of_play_url',
     'default_timezone',
     'active',
+    'enrollment_email',
+    'enrollment_password',
+    'organization_unit_id',
+    'organization_unit_path',
     'created',
     'updated'
 ]
@@ -130,8 +134,9 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'playlistId': lambda o, field_name, context: o.playlist_id},
     {'lastError': lambda o, field_name, context: o.last_error},
     {'archived': lambda o, field_name, context: o.archived},
-    {'overlay_status': lambda o, field_name, context: o.overlay_available},
-    {'overlay': lambda o, field_name, context: o.overlays_as_dict if o.overlay_available else None}
+    {'controlsMode': lambda o, field_name, context: o.controls_mode},
+    {'overlayStatus': lambda o, field_name, context: o.overlay_available},
+    {'overlays': lambda o, field_name, context: o.overlays_as_dict if o.overlay_available else None}
 
 ]
 
@@ -177,6 +182,7 @@ DEVICE_ISSUE_LOG_STRATEGY += [
 DOMAIN_FIELDS = [
     'name',
     'impersonation_admin_email_address',
+    'organization_unit_path',
     'active',
     'created',
     'updated'

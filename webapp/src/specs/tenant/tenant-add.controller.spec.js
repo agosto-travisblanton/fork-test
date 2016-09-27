@@ -165,7 +165,21 @@ describe('TenantAddCtrl', function () {
       it('stops the progress bar animation', () => expect(progressBarService.complete).toHaveBeenCalled());
 
       return it("show the error dialog", function () {
-        let expectedError = 'Tenant code unavailable. Please modify tenant name to generate a unique tenant code.';
+        let expectedError = 'Tenant code unavailable in Provisioning. Please modify tenant name to generate a unique tenant code.';
+        return expect(sweet.show).toHaveBeenCalledWith('Oops...', expectedError, 'error');
+      });
+    });
+
+    describe('.onFailureTenantSave 412 Precondition Failed', function () {
+      beforeEach(function () {
+        let errorObject = {status: 412};
+        return controller.onFailureTenantSave(errorObject);
+      });
+
+      it('stops the progress bar animation', () => expect(progressBarService.complete).toHaveBeenCalled());
+
+      return it("show the error dialog", function () {
+        let expectedError = 'Tenant code unavailable in Chrome Device Management. Modify tenant name to generate a unique tenant code.';
         return expect(sweet.show).toHaveBeenCalledWith('Oops...', expectedError, 'error');
       });
     });
