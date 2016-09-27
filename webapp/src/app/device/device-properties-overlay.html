@@ -10,13 +10,16 @@
             <div class="row">
               <div class="col-md-8 col-md-offset-2" style="margin-top: -1.5em">
                 <md-input-container>
-                  <md-button type="submit"
-                             class="md-raised"
-                             ng-click="vm.applyTenantOverlay($event)"
+                  <button type="submit"
+                             tooltips
+                             tooltip-side="left"
+                             tooltip-template="Revert your Device Overlay to your Tenant Overlay Configuration."
+                             class="md-button md-raised"
+                             ng-click="deviceDetailsCtrl.revertToTenantOverlay($event)"
                              ng-disabled="vm.overlayChanged || vm.loading">
 
                     REVERT
-                  </md-button>
+                  </button>
                   <md-button
                     class="md-raised md-primary"
                     ng-disabled="deviceDetailsCtrl.currentDevice.overlayStatus"

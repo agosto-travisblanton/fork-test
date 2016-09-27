@@ -85,9 +85,9 @@ class OverlayHandler(ExtendedSessionRequestHandler):
     def tenant_apply_overlay_to_devices(self, tenant_urlsafe_key):
         tenant = self.validate_and_get(tenant_urlsafe_key, Tenant, abort_on_not_found=True)
         tenant_overlay_template = OverlayTemplate.create_or_get_by_tenant_key(tenant.key)
-        tenant_overlay_template.apply_overlay_template_to_all_tenant_devices(host=self.request.host_url,
-                                                                             user_identifier="system (overlay override)")
-
+        tenant_overlay_template.apply_overlay_template_to_all_tenant_devices(
+            host=self.request.host_url,
+            user_identifier="system (overlay override)")
         return json_response(self.response, {
             "success": True,
             "overlay_template": tenant.overlays_as_dict

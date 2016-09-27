@@ -64,6 +64,50 @@ function DeviceDetailsCtrl($log,
     vm.overlayChanged = changed;
   }
 
+
+  vm.revertToTenantOverlay = (ev) => {
+    ProgressBarService.start();
+    vm.loadingOverlays = true;
+    let tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey);
+    tenantPromise.then(function (tenant) {
+      let currentTenantOverlays = tenant.overlays;
+      delete currentTenantOverlays.key;
+
+      for (let key in currentTenantOverlays) {
+        if (currentTenantOverlays[key]["type"] === "logo") {
+          currentTenantOverlays[key]["image_key"] = currentTenantOverlays[key]["imageKey"]["key"]
+        } else {
+          currentTenantOverlays[key]["image_key"] = null;
+        }
+      };
+
+      let promise = DevicesService.saveOverlaySettings(
+        vm.deviceKey,
+        currentTenantOverlays.bottom_left,
+        currentTenantOverlays.bottom_right,
+        currentTenantOverlays.top_right,
+        currentTenantOverlays.top_left
+      );
+
+      promise.then((res) => {
+        let devicePromise = DevicesService.getDeviceByKey(vm.deviceKey);
+        devicePromise.then((currentDevice) => {
+          vm.currentDevice.overlays = currentDevice.overlays;
+          vm.currentDeviceCopy.overlays = angular.copy(vm.currentDevice.overlays)
+          vm.loadingOverlays = false;
+          ProgressBarService.complete();
+          ToastsService.showSuccessToast('We saved your update.');
+        })
+      });
+
+      promise.catch((res) => {
+        ProgressBarService.complete();
+        ToastsService.showErrorToast('Something went wrong');
+      })
+    });
+
+  };
+
   vm.adjustControlsMode = () => {
     let controlsMode = vm.currentDevice.controlsMode;
     ProgressBarService.start();
@@ -116,7 +160,6 @@ function DeviceDetailsCtrl($log,
     promise.catch((res) => {
       ProgressBarService.complete();
       ToastsService.showErrorToast('Something went wrong');
-
     })
   };
 

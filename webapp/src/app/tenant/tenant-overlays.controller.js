@@ -53,7 +53,6 @@ function TenantOverlaysCtrl($stateParams,
     let tenantPromise = vm.getTenant();
     tenantPromise.then((tenant) => {
       vm.overlayChanged = false;
-      ToastsService.showSuccessToast('We saved your update.');
       vm.currentTenant.overlays = tenant.overlays;
       vm.currentTenantCopy.overlays = angular.copy(vm.currentTenant.overlays);
       vm.loadingOverlays = false;
@@ -77,15 +76,14 @@ function TenantOverlaysCtrl($stateParams,
     let updateOverlayPromiseDeferred = () => {
       let updateOverlayPromise = vm.updateOverlays();
       updateOverlayPromise.then((res) => {
+        ToastsService.showSuccessToast('We saved your update.');
         ProgressBarService.complete();
       });
     };
 
     promise.then(() => {
       $timeout(updateOverlayPromiseDeferred, 1000)
-
     })
-
 
     promise.catch((res) => {
       ProgressBarService.complete();
@@ -284,7 +282,6 @@ function TenantOverlaysCtrl($stateParams,
     vm.getTenantImages()
     vm.getTenant()
   }
-
 
   $scope.$watch('tabIndex', function (toTab, fromTab) {
     if (toTab !== undefined) {

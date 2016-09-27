@@ -5,18 +5,22 @@
       <section name="overlay">
         <div class="row">
           <div class="col-md-12">
-              <h3>Overlays</h3>
+            <h3>Overlays</h3>
+            <p>Configure default overlays for the Tenant's devices. You can override the default Tenant Overlays in the Device Detail view.</p>
             <hr/>
             <div class="row">
               <div class="col-md-8 col-md-offset-2" style="margin-top: -1.5em">
                 <md-input-container>
-                  <md-button type="submit"
-                             class="md-raised"
-                             ng-click="vm.applyTenantOverlay($event)"
-                             ng-disabled="vm.overlayChanged || vm.loading">
+                  <button type="submit"
+                          tooltips
+                          tooltip-side="left"
+                          tooltip-template="Apply your Tenant Overlay to all Device Overlays in your Tenant."
+                          class="md-button md-raised"
+                          ng-click="vm.applyTenantOverlay($event)"
+                          ng-disabled="vm.overlayChanged || vm.loading">
 
                     Apply
-                  </md-button>
+                  </button>
                   <md-button
                     class="md-raised md-primary"
                     ng-disabled="vm.currentTenant.overlayStatus"
