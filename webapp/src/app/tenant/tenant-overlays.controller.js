@@ -156,21 +156,30 @@ function TenantOverlaysCtrl($stateParams,
   vm.submitImage = () => {
     if (vm.selectedLogo && vm.selectedLogo[0]) {
       var formData = new FormData();
+      let validFile = true;
       angular.forEach(vm.selectedLogo, function (obj) {
-        formData.append('files', obj.lfFile);
+        if (obj.lfFile.size < 15000000) {
+          formData.append('files', obj.lfFile);
+        } else {
+          vm.fileApi.removeAll()
+          validFile = false;
+          ToastsService.showErrorToast('Your image is larger than 15 MB. Please choose a smaller image');
+        }
       });
 
-      let promise = ImageService.saveImage(vm.tenantKey, formData)
-      promise.then((res) => {
-        ProgressBarService.complete();
-        $timeout(vm.getTenantImages, 1000);
-        vm.fileApi.removeAll()
-        ToastsService.showSuccessToast('We uploaded your image.');
-      })
-      promise.catch((res) => {
-        ProgressBarService.complete();
-        ToastsService.showErrorToast('Something went wrong. You may have already uploaded this image.');
-      })
+      if (validFile) {
+        let promise = ImageService.saveImage(vm.tenantKey, formData)
+        promise.then((res) => {
+          ProgressBarService.complete();
+          $timeout(vm.getTenantImages, 1000);
+          vm.fileApi.removeAll()
+          ToastsService.showSuccessToast('We uploaded your image.');
+        })
+        promise.catch((res) => {
+          ProgressBarService.complete();
+          ToastsService.showErrorToast('Something went wrong. You may have already uploaded this image.');
+        })
+      }
     }
   }
 
