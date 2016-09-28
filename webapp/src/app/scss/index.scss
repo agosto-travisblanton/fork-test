@@ -579,19 +579,3 @@ md-select {
   min-width: 180px;
   max-width: 180px;
 }
-
-.small-delete-button {
-  float: right;
-  min-width: 25px;
-  margin-top: -15px;
-  margin-right: -5px;
-}
-
-
-.tenant-image-name {
-  width: 10em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis // This is where the magic happens
-
-}

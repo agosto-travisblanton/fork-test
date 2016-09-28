@@ -285,23 +285,5 @@ describe('DevicesService', function () {
     })
   );
 
-    describe('.adjustControlsMode', () =>
-    it('posts a controlsMode via Restangular', function () {
-      let deviceRestangularService = {
-        customPUT() {
-        }
-      };
-      spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
-      spyOn(deviceRestangularService, 'customPUT').and.returnValue(promise);
-
-      let deviceUrlsafeKey = 'bsdfljkdfsljkafsd';
-      let controlsMode = 'invisible';
-
-      let search = DevicesService.adjustControlsMode(deviceUrlsafeKey, controlsMode);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/devices/${deviceUrlsafeKey}/controls-mode`);
-      expect(deviceRestangularService.customPUT).toHaveBeenCalled();
-      return expect(search).toBe(promise);
-    })
-  );
 
 });

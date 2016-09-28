@@ -15,18 +15,16 @@ export default class TenantsService {
     return promise;
   }
 
-  saveOverlaySettings(tenant_urlsafe_key, bottom_left, bottom_right, top_right, top_left) {
-    let payload = {
-      bottom_left,
-      bottom_right,
-      top_right,
-      top_left,
-    }
-    return this.Restangular.oneUrl('overlay', `/api/v1/overlay/tenant/${tenant_urlsafe_key}`).customPOST(payload);
+  getImages(tenant_urlsafe_key) {
+    return this.Restangular.oneUrl('image', `/api/v1/image/tenant/${tenant_urlsafe_key}`).getList()
   }
 
-  overlayApplyTenant(tenant_urlsafe_key) {
-    return this.Restangular.oneUrl('overlay', `/api/v1/overlay/tenant/${tenant_urlsafe_key}/apply`).post();
+  saveImage(tenant_urlsafe_key, svg_rep, name) {
+    let payload = {
+      svg_rep,
+      name
+    }
+    return this.Restangular.oneUrl('image', `/api/v1/image/tenant/${tenant_urlsafe_key}`).customPOST(payload);
   }
 
   searchAllTenantsByName(tenant_name) {

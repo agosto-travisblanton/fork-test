@@ -14,12 +14,10 @@ function DomainDetailsCtrl($log,
     name: undefined,
     impersonation_admin_email_address: undefined,
     distributor_key: undefined,
-    organization_unit_path: '/skykit',
     active: true
   };
   vm.devicesAccess = false;
   vm.orgUnitsAccess = false;
-  vm.usersAccess = false;
   vm.currentDomains = [];
   vm.editMode = !!$stateParams.domainKey;
 
@@ -41,10 +39,8 @@ function DomainDetailsCtrl($log,
   vm.onSuccessDeterminingConnectivity = function (data) {
     vm.devicesAccess = data.devicesAccess;
     vm.orgUnitsAccess = data.orgUnitsAccess;
-    vm.usersAccess = data.usersAccess;
     vm.devicesAccessException = data.devicesAccessException;
     vm.orgUnitsAccessException = data.orgUnitsAccessException;
-    vm.usersAccessException = data.usersAccessException;
     ProgressBarService.complete();
   };
 

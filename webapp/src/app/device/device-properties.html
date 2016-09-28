@@ -253,7 +253,7 @@
         <div class="form-group">
           <label>Overlays Available</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.overlayStatus}}
+            {{deviceDetailsCtrl.currentDevice.overlay_status}}
           </div>
         </div>
         <div class="form-group"
@@ -464,23 +464,6 @@
             </div>
             <hr>
           </section>
-          <section name="controlsMode">
-            <h3>Panel Controls Mode</h3>
-            <div class="form-group">
-              <div class="col-sm-3">
-                <label>Controls Mode</label>
-                <select
-                  id="panelInput"
-                  class="form-control"
-                  ng-required="deviceDetailsCtrl.currentDevice.controlsMode !== null"
-                  ng-model="deviceDetailsCtrl.currentDevice.controlsMode"
-                  ng-change="deviceDetailsCtrl.adjustControlsMode()"
-                  ng-options="choice for choice in deviceDetailsCtrl.controlsModeOptions">
-                </select>
-              </div>
-            </div>
-            <hr>
-          </section>
           <section name="timezone">
             <h3>Timezone</h3>
             <div class="form-group"
@@ -543,8 +526,7 @@
         </form>
       </md-card-content>
     </md-card>
-    <div ng-include="'webapp/src/app/device/device-properties-overlay.html'"></div>
-
+    <!--<div ng-include="'webapp/src/app/device/device-properties-overlay.html'"></div>-->
   </div>
 </md-content>
 
