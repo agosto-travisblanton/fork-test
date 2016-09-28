@@ -3,15 +3,9 @@ import naturalSort from 'javascript-natural-sort';
 
 function TenantOverlaysCtrl($stateParams,
                             TenantsService,
-                            DomainsService,
-                            TimezonesService,
-                            DistributorsService,
                             $state,
-                            sweet,
                             ProgressBarService,
                             ToastsService,
-                            SessionsService,
-                            $location,
                             $scope,
                             ImageService,
                             $timeout,
@@ -259,8 +253,7 @@ function TenantOverlaysCtrl($stateParams,
     vm.currentTenant = tenant;
     vm.currentTenantCopy = angular.copy(vm.currentTenant);
     vm.selectedTimezone = tenant.default_timezone;
-    let domainPromise = DomainsService.getDomainByKey(tenant.domain_key);
-    return domainPromise.then(data => vm.selectedDomain = data);
+
   };
 
   vm.getTenant = () => {

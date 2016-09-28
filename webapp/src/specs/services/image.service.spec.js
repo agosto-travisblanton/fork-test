@@ -32,6 +32,23 @@ describe('ImageService', function () {
     })
   );
 
+
+  describe('.deleteImage', () =>
+    it('delete Image, returning a promise', function () {
+      let key = '33ik3k3k33k3k33l2l2l';
+      let imageRestangularService = {
+        remove() {
+        }
+      };
+      spyOn(Restangular, 'oneUrl').and.returnValue(imageRestangularService);
+      spyOn(imageRestangularService, 'remove').and.returnValue(promise);
+      let actual = ImageService.deleteImage(key);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('image', `/api/v1/image/${key}`);
+      expect(imageRestangularService.remove).toHaveBeenCalled();
+      expect(actual).toBe(promise);
+    })
+  );
+
   // Todo: Fix this test to test jQuery ajax call
   // describe('.saveImage', () =>
   //   it('saves Image, returning a promise', function () {
