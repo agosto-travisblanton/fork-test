@@ -85,9 +85,6 @@ describe('TenantOverlaysCtrl', function () {
         tenantsServicePromiseSave.resolve(true)
         tenantsServicePromise.resolve(true)
         expect(controller.loadingOverlays).toEqual(false);
-
-        // expect(TenantsService, 'getTenantByKey').toHaveBeenCalled();
-        // expect(TenantsService, 'save').toHaveBeenCalled();
       })
     });
 
@@ -158,6 +155,20 @@ describe('TenantOverlaysCtrl', function () {
         controller.checkForOverlayChanges()
         expect(controller.overlayChanged).toEqual(true)
 
+      })
+    });
+
+    describe('getTenant', function () {
+
+      it('sets currentTenant', function () {
+        let tenant = {
+          overlays: {
+            stuff: 'blah'
+          }
+        };
+        controller.getTenant();
+        tenantsServicePromise.resolve(tenant)
+        expect(controller.currentTenant).toEqual(tenant)
       })
     });
 
