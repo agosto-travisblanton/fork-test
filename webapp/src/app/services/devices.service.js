@@ -12,15 +12,6 @@ export default class DevicesService {
     this.uriBase = 'v1/devices';
   }
 
-  adjustControlsMode(deviceKey, controlsMode) {
-    let payload = {
-      controlsMode
-    };
-
-    let promise = this.Restangular.oneUrl(this.SERVICE_NAME, `/api/v1/devices/${deviceKey}/controls-mode`).customPUT(payload);
-    return promise;
-  }
-
   getDeviceByMacAddress(macAddress) {
     let url = `api/v1/devices?mac_address=${macAddress}`;
     return this.Restangular.oneUrl('api/v1/devices', url).get();

@@ -773,24 +773,6 @@ describe('DeviceDetailsCtrl', function () {
     });
 
 
-    describe('.adjustControlsMode', function () {
-      beforeEach(function () {
-        spyOn(DevicesService, 'adjustControlsMode').and.returnValue(promise);
-        spyOn(ToastsService, 'showSuccessToast');
-        spyOn(ToastsService, 'showErrorToast');
-        controller.currentDevice = {
-          controlsMode: 'invisible'
-        }
-      });
-
-      it('calls DevicesService.adjustControlsMode with values', () => {
-        controller.adjustControlsMode();
-        promise.resolve(true);
-        expect(DevicesService.adjustControlsMode).toHaveBeenCalled();
-      })
-    });
-
-
     describe('.getTenantImages', function () {
 
       beforeEach(function () {
