@@ -16,7 +16,7 @@ function TenantOverlaysCtrl($stateParams,
   $scope.tabIndex = 4;
   vm.tenantKey = $stateParams.tenantKey;
   vm.editMode = !!$stateParams.tenantKey;
-  vm.currentTenant = null;
+  vm.currentTenant = {};
   vm.overlayChanged = false;
 
   ////////////////////////////////////////////////////////////////
@@ -32,7 +32,7 @@ function TenantOverlaysCtrl($stateParams,
       let tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey);
       tenantPromise.then(function (tenant) {
         vm.loadingOverlays = false;
-        return vm.onSuccessResolvingTenant(tenant);
+        vm.onSuccessResolvingTenant(tenant);
       });
     })
     promise.catch((err) => {
@@ -40,6 +40,7 @@ function TenantOverlaysCtrl($stateParams,
       ToastsService.showErrorToast('Something went wrong');
       console.log(err)
     })
+    return promise;
   }
 
   vm.updateOverlays = () => {
@@ -73,6 +74,7 @@ function TenantOverlaysCtrl($stateParams,
         ToastsService.showSuccessToast('We saved your update.');
         ProgressBarService.complete();
       });
+      return updateOverlayPromise;
     };
 
     promise.then(() => {
@@ -82,8 +84,8 @@ function TenantOverlaysCtrl($stateParams,
     promise.catch((res) => {
       ProgressBarService.complete();
       ToastsService.showErrorToast('Something went wrong');
-
     })
+    return promise;
   };
 
   vm.applyTenantOverlay = (ev) => {
@@ -113,6 +115,7 @@ function TenantOverlaysCtrl($stateParams,
         ToastsService.showErrorToast('Something went wrong');
 
       })
+      return promise;
     }))
 
   }
@@ -171,6 +174,7 @@ function TenantOverlaysCtrl($stateParams,
           ProgressBarService.complete();
           ToastsService.showErrorToast('Something went wrong. You may have already uploaded this image.');
         })
+        return promise;
       }
     }
   }
@@ -200,14 +204,15 @@ function TenantOverlaysCtrl($stateParams,
 
     $mdDialog.show(confirm).then((function () {
       ProgressBarService.start();
-      ImageService.deleteImage(key)
-        .then((res) => {
-          $timeout(vm.getTenantImagesAndReloadTenantAfterDelete, 1000);
-        })
-        .catch((res) => {
-          ToastsService.showErrorToast('Something went wrong while deleting your image.');
-          ProgressBarService.complete();
-        })
+      let promise = ImageService.deleteImage(key)
+      promise.then((res) => {
+        $timeout(vm.getTenantImagesAndReloadTenantAfterDelete, 1000);
+      })
+      promise.catch((res) => {
+        ToastsService.showErrorToast('Something went wrong while deleting your image.');
+        ProgressBarService.complete();
+      })
+      return promise;
     }))
   };
 
