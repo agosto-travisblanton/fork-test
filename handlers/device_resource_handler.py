@@ -527,7 +527,6 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                 device.timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
             overlay_status = request_json.get('overlayStatus')
             if overlay_status != None:
-                # change intent
                 device.overlays_available = overlay_status
             controls_mode = request_json.get('controlsMode')
             if controls_mode != None:
