@@ -495,15 +495,18 @@ class Tenant(ndb.Model):
     class_version = ndb.IntegerProperty()
 
     @property
-    def devices(self, unmanaged=True, managed=True):
+    def devices(self, unmanaged=True, managed=True, archived=False):
         if unmanaged and managed:
-            return ChromeOsDevice.query(ChromeOsDevice.tenant_key == self.key).fetch()
+            return ChromeOsDevice.query(ChromeOsDevice.tenant_key == self.key,
+                                        ChromeOsDevice.archived == archived).fetch()
         elif unmanaged and not managed:
             return ChromeOsDevice.query(ChromeOsDevice.tenant_key == self.key,
-                                        ChromeOsDevice.is_unmanaged_device == True).fetch()
+                                        ChromeOsDevice.is_unmanaged_device == True,
+                                        ChromeOsDevice.archived == archived).fetch()
         elif managed and not managed:
             return ChromeOsDevice.query(ChromeOsDevice.tenant_key == self.key,
-                                        ChromeOsDevice.is_unmanaged_device == False).fetch()
+                                        ChromeOsDevice.is_unmanaged_device == False,
+                                        ChromeOsDevice.archived == archived).fetch()
         else:
             raise ValueError("You must choose either an unmanaged player, a managed player, or both.")
 

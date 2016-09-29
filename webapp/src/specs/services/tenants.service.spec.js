@@ -107,4 +107,39 @@ describe('TenantsService', function () {
       return expect(actual).toBe(promise);
     })
   );
+
+
+  describe('.getImages', () =>
+    it('gets Images, returning a promise', function () {
+      let tenant = {key: 'dhYUYdfhdjfhlasddf7898a7sdfdas78d67', name: 'Foobar'};
+      let tenantRestangularService = {
+        getList() {
+        }
+      };
+      spyOn(Restangular, 'oneUrl').and.returnValue(tenantRestangularService);
+      spyOn(tenantRestangularService, 'getList').and.returnValue(promise);
+      let actual = TenantsService.getImages(tenant.key);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('image', `/api/v1/image/tenant/${tenant.key}`);
+      expect(tenantRestangularService.getList).toHaveBeenCalled();
+      return expect(actual).toBe(promise);
+    })
+  );
+
+  describe('.saveImage', () =>
+    it('saves Image, returning a promise', function () {
+      let tenant = {key: 'dhYUYdfhdjfhlasddf7898a7sdfdas78d67', name: 'Foobar'};
+      let tenantRestangularService = {
+        customPOST() {
+        }
+      };
+      let svg_rep = "<xml>";
+      let name = "some name";
+      spyOn(Restangular, 'oneUrl').and.returnValue(tenantRestangularService);
+      spyOn(tenantRestangularService, 'customPOST').and.returnValue(promise);
+      let search = TenantsService.saveImage(tenant.key, svg_rep, name);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('image', `/api/v1/image/tenant/${tenant.key}`);
+      expect(tenantRestangularService.customPOST).toHaveBeenCalled();
+      return expect(search).toBe(promise)
+    })
+  );
 });

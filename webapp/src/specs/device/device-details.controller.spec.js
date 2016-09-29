@@ -20,7 +20,6 @@ describe('DeviceDetailsCtrl', function () {
   let locationsServicePromise = undefined;
   let CommandsService = undefined;
   let ToastsService = undefined;
-  let ImageService = undefined;
   let commandsServicePromise = undefined;
   let sweet = undefined;
   let progressBarService = undefined;
@@ -96,7 +95,7 @@ describe('DeviceDetailsCtrl', function () {
   beforeEach(module('skykitProvisioning'));
 
   beforeEach(inject(function (_$controller_, _DevicesService_, _TimezonesService_, _LocationsService_, _CommandsService_,
-                              _sweet_, _ToastsService_, _$state_, _ImageService_, _$mdDialog_, _$log_, _StorageService_, _TenantsService_) {
+                              _sweet_, _ToastsService_, _$state_, _$mdDialog_, _$log_, _StorageService_, _TenantsService_) {
     $controller = _$controller_;
     $stateParams = {};
     $state = _$state_;
@@ -115,11 +114,9 @@ describe('DeviceDetailsCtrl', function () {
       complete() {
       }
     };
-    ImageService = _ImageService_
     sweet = _sweet_;
     let scope = {};
     serviceInjection = {
-      ImageService,
       $state,
       DevicesService,
       TenantsService,
@@ -738,7 +735,7 @@ describe('DeviceDetailsCtrl', function () {
 
       spyOn(DevicesService, 'getIssuesByKey').and.returnValue(getDeviceIssuesPromise);
       spyOn(progressBarService, 'start');
-      spyOn(ImageService, 'saveImage');
+      spyOn(TenantsService, 'saveImage');
       $stateParams.deviceKey = 'fkasdhfjfa9s8udyva7dygoudyg';
       controller = $controller('DeviceDetailsCtrl', serviceInjection)
     });
@@ -753,7 +750,7 @@ describe('DeviceDetailsCtrl', function () {
       it('calls saveDevice after adjusting currentDevice', () => {
         controller.adjustOverlayStatus(true)
         promise.resolve()
-        expect(controller.currentDevice.overlayStatus).toEqual(true)
+        expect(controller.currentDevice.overlay_status).toEqual(true)
         expect(DevicesService.save).toHaveBeenCalled();
       });
     });
@@ -764,10 +761,7 @@ describe('DeviceDetailsCtrl', function () {
         spyOn(ToastsService, 'showSuccessToast');
         spyOn(ToastsService, 'showErrorToast');
         controller.currentDevice = {
-          overlays: {}
-        }
-        controller.currentDeviceCopy = {
-          overlays: {}
+          overlay: {}
         }
       });
 
@@ -800,7 +794,7 @@ describe('DeviceDetailsCtrl', function () {
     describe('.getTenantImages', function () {
 
       beforeEach(function () {
-        spyOn(ImageService, 'getImages').and.returnValue(promise);
+        spyOn(TenantsService, 'getImages').and.returnValue(promise);
       });
 
 
@@ -816,9 +810,8 @@ describe('DeviceDetailsCtrl', function () {
 
         expect(controller.OVERLAY_TYPES.slice(-1)[0]).toEqual({
           realName: toResolve[0].name,
-          name: 'logo: ' + toResolve[0].name,
-          type: 'logo',
-          size: 'large',
+          name: 'LOGO: ' + toResolve[0].name,
+          type: 'LOGO',
           image_key: toResolve[0].key
         });
       });
