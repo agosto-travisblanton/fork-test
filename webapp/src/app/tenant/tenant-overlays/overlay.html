@@ -1,0 +1,150 @@
+<md-card>
+  <md-card-content>
+    <form name="overlayForm" class="form-horizontal"
+          novalidate>
+      <section name="overlay">
+        <div class="row">
+          <div class="col-md-12">
+            <h3>Overlays</h3>
+            <p>Configure default overlays for the Tenant's devices. You can override the default Tenant Overlays in the Device Detail view.</p>
+            <hr/>
+            <div class="row">
+              <div class="col-md-8 col-md-offset-2" style="margin-top: -1.5em">
+                <md-input-container>
+                  <button type="submit"
+                          tooltips
+                          tooltip-side="left"
+                          tooltip-template="Apply your Tenant Overlay to all Device Overlays in your Tenant."
+                          class="md-button md-raised"
+                          ng-click="vm.applyTenantOverlay($event)"
+                          ng-disabled="vm.overlayChanged || vm.loading">
+
+                    Apply
+                  </button>
+                  <md-button
+                    class="md-raised md-primary"
+                    ng-disabled="vm.currentTenant.overlayStatus"
+                    ng-click="vm.adjustOverlayStatus(true)">
+                    ENABLE
+                  </md-button>
+                  <md-button
+                    class="md-raised md-primary"
+                    ng-disabled="!vm.currentTenant.overlayStatus"
+                    ng-click="vm.adjustOverlayStatus(false)">
+                    DISABLE
+                  </md-button>
+                </md-input-container>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div ng-if="vm.currentTenant.overlayStatus || vm.loading">
+          <div ng-if="vm.loading">
+            <div layout="row" layout-sm="column" layout-align="space-around">
+              <p>Please wait while your "Apply" takes effect.</p>
+              <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+            </div>
+          </div>
+          <div ng-if="vm.loadingOverlays">
+            <div layout="row" layout-sm="column" layout-align="space-around">
+              <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+            </div>
+          </div>
+          <div class="form-group" ng-if="!vm.loading && vm.currentTenant.overlayStatus && !vm.loadingOverlays">
+            <div class="col-md-12">
+              <div class="col-md-5 col-sm-12">
+                <md-input-container>
+                  <label>Top-Left</label>
+                  <md-select md-on-close="vm.checkForOverlayChanges()"
+                             ng-model="vm.currentTenantCopy.overlays.top_left">
+                    <md-option ng-repeat="overlay in vm.OVERLAY_TYPES"
+                               ng-value="overlay"
+                               ng-selected="
+                             (overlay.realName === vm.currentTenant.overlays.top_left.name)
+                              &&
+                             (overlay.size === vm.currentTenant.overlays.top_left.size)
+                              ? 'selected' : ''"
+                    >
+                      {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" +
+                      overlay.size.toUpperCase() + ")" : '') }}
+                    </md-option>
+                  </md-select>
+                </md-input-container>
+              </div>
+              <div class="col-md-5   col-sm-12" style="float: right">
+                <md-input-container>
+                  <label>Top-Right</label>
+                  <md-select md-on-close="vm.checkForOverlayChanges()"
+                             ng-model="vm.currentTenantCopy.overlays.top_right">
+                    <md-option ng-repeat="overlay in vm.OVERLAY_TYPES"
+                               ng-value="overlay"
+                               ng-selected="
+                             (overlay.realName === vm.currentTenant.overlays.top_right.name)
+                              &&
+                             (overlay.size === vm.currentTenant.overlays.top_right.size)
+                              ? 'selected' : ''"
+                    >
+                      {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" +
+                      overlay.size.toUpperCase() + ")" : '') }}
+                    </md-option>
+                  </md-select>
+                </md-input-container>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="col-md-5  col-sm-12">
+                <md-input-container>
+                  <label>Bottom-Left</label>
+                  <md-select md-on-close="vm.checkForOverlayChanges()"
+                             ng-model="vm.currentTenantCopy.overlays.bottom_left">
+                    <md-option ng-repeat="overlay in vm.OVERLAY_TYPES"
+                               ng-value="overlay"
+                               ng-selected="
+                             (overlay.realName === vm.currentTenant.overlays.bottom_left.name)
+                              &&
+                             (overlay.size === vm.currentTenant.overlays.bottom_left.size)
+                              ? 'selected' : ''"
+                    >
+                      {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" +
+                      overlay.size.toUpperCase() + ")" : '') }}
+                    </md-option>
+                  </md-select>
+                </md-input-container>
+              </div>
+              <div class="col-md-5  col-sm-12" style="float: right">
+                <md-input-container>
+                  <label>Bottom-Right</label>
+                  <md-select md-on-close="vm.checkForOverlayChanges()"
+                             ng-model="vm.currentTenantCopy.overlays.bottom_right">
+                    <md-option ng-repeat="overlay in vm.OVERLAY_TYPES"
+                               ng-value="overlay"
+                               ng-selected="
+                             (overlay.realName === vm.currentTenant.overlays.bottom_right.name)
+                              &&
+                             (overlay.size === vm.currentTenant.overlays.bottom_right.size)
+                              ? 'selected' : ''"
+                    >
+                      {{overlay.name.toUpperCase() + ((overlay.size && overlay.name.toUpperCase() !== "NONE") ? " (" +
+                      overlay.size.toUpperCase() + ")" : '') }}
+                    </md-option>
+                  </md-select>
+                </md-input-container>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <md-card-actions layout="row" layout-align="end center">
+                <md-button type="submit"
+                           class="md-raised md-primary"
+                           ng-click="vm.submitOverlaySettings()"
+                           ng-disabled="!vm.overlayChanged || overlayForm.$invalid">
+                  <i class="fa fa-fw fa-save"></i>
+                  SYNC
+                </md-button>
+              </md-card-actions>
+            </div>
+          </div>
+        </div>
+      </section>
+    </form>
+  </md-card-content>
+</md-card>

@@ -21,6 +21,7 @@ import {ProofOfPlayMultiDisplayCtrl} from './proof/multi-display.controller'
 import {ProofOfPlayMultiResourceCtrl} from './proof/multi-resource.controller'
 import {ProofOfPlayCtrl} from './proof/proof-of-play.controller'
 // Services
+import ImageService from './services/image.service'
 import AdminService from './services/admin.service'
 import AuthorizationService from './services/authorization.service'
 import CommandsService from './services/commands.service'
@@ -40,6 +41,7 @@ import TimezonesService from './services/timezones.service'
 import ToastsService from './services/toasts.service'
 import VersionsService from './services/versions.service'
 // Tenant
+import {TenantOverlaysCtrl} from './tenant/tenant-overlays.controller'
 import {TenantAddCtrl} from './tenant/tenant-add.controller'
 import {TenantDetailsCtrl} from './tenant/tenant-details.controller'
 import {TenantLocationCtrl} from './tenant/tenant-location.controller'
@@ -75,6 +77,7 @@ app
   .service("TimezonesService", TimezonesService)
   .service("ToastsService", ToastsService)
   .service("VersionsService", VersionsService)
+  .service("ImageService", ImageService)
   // Device
   .controller("DeviceDetailsCommandsCtrl", DeviceDetailsCommandsCtrl)
   .controller("DeviceDetailsCtrl", DeviceDetailsCtrl)
@@ -97,6 +100,7 @@ app
   .controller("ProofOfPlayMultiResourceCtrl", ProofOfPlayMultiResourceCtrl)
   .controller("ProofOfPlayCtrl", ProofOfPlayCtrl)
   // Tenants
+  .controller("TenantOverlaysCtrl", TenantOverlaysCtrl)
   .controller("TenantAddCtrl", TenantAddCtrl)
   .controller("TenantDetailsCtrl", TenantDetailsCtrl)
   .controller("TenantLocationCtrl", TenantLocationCtrl)
