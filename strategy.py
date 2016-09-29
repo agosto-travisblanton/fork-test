@@ -31,13 +31,17 @@ TENANT_FIELDS = [
     'organization_unit_id',
     'organization_unit_path',
     'created',
-    'updated'
+    'updated',
 ]
 TENANT_STRATEGY = ModelStrategy(Tenant) + TENANT_FIELDS
 TENANT_STRATEGY += [
     {'key': lambda o, field_name, context: o.key.urlsafe()},
     {'domain_key': lambda o, field_name, context: o.domain_key.urlsafe() if o.domain_key else None},
-    {'notification_emails': lambda o, field_name, context: ', '.join(o.notification_emails).strip(', ')}
+    {'notification_emails': lambda o, field_name, context: ', '.join(o.notification_emails).strip(', ')},
+    {'overlayStatus': lambda o, field_name, context: o.overlays_available},
+    {'overlays': lambda o, field_name, context: o.overlays_as_dict if o.overlays_available else None},
+    {'overlaysUpdateInProgress': lambda o, field_name, context: o.overlays_update_in_progress}
+
 ]
 
 DISTRIBUTOR_FIELDS = [
@@ -59,6 +63,7 @@ DEVICE_PAIRING_CODE_STRATEGY += [
     {'gcmRegistrationId': lambda o, field_name, context: o.gcm_registration_id},
     {'macAddress': lambda o, field_name, context: o.mac_address}
 ]
+
 
 CHROME_OS_DEVICE_STRATEGY = ModelStrategy(ChromeOsDevice)
 CHROME_OS_DEVICE_STRATEGY += [
@@ -135,9 +140,9 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'lastError': lambda o, field_name, context: o.last_error},
     {'archived': lambda o, field_name, context: o.archived},
     {'controlsMode': lambda o, field_name, context: o.controls_mode},
-    {'overlayStatus': lambda o, field_name, context: o.overlay_available},
-    {'overlays': lambda o, field_name, context: o.overlays_as_dict if o.overlay_available else None}
-
+    {'overlayStatus': lambda o, field_name,
+                             context: o.overlays_available},
+    {'overlays': lambda o, field_name, context: o.overlays_as_dict if o.overlays_available else None}
 ]
 
 LOCATION_STRATEGY = ModelStrategy(Location)

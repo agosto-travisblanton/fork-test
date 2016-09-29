@@ -50,17 +50,18 @@ class TenantsHandler(ExtendedSessionRequestHandler):
     @requires_api_token
     def get(self, tenant_key=None):
         distributor_urlsafe_key = self.request.headers.get('X-Provisioning-Distributor')
-        if not tenant_key:
+        tenant = self.validate_and_get(tenant_key, Tenant, abort_on_not_found=False)
+        if not tenant:
             tenant_search_code = self.request.get("tenant_name")
             if tenant_search_code:
                 result = Tenant.find_by_partial_name(tenant_search_code, distributor_urlsafe_key)
             else:
                 distributor_key = self.request.headers.get('X-Provisioning-Distributor')
                 result = get_tenant_list_from_distributor_key(distributor_key=distributor_key)
+
         else:
-            tenant_key = ndb.Key(urlsafe=tenant_key)
-            tenant = tenant_key.get()
-            if tenant.proof_of_play_url is None:
+            # Todo: Move this to a one-time migration / data entered during new entity creation
+            if tenant.proof_of_play_url == None:
                 tenant.proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
                 tenant.put()
             result = tenant
@@ -249,6 +250,12 @@ class TenantsHandler(ExtendedSessionRequestHandler):
             error_message = 'The default timezone parameter is invalid.'
         else:
             tenant.default_timezone = default_timezone
+        overlay_status = request_json.get('overlayStatus')
+        if overlay_status != (None or ''):
+            tenant.overlays_available = overlay_status
+        else:
+            tenant.overlays_available = False
+
         email_list = delimited_string_to_list(request_json.get('notification_emails'))
         tenant.notification_emails = email_list
         domain_key_input = request_json.get('domain_key')

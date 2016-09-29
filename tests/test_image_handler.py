@@ -41,14 +41,31 @@ class ImageHandlerTest(ProvisioningDistributorUserBase):
                                                      any_matcher(str)).thenReturn(None)
         overlay_type = "logo"
         Overlay.create_or_get(overlay_type, image_urlsafe_key=key)
-        overlay_template = OverlayTemplate.get_overlay_template_for_device(self.device.key)
+        overlay_template = OverlayTemplate.create_or_get_by_device_key(self.device.key)
         overlay_template.set_overlay("top_left", overlay_type, image_urlsafe_key=key)
         request_parameters = {}
         uri = application.router.build(None, 'delete_image', None, {'image_urlsafe_key': key})
         response = self.app.delete(uri, params=request_parameters)
-        # self.assertOK(response)
+        self.assertOK(response)
         self.run_all_tasks()
-        overlay_template_new = OverlayTemplate.get_overlay_template_for_device(self.device.key)
+        overlay_template_new = OverlayTemplate.create_or_get_by_device_key(self.device.key)
+        none_overlay = Overlay.create_or_get(None)
+        self.assertEqual(overlay_template_new.top_left.get(), none_overlay)
+
+    def test_tenant_delete(self):
+        key = self._create_image()
+        when(device_message_processor).change_intent(any_matcher(str), any_matcher(str), any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+        overlay_type = "logo"
+        Overlay.create_or_get(overlay_type, image_urlsafe_key=key)
+        overlay_template = OverlayTemplate.create_or_get_by_tenant_key(self.tenant.key)
+        overlay_template.set_overlay("top_left", overlay_type, image_urlsafe_key=key)
+        request_parameters = {}
+        uri = application.router.build(None, 'delete_image', None, {'image_urlsafe_key': key})
+        response = self.app.delete(uri, params=request_parameters)
+        self.assertOK(response)
+        self.run_all_tasks()
+        overlay_template_new = OverlayTemplate.create_or_get_by_tenant_key(self.tenant.key)
         none_overlay = Overlay.create_or_get(None)
         self.assertEqual(overlay_template_new.top_left.get(), none_overlay)
 

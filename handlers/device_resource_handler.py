@@ -525,9 +525,9 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             if timezone:
                 device.timezone = timezone
                 device.timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
-            overlay_status = request_json.get('overlay_status')
+            overlay_status = request_json.get('overlayStatus')
             if overlay_status != None:
-                device.overlay_available = overlay_status
+                device.overlays_available = overlay_status
             controls_mode = request_json.get('controlsMode')
             if controls_mode != None:
                 device.controls_mode = controls_mode

@@ -359,6 +359,21 @@ application = WSGIApplication(
               methods=['POST'],
               ),
 
+        Route(r'/api/v1/overlay/tenant/<tenant_urlsafe_key>',
+              handler='handlers.overlay_handler.OverlayHandler',
+              name='post_tenant_overlay',
+              handler_method='post_tenant_overlay',
+              methods=['POST'],
+              ),
+
+
+        Route(r'/api/v1/overlay/tenant/<tenant_urlsafe_key>/apply',
+              handler='handlers.overlay_handler.OverlayHandler',
+              name='tenant_apply_overlay_to_devices',
+              handler_method='tenant_apply_overlay_to_devices',
+              methods=['POST'],
+              ),
+
         ############################################################
         # IMAGE
         ############################################################
