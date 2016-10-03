@@ -72,6 +72,9 @@
                        id="organizationUnitPath"
                        ng-model="domainDetailsCtrl.currentDomain.organization_unit_path"
                        ng-readonly="domainDetailsCtrl.editMode"
+                       tooltips
+                       tooltip-side="right"
+                       tooltip-template-url="webapp/src/app/tooltip/domain-ou-path.html"
                        required>
               </div>
               <div class="col-sm-5">
