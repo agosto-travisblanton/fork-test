@@ -206,6 +206,21 @@ export function routes($stateProvider, $urlRouterProvider, RestangularProvider) 
       parent: 'tenants'
     }
   });
+  $stateProvider.state("tenantOverlays", {
+    resolve: {
+      authenticated(AuthorizationService) {
+        return AuthorizationService.authenticated();
+      }
+    },
+    url: "/tenants/:tenantKey/overlays",
+    templateUrl: "app/tenant/tenant-overlays.html",
+    controller: "TenantOverlaysCtrl",
+    controllerAs: 'vm',
+    ncyBreadcrumb: {
+      label: '{{ vm.currentTenant.name }}',
+      parent: 'tenants'
+    }
+  });
   $stateProvider.state("tenantLocations", {
     resolve: {
       authenticated(AuthorizationService) {

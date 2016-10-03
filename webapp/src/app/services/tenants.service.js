@@ -15,16 +15,18 @@ export default class TenantsService {
     return promise;
   }
 
-  getImages(tenant_urlsafe_key) {
-    return this.Restangular.oneUrl('image', `/api/v1/image/tenant/${tenant_urlsafe_key}`).getList()
+  saveOverlaySettings(tenant_urlsafe_key, bottom_left, bottom_right, top_right, top_left) {
+    let payload = {
+      bottom_left,
+      bottom_right,
+      top_right,
+      top_left,
+    }
+    return this.Restangular.oneUrl('overlay', `/api/v1/overlay/tenant/${tenant_urlsafe_key}`).customPOST(payload);
   }
 
-  saveImage(tenant_urlsafe_key, svg_rep, name) {
-    let payload = {
-      svg_rep,
-      name
-    }
-    return this.Restangular.oneUrl('image', `/api/v1/image/tenant/${tenant_urlsafe_key}`).customPOST(payload);
+  overlayApplyTenant(tenant_urlsafe_key) {
+    return this.Restangular.oneUrl('overlay', `/api/v1/overlay/tenant/${tenant_urlsafe_key}/apply`).post();
   }
 
   searchAllTenantsByName(tenant_name) {
