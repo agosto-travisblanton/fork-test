@@ -74,7 +74,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
         IntegrationEventLog.create(
             event_category='Tenant Creation',
             component_name='Provisioning',
-            workflow_step='Request from Client to create new Tenant',
+            workflow_step='Request from Client to create a tenant',
             details=self.request.body,
             correlation_identifier=correlation_id).put()
         if self.request.body is not str('') and self.request.body is not None:
@@ -138,7 +138,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                             IntegrationEventLog.create(
                                 event_category='Tenant Creation',
                                 component_name='Provisioning',
-                                workflow_step='Request from Provisioning to CDM to create new ou',
+                                workflow_step='Request from Provisioning to CDM to create new OU',
                                 tenant_code=tenant_code,
                                 correlation_identifier=correlation_id).put()
                             ou_result = organization_units_api.insert(ou_container_name=tenant.tenant_code)
@@ -157,7 +157,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                                 IntegrationEventLog.create(
                                     event_category='Tenant Creation',
                                     component_name='Provisioning',
-                                    workflow_step='OU Creation was unsuccesful',
+                                    workflow_step='Response from CDM: OU Creation was unsuccesful',
                                     tenant_code=tenant_code,
                                     details=error_message,
                                     correlation_identifier=correlation_id).put()
@@ -167,7 +167,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                                 IntegrationEventLog.create(
                                     event_category='Tenant Creation',
                                     component_name='Provisioning',
-                                    workflow_step='OU Creation was successful',
+                                    workflow_step='Response from CDM: OU Creation was successful',
                                     tenant_code=tenant_code,
                                     correlation_identifier=correlation_id).put()
                                 tenant.organization_unit_id = ou_result['orgUnitId']
@@ -178,7 +178,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                                 IntegrationEventLog.create(
                                     event_category='Tenant Creation',
                                     component_name='Provisioning',
-                                    workflow_step='Begin creating enrollment user',
+                                    workflow_step='Request from Provisioning to CDM to begin creating enrollment user',
                                     tenant_code=tenant_code,
                                     details=impersonation_email,
                                     correlation_identifier=correlation_id).put()
@@ -207,7 +207,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                                     IntegrationEventLog.create(
                                         event_category='Tenant Creation',
                                         component_name='Provisioning',
-                                        workflow_step='Creating enrollment user was unsuccesful',
+                                        workflow_step='Response from CDM: Creating enrollment user was unsuccesful',
                                         tenant_code=tenant_code,
                                         details=error_message,
                                         correlation_identifier=correlation_id).put()
@@ -219,7 +219,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                                     IntegrationEventLog.create(
                                         event_category='Tenant Creation',
                                         component_name='Provisioning',
-                                        workflow_step='Creating enrollment user was succesful',
+                                        workflow_step='Response from CDM: Creating enrollment user was successful',
                                         tenant_code=tenant_code,
                                         correlation_identifier=correlation_id).put()
 
@@ -232,35 +232,32 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                                     IntegrationEventLog.create(
                                         event_category='Tenant Creation',
                                         component_name='Provisioning',
-                                        workflow_step='Begin ContentManagerApi.create_tenant',
+                                        workflow_step='Request to ContentManagerApi to create tenant',
                                         tenant_code=tenant_code,
-                                        details=tenant_code,
+                                        details="Tenant Code: " + tenant_code,
                                         correlation_identifier=correlation_id).put()
 
                                     content_manager_api = ContentManagerApi()
                                     notify_content_manager = content_manager_api.create_tenant(tenant)
                                     if not notify_content_manager:
-                                        message = 'Failed to notify content manager about new tenant {0}'.format(name)
+                                        message = 'Failed to notify content manager about new tenant: {0}'.format(name)
                                         logging.debug(message)
-
-
-                                        registration_request_event = IntegrationEventLog.create(
+                                        IntegrationEventLog.create(
                                             event_category='Tenant Creation',
                                             component_name='Provisioning',
-                                            workflow_step='ContentManagerApi.create_tenant was unsuccesful',
+                                            workflow_step='Response from ContentManagerApi: Create Tenant was unsuccessful',
                                             tenant_code=tenant_code,
                                             details=message,
-                                            correlation_identifier=correlation_id)
-                                        registration_request_event.put()
+                                            correlation_identifier=correlation_id).put()
 
                                     else:
-                                        registration_request_event = IntegrationEventLog.create(
+                                        IntegrationEventLog.create(
                                             event_category='Tenant Creation',
                                             component_name='Provisioning',
-                                            workflow_step='ContentManagerApi.create_tenant was succesful',
+                                            workflow_step='Response from ContentManagerApi: Create Tenant was successful',
                                             tenant_code=tenant_code,
-                                            correlation_identifier=correlation_id)
-                                        registration_request_event.put()
+                                            details=message,
+                                            correlation_identifier=correlation_id).put()
 
                                     tenant_uri = self.request.app.router.build(None,
                                                                                'manage-tenant',

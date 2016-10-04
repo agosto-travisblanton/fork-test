@@ -67,7 +67,8 @@ class IntegrationEventLog(ndb.Model):
         return IntegrationEventLog.query(
             IntegrationEventLog.correlation_identifier == correlation_identifier
 
-        ).fetch()
+        ).order(
+            IntegrationEventLog.utc_timestamp).fetch()
 
     @classmethod
     def get_correlation_identifier_for_tenant_creation(cls, tenant_code):
