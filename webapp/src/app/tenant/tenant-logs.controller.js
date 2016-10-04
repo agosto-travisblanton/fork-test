@@ -2,14 +2,14 @@ import naturalSort from 'javascript-natural-sort';
 
 
 function TenantLogsCtrl($stateParams,
-                            TenantsService,
-                            $state,
-                            ProgressBarService,
-                            ToastsService,
-                            $scope,
-                            ImageService,
-                            $timeout,
-                            $mdDialog) {
+                        TenantsService,
+                        $state,
+                        ProgressBarService,
+                        ToastsService,
+                        $scope,
+                        ImageService,
+                        $timeout,
+                        $mdDialog) {
   "ngInject";
 
   let vm = this;
@@ -19,8 +19,6 @@ function TenantLogsCtrl($stateParams,
   tenantPromise.then(data => {
     vm.currentTenant = data
   });
-
-
 
 
   //////////////////////////////////////////////////////////////
@@ -66,6 +64,8 @@ function TenantLogsCtrl($stateParams,
           return $state.go('tenantLocations', {tenantKey: $stateParams.tenantKey});
         case 4:
           return $state.go('tenantOverlays', {tenantKey: $stateParams.tenantKey});
+        case 5:
+          return $state.go('tenantLogs', {tenantKey: $stateParams.tenantKey});
       }
     }
   });

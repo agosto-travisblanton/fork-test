@@ -66,7 +66,8 @@ function TenantManagedDevicesCtrl($scope, $stateParams, TenantsService, DevicesS
           return $state.go('tenantLocations', {tenantKey: $stateParams.tenantKey});
         case 4:
           return $state.go('tenantOverlays', {tenantKey: $stateParams.tenantKey});
-
+        case 5:
+          return $state.go('tenantLogs', {tenantKey: $stateParams.tenantKey});
       }
     }
   });
