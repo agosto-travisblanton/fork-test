@@ -20,10 +20,62 @@
     </md-tabs>
 
     <div flex="100" flex-sm="100" flex-xs="30" layout="column">
-      <div class="col-md-12">
-        <h1>logs</h1>
-
+      <div class="row text-center"
+           ng-hide="tenantLogsCtrl.tenantCreateEvents
+           .length>0">
+        No enrollment events
       </div>
+      <md-card ng-show="tenantLogsCtrl.tenantCreateEvents
+      .length>0">
+        <md-card-content>
+          <md-list>
+            <md-list-item>
+              <div class="col-sm-4">
+                <b>Workflow step</b>
+              </div>
+              <div class="col-sm-2">
+                <b>Timestamp</b>
+              </div>
+              <div class="col-sm-6">
+                <b>Details</b>
+              </div>
+              <md-divider></md-divider>
+            </md-list-item>
+            <md-list-item ng-repeat="item in tenantLogsCtrl.tenantCreateEvents
+"
+                          ng-show="tenantLogsCtrl.tenantCreateEvents
+                          .length>0">
+              <div class="col-sm-4 registration-event-column">
+                <b>{{ item.componentName }}</b><br>
+                {{ item.workflowStep }}
+              </div>
+              <div class="col-sm-2 registration-event-column">
+                {{ item.utcTimestamp }}
+              </div>
+              <div class="col-sm-6 registration-event-column">
+                {{ item.details }}
+              </div>
+              <md-divider>
+              </md-divider>
+            </md-list-item>
+          </md-list>
+          <div class="row margin-top-10">
+            <div class="col-sm-4">
+              <md-button ngclipboard data-clipboard-target="#hidden-correlation-identifier"
+                         ng-click="tenantLogsCtrl.copyCorrelationIdentifier()" class="md-raised">
+                <i class="fa fa-fw fa-clipboard"></i> Copy Correlation Id
+              </md-button>
+            </div>
+          </div>
+        </md-card-content>
+      </md-card>
     </div>
-  </md-content>
+    <div id="hidden-correlation-identifier" class="copy-ready-transparent"
+         ng-show="tenantLogsCtrl.tenantCreateEvents
+         .length>0">
+      {{tenantLogsCtrl.tenantCreateEvents
+      [0].correlationIdentifier}}
+    </div>
+</div>
+</md-content>
 </div>

@@ -5,11 +5,9 @@ function TenantLogsCtrl($stateParams,
                         TenantsService,
                         $state,
                         ProgressBarService,
-                        ToastsService,
+                        IntegrationEvents,
                         $scope,
-                        ImageService,
-                        $timeout,
-                        $mdDialog) {
+                        DateManipulationService) {
   "ngInject";
 
   let vm = this;
@@ -20,35 +18,33 @@ function TenantLogsCtrl($stateParams,
     vm.currentTenant = data
   });
 
+  vm.localFromUtc = function (events) {
+    for (let i = 0; i < events.length; i++) {
+      let each = events[i];
+      if (each.utcTimestamp) {
+        each.utcTimestamp = DateManipulationService.generateLocalFromUTC(each.utcTimestamp);
+      }
+    }
+    return;
+  };
+
+  vm.getTenantCreateEvents = function () {
+    ProgressBarService.start();
+    let enrollmentEventsPromise = IntegrationEvents.getTenantCreateEvents(vm.tenantKey);
+    return enrollmentEventsPromise.then(function (data) {
+      vm.tenantCreateEvents = data;
+      vm.localFromUtc(data);
+      return ProgressBarService.complete();
+    });
+  };
+
 
   //////////////////////////////////////////////////////////////
   // Setup
   //////////////////////////////////////////////////////////////
-  vm.onSuccessResolvingTenant = function (tenant) {
-    vm.currentTenant = tenant;
-    vm.currentTenantCopy = angular.copy(vm.currentTenant);
-    vm.selectedTimezone = tenant.default_timezone;
-
-  };
-
-  vm.getTenant = () => {
-    let tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey);
-    tenantPromise.then(function (tenant) {
-      vm.currentTenant = tenant;
-      if (vm.currentTenant.overlaysUpdateInProgress) {
-        vm.loading = true;
-        $timeout(vm.getTenant, 3000);
-      } else {
-        vm.loading = false;
-      }
-      vm.currentTenantCopy = angular.copy(vm.currentTenant);
-    })
-    return tenantPromise
-  }
 
   vm.initialize = () => {
-    // vm.getTenantImages()
-    vm.getTenant()
+    vm.getTenantCreateEvents()
   }
 
   $scope.$watch('tabIndex', function (toTab, fromTab) {

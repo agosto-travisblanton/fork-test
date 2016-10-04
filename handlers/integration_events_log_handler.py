@@ -1,6 +1,6 @@
 from google.appengine.ext import ndb
 from webapp2 import RequestHandler
-
+import logging
 from app_config import config
 from decorators import has_admin_user_key, requires_api_token
 from models import IntegrationEventLog
@@ -48,3 +48,19 @@ class IntegrationEventsLogHandler(RequestHandler, PagingListHandlerMixin, KeyVal
                 error_message = 'Unable to find registration events'
                 self.response.set_status(404, error_message)
                 return
+
+    @requires_api_token
+    def get_tenant_create_events(self):
+        tenantKey = self.request.get('tenantKey')
+        try:
+            tenant = ndb.Key(urlsafe=tenantKey).get()
+            tenant_code = tenant.tenant_code
+            correlation_id = IntegrationEventLog.get_correlation_identifier_for_tenant_creation(tenant_code=tenant_code)
+            query_results = IntegrationEventLog.get_associated_with_correlation_id(correlation_id)
+            json_response(self.response, query_results, strategy=INTEGRATION_EVENT_LOG_STRATEGY)
+
+        except Exception, e:
+            logging.exception(e)
+            error_message = 'Bad Tenant Key'
+            self.response.set_status(403, error_message)
+            return
