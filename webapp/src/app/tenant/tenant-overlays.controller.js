@@ -16,7 +16,11 @@ function TenantOverlaysCtrl($stateParams,
   $scope.tabIndex = 4;
   vm.tenantKey = $stateParams.tenantKey;
   vm.editMode = !!$stateParams.tenantKey;
-  vm.currentTenant = {};
+  let tenantPromise = TenantsService.getTenantByKey(vm.tenantKey);
+  tenantPromise.then(data => {
+    vm.currentTenant = data
+  });
+
   vm.overlayChanged = false;
 
   ////////////////////////////////////////////////////////////////
