@@ -177,7 +177,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
 
                                 IntegrationEventLog.create(
                                     event_category='Tenant Creation',
-                                    component_name='Provisioning',
+                                    component_name='Chrome Directory API',
                                     workflow_step='Request from Provisioning to CDM to begin creating enrollment user',
                                     tenant_code=tenant_code,
                                     details=impersonation_email,
@@ -206,7 +206,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
 
                                     IntegrationEventLog.create(
                                         event_category='Tenant Creation',
-                                        component_name='Provisioning',
+                                        component_name='Chrome Directory API',
                                         workflow_step='Response from CDM: Creating enrollment user was unsuccesful',
                                         tenant_code=tenant_code,
                                         details=error_message,
@@ -218,7 +218,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
 
                                     IntegrationEventLog.create(
                                         event_category='Tenant Creation',
-                                        component_name='Provisioning',
+                                        component_name='Chrome Directory API',
                                         workflow_step='Response from CDM: Creating enrollment user was successful',
                                         tenant_code=tenant_code,
                                         correlation_identifier=correlation_id).put()
@@ -231,7 +231,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
 
                                     IntegrationEventLog.create(
                                         event_category='Tenant Creation',
-                                        component_name='Provisioning',
+                                        component_name='Content Manager',
                                         workflow_step='Request to ContentManagerApi to create tenant',
                                         tenant_code=tenant_code,
                                         details="Tenant Code: " + tenant_code,
@@ -244,7 +244,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                                         logging.debug(message)
                                         IntegrationEventLog.create(
                                             event_category='Tenant Creation',
-                                            component_name='Provisioning',
+                                            component_name='Content Manager',
                                             workflow_step='Response from ContentManagerApi: Create Tenant was unsuccessful',
                                             tenant_code=tenant_code,
                                             details=message,
@@ -253,10 +253,9 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                                     else:
                                         IntegrationEventLog.create(
                                             event_category='Tenant Creation',
-                                            component_name='Provisioning',
+                                            component_name='Content Manager',
                                             workflow_step='Response from ContentManagerApi: Create Tenant was successful',
                                             tenant_code=tenant_code,
-                                            details=message,
                                             correlation_identifier=correlation_id).put()
 
                                     tenant_uri = self.request.app.router.build(None,
