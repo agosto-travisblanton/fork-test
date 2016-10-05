@@ -3,7 +3,7 @@ import json
 import logging
 
 from google.appengine.ext import ndb
-
+from models import IntegrationEventLog
 from app_config import config
 from decorators import requires_api_token
 from extended_session_request_handler import ExtendedSessionRequestHandler
@@ -70,6 +70,14 @@ class TenantsHandler(ExtendedSessionRequestHandler):
 
     @requires_api_token
     def post(self):
+        correlation_id = IntegrationEventLog.generate_correlation_id()
+        registration_request_event = IntegrationEventLog.create(
+            event_category='Tenant Creation',
+            component_name='Provisioning',
+            workflow_step='Request from Client to create new Tenant',
+            details=self.request.body,
+            correlation_identifier=correlation_id)
+        registration_request_event.put()
         if self.request.body is not str('') and self.request.body is not None:
             status = 201
             error_message = None
@@ -128,6 +136,13 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                     if 'statusCode' in result.keys():
                         if result['statusCode'] == httplib.NOT_FOUND:
                             logging.debug('Tenant OU not found, so attempting to create it.')
+                            registration_request_event = IntegrationEventLog.create(
+                                event_category='Tenant Creation',
+                                component_name='Provisioning',
+                                workflow_step='Request from Provisioning to CDM to create new ou',
+                                tenant_code=tenant_code,
+                                correlation_identifier=correlation_id)
+                            registration_request_event.put()
                             ou_result = organization_units_api.insert(ou_container_name=tenant.tenant_code)
                             if 'statusCode' in ou_result.keys() and 'statusText' in ou_result.keys():
                                 status_code = ou_result['statusCode']
@@ -141,14 +156,38 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                                     error_message = 'Unable to create tenant OU. {0} {1}'.format(
                                         status_code, status_text)
                                     logging.error(error_message)
-                                # TODO add integration event logging using correlation_id for failure response
+                                registration_request_event = IntegrationEventLog.create(
+                                    event_category='Tenant Creation',
+                                    component_name='Provisioning',
+                                    workflow_step='OU Creation was unsuccesful',
+                                    tenant_code=tenant_code,
+                                    details=error_message,
+                                    correlation_identifier=correlation_id)
+                                registration_request_event.put()
                                 self.response.set_status(status_code, error_message)
                                 return
                             else:
+                                registration_request_event = IntegrationEventLog.create(
+                                    event_category='Tenant Creation',
+                                    component_name='Provisioning',
+                                    workflow_step='OU Creation was successful',
+                                    tenant_code=tenant_code,
+                                    correlation_identifier=correlation_id)
+                                registration_request_event.put()
                                 tenant.organization_unit_id = ou_result['orgUnitId']
                                 tenant.put()
                                 logging.debug('Tenant OU created with organization_unit_id {0}.'.format(
                                     tenant.organization_unit_id))
+
+                                registration_request_event = IntegrationEventLog.create(
+                                    event_category='Tenant Creation',
+                                    component_name='Provisioning',
+                                    workflow_step='Begin creating enrollment user',
+                                    tenant_code=tenant_code,
+                                    details=impersonation_email,
+                                    correlation_identifier=correlation_id)
+                                registration_request_event.put()
+
                                 users_api = UsersApi(
                                     admin_to_impersonate_email_address=impersonation_email)
                                 user_result = users_api.insert(
@@ -169,21 +208,67 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                                         error_message = 'Unable to create enrollment user. {0} {1}'.format(status_code,
                                                                                                            status_text)
                                         logging.error(error_message)
-                                    # TODO add integration event logging using correlation_id for failure response
+
+                                    registration_request_event = IntegrationEventLog.create(
+                                        event_category='Tenant Creation',
+                                        component_name='Provisioning',
+                                        workflow_step='Creating enrollment user was unsuccesful',
+                                        tenant_code=tenant_code,
+                                        details=error_message,
+                                        correlation_identifier=correlation_id)
+                                    registration_request_event.put()
+
                                     self.response.set_status(status_code, error_message)
                                     return
                                 else:
-                                    # TODO add integration event logging using correlation_id for success!
+
+                                    registration_request_event = IntegrationEventLog.create(
+                                        event_category='Tenant Creation',
+                                        component_name='Provisioning',
+                                        workflow_step='Creating enrollment user was succesful',
+                                        tenant_code=tenant_code,
+                                        correlation_identifier=correlation_id)
+                                    registration_request_event.put()
+
                                     is_created = user_result['primaryEmail'].strip().lower() == tenant.enrollment_email
                                     logging.debug('Enrollment user is_created = {0}'.format(is_created))
                                     tenant_key = tenant.put()
                                     logging.debug('Enrollment user persisted for {0} on tenant.'.format(
                                         tenant.enrollment_email))
+
+                                    registration_request_event = IntegrationEventLog.create(
+                                        event_category='Tenant Creation',
+                                        component_name='Provisioning',
+                                        workflow_step='Begin ContentManagerApi.create_tenant',
+                                        tenant_code=tenant_code,
+                                        details=tenant,
+                                        correlation_identifier=correlation_id)
+                                    registration_request_event.put()
+
                                     content_manager_api = ContentManagerApi()
                                     notify_content_manager = content_manager_api.create_tenant(tenant)
                                     if not notify_content_manager:
-                                        logging.debug(
-                                            'Failed to notify content manager about new tenant {0}'.format(name))
+                                        message = 'Failed to notify content manager about new tenant {0}'.format(name)
+                                        logging.debug(message)
+
+
+                                        registration_request_event = IntegrationEventLog.create(
+                                            event_category='Tenant Creation',
+                                            component_name='Provisioning',
+                                            workflow_step='ContentManagerApi.create_tenant was unsuccesful',
+                                            tenant_code=tenant_code,
+                                            details=message,
+                                            correlation_identifier=correlation_id)
+                                        registration_request_event.put()
+
+                                    else:
+                                        registration_request_event = IntegrationEventLog.create(
+                                            event_category='Tenant Creation',
+                                            component_name='Provisioning',
+                                            workflow_step='ContentManagerApi.create_tenant was succesful',
+                                            tenant_code=tenant_code,
+                                            correlation_identifier=correlation_id)
+                                        registration_request_event.put()
 
                                     tenant_uri = self.request.app.router.build(None,
                                                                                'manage-tenant',
