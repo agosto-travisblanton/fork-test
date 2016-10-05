@@ -266,6 +266,7 @@ function TenantOverlaysCtrl($stateParams,
   };
 
   vm.getTenant = () => {
+    vm.loadingOverlays = true;
     let tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey);
     tenantPromise.then(function (tenant) {
       vm.currentTenant = tenant;
@@ -274,7 +275,8 @@ function TenantOverlaysCtrl($stateParams,
         $timeout(vm.getTenant, 3000);
       } else {
         vm.loading = false;
-      }
+      };
+      vm.loadingOverlays = false;
       vm.currentTenantCopy = angular.copy(vm.currentTenant);
     })
     return tenantPromise
