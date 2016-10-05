@@ -1,6 +1,6 @@
 <md-content class="md-padding" layout="row" layout-wrap layout-align="left start"
             layout-xs="column">
-  <div flex="50" flex-sm="50" flex-xs="50" layout="column">
+  <div class="properties-word-break" flex="50" flex-sm="50" flex-xs="50" layout="column">
     <md-card>
       <md-card-content>
         <h2>Information</h2>
@@ -41,9 +41,7 @@
              ng-hide="deviceDetailsCtrl.currentDevice.annotatedAssetId == null ||
                                            deviceDetailsCtrl.currentDevice.annotatedAssetId == ''">
           <label>Asset Id</label>
-          <div class="properties-word-break">
-            {{deviceDetailsCtrl.currentDevice.annotatedAssetId}}
-          </div>
+          {{deviceDetailsCtrl.currentDevice.annotatedAssetId}}
         </div>
         <div class="form-group"
              ng-hide="deviceDetailsCtrl.currentDevice.bootMode == null ||
@@ -122,9 +120,7 @@
              ng-hide="deviceDetailsCtrl.currentDevice.gcmRegistrationId == null ||
                                            deviceDetailsCtrl.currentDevice.gcmRegistrationId == ''">
           <label>GCM registration ID</label>
-          <div class="properties-word-break">
-            {{deviceDetailsCtrl.currentDevice.gcmRegistrationId}}
-          </div>
+          {{deviceDetailsCtrl.currentDevice.gcmRegistrationId}}
         </div>
         <div class="form-group"
              ng-hide="deviceDetailsCtrl.currentDevice.kind == null ||
@@ -289,9 +285,7 @@
         <hr/>
         <div class="form-group">
           <label>Device key</label>
-          <div class="properties-word-break">
-            {{deviceDetailsCtrl.currentDevice.key}}
-          </div>
+          {{deviceDetailsCtrl.currentDevice.key}}
           <md-card-actions layout="row" layout-align="end center">
             <button class="md-raised md-primary md-button md-ink-ripple" type="button"
                     aria-label="Delete" layout-align="right" ng-click="deviceDetailsCtrl.confirmDeviceDelete(
