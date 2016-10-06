@@ -63,7 +63,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                     logging.exception(e)
 
                 if user_entity and user_entity.is_administrator:
-                    result = Tenant.find_by_partial_name_across_all_tenants(tenant_name_search)
+                    result = Tenant.find_by_partial_name_across_all_distributors(tenant_name_search)
                 else:
                     print "bad userkey or not admin"
                     return

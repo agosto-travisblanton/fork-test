@@ -636,7 +636,7 @@ class Tenant(ndb.Model):
         return sorted_result
 
     @classmethod
-    def find_by_partial_name_across_all_tenants(cls, partial_name):
+    def find_by_partial_name_across_all_distributors(cls, partial_name):
         all_tenants = Tenant.query().fetch()
         return [item for item in all_tenants if partial_name.lower() in item.name.lower()]
 

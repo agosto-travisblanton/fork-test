@@ -308,6 +308,28 @@ export default class DevicesService {
     }
   }
 
+
+  searchDevicesByPartialSerialGlobally(partial_serial, unmanaged) {
+    let url = `/api/v1/devices/search-global?unmanaged=${unmanaged}&partial_serial=${partial_serial}`;
+    let promise = this.Restangular.oneUrl("devices", url).get();
+    return promise;
+
+  }
+
+  searchDevicesByPartialMacGlobally(partial_mac, unmanaged) {
+    let url = `/api/v1/devices/search-global?unmanaged=${unmanaged}&partial_mac=${partial_mac}`;
+    let promise = this.Restangular.oneUrl("devices", url).get();
+    return promise;
+
+  }
+
+  searchDistributorDevicesByPartialGCMidGlobally(partial_gcmid, unmanaged) {
+    let url = `/api/v1/devices/search-global?unmanaged=${unmanaged}&partial_gcmid=${partial_gcmid}`;
+    let promise = this.Restangular.oneUrl("devices", url).get();
+    return promise;
+
+  }
+
   getDevicesByDistributor(distributorKey, prev, next) {
     if (distributorKey !== undefined) {
       let url = this.makeDevicesByDistributorURL(distributorKey, prev, next, false);
