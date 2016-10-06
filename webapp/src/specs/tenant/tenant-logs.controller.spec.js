@@ -41,7 +41,6 @@ describe('TenantLogsCtrl', function () {
       TenantsService,
       ProgressBarService
     };
-    $q = _$q_;
     controller = $controller('TenantLogsCtrl', serviceInjection);
 
   }));
