@@ -52,9 +52,23 @@ class TenantsHandler(ExtendedSessionRequestHandler):
         distributor_urlsafe_key = self.request.headers.get('X-Provisioning-Distributor')
         tenant = self.validate_and_get(tenant_key, Tenant, abort_on_not_found=False)
         if not tenant:
-            tenant_search_code = self.request.get("tenant_name")
-            if tenant_search_code:
-                result = Tenant.find_by_partial_name(tenant_search_code, distributor_urlsafe_key)
+            tenant_name_search = self.request.get("tenant_name")
+            across_distributors_if_admin = self.request.get("allDistributors")
+            if tenant_name_search and across_distributors_if_admin:
+                user_key = self.request.headers.get("X-Provisioning-User")
+                try:
+                    user_entity = ndb.Key(urlsafe=user_key).get()
+                except Exception, e:
+                    user_entity = None
+                    logging.exception(e)
+
+                if user_entity and user_entity.is_administrator:
+                    result = Tenant.find_by_partial_name_across_all_tenants(tenant_name_search)
+                else:
+                    print "bad userkey or not admin"
+                    return
+            elif tenant_name_search:
+                result = Tenant.find_by_partial_name(tenant_name_search, distributor_urlsafe_key)
             else:
                 distributor_key = self.request.headers.get('X-Provisioning-Distributor')
                 result = get_tenant_list_from_distributor_key(distributor_key=distributor_key)

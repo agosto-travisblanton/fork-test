@@ -190,6 +190,55 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             },
         )
 
+    @requires_api_token
+    def search_for_device_globally(self):
+        unmanaged = self.request.get("unmanaged") == "true"
+        partial_gcmid = self.request.get("partial_gcmid")
+        partial_serial = self.request.get("partial_serial")
+        partial_mac = self.request.get("partial_mac")
+        user_key = self.request.headers.get("X-Provisioning-User")
+        try:
+            user_entity = ndb.Key(urlsafe=user_key).get()
+        except Exception, e:
+            user_entity = None
+            logging.exception(e)
+
+        if not user_entity or not user_entity.is_administrator:
+            print "bad user key or not admin"
+            return
+
+        else:
+            if partial_gcmid:
+                resulting_devices = Tenant.find_devices_with_partial_gcmid_globally(
+                    unmanaged=unmanaged,
+                    partial_gcmid=partial_gcmid
+                )
+
+            elif partial_serial:
+                resulting_devices = Tenant.find_devices_with_partial_serial_globally(
+                    unmanaged=unmanaged,
+                    partial_serial=partial_serial
+                )
+            elif partial_mac:
+                resulting_devices = Tenant.find_devices_with_partial_mac_globally(
+                    unmanaged=unmanaged,
+                    partial_mac=partial_mac
+                )
+
+            json_response(
+                self.response,
+                {
+                    "matches": [
+                        {
+                            "mac": DeviceResourceHandler.ethernet_or_wifi_mac_address(device, partial_mac),
+                            "serial": device.serial_number,
+                            "key": device.key.urlsafe(),
+                            "tenantKey": device.tenant_key.urlsafe(),
+                            "gcmid": device.gcm_registration_id
+                        } for device in resulting_devices]
+                },
+            )
+
     ############################################################################################
     # END DEVICES VIEW
     ############################################################################################

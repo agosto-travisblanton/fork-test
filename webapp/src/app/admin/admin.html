@@ -15,6 +15,9 @@
           <md-tab label="Create Reseller" layout-align="center center" ng-if="vm.isAdmin">
             <div ng-include="'webapp/src/app/admin/create-distributor.html'"></div>
           </md-tab>
+           <md-tab label="Search" layout-align="center center" ng-if="vm.isAdmin">
+            <div ng-include="'webapp/src/app/admin/search.html'"></div>
+          </md-tab>
         </div>
       </md-tabs>
     </div>
