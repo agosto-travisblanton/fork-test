@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 
 from google.appengine.ext import ndb
@@ -8,6 +9,7 @@ from integrations.content_manager.content_manager_api import ContentManagerApi
 from integrations.directory_api.chrome_os_devices_api import ChromeOsDevicesApi
 from model_entities.chrome_os_device_model_and_overlays import Tenant
 from model_entities.integration_events_log_model import IntegrationEventLog
+from utils.email_notify import EmailNotify
 from workflow.update_chrome_os_device import update_chrome_os_device
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
@@ -124,8 +126,14 @@ def register_device(device_urlsafe_key=None, device_mac_address=None, gcm_regist
             if device.tenant_key is None:
                 if device.org_unit_path:
                     tenant = Tenant.find_by_organization_unit_path(device.org_unit_path)
-                    device.tenant_key = tenant.key
-                    device.put()
+                    if tenant:
+                        device.tenant_key = tenant.key
+                        device.put()
+                        notifier = EmailNotify()
+                        notifier.device_enrolled(tenant_code=tenant.tenant_code,
+                                                 tenant_name=device.get_tenant().name,
+                                                 device_mac_address=device_mac_address,
+                                                 timestamp=datetime.utcnow())
 
             deferred.defer(ContentManagerApi().create_device,
                            device_urlsafe_key=device_urlsafe_key,
