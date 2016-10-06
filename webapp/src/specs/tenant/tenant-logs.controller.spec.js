@@ -20,7 +20,6 @@ describe('TenantLogsCtrl', function () {
                               _$timeout_,
                               _$q_,
                               _TenantsService_,
-                              _DevicesService_,
                               _ProgressBarService_,
                               _DateManipulationService_,
                               _$state_,
