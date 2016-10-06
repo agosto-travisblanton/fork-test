@@ -20,7 +20,6 @@ describe('TenantLogsCtrl', function () {
                               _$timeout_,
                               _$q_,
                               _TenantsService_,
-                              _DevicesService_,
                               _ProgressBarService_,
                               _DateManipulationService_,
                               _$state_,
@@ -32,7 +31,6 @@ describe('TenantLogsCtrl', function () {
     let $rootScope = _$rootScope_;
     TenantsService = _TenantsService_;
     IntegrationEvents = _IntegrationEvents_;
-    DevicesService = _DevicesService_;
     ProgressBarService = _ProgressBarService_;
     $timeout = _$timeout_;
     scope = $rootScope.$new();
@@ -41,10 +39,8 @@ describe('TenantLogsCtrl', function () {
       $stateParams,
       IntegrationEvents,
       TenantsService,
-      DevicesService,
       ProgressBarService
     };
-    $q = _$q_;
     controller = $controller('TenantLogsCtrl', serviceInjection);
 
   }));
