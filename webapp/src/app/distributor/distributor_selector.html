@@ -11,7 +11,7 @@
         <div ng-if="!vm.loading && (vm.distributors.length < 1 || vm.distributors.length > 1)">
           <md-card-title>
             <md-card-title-text>
-              <span class="md-headline">Distributor</span>
+              <span class="md-headline">Reseller</span>
             </md-card-title-text>
           </md-card-title>
           <md-card-content>
@@ -20,12 +20,12 @@
                 <div class="col-lg-12">
                   <div ng-show="vm.distributors.length < 1">
                     <div class="alert alert-warning" role="alert">
-                      <strong>Your account is not associated with a distributor.</strong> <br/><br/>
+                      <strong>Your account is not associated with a reseller.</strong> <br/><br/>
                       Try signing out, and then back in. If you continue to see this message,
                       please contact Skykit support at
                       <a class="md-primary md-ink-ripple"
                          href="mailto:support@skykit.com?subject=Distributor Setup for Account">
-                        support@skykit.com</a> for distributor setup.
+                        support@skykit.com</a> for reseller setup.
                     </div>
 
                     <md-button class="md-raised" ng-href="#/sign_out">
