@@ -1,6 +1,3 @@
-import naturalSort from 'javascript-natural-sort';
-
-
 function TenantLogsCtrl($stateParams,
                         TenantsService,
                         $state,
@@ -31,10 +28,10 @@ function TenantLogsCtrl($stateParams,
   vm.getTenantCreateEvents = function () {
     ProgressBarService.start();
     let enrollmentEventsPromise = IntegrationEvents.getTenantCreateEvents(vm.tenantKey);
-    return enrollmentEventsPromise.then(function (data) {
+    enrollmentEventsPromise.then(function (data) {
       vm.tenantCreateEvents = data;
       vm.localFromUtc(data);
-      return ProgressBarService.complete();
+      ProgressBarService.complete();
     });
   };
 
