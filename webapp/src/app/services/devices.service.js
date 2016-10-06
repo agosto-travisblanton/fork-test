@@ -57,14 +57,21 @@ export default class DevicesService {
     return this.searchDevicesByPartialSerial(distributorKey, partialSearch, unmanaged)
       .then((res) => {
         let result = res["matches"];
-        let serialDevicesDict;
         let isMac = false
         let isGCMid = false
-        if (unmanaged) {
-          serialDevicesDict = this.convertDevicesArrayToDictionaryObj(result, isMac, isGCMid);
-        } else {
-          serialDevicesDict = this.convertDevicesArrayToDictionaryObj(result, isMac, isGCMid);
-        }
+        let serialDevicesDict = this.convertDevicesArrayToDictionaryObj(result, isMac, isGCMid);
+        let serialDevicesOnly = this.retriveFilteredDictionaryValue(result, "serial");
+        return [serialDevicesOnly, serialDevicesDict];
+      });
+  }
+
+  executeSearchingPartialSerialGlobally(partialSearch, unmanaged) {
+    return this.searchDevicesByPartialSerialGlobally(partialSearch, unmanaged)
+      .then((res) => {
+        let result = res["matches"];
+        let isMac = false
+        let isGCMid = false
+        let serialDevicesDict = this.convertDevicesArrayToDictionaryObj(result, isMac, isGCMid);
         let serialDevicesOnly = this.retriveFilteredDictionaryValue(result, "serial");
         return [serialDevicesOnly, serialDevicesDict];
       });
@@ -83,19 +90,27 @@ export default class DevicesService {
   executeSearchingPartialMacByDistributor(distributorKey, partialSearch, unmanaged) {
     return this.searchDevicesByPartialMac(distributorKey, partialSearch, unmanaged)
       .then((res) => {
-        let result = res["matches"];
-        let macDevicesDict;
-        let isMac = true;
-        let isGCMid = false;
-        if (unmanaged) {
-          macDevicesDict = this.convertDevicesArrayToDictionaryObj(result, isMac, isGCMid);
-        } else {
-          macDevicesDict = this.convertDevicesArrayToDictionaryObj(result, isMac, isGCMid);
+          let result = res["matches"];
+          let isMac = true;
+          let isGCMid = false;
+          let macDevicesDict = this.convertDevicesArrayToDictionaryObj(result, isMac, isGCMid);
+          let macDevices = this.retriveFilteredDictionaryValue(result, "mac")
+          return [macDevices, macDevicesDict];
         }
-        let macDevices = this.retriveFilteredDictionaryValue(result, "mac")
-        return [macDevices, macDevicesDict];
-      });
+      );
+  }
 
+  executeSearchingPartialMacGlobally(partialSearch, unmanaged) {
+    return this.searchDevicesByPartialMacGlobally(partialSearch, unmanaged)
+      .then((res) => {
+          let result = res["matches"];
+          let isMac = true;
+          let isGCMid = false;
+          let macDevicesDict = this.convertDevicesArrayToDictionaryObj(result, isMac, isGCMid);
+          let macDevices = this.retriveFilteredDictionaryValue(result, "mac")
+          return [macDevices, macDevicesDict];
+        }
+      );
   }
 
   executeSearchingPartialGCMidByTenant(tenantKey, partialSearch, unmanaged) {
@@ -112,12 +127,17 @@ export default class DevicesService {
     return this.searchDistributorDevicesByPartialGCMid(distributorKey, partialSearch, unmanaged)
       .then((res) => {
         let result = res["matches"];
-        let GCMidDevicesDict;
-        if (unmanaged) {
-          GCMidDevicesDict = this.convertDevicesArrayToDictionaryObj(result, false, true);
-        } else {
-          GCMidDevicesDict = this.convertDevicesArrayToDictionaryObj(result, false, true);
-        }
+        let GCMidDevicesDict = this.convertDevicesArrayToDictionaryObj(result, false, true);
+        let gcmidDevicesOnly = this.retriveFilteredDictionaryValue(result, "gcmid")
+        return [gcmidDevicesOnly, GCMidDevicesDict];
+      });
+  }
+
+  executeSearchingPartialGCMidGlobally(partialSearch, unmanaged) {
+    return this.searchDistributorDevicesByPartialGCMidGlobally(partialSearch, unmanaged)
+      .then((res) => {
+        let result = res["matches"];
+        let GCMidDevicesDict = this.convertDevicesArrayToDictionaryObj(result, false, true);
         let gcmidDevicesOnly = this.retriveFilteredDictionaryValue(result, "gcmid")
         return [gcmidDevicesOnly, GCMidDevicesDict];
       });
@@ -130,25 +150,31 @@ export default class DevicesService {
   };
 
 
-  searchDevices(partialSearch, button, byTenant, tenantKey, distributorKey, unmanaged) {
+  searchDevices(partialSearch, button, byTenant, tenantKey, distributorKey, unmanaged, globally) {
     let deferred = this.$q.defer();
     let devicesPromise;
     if (partialSearch) {
       if (partialSearch.length > 2) {
         if (button === "Serial Number") {
-          if (byTenant) {
+          if (globally) {
+            devicesPromise = this.executeSearchingPartialSerialGlobally(partialSearch, unmanaged);
+          } else if (byTenant) {
             devicesPromise = this.executeSearchingPartialSerialByTenant(tenantKey, partialSearch, unmanaged)
           } else {
             devicesPromise = this.executeSearchingPartialSerialByDistributor(distributorKey, partialSearch, unmanaged)
           }
         } else if (button === "MAC") {
-          if (byTenant) {
+          if (globally) {
+            devicesPromise = this.executeSearchingPartialMacGlobally(partialSearch, unmanaged);
+          } else if (byTenant) {
             devicesPromise = this.executeSearchingPartialMacByTenant(tenantKey, partialSearch, unmanaged)
           } else {
             devicesPromise = this.executeSearchingPartialMacByDistributor(distributorKey, partialSearch, unmanaged)
           }
         } else {
-          if (byTenant) {
+          if (globally) {
+            devicesPromise = this.executeSearchingPartialGCMidGlobally(partialSearch, unmanaged);
+          } else if (byTenant) {
             devicesPromise = this.executeSearchingPartialGCMidByTenant(tenantKey, partialSearch, unmanaged)
           } else {
             devicesPromise = this.executeSearchingPartialGCMidByDistributor(distributorKey, partialSearch, unmanaged)
@@ -308,7 +334,9 @@ export default class DevicesService {
     }
   }
 
-
+  /////////////////////////////////////////////////////////////////////////
+  // SEARCH DEVICES GLOBALLY
+  /////////////////////////////////////////////////////////////////////////
   searchDevicesByPartialSerialGlobally(partial_serial, unmanaged) {
     let url = `/api/v1/devices/search-global?unmanaged=${unmanaged}&partial_serial=${partial_serial}`;
     let promise = this.Restangular.oneUrl("devices", url).get();
@@ -327,8 +355,10 @@ export default class DevicesService {
     let url = `/api/v1/devices/search-global?unmanaged=${unmanaged}&partial_gcmid=${partial_gcmid}`;
     let promise = this.Restangular.oneUrl("devices", url).get();
     return promise;
-
   }
+
+
+  /////////////////////////////////////////////////////////////////////////
 
   getDevicesByDistributor(distributorKey, prev, next) {
     if (distributorKey !== undefined) {
