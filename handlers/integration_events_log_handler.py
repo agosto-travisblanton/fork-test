@@ -1,6 +1,7 @@
 from google.appengine.ext import ndb
 from webapp2 import RequestHandler
 import logging
+import httplib
 from app_config import config
 from decorators import has_admin_user_key, requires_api_token
 from models import IntegrationEventLog
@@ -62,5 +63,5 @@ class IntegrationEventsLogHandler(RequestHandler, PagingListHandlerMixin, KeyVal
         except Exception, e:
             logging.exception(e)
             error_message = 'Bad Tenant Key'
-            self.response.set_status(403, error_message)
+            self.response.set_status(httplib.BAD_REQUEST, error_message)
             return
