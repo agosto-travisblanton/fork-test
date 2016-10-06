@@ -5,10 +5,10 @@ from model_entities.distributor_and_user_model import Distributor
 from model_entities.chrome_os_device_model_and_overlays import Tenant, ChromeOsDevice
 from model_entities.domain_model import Domain
 
-TENANT_CODE = 'qaskyauto'
+TENANT_CODE = 'slshs'
 OLD_DISTRIBUTOR_NAME = 'Agosto'
-NEW_DISTRIBUTOR_NAME = 'AcmeDistributor'
-NEW_DOMAIN_NAME = 'devqa.bogus.com'
+NEW_DISTRIBUTOR_NAME = 'Direct Technology Solutions'
+NEW_DOMAIN_NAME = 'slshs.org'
 
 old_distributor = Distributor.query(Distributor.name == OLD_DISTRIBUTOR_NAME).get()
 if None == old_distributor:
@@ -36,14 +36,14 @@ else:
         print '*None'
 print '=========================================================='
 
-tenant = Tenant.query(Tenant.name == TENANT_CODE).get()
+tenant = Tenant.query(Tenant.tenant_code == TENANT_CODE).get()
 if None == tenant:
     print 'tenant ' + tenant.name + ' not found'
 else:
     print 'tenant ' + tenant.name + ' exists.'
     domain_key = tenant.domain_key
     domain = domain_key.get()
-    print 'tenant domain is ' + domain.name + '.'
+    print 'BEFORE: tenant \'' + tenant.name + '\' domain is ' + domain.name + '.'
 print '=========================================================='
 
 tenant_devices = ChromeOsDevice.query(ChromeOsDevice.tenant_key == tenant.key).fetch()
