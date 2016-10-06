@@ -10,7 +10,7 @@ USER_EMAIL = 'daniel.ternyak@agosto.com'
 DISTRIBUTOR_NAME = 'Dunder'
 SECOND_DISTRIBUTOR = "Mifflin"
 THIRD_DISTRIBUTOR = "Scranton"
-DOMAIN = 'local.skykit.com'
+DOMAIN = 'dev.agosto.com'
 TENANT_NAME = 'Acme, Inc.'
 TENANT_CODE = 'acme_inc'
 TENANT_ADMIN_EMAIL = 'admin@acme.com'
@@ -277,7 +277,7 @@ def make_data_for_a_distributor():
     if not domain:
         domain = Domain.create(name=DOMAIN,
                                distributor_key=distributor.key,
-                               impersonation_admin_email_address='test@skykit.com',
+                               impersonation_admin_email_address='skykit.api@dev.agosto.com',
                                organization_unit_path=config.DEFAULT_OU_PATH,
                                active=True)
         domain.put()

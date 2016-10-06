@@ -97,7 +97,8 @@ function TenantDetailsCtrl($stateParams, TenantsService, DomainsService, Timezon
           return $state.go('tenantLocations', {tenantKey: $stateParams.tenantKey});
         case 4:
           return $state.go('tenantOverlays', {tenantKey: $stateParams.tenantKey});
-
+        case 5:
+          return $state.go('tenantLogs', {tenantKey: $stateParams.tenantKey});
       }
     }
   });

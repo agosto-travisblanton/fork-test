@@ -62,6 +62,24 @@ class IntegrationEventLog(ndb.Model):
     def generate_correlation_id(cls):
         return str(uuid.uuid4().hex)
 
+    @staticmethod
+    def get_associated_with_correlation_id(correlation_identifier):
+        return IntegrationEventLog.query(
+            IntegrationEventLog.correlation_identifier == correlation_identifier
+
+        ).order(
+            IntegrationEventLog.utc_timestamp).fetch()
+
+    @classmethod
+    def get_correlation_identifier_for_tenant_creation(cls, tenant_code):
+        events = IntegrationEventLog.query(
+            ndb.AND(IntegrationEventLog.event_category == 'Tenant Creation',
+                    IntegrationEventLog.tenant_code == tenant_code)).fetch()
+        if len(events) > 0:
+            return events[0].correlation_identifier
+        else:
+            return None
+
     @classmethod
     def get_correlation_identifier_for_registration(cls, device_urlsafe_key):
         events = IntegrationEventLog.query(

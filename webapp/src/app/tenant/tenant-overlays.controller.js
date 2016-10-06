@@ -16,7 +16,11 @@ function TenantOverlaysCtrl($stateParams,
   $scope.tabIndex = 4;
   vm.tenantKey = $stateParams.tenantKey;
   vm.editMode = !!$stateParams.tenantKey;
-  vm.currentTenant = {};
+  let tenantPromise = TenantsService.getTenantByKey(vm.tenantKey);
+  tenantPromise.then(data => {
+    vm.currentTenant = data
+  });
+
   vm.overlayChanged = false;
 
   ////////////////////////////////////////////////////////////////
@@ -262,6 +266,7 @@ function TenantOverlaysCtrl($stateParams,
   };
 
   vm.getTenant = () => {
+    vm.loadingOverlays = true;
     let tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey);
     tenantPromise.then(function (tenant) {
       vm.currentTenant = tenant;
@@ -270,7 +275,8 @@ function TenantOverlaysCtrl($stateParams,
         $timeout(vm.getTenant, 3000);
       } else {
         vm.loading = false;
-      }
+      };
+      vm.loadingOverlays = false;
       vm.currentTenantCopy = angular.copy(vm.currentTenant);
     })
     return tenantPromise
@@ -294,6 +300,8 @@ function TenantOverlaysCtrl($stateParams,
           return $state.go('tenantLocations', {tenantKey: $stateParams.tenantKey});
         case 4:
           return $state.go('tenantOverlays', {tenantKey: $stateParams.tenantKey});
+        case 5:
+          return $state.go('tenantLogs', {tenantKey: $stateParams.tenantKey});
       }
     }
   });

@@ -366,7 +366,6 @@ application = WSGIApplication(
               methods=['POST'],
               ),
 
-
         Route(r'/api/v1/overlay/tenant/<tenant_urlsafe_key>/apply',
               handler='handlers.overlay_handler.OverlayHandler',
               name='tenant_apply_overlay_to_devices',
@@ -465,6 +464,12 @@ application = WSGIApplication(
               handler='handlers.integration_events_log_handler.IntegrationEventsLogHandler',
               name='enrollment-events-list',
               handler_method='get_enrollment_events',
+              methods=['GET']
+              ),
+        Route(r'/api/v1/integration_events/tenant_create',
+              handler='handlers.integration_events_log_handler.IntegrationEventsLogHandler',
+              name='get_tenant_create_events',
+              handler_method='get_tenant_create_events',
               methods=['GET']
               ),
 
