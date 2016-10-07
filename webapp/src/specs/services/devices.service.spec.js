@@ -171,6 +171,61 @@ describe('DevicesService', function () {
   );
 
 
+    describe('.searchDevicesByPartialMacGlobally', () =>
+    it('search devices with a partial mac address returns an http promise', function () {
+      let distributorKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw';
+      let partialMac = "1234";
+      let unmanaged = false;
+      let deviceRestangularService = {
+        get() {
+        }
+      };
+      spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
+      spyOn(deviceRestangularService, 'get').and.returnValue(promise);
+      let actual = DevicesService.searchDevicesByPartialMacGlobally( partialMac, unmanaged);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/devices/analytics/search-global?unmanaged=${unmanaged}&partial_mac=${partialMac}`);
+      expect(deviceRestangularService.get).toHaveBeenCalled();
+      return expect(actual).toBe(promise);
+    })
+  );
+
+  describe('.searchDevicesByPartialSerialGlobally', () =>
+    it('search devices with a partial mac address returns an http promise', function () {
+      let distributorKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw';
+      let partialSerial = "1234";
+      let unmanaged = false;
+      let deviceRestangularService = {
+        get() {
+        }
+      };
+      spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
+      spyOn(deviceRestangularService, 'get').and.returnValue(promise);
+      let actual = DevicesService.searchDevicesByPartialSerialGlobally( partialSerial, unmanaged);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/devices/analytics/search-global?unmanaged=${unmanaged}&partial_serial=${partialSerial}`);
+      expect(deviceRestangularService.get).toHaveBeenCalled();
+      return expect(actual).toBe(promise);
+    })
+  );
+
+  describe('.searchDevicesByPartialGCMidGlobally', () =>
+    it('search devices with a partial gcmid returns an http promise', function () {
+      let distributorKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw';
+      let partialGCMid = "1234";
+      let unmanaged = false;
+      let deviceRestangularService = {
+        get() {
+        }
+      };
+      spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
+      spyOn(deviceRestangularService, 'get').and.returnValue(promise);
+      let request = DevicesService.searchDistributorDevicesByPartialGCMidGlobally( partialGCMid, unmanaged);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/devices/analytics/search-global?unmanaged=${unmanaged}&partial_gcmid=${partialGCMid}`);
+      expect(deviceRestangularService.get).toHaveBeenCalled();
+      return expect(request).toBe(promise);
+    })
+  );
+
+
   describe('.searchDevicesByPartialMac', () =>
     it('search devices with a partial mac address returns an http promise', function () {
       let distributorKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIsSBlRlbmFudBiAgICAgMCvCgw';
