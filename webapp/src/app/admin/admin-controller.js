@@ -50,6 +50,8 @@ function AdminCtrl(AdminService,
     for (let item of vm.devicesToMatchOn) {
       if (resource === item) {
         foundMatch = true;
+        vm.matchDevice = item;
+        break
       }
     }
     vm.controlOpenButton(foundMatch)
@@ -65,7 +67,6 @@ function AdminCtrl(AdminService,
 
     return DevicesService.searchDevices(partial, button, byTenant, tenantKey, distributor, unmanaged, globally)
       .then(function (response) {
-        console.log(response)
         let devicesToReturn;
         if (response.success) {
           let devices = response.devices;
@@ -218,7 +219,6 @@ function AdminCtrl(AdminService,
     return ToastsService.showSuccessToast(`Distributor ${distributor.name} selected!`);
   };
 
-
   vm.getUsersOfDistributor = function () {
     vm.loadingUsersOfDistributor = true;
     let currentDistributorKey = SessionsService.getCurrentDistributorKey();
@@ -243,7 +243,22 @@ function AdminCtrl(AdminService,
 
   vm.editTenant = item => $state.go('tenantDetails', {tenantKey: item.key});
 
-  vm.editItem = (item) => DevicesService.editItem(item, true)
+  vm.editItem = (searchText) => {
+    let mac, serial, gcmid;
+    let button = vm.selectedButton;
+
+    mac = button === "MAC";
+    serial = button === "Serial Number";
+    gcmid = button === "GCM ID"
+
+    if (mac) {
+      DevicesService.editItem(vm.macDevices[searchText]);
+    } else if (serial) {
+      DevicesService.editItem(vm.serialDevices[searchText]);
+    } else {
+      DevicesService.editItem(vm.gcmidDevices[searchText])
+    }
+  }
 
 
   return vm;

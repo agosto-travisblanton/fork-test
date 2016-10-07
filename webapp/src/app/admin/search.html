@@ -15,7 +15,7 @@
 
               <div class="col-md-2">
                 <md-radio-button value="Serial Number"
-                                 class="md-primary" ng-disabled="">
+                                 class="md-primary" ng-disabled="vm.unmanagedSelectedButton === 'Unmanaged'">
                   Serial Number
                 </md-radio-button>
               </div>
@@ -56,7 +56,7 @@
 
                 <md-radio-button
                   value="Unmanaged"
-                  class="md-primary radio-button">
+                  class="md-primary radio-button" ng-disabled="vm.selectedButton === 'Serial Number'">
                   Unmanaged
                 </md-radio-button>
               </div>
@@ -73,15 +73,15 @@
               md-items="item in vm.searchDevices(vm.unmanagedSelectedButton === 'Unmanaged', vm.searchText)"
               md-item-text="item"
               md-min-length="0"
-              md-search-text-change="vm.isResourceValid(true, vm.searchText)"
-              md-selected-item-change="vm.isResourceValid(true, vm.searchText)"
+              md-search-text-change="vm.isResourceValid(vm.searchText)"
+              md-selected-item-change="vm.isResourceValid(vm.searchText)"
               placeholder="Make A Search"
               md-select-on-match="true"
             >
 
               <md-item-template>
-                                                        <span md-highlight-text="vm.searchText"
-                                                              md-highlight-flags="^i">{{item}}</span>
+                    <span md-highlight-text="vm.searchText"
+                          md-highlight-flags="^i">{{item}}</span>
               </md-item-template>
               <md-not-found>
                 <div
@@ -100,7 +100,7 @@
           <div class="col-md-1" style="margin-left: -20px !important; margin-top: -4px !important">
             <md-button class="md-raised md-primary"
                        ng-disabled="vm.disabled" aria-label="OPEN"
-                       ng-click="vm.prepareForEditView(true, vm.searchText)">
+                       ng-click="vm.editItem(vm.matchDevice)">
               OPEN
 
             </md-button>
