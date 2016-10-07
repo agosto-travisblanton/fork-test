@@ -1,5 +1,5 @@
 <md-content class="md-padding">
-  <div flex="65" flex-sm="100" flex-xs="100" layout="column">
+  <div flex="100" flex-sm="100" flex-xs="100" layout="column">
     <md-card>
       <md-card-title>
         <md-card-title-text>
@@ -8,7 +8,7 @@
       </md-card-title>
       <md-card-content>
         <div class="col-md-12">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <md-radio-group ng-model="vm.selectedButton"
                             ng-change="vm.changeRadio()"
                             class="radio-horizontal">
@@ -37,6 +37,30 @@
                   GCM ID
                 </md-radio-button>
               </div>
+            </md-radio-group>
+          </div>
+           <div class="col-md-3">
+            <md-radio-group ng-model="vm.selectedButton"
+                            ng-change="vm.changeRadio()"
+                            class="radio-horizontal">
+
+              <div class="col-md-2">
+                <md-radio-button value="Serial Number"
+                                 class="md-primary" ng-disabled="">
+                  Managed
+                </md-radio-button>
+              </div>
+
+              <div class="col-md-2 col-md-offset-3">
+
+                <md-radio-button
+                  value="MAC"
+                  class="md-primary radio-button">
+                  Unmanaged
+                <!--</md-radio-button>-->
+              </div>
+
+
             </md-radio-group>
           </div>
 
@@ -84,7 +108,7 @@
       </md-card-content>
     </md-card>
   </div>
-  <div flex="35" flex-sm="100" flex-xs="100" layout="column">
+  <div flex="45" flex-sm="100" flex-xs="100" layout="column">
     <md-card>
       <md-card-title>
         <md-card-title-text>
@@ -93,7 +117,7 @@
       </md-card-title>
       <md-card-content>
         <div class="col-md-12">
-          <div class="col-md-4">
+          <div class="col-md-7">
             <md-autocomplete
               md-no-cache="true"
               md-selected-item="vm.tenantSelectedText"
@@ -125,7 +149,7 @@
 
             </md-autocomplete>
           </div>
-          <div class="col-md-1 col-md-offset-3">
+          <div class="col-md-1">
             <md-button class="md-raised md-primary"
                        ng-disabled="vm.unmanagedDisabled" aria-label="OPEN"
                        ng-click="vm.prepareForEditView(true, vm.searchText)">
