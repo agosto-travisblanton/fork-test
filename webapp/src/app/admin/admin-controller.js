@@ -16,6 +16,7 @@ function AdminCtrl(AdminService,
   // Device Search Variables
   //////////////////////////////////////////
   vm.selectedButton = "Serial Number";
+  vm.unmanagedSelectedButton = "Managed"
   vm.serialDevices = {};
   vm.disabled = true;
   vm.macDevices = {};
@@ -44,7 +45,6 @@ function AdminCtrl(AdminService,
     vm.devicesToMatchOn = [];
   };
 
-
   vm.isResourceValid = function (resource) {
     let foundMatch = false;
     for (let item of vm.devicesToMatchOn) {
@@ -65,6 +65,7 @@ function AdminCtrl(AdminService,
 
     return DevicesService.searchDevices(partial, button, byTenant, tenantKey, distributor, unmanaged, globally)
       .then(function (response) {
+        console.log(response)
         let devicesToReturn;
         if (response.success) {
           let devices = response.devices;
@@ -132,9 +133,7 @@ function AdminCtrl(AdminService,
     } else {
       vm.tenantSearchDisabled = true;
     }
-
   }
-
 
   //////////////////////////////////////////
   // Distributor Tab

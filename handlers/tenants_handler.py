@@ -65,8 +65,10 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                 if user_entity and user_entity.is_administrator:
                     result = Tenant.find_by_partial_name_across_all_distributors(tenant_name_search)
                 else:
-                    print "bad userkey or not admin"
+                    error_message = 'Bad User Key'
+                    self.response.set_status(httplib.BAD_REQUEST, error_message)
                     return
+
             elif tenant_name_search:
                 result = Tenant.find_by_partial_name(tenant_name_search, distributor_urlsafe_key)
             else:

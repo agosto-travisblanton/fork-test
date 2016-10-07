@@ -214,7 +214,7 @@ application = WSGIApplication(
               handler_method='post_log',
               methods=['POST']
               ),
-        Route(r'/api/v1/devices/search-global',
+        Route(r'/api/v1/devices/analytics/search-global',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='search_for_device_globally',
               handler_method='search_for_device_globally',

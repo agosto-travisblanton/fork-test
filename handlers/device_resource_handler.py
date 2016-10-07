@@ -4,7 +4,7 @@ import logging
 from datetime import datetime
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
-
+import httplib
 from app_config import config
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from device_commands_handler import DeviceCommandsHandler
@@ -197,6 +197,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
         partial_serial = self.request.get("partial_serial")
         partial_mac = self.request.get("partial_mac")
         user_key = self.request.headers.get("X-Provisioning-User")
+
         try:
             user_entity = ndb.Key(urlsafe=user_key).get()
         except Exception, e:
@@ -204,7 +205,8 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             logging.exception(e)
 
         if not user_entity or not user_entity.is_administrator:
-            print "bad user key or not admin"
+            error_message = 'Bad User Key'
+            self.response.set_status(httplib.BAD_REQUEST, error_message)
             return
 
         else:
@@ -225,17 +227,19 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                     partial_mac=partial_mac
                 )
 
+            matches = [
+                {
+                    "mac": DeviceResourceHandler.ethernet_or_wifi_mac_address(device, partial_mac),
+                    "serial": device.serial_number,
+                    "key": device.key.urlsafe(),
+                    "tenantKey": device.tenant_key.urlsafe(),
+                    "gcmid": device.gcm_registration_id
+                } for device in resulting_devices]
+
             json_response(
                 self.response,
                 {
-                    "matches": [
-                        {
-                            "mac": DeviceResourceHandler.ethernet_or_wifi_mac_address(device, partial_mac),
-                            "serial": device.serial_number,
-                            "key": device.key.urlsafe(),
-                            "tenantKey": device.tenant_key.urlsafe(),
-                            "gcmid": device.gcm_registration_id
-                        } for device in resulting_devices]
+                    "matches": matches
                 },
             )
 

@@ -39,14 +39,15 @@
               </div>
             </md-radio-group>
           </div>
-           <div class="col-md-3">
-            <md-radio-group ng-model="vm.selectedButton"
+          <div class="col-md-3">
+            <md-radio-group ng-model="vm.unmanagedSelectedButton"
                             ng-change="vm.changeRadio()"
                             class="radio-horizontal">
 
               <div class="col-md-2">
-                <md-radio-button value="Serial Number"
-                                 class="md-primary" ng-disabled="">
+                <md-radio-button
+                  value="Managed"
+                  class="md-primary">
                   Managed
                 </md-radio-button>
               </div>
@@ -54,7 +55,7 @@
               <div class="col-md-2 col-md-offset-3">
 
                 <md-radio-button
-                  value="MAC"
+                  value="Unmanaged"
                   class="md-primary radio-button">
                   Unmanaged
                 </md-radio-button>
@@ -69,7 +70,7 @@
               md-no-cache="true"
               md-selected-item="vm.selectedText"
               md-search-text="vm.searchText"
-              md-items="item in vm.searchDevices(true, vm.searchText)"
+              md-items="item in vm.searchDevices(vm.unmanagedSelectedButton === 'Unmanaged', vm.searchText)"
               md-item-text="item"
               md-min-length="0"
               md-search-text-change="vm.isResourceValid(true, vm.searchText)"
@@ -153,7 +154,7 @@
             <md-button class="md-raised md-primary"
                        ng-disabled="vm.tenantSearchDisabled" aria-label="OPEN"
                        ng-click="vm.editTenant(vm.searchMatch)">
-                OPEN
+              OPEN
 
             </md-button>
           </div>
