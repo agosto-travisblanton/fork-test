@@ -1,7 +1,13 @@
+import naturalSort from 'javascript-natural-sort';
+
+
 function AdminCtrl(AdminService,
                    SessionsService,
+                   DevicesService,
                    ToastsService,
+                   $state,
                    $mdDialog,
+                   TenantsService,
                    DistributorsService) {
   "ngInject";
 
@@ -19,8 +25,8 @@ function AdminCtrl(AdminService,
   // Tenant Search Variables
   //////////////////////////////////////////
   vm.searchedTenants = [];
-  vm.searchMatch = null;
-  vm.searchDisabled = true;
+  vm.tenantSearchMatch = null;
+  vm.tenantSearchDisabled = true;
 
   //////////////////////////////////////////
   // Device Search
@@ -57,7 +63,6 @@ function AdminCtrl(AdminService,
     let distributor = null;
     let globally = true;
 
-
     return DevicesService.searchDevices(partial, button, byTenant, tenantKey, distributor, unmanaged, globally)
       .then(function (response) {
         let devicesToReturn;
@@ -92,7 +97,7 @@ function AdminCtrl(AdminService,
     if (!tenant_name || tenant_name.length < 3) {
       return []
     }
-    let promise = TenantsService.searchAllTenantsByName(tenant_name)
+    let promise = TenantsService.searchAllTenantsByName(tenant_name, true)
     return promise.then((response) => {
       vm.searchedTenants = response
       if (vm.searchedTenants) {
@@ -112,23 +117,22 @@ function AdminCtrl(AdminService,
     if (!tenant_name || tenant_name.length < 3) {
       return []
     }
-    let promise = TenantsService.searchAllTenantsByName(tenant_name)
-      .then((response) => {
-        let match = response
-        if (match) {
-          for (let eachName of match) {
-            if (tenant_name === eachName.name) {
-              vm.searchDisabled = false;
-              vm.searchMatch = eachName
-              return;
-            } else {
-              vm.searchDisabled = true;
-            }
-          }
+
+    let match = vm.searchedTenants;
+    if (match) {
+      for (let eachName of match) {
+        if (tenant_name === eachName.name) {
+          vm.tenantSearchDisabled = false;
+          vm.searchMatch = eachName
+          return;
         } else {
-          vm.searchDisabled = true;
+          vm.tenantSearchDisabled = true;
         }
-      })
+      }
+    } else {
+      vm.tenantSearchDisabled = true;
+    }
+
   }
 
 

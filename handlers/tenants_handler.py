@@ -53,7 +53,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
         tenant = self.validate_and_get(tenant_key, Tenant, abort_on_not_found=False)
         if not tenant:
             tenant_name_search = self.request.get("tenant_name")
-            across_distributors_if_admin = self.request.get("allDistributors")
+            across_distributors_if_admin = self.request.get("allDistributors") == "true"
             if tenant_name_search and across_distributors_if_admin:
                 user_key = self.request.headers.get("X-Provisioning-User")
                 try:

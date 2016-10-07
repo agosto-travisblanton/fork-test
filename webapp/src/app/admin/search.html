@@ -57,7 +57,7 @@
                   value="MAC"
                   class="md-primary radio-button">
                   Unmanaged
-                <!--</md-radio-button>-->
+                </md-radio-button>
               </div>
 
 
@@ -122,27 +122,27 @@
               md-no-cache="true"
               md-selected-item="vm.tenantSelectedText"
               md-search-text="vm.tenantSearchText"
-              md-items="item in vm.searchDevices(true, vm.searchText)"
-              md-item-text="item"
+              md-items="tenantItem in vm.searchAllTenantsByName(vm.tenantSearchText)"
+              md-item-text="tenantItem"
               md-min-length="0"
-              md-search-text-change="vm.isResourceValid(true, vm.searchText)"
-              md-selected-item-change="vm.isResourceValid(true, vm.searchText)"
+              md-search-text-change="vm.isTenantValid(vm.tenantSearchText)"
+              md-selected-item-change="vm.isTenantValid(vm.tenantSearchText)"
               placeholder="Make A Search"
               md-select-on-match="true"
             >
 
               <md-item-template>
-                                                        <span md-highlight-text="vm.searchText"
-                                                              md-highlight-flags="^i">{{item}}</span>
+                    <span md-highlight-text="vm.tenantSearchText"
+                          md-highlight-flags="^i">{{tenantItem}}</span>
               </md-item-template>
               <md-not-found>
                 <div
-                  ng-if="vm.searchText !== '' && vm.searchText.length > 2">
-                  No results for "{{vm.searchText}}" were
+                  ng-if="vm.tenantSearchText !== '' && vm.tenantSearchText.length > 2">
+                  No results for "{{vm.tenantSearchText}}" were
                   found.
                 </div>
                 <div
-                  ng-if="vm.searchText !== '' && vm.searchText.length <= 2">
+                  ng-if="vm.tenantSearchText !== '' && vm.tenantSearchText.length <= 2">
                   Please enter at least 3 characters.
                 </div>
               </md-not-found>
@@ -151,15 +151,10 @@
           </div>
           <div class="col-md-1">
             <md-button class="md-raised md-primary"
-                       ng-disabled="vm.unmanagedDisabled" aria-label="OPEN"
-                       ng-click="vm.prepareForEditView(true, vm.searchText)">
-              <div ng-if="!vm.unmanagedDisabledButtonLoading">
+                       ng-disabled="vm.tenantSearchDisabled" aria-label="OPEN"
+                       ng-click="vm.editTenant(vm.searchMatch)">
                 OPEN
 
-              </div>
-              <div ng-if="vm.unmanagedDisabledButtonLoading">
-                Loading...
-              </div>
             </md-button>
           </div>
         </div>
