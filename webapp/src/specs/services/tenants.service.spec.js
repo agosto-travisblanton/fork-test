@@ -92,6 +92,22 @@ describe('TenantsService', function () {
     })
   );
 
+    describe('.searchAllTenantsByName', () =>
+    it('retrieve all tenant names, returning a promise', function () {
+      let tenantKey = 'dhYUYdfhdjfhlasddf7898a7sdfdas78d67';
+      let tenantRestangularService = {
+        customGETLIST() {
+        }
+      };
+      spyOn(Restangular, 'all').and.returnValue(tenantRestangularService);
+      spyOn(tenantRestangularService, 'customGETLIST').and.returnValue(promise);
+      let actual = TenantsService.searchAllTenantsByName(tenantKey);
+      expect(Restangular.all).toHaveBeenCalledWith('tenants');
+      expect(tenantRestangularService.customGETLIST).toHaveBeenCalled();
+      return expect(actual).toBe(promise);
+    })
+  );
+
   describe('.delete', () =>
     it('delete tenant, returning a promise', function () {
       let tenant = {key: 'dhYUYdfhdjfhlasddf7898a7sdfdas78d67', name: 'Foobar'};
