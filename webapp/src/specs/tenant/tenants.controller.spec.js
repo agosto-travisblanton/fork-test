@@ -189,8 +189,8 @@ describe('TenantsCtrl', function () {
 
     return it("isTenantValid changes searchDisabled based on if the tenant is valid", function () {
       let tenant_name = "Foobar1"
+      controller.searchedTenants = [{name: "Foobar1"}]
       controller.isTenantValid(tenant_name);
-      promise.resolve(tenants);
       expect(controller.searchDisabled).toBe(false);
     });
   });
