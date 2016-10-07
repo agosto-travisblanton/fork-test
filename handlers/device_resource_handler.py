@@ -370,6 +370,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                     return
                 tenant_code = request_json.get('tenantCode')
                 if tenant_code:
+                    has_tenant = True
                     tenant = Tenant.find_by_tenant_code(tenant_code)
                     if tenant is None:
                         status = 400
@@ -384,6 +385,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                     else:
                         tenant_key = tenant.key
                 else:
+                    has_tenant = False
                     tenant_key = None
                 if status == 201:
                     device = ChromeOsDevice.create_managed(tenant_key=tenant_key,
@@ -421,11 +423,12 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                         correlation_identifier=correlation_id,
                         details='Device resource uri {0} returned in response Location header.'.format(device_uri))
                     registration_response_event.put()
-                    notifier = EmailNotify()
-                    notifier.device_enrolled(tenant_code=tenant_code,
-                                             tenant_name=device.get_tenant().name,
-                                             device_mac_address=device_mac_address,
-                                             timestamp=datetime.utcnow())
+                    if has_tenant:
+                        notifier = EmailNotify()
+                        notifier.device_enrolled(tenant_code=tenant_code,
+                                                 tenant_name=device.get_tenant().name,
+                                                 device_mac_address=device_mac_address,
+                                                 timestamp=datetime.utcnow())
                 else:
                     self.response.set_status(status, error_message)
         else:

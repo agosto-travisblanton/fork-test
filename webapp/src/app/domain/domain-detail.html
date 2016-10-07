@@ -33,6 +33,7 @@
                              tooltips
                              tooltip-side="right"
                              tooltip-size="large"
+                             tooltip-hide-trigger="mouseleave click"
                              tooltip-template-url="webapp/src/app/tooltip/domains/domain-name.html"
                              required>
                     </div>
@@ -71,6 +72,7 @@
                              tooltips
                              tooltip-side="right"
                              tooltip-size="large"
+                             tooltip-hide-trigger="mouseleave click"
                              tooltip-template-url="webapp/src/app/tooltip/domains/impersonation-email.html"
                              required>
                     </div>
@@ -99,7 +101,7 @@
                 <div ng-if="domainDetailsCtrl.editMode == false">
                   <div class="col-sm-3">
                     <div>
-                      <label for="organizationUnitPath">Organization Unit Path</label>
+                      <label for="organizationUnitPath" style="white-space: nowrap;">Organization Unit Path</label>
                     </div>
                     <div
                       ng-class="{ 'has-error' : domainForm.organizationUnitPath.$invalid && !domainForm.organizationUnitPath.$pristine}">
@@ -114,6 +116,7 @@
                              tooltips
                              tooltip-side="right"
                              tooltip-size="large"
+                             tooltip-hide-trigger="mouseleave click"
                              tooltip-template-url="webapp/src/app/tooltip/domains/ou-path.html"
                              required>
                     </div>
