@@ -5,11 +5,12 @@ from app_config import config
 from env_setup import setup_test_paths
 from routes import application
 from models import ChromeOsDevice, Tenant, Distributor, Domain
+from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
 setup_test_paths()
 
 
-class TestDeviceResourceSearchHandlers(BaseTest, WebTest):
+class TestDeviceResourceSearchHandlers(ProvisioningDistributorUserBase):
     ADMIN_EMAIL = 'foo@bar.com'
     ANOTHER_TENANT_NAME = 'Another, Inc,'
     ANOTHER_TENANT_CODE = 'another_inc'
@@ -69,15 +70,6 @@ class TestDeviceResourceSearchHandlers(BaseTest, WebTest):
             device_id=self.DEVICE_ID,
             mac_address=self.MAC_ADDRESS)
         self.managed_device_key = self.managed_device.put()
-        self.unmanaged_registration_token_authorization_header = {
-            'Authorization': config.UNMANAGED_REGISTRATION_TOKEN
-        }
-        self.api_token_authorization_header = {
-            'Authorization': config.API_TOKEN
-        }
-        self.unmanaged_api_token_authorization_header = {
-            'Authorization': config.UNMANAGED_API_TOKEN
-        }
 
         self.empty_header = {}
 
@@ -125,7 +117,6 @@ class TestDeviceResourceSearchHandlers(BaseTest, WebTest):
 
         response_json = json.loads(response.body)
         self.assertTrue(len(response_json["matches"]) == managed_number_build)
-
 
     #################################################################################################################
     # get_devices_by_distributor
@@ -298,7 +289,123 @@ class TestDeviceResourceSearchHandlers(BaseTest, WebTest):
         response_json = json.loads(response.body)
         self.assertTrue(len(response_json["matches"]) == tenant_one_amount + tenant_two_amount)
 
+    def test_search_for_device_globally_by_gcmid(self):
+        self.user.is_administrator = True
+        self.user.put()
+        uri = application.router.build(None, 'search_for_device_globally', None, {})
+        distributor = Distributor.create(name='Acme Brothers',
+                                         active=True)
+        distributor_key = distributor.put()
+        tenant_one_amount = 13
+        tenant_two_amount = 6
 
+        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(distributor_key,
+                                                                              tenant_1_device_count=tenant_one_amount,
+                                                                              tenant_2_device_count=tenant_two_amount)
+
+
+        distributor_two = Distributor.create(name='Acme Brothers 2',
+                                             active=True)
+        distributor_two_key = distributor_two.put()
+        d_two_tenant_one_amount = 20
+        d_two_tenant_two_amount = 5
+
+        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(distributor_two_key,
+                                                                              tenant_1_device_count=d_two_tenant_one_amount,
+                                                                              tenant_2_device_count=d_two_tenant_two_amount)
+
+        response = self.app.get(uri, headers=self.api_token_authorization_header, params={'partial_gcmid': 'm-gcm'})
+
+        self.assertOK(response)
+        response_json = json.loads(response.body)
+        self.assertTrue(
+            len(
+                response_json[
+                    "matches"]) ==
+            tenant_one_amount +
+            tenant_two_amount +
+            d_two_tenant_one_amount +
+            d_two_tenant_two_amount
+        )
+
+
+    def test_search_for_device_globally_by_serial(self):
+        self.user.is_administrator = True
+        self.user.put()
+        uri = application.router.build(None, 'search_for_device_globally', None, {})
+        distributor = Distributor.create(name='Acme Brothers',
+                                         active=True)
+        distributor_key = distributor.put()
+        tenant_one_amount = 13
+        tenant_two_amount = 6
+
+        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(distributor_key,
+                                                                              tenant_1_device_count=tenant_one_amount,
+                                                                              tenant_2_device_count=tenant_two_amount)
+
+
+        distributor_two = Distributor.create(name='Acme Brothers 2',
+                                             active=True)
+        distributor_two_key = distributor_two.put()
+        d_two_tenant_one_amount = 20
+        d_two_tenant_two_amount = 5
+
+        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(distributor_two_key,
+                                                                              tenant_1_device_count=d_two_tenant_one_amount,
+                                                                              tenant_2_device_count=d_two_tenant_two_amount)
+
+        response = self.app.get(uri, headers=self.api_token_authorization_header, params={'partial_serial': 'm-serial'})
+
+        self.assertOK(response)
+        response_json = json.loads(response.body)
+        self.assertTrue(
+            len(
+                response_json[
+                    "matches"]) ==
+            tenant_one_amount +
+            tenant_two_amount +
+            d_two_tenant_one_amount +
+            d_two_tenant_two_amount
+        )
+
+    def test_search_for_device_globally_by_mac(self):
+        self.user.is_administrator = True
+        self.user.put()
+        uri = application.router.build(None, 'search_for_device_globally', None, {})
+        distributor = Distributor.create(name='Acme Brothers',
+                                         active=True)
+        distributor_key = distributor.put()
+        tenant_one_amount = 13
+        tenant_two_amount = 6
+
+        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(distributor_key,
+                                                                              tenant_1_device_count=tenant_one_amount,
+                                                                              tenant_2_device_count=tenant_two_amount)
+
+
+        distributor_two = Distributor.create(name='Acme Brothers 2',
+                                             active=True)
+        distributor_two_key = distributor_two.put()
+        d_two_tenant_one_amount = 20
+        d_two_tenant_two_amount = 5
+
+        self.__setup_distributor_with_two_tenants_with_n_devices_with_serials(distributor_two_key,
+                                                                              tenant_1_device_count=d_two_tenant_one_amount,
+                                                                              tenant_2_device_count=d_two_tenant_two_amount)
+
+        response = self.app.get(uri, headers=self.api_token_authorization_header, params={'partial_mac': 'm-mac'})
+
+        self.assertOK(response)
+        response_json = json.loads(response.body)
+        self.assertTrue(
+            len(
+                response_json[
+                    "matches"]) ==
+            tenant_one_amount +
+            tenant_two_amount +
+            d_two_tenant_one_amount +
+            d_two_tenant_two_amount
+        )
 
     ############################################################
     # HELPER FUNCTIONS

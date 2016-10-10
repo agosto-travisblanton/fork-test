@@ -204,10 +204,16 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             user_entity = None
             logging.exception(e)
 
-        if not user_entity or not user_entity.is_administrator:
+        if not user_entity:
             error_message = 'Bad User Key'
             self.response.set_status(httplib.BAD_REQUEST, error_message)
             return
+
+        if not user_entity.is_administrator:
+            error_message = 'User is not administrator'
+            self.response.set_status(httplib.BAD_REQUEST, error_message)
+            return
+
 
         else:
             if partial_gcmid:
