@@ -4,7 +4,7 @@ import logging
 from datetime import datetime
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
-
+import httplib
 from app_config import config
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from device_commands_handler import DeviceCommandsHandler
@@ -189,6 +189,65 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                     } for device in resulting_devices]
             },
         )
+
+    @requires_api_token
+    def search_for_device_globally(self):
+        unmanaged = self.request.get("unmanaged") == "true"
+        partial_gcmid = self.request.get("partial_gcmid")
+        partial_serial = self.request.get("partial_serial")
+        partial_mac = self.request.get("partial_mac")
+        user_key = self.request.headers.get("X-Provisioning-User")
+
+        try:
+            user_entity = ndb.Key(urlsafe=user_key).get()
+        except Exception, e:
+            user_entity = None
+            logging.exception(e)
+
+        if not user_entity:
+            error_message = 'Bad User Key'
+            self.response.set_status(httplib.BAD_REQUEST, error_message)
+            return
+
+        if not user_entity.is_administrator:
+            error_message = 'User is not administrator'
+            self.response.set_status(httplib.BAD_REQUEST, error_message)
+            return
+
+
+        else:
+            if partial_gcmid:
+                resulting_devices = Tenant.find_devices_with_partial_gcmid_globally(
+                    unmanaged=unmanaged,
+                    partial_gcmid=partial_gcmid
+                )
+
+            elif partial_serial:
+                resulting_devices = Tenant.find_devices_with_partial_serial_globally(
+                    unmanaged=unmanaged,
+                    partial_serial=partial_serial
+                )
+            elif partial_mac:
+                resulting_devices = Tenant.find_devices_with_partial_mac_globally(
+                    unmanaged=unmanaged,
+                    partial_mac=partial_mac
+                )
+
+            matches = [
+                {
+                    "mac": DeviceResourceHandler.ethernet_or_wifi_mac_address(device, partial_mac),
+                    "serial": device.serial_number,
+                    "key": device.key.urlsafe(),
+                    "tenantKey": device.tenant_key.urlsafe(),
+                    "gcmid": device.gcm_registration_id
+                } for device in resulting_devices]
+
+            json_response(
+                self.response,
+                {
+                    "matches": matches
+                },
+            )
 
     ############################################################################################
     # END DEVICES VIEW
