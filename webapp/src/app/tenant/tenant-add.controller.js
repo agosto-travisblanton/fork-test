@@ -15,7 +15,8 @@ function TenantAddCtrl($log, $location, TenantsService, DistributorsService, Tim
     notification_emails: undefined,
     proof_of_play_logging: false,
     proof_of_play_url: undefined,
-    active: true
+    active: true,
+    ou_create: true
   };
   vm.selectedDomain = undefined;
   vm.distributorDomains = [];
