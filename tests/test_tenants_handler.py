@@ -279,7 +279,8 @@ class TestTenantsHandler(BaseTest, WebTest):
                               'domain_key': self.domain_key.urlsafe(),
                               'proof_of_play_logging': False,
                               'default_timezone': 'America/Denver',
-                              'active': True}
+                              'active': True,
+                              'ou_create': False}
         uri = application.router.build(None, 'tenants', None, {})
         with self.assertRaises(AppError) as context:
             self.app.post_json(uri, params=request_parameters, headers=self.headers)

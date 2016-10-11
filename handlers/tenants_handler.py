@@ -130,6 +130,11 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                 error_message = 'The default timezone is invalid.'
             else:
                 default_timezone = default_timezone
+            ou_create = self.check_and_get_field('ou_create')
+            if str(ou_create).lower() == 'true':
+                ou_create = True
+            else:
+                ou_create = False
             if status == 201:
                 if Tenant.is_tenant_code_unique(tenant_code):
                     tenant = Tenant.create(name=name,
@@ -142,7 +147,8 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                                            notification_emails=notification_emails,
                                            proof_of_play_logging=proof_of_play_logging,
                                            proof_of_play_url=proof_of_play_url,
-                                           default_timezone=default_timezone)
+                                           default_timezone=default_timezone,
+                                           ou_create=ou_create)
                     # 1. Check if the tenant OU exists in CDM
                     impersonation_email = domain.impersonation_admin_email_address
                     organization_units_api = OrganizationUnitsApi(
