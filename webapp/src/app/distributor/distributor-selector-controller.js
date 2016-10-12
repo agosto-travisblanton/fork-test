@@ -1,8 +1,11 @@
 function DistributorSelectorCtrl($state,
+                                 $rootScope,
                                  DistributorsService,
                                  SessionsService) {
   "ngInject";
   let vm = this;
+  vm.paulsCurrentDistributorName = $rootScope.paulsCurrentDistributorName;
+
   vm.distributors = [];
   vm.currentDistributor = undefined;
   vm.loading = true;

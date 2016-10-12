@@ -9,10 +9,10 @@
       <div ng-if="!vm.isAdmin" ng-include="'webapp/src/app/admin/create-user.html'"></div>
       <md-tabs md-dynamic-height md-border-bottom ng-if="vm.isAdmin">
         <div class="container">
-          <md-tab label="Create User">
+          <md-tab label="User">
             <div ng-include="'webapp/src/app/admin/create-user.html'"></div>
           </md-tab>
-          <md-tab label="Create Reseller" layout-align="center center" ng-if="vm.isAdmin">
+          <md-tab label="{{vm.paulsCurrentDistributorName}}" layout-align="center center" ng-if="vm.isAdmin">
             <div ng-include="'webapp/src/app/admin/create-distributor.html'"></div>
           </md-tab>
            <md-tab label="Search" layout-align="center center" ng-if="vm.isAdmin">

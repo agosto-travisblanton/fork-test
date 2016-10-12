@@ -15,14 +15,14 @@
             <input ng-model="vm.user.email" type="email" required>
           </md-input-container>
           <md-input-container>
-            <md-checkbox ng-model="vm.user.cb1" aria-label="Reseller Admin">
-              Reseller Admin
+            <md-checkbox ng-model="vm.user.cb1" aria-label="{{vm.paulsCurrentDistributorName}} Admin">
+              {{vm.paulsCurrentDistributorName}} Admin
             </md-checkbox>
           </md-input-container>
           <md-input-container class="md-block">
             <div ng-if="vm.isAdmin && vm.allDistributors.length > 1">
-              <md-select ng-model="vm.user.distributor" required aria-label="distribuor select">
-                <label>Reseller</label>
+              <md-select ng-model="vm.user.distributor" required aria-label="{{vm.paulsCurrentDistributorName}} select">
+                <label>{{vm.paulsCurrentDistributorName}}</label>
                 <md-option ng-repeat="distributor in vm.allDistributors" value="{{distributor.name}}">
                   {{distributor.name}}
                 </md-option>
@@ -30,7 +30,7 @@
             </div>
             <div ng-if="!vm.isAdmin && vm.distributorsAsAdmin.length > 1">
               <md-select ng-model="vm.user.distributor" required aria-label="distribuor select">
-                <label>Reseller</label>
+                <label>{{vm.paulsCurrentDistributorName}}</label>
                 <md-option ng-repeat="distributor in vm.distributorsAsAdmin" value="{{distributor.name}}">
                   {{distributor.name}}
                 </md-option>
