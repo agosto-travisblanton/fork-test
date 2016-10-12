@@ -284,7 +284,7 @@ class TestTenantsHandler(BaseTest, WebTest):
         uri = application.router.build(None, 'tenants', None, {})
         with self.assertRaises(AppError) as context:
             self.app.post_json(uri, params=request_parameters, headers=self.headers)
-        error_message = "Bad response: 409 Conflict. Tenant code \"{0}\" is already assigned to a tenant.".format(
+        error_message = "Bad response: 409 Conflict. Tenant code \"{0}\" is already assigned.".format(
             existing_tenant_code)
         self.assertTrue(error_message in context.exception.message)
 

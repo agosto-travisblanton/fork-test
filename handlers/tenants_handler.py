@@ -3,7 +3,7 @@ import json
 import logging
 
 from google.appengine.ext import ndb
-from models import IntegrationEventLog
+
 from app_config import config
 from decorators import requires_api_token
 from extended_session_request_handler import ExtendedSessionRequestHandler
@@ -11,6 +11,7 @@ from integrations.content_manager.content_manager_api import ContentManagerApi
 from integrations.directory_api.organization_units_api import OrganizationUnitsApi
 from integrations.directory_api.users_api import UsersApi
 from model_entities.domain_model import Domain
+from models import IntegrationEventLog
 from models import Tenant
 from proofplay.database_calls import get_tenant_list_from_distributor_key
 from restler.serializers import json_response
@@ -90,31 +91,29 @@ class TenantsHandler(ExtendedSessionRequestHandler):
         IntegrationEventLog.create(
             event_category='Tenant Creation',
             component_name='Provisioning',
-            workflow_step='Request from Client to create a tenant',
+            workflow_step='Request to create a tenant',
             details=self.request.body,
             correlation_identifier=correlation_id).put()
         if self.request.body is not str('') and self.request.body is not None:
-            status = 201
-            error_message = None
             request_json = json.loads(self.request.body)
-            name = self.check_and_get_field('name')
-            admin_email = self.check_and_get_field('admin_email')
+            name = self.check_and_get_field(key='name', abort_on_not_found=True)
+            admin_email = self.check_and_get_field(key='admin_email', abort_on_not_found=True)
             admin_email = admin_email.strip().lower()
-            tenant_code = self.check_and_get_field('tenant_code')
+            tenant_code = self.check_and_get_field(key='tenant_code', abort_on_not_found=True)
             tenant_code = tenant_code.strip().lower()
-            content_server_url = self.check_and_get_field('content_server_url')
+            content_server_url = self.check_and_get_field(key='content_server_url', abort_on_not_found=True)
             content_server_url = content_server_url.strip().lower()
-            content_manager_base_url = self.check_and_get_field('content_manager_base_url')
+            content_manager_base_url = self.check_and_get_field(key='content_manager_base_url', abort_on_not_found=True)
             content_manager_base_url = content_manager_base_url.strip().lower()
             notification_emails = delimited_string_to_list(request_json.get('notification_emails'))
-            domain_urlsafe_key = self.check_and_get_field('domain_key')
+            domain_urlsafe_key = self.check_and_get_field(key='domain_key', abort_on_not_found=True)
             domain = self.validate_and_get(urlsafe_key=domain_urlsafe_key, kind_cls=Domain, abort_on_not_found=True)
-            active = self.check_and_get_field('active')
+            active = self.check_and_get_field(key='active', abort_on_not_found=True)
             if str(active).lower() == 'false':
                 active = False
             else:
                 active = True
-            proof_of_play_logging = self.check_and_get_field('proof_of_play_logging')
+            proof_of_play_logging = self.check_and_get_field(key='proof_of_play_logging', abort_on_not_found=True)
             if str(proof_of_play_logging).lower() == 'true':
                 proof_of_play_logging = True
             else:
@@ -124,183 +123,79 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                 proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
             else:
                 proof_of_play_url = proof_of_play_url.strip().lower()
-            default_timezone = request_json.get('default_timezone')
-            if default_timezone is None or default_timezone == '':
-                status = 400
-                error_message = 'The default timezone is invalid.'
-            else:
-                default_timezone = default_timezone
-            ou_create = self.check_and_get_field('ou_create')
+            default_timezone = self.check_and_get_field(key='default_timezone', abort_on_not_found=True)
+            ou_create = self.check_and_get_field(key='ou_create', abort_on_not_found=True)
             if str(ou_create).lower() == 'true':
-                ou_create = True
+                create_tenant_organization_unit = True
             else:
-                ou_create = False
-            if status == 201:
-                if Tenant.is_tenant_code_unique(tenant_code):
-                    tenant = Tenant.create(name=name,
-                                           tenant_code=tenant_code,
-                                           admin_email=admin_email,
-                                           content_server_url=content_server_url,
-                                           content_manager_base_url=content_manager_base_url,
-                                           domain_key=domain.key,
-                                           active=active,
-                                           notification_emails=notification_emails,
-                                           proof_of_play_logging=proof_of_play_logging,
-                                           proof_of_play_url=proof_of_play_url,
-                                           default_timezone=default_timezone,
-                                           ou_create=ou_create)
-                    # 1. Check if the tenant OU exists in CDM
-                    impersonation_email = domain.impersonation_admin_email_address
-                    organization_units_api = OrganizationUnitsApi(
-                        admin_to_impersonate_email_address=impersonation_email)
-                    result = organization_units_api.get(organization_unit_path=tenant.organization_unit_path)
-                    if 'statusCode' in result.keys():
-                        if result['statusCode'] == httplib.NOT_FOUND:
-                            logging.debug('Tenant OU not found, so attempting to create it.')
-                            IntegrationEventLog.create(
-                                event_category='Tenant Creation',
-                                component_name='Provisioning',
-                                workflow_step='Request from Provisioning to CDM to create new OU',
-                                tenant_code=tenant_code,
-                                correlation_identifier=correlation_id).put()
-                            ou_result = organization_units_api.insert(ou_container_name=tenant.tenant_code)
-                            if 'statusCode' in ou_result.keys() and 'statusText' in ou_result.keys():
-                                status_code = ou_result['statusCode']
-                                status_text = ou_result['statusText']
-                                if 'Invalid Ou Id' in status_text:
-                                    # We return 412 Precondition Failed so UI knows error occurred due to dupe OU in CDM
-                                    error_message = 'Precondition Failed. {0} {1}'.format(
-                                        httplib.PRECONDITION_FAILED, status_text)
-                                    logging.error(error_message)
-                                else:
-                                    error_message = 'Unable to create tenant OU. {0} {1}'.format(
-                                        status_code, status_text)
-                                    logging.error(error_message)
-                                IntegrationEventLog.create(
-                                    event_category='Tenant Creation',
-                                    component_name='Provisioning',
-                                    workflow_step='Response from CDM: OU Creation was unsuccesful',
-                                    tenant_code=tenant_code,
-                                    details=error_message,
-                                    correlation_identifier=correlation_id).put()
-                                self.response.set_status(status_code, error_message)
-                                return
-                            else:
-                                IntegrationEventLog.create(
-                                    event_category='Tenant Creation',
-                                    component_name='Provisioning',
-                                    workflow_step='Response from CDM: OU Creation was successful',
-                                    tenant_code=tenant_code,
-                                    correlation_identifier=correlation_id).put()
-                                tenant.organization_unit_id = ou_result['orgUnitId']
-                                tenant.put()
-                                logging.debug('Tenant OU created with organization_unit_id {0}.'.format(
-                                    tenant.organization_unit_id))
+                create_tenant_organization_unit = False
+            if Tenant.is_tenant_code_unique(tenant_code):
+                tenant = Tenant.create(name=name,
+                                       tenant_code=tenant_code,
+                                       admin_email=admin_email,
+                                       content_server_url=content_server_url,
+                                       content_manager_base_url=content_manager_base_url,
+                                       domain_key=domain.key,
+                                       active=active,
+                                       notification_emails=notification_emails,
+                                       proof_of_play_logging=proof_of_play_logging,
+                                       proof_of_play_url=proof_of_play_url,
+                                       default_timezone=default_timezone,
+                                       ou_create=ou_create)
+                tenant_key = tenant.put()
+                IntegrationEventLog.create(
+                    event_category='Tenant Creation',
+                    component_name='Provisioning',
+                    workflow_step='Tenant persistence',
+                    tenant_code=tenant_code,
+                    details='key: {0}, code: {1} '.format(tenant_key.urlsafe(), tenant_code),
+                    correlation_identifier=correlation_id).put()
 
-                                IntegrationEventLog.create(
-                                    event_category='Tenant Creation',
-                                    component_name='Chrome Directory API',
-                                    workflow_step='Request from Provisioning to CDM to begin creating enrollment user',
-                                    tenant_code=tenant_code,
-                                    details=impersonation_email,
-                                    correlation_identifier=correlation_id).put()
-
-                                users_api = UsersApi(
-                                    admin_to_impersonate_email_address=impersonation_email)
-                                user_result = users_api.insert(
-                                    family_name=tenant.tenant_code,
-                                    given_name='enrollment',
-                                    password=tenant.enrollment_password,
-                                    primary_email=tenant.enrollment_email,
-                                    org_unit_path=tenant.organization_unit_path)
-                                if 'statusCode' in user_result.keys() and 'statusText' in user_result.keys():
-                                    status_code = user_result['statusCode']
-                                    status_text = user_result['statusText']
-                                    if 'Entity already exists' in status_text:
-                                        # Return 412 Precondition Failed so UI knows error is due to dupe user in CDM
-                                        error_message = 'Precondition Failed. {0} {1}'.format(
-                                            httplib.PRECONDITION_FAILED, status_text)
-                                        logging.error(error_message)
-                                    else:
-                                        error_message = 'Unable to create enrollment user. {0} {1}'.format(status_code,
-                                                                                                           status_text)
-                                        logging.error(error_message)
-
-                                    IntegrationEventLog.create(
-                                        event_category='Tenant Creation',
-                                        component_name='Chrome Directory API',
-                                        workflow_step='Response from CDM: Creating enrollment user was unsuccesful',
-                                        tenant_code=tenant_code,
-                                        details=error_message,
-                                        correlation_identifier=correlation_id).put()
-
-                                    self.response.set_status(status_code, error_message)
-                                    return
-                                else:
-
-                                    IntegrationEventLog.create(
-                                        event_category='Tenant Creation',
-                                        component_name='Chrome Directory API',
-                                        workflow_step='Response from CDM: Creating enrollment user was successful',
-                                        tenant_code=tenant_code,
-                                        correlation_identifier=correlation_id).put()
-
-                                    is_created = user_result['primaryEmail'].strip().lower() == tenant.enrollment_email
-                                    logging.debug('Enrollment user is_created = {0}'.format(is_created))
-                                    tenant_key = tenant.put()
-                                    logging.debug('Enrollment user persisted for {0} on tenant.'.format(
-                                        tenant.enrollment_email))
-
-                                    IntegrationEventLog.create(
-                                        event_category='Tenant Creation',
-                                        component_name='Content Manager',
-                                        workflow_step='Request to ContentManagerApi to create tenant',
-                                        tenant_code=tenant_code,
-                                        details="Tenant Code: " + tenant_code,
-                                        correlation_identifier=correlation_id).put()
-
-                                    content_manager_api = ContentManagerApi()
-                                    notify_content_manager = content_manager_api.create_tenant(tenant)
-                                    if not notify_content_manager:
-                                        message = 'Failed to notify content manager about new tenant: {0}'.format(name)
-                                        logging.debug(message)
-                                        IntegrationEventLog.create(
-                                            event_category='Tenant Creation',
-                                            component_name='Content Manager',
-                                            workflow_step='Response from ContentManagerApi: Create Tenant was unsuccessful',
-                                            tenant_code=tenant_code,
-                                            details=message,
-                                            correlation_identifier=correlation_id).put()
-
-                                    else:
-                                        IntegrationEventLog.create(
-                                            event_category='Tenant Creation',
-                                            component_name='Content Manager',
-                                            workflow_step='Response from ContentManagerApi: Create Tenant was successful',
-                                            tenant_code=tenant_code,
-                                            correlation_identifier=correlation_id).put()
-
-                                    tenant_uri = self.request.app.router.build(None,
-                                                                               'manage-tenant',
-                                                                               None,
-                                                                               {'tenant_key': tenant_key.urlsafe()})
-                                    self.response.headers['Location'] = tenant_uri
-                                    self.response.headers.pop('Content-Type', None)
-                                    self.response.set_status(httplib.CREATED)
-                    else:
-                        error_message = "Conflict. Tenant code \"{0}\" already assigned an OU.".format(tenant_code)
+                if create_tenant_organization_unit:
+                    status_code, error_message = self.create_tenant_organization_unit_in_chrome_device_management(
+                        domain, tenant, correlation_id)
+                    if status_code != httplib.CREATED:
                         logging.error(error_message)
-                        self.response.set_status(httplib.PRECONDITION_FAILED, error_message)
-                else:
-                    error_message = "Conflict. Tenant code \"{0}\" is already assigned to a tenant.".format(tenant_code)
-                    logging.error(error_message)
-                    self.response.set_status(httplib.CONFLICT, error_message)
+                        self.response.set_status(status_code, error_message)
+                        return
+
+                self.notify_content_manager_of_tenant_creation(tenant=tenant, correlation_id=correlation_id)
+
+                tenant_uri = self.request.app.router.build(None, 'manage-tenant', None,
+                                                           {'tenant_key': tenant_key.urlsafe()})
+                success_message = 'Tenant {0} ({1}) created. Uri = {2}. Organization unit option = {3}.'.format(
+                        tenant.name, tenant_code, tenant_uri, create_tenant_organization_unit)
+                IntegrationEventLog.create(
+                    event_category='Tenant Creation',
+                    component_name='Provisioning',
+                    workflow_step='Create Tenant success!',
+                    details=success_message,
+                    correlation_identifier=correlation_id).put()
+                logging.debug('Success creating Tenant: {0}'.format(success_message))
+
+                self.response.headers['Location'] = tenant_uri
+                self.response.headers.pop('Content-Type', None)
+                self.response.set_status(httplib.CREATED)
             else:
-                logging.error(error_message)
-                self.response.set_status(status, error_message)
+                error_message = "Conflict. Tenant code \"{0}\" is already assigned.".format(tenant_code)
+                IntegrationEventLog.create(
+                    event_category='Tenant Creation',
+                    component_name='Provisioning',
+                    workflow_step='Request to create a tenant',
+                    details=error_message,
+                    correlation_identifier=correlation_id).put()
+                logging.error('Failed creating Tenant: {0}'.format(error_message))
+                self.response.set_status(httplib.CONFLICT, error_message)
         else:
-            logging.error("Problem creating Tenant. No request body.")
-            self.response.set_status(httplib.BAD_REQUEST, 'Did not receive request body.')
+            error_message = 'Did not receive request body.'
+            IntegrationEventLog.create(
+                event_category='Tenant Creation',
+                component_name='Provisioning',
+                workflow_step='Request to create a tenant',
+                details=error_message,
+                correlation_identifier=correlation_id).put()
+            logging.error('Failed creating Tenant: {0}'.format(error_message))
+            self.response.set_status(httplib.BAD_REQUEST, error_message)
 
     @requires_api_token
     def put(self, tenant_key):
@@ -387,3 +282,128 @@ class TenantsHandler(ExtendedSessionRequestHandler):
             tenant.put()
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
+
+    @staticmethod
+    def notify_content_manager_of_tenant_creation(tenant, correlation_id):
+        content_manager_api = ContentManagerApi()
+        notify_content_manager = content_manager_api.create_tenant(tenant)
+        if notify_content_manager:
+            IntegrationEventLog.create(event_category='Tenant Creation',
+                                       component_name='Content Manager',
+                                       workflow_step='Response from ContentManagerApi: created',
+                                       tenant_code=tenant.tenant_code,
+                                       correlation_identifier=correlation_id).put()
+        else:
+            message = 'Failed create request to content manager for new tenant: {0}'.format(tenant.name)
+            logging.debug(message)
+            IntegrationEventLog.create(event_category='Tenant Creation',
+                                       component_name='Content Manager',
+                                       workflow_step='Response from ContentManagerApi: not created',
+                                       tenant_code=tenant.tenant_code,
+                                       details=message,
+                                       correlation_identifier=correlation_id).put()
+
+    @staticmethod
+    def create_tenant_organization_unit_in_chrome_device_management(domain, tenant, correlation_id):
+        tenant_code = tenant.tenant_code
+        # 1. Check if the tenant OU exists in CDM
+        impersonation_email = domain.impersonation_admin_email_address
+        organization_units_api = OrganizationUnitsApi(
+            admin_to_impersonate_email_address=impersonation_email)
+        result = organization_units_api.get(organization_unit_path=tenant.organization_unit_path)
+        if 'statusCode' in result.keys():
+            if result['statusCode'] == httplib.NOT_FOUND:
+                logging.debug('Tenant OU not found, so attempting to create it.')
+                IntegrationEventLog.create(
+                    event_category='Tenant Creation',
+                    component_name='Chrome Device Management',
+                    workflow_step='Request to CDM to create a new tenant OU',
+                    tenant_code=tenant_code,
+                    correlation_identifier=correlation_id).put()
+                ou_result = organization_units_api.insert(ou_container_name=tenant_code)
+                if 'statusCode' in ou_result.keys() and 'statusText' in ou_result.keys():
+                    status_code = ou_result['statusCode']
+                    status_text = ou_result['statusText']
+                    if 'Invalid Ou Id' in status_text:
+                        # We return 412 Precondition Failed so UI knows error occurred due to dupe OU in CDM
+                        error_message = 'Precondition failed: {0} {1}'.format(
+                            httplib.PRECONDITION_FAILED, status_text)
+                        logging.error(error_message)
+                    else:
+                        error_message = 'Unable to create tenant OU: {0} {1}'.format(
+                            status_code, status_text)
+                        logging.error(error_message)
+
+                    IntegrationEventLog.create(
+                        event_category='Tenant Creation',
+                        component_name='Chrome Device Management',
+                        workflow_step='Response from CDM: OU Creation was unsuccessful',
+                        tenant_code=tenant_code,
+                        details=error_message,
+                        correlation_identifier=correlation_id).put()
+                    return status_code, error_message
+                else:
+                    tenant.organization_unit_id = ou_result['orgUnitId']
+                    message = 'Tenant OU created for {0} ({1}) with organization_unit_id set to {2}.'.format(
+                        tenant.name, tenant_code, tenant.organization_unit_id)
+                    IntegrationEventLog.create(
+                        event_category='Tenant Creation',
+                        component_name='Chrome Device Management',
+                        workflow_step='Response: OU Creation was successful',
+                        details=message,
+                        tenant_code=tenant_code,
+                        correlation_identifier=correlation_id).put()
+
+                    tenant.put()
+                    logging.debug(message)
+
+                    message = 'Prepare enrollment user for {0} ({1}) with impersonation email {2}.'.format(
+                        tenant.name, tenant_code, impersonation_email)
+                    IntegrationEventLog.create(
+                        event_category='Tenant Creation',
+                        component_name='Chrome Device Management',
+                        workflow_step='Request to CDM to begin creating enrollment user',
+                        tenant_code=tenant_code,
+                        details=message,
+                        correlation_identifier=correlation_id).put()
+                    logging.debug(message)
+
+                    users_api = UsersApi(admin_to_impersonate_email_address=impersonation_email)
+                    user_result = users_api.insert(
+                        family_name=tenant_code,
+                        given_name='enrollment',
+                        password=tenant.enrollment_password,
+                        primary_email=tenant.enrollment_email,
+                        org_unit_path=tenant.organization_unit_path)
+                    if 'statusCode' in user_result.keys() and 'statusText' in user_result.keys():
+                        status_code = user_result['statusCode']
+                        status_text = user_result['statusText']
+                        if 'Entity already exists' in status_text:
+                            # Return 412 Precondition Failed so UI knows error is due to dupe user in CDM
+                            error_message = 'Precondition failed for enrollment user. {0} {1}'.format(
+                                httplib.PRECONDITION_FAILED, status_text)
+                        else:
+                            error_message = 'Unable to create enrollment user. {0} {1}'.format(status_code, status_text)
+
+                        logging.error(error_message)
+                        IntegrationEventLog.create(
+                            event_category='Tenant Creation',
+                            component_name='Chrome Device Management',
+                            workflow_step='Response: Creating enrollment user unsuccessful',
+                            tenant_code=tenant_code,
+                            details=error_message,
+                            correlation_identifier=correlation_id).put()
+
+                        return status_code, error_message
+                    else:
+                        message = 'Enrollment user persisted for {0} on tenant {1} ({2}).'.format(
+                            tenant.enrollment_email, tenant.name, tenant_code)
+                        status_code = httplib.CREATED
+                        IntegrationEventLog.create(
+                            event_category='Tenant Creation',
+                            component_name='Chrome Device Management',
+                            workflow_step='Response: Creating enrollment user successful',
+                            tenant_code=tenant_code,
+                            correlation_identifier=correlation_id).put()
+                        logging.debug(message)
+                    return status_code, message
