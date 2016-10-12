@@ -163,7 +163,7 @@ class ContentManagerApi(KeyValidatorMixin, object):
 
                 if not cm_request_success:
                     # exponential backoff
-                    time.sleep(retry * retry)
+                    time.sleep((retry + 1) * (retry + 1))
                     return self.create_device(device_urlsafe_key, correlation_id, gcm_registration_id, retry=retry + 1)
 
 
