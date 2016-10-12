@@ -3,7 +3,7 @@ import logging
 from env_setup import setup_test_paths
 
 setup_test_paths()
-
+import device_message_processor
 from http_client import HttpClient, HttpClientRequest, HttpClientResponse
 from models import Tenant, ChromeOsDevice, Distributor, Domain
 from agar.test import BaseTest
@@ -78,13 +78,17 @@ class TestContentManagerApi(BaseTest):
     ##################################################################################################################
 
     def test_create_device_success_returns_true(self):
+        when(device_message_processor).change_intent(any_matcher(str), any_matcher(str), any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=201))
         result = self.content_manager_api.create_device(device_urlsafe_key=self.device_key.urlsafe(),
                                                         correlation_id='some correlation id')
         self.assertTrue(result)
 
     def test_create_device_issues_gcm_update_when_success(self):
-        when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=201))
+        when(device_message_processor).change_intent(any_matcher(str), any_matcher(str), any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
 
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=201))
         result = self.content_manager_api.create_device(device_urlsafe_key=self.device_key.urlsafe(),
@@ -101,6 +105,9 @@ class TestContentManagerApi(BaseTest):
     # update_device
     ##################################################################################################################
     def test_update_device_success(self):
+        when(device_message_processor).change_intent(any_matcher(str), any_matcher(str), any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+
         when(self.content_manager_api).delete_device(any_matcher()).thenReturn(True)
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=201))
         result = self.content_manager_api.update_device(device_urlsafe_key=self.device_key.urlsafe())

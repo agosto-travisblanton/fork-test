@@ -165,7 +165,8 @@ class ContentManagerApi(KeyValidatorMixin, object):
                     # exponential backoff
                     time.sleep((retry + 1) * (retry + 1))
                     return self.create_device(device_urlsafe_key, correlation_id, gcm_registration_id, retry=retry + 1)
-
+                else:
+                    return True
 
             else:
                 message = 'ContentManagerApi.create_device unable to resolve tenant: device_key={0}, \
@@ -190,6 +191,7 @@ class ContentManagerApi(KeyValidatorMixin, object):
                 serial_number=chrome_os_device.serial_number,
                 correlation_identifier=correlation_id)
             cm_create_device_event_request.put()
+            return False
 
     def delete_device(self, device_urlsafe_key):
         key = ndb.Key(urlsafe=device_urlsafe_key)
