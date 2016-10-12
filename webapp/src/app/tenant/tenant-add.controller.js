@@ -1,4 +1,11 @@
-function TenantAddCtrl($log, $location, TenantsService, DistributorsService, TimezonesService, $state, sweet, ProgressBarService,
+function TenantAddCtrl($log,
+                       $location,
+                       TenantsService,
+                       DistributorsService,
+                       TimezonesService,
+                       $state,
+                       sweet,
+                       ProgressBarService,
                        SessionsService) {
   "ngInject";
 
@@ -65,6 +72,10 @@ function TenantAddCtrl($log, $location, TenantsService, DistributorsService, Tim
       return sweet.show('Oops...', 'Unable to save the tenant.', 'error');
     }
   };
+
+  vm.cancel = () => {
+    $state.go("tenants")
+  }
 
   vm.autoGenerateTenantCode = function () {
     if (!vm.currentTenant.key) {
