@@ -80,6 +80,10 @@ describe('TenantAddCtrl', function () {
       return expect(controller.currentTenant.proof_of_play_logging).toBeFalsy();
     });
 
+    it('declares a currentTenant that has OU creation turned on', function () {
+      expect(controller.currentTenant.ou_create).toBeTruthy();
+    });
+
     it('declares a currentTenant that has content_manager_url declared but not defined', () => expect(controller.currentTenant.content_manager_url).toBeUndefined());
 
     it('declares a currentTenant that has player_content_url declared but not defined', () => expect(controller.currentTenant.player_content_url).toBeUndefined());
