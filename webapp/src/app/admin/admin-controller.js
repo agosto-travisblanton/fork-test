@@ -4,6 +4,7 @@ import naturalSort from 'javascript-natural-sort';
 function AdminCtrl(AdminService,
                    SessionsService,
                    DevicesService,
+                   $rootScope,
                    ToastsService,
                    $state,
                    $mdDialog,
@@ -12,6 +13,8 @@ function AdminCtrl(AdminService,
   "ngInject";
 
   let vm = this;
+  vm.paulsCurrentDistributorName = $rootScope.paulsCurrentDistributorName;
+
   //////////////////////////////////////////
   // Device Search Variables
   //////////////////////////////////////////
