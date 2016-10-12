@@ -64,6 +64,30 @@ class KeyValidatorMixin(object):
         return obj
 
 
+
+    def get_or_except(self, urlsafe_key, kind_cls, use_app_engine_memcache=True):
+        '''
+        Validates that urlsafe_key is an ndb.Key of type kind_cls, and if it is, retrieves and returns the object
+        :param urlsafe_key: an urlsafe key string
+        :param kind_cls: a class object
+        :param abort_on_not_found: if the key is valid but the object is not found, True will cause this method to
+        abort with a 404; False will cause None to be returned.
+        :param use_app_engine_memcache: Passing False will bypass App Engine's standard caching service memcache.
+        Default is True which is to use App Engine's memcache .
+        :return: If the key is valid and the object exists, the object is returned.  If the key is invalid, the method
+        will abort with a 400.
+        '''
+        obj = None
+        valid, key = self.valid_key(urlsafe_key, kind_cls)
+        if valid:
+            obj = key.get(use_memcache=use_app_engine_memcache)
+            if obj is None:
+                raise ValueError("Bad urlsafe_key {}".format(urlsafe_key))
+
+        return obj
+
+
+
 class PagingListHandlerMixin(object):
     @property
     def page_size(self):

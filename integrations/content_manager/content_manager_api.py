@@ -8,6 +8,8 @@ from http_client import HttpClient, HttpClientRequest
 from model_entities.chrome_os_device_model_and_overlays import Tenant, ChromeOsDevice
 from model_entities.integration_events_log_model import IntegrationEventLog
 from ndb_mixins import KeyValidatorMixin
+from device_message_processor import change_intent
+import time
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -39,99 +41,155 @@ class ContentManagerApi(KeyValidatorMixin, object):
             return True
         else:
             error_message = 'Unable to create tenant {0} in Content Manager. Status code: {1}'.format(
-                    tenant.name, http_client_response.status_code)
+                tenant.name, http_client_response.status_code)
             logging.error(error_message)
             raise RuntimeError(error_message)
 
-    def create_device(self, device_urlsafe_key, correlation_id):
-        chrome_os_device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
-        cm_create_device_event_request = IntegrationEventLog.create(
-            event_category='Registration',
-            component_name='Content Manager',
-            workflow_step='Request to Content Manager for a create_device',
-            mac_address=chrome_os_device.mac_address,
-            gcm_registration_id=chrome_os_device.gcm_registration_id,
-            device_urlsafe_key=device_urlsafe_key,
-            serial_number=chrome_os_device.serial_number,
-            correlation_identifier=correlation_id)
-        cm_create_device_event_request.put()
-        tenant = None
-        if chrome_os_device.tenant_key:
-            tenant = self.validate_and_get(chrome_os_device.tenant_key.urlsafe(), Tenant, abort_on_not_found=True)
-        if tenant:
-            cms_payload = {
-                "device_key": device_urlsafe_key,
-                "api_key": chrome_os_device.api_key,
-                "tenant_code": tenant.tenant_code,
-                "serial_number": chrome_os_device.serial_number
-            }
-            if chrome_os_device.content_manager_display_name:
-                cms_payload['name'] = chrome_os_device.content_manager_display_name
-            if chrome_os_device.content_manager_location_description:
-                cms_payload['location'] = chrome_os_device.content_manager_location_description
-            url = "{content_manager_base_url}/provisioning/v1/displays".format(
-                content_manager_base_url=tenant.content_manager_base_url)
-            cm_create_device_event_request.tenant_code = tenant.tenant_code
-            cm_create_device_event_request.details = 'Request url: {0} for call to CM.'.format(url)
-            cm_create_device_event_request.put()
-            http_client_request = HttpClientRequest(url=url,
-                                                    payload=json.dumps(cms_payload),
-                                                    headers=self.HEADERS)
-            http_client_response = HttpClient().post(http_client_request)
-            if http_client_response.status_code == 201:
-                message = 'ContentManagerApi.create_device: http_status={0}, url={1}, device_key={2}, \
-                    api_key={3}, tenant_code={4}, SN={5}'.format(
-                    http_client_response.status_code,
-                    url,
-                    device_urlsafe_key,
-                    chrome_os_device.api_key,
-                    tenant.tenant_code,
-                    chrome_os_device.serial_number)
-                logging.info(message)
-                cm_create_device_event_success = IntegrationEventLog.create(
-                    event_category='Registration',
-                    component_name='Content Manager',
-                    workflow_step='Response from Content Manager for create_device request (201 Created)',
-                    mac_address=chrome_os_device.mac_address,
-                    gcm_registration_id=chrome_os_device.gcm_registration_id,
+    def cm_request(self, url, payload, headers, device_urlsafe_key, chrome_os_device, tenant, correlation_id,
+                   gcm_registration_id=None, retry=0):
+        http_client_request = HttpClientRequest(url=url,
+                                                payload=payload,
+                                                headers=headers)
+        http_client_response = HttpClient().post(http_client_request)
+        if http_client_response.status_code == 201:
+            message = 'ContentManagerApi.create_device: http_status={0}, url={1}, device_key={2}, \
+                            api_key={3}, tenant_code={4}, SN={5}'.format(
+                http_client_response.status_code,
+                url,
+                device_urlsafe_key,
+                chrome_os_device.api_key,
+                tenant.tenant_code,
+                chrome_os_device.serial_number)
+            logging.info(message)
+            workflow_step = 'Response from Content Manager for create_device request (201 Created)'
+            if retry != 0:
+                workflow_step = "Retry: {}; ".format(retry) + workflow_step
+            cm_create_device_event_success = IntegrationEventLog.create(
+                event_category='Registration',
+                component_name='Content Manager',
+                workflow_step=workflow_step,
+                mac_address=chrome_os_device.mac_address,
+                gcm_registration_id=chrome_os_device.gcm_registration_id,
+                device_urlsafe_key=device_urlsafe_key,
+                serial_number=chrome_os_device.serial_number,
+                correlation_identifier=correlation_id,
+                details=message)
+            cm_create_device_event_success.put()
+            if not gcm_registration_id:
+                try:
+                    gcm_registration_id = ndb.Key(urlsafe=device_urlsafe_key).get().gcm_registration_id
+                except Exception, e:
+                    logging.exception("Failure to send change intent because device key is bad")
+            if gcm_registration_id:
+                change_intent(
+                    gcm_registration_id=gcm_registration_id,
+                    payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
                     device_urlsafe_key=device_urlsafe_key,
-                    serial_number=chrome_os_device.serial_number,
-                    correlation_identifier=correlation_id,
-                    details=message)
-                cm_create_device_event_success.put()
-                return True
-            else:
-                message = 'ContentManagerApi.create_device: http_status={0}, url={1}, device_key={2}, \
-                    api_key={3}, tenant_code={4}, SN={5}'.format(
-                    http_client_response.status_code,
-                    url,
-                    device_urlsafe_key,
-                    chrome_os_device.api_key,
-                    tenant.tenant_code,
-                    chrome_os_device.serial_number)
-                logging.error(message)
-                cm_create_device_event_failure = IntegrationEventLog.create(
-                    event_category='Registration',
-                    component_name='Content Manager',
-                    workflow_step='Response from Content Manager for create_device request (Failed)',
-                    mac_address=chrome_os_device.mac_address,
-                    gcm_registration_id=chrome_os_device.gcm_registration_id,
-                    device_urlsafe_key=device_urlsafe_key,
-                    serial_number=chrome_os_device.serial_number,
-                    correlation_identifier=correlation_id,
-                    details=message)
-                cm_create_device_event_failure.put()
+                    host='unknown',
+                    user_identifier='system (CM update succesful)')
+            return True
+        # cm response was 4xx
         else:
-            message = 'ContentManagerApi.create_device unable to resolve tenant: device_key={0}, \
-                    api_key={1}, tenant_code={2}, SN={3}'.format(
+            message = 'ContentManagerApi.create_device: http_status={0}, url={1}, device_key={2}, \
+                            api_key={3}, tenant_code={4}, SN={5}'.format(
+                http_client_response.status_code,
+                url,
                 device_urlsafe_key,
                 chrome_os_device.api_key,
                 tenant.tenant_code,
                 chrome_os_device.serial_number)
             logging.error(message)
-            cm_create_device_event_request.details = message
+            workflow_step = 'Response from Content Manager for create_device request (Failed)'
+            if retry != 0:
+                workflow_step = "Retry: {}; ".format(retry) + workflow_step
+            cm_create_device_event_failure = IntegrationEventLog.create(
+                event_category='Registration',
+                component_name='Content Manager',
+                workflow_step=workflow_step,
+                mac_address=chrome_os_device.mac_address,
+                gcm_registration_id=chrome_os_device.gcm_registration_id,
+                device_urlsafe_key=device_urlsafe_key,
+                serial_number=chrome_os_device.serial_number,
+                correlation_identifier=correlation_id,
+                details=message)
+            cm_create_device_event_failure.put()
+            return False
+
+    def create_device(self, device_urlsafe_key, correlation_id, gcm_registration_id=None, retry=0):
+        if retry < 5:
+            chrome_os_device = self.get_or_except(device_urlsafe_key, ChromeOsDevice)
+            cm_create_device_event_request = IntegrationEventLog.create(
+                event_category='Registration',
+                component_name='Content Manager',
+                workflow_step='Request to Content Manager for a create_device' if retry == 0 else 'Retry {}: Request to Content Manager for a create_device'.format(
+                    retry),
+                mac_address=chrome_os_device.mac_address,
+                gcm_registration_id=chrome_os_device.gcm_registration_id,
+                device_urlsafe_key=device_urlsafe_key,
+                serial_number=chrome_os_device.serial_number,
+                correlation_identifier=correlation_id)
             cm_create_device_event_request.put()
-        return False
+            tenant = None
+            if chrome_os_device.tenant_key:
+                tenant = self.get_or_except(chrome_os_device.tenant_key.urlsafe(), Tenant)
+            if tenant:
+                cms_payload = {
+                    "device_key": device_urlsafe_key,
+                    "api_key": chrome_os_device.api_key,
+                    "tenant_code": tenant.tenant_code,
+                    "serial_number": chrome_os_device.serial_number
+                }
+                if chrome_os_device.content_manager_display_name:
+                    cms_payload['name'] = chrome_os_device.content_manager_display_name
+                if chrome_os_device.content_manager_location_description:
+                    cms_payload['location'] = chrome_os_device.content_manager_location_description
+                url = "{content_manager_base_url}/provisioning/v1/displays".format(
+                    content_manager_base_url=tenant.content_manager_base_url)
+                cm_create_device_event_request.tenant_code = tenant.tenant_code
+                cm_create_device_event_request.details = 'Request url: {0} for call to CM.'.format(url)
+                cm_create_device_event_request.put()
+
+                cm_request_success = self.cm_request(
+                    url=url,
+                    payload=json.dumps(cms_payload),
+                    headers=self.HEADERS,
+                    device_urlsafe_key=device_urlsafe_key,
+                    chrome_os_device=chrome_os_device,
+                    tenant=tenant,
+                    correlation_id=correlation_id,
+                    gcm_registration_id=gcm_registration_id,
+                    retry=retry
+                )
+
+                if not cm_request_success:
+                    # exponential backoff
+                    time.sleep(retry * retry)
+                    return self.create_device(device_urlsafe_key, correlation_id, gcm_registration_id, retry=retry + 1)
+
+
+            else:
+                message = 'ContentManagerApi.create_device unable to resolve tenant: device_key={0}, \
+                        api_key={1}, tenant_code={2}, SN={3}'.format(
+                    device_urlsafe_key,
+                    chrome_os_device.api_key,
+                    tenant.tenant_code,
+                    chrome_os_device.serial_number)
+                logging.error(message)
+                cm_create_device_event_request.details = message
+                cm_create_device_event_request.put()
+            return False
+        else:
+            chrome_os_device = self.get_or_except(device_urlsafe_key, ChromeOsDevice)
+            cm_create_device_event_request = IntegrationEventLog.create(
+                event_category='Registration',
+                component_name='Content Manager',
+                workflow_step='Ending Retry',
+                mac_address=chrome_os_device.mac_address,
+                gcm_registration_id=chrome_os_device.gcm_registration_id,
+                device_urlsafe_key=device_urlsafe_key,
+                serial_number=chrome_os_device.serial_number,
+                correlation_identifier=correlation_id)
+            cm_create_device_event_request.put()
 
     def delete_device(self, device_urlsafe_key):
         key = ndb.Key(urlsafe=device_urlsafe_key)
