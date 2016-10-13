@@ -374,6 +374,8 @@ app_DEFAULT_TIMEZONE = 'America/Chicago'
 
 app_DEFAULT_OU_PATH = '/skykit'
 
+app_TENANT_CODE_UNKNOWN = 'TBD'
+
 def _DEFAULT_CONTENT_MANAGER_URL():
     if on_development_server or not on_server:
         return 'https://skykit-contentmanager-int.appspot.com'
