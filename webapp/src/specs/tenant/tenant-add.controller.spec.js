@@ -174,6 +174,20 @@ describe('TenantAddCtrl', function () {
       });
     });
 
+    describe('.onFailureTenantSave 406 Unacceptable', function () {
+      beforeEach(function () {
+        let errorObject = {status: 406};
+        return controller.onFailureTenantSave(errorObject);
+      });
+
+      it('stops the progress bar animation', () => expect(progressBarService.complete).toHaveBeenCalled());
+
+      return it("show the error dialog", function () {
+        let expectedError = 'Unable to create tenant Organization Unit in Chrome Device Management.';
+        return expect(sweet.show).toHaveBeenCalledWith('Oops...', expectedError, 'error');
+      });
+    });
+
     describe('.onFailureTenantSave 412 Precondition Failed', function () {
       beforeEach(function () {
         let errorObject = {status: 412};
@@ -202,7 +216,7 @@ describe('TenantAddCtrl', function () {
       it('logs the error', () => expect($log.error).toHaveBeenCalledWith(errorObject));
 
       return it("show the error dialog", function () {
-        let expectedError = 'Unable to save the tenant.';
+        let expectedError = 'Not everything needed for tenant was created in Content Manager or CDM.';
         return expect(sweet.show).toHaveBeenCalledWith('Oops...', expectedError, 'error');
       });
     });
