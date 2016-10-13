@@ -3,6 +3,7 @@ import json
 import logging
 
 from google.appengine.ext import ndb
+from google.appengine.ext.deferred import deferred
 
 from app_config import config
 from decorators import requires_api_token
@@ -91,7 +92,8 @@ class TenantsHandler(ExtendedSessionRequestHandler):
         IntegrationEventLog.create(
             event_category='Tenant Creation',
             component_name='Provisioning',
-            workflow_step='Request to create a tenant',
+            workflow_step='Initialize Tenant Creation',
+            tenant_code=config.TENANT_CODE_UNKNOWN,
             details=self.request.body,
             correlation_identifier=correlation_id).put()
         if self.request.body is not str('') and self.request.body is not None:
@@ -146,20 +148,38 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                 IntegrationEventLog.create(
                     event_category='Tenant Creation',
                     component_name='Provisioning',
-                    workflow_step='Tenant persistence',
+                    workflow_step='Saved in DataStore',
                     tenant_code=tenant_code,
                     details='key: {0}, code: {1} '.format(tenant_key.urlsafe(), tenant_code),
                     correlation_identifier=correlation_id).put()
 
                 if create_tenant_organization_unit:
+                    IntegrationEventLog.create(
+                        event_category='Tenant Creation',
+                        component_name='Provisioning',
+                        workflow_step='Tenant With OU Option',
+                        tenant_code=tenant_code,
+                        details='key: {0}, code: {1} '.format(tenant_key.urlsafe(), tenant_code),
+                        correlation_identifier=correlation_id).put()
                     status_code, error_message = self.create_tenant_organization_unit_in_chrome_device_management(
                         domain, tenant, correlation_id)
                     if status_code != httplib.CREATED:
                         logging.error(error_message)
                         self.response.set_status(status_code, error_message)
                         return
+                else:
+                    IntegrationEventLog.create(
+                        event_category='Tenant Creation',
+                        component_name='Provisioning',
+                        workflow_step='Tenant Without OU Option',
+                        tenant_code=tenant_code,
+                        details='key: {0}, code: {1} '.format(tenant_key.urlsafe(), tenant_code),
+                        correlation_identifier=correlation_id).put()
 
-                self.notify_content_manager_of_tenant_creation(tenant=tenant, correlation_id=correlation_id)
+                deferred.defer(ContentManagerApi().create_tenant,
+                               tenant=tenant,
+                               correlation_id=correlation_id,
+                               _queue='content-server')
 
                 tenant_uri = self.request.app.router.build(None, 'manage-tenant', None,
                                                            {'tenant_key': tenant_key.urlsafe()})
@@ -168,10 +188,17 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                 IntegrationEventLog.create(
                     event_category='Tenant Creation',
                     component_name='Provisioning',
-                    workflow_step='Create Tenant success!',
+                    workflow_step='Complete Success!',
+                    tenant_code=tenant_code,
                     details=success_message,
                     correlation_identifier=correlation_id).put()
                 logging.debug('Success creating Tenant: {0}'.format(success_message))
+
+                # update initial tenant creation event to include then known tenant_code
+                initial_tenant_creation_event = IntegrationEventLog.get_initial_tenant_creation_event(
+                    correlation_identifier=correlation_id)
+                initial_tenant_creation_event.tenant_code = tenant_code
+                initial_tenant_creation_event.put()
 
                 self.response.headers['Location'] = tenant_uri
                 self.response.headers.pop('Content-Type', None)
@@ -182,6 +209,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                     event_category='Tenant Creation',
                     component_name='Provisioning',
                     workflow_step='Request to create a tenant',
+                    tenant_code=tenant_code,
                     details=error_message,
                     correlation_identifier=correlation_id).put()
                 logging.error('Failed creating Tenant: {0}'.format(error_message))
@@ -284,26 +312,6 @@ class TenantsHandler(ExtendedSessionRequestHandler):
         self.response.set_status(204)
 
     @staticmethod
-    def notify_content_manager_of_tenant_creation(tenant, correlation_id):
-        content_manager_api = ContentManagerApi()
-        notify_content_manager = content_manager_api.create_tenant(tenant)
-        if notify_content_manager:
-            IntegrationEventLog.create(event_category='Tenant Creation',
-                                       component_name='Content Manager',
-                                       workflow_step='Response from ContentManagerApi: created',
-                                       tenant_code=tenant.tenant_code,
-                                       correlation_identifier=correlation_id).put()
-        else:
-            message = 'Failed create request to content manager for new tenant: {0}'.format(tenant.name)
-            logging.debug(message)
-            IntegrationEventLog.create(event_category='Tenant Creation',
-                                       component_name='Content Manager',
-                                       workflow_step='Response from ContentManagerApi: not created',
-                                       tenant_code=tenant.tenant_code,
-                                       details=message,
-                                       correlation_identifier=correlation_id).put()
-
-    @staticmethod
     def create_tenant_organization_unit_in_chrome_device_management(domain, tenant, correlation_id):
         tenant_code = tenant.tenant_code
         # 1. Check if the tenant OU exists in CDM
@@ -313,11 +321,13 @@ class TenantsHandler(ExtendedSessionRequestHandler):
         result = organization_units_api.get(organization_unit_path=tenant.organization_unit_path)
         if 'statusCode' in result.keys():
             if result['statusCode'] == httplib.NOT_FOUND:
-                logging.debug('Tenant OU not found, so attempting to create it.')
+                details = 'OU available. Attempting to create it.'
+                logging.debug(details)
                 IntegrationEventLog.create(
                     event_category='Tenant Creation',
-                    component_name='Chrome Device Management',
-                    workflow_step='Request to CDM to create a new tenant OU',
+                    component_name='Chrome Directory API',
+                    workflow_step='CDM Tenant OU Request',
+                    details=details,
                     tenant_code=tenant_code,
                     correlation_identifier=correlation_id).put()
                 ou_result = organization_units_api.insert(ou_container_name=tenant_code)
@@ -336,7 +346,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
 
                     IntegrationEventLog.create(
                         event_category='Tenant Creation',
-                        component_name='Chrome Device Management',
+                        component_name='Chrome Directory API',
                         workflow_step='Response from CDM: OU Creation was unsuccessful',
                         tenant_code=tenant_code,
                         details=error_message,
@@ -344,25 +354,25 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                     return status_code, error_message
                 else:
                     tenant.organization_unit_id = ou_result['orgUnitId']
-                    message = 'Tenant OU created for {0} ({1}) with organization_unit_id set to {2}.'.format(
+                    success_message = 'Success creating OU for {0} ({1}) with organization_unit_id set to {2}.'.format(
                         tenant.name, tenant_code, tenant.organization_unit_id)
                     IntegrationEventLog.create(
                         event_category='Tenant Creation',
-                        component_name='Chrome Device Management',
-                        workflow_step='Response: OU Creation was successful',
-                        details=message,
+                        component_name='Chrome Directory API',
+                        workflow_step='CDM OU Created',
+                        details=success_message,
                         tenant_code=tenant_code,
                         correlation_identifier=correlation_id).put()
 
                     tenant.put()
-                    logging.debug(message)
+                    logging.debug(success_message)
 
                     message = 'Prepare enrollment user for {0} ({1}) with impersonation email {2}.'.format(
                         tenant.name, tenant_code, impersonation_email)
                     IntegrationEventLog.create(
                         event_category='Tenant Creation',
-                        component_name='Chrome Device Management',
-                        workflow_step='Request to CDM to begin creating enrollment user',
+                        component_name='Chrome Directory API',
+                        workflow_step='CDM Enrollment User Request',
                         tenant_code=tenant_code,
                         details=message,
                         correlation_identifier=correlation_id).put()
@@ -388,7 +398,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                         logging.error(error_message)
                         IntegrationEventLog.create(
                             event_category='Tenant Creation',
-                            component_name='Chrome Device Management',
+                            component_name='Chrome Directory API',
                             workflow_step='Response: Creating enrollment user unsuccessful',
                             tenant_code=tenant_code,
                             details=error_message,
@@ -396,14 +406,19 @@ class TenantsHandler(ExtendedSessionRequestHandler):
 
                         return status_code, error_message
                     else:
-                        message = 'Enrollment user persisted for {0} on tenant {1} ({2}).'.format(
+                        success_message = 'Success creating enrollment user for {0} on tenant {1} ({2}).'.format(
                             tenant.enrollment_email, tenant.name, tenant_code)
                         status_code = httplib.CREATED
                         IntegrationEventLog.create(
                             event_category='Tenant Creation',
-                            component_name='Chrome Device Management',
-                            workflow_step='Response: Creating enrollment user successful',
+                            component_name='Chrome Directory API',
+                            workflow_step='CDM Created Enrollment User',
+                            details=success_message,
                             tenant_code=tenant_code,
                             correlation_identifier=correlation_id).put()
-                        logging.debug(message)
-                    return status_code, message
+                        logging.debug(success_message)
+                    return status_code, 'Created'
+        else:
+            status_code = httplib.NOT_ACCEPTABLE
+            status_text = 'Unable to create organization unit in CDM.'
+            return status_code, status_text
