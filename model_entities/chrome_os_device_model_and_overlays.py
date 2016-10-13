@@ -5,11 +5,11 @@ from datetime import datetime
 from google.appengine.datastore.datastore_query import Cursor
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
+
 import ndb_json
 from app_config import config
 from domain_model import Domain
 from entity_groups import TenantEntityGroup
-from ndb_mixins import KeyValidatorMixin
 from restler.decorators import ae_ndb_serializer
 from utils.timezone_util import TimezoneUtil
 
@@ -582,11 +582,10 @@ class Tenant(ndb.Model):
                ou_create=False):
 
         if ou_create:
-            validator = KeyValidatorMixin()
-            domain = validator.validate_and_get(
-                urlsafe_key=domain_key.urlsafe(),
-                kind_cls=Domain,
-                abort_on_not_found=True)
+            try:
+                domain = ndb.Key(urlsafe=domain_key.urlsafe()).get()
+            except Exception, e:
+                logging.exception(e)
             if domain.organization_unit_path:
                 organization_unit_path = '{0}/{1}'.format(domain.organization_unit_path, tenant_code)
             else:
