@@ -125,6 +125,16 @@ describe('TenantAddCtrl', function () {
     return it('calls DistributorsService with distributorKey to get the distributor domains', () => expect(DistributorsService.getDomainsByKey).toHaveBeenCalledWith(distributorKey));
   });
 
+  describe('.cancel', function () {
+    beforeEach(function () {
+      spyOn($state, 'go');
+      controller.cancel();
+    });
+
+    it('navigates back to tenants list', () => expect($state.go).toHaveBeenCalledWith('tenants'))
+
+  });
+
   describe('.onClickSaveButton', function () {
     let domain_key = undefined;
 
@@ -155,6 +165,7 @@ describe('TenantAddCtrl', function () {
 
       return it("the 'then' handler routes navigation back to 'tenants'", () => expect($state.go).toHaveBeenCalledWith('tenants'));
     });
+
 
     describe('.onFailureTenantSave 409 conflict', function () {
       beforeEach(function () {
