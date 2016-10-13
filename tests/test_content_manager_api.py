@@ -1,3 +1,4 @@
+import httplib
 import logging
 
 from env_setup import setup_test_paths
@@ -26,6 +27,7 @@ class TestContentManagerApi(BaseTest):
     IMPERSONATION_EMAIL = 'test@test.com'
     CONTENT_MANAGER_DISPLAY_NAME = 'Agosto No. 1'
     CONTENT_MANAGER_LOCATION_DESCRIPTION = 'Front Reception'
+    CORRELATION_ID = 'adsfsd132'
 
     def setUp(self):
         super(TestContentManagerApi, self).setUp()
@@ -60,18 +62,10 @@ class TestContentManagerApi(BaseTest):
     ##################################################################################################################
 
     def test_create_tenant_success(self):
-        when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=201))
-        result = self.content_manager_api.create_tenant(self.tenant)
+        when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(
+            HttpClientResponse(status_code=httplib.CREATED))
+        result = self.content_manager_api.create_tenant(tenant=self.tenant, correlation_id=self.CORRELATION_ID)
         self.assertTrue(result)
-
-    def test_unsuccessful_create_tenant_raises_error(self):
-        error_code = 400
-        when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=error_code))
-        with self.assertRaises(RuntimeError) as context:
-            self.content_manager_api.create_tenant(self.tenant)
-        error_message = 'Unable to create tenant {0} in Content Manager. Status code: {1}'.format(
-            self.NAME, error_code)
-        self.assertEqual(error_message, str(context.exception))
 
     ##################################################################################################################
     # create_device
@@ -80,13 +74,13 @@ class TestContentManagerApi(BaseTest):
     def test_create_device_success_returns_true(self):
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=201))
         result = self.content_manager_api.create_device(device_urlsafe_key=self.device_key.urlsafe(),
-                                                        correlation_id='some correlation id')
+                                                        correlation_id=self.CORRELATION_ID)
         self.assertTrue(result)
 
     def test_create_device_failure_returns_false(self):
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(status_code=400))
         result = self.content_manager_api.create_device(device_urlsafe_key=self.device_key.urlsafe(),
-                                                        correlation_id='some correlation id')
+                                                        correlation_id=self.CORRELATION_ID)
         self.assertFalse(result)
 
     ##################################################################################################################

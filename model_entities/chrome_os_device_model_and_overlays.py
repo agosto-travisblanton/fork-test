@@ -5,11 +5,11 @@ from datetime import datetime
 from google.appengine.datastore.datastore_query import Cursor
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
+
 import ndb_json
 from app_config import config
 from domain_model import Domain
 from entity_groups import TenantEntityGroup
-from ndb_mixins import KeyValidatorMixin
 from restler.decorators import ae_ndb_serializer
 from utils.timezone_util import TimezoneUtil
 
@@ -578,19 +578,25 @@ class Tenant(ndb.Model):
                overlays_available=False,
                proof_of_play_logging=False,
                proof_of_play_url=config.DEFAULT_PROOF_OF_PLAY_URL,
-               default_timezone=config.DEFAULT_TIMEZONE):
+               default_timezone=config.DEFAULT_TIMEZONE,
+               ou_create=False):
 
-        validator = KeyValidatorMixin()
-        domain = validator.validate_and_get(
-            urlsafe_key=domain_key.urlsafe(),
-            kind_cls=Domain,
-            abort_on_not_found=True)
-        if domain.organization_unit_path:
-            organization_unit_path = '{0}/{1}'.format(domain.organization_unit_path, tenant_code)
+        if ou_create:
+            try:
+                domain = ndb.Key(urlsafe=domain_key.urlsafe()).get()
+            except Exception, e:
+                logging.exception(e)
+            if domain.organization_unit_path:
+                organization_unit_path = '{0}/{1}'.format(domain.organization_unit_path, tenant_code)
+            else:
+                organization_unit_path = '/skykit/{0}'.format(tenant_code)
+            enrollment_password = cls.generate_enrollment_password(config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE)
+            enrollment_email = 'en.{0}@{1}'.format(tenant_code, domain_key.get().name)
         else:
-            organization_unit_path = '/skykit/{0}'.format(tenant_code)
-        enrollment_password = cls.generate_enrollment_password(config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE)
-        enrollment_email = 'en.{0}@{1}'.format(tenant_code, domain_key.get().name)
+            organization_unit_path = None
+            enrollment_password = None
+            enrollment_email = None
+
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
                    tenant_code=tenant_code,

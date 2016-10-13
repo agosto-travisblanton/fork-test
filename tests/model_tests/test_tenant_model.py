@@ -40,7 +40,8 @@ class TestTenantModel(BaseTest):
                                     content_server_url=self.CONTENT_SERVER_URL,
                                     content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
                                     domain_key=self.domain_key,
-                                    active=True)
+                                    active=True,
+                                    ou_create=True)
         self.tenant_key = self.tenant.put()
 
         self.device_1 = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
@@ -163,7 +164,8 @@ class TestTenantModel(BaseTest):
                                                      content_server_url=self.CONTENT_SERVER_URL,
                                                      content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
                                                      domain_key=domain_key,
-                                                     active=False)
+                                                     active=False,
+                                                     ou_create=True)
         tenant_with_prefix_on_domain.put()
         expected_organization_unit_path = '{0}/{1}'.format(organization_unit_path, self.TENANT_CODE)
         self.assertEqual(expected_organization_unit_path, tenant_with_prefix_on_domain.organization_unit_path)
