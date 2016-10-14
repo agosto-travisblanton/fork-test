@@ -488,6 +488,16 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
 
 }
 
+.tenant-logo-name p {
+  width: 10em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: center;
+  positition: absolute;
+  text-overflow: ellipsis // This is where the magic happens
+
+}
+
 .proof-of-play-horizontal-top-bar {
   display: flex;
   align-self: center;

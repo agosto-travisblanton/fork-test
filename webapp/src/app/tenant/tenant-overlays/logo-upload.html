@@ -21,8 +21,9 @@
             <md-card>
               <md-card-title>
                 <md-card-title-text>
-                  <p style="display:block;
-    margin:auto; margin-top:-8px">{{tenantImage.name}}</p>
+                  <div class="tenant-logo-name">
+                    <p>{{tenantImage.name}}</p>
+                  </div>
                 </md-card-title-text>
                 <md-button ng-click="vm.deleteImage($event, tenantImage.name, tenantImage.key) "
                            class="small-delete-button">X
