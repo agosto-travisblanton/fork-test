@@ -206,6 +206,36 @@ export function routes($stateProvider, $urlRouterProvider, RestangularProvider) 
       parent: 'tenants'
     }
   });
+  $stateProvider.state("tenantLogs", {
+    resolve: {
+      authenticated(AuthorizationService) {
+        return AuthorizationService.authenticated();
+      }
+    },
+    url: "/tenants/:tenantKey/logs",
+    templateUrl: "app/tenant/tenant-logs.html",
+    controller: "TenantLogsCtrl",
+    controllerAs: 'tenantLogsCtrl',
+    ncyBreadcrumb: {
+      label: '{{ tenantLogsCtrl.currentTenant.name }}',
+      parent: 'tenants'
+    }
+  });
+  $stateProvider.state("tenantOverlays", {
+    resolve: {
+      authenticated(AuthorizationService) {
+        return AuthorizationService.authenticated();
+      }
+    },
+    url: "/tenants/:tenantKey/overlays",
+    templateUrl: "app/tenant/tenant-overlays.html",
+    controller: "TenantOverlaysCtrl",
+    controllerAs: 'tenantOverlaysCtrl',
+    ncyBreadcrumb: {
+      label: '{{ tenantOverlaysCtrl.currentTenant.name }}',
+      parent: 'tenants'
+    }
+  });
   $stateProvider.state("tenantLocations", {
     resolve: {
       authenticated(AuthorizationService) {

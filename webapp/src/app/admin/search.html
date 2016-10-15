@@ -1,0 +1,165 @@
+<md-content class="md-padding">
+  <div flex="100" flex-sm="100" flex-xs="100" layout="column">
+    <md-card>
+      <md-card-title>
+        <md-card-title-text>
+          <span class="md-headline">Device</span>
+        </md-card-title-text>
+      </md-card-title>
+      <md-card-content>
+        <div class="col-md-12">
+          <div class="col-md-4">
+            <md-radio-group ng-model="vm.selectedButton"
+                            ng-change="vm.changeRadio()"
+                            class="radio-horizontal">
+
+              <div class="col-md-2">
+                <md-radio-button value="Serial Number"
+                                 class="md-primary" ng-disabled="vm.unmanagedSelectedButton === 'Unmanaged'">
+                  Serial Number
+                </md-radio-button>
+              </div>
+
+              <div class="col-md-2 col-md-offset-2">
+
+                <md-radio-button
+                  value="MAC"
+                  class="md-primary radio-button">
+                  MAC
+                </md-radio-button>
+              </div>
+
+              <div class="col-md-2 col-md-offset-2">
+
+                <md-radio-button
+                  value="GCM ID"
+                  class="md-primary radio-button">
+                  GCM ID
+                </md-radio-button>
+              </div>
+            </md-radio-group>
+          </div>
+          <div class="col-md-3">
+            <md-radio-group ng-model="vm.unmanagedSelectedButton"
+                            ng-change="vm.changeRadio()"
+                            class="radio-horizontal">
+
+              <div class="col-md-2">
+                <md-radio-button
+                  value="Managed"
+                  class="md-primary">
+                  Managed
+                </md-radio-button>
+              </div>
+
+              <div class="col-md-2 col-md-offset-3">
+
+                <md-radio-button
+                  value="Unmanaged"
+                  class="md-primary radio-button" ng-disabled="vm.selectedButton === 'Serial Number'">
+                  Unmanaged
+                </md-radio-button>
+              </div>
+
+
+            </md-radio-group>
+          </div>
+
+          <div class="col-md-4">
+            <md-autocomplete
+              md-no-cache="true"
+              md-selected-item="vm.selectedText"
+              md-search-text="vm.searchText"
+              md-items="item in vm.searchDevices(vm.unmanagedSelectedButton === 'Unmanaged', vm.searchText)"
+              md-item-text="item"
+              md-min-length="0"
+              md-search-text-change="vm.isResourceValid(vm.searchText)"
+              md-selected-item-change="vm.isResourceValid(vm.searchText)"
+              placeholder="Make A Search"
+              md-select-on-match="true"
+            >
+
+              <md-item-template>
+                    <span md-highlight-text="vm.searchText"
+                          md-highlight-flags="^i">{{item}}</span>
+              </md-item-template>
+              <md-not-found>
+                <div
+                  ng-if="vm.searchText !== '' && vm.searchText.length > 2">
+                  No results for "{{vm.searchText}}" were
+                  found.
+                </div>
+                <div
+                  ng-if="vm.searchText !== '' && vm.searchText.length <= 2">
+                  Please enter at least 3 characters.
+                </div>
+              </md-not-found>
+
+            </md-autocomplete>
+          </div>
+          <div class="col-md-1" style="margin-left: -20px !important; margin-top: -4px !important">
+            <md-button class="md-raised md-primary"
+                       ng-disabled="vm.disabled" aria-label="OPEN"
+                       ng-click="vm.editItem(vm.matchDevice)">
+              OPEN
+
+            </md-button>
+          </div>
+        </div>
+      </md-card-content>
+    </md-card>
+  </div>
+  <div flex="45" flex-sm="100" flex-xs="100" layout="column">
+    <md-card>
+      <md-card-title>
+        <md-card-title-text>
+          <span class="md-headline">Tenant</span>
+        </md-card-title-text>
+      </md-card-title>
+      <md-card-content>
+        <div class="col-md-12">
+          <div class="col-md-7">
+            <md-autocomplete
+              md-no-cache="true"
+              md-selected-item="vm.tenantSelectedText"
+              md-search-text="vm.tenantSearchText"
+              md-items="tenantItem in vm.searchAllTenantsByName(vm.tenantSearchText)"
+              md-item-text="tenantItem"
+              md-min-length="0"
+              md-search-text-change="vm.isTenantValid(vm.tenantSearchText)"
+              md-selected-item-change="vm.isTenantValid(vm.tenantSearchText)"
+              placeholder="Make A Search"
+              md-select-on-match="true"
+            >
+
+              <md-item-template>
+                    <span md-highlight-text="vm.tenantSearchText"
+                          md-highlight-flags="^i">{{tenantItem}}</span>
+              </md-item-template>
+              <md-not-found>
+                <div
+                  ng-if="vm.tenantSearchText !== '' && vm.tenantSearchText.length > 2">
+                  No results for "{{vm.tenantSearchText}}" were
+                  found.
+                </div>
+                <div
+                  ng-if="vm.tenantSearchText !== '' && vm.tenantSearchText.length <= 2">
+                  Please enter at least 3 characters.
+                </div>
+              </md-not-found>
+
+            </md-autocomplete>
+          </div>
+          <div class="col-md-1">
+            <md-button class="md-raised md-primary"
+                       ng-disabled="vm.tenantSearchDisabled" aria-label="OPEN"
+                       ng-click="vm.editTenant(vm.searchMatch)">
+              OPEN
+
+            </md-button>
+          </div>
+        </div>
+      </md-card-content>
+    </md-card>
+  </div>
+</md-content>

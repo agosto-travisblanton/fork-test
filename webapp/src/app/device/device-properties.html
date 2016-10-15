@@ -1,6 +1,6 @@
 <md-content class="md-padding" layout="row" layout-wrap layout-align="left start"
             layout-xs="column">
-  <div flex="50" flex-sm="50" flex-xs="50" layout="column">
+  <div class="properties-word-break" flex="50" flex-sm="50" flex-xs="50" layout="column">
     <md-card>
       <md-card-content>
         <h2>Information</h2>
@@ -41,9 +41,7 @@
              ng-hide="deviceDetailsCtrl.currentDevice.annotatedAssetId == null ||
                                            deviceDetailsCtrl.currentDevice.annotatedAssetId == ''">
           <label>Asset Id</label>
-          <div class="properties-word-break">
-            {{deviceDetailsCtrl.currentDevice.annotatedAssetId}}
-          </div>
+          {{deviceDetailsCtrl.currentDevice.annotatedAssetId}}
         </div>
         <div class="form-group"
              ng-hide="deviceDetailsCtrl.currentDevice.bootMode == null ||
@@ -122,9 +120,7 @@
              ng-hide="deviceDetailsCtrl.currentDevice.gcmRegistrationId == null ||
                                            deviceDetailsCtrl.currentDevice.gcmRegistrationId == ''">
           <label>GCM registration ID</label>
-          <div class="properties-word-break">
-            {{deviceDetailsCtrl.currentDevice.gcmRegistrationId}}
-          </div>
+          {{deviceDetailsCtrl.currentDevice.gcmRegistrationId}}
         </div>
         <div class="form-group"
              ng-hide="deviceDetailsCtrl.currentDevice.kind == null ||
@@ -253,7 +249,7 @@
         <div class="form-group">
           <label>Overlays Available</label>
           <div>
-            {{deviceDetailsCtrl.currentDevice.overlay_status}}
+            {{deviceDetailsCtrl.currentDevice.overlayStatus}}
           </div>
         </div>
         <div class="form-group"
@@ -289,9 +285,7 @@
         <hr/>
         <div class="form-group">
           <label>Device key</label>
-          <div class="properties-word-break">
-            {{deviceDetailsCtrl.currentDevice.key}}
-          </div>
+          {{deviceDetailsCtrl.currentDevice.key}}
           <md-card-actions layout="row" layout-align="end center">
             <button class="md-raised md-primary md-button md-ink-ripple" type="button"
                     aria-label="Delete" layout-align="right" ng-click="deviceDetailsCtrl.confirmDeviceDelete(
@@ -319,28 +313,14 @@
                 <label>Logging</label>
                 <div>
                   <input type="checkbox"
+                         tooltips
+                         tooltip-class="tooltip-custom-large"
+                         tooltip-side="left"
+                         tooltip-template-url="webapp/src/app/tooltip/proof-of-play-toggle.html"
                          ng-model="deviceDetailsCtrl.currentDevice.proofOfPlayLogging"
                          ng-change="deviceDetailsCtrl.onProofOfPlayLoggingCheck()">
                   <span>Enable</span>
                 </div>
-              </div>
-              <div class="col-sm-2">
-                <md-button class="md-fab md-primary"
-                           aria-label="Proof of play logging"
-                           ng-show="deviceDetailsCtrl.currentDevice.proofOfPlayLogging == false &&
-                                      (deviceDetailsCtrl.currentDevice.locationKey == null ||
-                                      deviceDetailsCtrl.currentDevice.customerDisplayCode == null)">
-                  <md-tooltip>
-                    A device must have a Location and Display code to it to enable Proof of play logging.
-                  </md-tooltip>
-                  <md-icon>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                         width="24" height="24">
-                      <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1z"></path>
-                      <path d="M17 12V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"></path>
-                    </svg>
-                  </md-icon>
-                </md-button>
               </div>
             </div>
             <hr>
@@ -436,8 +416,14 @@
                   ng-options="c.id for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">
                 </select>
               </div>
-              <div class="col-sm-3">
-                <label>Panel sleep</label>
+              <div class="col-sm-5"
+                   tooltips
+                   tooltip-class="tooltip-custom-large"
+                   tooltip-side="top"
+                   tooltip-template-url="webapp/src/app/tooltip/panel-sleep-toggle.html"
+              >
+                <label
+                >Panel sleep</label>
 
                 <md-switch class="md-switch device-properties-switch"
                            ng-model="deviceDetailsCtrl.currentDevice.panelSleep"
@@ -446,20 +432,6 @@
                 </md-switch>
               </div>
 
-              <div class="col-md-1 pull-tooltip-left">
-                <md-button class="md-fab md-primary">
-                  <md-tooltip>
-                    Use the panel sleep toggle to enable/disable panel sleeping.
-                  </md-tooltip>
-                  <md-icon>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                         width="24" height="24">
-                      <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1z"></path>
-                      <path d="M17 12V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"></path>
-                    </svg>
-                  </md-icon>
-                </md-button>
-              </div>
 
             </div>
             <hr>
@@ -543,7 +515,8 @@
         </form>
       </md-card-content>
     </md-card>
-    <!--<div ng-include="'webapp/src/app/device/device-properties-overlay.html'"></div>-->
+    <div ng-include="'webapp/src/app/device/device-properties-overlay.html'"></div>
+
   </div>
 </md-content>
 

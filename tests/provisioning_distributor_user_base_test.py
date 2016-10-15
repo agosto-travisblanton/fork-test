@@ -108,7 +108,9 @@ class ProvisioningDistributorUserBase(ProvisioningBaseTest):
             'Authorization': config.UNMANAGED_REGISTRATION_TOKEN
         }
         self.api_token_authorization_header = {
-            'Authorization': config.API_TOKEN
+            'Authorization': config.API_TOKEN,
+            'X-Provisioning-User': self.user_key.urlsafe(),
+            'X-Provisioning-Distributor': self.distributor_key.urlsafe()
         }
         self.unmanaged_api_token_authorization_header = {
             'Authorization': config.UNMANAGED_API_TOKEN

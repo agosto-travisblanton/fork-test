@@ -4,6 +4,7 @@ function TenantDetailsCtrl($stateParams, TenantsService, DomainsService, Timezon
 
   let vm = this;
   vm.gameStopServer = $location.host().indexOf('provisioning-gamestop') > -1;
+  vm.showCdmInfo = false;
   vm.currentTenant = {
     key: undefined,
     name: undefined,
@@ -40,6 +41,8 @@ function TenantDetailsCtrl($stateParams, TenantsService, DomainsService, Timezon
   };
 
   vm.onSuccessResolvingTenant = function (tenant) {
+    vm.showCdmInfo = tenant.organization_unit_path != null && tenant.enrollment_email != null &&
+      tenant.enrollment_password != null;
     vm.selectedTimezone = tenant.default_timezone;
     let domainPromise = DomainsService.getDomainByKey(tenant.domain_key);
     return domainPromise.then(data => vm.selectedDomain = data);
@@ -95,6 +98,10 @@ function TenantDetailsCtrl($stateParams, TenantsService, DomainsService, Timezon
           return $state.go('tenantUnmanagedDevices', {tenantKey: $stateParams.tenantKey});
         case 3:
           return $state.go('tenantLocations', {tenantKey: $stateParams.tenantKey});
+        case 4:
+          return $state.go('tenantOverlays', {tenantKey: $stateParams.tenantKey});
+        case 5:
+          return $state.go('tenantLogs', {tenantKey: $stateParams.tenantKey});
       }
     }
   });

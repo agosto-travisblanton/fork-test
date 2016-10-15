@@ -54,15 +54,15 @@
               </div>
             </div>
             <div ng-if="!vm.loading">
-              <h3>You are signed in under the <b>{{
-                vm.identity.distributorName }}</b> distributor.</h3>
+              <h3>Signed in under the <b>{{
+                vm.identity.distributorName }}</b> {{vm.paulsCurrentDistributorName}}.</h3>
               <p> Click on the hamburger icon in the top-left to get started.</p>
 
               <div ng-if="vm.has_multiple_distributors">
                 <h5>OR</h5>
                 <h4>Click
                   <md-button class="md-raised" ng-click="vm.changeDistributor()">Here</md-button>
-                  to change your Distributor
+                  to change your {{vm.paulsCurrentDistributorName}}
                 </h4>
               </div>
             </div>
@@ -72,5 +72,3 @@
     </div>
   </md-content>
 </div>
-
-

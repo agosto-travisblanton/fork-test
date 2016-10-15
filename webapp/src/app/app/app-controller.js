@@ -1,9 +1,15 @@
 import contains from 'lodash.contains';
 
-function AppController($mdSidenav, $state, $window, SessionsService) {
+function AppController(
+  $mdSidenav,
+  $state,
+  $rootScope,
+  $window,
+  SessionsService) {
   "ngInject";
 
   let vm = this;
+  $rootScope.paulsCurrentDistributorName = 'Managing Organization'
 
   vm.currentDistributerInDistributerAdminList = function () {
     let currentDistributorName = SessionsService.getCurrentDistributorName();

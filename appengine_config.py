@@ -368,11 +368,13 @@ backup_BACKUP_EMAIL_SENDER = 'Backup Datastore Service <gcp.admin@agosto.com>'
 
 app_ACCEPTABLE_ENROLLMENT_USER_PASSWORD_CHARS = "!$AaBbCcDdEeFfGgHhJjKkLlMmNnPpQqRrSsTtUuVvWwXxYyZz23456789"
 
-app_ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE = 8
+app_ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE = 16
 
 app_DEFAULT_TIMEZONE = 'America/Chicago'
 
 app_DEFAULT_OU_PATH = '/skykit'
+
+app_TENANT_CODE_UNKNOWN = 'TBD'
 
 def _DEFAULT_CONTENT_MANAGER_URL():
     if on_development_server or not on_server:
@@ -541,9 +543,8 @@ proofplay_DAYS_TO_KEEP_RAW_EVENTS = 30
 # DON'T DO DIRECTORY LOOKUP ON DEV. IT CREATES A CASCADING TASK QUEUE FAILURE
 ##############################################################################
 if on_development_server:
-    from workflow import refresh_device_by_mac_address
-    from workflow import refresh_device
-
+    from workflow import refresh_device_by_mac_address, refresh_device, update_chrome_os_device
+    from workflow import update_chrome_os_device
 
     def _refresh_device_by_mac_address_dud(device_urlsafe_key, device_mac_address,
                                            device_has_previous_directory_api_info=False, page_token=None):
@@ -553,9 +554,13 @@ if on_development_server:
     def _refresh_device_dud(device_urlsafe_key):
         pass
 
+    def _update_chrome_os_device(device_urlsafe_key):
+        pass
+
 
     refresh_device_by_mac_address.refresh_device_by_mac_address = _refresh_device_by_mac_address_dud
     refresh_device.refresh_device = _refresh_device_dud
+    update_chrome_os_device.update_chrome_os_device = _update_chrome_os_device
 
 
 ##############################################################################

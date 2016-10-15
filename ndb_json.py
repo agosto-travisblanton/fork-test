@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+from google.appengine.api import datastore_types
+
+# !/usr/bin/env python
 """
 JSON encoder/decoder adapted for use with Google App Engine NDB.
 Usage:
@@ -85,6 +87,9 @@ def encode_complex(obj):
     return [obj.real, obj.imag]
 
 
+def encode_geopoint(obj):
+    return {'lat': obj.lat, 'lon': obj.lon}
+
 def encode_basevalue(obj):
     """Retrieve the actual value from a ndb.model._BaseValue.
 
@@ -99,6 +104,7 @@ NDB_TYPE_ENCODING = {
     ndb.Query: encode_generator,
     ndb.QueryIterator: encode_generator,
     ndb.Key: encode_key,
+    datastore_types.GeoPt: encode_geopoint,
     ndb.Future: encode_future,
     datetime.date: encode_datetime,
     datetime.datetime: encode_datetime,

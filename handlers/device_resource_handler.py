@@ -4,7 +4,7 @@ import logging
 from datetime import datetime
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
-
+import httplib
 from app_config import config
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from device_commands_handler import DeviceCommandsHandler
@@ -190,6 +190,65 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             },
         )
 
+    @requires_api_token
+    def search_for_device_globally(self):
+        unmanaged = self.request.get("unmanaged") == "true"
+        partial_gcmid = self.request.get("partial_gcmid")
+        partial_serial = self.request.get("partial_serial")
+        partial_mac = self.request.get("partial_mac")
+        user_key = self.request.headers.get("X-Provisioning-User")
+
+        try:
+            user_entity = ndb.Key(urlsafe=user_key).get()
+        except Exception, e:
+            user_entity = None
+            logging.exception(e)
+
+        if not user_entity:
+            error_message = 'Bad User Key'
+            self.response.set_status(httplib.BAD_REQUEST, error_message)
+            return
+
+        if not user_entity.is_administrator:
+            error_message = 'User is not administrator'
+            self.response.set_status(httplib.BAD_REQUEST, error_message)
+            return
+
+
+        else:
+            if partial_gcmid:
+                resulting_devices = Tenant.find_devices_with_partial_gcmid_globally(
+                    unmanaged=unmanaged,
+                    partial_gcmid=partial_gcmid
+                )
+
+            elif partial_serial:
+                resulting_devices = Tenant.find_devices_with_partial_serial_globally(
+                    unmanaged=unmanaged,
+                    partial_serial=partial_serial
+                )
+            elif partial_mac:
+                resulting_devices = Tenant.find_devices_with_partial_mac_globally(
+                    unmanaged=unmanaged,
+                    partial_mac=partial_mac
+                )
+
+            matches = [
+                {
+                    "mac": DeviceResourceHandler.ethernet_or_wifi_mac_address(device, partial_mac),
+                    "serial": device.serial_number,
+                    "key": device.key.urlsafe(),
+                    "tenantKey": device.tenant_key.urlsafe(),
+                    "gcmid": device.gcm_registration_id
+                } for device in resulting_devices]
+
+            json_response(
+                self.response,
+                {
+                    "matches": matches
+                },
+            )
+
     ############################################################################################
     # END DEVICES VIEW
     ############################################################################################
@@ -370,6 +429,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                     return
                 tenant_code = request_json.get('tenantCode')
                 if tenant_code:
+                    has_tenant = True
                     tenant = Tenant.find_by_tenant_code(tenant_code)
                     if tenant is None:
                         status = 400
@@ -384,6 +444,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                     else:
                         tenant_key = tenant.key
                 else:
+                    has_tenant = False
                     tenant_key = None
                 if status == 201:
                     device = ChromeOsDevice.create_managed(tenant_key=tenant_key,
@@ -421,11 +482,12 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                         correlation_identifier=correlation_id,
                         details='Device resource uri {0} returned in response Location header.'.format(device_uri))
                     registration_response_event.put()
-                    notifier = EmailNotify()
-                    notifier.device_enrolled(tenant_code=tenant_code,
-                                             tenant_name=device.get_tenant().name,
-                                             device_mac_address=device_mac_address,
-                                             timestamp=datetime.utcnow())
+                    if has_tenant:
+                        notifier = EmailNotify()
+                        notifier.device_enrolled(tenant_code=tenant_code,
+                                                 tenant_name=device.get_tenant().name,
+                                                 device_mac_address=device_mac_address,
+                                                 timestamp=datetime.utcnow())
                 else:
                     self.response.set_status(status, error_message)
         else:
@@ -525,13 +587,27 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             if timezone:
                 device.timezone = timezone
                 device.timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
-            overlay_status = request_json.get('overlay_status')
+            overlay_status = request_json.get('overlayStatus')
             if overlay_status != None:
-                device.overlay_available = overlay_status
+                device.overlays_available = overlay_status
             controls_mode = request_json.get('controlsMode')
             if controls_mode != None:
                 device.controls_mode = controls_mode
             device.put()
+
+            # adjust this object with values you want to spy on to do a gcm_update on when they are True
+            gcm_update_on_changed_if_true = [controls_mode, overlay_status]
+            gcm_update_on_changed_since_true = [e for e in gcm_update_on_changed_if_true if e != None]
+
+            if len(gcm_update_on_changed_since_true) > 0:
+                change_intent(
+                    gcm_registration_id=device.gcm_registration_id,
+                    payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                    device_urlsafe_key=device.key.urlsafe(),
+                    host=self.request.host_url,
+                    user_identifier='system (device update)'
+                )
+
             if not device.is_unmanaged_device:
                 deferred.defer(update_chrome_os_device,
                                device_urlsafe_key=device.key.urlsafe(),

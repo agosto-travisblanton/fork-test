@@ -37,6 +37,10 @@ body {
   }
 }
 
+.margin-bottom-15 {
+  margin-bottom: 1.5em;
+}
+
 .margin-top-05 {
   margin-top: 0.5em;
 }
@@ -578,4 +582,23 @@ md-select {
   position: relative;
   min-width: 180px;
   max-width: 180px;
+}
+
+.small-delete-button {
+  float: right;
+  min-width: 25px;
+  margin-top: -15px;
+  margin-right: -5px;
+}
+
+.tooltip-custom-large {
+  min-width: 250px;
+}
+
+.tenant-image-name {
+  width: 10em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis // This is where the magic happens
+
 }

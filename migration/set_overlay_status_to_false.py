@@ -12,6 +12,6 @@ class SetOverlayStatusToFalse(MigrationBase):
         all_device_entities = ChromeOsDevice.query().fetch()
 
         for each_entity in all_device_entities:
-            if not each_entity.overlay_available:
-                each_entity.overlay_available = False
+            if not each_entity.overlays_available:
+                each_entity.overlays_available = False
                 each_entity.put()

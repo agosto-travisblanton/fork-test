@@ -1,7 +1,13 @@
-function WelcomeCtrl(VersionsService, $state, DistributorsService, SessionsService) {
+function WelcomeCtrl(
+  VersionsService,
+  $state,
+  $rootScope,
+  DistributorsService,
+  SessionsService) {
   "ngInject";
 
   let vm = this;
+  vm.paulsCurrentDistributorName = $rootScope.paulsCurrentDistributorName;
   vm.version_data = [];
   vm.loading = true;
 

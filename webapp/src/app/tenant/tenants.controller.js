@@ -66,23 +66,21 @@ function TenantsCtrl($state, $log, TenantsService, ProgressBarService, sweet) {
     if (!tenant_name || tenant_name.length < 3) {
       return []
     }
-    let promise = TenantsService.searchAllTenantsByName(tenant_name)
-      .then((response) => {
-        let match = response
-        if (match) {
-          for (let eachName of match) {
-            if (tenant_name === eachName.name) {
-              vm.searchDisabled = false;
-              vm.searchMatch = eachName
-              return;
-            } else {
-              vm.searchDisabled = true;
-            }
-          }
+
+    let match = vm.searchedTenants;
+    if (match) {
+      for (let eachName of match) {
+        if (tenant_name === eachName.name) {
+          vm.searchDisabled = false;
+          vm.searchMatch = eachName
+          return;
         } else {
           vm.searchDisabled = true;
         }
-      })
+      }
+    } else {
+      vm.searchDisabled = true;
+    }
   }
 
   vm.editItem = item => $state.go('tenantDetails', {tenantKey: item.key});

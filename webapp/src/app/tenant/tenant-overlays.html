@@ -1,0 +1,34 @@
+<div ng-controller="TenantOverlaysCtrl as vm" ng-init="vm.initialize()" layout="column" ng-cloak>
+  <md-toolbar class="md-hue-2">
+    <div class="md-toolbar-tools">
+      <h2 class="md-flex"><i class="fa fa-fw fa-group ng-scope"></i> Tenants</h2>
+    </div>
+  </md-toolbar>
+  <md-content class="md-padding">
+    <div flex="80" flex-xs="100" layout="column">
+      <div ncy-breadcrumb>
+      </div>
+
+    </div>
+    <md-tabs md-stretch-tabs md-selected="tabIndex" md-border-bottom>
+      <md-tab label="General"></md-tab>
+      <md-tab label="Managed Devices"></md-tab>
+      <md-tab label="Unmanaged Devices"></md-tab>
+      <md-tab label="Locations"></md-tab>
+      <md-tab label="Overlays"></md-tab>
+      <md-tab label="Logs"></md-tab>
+    </md-tabs>
+    <div flex="100" flex-sm="100" flex-xs="30" layout="column">
+      <div class="col-md-12">
+        <div class="col-md-6">
+          <div ng-include="'webapp/src/app/tenant/tenant-overlays/overlay.html'"></div>
+        </div>
+        <div class="col-md-6">
+          <div ng-include="'webapp/src/app/tenant/tenant-overlays/logo-upload.html'"></div>
+
+        </div>
+
+      </div>
+    </div>
+  </md-content>
+</div>

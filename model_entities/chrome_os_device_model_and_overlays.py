@@ -4,12 +4,12 @@ import uuid
 from datetime import datetime
 from google.appengine.datastore.datastore_query import Cursor
 from google.appengine.ext import ndb
+from google.appengine.ext.deferred import deferred
 
 import ndb_json
 from app_config import config
 from domain_model import Domain
 from entity_groups import TenantEntityGroup
-from ndb_mixins import KeyValidatorMixin
 from restler.decorators import ae_ndb_serializer
 from utils.timezone_util import TimezoneUtil
 
@@ -75,7 +75,7 @@ class ChromeOsDevice(ndb.Model):
     registration_correlation_identifier = ndb.StringProperty(required=False, indexed=True)
     archived = ndb.BooleanProperty(default=False, required=True, indexed=True)
     panel_sleep = ndb.BooleanProperty(default=False, required=True, indexed=True)
-    overlay_available = ndb.BooleanProperty(default=False, required=True, indexed=True)
+    overlays_available = ndb.BooleanProperty(default=False, required=True, indexed=True)
     controls_mode = ndb.StringProperty(required=False, indexed=True, default='invisible')
     class_version = ndb.IntegerProperty()
 
@@ -89,14 +89,15 @@ class ChromeOsDevice(ndb.Model):
 
     @property
     def overlays(self):
-        return OverlayTemplate.get_overlay_template_for_device(self.key)
+        return OverlayTemplate.create_or_get_by_device_key(self.key)
 
     @property
     def overlays_as_dict(self):
         """ This method is offered because restler doesn't support keyProperty serialization beyond a single child"""
         json = ndb_json.dumps(self.overlays)
         python_dict = ndb_json.loads(json)
-        del python_dict["device_key"]
+        if "device_key" in python_dict:
+            del python_dict["device_key"]
         for key, value in python_dict.iteritems():
             if key != "key":
                 if python_dict[key]:
@@ -115,9 +116,8 @@ class ChromeOsDevice(ndb.Model):
         return python_dict
 
     def enable_overlays(self):
-        self.overlay_available = True
+        self.overlays_available = True
         self.put()
-        return self
 
     @classmethod
     def get_by_device_id(cls, device_id):
@@ -490,7 +490,77 @@ class Tenant(ndb.Model):
     enrollment_password = ndb.StringProperty(required=False, indexed=False)
     organization_unit_id = ndb.StringProperty(required=False, indexed=True)
     organization_unit_path = ndb.StringProperty(required=False, indexed=True)
+    overlays_available = ndb.BooleanProperty(default=False, required=False, indexed=True)
+    overlays_update_in_progress = ndb.BooleanProperty(default=False, required=False, indexed=True)
     class_version = ndb.IntegerProperty()
+
+    @property
+    def devices(self, unmanaged=True, managed=True, archived=False):
+        if unmanaged and managed:
+            return ChromeOsDevice.query(ChromeOsDevice.tenant_key == self.key,
+                                        ChromeOsDevice.archived == archived).fetch()
+        elif unmanaged and not managed:
+            return ChromeOsDevice.query(ChromeOsDevice.tenant_key == self.key,
+                                        ChromeOsDevice.is_unmanaged_device == True,
+                                        ChromeOsDevice.archived == archived).fetch()
+        elif managed and not managed:
+            return ChromeOsDevice.query(ChromeOsDevice.tenant_key == self.key,
+                                        ChromeOsDevice.is_unmanaged_device == False,
+                                        ChromeOsDevice.archived == archived).fetch()
+        else:
+            raise ValueError("You must choose either an unmanaged player, a managed player, or both.")
+
+    def gcm_update_devices(self, host, user_identifier, devices=None, deferred_call=True):
+        from device_message_processor import change_intent
+        if not devices:
+            devices = self.devices
+        for each_device in devices:
+            if deferred_call:
+                deferred.defer(
+                    change_intent,
+                    gcm_registration_id=each_device.gcm_registration_id,
+                    payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                    device_urlsafe_key=each_device.key.urlsafe(),
+                    host=host,
+                    user_identifier=user_identifier
+                )
+            else:
+                change_intent(
+                    gcm_registration_id=each_device.gcm_registration_id,
+                    payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                    device_urlsafe_key=each_device.key.urlsafe(),
+                    host=host,
+                    user_identifier=user_identifier)
+
+    @property
+    def overlays(self):
+        return OverlayTemplate.create_or_get_by_tenant_key(self.key)
+
+    @property
+    def overlays_as_dict(self):
+        """ This method is offered because restler doesn't support keyProperty serialization beyond a single child"""
+        json = ndb_json.dumps(self.overlays)
+        python_dict = ndb_json.loads(json)
+        if "device_key" in python_dict:
+            del python_dict["device_key"]
+        if "tenant_key" in python_dict:
+            del python_dict["tenant_key"]
+        for key, value in python_dict.iteritems():
+            if key != "key":
+                if python_dict[key]:
+                    # Player team wants the positional key to also be in a field called "gravity"
+                    python_dict[key]["gravity"] = key
+                    if python_dict[key]["type"] == "logo":
+                        python_dict[key]["name"] = python_dict[key]["image_key"]["name"]
+                        del python_dict[key]["image_key"]["tenant_key"]
+                        python_dict[key]["imageKey"] = python_dict[key]["image_key"]
+                        del python_dict[key]["image_key"]
+                    else:
+                        python_dict[key]["name"] = python_dict[key]["type"]
+                        if python_dict[key]["name"] == None:
+                            python_dict[key]["name"] = "none"
+
+        return python_dict
 
     def get_domain(self):
         return self.domain_key.get()
@@ -505,21 +575,28 @@ class Tenant(ndb.Model):
                active,
                content_manager_base_url,
                notification_emails=[],
+               overlays_available=False,
                proof_of_play_logging=False,
                proof_of_play_url=config.DEFAULT_PROOF_OF_PLAY_URL,
-               default_timezone=config.DEFAULT_TIMEZONE):
+               default_timezone=config.DEFAULT_TIMEZONE,
+               ou_create=False):
 
-        validator = KeyValidatorMixin()
-        domain = validator.validate_and_get(
-            urlsafe_key=domain_key.urlsafe(),
-            kind_cls=Domain,
-            abort_on_not_found=True)
-        if domain.organization_unit_path:
-            organization_unit_path = '{0}/{1}'.format(domain.organization_unit_path, tenant_code)
+        if ou_create:
+            try:
+                domain = ndb.Key(urlsafe=domain_key.urlsafe()).get()
+            except Exception, e:
+                logging.exception(e)
+            if domain.organization_unit_path:
+                organization_unit_path = '{0}/{1}'.format(domain.organization_unit_path, tenant_code)
+            else:
+                organization_unit_path = '/skykit/{0}'.format(tenant_code)
+            enrollment_password = cls.generate_enrollment_password(config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE)
+            enrollment_email = 'en.{0}@{1}'.format(tenant_code, domain_key.get().name)
         else:
-            organization_unit_path = '/skykit/{0}'.format(tenant_code)
-        enrollment_password = cls.generate_enrollment_password(config.ACCEPTABLE_ENROLLMENT_USER_PASSWORD_SIZE)
-        enrollment_email = 'en.{0}@{1}'.format(tenant_code, domain_key.get().name)
+            organization_unit_path = None
+            enrollment_password = None
+            enrollment_email = None
+
         tenant_entity_group = TenantEntityGroup.singleton()
         return cls(parent=tenant_entity_group.key,
                    tenant_code=tenant_code,
@@ -528,6 +605,7 @@ class Tenant(ndb.Model):
                    content_server_url=content_server_url,
                    domain_key=domain_key,
                    active=active,
+                   overlays_available=overlays_available,
                    content_manager_base_url=content_manager_base_url,
                    notification_emails=notification_emails,
                    proof_of_play_logging=proof_of_play_logging,
@@ -562,6 +640,11 @@ class Tenant(ndb.Model):
         result = filter(lambda x: x.domain_key in domain_keys, tenant_list)
         sorted_result = sorted(result, key=lambda k: k.tenant_code)
         return sorted_result
+
+    @classmethod
+    def find_by_partial_name_across_all_distributors(cls, partial_name):
+        all_tenants = Tenant.query().fetch()
+        return [item for item in all_tenants if partial_name.lower() in item.name.lower()]
 
     @classmethod
     def find_by_partial_name(cls, partial_name, distributor_urlsafe_key):
@@ -666,6 +749,9 @@ class Tenant(ndb.Model):
 
         return filtered_devices
 
+    ################################################
+    # FIND DEVICES OF DISTRIBUTOR
+    ################################################
     @classmethod
     def find_devices_with_partial_mac_of_distributor(cls, distributor_urlsafe_key, unmanaged, partial_mac):
         domain_tenant_list = cls.tenants_of_distributor(distributor_urlsafe_key)
@@ -684,6 +770,28 @@ class Tenant(ndb.Model):
         tenant_keys = [tenant.key for tenant in domain_tenant_list]
         return cls.find_devices_with_partial_gcmid(tenant_keys, unmanaged, partial_gcmid)
 
+    ################################################
+    # FIND DEVICES GLOBALLY (ADMIN SEARCH)
+    ################################################
+    @classmethod
+    def find_devices_with_partial_mac_globally(cls, unmanaged, partial_mac):
+        domain_tenant_list = Tenant.query().fetch()
+        tenant_keys = [tenant.key for tenant in domain_tenant_list]
+        return cls.find_devices_with_partial_mac(tenant_keys, unmanaged, partial_mac)
+
+    @classmethod
+    def find_devices_with_partial_serial_globally(cls, unmanaged, partial_serial):
+        domain_tenant_list = Tenant.query().fetch()
+        tenant_keys = [tenant.key for tenant in domain_tenant_list]
+        return cls.find_devices_with_partial_serial(tenant_keys, unmanaged, partial_serial)
+
+    @classmethod
+    def find_devices_with_partial_gcmid_globally(cls, unmanaged, partial_gcmid):
+        domain_tenant_list = Tenant.query().fetch()
+        tenant_keys = [tenant.key for tenant in domain_tenant_list]
+        return cls.find_devices_with_partial_gcmid(tenant_keys, unmanaged, partial_gcmid)
+
+    ################################################
     @classmethod
     def find_issues_paginated(cls, start, end, device, fetch_size=25, prev_cursor_str=None,
                               next_cursor_str=None):
@@ -1001,10 +1109,11 @@ class Overlay(ndb.Model):
     image_key = ndb.KeyProperty(kind=Image, required=False)
 
     @staticmethod
-    def create_or_get(overlay_type, size="original", image_urlsafe_key=None):
-        size_options = ["original", "large", "small"]
-        if size and size.lower() not in size_options:
-            raise ValueError("Overlay size must be in {}".format(size_options))
+    def create_or_get(overlay_type, size=None, image_urlsafe_key=None):
+        size_options = ["large", "small"]
+        if size:
+            if (size.lower() not in size_options) and (overlay_type.lower() != "logo"):
+                raise ValueError("Overlay size must be in {}".format(size_options))
 
         # not an overlay with an image that doesn't have a image_urlsafe_key
         if overlay_type and overlay_type.lower() == "logo":
@@ -1016,7 +1125,8 @@ class Overlay(ndb.Model):
         else:
             image_key = None
 
-        overlay_query = Overlay.query(ndb.AND(Overlay.type == overlay_type, Overlay.image_key == image_key)).fetch()
+        overlay_query = Overlay.query(
+            ndb.AND(Overlay.type == overlay_type, Overlay.image_key == image_key, Overlay.size == size)).fetch()
 
         if overlay_query:
             overlay = overlay_query[0]
@@ -1040,7 +1150,10 @@ class OverlayTemplate(ndb.Model):
     top_right = ndb.KeyProperty(kind=Overlay, required=False)
     bottom_left = ndb.KeyProperty(kind=Overlay, required=False)
     bottom_right = ndb.KeyProperty(kind=Overlay, required=False)
-    device_key = ndb.KeyProperty(kind=ChromeOsDevice, required=True)
+    # an OverlayTemplate may be associated with either a device or a tenant
+    # you should never associate an OverlayTemplate with both a device and a tenant at the same time
+    device_key = ndb.KeyProperty(kind=ChromeOsDevice, required=False)
+    tenant_key = ndb.KeyProperty(kind=Tenant, required=False)
 
     def image_in_use(self, image_key):
         in_use_dict = {
@@ -1082,20 +1195,11 @@ class OverlayTemplate(ndb.Model):
 
     @staticmethod
     # plural, but will always return the 0th index since we are only supporting one template per device for now
-    def get_overlay_template_for_device(device_key):
+    def __get_overlay_template_for_device(device_key):
         overlay_template = OverlayTemplate.query(OverlayTemplate.device_key == device_key).fetch()
 
         if not overlay_template:
-            nullOverlay = Overlay.create_or_get(None)
-            overlay_template = OverlayTemplate(
-                device_key=device_key,
-                top_left=nullOverlay.key,
-                top_right=nullOverlay.key,
-                bottom_left=nullOverlay.key,
-                bottom_right=nullOverlay.key
-            )
-            overlay_template.put()
-
+            overlay_template = None
         else:
             overlay_template = overlay_template[0]
 
@@ -1103,13 +1207,14 @@ class OverlayTemplate(ndb.Model):
 
     @staticmethod
     def create_or_get_by_device_key(device_key):
-        existing_template = OverlayTemplate.get_overlay_template_for_device(device_key)
+        existing_template = OverlayTemplate.__get_overlay_template_for_device(device_key)
         if existing_template:
             return existing_template
 
         else:
             nullOverlay = Overlay.create_or_get(None)
             overlay_template = OverlayTemplate(
+                tenant_key=None,
                 device_key=device_key,
                 top_left=nullOverlay.key,
                 top_right=nullOverlay.key,
@@ -1119,23 +1224,108 @@ class OverlayTemplate(ndb.Model):
             overlay_template.put()
             return overlay_template
 
-    # expects a a dictionary with config about overlay
-    def set_overlay(self, position, overlay_type, size="original", image_urlsafe_key=None):
+    @staticmethod
+    def __get_overlay_template_for_tenant(tenant_key):
+        overlay_template = OverlayTemplate.query(OverlayTemplate.tenant_key == tenant_key).fetch()
 
+        if not overlay_template:
+            overlay_template = None
+        else:
+            overlay_template = overlay_template[0]
+
+        return overlay_template
+
+    @staticmethod
+    def create_or_get_by_tenant_key(tenant_key):
+        existing_template = OverlayTemplate.__get_overlay_template_for_tenant(tenant_key)
+        if existing_template:
+            return existing_template
+
+        else:
+            nullOverlay = Overlay.create_or_get(None)
+            overlay_template = OverlayTemplate(
+                device_key=None,
+                tenant_key=tenant_key,
+                top_left=nullOverlay.key,
+                top_right=nullOverlay.key,
+                bottom_left=nullOverlay.key,
+                bottom_right=nullOverlay.key
+            )
+            overlay_template.put()
+            return overlay_template
+
+    # expects a a dictionary with config about overlay
+    def set_overlay(self, position, overlay_type, size=None, image_urlsafe_key=None):
         overlay = Overlay.create_or_get(overlay_type=overlay_type, size=size, image_urlsafe_key=image_urlsafe_key)
 
         if position.lower() == "top_left":
             self.top_left = overlay.key
             self.put()
 
-        elif position.upper() == "bottom_left":
+        elif position.lower() == "bottom_left":
             self.bottom_left = overlay.key
             self.put()
 
-        elif position.upper() == "bottom_right":
+        elif position.lower() == "bottom_right":
             self.bottom_right = overlay.key
             self.put()
 
-        elif position.upper() == "top_right":
+        elif position.lower() == "top_right":
             self.top_right = overlay.key
             self.put()
+
+    def apply_overlay_template_to_all_tenant_devices(self, host, user_identifier, as_deferred=True,
+                                                     calledRecursivly=False):
+        if as_deferred and not calledRecursivly:
+            deferred.defer(self.apply_overlay_template_to_all_tenant_devices, host, user_identifier,
+                           calledRecursivly=True)
+        else:
+            from device_message_processor import change_intent
+
+            if not self.tenant_key:
+                raise ValueError(
+                    "This OverlayTemplate is not associated with a tenant_key. {}".format(self.key.urlsafe()))
+            else:
+                tenant_entity = self.tenant_key.get()
+                tenant_entity.overlays_update_in_progress = True
+                tenant_entity.put()
+                tenant_overlay_template = OverlayTemplate.create_or_get_by_tenant_key(tenant_entity.key)
+                tenant_devices = tenant_entity.devices
+
+                for device in tenant_devices:
+                    device_overlay_template = OverlayTemplate.create_or_get_by_device_key(device.key)
+                    device_modified = False
+
+                    if device.overlays_available != tenant_entity.overlays_available:
+                        device.overlays_available = tenant_entity.overlays_available
+                        device_modified = True
+
+                    if device_overlay_template.top_left.get().key != tenant_overlay_template.top_left.get().key:
+                        device_overlay_template.top_left = tenant_overlay_template.top_left
+                        device_modified = True
+
+                    if device_overlay_template.top_right.get().key != tenant_overlay_template.top_right.get().key:
+                        device_overlay_template.top_right = tenant_overlay_template.top_right
+                        device_modified = True
+
+                    if device_overlay_template.bottom_left.get().key != tenant_overlay_template.bottom_left.get().key:
+                        device_overlay_template.bottom_left = tenant_overlay_template.bottom_left
+                        device_modified = True
+
+                    if device_overlay_template.bottom_right.get().key != tenant_overlay_template.bottom_right.get().key:
+                        device_overlay_template.bottom_right = tenant_overlay_template.bottom_right
+                        device_modified = True
+
+                    if device_modified:
+                        device_overlay_template.put()
+                        device.put()
+
+                        change_intent(
+                            gcm_registration_id=device.gcm_registration_id,
+                            payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                            device_urlsafe_key=device.key.urlsafe(),
+                            host=host,
+                            user_identifier=user_identifier)
+
+                tenant_entity.overlays_update_in_progress = False
+                tenant_entity.put()
