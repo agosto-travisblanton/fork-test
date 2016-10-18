@@ -22,7 +22,8 @@ function TenantAddCtrl($log,
     notification_emails: undefined,
     proof_of_play_logging: false,
     proof_of_play_url: undefined,
-    active: true
+    active: true,
+    ou_create: true
   };
   vm.selectedDomain = undefined;
   vm.distributorDomains = [];
@@ -67,9 +68,14 @@ function TenantAddCtrl($log,
         'Tenant code unavailable in Chrome Device Management. Modify tenant name to generate a unique tenant code.',
         'error');
     }
+    else if(errorObject.status === 406) {
+      return sweet.show('Oops...',
+        'Unable to create tenant Organization Unit in Chrome Device Management.',
+        'error');
+    }
     else {
       $log.error(errorObject);
-      return sweet.show('Oops...', 'Unable to save the tenant.', 'error');
+      return sweet.show('Oops...', 'Not everything needed for tenant was created in Content Manager or CDM.', 'error');
     }
   };
 

@@ -1,3 +1,4 @@
+import httplib
 import json
 import logging
 
@@ -20,7 +21,7 @@ class ContentManagerApi(KeyValidatorMixin, object):
     def __init__(self):
         self.HEADERS['Authorization'] = config.CONTENT_MANAGER_API_SERVER_KEY
 
-    def create_tenant(self, tenant):
+    def create_tenant(self, tenant, correlation_id):
         payload = {
             "tenant_name": tenant.name,
             "tenant_code": tenant.tenant_code,
@@ -33,15 +34,30 @@ class ContentManagerApi(KeyValidatorMixin, object):
         http_client_response = http_client.post(HttpClientRequest(url=url,
                                                                   payload=(json.dumps(payload)),
                                                                   headers=self.HEADERS))
-        if http_client_response.status_code == 201:
-            logging.info('create_tenant to Content Mgr: url={0}, admin_email={1}, tenant_code={2}'.format(
-                url, tenant.admin_email, tenant.tenant_code))
+        if http_client_response.status_code == httplib.CREATED:
+            details = 'Tenant created in Content Manager: url={0}, admin_email={1}, tenant_code={2}'.format(
+                url, tenant.admin_email, tenant.tenant_code)
+            logging.debug(details)
+            IntegrationEventLog.create(event_category='Tenant Creation',
+                                       component_name='Content Manager',
+                                       workflow_step='ContentManager: Created',
+                                       tenant_code=tenant.tenant_code,
+                                       details=details,
+                                       correlation_identifier=correlation_id).put()
             return True
         else:
-            error_message = 'Unable to create tenant {0} in Content Manager. Status code: {1}'.format(
+            error_message = 'Failed to create tenant {0} in Content Manager. Status code: {1}'.format(
                     tenant.name, http_client_response.status_code)
             logging.error(error_message)
-            raise RuntimeError(error_message)
+            IntegrationEventLog.create(event_category='Tenant Creation',
+                                       component_name='Content Manager',
+                                       workflow_step='ContentManager: Not Created',
+                                       tenant_code=tenant.tenant_code,
+                                       details=error_message,
+                                       correlation_identifier=correlation_id).put()
+            logging.error(error_message)
+            return False
+            # raise RuntimeError(error_message)
 
     def create_device(self, device_urlsafe_key, correlation_id):
         chrome_os_device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
@@ -78,7 +94,7 @@ class ContentManagerApi(KeyValidatorMixin, object):
                                                     payload=json.dumps(cms_payload),
                                                     headers=self.HEADERS)
             http_client_response = HttpClient().post(http_client_request)
-            if http_client_response.status_code == 201:
+            if http_client_response.status_code == httplib.CREATED:
                 message = 'ContentManagerApi.create_device: http_status={0}, url={1}, device_key={2}, \
                     api_key={3}, tenant_code={4}, SN={5}'.format(
                     http_client_response.status_code,
@@ -142,7 +158,7 @@ class ContentManagerApi(KeyValidatorMixin, object):
             device_key=device_urlsafe_key)
         http_client_request = HttpClientRequest(url=url, headers=self.HEADERS)
         http_client_response = HttpClient().delete(http_client_request)
-        if http_client_response.status_code == 204:
+        if http_client_response.status_code == httplib.NO_CONTENT:
             logging.info(
                 'delete_device to Content Mgr successful: url={0}, device_key={1}, tenant_code={2}'.format(
                     url,

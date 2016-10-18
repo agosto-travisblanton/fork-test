@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from app_config import config
 from env_setup import setup_test_paths
 from tests.provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
@@ -42,6 +43,18 @@ class TestIntegrationEventLogModel(ProvisioningDistributorUserBase):
         correlation_identifier = IntegrationEventLog.get_correlation_identifier_for_registration(
             device_urlsafe_key)
         self.assertEqual(event_log.correlation_identifier, correlation_identifier)
+
+    def test_get_initial_tenant_creation_event(self):
+        correlation_id = '12341234lkjsadlfkjs'
+        event_log_key = IntegrationEventLog.create(
+            event_category='Tenant Creation',
+            component_name='Provisioning',
+            workflow_step='Tenant Initialization',
+            tenant_code=config.TENANT_CODE_UNKNOWN,
+            correlation_identifier=correlation_id).put()
+        initial_tenant_creation_event = \
+            IntegrationEventLog.get_initial_tenant_creation_event(correlation_identifier=correlation_id)
+        self.assertEqual(event_log_key.get().tenant_code, initial_tenant_creation_event.tenant_code)
 
     def test_class_version_is_only_set_by_pre_put_hook_method(self):
         event_log = IntegrationEventLog.create(

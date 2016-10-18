@@ -140,12 +140,30 @@ describe('TenantDetailsCtrl', function () {
     });
 
     return describe('.onSuccessResolvingTenant', function () {
-      let tenant = {domain_key: 'some_key'};
+      let tenant = {
+        domain_key: 'some_key',
+        organization_unit_path: 'skykit',
+        enrollment_email:'test@agosto.com',
+        enrollment_password:'Pwd12345'
+      };
       beforeEach(() => controller = $controller('TenantDetailsCtrl', serviceInjection));
 
-      return it('calls DomainsService.getDomainByKey to retrieve domain', function () {
+      it('calls DomainsService.getDomainByKey to retrieve domain', function () {
         controller.onSuccessResolvingTenant(tenant);
         return expect(DomainsService.getDomainByKey).toHaveBeenCalledWith(tenant.domain_key);
+      });
+
+      it('shows CDM info when attached to the tenant', function () {
+        controller.onSuccessResolvingTenant(tenant);
+        return expect(controller.showCdmInfo).toBeTruthy();
+      });
+
+      return it('hides CDM info when not attached to the tenant', function () {
+        let tenant = {
+          domain_key: 'some_key'
+        };
+        controller.onSuccessResolvingTenant(tenant);
+        return expect(controller.showCdmInfo).toBeFalsy();
       });
     });
   });
