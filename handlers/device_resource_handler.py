@@ -593,10 +593,18 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             controls_mode = request_json.get('controlsMode')
             if controls_mode != None:
                 device.controls_mode = controls_mode
+            orientation_mode = request_json.get('orientationMode')
+            if controls_mode != None:
+                device.orientation_mode = orientation_mode
             device.put()
 
             # adjust this object with values you want to spy on to do a gcm_update on when they are True
-            gcm_update_on_changed_if_true = [controls_mode, overlay_status]
+            gcm_update_on_changed_if_true = [
+                controls_mode,
+                overlay_status,
+                orientation_mode
+            ]
+
             gcm_update_on_changed_since_true = [e for e in gcm_update_on_changed_if_true if e != None]
 
             if len(gcm_update_on_changed_since_true) > 0:
@@ -961,6 +969,29 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             panel_sleep = request_json["panelSleep"]
             device = ndb.Key(urlsafe=device_urlsafe_key).get()
             device.panel_sleep = panel_sleep
+            device.put()
+
+            change_intent(
+                gcm_registration_id=device.gcm_registration_id,
+                payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                device_urlsafe_key=device_urlsafe_key,
+                host=self.request.host_url,
+                user_identifier=user_identifier)
+
+        self.response.set_status(status, message)
+
+    @requires_api_token
+    def orientation_mode(self, device_urlsafe_key):
+        status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
+        if device:
+            user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
+            if user_identifier is None or user_identifier == '':
+                user_identifier = 'system'
+
+            request_json = json.loads(self.request.body)
+            orientation_mode = request_json["orientationMode"]
+            device = ndb.Key(urlsafe=device_urlsafe_key).get()
+            device.orientation_mode = orientation_mode
             device.put()
 
             change_intent(

@@ -36,6 +36,7 @@ function DeviceDetailsCtrl($log,
   vm.enrollmentEvents = [];
   vm.logoChange = false;
   vm.controlsModeOptions = ["visible", "invisible", "disabled"]
+  vm.orientationOptions = ["landscape", "portrait"]
   vm.overlayChanged = false;
 
 
@@ -79,7 +80,8 @@ function DeviceDetailsCtrl($log,
         } else {
           currentTenantOverlays[key]["image_key"] = null;
         }
-      };
+      }
+      ;
 
       let promise = DevicesService.saveOverlaySettings(
         vm.deviceKey,
@@ -105,7 +107,20 @@ function DeviceDetailsCtrl($log,
         ToastsService.showErrorToast('Something went wrong');
       })
     });
+  };
 
+  vm.adjustOrientationMode = () => {
+    let controlsMode = vm.currentDevice.controlsMode;
+    ProgressBarService.start();
+    let controlsPromise = DevicesService.adjustControlsMode(vm.deviceKey, controlsMode)
+    controlsPromise.then(() => {
+      ProgressBarService.complete();
+      ToastsService.showSuccessToast(`Your controls mode selection was succesfully changed to: ${controlsMode}`);
+    })
+    controlsPromise.catch(() => {
+      ProgressBarService.complete();
+      //ToastsService.showErrorToast("Your controls mode change failed to save. Please contact support.")
+    })
   };
 
   vm.adjustControlsMode = () => {
@@ -120,7 +135,7 @@ function DeviceDetailsCtrl($log,
       ProgressBarService.complete();
       //ToastsService.showErrorToast("Your controls mode change failed to save. Please contact support.")
     })
-  }
+  };
 
   vm.adjustOverlayStatus = (status) => {
     vm.currentDevice.overlayStatus = status

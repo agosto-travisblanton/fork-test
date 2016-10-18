@@ -113,11 +113,6 @@ indexes:
 
 - kind: IntegrationEventLog
   properties:
-  - name: correlation_identifier
-  - name: utc_timestamp
-
-- kind: IntegrationEventLog
-  properties:
   - name: device_urlsafe_key
   - name: event_category
   - name: utc_timestamp

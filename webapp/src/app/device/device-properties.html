@@ -416,7 +416,7 @@
                   ng-options="c.id for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">
                 </select>
               </div>
-              <div class="col-sm-5"
+              <div class="col-sm-2"
                    tooltips
                    tooltip-class="tooltip-custom-large"
                    tooltip-side="top"
@@ -433,12 +433,6 @@
               </div>
 
 
-            </div>
-            <hr>
-          </section>
-          <section name="controlsMode">
-            <h3>Panel Controls Mode</h3>
-            <div class="form-group">
               <div class="col-sm-3">
                 <label>Controls Mode</label>
                 <select
@@ -448,6 +442,18 @@
                   ng-model="deviceDetailsCtrl.currentDevice.controlsMode"
                   ng-change="deviceDetailsCtrl.adjustControlsMode()"
                   ng-options="choice for choice in deviceDetailsCtrl.controlsModeOptions">
+                </select>
+              </div>
+
+              <div class="col-sm-3">
+                <label>Panel Orientation</label>
+                <select
+                  id="panelInput"
+                  class="form-control"
+                  ng-required="deviceDetailsCtrl.currentDevice.controlsMode !== null"
+                  ng-model="deviceDetailsCtrl.currentDevice.orientationMode"
+                  ng-change="deviceDetailsCtrl.adjustOrientationMode()"
+                  ng-options="choice for choice in deviceDetailsCtrl.orientationOptions">
                 </select>
               </div>
             </div>
