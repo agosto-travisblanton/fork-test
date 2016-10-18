@@ -357,6 +357,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                 timezone = config.DEFAULT_TIMEZONE
 
             correlation_id = IntegrationEventLog.generate_correlation_id()
+
             if self.is_unmanaged_device:
                 registration_request_event = IntegrationEventLog.create(
                     event_category='Registration',
