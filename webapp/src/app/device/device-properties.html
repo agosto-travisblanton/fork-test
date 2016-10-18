@@ -450,7 +450,7 @@
                 <select
                   id="panelInput"
                   class="form-control"
-                  ng-required="deviceDetailsCtrl.currentDevice.controlsMode !== null"
+                  ng-required="deviceDetailsCtrl.currentDevice.orientationMode !== null"
                   ng-model="deviceDetailsCtrl.currentDevice.orientationMode"
                   ng-change="deviceDetailsCtrl.adjustOrientationMode()"
                   ng-options="choice for choice in deviceDetailsCtrl.orientationOptions">
