@@ -94,4 +94,6 @@ class AppConfig(Config):
 
     DEFAULT_OU_PATH = None
 
+    TENANT_CODE_UNKNOWN = None
+
 config = AppConfig.get_config()
