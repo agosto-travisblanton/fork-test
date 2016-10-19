@@ -304,9 +304,6 @@ class ChromeOsDevice(ndb.Model):
     def _pre_put_hook(self):
         self.class_version = 3
 
-    def get_impersonation_email(self):
-        return self.get_tenant().get_domain().impersonation_admin_email_address
-
 
 #####################################################
 # DEVICE ISSUE LOG

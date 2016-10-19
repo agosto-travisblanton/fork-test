@@ -8,6 +8,7 @@ from app_config import config
 from integrations.content_manager.content_manager_api import ContentManagerApi
 from integrations.directory_api.chrome_os_devices_api import ChromeOsDevicesApi
 from model_entities.chrome_os_device_model_and_overlays import Tenant
+from model_entities.domain_model import Domain
 from model_entities.integration_events_log_model import IntegrationEventLog
 from utils.email_notify import EmailNotify
 from workflow.update_chrome_os_device import update_chrome_os_device
@@ -57,7 +58,11 @@ def register_device(urlsafe_key=None, mac_address=None, gcm_registration_id=None
             api_request_event.details = error_message
             api_request_event.put()
         return
-    impersonation_email = device.get_impersonation_email()
+    if chrome_domain:
+        impersonation_email = Domain.get_impersonation_email_by_domain_name(domain_name=chrome_domain)
+    else:
+        tenant = device.get_tenant()
+        impersonation_email = tenant.get_domain().impersonation_admin_email_address
     if not impersonation_email:
         error_message = 'register_device: Impersonation email not found for device with device key {0}.'.format(
             urlsafe_key)

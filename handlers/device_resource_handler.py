@@ -444,9 +444,12 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                         return
                     else:
                         tenant_key = tenant.key
+                    chrome_domain = None
                 else:
+                    chrome_domain = self.check_and_get_field('domain')
                     has_tenant = False
                     tenant_key = None
+
                 if status == httplib.CREATED:
                     device = ChromeOsDevice.create_managed(tenant_key=tenant_key,
                                                            gcm_registration_id=gcm_registration_id,
@@ -465,6 +468,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                                    device_mac_address=device_mac_address,
                                    gcm_registration_id=gcm_registration_id,
                                    correlation_id=correlation_id,
+                                   chrome_domain=chrome_domain,
                                    _queue='directory-api',
                                    _countdown=60)
                     device_uri = self.request.app.router.build(None,
