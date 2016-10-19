@@ -88,3 +88,10 @@ class TestDomainModel(BaseTest):
         name = 'non-existing.skykit.com'
         self.assertFalse(Domain.already_exists(name))
 
+    def test_get_impersonation_email_when_domain_name_found(self):
+        expected_impersonation_email = Domain.get_impersonation_email(domain_name=self.CHROME_DEVICE_DOMAIN)
+        self.assertEqual(self.domain.impersonation_admin_email_address, expected_impersonation_email)
+
+    def test_get_impersonation_email_when_domain_name__not_found(self):
+        expected = Domain.get_impersonation_email(domain_name='foobar.com')
+        self.assertIsNone(expected)

@@ -42,5 +42,15 @@ class Domain(ndb.Model):
             return True
         return False
 
+    @classmethod
+    def get_impersonation_email(cls, domain_name):
+        impersonation_email = None
+        if domain_name:
+            domains = Domain.query(Domain.name == domain_name).fetch()
+            if len(domains) > 0:
+                impersonation_email = domains[0].impersonation_admin_email_address
+        return impersonation_email
+
+
     def _pre_put_hook(self):
         self.class_version = 1
