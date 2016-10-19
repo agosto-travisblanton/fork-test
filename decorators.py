@@ -66,6 +66,20 @@ def log_memory(function):
     return log
 
 
+def requires_cm_key(handler_method):
+    def authorize(self, *args, **kwargs):
+        api_token = self.request.headers.get('Authorization')
+        if _token_missing(api_token):
+            json_response(self.response, {'error': 'No API token supplied in the HTTP request.'}, status_code=403)
+            return
+        if api_token != config.API_TOKEN:
+            json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=403)
+            return
+        handler_method(self, *args, **kwargs)
+
+    return authorize
+
+
 def requires_api_token(handler_method):
     def authorize(self, *args, **kwargs):
         self.is_unmanaged_device = False
