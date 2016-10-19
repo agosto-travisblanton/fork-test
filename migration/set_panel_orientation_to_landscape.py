@@ -12,6 +12,6 @@ class SetPanelOrientationToLandscape(MigrationBase):
         all_device_entities = ChromeOsDevice.query().fetch()
 
         for each_entity in all_device_entities:
-            if not each_entity.orientation_mode:
-                each_entity.orientation_mode = 'landscape'
-                each_entity.put()
+            each_entity.orientation_mode = 'landscape'
+            each_entity.put()
+            print each_entity

@@ -143,7 +143,7 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'overlayStatus': lambda o, field_name,
                              context: o.overlays_available},
     {'overlays': lambda o, field_name, context: o.overlays_as_dict if o.overlays_available else None},
-    {'orientationMode': lambda o, field_name, context: o.orienation_mode}
+    {'orientationMode': lambda o, field_name, context: o.orientation_mode}
 
 ]
 

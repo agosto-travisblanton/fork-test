@@ -452,7 +452,7 @@
                   class="form-control"
                   ng-required="deviceDetailsCtrl.currentDevice.orientationMode !== null"
                   ng-model="deviceDetailsCtrl.currentDevice.orientationMode"
-                  ng-change="deviceDetailsCtrl.adjustOrientationMode()"
+                  ng-change="deviceDetailsCtrl.onSaveDevice()"
                   ng-options="choice for choice in deviceDetailsCtrl.orientationOptions">
                 </select>
               </div>
