@@ -594,7 +594,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             if controls_mode != None:
                 device.controls_mode = controls_mode
             orientation_mode = request_json.get('orientationMode')
-            if controls_mode != None:
+            if orientation_mode != None:
                 if orientation_mode.lower() in ["landscape", "portrait"]:
                     device.orientation_mode = orientation_mode.lower()
 
@@ -607,9 +607,9 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                 orientation_mode
             ]
 
-            gcm_update_on_changed_since_true = [e for e in gcm_update_on_changed_if_true if e != None]
+            changes_to_device = [e for e in gcm_update_on_changed_if_true if e != None]
 
-            if len(gcm_update_on_changed_since_true) > 0:
+            if len(changes_to_device) > 0:
                 change_intent(
                     gcm_registration_id=device.gcm_registration_id,
                     payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,

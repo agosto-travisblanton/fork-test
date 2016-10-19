@@ -981,7 +981,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(gcm_registration_id, updated_display.gcm_registration_id)
 
     def test_put_updates_orientation_mode(self):
-        orientation_mode = 'landscape'
+        orientation_mode = 'portrait'
         request_body = {
             'orientationMode': orientation_mode,
             'tenantCode': self.tenant_key.get().tenant_code
