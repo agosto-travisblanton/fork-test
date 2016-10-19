@@ -595,7 +595,9 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                 device.controls_mode = controls_mode
             orientation_mode = request_json.get('orientationMode')
             if controls_mode != None:
-                device.orientation_mode = orientation_mode
+                if orientation_mode.lower() in ["landscape", "portrait"]:
+                    device.orientation_mode = orientation_mode.lower()
+
             device.put()
 
             # adjust this object with values you want to spy on to do a gcm_update on when they are True
