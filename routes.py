@@ -524,10 +524,9 @@ application = WSGIApplication(
         # /content-manager/ routes secured by shared_secret
         ############################################################
         Route(r'/api/v1/content-manager/devices/<device_urlsafe_key>',
-              handler='handlers.tenant_organization_units_handler.TenantOrganizationUnitsHandler',
-              name='organization-units-list',
-              handler_method='get_ou_list',
-              methods=['GET']
+              handler='handlers.content_manager_handler.ChromeOsDeviceHandler',
+              name='update-content-manager',
+              methods=['PUT']
               ),
 
         ############################################################
