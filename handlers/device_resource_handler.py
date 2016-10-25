@@ -594,13 +594,23 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             controls_mode = request_json.get('controlsMode')
             if controls_mode != None:
                 device.controls_mode = controls_mode
+            orientation_mode = request_json.get('orientationMode')
+            if orientation_mode != None:
+                if orientation_mode.lower() in ["landscape", "portrait"]:
+                    device.orientation_mode = orientation_mode.lower()
+
             device.put()
 
             # adjust this object with values you want to spy on to do a gcm_update on when they are True
-            gcm_update_on_changed_if_true = [controls_mode, overlay_status]
-            gcm_update_on_changed_since_true = [e for e in gcm_update_on_changed_if_true if e != None]
+            gcm_update_on_changed_if_true = [
+                controls_mode,
+                overlay_status,
+                orientation_mode
+            ]
 
-            if len(gcm_update_on_changed_since_true) > 0:
+            changes_to_device = [e for e in gcm_update_on_changed_if_true if e != None]
+
+            if len(changes_to_device) > 0:
                 change_intent(
                     gcm_registration_id=device.gcm_registration_id,
                     payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
