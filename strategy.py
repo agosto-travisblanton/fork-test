@@ -142,7 +142,9 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'controlsMode': lambda o, field_name, context: o.controls_mode},
     {'overlayStatus': lambda o, field_name,
                              context: o.overlays_available},
-    {'overlays': lambda o, field_name, context: o.overlays_as_dict if o.overlays_available else None}
+    {'overlays': lambda o, field_name, context: o.overlays_as_dict if o.overlays_available else None},
+    {'orientationMode': lambda o, field_name, context: o.orientation_mode}
+
 ]
 
 LOCATION_STRATEGY = ModelStrategy(Location)

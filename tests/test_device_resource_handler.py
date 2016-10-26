@@ -980,6 +980,18 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertNotEqual(self.GCM_REGISTRATION_ID, updated_display.gcm_registration_id)
         self.assertEqual(gcm_registration_id, updated_display.gcm_registration_id)
 
+    def test_put_updates_orientation_mode(self):
+        orientation_mode = 'portrait'
+        request_body = {
+            'orientationMode': orientation_mode,
+            'tenantCode': self.tenant_key.get().tenant_code
+        }
+        self.app.put('/api/v1/devices/{0}'.format(self.managed_device_key.urlsafe()),
+                     json.dumps(request_body),
+                     headers=self.api_token_authorization_header)
+        updated_display = self.managed_device_key.get()
+        self.assertEqual(orientation_mode, updated_display.orientation_mode)
+
     def test_put_updates_device_with_an_explicit_tenant_change(self):
         new_tenant = self.another_tenant_key.get()
         request_body = {

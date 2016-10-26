@@ -259,6 +259,8 @@ def make_data_for_a_distributor():
         u.add_distributor(second_distributor.key)
 
     user = User.get_or_insert_by_email(email=USER_EMAIL)
+    user.is_administrator = True
+    user.put()
     if not distributor:
         print 'Distributor ' + DISTRIBUTOR_NAME + ' not found'
         print 'Could not add ' + USER_EMAIL + ' to ' + DISTRIBUTOR_NAME
