@@ -18,7 +18,10 @@ def update_chrome_os_device(device_urlsafe_key=None):
     if device_urlsafe_key is None:
         raise deferred.PermanentTaskFailure('The device URL-safe key parameter is None.  It is required.')
     device = ndb.Key(urlsafe=device_urlsafe_key).get()
-    # TODO handle the tenant not known yet case
+    if device.tenant_key is None:
+        logging.info('Tenant not known. Unable to refresh device by device_urlsafe_key: {0}'.format(device_urlsafe_key))
+        return
+
     tenant = device.get_tenant()
     impersonation_email = tenant.get_domain().impersonation_admin_email_address
     if None == impersonation_email:

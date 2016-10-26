@@ -30,7 +30,9 @@ def refresh_device_by_mac_address(device_urlsafe_key, device_mac_address,
     if None == device:
         logging.error('Unable to find device by device_urlsafe_key: {0}'.format(device_urlsafe_key))
         return
-    # TODO handle the tenant not known yet case
+    if device.tenant_key is None:
+        logging.info('Tenant not known. Unable to refresh device by device_urlsafe_key: {0}'.format(device_urlsafe_key))
+        return
     tenant = device.get_tenant()
     impersonation_email = tenant.get_domain().impersonation_admin_email_address
     if None == impersonation_email:
