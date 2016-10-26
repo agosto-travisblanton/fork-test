@@ -1,6 +1,6 @@
-from datetime import datetime
 import logging
 
+from datetime import datetime
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
@@ -17,11 +17,11 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 def register_device(urlsafe_key=None, mac_address=None, gcm_registration_id=None,
-                    correlation_id=None, chrome_domain=None, page_token=None):
+                    correlation_id=None, domain_name=None, page_token=None):
     """
     A function that is meant to be run asynchronously to fetch information about the device entity
     with ChromeOsDevice information from Directory API using the device's MAC address to match.
-    :param chrome_domain: the domain needed to connect to in CDM to search for the device.
+    :param domain_name: the domain needed to connect to in CDM to search for the device.
     :param page_token: a google api page marker for where you are in the larger list. Fetches in chunks of 100 records.
     :param correlation_id: our generated id to track the registration process
     :param gcm_registration_id: google cloud messaging id the player sends to us for messaging purposes.
@@ -39,38 +39,34 @@ def register_device(urlsafe_key=None, mac_address=None, gcm_registration_id=None
     api_request_event.put()
     if not urlsafe_key:
         error_message = 'register_device: The device URL-safe key parameter is None. It is required.'
-        if api_request_event:
-            api_request_event.details = error_message
-            api_request_event.put()
+        api_request_event.details = error_message
+        api_request_event.put()
         raise deferred.PermanentTaskFailure(error_message)
     if not mac_address:
         error_message = 'register_device: The device MAC address parameter is None. It is required.'
-        if api_request_event:
-            api_request_event.details = error_message
-            api_request_event.put()
+        api_request_event.details = error_message
+        api_request_event.put()
         raise deferred.PermanentTaskFailure(error_message)
     device_key = ndb.Key(urlsafe=urlsafe_key)
     device = device_key.get()
     if None == device:
         error_message = 'Unable to find device by device_urlsafe_key: {0}'.format(urlsafe_key)
         logging.error(error_message)
-        if api_request_event:
-            api_request_event.details = error_message
-            api_request_event.put()
-        return
-    if chrome_domain:
-        impersonation_email = Domain.get_impersonation_email_by_domain_name(domain_name=chrome_domain)
+        api_request_event.details = error_message
+        api_request_event.put()
+        raise deferred.PermanentTaskFailure(error_message)
+    if domain_name:
+        impersonation_email = Domain.get_impersonation_email_by_domain_name(domain_name=domain_name)
     else:
         tenant = device.get_tenant()
         impersonation_email = tenant.get_domain().impersonation_admin_email_address
     if not impersonation_email:
-        error_message = 'register_device: Impersonation email not found for device with device key {0}.'.format(
+        api_request_event.details = 'register_device: Impersonation email is not resolvable.'
+        api_request_event.put()
+        error_message = 'register_device: Impersonation email is not resolvable for device with device key {0}.'.format(
             urlsafe_key)
-        if api_request_event:
-            api_request_event.details = error_message
-            api_request_event.put()
         logging.error(error_message)
-        return
+        raise deferred.PermanentTaskFailure(error_message)
 
     api_response_event = IntegrationEventLog.create(
         event_category='Registration',
@@ -135,17 +131,28 @@ def register_device(urlsafe_key=None, mac_address=None, gcm_registration_id=None
                     if tenant:
                         device.tenant_key = tenant.key
                         device.put()
-                        notifier = EmailNotify()
-                        notifier.device_enrolled(tenant_code=tenant.tenant_code,
-                                                 tenant_name=device.get_tenant().name,
-                                                 device_mac_address=mac_address,
-                                                 timestamp=datetime.utcnow())
+            notifier = EmailNotify()
+            tenant_name = device.get_tenant().name
+            notification_emails = device.get_tenant().notification_emails
+            notifier.device_enrolled(tenant_code=device.get_tenant().tenant_code,
+                                     tenant_name=tenant_name,
+                                     device_mac_address=mac_address,
+                                     timestamp=datetime.utcnow())
+            device_enrollment_email_event = IntegrationEventLog.create(
+                event_category='Registration',
+                component_name='Provisioning',
+                workflow_step='Device enrolled email notification sent',
+                mac_address=mac_address,
+                device_urlsafe_key=urlsafe_key,
+                gcm_registration_id=gcm_registration_id,
+                details='Device enrollment email for {0} sent to: {1}'.format(tenant_name, notification_emails),
+                correlation_identifier=correlation_id)
+            device_enrollment_email_event.put()
 
             deferred.defer(ContentManagerApi().create_device,
                            device_urlsafe_key=urlsafe_key,
                            correlation_id=correlation_id,
-                           _queue='content-server',
-                           _countdown=5)
+                           _queue='content-server')
 
             # Update Directory API with the device key in the annotated asset ID.
             if not device.is_unmanaged_device:
