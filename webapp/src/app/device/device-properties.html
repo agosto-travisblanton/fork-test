@@ -313,13 +313,14 @@
                 <label>Logging</label>
                 <div>
                   <input type="checkbox"
+                         id="proofOfPlayLogging"
                          tooltips
                          tooltip-class="tooltip-custom-large"
                          tooltip-side="left"
                          tooltip-template-url="webapp/src/app/tooltip/proof-of-play-toggle.html"
                          ng-model="deviceDetailsCtrl.currentDevice.proofOfPlayLogging"
                          ng-change="deviceDetailsCtrl.onProofOfPlayLoggingCheck()">
-                  <span>Enable</span>
+                  <label for="proofOfPlayLogging">Enable</label>
                 </div>
               </div>
             </div>

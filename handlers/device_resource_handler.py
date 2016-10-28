@@ -1,10 +1,11 @@
+import httplib
 import json
 import logging
 
 from datetime import datetime
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
-import httplib
+
 from app_config import config
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from device_commands_handler import DeviceCommandsHandler
@@ -26,7 +27,6 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob
 
 
 class DeviceResourceHandler(ExtendedSessionRequestHandler):
-    MAILGUN_QUEUED_MESSAGE = 'Queued. Thank you.'
 
     ############################################################################################
     # HELPER METHODS
@@ -444,9 +444,12 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                         return
                     else:
                         tenant_key = tenant.key
+                    chrome_domain = None
                 else:
+                    chrome_domain = self.check_and_get_field('domain')
                     has_tenant = False
                     tenant_key = None
+
                 if status == httplib.CREATED:
                     device = ChromeOsDevice.create_managed(tenant_key=tenant_key,
                                                            gcm_registration_id=gcm_registration_id,
@@ -454,17 +457,23 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                                                            timezone=timezone,
                                                            registration_correlation_identifier=correlation_id)
                     key = device.put()
+
                     registration_request_event.device_urlsafe_key = key.urlsafe()
-                    registration_request_event.details = 'register_device: mac address={0}, ' \
-                                                         'gcm id = {1}, ' \
-                                                         'device key = {2}'.format(device_mac_address,
-                                                                                   gcm_registration_id, key.urlsafe())
+                    registration_request_event.mac_address = device_mac_address
+                    registration_request_event.gcm_registration_id = gcm_registration_id
+                    if has_tenant:
+                        registration_request_event.tenant_code = tenant_code
+                        registration_request_event.details = 'Tenant code present in request'
+                    else:
+                        registration_request_event.details = 'Tenant code not present in request. Domain = {0}'.format(
+                            chrome_domain)
                     registration_request_event.put()
                     deferred.defer(register_device,
                                    device_urlsafe_key=key.urlsafe(),
                                    device_mac_address=device_mac_address,
                                    gcm_registration_id=gcm_registration_id,
                                    correlation_id=correlation_id,
+                                   chrome_domain=chrome_domain,
                                    _queue='directory-api',
                                    _countdown=60)
                     device_uri = self.request.app.router.build(None,
@@ -481,14 +490,9 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                         mac_address=device_mac_address,
                         gcm_registration_id=gcm_registration_id,
                         correlation_identifier=correlation_id,
+                        device_urlsafe_key=key.urlsafe(),
                         details='Device resource uri {0} returned in response Location header.'.format(device_uri))
                     registration_response_event.put()
-                    if has_tenant:
-                        notifier = EmailNotify()
-                        notifier.device_enrolled(tenant_code=tenant_code,
-                                                 tenant_name=device.get_tenant().name,
-                                                 device_mac_address=device_mac_address,
-                                                 timestamp=datetime.utcnow())
                 else:
                     self.response.set_status(status, error_message)
         else:
