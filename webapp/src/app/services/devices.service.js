@@ -427,6 +427,10 @@ export default class DevicesService {
         'displayName': 'Panasonic TH55LF6U'
       },
       {
+        'id': 'LG-43SM5B-B',
+        'displayName': 'LG 43SM5B-B'
+      },
+      {
         'id': 'Sharp-PNE521',
         'displayName': 'Sharp PNE521'
       }
@@ -438,6 +442,10 @@ export default class DevicesService {
       {
         'id': 'None',
         'parentId': 'None'
+      },
+      {
+        'id': 'HDMI1',
+        'parentId': 'LG-43SM5B-B'
       },
       {
         'id': 'HDMI1',
