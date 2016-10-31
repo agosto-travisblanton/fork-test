@@ -14,7 +14,7 @@ from utils.web_util import build_uri
 from webapp2 import RequestHandler
 import logging
 import traceback
-
+from set_panel_orientation_to_landscape import SetPanelOrientationToLandscape
 from hydrate_tenant_key_on_devices import HydrateTenantKeyOnDevices
 from refresh_chrome_device_properties_from_directory_api import RefreshChromeDevicePropertiesFromDirectoryApi
 from set_content_manager_base_url_on_tenant import SetContentManagerBaseUrlOnTenant
@@ -28,7 +28,6 @@ from set_controls_mode_to_invisible import SetControlsModeToInvisible
 from hydrate_organization_unit_id_to_none import HydrateOrganizationUnitIdToNone
 from set_default_organization_unit_path_on_domains import SetDefaultOrganizationUnitPathOnDomains
 
-
 MIGRATIONS = [
     HydrateTenantKeyOnDevices(),
     RefreshChromeDevicePropertiesFromDirectoryApi(),
@@ -41,6 +40,7 @@ MIGRATIONS = [
     SetOverlayStatusToFalse(),
     SetControlsModeToInvisible(),
     HydrateOrganizationUnitIdToNone(),
+    SetPanelOrientationToLandscape(),
     SetDefaultOrganizationUnitPathOnDomains()
 ]
 

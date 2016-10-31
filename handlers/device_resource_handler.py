@@ -1,10 +1,11 @@
+import httplib
 import json
 import logging
 
 from datetime import datetime
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
-import httplib
+
 from app_config import config
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from device_commands_handler import DeviceCommandsHandler
@@ -26,7 +27,6 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob
 
 
 class DeviceResourceHandler(ExtendedSessionRequestHandler):
-    MAILGUN_QUEUED_MESSAGE = 'Queued. Thank you.'
 
     ############################################################################################
     # HELPER METHODS
@@ -272,7 +272,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                     logging.error(error_message)
                 else:
                     message = "Unable to find device by pairing code: {0}".format(pairing_code)
-                    self.response.set_status(404, message)
+                    self.response.set_status(httplib.NOT_FOUND, message)
                 return
 
             query_results = ChromeOsDevice.get_by_gcm_registration_id(gcm_registration_id)
@@ -289,7 +289,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                         self.delete(query_results[0].key.urlsafe())
                         error_message = "Rogue unmanaged device with MAC address: {0} no longer exists.".format(
                             device_mac_address)
-                        self.response.set_status(404, error_message)
+                        self.response.set_status(httplib.NOT_FOUND, error_message)
                     else:
                         json_response(self.response, query_results[0], strategy=CHROME_OS_DEVICE_STRATEGY)
                 elif len(query_results) > 1:
@@ -299,9 +299,9 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                 else:
                     error_message = "Unable to find device by GCM registration ID: {0} or MAC address: {1}".format(
                         gcm_registration_id, device_mac_address)
-                    self.response.set_status(404, error_message)
+                    self.response.set_status(httplib.NOT_FOUND, error_message)
         else:
-            self.response.set_status(400)
+            self.response.set_status(httplib.BAD_REQUEST)
         return
 
     @requires_api_token
@@ -309,7 +309,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True,
                                        use_app_engine_memcache=False)
         if device.archived:
-            status = 404
+            status = httplib.NOT_FOUND
             message = 'Device with key: {0} archived.'.format(device_urlsafe_key)
             return self.response.set_status(status, message)
         if device.timezone:
@@ -335,11 +335,11 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
     def get_pairing_code(self, device_urlsafe_key):
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
         if device is None:
-            status = 404
+            status = httplib.NOT_FOUND
             message = 'Unrecognized device_key: {0}'.format(device_urlsafe_key)
             return self.response.set_status(status, message)
         elif device.archived:
-            status = 404
+            status = httplib.NOT_FOUND
             message = 'Device with key: {0} archived.'.format(device_urlsafe_key)
             return self.response.set_status(status, message)
         return json_response(self.response, device, strategy=DEVICE_PAIRING_CODE_STRATEGY)
@@ -347,7 +347,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
     @requires_registration_token
     def post(self):
         if self.request.body is not '' and self.request.body is not None:
-            status = 201
+            status = httplib.CREATED
             error_message = None
             request_json = json.loads(self.request.body)
             device_mac_address = self.check_and_get_field('macAddress')
@@ -357,6 +357,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                 timezone = config.DEFAULT_TIMEZONE
 
             correlation_id = IntegrationEventLog.generate_correlation_id()
+
             if self.is_unmanaged_device:
                 registration_request_event = IntegrationEventLog.create(
                     event_category='Registration',
@@ -370,7 +371,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                         gcm_registration_id=gcm_registration_id,
                         is_unmanaged_device=True):
                     error_message = 'Conflict gcm registration id is already assigned to an unmanaged device.'
-                    self.response.set_status(409, error_message)
+                    self.response.set_status(httplib.CONFLICT, error_message)
                     registration_request_event.details = error_message
                     registration_request_event.put()
                     device = ChromeOsDevice.get_unmanaged_device_by_gcm_registration_id(
@@ -386,7 +387,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                         device_mac_address=device_mac_address,
                         is_unmanaged_device=True):
                     error_message = 'Conflict mac address is already assigned to an unmanaged device.'
-                    self.response.set_status(409, error_message)
+                    self.response.set_status(httplib.CONFLICT, error_message)
                     registration_request_event.details = error_message
                     registration_request_event.put()
                     device = ChromeOsDevice.get_unmanaged_device_by_mac_address(mac_address=device_mac_address)
@@ -425,14 +426,14 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                     error_message = 'Conflict gcm registration id is already assigned to a managed device.'
                     registration_request_event.details = error_message
                     registration_request_event.put()
-                    self.response.set_status(409, error_message)
+                    self.response.set_status(httplib.CONFLICT, error_message)
                     return
                 tenant_code = request_json.get('tenantCode')
                 if tenant_code:
                     has_tenant = True
                     tenant = Tenant.find_by_tenant_code(tenant_code)
                     if tenant is None:
-                        status = 400
+                        status = httplib.BAD_REQUEST
                         error_message = 'Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
                         self.response.set_status(status, error_message)
                         registration_request_event.details = error_message
@@ -443,27 +444,36 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                         return
                     else:
                         tenant_key = tenant.key
+                    chrome_domain = None
                 else:
+                    chrome_domain = self.check_and_get_field('domain')
                     has_tenant = False
                     tenant_key = None
-                if status == 201:
+
+                if status == httplib.CREATED:
                     device = ChromeOsDevice.create_managed(tenant_key=tenant_key,
                                                            gcm_registration_id=gcm_registration_id,
                                                            mac_address=device_mac_address,
                                                            timezone=timezone,
                                                            registration_correlation_identifier=correlation_id)
                     key = device.put()
+
                     registration_request_event.device_urlsafe_key = key.urlsafe()
-                    registration_request_event.details = 'register_device: mac address={0}, ' \
-                                                         'gcm id = {1}, ' \
-                                                         'device key = {2}'.format(device_mac_address,
-                                                                                   gcm_registration_id, key.urlsafe())
+                    registration_request_event.mac_address = device_mac_address
+                    registration_request_event.gcm_registration_id = gcm_registration_id
+                    if has_tenant:
+                        registration_request_event.tenant_code = tenant_code
+                        registration_request_event.details = 'Tenant code present in request'
+                    else:
+                        registration_request_event.details = 'Tenant code not present in request. Domain = {0}'.format(
+                            chrome_domain)
                     registration_request_event.put()
                     deferred.defer(register_device,
                                    device_urlsafe_key=key.urlsafe(),
                                    device_mac_address=device_mac_address,
                                    gcm_registration_id=gcm_registration_id,
                                    correlation_id=correlation_id,
+                                   chrome_domain=chrome_domain,
                                    _queue='directory-api',
                                    _countdown=60)
                     device_uri = self.request.app.router.build(None,
@@ -480,27 +490,22 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                         mac_address=device_mac_address,
                         gcm_registration_id=gcm_registration_id,
                         correlation_identifier=correlation_id,
+                        device_urlsafe_key=key.urlsafe(),
                         details='Device resource uri {0} returned in response Location header.'.format(device_uri))
                     registration_response_event.put()
-                    if has_tenant:
-                        notifier = EmailNotify()
-                        notifier.device_enrolled(tenant_code=tenant_code,
-                                                 tenant_name=device.get_tenant().name,
-                                                 device_mac_address=device_mac_address,
-                                                 timestamp=datetime.utcnow())
                 else:
                     self.response.set_status(status, error_message)
         else:
             logging.info("Problem creating Device. No request body.")
-            self.response.set_status(400, 'Did not receive request body.')
+            self.response.set_status(httplib.BAD_REQUEST, 'Did not receive request body.')
 
     @requires_api_token
     def put(self, device_urlsafe_key):
-        status = 204
+        status = httplib.NO_CONTENT
         message = None
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
         if device.archived:
-            status = 404
+            status = httplib.NOT_FOUND
             message = 'Device with key: {0} archived.'.format(device_urlsafe_key)
             return self.response.set_status(status, message)
         else:
@@ -536,7 +541,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                             tenant_key=device.tenant_key):
                         device.customer_display_code = customer_display_code
                     else:
-                        status = 409
+                        status = httplib.CONFLICT
                         message = "Conflict. Customer display code \"{0}\" is already assigned for tenant.".format(
                             customer_display_code)
                         self.response.set_status(status, message)
@@ -574,7 +579,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                                            _queue='content-server',
                                            _countdown=5)
                 else:
-                    status = 400
+                    status = httplib.BAD_REQUEST
                     message = "Attempt to update an invalid tenant code: \"{0}\".".format(
                         tenant_code)
                     self.response.set_status(status, message)
@@ -593,13 +598,23 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             controls_mode = request_json.get('controlsMode')
             if controls_mode != None:
                 device.controls_mode = controls_mode
+            orientation_mode = request_json.get('orientationMode')
+            if orientation_mode != None:
+                if orientation_mode.lower() in ["landscape", "portrait"]:
+                    device.orientation_mode = orientation_mode.lower()
+
             device.put()
 
             # adjust this object with values you want to spy on to do a gcm_update on when they are True
-            gcm_update_on_changed_if_true = [controls_mode, overlay_status]
-            gcm_update_on_changed_since_true = [e for e in gcm_update_on_changed_if_true if e != None]
+            gcm_update_on_changed_if_true = [
+                controls_mode,
+                overlay_status,
+                orientation_mode
+            ]
 
-            if len(gcm_update_on_changed_since_true) > 0:
+            changes_to_device = [e for e in gcm_update_on_changed_if_true if e != None]
+
+            if len(changes_to_device) > 0:
                 change_intent(
                     gcm_registration_id=device.gcm_registration_id,
                     payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
@@ -617,7 +632,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
 
     @requires_api_token
     def heartbeat(self, device_urlsafe_key):
-        status = 204
+        status = httplib.NO_CONTENT
         message = None
         device = None
         try:
@@ -625,11 +640,11 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
         except Exception, e:
             logging.exception(e)
         if device is None:
-            status = 404
+            status = httplib.NOT_FOUND
             message = 'Unrecognized heartbeat device_key: {0}'.format(device_urlsafe_key)
             return self.response.set_status(status, message)
         elif device.archived:
-            status = 404
+            status = httplib.NOT_FOUND
             message = 'Device with key: {0} archived.'.format(device_urlsafe_key)
             return self.response.set_status(status, message)
         else:
@@ -900,16 +915,16 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
 
     @requires_api_token
     def delete(self, device_urlsafe_key):
-        status = 204
+        status = httplib.NO_CONTENT
         message = None
         device = self.validate_and_get(urlsafe_key=device_urlsafe_key,
                                        kind_cls=ChromeOsDevice,
                                        abort_on_not_found=False)
         if device is None:
-            status = 404
+            status = httplib.NOT_FOUND
             message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
         elif device.archived:
-            status = 404
+            status = httplib.NOT_FOUND
             message = 'Device with key: {0} archived.'.format(device_urlsafe_key)
         else:
             user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')

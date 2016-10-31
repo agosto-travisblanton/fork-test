@@ -1,3 +1,5 @@
+import httplib
+
 from env_setup import setup_test_paths
 from handlers.device_commands_handler import DeviceCommandsHandler
 
@@ -100,18 +102,16 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         message = '400 DeviceCommandsHandler.post: Invalid intent.'
         self.assertTrue(message in context.exception.message)
 
-    def test_post_bogus_key_returns_not_found(self):
+    def test_post_corrupted_key_returns_invalid_urlsafe_string_error(self):
         request_body = {'intent': self.some_intent}
-        bogus_key = 'bogus key'
+        corrupted_key = 'corrupted key'
         uri = application.router.build(None,
                                        'device-commands',
                                        None,
-                                       {'device_urlsafe_key': bogus_key})
+                                       {'device_urlsafe_key': corrupted_key})
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        message = 'Bad response: 404 post command not executed because device not found with key: {0}'.format(
-            bogus_key
-        )
+        message = 'Bad response: 400 Invalid urlsafe string (Protocol Buffer Decode Error): corrupted'
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
@@ -131,20 +131,23 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertOK(response)
 
     def test_reset_with_bogus_device_key_returns_not_found_status(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
         when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
                                                      config.PLAYER_RESET_COMMAND, any_matcher(str),
                                                      any_matcher(str)).thenReturn(None)
-        bogus_key = '0AXC19Z0DE'
+        key = device.put().urlsafe()
         uri = application.router.build(None,
                                        'device-reset-command',
                                        None,
-                                       {'device_urlsafe_key': bogus_key})
+                                       {'device_urlsafe_key': key})
         request_body = {}
+        device.key.delete()
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        message = 'Bad response: 404 reset command not executed because device not found with key: {0}'.format(
-            bogus_key
-        )
+        message = 'Bad response: 404 reset method not executed because device unresolvable with ' \
+                  'urlsafe key: {0}'.format(key)
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
@@ -164,21 +167,23 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertOK(response)
 
     def test_delete_content_with_bogus_device_key_returns_not_found_status(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
         when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
                                                      config.PLAYER_DELETE_CONTENT_COMMAND, any_matcher(str),
                                                      any_matcher(str)).thenReturn(None)
-        bogus_key = '0AXC19Z0DE'
+        key = device.put().urlsafe()
         uri = application.router.build(None,
                                        'device-delete-content-command',
                                        None,
-                                       {'device_urlsafe_key': bogus_key})
+                                       {'device_urlsafe_key': key})
         request_body = {}
+        device.key.delete()
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-
-        message = 'Bad response: 404 content_delete command not executed because device not found with key: {0}'.format(
-            bogus_key
-        )
+        message = 'Bad response: 404 content_delete method not executed because device unresolvable with ' \
+                  'urlsafe key: {0}'.format(key)
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
@@ -198,21 +203,23 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertOK(response)
 
     def test_content_update_with_bogus_device_key_returns_not_found_status(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
         when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
                                                      config.PLAYER_DELETE_CONTENT_COMMAND, any_matcher(str),
                                                      any_matcher(str)).thenReturn(None)
-        bogus_key = '0AXC19Z0DE'
+        key = device.put().urlsafe()
         uri = application.router.build(None,
                                        'device-update-content-command',
                                        None,
-                                       {'device_urlsafe_key': bogus_key})
+                                       {'device_urlsafe_key': key})
         request_body = {}
+        device.key.delete()
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-
-        message = 'Bad response: 404 content_update command not executed because device not found with key: {0}'.format(
-            bogus_key
-        )
+        message = 'Bad response: 404 content_update method not executed because device unresolvable with ' \
+                  'urlsafe key: {0}'.format(key)
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
@@ -273,19 +280,22 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertTrue(message in context.exception.message)
 
     def test_volume_with_bogus_device_key_returns_not_found_status(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
         when(device_message_processor).change_intent(any_matcher(str), any_matcher(str), any_matcher(str),
                                                      any_matcher(str)).thenReturn(None)
-        bogus_key = '0AXC19Z0DE'
+        key = device.put().urlsafe()
         uri = application.router.build(None,
                                        'device-volume-command',
                                        None,
-                                       {'device_urlsafe_key': bogus_key})
+                                       {'device_urlsafe_key': key})
+        device.key.delete()
         request_body = {'volume': 5}
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        message = 'Bad response: 404 volume command not executed because device not found with key: {0}'.format(
-            bogus_key
-        )
+        message = 'Bad response: 404 volume method not executed because device unresolvable with ' \
+                  'urlsafe key: {0}'.format(key)
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
@@ -316,19 +326,22 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertTrue('400 DeviceCommandsHandler: Invalid command.' in context.exception.message)
 
     def test_custom_command_with_bogus_device_key_returns_not_found_status(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
         when(device_message_processor).change_intent(any_matcher(str), any_matcher(str), any_matcher(str),
                                                      any_matcher(str)).thenReturn(None)
-        bogus_key = '0AXC19Z0DE'
+        key = device.put().urlsafe()
         uri = application.router.build(None,
                                        'device-custom-command',
                                        None,
-                                       {'device_urlsafe_key': bogus_key})
+                                       {'device_urlsafe_key': key})
         request_body = {'command': 'skykit.com/skdchromeapp/update/content'}
+        device.key.delete()
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        message = 'Bad response: 404 custom command not executed because device not found with key: {0}'.format(
-            bogus_key
-        )
+        message = 'Bad response: 404 custom method not executed because device unresolvable with ' \
+                  'urlsafe key: {0}'.format(key)
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
@@ -348,20 +361,23 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertOK(response)
 
     def test_power_on_with_bogus_device_key_returns_not_found_status(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
         when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
                                                      config.PLAYER_POWER_ON_COMMAND, any_matcher(str),
                                                      any_matcher(str)).thenReturn(None)
-        bogus_key = '0AXC19Z0DE'
+        key = device.put().urlsafe()
         uri = application.router.build(None,
                                        'device-power-on-command',
                                        None,
-                                       {'device_urlsafe_key': bogus_key})
+                                       {'device_urlsafe_key': key})
+        device.key.delete()
         request_body = {}
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        message = 'Bad response: 404 power_on command not executed because device not found with key: {0}'.format(
-            bogus_key
-        )
+        message = 'Bad response: 404 power_on method not executed because device unresolvable with ' \
+                  'urlsafe key: {0}'.format(key)
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
@@ -381,20 +397,23 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertOK(response)
 
     def test_power_off_with_bogus_device_key_returns_not_found_status(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
         when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
                                                      config.PLAYER_POWER_OFF_COMMAND, any_matcher(str),
                                                      any_matcher(str)).thenReturn(None)
-        bogus_key = '0AXC19Z0DE'
+        key = device.put().urlsafe()
         uri = application.router.build(None,
                                        'device-power-off-command',
                                        None,
-                                       {'device_urlsafe_key': bogus_key})
+                                       {'device_urlsafe_key': key})
+        device.key.delete()
         request_body = {}
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        message = 'Bad response: 404 power_off command not executed because device not found with key: {0}'.format(
-            bogus_key
-        )
+        message = 'Bad response: 404 power_off method not executed because device unresolvable with ' \
+                  'urlsafe key: {0}'.format(key)
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
@@ -414,21 +433,23 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertOK(response)
 
     def test_refresh_device_representation_with_bogus_device_key_returns_not_found_status(self):
-        command = 'refresh_device_representation'
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
         when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
                                                      config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
                                                      any_matcher(str), any_matcher(str)).thenReturn(None)
-        bogus_key = '0AXC19Z0DE'
+        key = device.put().urlsafe()
         uri = application.router.build(None,
                                        'refresh-device-representation-command',
                                        None,
-                                       {'device_urlsafe_key': bogus_key})
+                                       {'device_urlsafe_key': key})
+        device.key.delete()
         request_body = {}
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        message = 'Bad response: 404 {0} command not executed because device not found with key: {1}'.format(
-            command, bogus_key
-        )
+        message = 'Bad response: 404 refresh_device_representation method not executed because device unresolvable ' \
+                  'with urlsafe key: {0}'.format(key)
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
@@ -448,19 +469,23 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertOK(response)
 
     def test_diagnostics_toggle_with_bogus_device_key_returns_not_found_status(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
         when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
                                                      config.PLAYER_RESET_COMMAND, any_matcher(str),
                                                      any_matcher(str)).thenReturn(None)
-        bogus_key = '0AXC19Z0DE'
+        key = device.put().urlsafe()
         uri = application.router.build(None,
                                        'device-diagnostics-toggle-command',
                                        None,
-                                       {'device_urlsafe_key': bogus_key})
+                                       {'device_urlsafe_key': key})
+        device.key.delete()
         request_body = {}
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        message = 'Bad response: 404 diagnostics_toggle command not executed because device not found with key: {0}'. \
-            format(bogus_key)
+        message = 'Bad response: 404 diagnostics_toggle method not executed because device unresolvable with ' \
+                  'urlsafe key: {0}'.format(key)
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
@@ -480,23 +505,27 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertOK(response)
 
     def test_restart_with_bogus_device_key_returns_not_found_status(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
         when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
                                                      config.PLAYER_RESTART_COMMAND, any_matcher(str),
                                                      any_matcher(str)).thenReturn(None)
-        bogus_key = '0AXC19Z0DE'
+        key = device.put().urlsafe()
         uri = application.router.build(None,
                                        'device-restart-command',
                                        None,
-                                       {'device_urlsafe_key': bogus_key})
+                                       {'device_urlsafe_key': key})
+        device.key.delete()
         request_body = {}
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        message = 'Bad response: 404 restart command not executed because device not found with key: {0}'.format(
-            bogus_key
-        )
+        message = 'Bad response: 404 restart method not executed because device unresolvable ' \
+                  'with urlsafe key: {0}'.format(key)
         self.assertTrue(message in context.exception.message)
 
-    ##################################################################################################################
+        ##################################################################################################################
+
     # post log
     ##################################################################################################################
 
@@ -513,20 +542,23 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         self.assertOK(response)
 
     def test_post_log_with_bogus_device_key_returns_not_found_status(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               gcm_registration_id=self.GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
         when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
                                                      config.PLAYER_RESTART_COMMAND, any_matcher(str),
                                                      any_matcher(str)).thenReturn(None)
-        bogus_key = '0AXC19Z0DE'
+        key = device.put().urlsafe()
         uri = application.router.build(None,
                                        'device-post-log-command',
                                        None,
-                                       {'device_urlsafe_key': bogus_key})
+                                       {'device_urlsafe_key': key})
         request_body = {}
+        device.key.delete()
         with self.assertRaises(AppError) as context:
             self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        message = 'Bad response: 404 post_log command not executed because device not found with key: {0}'.format(
-            bogus_key
-        )
+        message = 'Bad response: 404 post_log method not executed because device unresolvable with ' \
+                  'urlsafe key: {0}'.format(key)
         self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
@@ -535,15 +567,20 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
 
     def test_resolve_device_with_valid_device_key_returns_ok(self):
         status, message, device = DeviceCommandsHandler.resolve_device(self.chrome_os_device_key.urlsafe())
-        self.assertEqual(status, 200)
+        self.assertEqual(status, httplib.OK)
         self.assertEqual(message, 'OK')
         self.assertEqual(device, self.chrome_os_device)
 
-    def test_resolve_device_with_invalid_device_key_returns_not_found(self):
-        bogus_key = 'ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgIDepYUKDA'
-        status, message, device = DeviceCommandsHandler.resolve_device(bogus_key)
-        expected_error_message = 'test_resolve_device_with_invalid_device_key_returns_not_found ' \
-                                 'command not executed because device not found with key: {0}'.format(bogus_key)
-        self.assertEqual(status, 404)
-        self.assertEqual(message, expected_error_message)
+    def test_resolve_device_with_environmentally_invalid_device_key_returns_bad_request(self):
+        environmentally_invalid_key = 'ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgIDepYUKDA'
+        status, message, device = DeviceCommandsHandler.resolve_device(environmentally_invalid_key)
+        self.assertEqual(status, httplib.BAD_REQUEST)
+        self.assertIsNone(device)
+
+    def test_resolve_device_with_invalid_device_key_string_returns_bad_request(self):
+        invalid_key = 'invalid key'
+        status, message, device = DeviceCommandsHandler.resolve_device(invalid_key)
+        expected_message = 'Invalid input (Type Error). Incorrect padding in urlsafe key'
+        self.assertEqual(status, httplib.BAD_REQUEST)
+        self.assertEqual(message, expected_message)
         self.assertIsNone(device)

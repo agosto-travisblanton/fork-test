@@ -1,4 +1,11 @@
-function TenantAddCtrl($log, $location, TenantsService, DistributorsService, TimezonesService, $state, sweet, ProgressBarService,
+function TenantAddCtrl($log,
+                       $location,
+                       TenantsService,
+                       DistributorsService,
+                       TimezonesService,
+                       $state,
+                       sweet,
+                       ProgressBarService,
                        SessionsService) {
   "ngInject";
 
@@ -71,6 +78,10 @@ function TenantAddCtrl($log, $location, TenantsService, DistributorsService, Tim
       return sweet.show('Oops...', 'Not everything needed for tenant was created in Content Manager or CDM.', 'error');
     }
   };
+
+  vm.cancel = () => {
+    $state.go("tenants")
+  }
 
   vm.autoGenerateTenantCode = function () {
     if (!vm.currentTenant.key) {

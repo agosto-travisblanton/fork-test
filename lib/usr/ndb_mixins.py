@@ -64,6 +64,19 @@ class KeyValidatorMixin(object):
         return obj
 
 
+
+    def get_or_except(self, urlsafe_key, kind_cls, use_app_engine_memcache=True):
+        obj = None
+        valid, key = self.valid_key(urlsafe_key, kind_cls)
+        if valid:
+            obj = key.get(use_memcache=use_app_engine_memcache)
+            if obj is None:
+                raise ValueError("Bad urlsafe_key {}".format(urlsafe_key))
+
+        return obj
+
+
+
 class PagingListHandlerMixin(object):
     @property
     def page_size(self):
