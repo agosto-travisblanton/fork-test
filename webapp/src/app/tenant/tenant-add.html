@@ -29,13 +29,12 @@
             <div class="form-group"
                  ng-class="{ 'has-error' : tenantForm.tenantCode.$invalid && !tenantForm.tenantCode.$pristine }">
               <div class="col-sm-4">
-                <label>Code</label>
+                <label>Tenant Code</label><br>
                 <input type="text"
                        class="form-control"
                        name="tenantCode"
-                       placeholder="Code in Google Device Management"
-                       ng-model="tenantAddCtrl.currentTenant.tenant_code" required
-                       ng-pattern="/^[a-z0-9_]*$/">
+                       ng-readonly="true"
+                       ng-model="tenantAddCtrl.currentTenant.tenant_code">
               </div>
               <div class="col-sm-5 margin-top-15">
                 <p
@@ -43,18 +42,6 @@
                   class="help-block">
                   Alphanumeric and underscore are allowed.
                 </p>
-              </div>
-            </div>
-            <div class="form-group"
-                 ng-class="{ 'has-error' : tenantForm.chromeDeviceDomain.$invalid && !tenantForm.chromeDeviceDomain.$pristine }">
-              <div class="col-sm-4">
-                <label>Domain</label>
-                <select id="chromeDeviceDomain"
-                        ng-model="tenantAddCtrl.selectedDomain"
-                        class="form-control"
-                        ng-options="i.name for i in tenantAddCtrl.distributorDomains track by i.key" required>
-                  <option value=''>Select domain</option>
-                </select>
               </div>
             </div>
             <div class="form-group"
@@ -75,6 +62,18 @@
                   class="help-block">
                   A valid admin email is required.
                 </p>
+              </div>
+            </div>
+            <div class="form-group"
+                 ng-class="{ 'has-error' : tenantForm.chromeDeviceDomain.$invalid && !tenantForm.chromeDeviceDomain.$pristine }">
+              <div class="col-sm-4">
+                <label>Domain</label>
+                <select id="chromeDeviceDomain"
+                        ng-model="tenantAddCtrl.selectedDomain"
+                        class="form-control"
+                        ng-options="i.name for i in tenantAddCtrl.distributorDomains track by i.key" required>
+                  <option value=''>Select domain</option>
+                </select>
               </div>
             </div>
             <div class="form-group"
