@@ -332,30 +332,16 @@
               <div class="col-sm-5">
                 <label>Panel location</label>
                 <select
+                   tooltips
+                   tooltip-class="tooltip-custom-large"
+                   tooltip-side="right"
+                   tooltip-template-url="webapp/src/app/tooltip/location-select.html"
                   id="customerLocationName"
                   class="form-control"
                   ng-model="deviceDetailsCtrl.currentDevice.location"
                   ng-options="i.customerLocationName for i in deviceDetailsCtrl.locations track by i.key"
                   ng-change="deviceDetailsCtrl.onUpdateLocation()">
                 </select>
-              </div>
-              <div class="col-sm-2">
-                <md-button class="md-fab  md-primary"
-                           aria-label="Customer Location Name"
-                           ng-hide="deviceDetailsCtrl.currentDevice.proofOfPlayLogging ||
-                                               deviceDetailsCtrl.currentDevice.locationKey != null">
-                  <md-tooltip>
-                    Locations may be added or edited in the Locations tab of the tenant view
-                    for the tenant {{deviceDetailsCtrl.currentDevice.tenantName}}.
-                  </md-tooltip>
-                  <md-icon>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                         width="24" height="24">
-                      <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1z"></path>
-                      <path d="M17 12V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"></path>
-                    </svg>
-                  </md-icon>
-                </md-button>
               </div>
             </div>
             <hr>
