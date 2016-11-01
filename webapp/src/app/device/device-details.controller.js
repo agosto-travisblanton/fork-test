@@ -23,6 +23,7 @@ function DeviceDetailsCtrl($log,
 
   const vm = this;
   vm.tenantKey = $stateParams.tenantKey;
+  vm.tenantUrl = `/#/tenants/${vm.tenantKey}/details`
   vm.deviceKey = $stateParams.deviceKey;
   vm.fromDevices = $stateParams.fromDevices === "true";
   vm.currentDevice = {};
