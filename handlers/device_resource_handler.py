@@ -538,6 +538,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
         else:
             request_json = json.loads(self.request.body)
             location_urlsafe_key = request_json.get('locationKey')
+            location = None
             if location_urlsafe_key:
                 try:
                     location = ndb.Key(urlsafe=location_urlsafe_key).get()
@@ -636,7 +637,15 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             gcm_update_on_changed_if_true = [
                 controls_mode,
                 overlay_status,
-                orientation_mode
+                orientation_mode,
+                location,
+                panel_input,
+                panel_model,
+                customer_display_code,
+                customer_display_name,
+                proof_of_play_logging,
+                timezone,
+
             ]
 
             changes_to_device = [e for e in gcm_update_on_changed_if_true if e != None]
