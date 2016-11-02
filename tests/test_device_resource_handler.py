@@ -224,6 +224,40 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(device.timezone_offset, TimezoneUtil.get_timezone_offset(explicit_timezone))
         self.assertEqual(device.timezone, explicit_timezone)
 
+    def test_post_managed_device_with_domain_and_tenant_in_payload_sets_tenant(self):
+        tenant = self.tenant_key.get()
+        mac_address = '12345678'
+        request_body = {'macAddress': mac_address,
+                        'gcmRegistrationId': 'foobar',
+                        'domain': 'dev.agosto.com',
+                        'tenantCode': tenant.tenant_code}
+        response = self.app.post('/api/v1/devices', json.dumps(request_body),
+                                 headers=self.api_token_authorization_header)
+        results = ChromeOsDevice.query(ChromeOsDevice.mac_address == mac_address,
+                                       ndb.AND(ChromeOsDevice.archived == False)).fetch()
+        self.assertIsNotNone(results[0].tenant_key)
+        self.assertEqual('201 Created', response.status)
+
+    def test_post_managed_device_with_domain_only_does_not_set_tenant(self):
+        mac_address = '012345678'
+        request_body = {'macAddress': mac_address,
+                        'gcmRegistrationId': 'foobar',
+                        'domain': 'dev.agosto.com'}
+        response = self.app.post('/api/v1/devices', json.dumps(request_body),
+                                 headers=self.api_token_authorization_header)
+        results = ChromeOsDevice.query(ChromeOsDevice.mac_address == mac_address,
+                                       ndb.AND(ChromeOsDevice.archived == False)).fetch()
+        self.assertIsNone(results[0].tenant_key)
+        self.assertEqual('201 Created', response.status)
+
+    def test_post_managed_device_without_tenant_code_or_domain_in_payload(self):
+        request_body = {'macAddress': self.MAC_ADDRESS,
+                        'gcmRegistrationId': 'foobar'}
+        with self.assertRaises(AppError) as context:
+            self.app.post('/api/v1/devices', json.dumps(request_body), headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 400 Did not detect a tenantCode or a domain in device registration payload.' in
+                        context.exception.message)
+
     ##################################################################################################################
     # post unmanaged device
     ##################################################################################################################
