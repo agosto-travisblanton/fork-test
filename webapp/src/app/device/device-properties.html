@@ -334,15 +334,10 @@
               <div class="col-sm-5">
                 <label>Panel location</label>
                 <select
-                   tooltips
-                   tooltip-class="tooltip-custom-large"
-                   tooltip-side="right"
-                   tooltip-template-url="webapp/src/app/tooltip/location-select.html"
-                  id="customerLocationName"
                   class="form-control"
                   ng-model="deviceDetailsCtrl.currentDevice.location"
                   ng-options="i.customerLocationName for i in deviceDetailsCtrl.locations track by i.key"
-                  ng-change="deviceDetailsCtrl.onUpdateLocation()">
+                  ng-change="deviceDetailsCtrl.onSaveDevice()">
                 </select>
               </div>
             </div>
