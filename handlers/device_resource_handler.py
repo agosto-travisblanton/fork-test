@@ -511,6 +511,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
         else:
             request_json = json.loads(self.request.body)
             location_urlsafe_key = request_json.get('locationKey')
+            location = None
             if location_urlsafe_key:
                 try:
                     location = ndb.Key(urlsafe=location_urlsafe_key).get()
