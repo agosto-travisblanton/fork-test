@@ -436,6 +436,15 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                         status = httplib.BAD_REQUEST
                         error_message = 'Cannot resolve tenant from tenant code. Bad tenant code or inactive tenant.'
                         self.response.set_status(status, error_message)
+                        bad_registration_request_event = IntegrationEventLog.create(
+                            event_category='Registration',
+                            component_name='Player',
+                            workflow_step='Player payload to create a managed device',
+                            mac_address=device_mac_address,
+                            gcm_registration_id=gcm_registration_id,
+                            correlation_identifier=correlation_id,
+                            details=error_message)
+                        bad_registration_request_event.put()
                         registration_request_event.details = error_message
                         registration_request_event.put()
                         self.response.set_status(status, error_message)
@@ -446,7 +455,25 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                         tenant_key = tenant.key
                     chrome_domain = None
                 else:
-                    chrome_domain = self.check_and_get_field('domain')
+                    chrome_domain = request_json.get('domain')
+                    if chrome_domain is None:
+                        status = httplib.BAD_REQUEST
+                        error_message = 'Did not detect a tenantCode or a domain in device registration payload.'
+                        self.response.set_status(status, error_message)
+                        registration_request_event.details = error_message
+                        registration_request_event.put()
+                        bad_registration_request_event = IntegrationEventLog.create(
+                            event_category='Registration',
+                            component_name='Player',
+                            workflow_step='Player payload to create a managed device',
+                            mac_address=device_mac_address,
+                            gcm_registration_id=gcm_registration_id,
+                            correlation_identifier=correlation_id,
+                            details=error_message)
+                        bad_registration_request_event.put()
+                        self.response.set_status(status, error_message)
+                        logging.error(error_message)
+                        return
                     has_tenant = False
                     tenant_key = None
 
