@@ -505,6 +505,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
         message = None
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
         if device.archived:
+
             status = httplib.NOT_FOUND
             message = 'Device with key: {0} archived.'.format(device_urlsafe_key)
             return self.response.set_status(status, message)
