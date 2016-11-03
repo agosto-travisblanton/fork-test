@@ -12,7 +12,7 @@
               novalidate>
           <md-input-container class="md-block">
             <label>Admin Email</label>
-            <input ng-model="vm.distributor.adminEmail" type="email" required>
+            <input ng-model="vm.distributor.adminEmail" pattern=".{1,}@[_a-z0-9A-Z]+(\.[a-z0-9A-Z]+)+" type="email" required>
           </md-input-container>
 
           <md-input-container class="md-block">
