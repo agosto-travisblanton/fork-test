@@ -99,6 +99,26 @@ class TestDeviceIssueLogModel(BaseTest):
         self.assertEqual(issue.level_descriptor, self.NORMAL_LEVEL_DESCRIPTION)
         self.assertTrue(issue.up)
 
+    def test_create_with_float_memory_input_converts_to_int(self):
+        memory = 31.920000000000002
+        issue = DeviceIssueLog.create(device_key=self.device_key,
+                                      category=config.DEVICE_ISSUE_PLAYER_UP,
+                                      up=True,
+                                      storage_utilization=self.STORAGE_UTILIZATION,
+                                      memory_utilization=memory,
+                                      program=self.PROGRAM)
+        self.assertEqual(issue.memory_utilization, int(memory))
+
+    def test_create_with_float_storage_input_converts_to_int(self):
+        storage = 89.910000000000001
+        issue = DeviceIssueLog.create(device_key=self.device_key,
+                                      category=config.DEVICE_ISSUE_PLAYER_UP,
+                                      up=True,
+                                      storage_utilization=storage,
+                                      memory_utilization=self.MEMORY_UTILIZATION,
+                                      program=self.PROGRAM)
+        self.assertEqual(issue.storage_utilization, int(storage))
+
     def test_class_version_is_only_set_by_pre_put_hook_method(self):
         issue = DeviceIssueLog.create(device_key=self.device_key,
                                       category=config.DEVICE_ISSUE_PLAYER_DOWN,
