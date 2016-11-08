@@ -12,7 +12,7 @@
               novalidate>
           <md-input-container class="md-block">
             <label>Email</label>
-            <input ng-model="vm.user.email" type="email" required>
+            <input ng-model="vm.user.email" pattern=".{1,}@[_a-z0-9A-Z]+(\.[a-z0-9A-Z]+)+" type="email" required>
           </md-input-container>
           <md-input-container>
             <md-checkbox ng-model="vm.user.cb1" aria-label="{{vm.paulsCurrentDistributorName}} Admin">
