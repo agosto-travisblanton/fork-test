@@ -672,7 +672,8 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
         message = None
         device = None
         try:
-            device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True)
+            device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=False,
+                                           use_app_engine_memcache=False)
         except Exception, e:
             logging.exception(e)
         if device is None:
