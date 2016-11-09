@@ -17,7 +17,7 @@ export default class DateManipulationService {
     let startTimeMidNight = moment(startTime, 'YYYY-MM-DD').format('YYYY-MM-DD hh:mm A')
     let startTimeEndOfDay = moment(startTimeMidNight, 'YYYY-MM-DD hh:mm A').add(1, 'day').subtract(60, 'seconds').format('YYYY-MM-DD hh:mm A')
 
-    let endTime = moment().subtract(30, 'days').format('YYYY-MM-DD')
+    let endTime = moment().subtract(daysBack, 'days').format('YYYY-MM-DD')
     let endTimeMidNight = moment(endTime, 'YYYY-MM-DD').format('YYYY-MM-DD hh:mm A')
 
     return [endTimeMidNight, startTimeEndOfDay]

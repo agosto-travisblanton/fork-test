@@ -60,16 +60,19 @@ Update Skykit device status. Emanates from the player.
     + Body
 
             {
-                "macAddress": "d0df9a904b99",
+                "storage":"30",
+                "memory":"89",
+                "macAddress":"d0df9a904b99",
 				"program":"program name",
 				"programId":"program identifier",
-                "playerVersion" : "v1",
-				"storage":25,
-				"memory":65,
-                "os": "",
-                "osVersion" : "",
 				"lastError":"error description",
-                "timezone" : "UTC-6"
+                "timezone":"America/Chicago",
+                "timezoneOffset":"5",
+                "playerVersion":"v1",
+                "os" : "blah",
+                "osVersion" : "1.5",
+                "playlist" : "ads",
+                "playlistId" : "52341"
 			}
 
 + Response 204 (application/json)
