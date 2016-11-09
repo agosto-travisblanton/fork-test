@@ -121,7 +121,7 @@ skip_files:
 - ^webapp/dist/.*$
 - ^webapp/src/specs/.*$
 - ^webapp/coverage/.*$
-- ^webapp/src/.js$
+- ^(.*/)?webapp/src/.js$
 - ^webapp/generator/.*$
 - ^.git/.*$
 - ^backup/.git/.*
