@@ -428,9 +428,9 @@
               </div>
 
               <div class="col-sm-3">
-                <label>Panel Orientation</label>
+                <label style="white-space: nowrap">Panel Orientation</label>
                 <select
-                  id="panelInput"
+                  id="panelOrientation"
                   class="form-control"
                   ng-required="deviceDetailsCtrl.currentDevice.orientationMode !== null"
                   ng-model="deviceDetailsCtrl.currentDevice.orientationMode"
@@ -440,9 +440,9 @@
               </div>
 
               <div class="col-sm-3" ng-if="deviceDetailsCtrl.currentDevice.panelSleep && (deviceDetailsCtrl.currentDevice.panelModel && deviceDetailsCtrl.currentDevice.panelModel.id !== 'None')">
-                <label>Sleep Controller Option</label>
+                <label style="white-space: nowrap">Sleep Controller Option</label>
                 <select
-                  id="panelInput"
+                  id="sleepControlInput"
                   class="form-control"
                   ng-required="deviceDetailsCtrl.currentDevice.sleepController !== null"
                   ng-model="deviceDetailsCtrl.currentDevice.sleepController"
