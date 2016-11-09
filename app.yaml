@@ -105,6 +105,12 @@ handlers:
   secure: always
 
 skip_files:
+- ^(.*/)?#.*#$
+- ^(.*/)?.*~$
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*/RCS/.*$
+- ^(.*/)?\..*$
+- ^(.*/)?\.bak$
 - ^coverage/.*$
 - ^coverage_html_report/.*$
 - ^scripts/.*
@@ -115,14 +121,15 @@ skip_files:
 - ^webapp/dist/.*$
 - ^webapp/src/specs/.*$
 - ^webapp/coverage/.*$
+- ^webapp/src/.js$
+- ^webapp/generator/.*$
 - ^.git/.*$
 - ^backup/.git/.*
-- ^.idea/.*
 - ^.venv2/.*
-- ^.*~
-- ^.*\.py[co]
-- ^.*\.po
-- ^.*\.pot
+- ^(.*/)?.*\.git/.*$
+- ^(.*/)?.*\.idea/.*$
+- ^(.*/)?.*\.po$
+- ^(.*/)?.*\.pot$
+- ^(.*/)?.*\.DS_Store.*$
 - ^.*\.egg-info
-- ^\.DS_Store.*
 - ^(.*/)?.*static/node_modules/.*
