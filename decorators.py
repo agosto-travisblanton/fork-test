@@ -1,9 +1,12 @@
+import httplib
 import logging
+
 from google.appengine.ext import ndb
+
 from app_config import config
-from restler.serializers import json_response
-from proofplay.database_calls import get_tenant_names_for_distributor
 from models import User
+from proofplay.database_calls import get_tenant_names_for_distributor
+from restler.serializers import json_response
 
 
 def identity_required(handler_method):
@@ -15,7 +18,7 @@ def identity_required(handler_method):
         except Exception, e:
             logging.exception(e)
             logging.error('API call is missing a user key in header.')
-            json_response(self.response, {'error': 'No user logged in'}, status_code=403)
+            json_response(self.response, {'error': 'No user logged in'}, status_code=httplib.FORBIDDEN)
             return
 
         handler_method(self, *args, **kwargs)
@@ -32,7 +35,7 @@ def distributor_required(handler_method):
         except Exception, e:
             logging.exception(e)
             logging.error('API call is missing a distributor key in header.')
-            json_response(self.response, {'error': 'No distributor'}, status_code=403)
+            json_response(self.response, {'error': 'No distributor'}, status_code=httplib.FORBIDDEN)
             return
 
         handler_method(self, *args, **kwargs)
@@ -66,16 +69,31 @@ def log_memory(function):
     return log
 
 
+def requires_cm_key(handler_method):
+    def authorize(self, *args, **kwargs):
+        api_token = self.request.headers.get('Authorization')
+        if _token_missing(api_token):
+            json_response(self.response, {'error': 'No API token supplied in the HTTP request.'}, status_code=403)
+            return
+        if api_token != config.API_TOKEN:
+            json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=403)
+            return
+        handler_method(self, *args, **kwargs)
+
+    return authorize
+
+
 def requires_api_token(handler_method):
     def authorize(self, *args, **kwargs):
         self.is_unmanaged_device = False
         api_token = self.request.headers.get('Authorization')
         self.is_unmanaged_device = api_token == config.UNMANAGED_API_TOKEN
         if _token_missing(api_token):
-            json_response(self.response, {'error': 'No API token supplied in the HTTP request.'}, status_code=403)
+            json_response(self.response, {'error': 'No API token supplied in the HTTP request.'},
+                          status_code=httplib.FORBIDDEN)
             return
         if _token_invalid(api_token=api_token, for_unmanaged_registration_token=False, for_registration_token=False):
-            json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=403)
+            json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=httplib.FORBIDDEN)
             return
         handler_method(self, *args, **kwargs)
 
@@ -92,7 +110,8 @@ def has_distributor_admin_user_key(handler_method):
                 kwargs["current_user"] = valid_user
                 return handler_method(self, *args, **kwargs)
 
-        json_response(self.response, {'error': 'You do not have the required permissions.'}, status_code=403)
+        json_response(self.response, {'error': 'You do not have the required permissions.'},
+                      status_code=httplib.FORBIDDEN)
 
     return authorize
 
@@ -106,7 +125,8 @@ def has_admin_user_key(handler_method):
             if valid_user.is_administrator:
                 return handler_method(self, *args, **kwargs)
 
-        json_response(self.response, {'error': 'You do not have the required permissions.'}, status_code=403)
+        json_response(self.response, {'error': 'You do not have the required permissions.'},
+                      status_code=httplib.FORBIDDEN)
 
     return authorize
 
@@ -118,7 +138,7 @@ def has_tenant_in_distributor_header(handler_method):
         tenant = kwargs['tenant']
         if tenant not in tenants:
             self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
+            self.abort(httplib.FORBIDDEN)
             return
 
         handler_method(self, *args, **kwargs)
@@ -133,7 +153,7 @@ def has_tenant_in_distributor_param(handler_method):
         tenant = kwargs['tenant']
         if tenant not in tenants:
             self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
+            self.abort(httplib.FORBIDDEN)
             return
 
         handler_method(self, *args, **kwargs)
@@ -146,7 +166,7 @@ def has_distributor_key(handler_method):
         distributor_key = self.request.headers.get('X-Provisioning-Distributor')
         if not distributor_key:
             self.response.write("YOU ARE NOT ALLOWED TO QUERY THIS CONTENT")
-            self.abort(403)
+            self.abort(httplib.FORBIDDEN)
             return
 
         handler_method(self, *args, **kwargs)
@@ -160,10 +180,12 @@ def requires_registration_token(handler_method):
         api_token = self.request.headers.get('Authorization')
         self.is_unmanaged_device = api_token == config.UNMANAGED_REGISTRATION_TOKEN
         if _token_missing(api_token):
-            json_response(self.response, {'error': 'No API token supplied in the HTTP request.'}, status_code=403)
+            json_response(self.response, {'error': 'No API token supplied in the HTTP request.'},
+                          status_code=httplib.FORBIDDEN)
             return
         if _token_invalid(api_token=api_token, for_unmanaged_registration_token=False, for_registration_token=True):
-            json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=403)
+            json_response(self.response, {'error': 'HTTP request API token is invalid.'},
+                          status_code=httplib.FORBIDDEN)
             return
         handler_method(self, *args, **kwargs)
 
@@ -175,10 +197,12 @@ def requires_unmanaged_registration_token(handler_method):
         self.is_unmanaged_device = True
         api_token = self.request.headers.get('Authorization')
         if _token_missing(api_token):
-            json_response(self.response, {'error': 'No API token supplied in the HTTP request.'}, status_code=403)
+            json_response(self.response, {'error': 'No API token supplied in the HTTP request.'},
+                          status_code=httplib.FORBIDDEN)
             return
         if _token_invalid(api_token=api_token, for_unmanaged_registration_token=True, for_registration_token=False):
-            json_response(self.response, {'error': 'HTTP request API token is invalid.'}, status_code=403)
+            json_response(self.response, {'error': 'HTTP request API token is invalid.'},
+                          status_code=httplib.FORBIDDEN)
             return
         handler_method(self, *args, **kwargs)
 

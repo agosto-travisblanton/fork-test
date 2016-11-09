@@ -22,7 +22,7 @@ def refresh_device(device_urlsafe_key=None):
     if None == device.device_id:
         logging.info('Did not refresh in refresh_device because no device_id available.')
         return
-    impersonation_admin_email_address = device.get_impersonation_email()
+    impersonation_admin_email_address = device.get_impersonation_email_by_domain_name()
     if None == impersonation_admin_email_address:
         logging.info('Impersonation email not found for device with device key {0}.'.format(device_urlsafe_key))
         return

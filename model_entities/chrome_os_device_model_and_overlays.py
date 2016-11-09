@@ -77,6 +77,7 @@ class ChromeOsDevice(ndb.Model):
     panel_sleep = ndb.BooleanProperty(default=False, required=True, indexed=True)
     overlays_available = ndb.BooleanProperty(default=False, required=True, indexed=True)
     controls_mode = ndb.StringProperty(required=False, indexed=True, default='invisible')
+    orientation_mode = ndb.StringProperty(required=False, indexed=True, default='landscape')
     class_version = ndb.IntegerProperty()
 
     def get_tenant(self):
@@ -304,9 +305,6 @@ class ChromeOsDevice(ndb.Model):
     def _pre_put_hook(self):
         self.class_version = 3
 
-    def get_impersonation_email(self):
-        return self.get_tenant().get_domain().impersonation_admin_email_address
-
 
 #####################################################
 # DEVICE ISSUE LOG
@@ -345,6 +343,16 @@ class DeviceIssueLog(ndb.Model):
                playlist_id=None,
                resolved=False,
                resolved_datetime=None):
+        if storage_utilization != 0:
+            try:
+                storage_utilization = int(storage_utilization)
+            except ValueError, e:
+                logging.debug('ValueError trying to convert storage_utilization to int: '.format(e.message))
+        if memory_utilization != 0:
+            try:
+                memory_utilization = int(memory_utilization)
+            except ValueError, e:
+                logging.debug('ValueError trying to convert memory_utilization to int: '.format(e.message))
         if category in [config.DEVICE_ISSUE_MEMORY_HIGH, config.DEVICE_ISSUE_STORAGE_LOW]:
             level = 1
             level_descriptor = 'Warning'
@@ -444,7 +452,6 @@ class DeviceIssueLog(ndb.Model):
     @staticmethod
     def _resolve_device_issue(device_key, category, resolved_datetime):
         issues = DeviceIssueLog.query(DeviceIssueLog.device_key == device_key,
-                                      ndb.AND(DeviceIssueLog.device_key == device_key),
                                       ndb.AND(DeviceIssueLog.category == category),
                                       ndb.AND(DeviceIssueLog.resolved == False),
                                       ndb.AND(DeviceIssueLog.resolved_datetime == None)).fetch()

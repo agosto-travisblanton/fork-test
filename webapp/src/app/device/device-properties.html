@@ -243,7 +243,9 @@
                                            deviceDetailsCtrl.currentDevice.tenantCode == ''">
           <label>Tenant code</label>
           <div>
+            <a href="{{deviceDetailsCtrl.tenantUrl}}">
             {{deviceDetailsCtrl.currentDevice.tenantCode}}
+              </a>
           </div>
         </div>
         <div class="form-group">
@@ -313,13 +315,14 @@
                 <label>Logging</label>
                 <div>
                   <input type="checkbox"
+                         id="proofOfPlayLogging"
                          tooltips
                          tooltip-class="tooltip-custom-large"
                          tooltip-side="left"
                          tooltip-template-url="webapp/src/app/tooltip/proof-of-play-toggle.html"
                          ng-model="deviceDetailsCtrl.currentDevice.proofOfPlayLogging"
                          ng-change="deviceDetailsCtrl.onProofOfPlayLoggingCheck()">
-                  <span>Enable</span>
+                  <label for="proofOfPlayLogging">Enable</label>
                 </div>
               </div>
             </div>
@@ -331,30 +334,11 @@
               <div class="col-sm-5">
                 <label>Panel location</label>
                 <select
-                  id="customerLocationName"
                   class="form-control"
                   ng-model="deviceDetailsCtrl.currentDevice.location"
                   ng-options="i.customerLocationName for i in deviceDetailsCtrl.locations track by i.key"
-                  ng-change="deviceDetailsCtrl.onUpdateLocation()">
+                  ng-change="deviceDetailsCtrl.onSaveDevice()">
                 </select>
-              </div>
-              <div class="col-sm-2">
-                <md-button class="md-fab  md-primary"
-                           aria-label="Customer Location Name"
-                           ng-hide="deviceDetailsCtrl.currentDevice.proofOfPlayLogging ||
-                                               deviceDetailsCtrl.currentDevice.locationKey != null">
-                  <md-tooltip>
-                    Locations may be added or edited in the Locations tab of the tenant view
-                    for the tenant {{deviceDetailsCtrl.currentDevice.tenantName}}.
-                  </md-tooltip>
-                  <md-icon>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                         width="24" height="24">
-                      <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1z"></path>
-                      <path d="M17 12V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"></path>
-                    </svg>
-                  </md-icon>
-                </md-button>
               </div>
             </div>
             <hr>
@@ -416,7 +400,7 @@
                   ng-options="c.id for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">
                 </select>
               </div>
-              <div class="col-sm-5"
+              <div class="col-sm-2"
                    tooltips
                    tooltip-class="tooltip-custom-large"
                    tooltip-side="top"
@@ -433,12 +417,6 @@
               </div>
 
 
-            </div>
-            <hr>
-          </section>
-          <section name="controlsMode">
-            <h3>Panel Controls Mode</h3>
-            <div class="form-group">
               <div class="col-sm-3">
                 <label>Controls Mode</label>
                 <select
@@ -448,6 +426,18 @@
                   ng-model="deviceDetailsCtrl.currentDevice.controlsMode"
                   ng-change="deviceDetailsCtrl.adjustControlsMode()"
                   ng-options="choice for choice in deviceDetailsCtrl.controlsModeOptions">
+                </select>
+              </div>
+
+              <div class="col-sm-3">
+                <label>Panel Orientation</label>
+                <select
+                  id="panelInput"
+                  class="form-control"
+                  ng-required="deviceDetailsCtrl.currentDevice.orientationMode !== null"
+                  ng-model="deviceDetailsCtrl.currentDevice.orientationMode"
+                  ng-change="deviceDetailsCtrl.onSaveDevice()"
+                  ng-options="choice for choice in deviceDetailsCtrl.orientationOptions">
                 </select>
               </div>
             </div>

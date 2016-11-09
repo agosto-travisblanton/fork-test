@@ -59,7 +59,7 @@ class TestRegisterDevice(BaseTest):
         self._build_cursor_list_mock(chrome_os_devices_api_class_mock)
         self._build_create_device_mock(content_manager_api_class_mock)
         register_device(self.device_key.urlsafe(),
-                        device_mac_address=self.mac_address,
+                        mac_address=self.mac_address,
                         gcm_registration_id=self.expected_gcm_registration_id,
                         correlation_id=self.expected_correlation_id)
         integration_event_logs = IntegrationEventLog.query(
@@ -73,7 +73,7 @@ class TestRegisterDevice(BaseTest):
                                                               content_manager_api_class_mock):
         with self.assertRaises(deferred.PermanentTaskFailure):
             register_device(None,
-                            device_mac_address=self.mac_address,
+                            mac_address=self.mac_address,
                             gcm_registration_id=self.expected_gcm_registration_id,
                             correlation_id=self.expected_correlation_id)
 
@@ -84,7 +84,7 @@ class TestRegisterDevice(BaseTest):
                                                               content_manager_api_class_mock):
         with self.assertRaises(deferred.PermanentTaskFailure):
             register_device(self.device_key.urlsafe(),
-                            device_mac_address=None,
+                            mac_address=None,
                             gcm_registration_id=self.expected_gcm_registration_id,
                             correlation_id=self.expected_correlation_id)
 
@@ -96,7 +96,7 @@ class TestRegisterDevice(BaseTest):
         chrome_os_devices_api_instance_mock = self._build_cursor_list_mock(chrome_os_devices_api_class_mock)
         self._build_create_device_mock(content_manager_api_class_mock)
         register_device(self.device_key.urlsafe(),
-                        device_mac_address=self.mac_address,
+                        mac_address=self.mac_address,
                         gcm_registration_id=self.expected_gcm_registration_id,
                         correlation_id=self.expected_correlation_id)
         chrome_os_devices_api_instance_mock.cursor_list.assert_called_with(next_page_token=None,
@@ -111,7 +111,7 @@ class TestRegisterDevice(BaseTest):
         self._build_cursor_list_mock(chrome_os_devices_api_class_mock, [matching_chrome_os_device_dict])
         self._build_create_device_mock(content_manager_api_class_mock)
         register_device(self.device_key.urlsafe(),
-                        device_mac_address=self.mac_address,
+                        mac_address=self.mac_address,
                         gcm_registration_id=self.expected_gcm_registration_id,
                         correlation_id=self.expected_correlation_id)
         actual = self.device_key.get()
@@ -144,7 +144,7 @@ class TestRegisterDevice(BaseTest):
         self._build_cursor_list_mock(chrome_os_devices_api_class_mock, [matching_chrome_os_device_dict])
         self._build_create_device_mock(content_manager_api_class_mock)
         register_device(self.device_key.urlsafe(),
-                        device_mac_address=self.mac_address,
+                        mac_address=self.mac_address,
                         gcm_registration_id=self.expected_gcm_registration_id,
                         correlation_id=self.expected_correlation_id)
         actual = self.device_key.get()
@@ -159,7 +159,7 @@ class TestRegisterDevice(BaseTest):
         self._build_cursor_list_mock(chrome_os_devices_api_class_mock, [matching_chrome_os_device_dict])
         self._build_create_device_mock(content_manager_api_class_mock)
         register_device(self.device_key.urlsafe(),
-                        device_mac_address=self.mac_address,
+                        mac_address=self.mac_address,
                         gcm_registration_id=self.expected_gcm_registration_id,
                         correlation_id=self.expected_correlation_id)
         actual = IntegrationEventLog.query(
@@ -178,7 +178,7 @@ class TestRegisterDevice(BaseTest):
         self._build_cursor_list_mock(chrome_os_devices_api_class_mock, [matching_chrome_os_device_dict])
         self._build_create_device_mock(content_manager_api_class_mock)
         register_device(self.device_key.urlsafe(),
-                        device_mac_address=self.mac_address,
+                        mac_address=self.mac_address,
                         gcm_registration_id=self.expected_gcm_registration_id,
                         correlation_id=self.expected_correlation_id)
         actual = IntegrationEventLog.query(
@@ -196,7 +196,7 @@ class TestRegisterDevice(BaseTest):
         self._build_cursor_list_mock(chrome_os_devices_api_class_mock)
         content_manager_api_instance_mock = self._build_create_device_mock(content_manager_api_class_mock)
         register_device(self.device_key.urlsafe(),
-                        device_mac_address=self.mac_address,
+                        mac_address=self.mac_address,
                         gcm_registration_id=self.expected_gcm_registration_id,
                         correlation_id=self.expected_correlation_id)
         content_manager_api_instance_mock.create_device.assert_called()
@@ -244,7 +244,7 @@ class TestRegisterDevice(BaseTest):
     def test_register_device_creates_integration_event_log_entities(self, chrome_os_devices_api_class_mock):
         self._build_cursor_list_mock(chrome_os_devices_api_class_mock)
         register_device(self.device_key.urlsafe(),
-                        device_mac_address=self.mac_address,
+                        mac_address=self.mac_address,
                         gcm_registration_id=self.expected_gcm_registration_id,
                         correlation_id=self.expected_correlation_id)
         integration_event_logs = IntegrationEventLog.query(
@@ -255,7 +255,7 @@ class TestRegisterDevice(BaseTest):
     def test_register_device_fails_device_key_urlsafe_is_none(self, chrome_os_devices_api_class_mock):
         with self.assertRaises(deferred.PermanentTaskFailure):
             register_device(None,
-                            device_mac_address=self.mac_address,
+                            mac_address=self.mac_address,
                             gcm_registration_id=self.expected_gcm_registration_id,
                             correlation_id=self.expected_correlation_id)
 
@@ -263,7 +263,7 @@ class TestRegisterDevice(BaseTest):
     def test_register_device_fails_device_mac_address_is_none(self, chrome_os_devices_api_class_mock):
         with self.assertRaises(deferred.PermanentTaskFailure):
             register_device(self.device_key.urlsafe(),
-                            device_mac_address=None,
+                            mac_address=None,
                             gcm_registration_id=self.expected_gcm_registration_id,
                             correlation_id=self.expected_correlation_id)
 
@@ -271,7 +271,7 @@ class TestRegisterDevice(BaseTest):
     def test_register_device_invokes_cursor_list(self, chrome_os_devices_api_class_mock):
         chrome_os_devices_api_instance_mock = self._build_cursor_list_mock(chrome_os_devices_api_class_mock)
         register_device(self.device_key.urlsafe(),
-                        device_mac_address=self.mac_address,
+                        mac_address=self.mac_address,
                         gcm_registration_id=self.expected_gcm_registration_id,
                         correlation_id=self.expected_correlation_id)
         chrome_os_devices_api_instance_mock.cursor_list.assert_called_with(next_page_token=None,
@@ -282,7 +282,7 @@ class TestRegisterDevice(BaseTest):
         matching_chrome_os_device_dict = self._build_chrome_os_device_resource_representation()
         self._build_cursor_list_mock(chrome_os_devices_api_class_mock, [matching_chrome_os_device_dict])
         register_device(self.device_key.urlsafe(),
-                        device_mac_address=self.mac_address,
+                        mac_address=self.mac_address,
                         gcm_registration_id=self.expected_gcm_registration_id,
                         correlation_id=self.expected_correlation_id)
         actual = self.device_key.get()
@@ -311,7 +311,7 @@ class TestRegisterDevice(BaseTest):
         matching_chrome_os_device_dict = self._build_chrome_os_device_resource_representation()
         self._build_cursor_list_mock(chrome_os_devices_api_class_mock, [matching_chrome_os_device_dict])
         register_device(self.device_key.urlsafe(),
-                        device_mac_address=self.mac_address,
+                        mac_address=self.mac_address,
                         gcm_registration_id=self.expected_gcm_registration_id,
                         correlation_id=self.expected_correlation_id)
         actual = self.device_key.get()
@@ -322,7 +322,7 @@ class TestRegisterDevice(BaseTest):
         matching_chrome_os_device_dict = self._build_chrome_os_device_resource_representation()
         self._build_cursor_list_mock(chrome_os_devices_api_class_mock, [matching_chrome_os_device_dict])
         register_device(self.device_key.urlsafe(),
-                        device_mac_address=self.mac_address,
+                        mac_address=self.mac_address,
                         gcm_registration_id=self.expected_gcm_registration_id,
                         correlation_id=self.expected_correlation_id)
         actual = IntegrationEventLog.query(
@@ -338,7 +338,7 @@ class TestRegisterDevice(BaseTest):
         matching_chrome_os_device_dict = self._build_chrome_os_device_resource_representation()
         self._build_cursor_list_mock(chrome_os_devices_api_class_mock, [matching_chrome_os_device_dict])
         register_device(self.device_key.urlsafe(),
-                        device_mac_address=self.mac_address,
+                        mac_address=self.mac_address,
                         gcm_registration_id=self.expected_gcm_registration_id,
                         correlation_id=self.expected_correlation_id)
         actual = IntegrationEventLog.query(

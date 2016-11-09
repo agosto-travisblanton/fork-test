@@ -70,10 +70,13 @@ ChangesetInfo = namedtuple('ChangesetInfo', ['branch', 'hash', 'dirty'])
 
 def filtered_module_array(excludes, all_modules):
     filtered_array = []
-    for yaml_filename in all_modules:
-        if not yaml_filename[:-5] in excludes:
-            filtered_array.append(yaml_filename)
-    return filtered_array
+    if excludes:
+        for yaml_filename in all_modules:
+            if not yaml_filename[:-5] in excludes:
+                filtered_array.append(yaml_filename)
+        return filtered_array
+    else:
+        return all_modules
 
 
 def git_get_current_changeset_info():

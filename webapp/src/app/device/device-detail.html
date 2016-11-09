@@ -28,16 +28,28 @@
                 {{deviceDetailsCtrl.currentDevice.serialNumber}}
               </h5>
             </div>
+            <div ng-show="deviceDetailsCtrl.currentDevice.tenantCode">
+              <h5>
+                <i class="fa fa-building-o"></i> Tenant Code:
+                {{deviceDetailsCtrl.currentDevice.tenantCode}}
+              </h5>
+            </div>
           </div>
 
-          <div class="col-sm-2 col-sm-offset-4">
+          <div class="col-sm-2 col-sm-offset-3" style="margin-right: -25px;">
+            <a href="{{deviceDetailsCtrl.tenantUrl}}" class="md-primary md-button md-ink-ripple">
+             <i class="fa fa-fw fa-building-o"></i> Go to Tenant</a>
+          </div>
+
+          <div class="col-sm-2">
             <md-button ngclipboard data-clipboard-target="#hidden-device-key"
                        ng-click="deviceDetailsCtrl.copyDeviceKey()" class="md-raised">
               <i class="fa fa-fw fa-clipboard"></i> Copy Device key
             </md-button>
             <a href="{{deviceDetailsCtrl.backUrl}}" class="md-primary md-button md-ink-ripple">
-              <i class="fa fa-fw fa-backward"></i>Back</a>
-          </div>
+              <i class="fa fa-fw fa-backward"></i> Back</a>
+            </div>
+
         </md-card-content>
       </md-card>
       <md-tabs md-dynamic-height md-border-bottom>
