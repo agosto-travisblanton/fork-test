@@ -244,8 +244,8 @@
           <label>Tenant code</label>
           <div>
             <a href="{{deviceDetailsCtrl.tenantUrl}}">
-            {{deviceDetailsCtrl.currentDevice.tenantCode}}
-              </a>
+              {{deviceDetailsCtrl.currentDevice.tenantCode}}
+            </a>
           </div>
         </div>
         <div class="form-group">
@@ -387,6 +387,7 @@
                   id="panelModel"
                   class="form-control"
                   ng-model="deviceDetailsCtrl.currentDevice.panelModel"
+                  ng-change="deviceDetailsCtrl.onSaveDevice()"
                   ng-options="p.displayName for p in deviceDetailsCtrl.panelModels track by p.id">
                 </select>
               </div>
@@ -404,11 +405,8 @@
                    tooltips
                    tooltip-class="tooltip-custom-large"
                    tooltip-side="top"
-                   tooltip-template-url="webapp/src/app/tooltip/panel-sleep-toggle.html"
-              >
-                <label
-                >Panel sleep</label>
-
+                   tooltip-template-url="webapp/src/app/tooltip/panel-sleep-toggle.html">
+                <label>Panel sleep</label>
                 <md-switch class="md-switch device-properties-switch"
                            ng-model="deviceDetailsCtrl.currentDevice.panelSleep"
                            ng-change="deviceDetailsCtrl.onPanelSleep(deviceDetailsCtrl.currentDevice.panelSleep)"
@@ -430,14 +428,26 @@
               </div>
 
               <div class="col-sm-3">
-                <label>Panel Orientation</label>
+                <label style="white-space: nowrap">Panel Orientation</label>
                 <select
-                  id="panelInput"
+                  id="panelOrientation"
                   class="form-control"
                   ng-required="deviceDetailsCtrl.currentDevice.orientationMode !== null"
                   ng-model="deviceDetailsCtrl.currentDevice.orientationMode"
                   ng-change="deviceDetailsCtrl.onSaveDevice()"
                   ng-options="choice for choice in deviceDetailsCtrl.orientationOptions">
+                </select>
+              </div>
+
+              <div class="col-sm-3" ng-if="deviceDetailsCtrl.currentDevice.panelSleep && (deviceDetailsCtrl.currentDevice.panelModel && deviceDetailsCtrl.currentDevice.panelModel.id !== 'None')">
+                <label style="white-space: nowrap">Sleep Controller Option</label>
+                <select
+                  id="sleepControlInput"
+                  class="form-control"
+                  ng-required="deviceDetailsCtrl.currentDevice.sleepController !== null"
+                  ng-model="deviceDetailsCtrl.currentDevice.sleepController"
+                  ng-change="deviceDetailsCtrl.onSaveDevice()"
+                  ng-options="choice for choice in deviceDetailsCtrl.sleepControllerOptions">
                 </select>
               </div>
             </div>

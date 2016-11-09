@@ -630,6 +630,10 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             if orientation_mode != None:
                 if orientation_mode.lower() in ["landscape", "portrait"]:
                     device.orientation_mode = orientation_mode.lower()
+            sleep_controller = request_json.get('sleepController')
+            if sleep_controller != None:
+                if sleep_controller.lower() in ["chrome-default", "rs232"]:
+                    device.sleep_controller = sleep_controller.lower()
 
             device.put()
 
@@ -645,7 +649,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                 customer_display_name,
                 proof_of_play_logging,
                 timezone,
-
+                sleep_controller
             ]
 
             changes_to_device = [e for e in gcm_update_on_changed_if_true if e != None]

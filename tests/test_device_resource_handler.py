@@ -343,7 +343,8 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertEqual(response_json['gcmRegistrationId'], new_gcm_registration_id)
         self.assertEqual(response_json['macAddress'], new_mac_address)
 
-     #################################################################################################################
+        #################################################################################################################
+
     # get_device_by_parameter - pairing code lookup
     #################################################################################################################
 
@@ -508,7 +509,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             device_id=self.DEVICE_ID,
             mac_address=mac_address)
         device.put()
-        request_parameters = {'macAddress': mac_address, 'gcmRegistrationId':gcm_registration_id}
+        request_parameters = {'macAddress': mac_address, 'gcmRegistrationId': gcm_registration_id}
         uri = build_uri('devices-retrieval')
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
@@ -524,7 +525,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         rogue_key = rogue.put()
         self.assertTrue(ChromeOsDevice.get_unmanaged_device_by_mac_address(mac_address))
         self.assertFalse(rogue.archived)
-        request_parameters = {'macAddress': mac_address, 'gcmRegistrationId':gcm_registration_id_2}
+        request_parameters = {'macAddress': mac_address, 'gcmRegistrationId': gcm_registration_id_2}
         uri = build_uri('devices-retrieval')
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
@@ -543,7 +544,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         self.assertIsNotNone(unmanaged_device.tenant_key)
         self.assertIsNotNone(unmanaged_device)
         self.assertFalse(unmanaged_device.archived)
-        request_parameters = {'macAddress': mac_address, 'gcmRegistrationId':gcm_registration_id_2}
+        request_parameters = {'macAddress': mac_address, 'gcmRegistrationId': gcm_registration_id_2}
         uri = build_uri('devices-retrieval')
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         device = unmanaged_device_key.get()
@@ -839,6 +840,21 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
     ##################################################################################################################
     # put
     ##################################################################################################################
+    def test_put_updates_sleep_controller(self):
+        when(device_message_processor).change_intent(self.chrome_os_device.gcm_registration_id,
+                                                     config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
+                                                     any_matcher(str),
+                                                     any_matcher(str)).thenReturn(None)
+        sleep_controller = 'rs232'
+        request_body = {
+            'sleepController': sleep_controller,
+        }
+        response = self.app.put('/api/v1/devices/{0}'.format(self.chrome_os_device.key.urlsafe()),
+                                json.dumps(request_body),
+                                headers=self.api_token_authorization_header)
+        self.assertEqual(204, response.status_int)
+        self.assertEqual(self.chrome_os_device_key.get().sleep_controller, sleep_controller)
+
     ##################################################################################################################
     # panel_sleep
     ##################################################################################################################
@@ -896,7 +912,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             if e.__class__.__name__ == 'ProtocolBufferDecodeError':
                 self.assertTrue(message in Exception.message)
 
-
     ##################################################################################################################
     # controls_mode
     ##################################################################################################################
@@ -952,7 +967,6 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         except Exception, e:
             if e.__class__.__name__ == 'ProtocolBufferDecodeError':
                 self.assertTrue(message in Exception.message)
-
 
     def test_put_no_authorization_header_returns_forbidden(self):
         request_body = {'gcmRegistrationId': self.GCM_REGISTRATION_ID,
