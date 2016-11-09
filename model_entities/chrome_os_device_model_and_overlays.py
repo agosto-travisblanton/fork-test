@@ -344,6 +344,16 @@ class DeviceIssueLog(ndb.Model):
                playlist_id=None,
                resolved=False,
                resolved_datetime=None):
+        if storage_utilization != 0:
+            try:
+                storage_utilization = int(storage_utilization)
+            except ValueError, e:
+                logging.debug('ValueError trying to convert storage_utilization to int: '.format(e.message))
+        if memory_utilization != 0:
+            try:
+                memory_utilization = int(memory_utilization)
+            except ValueError, e:
+                logging.debug('ValueError trying to convert memory_utilization to int: '.format(e.message))
         if category in [config.DEVICE_ISSUE_MEMORY_HIGH, config.DEVICE_ISSUE_STORAGE_LOW]:
             level = 1
             level_descriptor = 'Warning'
