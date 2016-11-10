@@ -5,6 +5,7 @@ from google.appengine.ext.deferred import deferred
 
 from app_config import config
 from integrations.directory_api.chrome_os_devices_api import (ChromeOsDevicesApi)
+from model_entities.chrome_os_device_model_and_overlays import Tenant
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -26,6 +27,15 @@ def refresh_device(device_urlsafe_key=None):
     if None == impersonation_admin_email_address:
         logging.info('Impersonation email not found for device with device key {0}.'.format(device_urlsafe_key))
         return
+    if device.tenant_key is None:
+        logging.info('Did not refresh in refresh_device because no tenant_key available.')
+        return
+    else:
+        impersonation_admin_email_address = \
+            Tenant.get_impersonation_email(urlsafe_tenant_key=device.tenant_key.urlsafe())
+        if None == impersonation_admin_email_address:
+            logging.info('Impersonation email not found for device with device key {0}.'.format(device_urlsafe_key))
+            return
     chrome_os_device = None
     chrome_os_devices_api = ChromeOsDevicesApi(impersonation_admin_email_address)
     try:
