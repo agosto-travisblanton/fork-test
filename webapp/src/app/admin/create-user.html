@@ -58,7 +58,7 @@
       <md-card-content>
         <md-list ng-if="!vm.loadingUsersOfDistributor">
           <md-list-item ng-repeat="item in vm.usersOfDistributor | orderBy:'item' track by $index">
-            <p>{{$index + 1}}. {{ item.email }}</p>
+            <p class="user-email-ellipsis">{{$index + 1}}. {{ item.email }}</p>
 
           </md-list-item>
         </md-list>
