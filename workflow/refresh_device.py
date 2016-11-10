@@ -23,7 +23,15 @@ def refresh_device(device_urlsafe_key=None):
     if None == device.device_id:
         logging.info('Did not refresh in refresh_device because no device_id available.')
         return
-    impersonation_admin_email_address = device.get_impersonation_email_by_domain_name()
+    if device.tenant_key is None:
+        logging.info('Did not refresh in refresh_device because no tenant_key available.')
+        return
+    else:
+        impersonation_admin_email_address = \
+            Tenant.get_impersonation_email(urlsafe_tenant_key=device.tenant_key.urlsafe())
+        if None == impersonation_admin_email_address:
+            logging.info('Impersonation email not found for device with device key {0}.'.format(device_urlsafe_key))
+            return
     if None == impersonation_admin_email_address:
         logging.info('Impersonation email not found for device with device key {0}.'.format(device_urlsafe_key))
         return
