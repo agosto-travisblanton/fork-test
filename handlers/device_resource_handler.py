@@ -628,7 +628,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                 device.controls_mode = controls_mode
             orientation_mode = request_json.get('orientationMode')
             if orientation_mode != None:
-                if orientation_mode.lower() in ["landscape", "portrait"]:
+                if orientation_mode.lower() in ["0", "90", "180", "270"]:
                     device.orientation_mode = orientation_mode.lower()
 
             device.put()

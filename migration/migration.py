@@ -14,6 +14,7 @@ from utils.web_util import build_uri
 from webapp2 import RequestHandler
 import logging
 import traceback
+from set_device_orientation_to_zero import SetAllOrientationToZero
 from set_panel_orientation_to_landscape import SetPanelOrientationToLandscape
 from hydrate_tenant_key_on_devices import HydrateTenantKeyOnDevices
 from refresh_chrome_device_properties_from_directory_api import RefreshChromeDevicePropertiesFromDirectoryApi
@@ -40,6 +41,7 @@ MIGRATIONS = [
     SetOverlayStatusToFalse(),
     SetControlsModeToInvisible(),
     HydrateOrganizationUnitIdToNone(),
+    SetAllOrientationToZero(),
     SetPanelOrientationToLandscape(),
     SetDefaultOrganizationUnitPathOnDomains()
 ]

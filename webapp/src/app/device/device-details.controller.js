@@ -37,7 +37,7 @@ function DeviceDetailsCtrl($log,
   vm.enrollmentEvents = [];
   vm.logoChange = false;
   vm.controlsModeOptions = ["visible", "invisible", "disabled"]
-  vm.orientationOptions = ["landscape", "portrait"]
+  vm.orientationOptions = ["0", "90", "180", "270"]
   vm.overlayChanged = false;
 
 
@@ -402,10 +402,10 @@ function DeviceDetailsCtrl($log,
     if (vm.currentDevice.location !== undefined && vm.currentDevice.location.key !== undefined) {
       vm.currentDevice.locationKey = vm.currentDevice.location.key;
     }
-    if (vm.currentDevice.panelModel.id !== undefined && vm.currentDevice.panelModel.id !== 'None') {
+    if ((vm.currentDevice.panelModel) && (vm.currentDevice.panelModel.id !== undefined && vm.currentDevice.panelModel.id !== 'None')) {
       vm.currentDevice.panelModelNumber = vm.currentDevice.panelModel.id;
     }
-    if (vm.currentDevice.panelInput.id !== undefined && vm.currentDevice.panelInput.id !== 'None') {
+    if ((vm.currentDevice.panelInput) && (vm.currentDevice.panelInput.id !== undefined && vm.currentDevice.panelInput.id !== 'None')) {
       vm.currentDevice.panelSerialInput = vm.currentDevice.panelInput.id.toLowerCase();
     }
     vm.currentDevice.timezone = vm.selectedTimezone;
