@@ -30,14 +30,15 @@ describe('DateManipulationService', function () {
 
   })
 
-  //describe('.createFormattedStartAndEndDateFromToday', function () {
-  //  it('returns two dates originating from today', function () {
-  //    let bothDates = DateManipulationService.createFormattedStartAndEndDateFromToday(30)
-  //    let duration = moment.duration(moment(bothDates[0], 'YYYY-MM-DD hh:mm A').diff(moment(bothDates[1], 'YYYY-MM-DD hh:mm A')));
-  //    let days = duration.asDays();
-  //    expect(days).toBe(-30.999305555555555)
-  //  })
-  //})
+  describe('.createFormattedStartAndEndDateFromToday', function () {
+   it('returns two dates originating from today', function () {
+     let bothDates = DateManipulationService.createFormattedStartAndEndDateFromToday(30)
+     let duration = moment.duration(moment(bothDates[0], 'YYYY-MM-DD hh:mm A').diff(moment(bothDates[1], 'YYYY-MM-DD hh:mm A')));
+     let days = duration.asDays();
+     expect(days)
+     expect(Math.round(days)).toBe(-31)
+   })
+  })
 
   describe('.generateLocalFromUTC', function () {
     it('returns a local time from a UTC', function () {
