@@ -129,6 +129,8 @@ app.service('RequestInterceptor', function (StorageService, $location) {
       config.headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        'Authenticated': StorageService.get('Authenticated'),
+        'oAuth': StorageService.get('oAuth'),
         'Authorization': $location.host().indexOf('provisioning-gamestop') > -1 ? gs : prod,
         'X-Provisioning-User': StorageService.get('userKey'),
         'X-Provisioning-User-Identifier': StorageService.get('userEmail'),

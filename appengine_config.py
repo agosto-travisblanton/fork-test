@@ -27,10 +27,9 @@ basedir = path.abspath(path.dirname(__file__))
 ##############################################################################
 # APPLICATION SETTINGS
 ##############################################################################
-# SECRET_KEY used for signing JWTs
-app_SECRET_KEY = '4jlklk3jlkdsmn,mnlaks400295925jo5434lk534lk345lkm354m,vc.m,vlxlkjo0afjdkslsfadkdd40gkgs'
-
 app_APP_ROOT = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+# SECRET_KEY used for signing JWTs
+app_JWT_SECRET_KEY = '4jlklk3jlkdsmn,mnlaks400295925jo5434lk534lk345lkm354m,vc.m,vlxlkjo0afjdkslsfadkdd40gkgs'
 
 
 def _APP_NAME():

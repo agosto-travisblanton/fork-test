@@ -12,25 +12,50 @@ from agar.sessions import SessionRequestHandler
 TWO_WEEKS = 1209600
 
 
+def requires_auth(f):
+    @wraps(f)
+    def decorated(self, *args, **kwargs):
+        token = self.request.headers.get('Authenticated')
+        if token:
+            string_token = token.encode('ascii', 'ignore')
+            user = verify_our_token(string_token)
+            if user:
+                user_entity = User.get_by_email(user["email"])
+                if not user_entity:
+                    user_entity = User.insert_user(user["name"], user["email"])
+                self.user_entity = user_entity
+                return f(self, *args, **kwargs)
+
+        return json_response(self.response, {
+            "message": "Authentication is required to access this resource"
+        })
+
+    return decorated
+
+
 class JWTHandler(SessionRequestHandler, KeyValidatorMixin):
     def get(self):
-        token = self.request.headers.get('Authorization', None)
+        token = self.request.headers.get('oAuth')
+        print self.request
+        print "here"
+        print token
         if token:
             string_token = token.encode('ascii', 'ignore')
             valid_token = verify_google_token(string_token)
+            print valid_token
             if valid_token:
-                user_entity = User.get_by_email(valid_token["email"])
+                user_entity = User.get_or_insert_by_email(valid_token["email"])
                 if not user_entity:
-                    user_entity = User.insert_user(valid_token["name"], valid_token["email"])
-                our_token = generate_token((user_entity))
+                    user_entity = User.get_or_insert_by_email(valid_token["email"])
+                our_token = generate_token(user_entity)
 
                 return json_response(self.response, {"token": our_token})
 
-        return json_response(self.response, {"message": "Authentication is required to access this resource"}, 403)
+        return json_response(self.response, {"message": "Authentication is required to access this resource"})
 
     @requires_auth
     def get_is_our_token_valid(self):
-        return json_response(self.response, {"valid": True})
+        return json_response(self.response, {"valid": True, "user": self.user_entity})
 
 
 def verify_google_token(token):
@@ -52,7 +77,7 @@ def verify_google_token(token):
 
 def verify_our_token(token):
     # app.config is defined in root config.py
-    s = Serializer(config.SECRET_KEY)
+    s = Serializer(config.JWT_SECRET_KEY)
     try:
         data = s.loads(token)
     except (BadSignature, SignatureExpired) as e:
@@ -70,11 +95,10 @@ def generate_token(user, expiration=TWO_WEEKS):
     distributor_names = [distributor.name for distributor in user.distributors]
     distributors_as_admin = [each_distributor.name for each_distributor in user.distributors_as_admin]
 
-    s = Serializer(config.SECRET_KEY, expires_in=expiration)
+    s = Serializer(config.JWT_SECRET_KEY, expires_in=expiration)
     token = s.dumps({
         'key': user.key.urlsafe(),
         'email': user.email,
-        'name': user.name,
         'is_admin': user.is_administrator,
         'is_logged_in': True,
         'distributors': [distributor.name for distributor in
@@ -85,23 +109,3 @@ def generate_token(user, expiration=TWO_WEEKS):
 
     }).decode('utf-8')
     return token
-
-
-def requires_auth(f):
-    @wraps(f)
-    def decorated(self, *args, **kwargs):
-        token = self.request.headers.get('Authorization', None)
-        if token:
-            string_token = token.encode('ascii', 'ignore')
-            user = verify_our_token(string_token)
-            if user:
-                user_entity = User.get_by_email(user["email"])
-                if not user_entity:
-                    User.insert_user(user["name"], user["email"])
-                return f(*args, **kwargs)
-
-        return json_response(self.response, {
-            "message": "Authentication is required to access this resource"
-        }, 403)
-
-    return decorated
