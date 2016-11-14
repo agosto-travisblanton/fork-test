@@ -11,7 +11,7 @@ from agar.sessions import SessionRequestHandler
 
 TWO_WEEKS = 1209600
 
-
+import os
 def requires_auth(f):
     @wraps(f)
     def decorated(self, *args, **kwargs):
@@ -27,7 +27,11 @@ def requires_auth(f):
                 return f(self, *args, **kwargs)
 
         return json_response(self.response, {
-            "message": "Authentication is required to access this resource"
+            "message": "Authentication is required to access this resource",
+            "OAUTH_CLIENT_ID": config.OAUTH_CLIENT_ID,
+            'BROWSER_API_KEY': config.PUBLIC_API_SERVER_KEY,
+            'version': os.environ['CURRENT_VERSION_ID'],
+
         })
 
     return decorated
