@@ -1,7 +1,6 @@
 import httplib
 import json
 import logging
-import time
 
 from datetime import datetime
 from google.appengine.ext import ndb
@@ -118,7 +117,6 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
     ############################################################################################
     @requires_api_token
     def get_devices_by_distributor(self, distributor_urlsafe_key):
-        start_time = time.time()
         next_cursor = self.request.get("next_cursor")
         prev_cursor = self.request.get("prev_cursor")
         cur_next_cursor = next_cursor if next_cursor != "null" else None
@@ -140,8 +138,6 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
         next_cursor = distributor_devices["next_cursor"]
         devices = distributor_devices["objects"]
 
-        elapsed_time = time.time() - start_time
-        print 'ET: ' + str(elapsed_time)
 
         json_response(
             self.response,
