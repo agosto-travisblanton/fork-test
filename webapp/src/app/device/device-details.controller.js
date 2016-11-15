@@ -260,7 +260,6 @@ function DeviceDetailsCtrl($log,
     let issuesPromise = DevicesService.getIssuesByKey(device, epochStart, epochEnd, prev, next);
     return issuesPromise.then(function (data) {
       vm.replaceIssueTime(data.issues);
-      console.log("DATA", data)
       vm.issues = data.issues;
       vm.prev_cursor = data.prev;
       vm.next_cursor = data.next;
@@ -270,7 +269,6 @@ function DeviceDetailsCtrl($log,
 
   // command history tab
   vm.getEvents = function (deviceKey, prev, next) {
-    console.log(deviceKey)
     ProgressBarService.start();
     let commandEventsPromise = DevicesService.getCommandEventsByKey(deviceKey, prev, next);
     return commandEventsPromise.then(function (data) {

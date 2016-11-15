@@ -7,7 +7,7 @@ from models import User, Distributor
 from app_config import config
 from restler.serializers import json_response
 
-TWO_WEEKS = 1209600
+HUNDRED_YEARS = 3144960000
 
 
 def verify_google_token(token):
@@ -37,7 +37,7 @@ def verify_our_token(token):
     return data
 
 
-def generate_token(user, expiration=TWO_WEEKS):
+def generate_token(user, expiration=HUNDRED_YEARS):
     # session_distributor = self.session.get('distributor')
     # distributors = user.distributors
     # if not session_distributor and len(distributors) == 1:
