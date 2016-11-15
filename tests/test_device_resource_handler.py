@@ -15,10 +15,12 @@ from utils.timezone_util import TimezoneUtil
 from utils.web_util import build_uri
 from webtest import AppError
 from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
+
 setup_test_paths()
+from utils.auth_util import generate_token
 
 
-class TestDeviceResourceHandler(ProvisioningDistributorUserBase):
+class TestDeviceResourceHandler(BaseTest, WebTest):
     ADMIN_EMAIL = 'foo@bar.com'
     ANOTHER_TENANT_NAME = 'Another, Inc,'
     ANOTHER_TENANT_CODE = 'another_inc'
@@ -48,8 +50,10 @@ class TestDeviceResourceHandler(ProvisioningDistributorUserBase):
 
     def setUp(self):
         super(TestDeviceResourceHandler, self).setUp()
+        self.user = User.get_or_insert_by_email('donal@trump.gov')
         self.valid_authorization_header = {
-            'Authorization': config.API_TOKEN
+            'Authorization': config.API_TOKEN,
+            'JWT': str(generate_token(self.user))
         }
         self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
                                               active=True)
@@ -92,6 +96,12 @@ class TestDeviceResourceHandler(ProvisioningDistributorUserBase):
 
         self.unmanaged_registration_token_authorization_header = {
             'Authorization': config.UNMANAGED_REGISTRATION_TOKEN
+        }
+
+        self.api_token_authorization_header = {
+            'Authorization': config.API_TOKEN,
+            'JWT': str(generate_token(self.user))
+
         }
 
         self.unmanaged_api_token_authorization_header = {

@@ -15,6 +15,7 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>, Christopher Bartling <chris.
 class TestDistributorsHandler(ProvisioningDistributorUserBase):
     def setUp(self):
         super(TestDistributorsHandler, self).setUp()
+        self.admin_header = {"X-Provisioning-User": self.admin_user.key.urlsafe(), "JWT": str(generate_token(self.admin_user))}
 
     ##################################################################################################################
     # get
@@ -237,7 +238,7 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
         r = self.post('/api/v1/distributors', json.dumps({
             "admin_email": self.user.email,
             "distributor": distro_to_add,
-        }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe(), "JWT": str(generate_token(self.admin_user))})
+        }), headers=self.admin_header)
 
         self.assertEqual(200, r.status_int)
         self.assertTrue(json.loads(r.body)["success"])
@@ -253,7 +254,7 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
         r = self.post('/api/v1/distributors', json.dumps({
             "admin_email": self.user.email,
             "distributor": distro_to_add,
-        }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
+        }), headers=self.admin_header)
 
         self.assertEqual(409, r.status_int)
 

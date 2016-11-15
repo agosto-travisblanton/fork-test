@@ -7,6 +7,7 @@ from models import User, Distributor
 from app_config import config
 from restler.serializers import json_response
 import httplib
+
 HUNDRED_YEARS = 3144960000
 
 
@@ -74,10 +75,16 @@ def requires_auth(f):
         api_token = self.request.headers.get('Authorization')
         self.is_unmanaged_device = api_token == config.UNMANAGED_API_TOKEN
 
+
         ################################################
         # DO THE ACTUAL TOKEN VALIDATION
         ################################################
         token = self.request.headers.get('JWT')
+
+        if self.is_unmanaged_device and not token:
+            # ONLY ALLOW CERTAIN ROUTES HERE
+            return f(self, *args, **kwargs)
+
         if token and token != '':
             string_token = token.encode('ascii', 'ignore')
             user = verify_our_token(string_token)
