@@ -15,7 +15,8 @@ from integrations.content_manager.content_manager_api import ContentManagerApi
 from model_entities.integration_events_log_model import IntegrationEventLog
 from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup, DeviceIssueLog
 from restler.serializers import json_response
-from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY, DEVICE_ISSUE_LOG_STRATEGY
+from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY, DEVICE_ISSUE_LOG_STRATEGY, \
+    CHROME_OS_DEVICES_LIST_VIEW_STRATEGY
 from utils.email_notify import EmailNotify
 from utils.timezone_util import TimezoneUtil
 from workflow.refresh_device import refresh_device
@@ -146,7 +147,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                 "prev_cursor": prev_cursor,
 
             },
-            strategy=CHROME_OS_DEVICE_STRATEGY
+            strategy=CHROME_OS_DEVICES_LIST_VIEW_STRATEGY
         )
 
     @requires_auth
