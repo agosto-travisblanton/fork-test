@@ -78,7 +78,7 @@ def requires_auth(f):
         # DO THE ACTUAL TOKEN VALIDATION
         ################################################
         token = self.request.headers.get('JWT')
-        if token:
+        if token and token != '':
             string_token = token.encode('ascii', 'ignore')
             user = verify_our_token(string_token)
             if user:
