@@ -53,26 +53,11 @@ application = WSGIApplication(
 
         Route(r'/api/v1/identity',
               handler='handlers.identity_handler.IdentityHandler',
-              name='identity'
+              name='identity',
               ),
-        Route(r'/api/v1/is_token_valid',
+        Route(r'/api/v1/login',
               handler='handlers.jwt_handler.JWTHandler',
-              name='jwt',
-              ),
-        Route(r'/api/v1/is_our_token_valid',
-              handler='handlers.jwt_handler.JWTHandler',
-              handler_method='get_is_our_token_valid',
-              name='get_is_our_token_valid'
-              ),
-
-        Route(r'/login',
-              handler='handlers.login_handler.LoginHandler',
-              name='login',
-              ),
-
-        Route(r'/logout',
-              handler='handlers.logout_handler.LogoutHandler',
-              name='logout',
+              name='token-exchange',
               ),
 
         ############################################################

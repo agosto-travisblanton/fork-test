@@ -74,7 +74,7 @@ export default class SessionsService {
     // request interceptor checks this
     this.StorageService.set('oAuth', credentials.id_token)
 
-    let promise = this.$http({url: '/api/v1/is_token_valid', method: 'GET'})
+    let promise = this.$http({url: '/api/v1/login', method: 'GET'})
     return promise.then((res) => {
       let data = jwt_decode(res.data.token);
       this.StorageService.set("Authenticated", res.data.token)
@@ -84,7 +84,7 @@ export default class SessionsService {
       this.setUserEmail(data['email']);
       this.setUserKey(data['key']);
 
-      this.$http.get("/api/v1/is_our_token_valid")
+      this.$http.get("/api/v1/identity")
         .then((res) => {
           console.log(res)
         })

@@ -6,6 +6,6 @@ export default class IdentityService {
   }
 
   getIdentity() {
-    return this.Restangular.oneUrl('is_our_token_valid').get();
+    return this.Restangular.oneUrl('identity').get();
   }
 }
