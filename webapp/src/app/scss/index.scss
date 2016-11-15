@@ -602,3 +602,11 @@ md-select {
   text-overflow: ellipsis // This is where the magic happens
 
 }
+
+.user-email-ellipsis {
+  width: 10em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis // This is where the magic happens
+
+}

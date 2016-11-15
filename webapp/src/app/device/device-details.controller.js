@@ -36,9 +36,9 @@ function DeviceDetailsCtrl($log,
   [vm.startTime, vm.endTime] = DateManipulationService.createFormattedStartAndEndDateFromToday(30);
   vm.enrollmentEvents = [];
   vm.logoChange = false;
-  vm.controlsModeOptions = ["visible", "invisible", "disabled"]
-  vm.orientationOptions = ["landscape", "portrait"]
-  vm.sleepControllerOptions = ["chrome-default", "rs232"]
+  vm.controlsModeOptions = ["visible", "invisible", "disabled"];
+  vm.orientationOptions = ["0", "90", "180", "270"];
+  vm.sleepControllerOptions = ["chrome-default", "rs232"];
   vm.overlayChanged = false;
 
 

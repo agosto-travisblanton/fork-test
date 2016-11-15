@@ -633,7 +633,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                 device.controls_mode = controls_mode
             orientation_mode = request_json.get('orientationMode')
             if orientation_mode != None:
-                if orientation_mode.lower() in ["landscape", "portrait"]:
+                if orientation_mode.lower() in ["0", "90", "180", "270"]:
                     device.orientation_mode = orientation_mode.lower()
             sleep_controller = request_json.get('sleepController')
             if sleep_controller != None:
@@ -933,7 +933,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                 else:
                     message = '{0} event detected for device_key={1}, but no correlation identifier!'.format(
                         config.DEVICE_ISSUE_FIRST_HEARTBEAT, device_urlsafe_key)
-                    logging.debug()
+                    logging.info(message)
 
             device.up = True
             device.heartbeat_updated = utc_now

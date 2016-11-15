@@ -442,3 +442,11 @@ class TestChromeOsDeviceModel(BaseTest):
         device.put()
         results = ChromeOsDevice.get_by_pairing_code(pairing_code)
         self.assertEmpty(results)
+
+    def test_get_impersonation_email(self):
+        device = ChromeOsDevice.create_managed(tenant_key=self.tenant_key,
+                                               device_id=self.TESTING_DEVICE_ID,
+                                               gcm_registration_id=self.TEST_GCM_REGISTRATION_ID,
+                                               mac_address=self.MAC_ADDRESS)
+        impersonation_email = Tenant.get_impersonation_email(urlsafe_tenant_key=device.tenant_key.urlsafe())
+        self.assertEqual(impersonation_email, self.IMPERSONATION_EMAIL)
