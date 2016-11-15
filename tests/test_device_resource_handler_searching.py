@@ -139,6 +139,33 @@ class TestDeviceResourceSearchHandlers(ProvisioningDistributorUserBase):
 
         self.assertOK(response)
 
+    def test_get_devices_by_distributor_serialization_strategy(self):
+        distributor = Distributor.create(name='Acme Brothers',
+                                         active=True)
+        distributor_key = distributor.put()
+        self.__setup_distributor_with_two_tenants_with_n_devices(distributor_key,
+                                                                 tenant_1_device_count=1,
+                                                                 tenant_2_device_count=1)
+        request_parameters = {'unmanaged': 'false', 'cur_prev_cursor': 'null',
+                              'cur_next_cursor': 'null'}
+
+        uri = application.router.build(None, 'devices-by-distributor', None,
+                                       {'distributor_urlsafe_key': distributor_key.urlsafe()})
+
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        response_json = json.loads(response.body)
+
+        self.assertTrue('macAddress' in response_json['devices'][0])
+        self.assertTrue('serialNumber' in response_json['devices'][0])
+        self.assertTrue('tenantCode' in response_json['devices'][0])
+        self.assertTrue('tenantKey' in response_json['devices'][0])
+        self.assertTrue('created' in response_json['devices'][0])
+        self.assertTrue('key' in response_json['devices'][0])
+
+        self.assertFalse('panel_sleep' in response_json['devices'][0])
+        self.assertFalse('status' in response_json['devices'][0])
+        self.assertFalse('updated' in response_json['devices'][0])
+
     def test_get_devices_by_distributor_returns_expected_device_count(self):
         distributor = Distributor.create(name='Acme Brothers',
                                          active=True)

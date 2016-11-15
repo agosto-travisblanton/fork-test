@@ -64,6 +64,15 @@ DEVICE_PAIRING_CODE_STRATEGY += [
     {'macAddress': lambda o, field_name, context: o.mac_address}
 ]
 
+CHROME_OS_DEVICES_LIST_VIEW_STRATEGY = ModelStrategy(ChromeOsDevice).include('tenant_key',
+                                                                             macAddress='mac_address',
+                                                                             serialNumber='serial_number',
+                                                                             created='created')
+CHROME_OS_DEVICES_LIST_VIEW_STRATEGY += [
+    {'tenantCode': lambda o, field_name, context: o.tenant_key.get().tenant_code if o.tenant_key is not None else None},
+    {'key': lambda o, field_name, context: o.key.urlsafe()},
+    {'tenantKey': lambda o, field_name, context: o.tenant_key.urlsafe() if o.tenant_key is not None else None},
+]
 
 CHROME_OS_DEVICE_STRATEGY = ModelStrategy(ChromeOsDevice)
 CHROME_OS_DEVICE_STRATEGY += [
