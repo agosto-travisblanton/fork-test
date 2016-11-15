@@ -16,6 +16,7 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 class IntegrationEventsLogHandler(ExtendedSessionRequestHandler):
     INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY = 'Registration'
 
+    @requires_auth
     @has_admin_user_key
     def get_by_event_category(self):
         category_filter = self.INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY

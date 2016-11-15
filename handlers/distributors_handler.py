@@ -49,6 +49,7 @@ class DistributorsHandler(ExtendedSessionRequestHandler):
         result = Domain.query(Domain.distributor_key == distributor_key, True == Domain.active).fetch(100)
         json_response(self.response, result, strategy=DOMAIN_STRATEGY)
 
+    @requires_auth
     @has_admin_user_key
     def post(self):
         incoming = json.loads(self.request.body)

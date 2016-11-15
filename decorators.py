@@ -122,6 +122,8 @@ def has_admin_user_key(handler_method):
         user_key = self.request.headers.get('X-Provisioning-User') or self.request.cookies.get('userKey')
         valid_user = User.get_user_from_urlsafe_key(user_key)
 
+        print valid_user
+
         if valid_user:
             if valid_user.is_administrator:
                 return handler_method(self, *args, **kwargs)
