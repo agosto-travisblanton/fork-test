@@ -10,11 +10,12 @@ from models import Location, Tenant
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import LOCATION_STRATEGY
+from extended_session_request_handler import ExtendedSessionRequestHandler
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
-class LocationsHandler(RequestHandler, KeyValidatorMixin):
+class LocationsHandler(ExtendedSessionRequestHandler):
     LATITUDE_PATTERN = '^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?)'
     LONGITUDE_PATTERN = '\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$'
 

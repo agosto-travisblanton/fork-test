@@ -7,6 +7,7 @@ from models import Distributor, Domain, ChromeOsDevice, Tenant
 from routes import application
 from provisioning_base_test import ProvisioningBaseTest
 from app_config import config
+from utils.auth_util import generate_token
 
 
 class ProvisioningDistributorUserBase(ProvisioningBaseTest):
@@ -84,8 +85,6 @@ class ProvisioningDistributorUserBase(ProvisioningBaseTest):
 
         self.default_distributor = self.agosto_key.get()
 
-        self.login_url = build_uri('login')
-        self.logout_url = build_uri('logout')
         self.identity_url = build_uri('identity')
 
         self.tenant = Tenant.create(tenant_code=self.TENANT_CODE,
@@ -109,6 +108,14 @@ class ProvisioningDistributorUserBase(ProvisioningBaseTest):
         }
         self.api_token_authorization_header = {
             'Authorization': config.API_TOKEN,
+            'JWT': str(generate_token(self.user)),
+            'X-Provisioning-User': self.user_key.urlsafe(),
+            'X-Provisioning-Distributor': self.distributor_key.urlsafe()
+        }
+
+        self.JWT_DEFUALT_HEADER = {
+            'Authorization': config.API_TOKEN,
+            'JWT': str(generate_token(self.user)),
             'X-Provisioning-User': self.user_key.urlsafe(),
             'X-Provisioning-Distributor': self.distributor_key.urlsafe()
         }

@@ -8,17 +8,17 @@ from agar.test import BaseTest, WebTest
 from app_config import config
 from env_setup import setup_test_paths
 from mockito import when, any as any_matcher
-from models import ChromeOsDevice, Tenant, Distributor, Domain, DeviceIssueLog, Location
+from models import ChromeOsDevice, Tenant, Distributor, Domain, DeviceIssueLog, Location, User
 from routes import application
 from utils.email_notify import EmailNotify
 from utils.timezone_util import TimezoneUtil
 from utils.web_util import build_uri
 from webtest import AppError
-
+from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 setup_test_paths()
 
 
-class TestDeviceResourceHandler(BaseTest, WebTest):
+class TestDeviceResourceHandler(ProvisioningDistributorUserBase):
     ADMIN_EMAIL = 'foo@bar.com'
     ANOTHER_TENANT_NAME = 'Another, Inc,'
     ANOTHER_TENANT_CODE = 'another_inc'
@@ -89,12 +89,11 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             device_id=self.DEVICE_ID,
             mac_address=self.MAC_ADDRESS)
         self.managed_device_key = self.managed_device.put()
+
         self.unmanaged_registration_token_authorization_header = {
             'Authorization': config.UNMANAGED_REGISTRATION_TOKEN
         }
-        self.api_token_authorization_header = {
-            'Authorization': config.API_TOKEN
-        }
+
         self.unmanaged_api_token_authorization_header = {
             'Authorization': config.UNMANAGED_API_TOKEN
         }

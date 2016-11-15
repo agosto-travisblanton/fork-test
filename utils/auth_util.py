@@ -6,7 +6,7 @@ from oauth2client import client, crypt
 from models import User, Distributor
 from app_config import config
 from restler.serializers import json_response
-
+import httplib
 HUNDRED_YEARS = 3144960000
 
 
@@ -94,6 +94,6 @@ def requires_auth(f):
             'BROWSER_API_KEY': config.PUBLIC_API_SERVER_KEY,
             'version': os.environ['CURRENT_VERSION_ID'],
 
-        })
+        }, status_code=httplib.FORBIDDEN)
 
     return decorated

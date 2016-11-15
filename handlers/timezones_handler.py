@@ -3,11 +3,13 @@ from webapp2 import RequestHandler
 from decorators import requires_auth
 from restler.serializers import json_response
 from utils.timezone_util import TimezoneUtil
+from extended_session_request_handler import ExtendedSessionRequestHandler
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
-class TimezonesHandler(RequestHandler):
+class TimezonesHandler(ExtendedSessionRequestHandler):
+
     @requires_auth
     def get_us_timezones(self):
         result = TimezoneUtil.get_us_timezones()

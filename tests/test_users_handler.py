@@ -23,7 +23,7 @@ class TestUsersHandler(ProvisioningDistributorUserBase):
         uri = application.router.build(None, 'get-distributors-by-user', None, {
             'user_urlsafe_key': self.user_key.urlsafe()
         })
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFUALT_HEADER)
         self.assertOK(response)
 
     def test_get_list_returns_distributors_associated_to_user(self):
@@ -31,7 +31,7 @@ class TestUsersHandler(ProvisioningDistributorUserBase):
         uri = application.router.build(None, 'get-distributors-by-user', None, {
             'user_urlsafe_key': self.user_key.urlsafe()
         })
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFUALT_HEADER)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 2)
         self.assertEqual(response_json[0].get('name'), self.AGOSTO)

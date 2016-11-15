@@ -14,11 +14,12 @@ from ndb_mixins import KeyValidatorMixin
 from oauth2client.client import AccessTokenRefreshError
 from restler.serializers import json_response
 from strategy import DOMAIN_STRATEGY
+from extended_session_request_handler import ExtendedSessionRequestHandler
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
-class DomainsHandler(RequestHandler, KeyValidatorMixin):
+class DomainsHandler(ExtendedSessionRequestHandler):
     DEVICES_SCOPE = 'https://www.googleapis.com/auth/admin.directory.device.chromeos'
     OU_SCOPE = 'https://www.googleapis.com/auth/admin.directory.orgunit'
     USERS_SCOPE = 'https://www.googleapis.com/auth/admin.directory.user'

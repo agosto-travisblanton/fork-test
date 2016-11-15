@@ -8,9 +8,10 @@ from agar.test import BaseTest, WebTest
 from models import Distributor
 from routes import application
 from app_config import config
+from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
 
-class TestTimezonesHandler(BaseTest, WebTest):
+class TestTimezonesHandler(ProvisioningDistributorUserBase):
     APPLICATION = application
     DISTRIBUTOR_NAME = 'agosto'
     FORBIDDEN = '403 Forbidden'
@@ -20,10 +21,9 @@ class TestTimezonesHandler(BaseTest, WebTest):
         self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
                                               active=True)
         self.distributor_key = self.distributor.put()
-        self.headers = {
-            'Authorization': config.API_TOKEN,
-            'X-Provisioning-Distributor': self.distributor_key.urlsafe()
-        }
+        self.headers = self.JWT_DEFUALT_HEADER
+
+
         self.bad_authorization_header = {
             'Authorization': 'Forget about it!',
             'X-Provisioning-Distributor': self.distributor_key.urlsafe()

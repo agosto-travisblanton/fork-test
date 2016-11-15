@@ -7,9 +7,10 @@ from agar.sessions import SessionRequestHandler
 from models import User, Distributor, DistributorUser
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
+from extended_session_request_handler import ExtendedSessionRequestHandler
 
 
-class UsersHandler(SessionRequestHandler, KeyValidatorMixin):
+class UsersHandler(ExtendedSessionRequestHandler):
     @requires_auth
     def get_list_by_user(self, user_urlsafe_key):
         user = ndb.Key(urlsafe=user_urlsafe_key).get()

@@ -6,11 +6,12 @@ from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import PLAYER_COMMAND_EVENT_STRATEGY
 from datetime import datetime
+from extended_session_request_handler import ExtendedSessionRequestHandler
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
-class PlayerCommandEventsHandler(RequestHandler, KeyValidatorMixin):
+class PlayerCommandEventsHandler(ExtendedSessionRequestHandler):
     @requires_auth
     def command_confirmation(self, urlsafe_event_key):
         try:

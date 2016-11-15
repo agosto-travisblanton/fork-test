@@ -8,11 +8,12 @@ from models import IntegrationEventLog
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import INTEGRATION_EVENT_LOG_STRATEGY
+from extended_session_request_handler import ExtendedSessionRequestHandler
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
-class IntegrationEventsLogHandler(RequestHandler, PagingListHandlerMixin, KeyValidatorMixin):
+class IntegrationEventsLogHandler(ExtendedSessionRequestHandler):
     INTEGRATION_EVENTS_DEFAULT_EVENTS_CATEGORY = 'Registration'
 
     @has_admin_user_key

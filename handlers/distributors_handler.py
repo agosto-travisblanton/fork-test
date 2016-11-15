@@ -6,11 +6,12 @@ from models import Distributor, DistributorEntityGroup, Domain, DistributorUser,
 from restler.serializers import json_response
 from decorators import has_admin_user_key, requires_auth
 from strategy import DISTRIBUTOR_STRATEGY, DOMAIN_STRATEGY
+from extended_session_request_handler import ExtendedSessionRequestHandler
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>, Christopher Bartling <chris.bartling@agosto.com>'
 
 
-class DistributorsHandler(RequestHandler):
+class DistributorsHandler(ExtendedSessionRequestHandler):
     @requires_auth
     def get_list(self):
         distributor_name = self.request.get('distributorName')
