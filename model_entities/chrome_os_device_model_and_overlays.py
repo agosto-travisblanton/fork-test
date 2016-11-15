@@ -77,7 +77,7 @@ class ChromeOsDevice(ndb.Model):
     panel_sleep = ndb.BooleanProperty(default=False, required=True, indexed=True)
     overlays_available = ndb.BooleanProperty(default=False, required=True, indexed=True)
     controls_mode = ndb.StringProperty(required=False, indexed=True, default='invisible')
-    orientation_mode = ndb.StringProperty(required=False, indexed=True, default='landscape')
+    orientation_mode = ndb.StringProperty(required=False, indexed=True, default='0')
     sleep_controller = ndb.StringProperty(required=False, indexed=True, default='chrome-default')
     class_version = ndb.IntegerProperty()
 

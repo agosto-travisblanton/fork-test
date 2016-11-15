@@ -174,6 +174,9 @@ def register_device(urlsafe_key=None, mac_address=None, gcm_registration_id=None
                                _countdown=60)
             return device
         else:
+            info = 'register_device: requested device not found in directory API for MAC address = {0}.'.format(
+                lowercase_device_mac_address)
+            logging.info(info)
             device_not_found_event = IntegrationEventLog.create(
                 event_category='Registration',
                 component_name='Chrome Directory API',
@@ -184,6 +187,8 @@ def register_device(urlsafe_key=None, mac_address=None, gcm_registration_id=None
                 correlation_identifier=correlation_id)
             device_not_found_event.put()
             if new_page_token:
+                device_not_found_event.details = 'Calling register_device with new page token.'
+                device.put()
                 deferred.defer(register_device,
                                device_urlsafe_key=urlsafe_key,
                                device_mac_address=mac_address,
