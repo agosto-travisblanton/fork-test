@@ -72,6 +72,8 @@ CHROME_OS_DEVICES_LIST_VIEW_STRATEGY += [
     {'tenantCode': lambda o, field_name, context: o.tenant_key.get().tenant_code if o.tenant_key is not None else None},
     {'key': lambda o, field_name, context: o.key.urlsafe()},
     {'tenantKey': lambda o, field_name, context: o.tenant_key.urlsafe() if o.tenant_key is not None else None},
+    {'up': lambda o, field_name, context: o.up},
+
 ]
 
 CHROME_OS_DEVICE_STRATEGY = ModelStrategy(ChromeOsDevice)
