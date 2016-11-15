@@ -1,11 +1,11 @@
 from webapp2 import RequestHandler
 
-from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
+from decorators import requires_auth, requires_registration_token, requires_unmanaged_registration_token
 
 
 class BogusHandler(RequestHandler):
 
-    @requires_api_token
+    @requires_auth
     def get(self):
         pass
 

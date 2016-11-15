@@ -4,14 +4,14 @@ from google.appengine.ext import ndb
 from webapp2 import RequestHandler
 from models import Distributor, DistributorEntityGroup, Domain, DistributorUser, User
 from restler.serializers import json_response
-from decorators import has_admin_user_key, requires_api_token
+from decorators import has_admin_user_key, requires_auth
 from strategy import DISTRIBUTOR_STRATEGY, DOMAIN_STRATEGY
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>, Christopher Bartling <chris.bartling@agosto.com>'
 
 
 class DistributorsHandler(RequestHandler):
-    @requires_api_token
+    @requires_auth
     def get_list(self):
         distributor_name = self.request.get('distributorName')
         result = Distributor.query(ancestor=DistributorEntityGroup.singleton().key).fetch(100)
@@ -21,13 +21,13 @@ class DistributorsHandler(RequestHandler):
             result = filter(lambda x: x.active is True, result)
         json_response(self.response, result, strategy=DISTRIBUTOR_STRATEGY)
 
-    @requires_api_token
+    @requires_auth
     def get(self, distributor_key):
         distributor_key = ndb.Key(urlsafe=distributor_key)
         result = distributor_key.get()
         json_response(self.response, result, strategy=DISTRIBUTOR_STRATEGY)
 
-    @requires_api_token
+    @requires_auth
     def get_users(self, distributor_key):
         distributor_key = ndb.Key(urlsafe=distributor_key)
         all_users_of_distributor = DistributorUser.users_of_distributor(distributor_key)
@@ -42,7 +42,7 @@ class DistributorsHandler(RequestHandler):
 
         json_response(self.response, filtered_data_about_user)
 
-    @requires_api_token
+    @requires_auth
     def get_domains(self, distributor_key):
         distributor_key = ndb.Key(urlsafe=distributor_key)
         result = Domain.query(Domain.distributor_key == distributor_key, True == Domain.active).fetch(100)
@@ -73,7 +73,7 @@ class DistributorsHandler(RequestHandler):
                 "message": "Distributor already exists"
             }, status_code=409)
 
-    @requires_api_token
+    @requires_auth
     def put(self, distributor_key):
         key = ndb.Key(urlsafe=distributor_key)
         distributor = key.get()
@@ -84,7 +84,7 @@ class DistributorsHandler(RequestHandler):
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
 
-    @requires_api_token
+    @requires_auth
     def delete(self, distributor_key):
         key = ndb.Key(urlsafe=distributor_key)
         distributor = key.get()

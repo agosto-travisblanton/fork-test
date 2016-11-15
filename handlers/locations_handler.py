@@ -5,7 +5,7 @@ import re
 from google.appengine.ext import ndb
 from webapp2 import RequestHandler
 
-from decorators import requires_api_token
+from decorators import requires_auth
 from models import Location, Tenant
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
@@ -18,12 +18,12 @@ class LocationsHandler(RequestHandler, KeyValidatorMixin):
     LATITUDE_PATTERN = '^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?)'
     LONGITUDE_PATTERN = '\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$'
 
-    @requires_api_token
+    @requires_auth
     def get(self, location_urlsafe_key):
         result = self.validate_and_get(location_urlsafe_key, Location, abort_on_not_found=True)
         json_response(self.response, result, strategy=LOCATION_STRATEGY)
 
-    @requires_api_token
+    @requires_auth
     def get_locations_by_tenant(self, tenant_urlsafe_key):
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
 
@@ -35,7 +35,7 @@ class LocationsHandler(RequestHandler, KeyValidatorMixin):
 
         json_response(self.response, query_results, strategy=LOCATION_STRATEGY)
 
-    @requires_api_token
+    @requires_auth
     def get_locations_by_tenant_paginated(self, tenant_urlsafe_key, prev_cursor, next_cursor):
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
         next_cursor = next_cursor if next_cursor != "null" else None
@@ -57,7 +57,7 @@ class LocationsHandler(RequestHandler, KeyValidatorMixin):
             strategy=LOCATION_STRATEGY
         )
 
-    @requires_api_token
+    @requires_auth
     def post(self):
         if self.request.body is not '' and self.request.body is not None:
             status = 201
@@ -138,7 +138,7 @@ class LocationsHandler(RequestHandler, KeyValidatorMixin):
             logging.info("Problem creating Location. No request body.")
             self.response.set_status(400, 'Did not receive request body.')
 
-    @requires_api_token
+    @requires_auth
     def put(self, location_urlsafe_key):
         key = ndb.Key(urlsafe=location_urlsafe_key)
         location = key.get()

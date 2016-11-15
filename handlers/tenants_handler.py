@@ -6,7 +6,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
 from app_config import config
-from decorators import requires_api_token
+from decorators import requires_auth
 from extended_session_request_handler import ExtendedSessionRequestHandler
 from integrations.content_manager.content_manager_api import ContentManagerApi
 from integrations.directory_api.organization_units_api import OrganizationUnitsApi
@@ -23,7 +23,7 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
 
 
 class TenantsHandler(ExtendedSessionRequestHandler):
-    @requires_api_token
+    @requires_auth
     def get_tenants_paginated(self, offset, page_size):
         offset = int(offset)
         page_size = int(page_size)
@@ -49,7 +49,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
             },
             strategy=TENANT_STRATEGY)
 
-    @requires_api_token
+    @requires_auth
     def get(self, tenant_key=None):
         distributor_urlsafe_key = self.request.headers.get('X-Provisioning-Distributor')
         tenant = self.validate_and_get(tenant_key, Tenant, abort_on_not_found=False)
@@ -86,7 +86,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
 
         json_response(self.response, result, strategy=TENANT_STRATEGY)
 
-    @requires_api_token
+    @requires_auth
     def post(self):
         correlation_id = IntegrationEventLog.generate_correlation_id()
         IntegrationEventLog.create(
@@ -225,7 +225,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
             logging.error('Failed creating Tenant: {0}'.format(error_message))
             self.response.set_status(httplib.BAD_REQUEST, error_message)
 
-    @requires_api_token
+    @requires_auth
     def put(self, tenant_key):
         status = 204
         error_message = None
@@ -301,7 +301,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
         else:
             self.response.set_status(status, error_message)
 
-    @requires_api_token
+    @requires_auth
     def delete(self, tenant_key):
         key = ndb.Key(urlsafe=tenant_key)
         tenant = key.get()

@@ -1,6 +1,6 @@
 import logging
 from webapp2 import RequestHandler
-from decorators import requires_api_token
+from decorators import requires_auth
 from models import PlayerCommandEvent
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
@@ -11,7 +11,7 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 class PlayerCommandEventsHandler(RequestHandler, KeyValidatorMixin):
-    @requires_api_token
+    @requires_auth
     def command_confirmation(self, urlsafe_event_key):
         try:
             command_event = self.validate_and_get(urlsafe_event_key, PlayerCommandEvent, abort_on_not_found=True)
@@ -23,7 +23,7 @@ class PlayerCommandEventsHandler(RequestHandler, KeyValidatorMixin):
         self.response.headers.pop('Content-Type', None)
         self.response.set_status(204)
 
-    @requires_api_token
+    @requires_auth
     def get_player_command_events(self, device_urlsafe_key, prev_cursor_str, next_cursor_str):
         next_cursor_str = next_cursor_str if next_cursor_str != "null" else None
         prev_cursor_str = prev_cursor_str if prev_cursor_str != "null" else None
@@ -39,7 +39,7 @@ class PlayerCommandEventsHandler(RequestHandler, KeyValidatorMixin):
         next_cursor = events["next_cursor"]
         events = events["objects"]
 
-        return json_response(
+        json_response(
             self.response,
             {
                 "events": events,

@@ -7,7 +7,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
 from app_config import config
-from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
+from decorators import requires_auth, requires_registration_token, requires_unmanaged_registration_token
 from device_commands_handler import DeviceCommandsHandler
 from device_message_processor import post_unmanaged_device_info, change_intent
 from extended_session_request_handler import ExtendedSessionRequestHandler
@@ -43,7 +43,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
     ############################################################################################
     # TENANTS VIEW
     ############################################################################################
-    @requires_api_token
+    @requires_auth
     def search_for_device_by_tenant(self, tenant_urlsafe_key):
         unmanaged = self.request.get("unmanaged") == "true"
         partial_gcmid = self.request.get("partial_gcmid")
@@ -85,7 +85,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             },
         )
 
-    @requires_api_token
+    @requires_auth
     def get_devices_by_tenant(self, tenant_urlsafe_key):
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
         next_cursor = self.request.get("next_cursor")
@@ -115,7 +115,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
     ############################################################################################
     # (DISTRIBUTOR) DEVICES VIEW
     ############################################################################################
-    @requires_api_token
+    @requires_auth
     def get_devices_by_distributor(self, distributor_urlsafe_key):
         next_cursor = self.request.get("next_cursor")
         prev_cursor = self.request.get("prev_cursor")
@@ -149,7 +149,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             strategy=CHROME_OS_DEVICE_STRATEGY
         )
 
-    @requires_api_token
+    @requires_auth
     def search_for_device(self, distributor_urlsafe_key):
         unmanaged = self.request.get("unmanaged") == "true"
         partial_gcmid = self.request.get("partial_gcmid")
@@ -190,7 +190,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             },
         )
 
-    @requires_api_token
+    @requires_auth
     def search_for_device_globally(self):
         unmanaged = self.request.get("unmanaged") == "true"
         partial_gcmid = self.request.get("partial_gcmid")
@@ -252,7 +252,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
     ############################################################################################
     # END DEVICES VIEW
     ############################################################################################
-    @requires_api_token
+    @requires_auth
     def get_device_by_parameter(self):
         pairing_code = self.request.get('pairingCode')
         gcm_registration_id = self.request.get('gcmRegistrationId')
@@ -304,7 +304,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             self.response.set_status(httplib.BAD_REQUEST)
         return
 
-    @requires_api_token
+    @requires_auth
     def get(self, device_urlsafe_key):
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True,
                                        use_app_engine_memcache=False)
@@ -526,7 +526,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             logging.info("Problem creating Device. No request body.")
             self.response.set_status(httplib.BAD_REQUEST, 'Did not receive request body.')
 
-    @requires_api_token
+    @requires_auth
     def put(self, device_urlsafe_key):
         status = httplib.NO_CONTENT
         message = None
@@ -670,7 +670,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
 
-    @requires_api_token
+    @requires_auth
     def heartbeat(self, device_urlsafe_key):
         status = httplib.NO_CONTENT
         message = None
@@ -937,7 +937,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
 
         self.response.set_status(status, message)
 
-    @requires_api_token
+    @requires_auth
     def get_latest_issues(self, device_urlsafe_key, prev_cursor_str, next_cursor_str):
         start_epoch = int(self.request.params['start'])
         end_epoch = int(self.request.params['end'])
@@ -954,7 +954,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             "next": paginated_results["next_cursor"]
         }, strategy=DEVICE_ISSUE_LOG_STRATEGY)
 
-    @requires_api_token
+    @requires_auth
     def delete(self, device_urlsafe_key):
         status = httplib.NO_CONTENT
         message = None
@@ -982,7 +982,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
 
-    @requires_api_token
+    @requires_auth
     def controls_mode(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
@@ -1005,7 +1005,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
 
         self.response.set_status(status, message)
 
-    @requires_api_token
+    @requires_auth
     def panel_sleep(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:

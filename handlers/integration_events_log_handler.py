@@ -3,7 +3,7 @@ from webapp2 import RequestHandler
 import logging
 import httplib
 from app_config import config
-from decorators import has_admin_user_key, requires_api_token
+from decorators import has_admin_user_key, requires_auth
 from models import IntegrationEventLog
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response
@@ -29,7 +29,7 @@ class IntegrationEventsLogHandler(RequestHandler, PagingListHandlerMixin, KeyVal
             IntegrationEventLog.utc_timestamp).fetch(fetch_size)
         json_response(self.response, query_results, strategy=INTEGRATION_EVENT_LOG_STRATEGY)
 
-    @requires_api_token
+    @requires_auth
     def get_enrollment_events(self):
         device_key = self.request.get('deviceKey')
         if device_key:
@@ -50,7 +50,7 @@ class IntegrationEventsLogHandler(RequestHandler, PagingListHandlerMixin, KeyVal
                 self.response.set_status(404, error_message)
                 return
 
-    @requires_api_token
+    @requires_auth
     def get_tenant_create_events(self):
         tenantKey = self.request.get('tenantKey')
         try:

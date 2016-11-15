@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 from webapp2 import RequestHandler
 
 from app_config import config
-from decorators import requires_api_token
+from decorators import requires_auth
 from integrations.directory_api.chrome_os_devices_api import ChromeOsDevicesApi
 from integrations.directory_api.organization_units_api import OrganizationUnitsApi
 from integrations.directory_api.users_api import UsersApi
@@ -23,7 +23,7 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
     OU_SCOPE = 'https://www.googleapis.com/auth/admin.directory.orgunit'
     USERS_SCOPE = 'https://www.googleapis.com/auth/admin.directory.user'
 
-    @requires_api_token
+    @requires_auth
     def get(self, domain_key=None):
         if None == domain_key:
             distributor_key = self.request.headers.get('X-Provisioning-Distributor')
@@ -34,7 +34,7 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
             result = self.validate_and_get(domain_key, Domain, abort_on_not_found=True, use_app_engine_memcache=False)
         json_response(self.response, result, strategy=DOMAIN_STRATEGY)
 
-    @requires_api_token
+    @requires_auth
     def post(self):
         if self.request.body is not str('') and self.request.body is not None:
             status = 201
@@ -85,7 +85,7 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
             logging.info("Problem creating Domain. No request body.")
             self.response.set_status(400, 'Did not receive request body.')
 
-    @requires_api_token
+    @requires_auth
     def put(self, domain_key):
         status = 204
         message = None
@@ -109,7 +109,7 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
             self.response.headers.pop('Content-Type', None)
             self.response.set_status(status, message)
 
-    @requires_api_token
+    @requires_auth
     def delete(self, domain_key):
         key = ndb.Key(urlsafe=domain_key)
         device = key.get()
@@ -119,7 +119,7 @@ class DomainsHandler(RequestHandler, KeyValidatorMixin):
         self.response.set_status(204)
         self.response.headers.pop('Content-Type', None)
 
-    @requires_api_token
+    @requires_auth
     def ping_directory_api(self, domain_key):
         domain = self.validate_and_get(domain_key, Domain, abort_on_not_found=True, use_app_engine_memcache=False)
         result = {'domainName': domain.name, 'impersonationEmail': domain.impersonation_admin_email_address}
