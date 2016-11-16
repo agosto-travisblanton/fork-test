@@ -56,8 +56,8 @@ application = WSGIApplication(
               name='identity',
               ),
         Route(r'/api/v1/login',
-              handler='handlers.jwt_handler.JWTHandler',
-              name='token-exchange',
+              handler='handlers.login_handler.LoginHandler',
+              name='login',
               ),
 
         ############################################################

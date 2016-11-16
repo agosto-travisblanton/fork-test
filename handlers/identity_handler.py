@@ -1,11 +1,9 @@
-from utils.auth_util import requires_auth
 from extended_session_request_handler import ExtendedSessionRequestHandler
 from app_config import config
-from utils.auth_util import verify_google_token, verify_our_token
+from utils.auth_util import verify_our_token
 from models import User
 from restler.serializers import json_response
 import os
-import httplib
 
 class IdentityHandler(ExtendedSessionRequestHandler):
     def get(self):
