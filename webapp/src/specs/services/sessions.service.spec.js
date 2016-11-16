@@ -1,7 +1,6 @@
 import mocks from 'angular-mocks';
 let module = angular.mock.module
 let inject = angular.mock.inject
-import jwt_decode from 'jwt-decode'
 
 
 describe('SessionsService', function () {
@@ -30,10 +29,13 @@ describe('SessionsService', function () {
     return it('sets @currentUserKey variable to undefined', () => expect(SessionsService.currentUserKey).toBeUndefined());
   });
 
-  return describe('.login', function () {
+  describe('.login', function () {
     let deferred = undefined;
-    let result = undefined;
-
+    let expectedCallbackResponse = {
+      data: {
+        token: 'eyJleHAiOjQ2MjQyMTAyNzMsImlhdCI6MTQ3OTI1MDI3MywiYWxnIjoiSFMyNTYifQ.eyJpc19sb2dnZWRfaW4iOnRydWUsImtleSI6ImFoMWtaWFotYzJ0NWEybDBMV1JwYzNCc1lYa3RaR1YyYVdObExXbHVkSElqQ3hJRVZYTmxjaUlaWkdGdWFXVnNMblJsY201NVlXdEFZV2R2YzNSdkxtTnZiUXciLCJpc19hZG1pbiI6dHJ1ZSwiZGlzdHJpYnV0b3JzIjpbIk1pZmZsaW4iLCJEdW5kZXIiLCJTY3JhbnRvbiJdLCJlbWFpbCI6ImRhbmllbC50ZXJueWFrQGFnb3N0by5jb20iLCJkaXN0cmlidXRvcnNfYXNfYWRtaW4iOlsiTWlmZmxpbiIsIkR1bmRlciIsIlNjcmFudG9uIl19.HBspomnaabOvV4j0jPv6NNUMWoUa2PptTmExQv9kaC0'
+      }
+    };
 
     beforeEach(() => deferred = q.defer());
 
@@ -42,20 +44,17 @@ describe('SessionsService', function () {
       return $httpBackend.verifyNoOutstandingRequest();
     });
 
-    return it('logs in to Stormpath and sets identity', function () {
-      let expectedCallbackResponse = {
-        data: {
-          token: 'eyJleHAiOjQ2MjQyMTAyNzMsImlhdCI6MTQ3OTI1MDI3MywiYWxnIjoiSFMyNTYifQ.eyJpc19sb2dnZWRfaW4iOnRydWUsImtleSI6ImFoMWtaWFotYzJ0NWEybDBMV1JwYzNCc1lYa3RaR1YyYVdObExXbHVkSElqQ3hJRVZYTmxjaUlaWkdGdWFXVnNMblJsY201NVlXdEFZV2R2YzNSdkxtTnZiUXciLCJpc19hZG1pbiI6dHJ1ZSwiZGlzdHJpYnV0b3JzIjpbIk1pZmZsaW4iLCJEdW5kZXIiLCJTY3JhbnRvbiJdLCJlbWFpbCI6ImRhbmllbC50ZXJueWFrQGFnb3N0by5jb20iLCJkaXN0cmlidXRvcnNfYXNfYWRtaW4iOlsiTWlmZmxpbiIsIkR1bmRlciIsIlNjcmFudG9uIl19.HBspomnaabOvV4j0jPv6NNUMWoUa2PptTmExQv9kaC0'
-        }
-      };
-      $httpBackend.expectGET('/api/v1/login').respond(expectedCallbackResponse);
-      result = SessionsService.login({
-        data: {
-          token: '2lk34jl3k4j2l34jjkl2433k4'
-        }
+    it('exchanges oAuth for JWT', function () {
+      $httpBackend.when('GET', '/api/v1/login').respond(() => expectedCallbackResponse);
+      let result = SessionsService.login({
+        id_token: '2lk34jl3k4j2l34jjkl2433k4'
       });
-      expect(SessionsService.getUserKey()).toEqual(jwt_decode(expectedCallbackResponse.data.token.key));
 
+      $httpBackend.flush();
+      result.then(() => {
+        expect(SessionsService.getIsAdmin()).toBeTruthy()
+        expect(SessionsService.getUserEmail()).toEqual('daniel.ternyak@agosto.com')
+      })
     });
   });
 });

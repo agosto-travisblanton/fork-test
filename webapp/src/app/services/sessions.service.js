@@ -75,7 +75,9 @@ export default class SessionsService {
 
     let promise = this.$http({url: '/api/v1/login', method: 'GET'})
     return promise.then((res) => {
+      console.log(res)
       let data = jwt_decode(res.data.token);
+      console.log(data)
       this.StorageService.set("JWT", res.data.token)
       this.setDistributors(data['distributors']);
       this.setDistributorsAsAdmin(data['distributors_as_admin']);
