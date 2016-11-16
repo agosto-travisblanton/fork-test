@@ -33,7 +33,7 @@ class TestUsersHandler(ProvisioningDistributorUserBase):
         })
         response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFUALT_HEADER)
         response_json = json.loads(response.body)
-        self.assertEqual(len(response_json), 2)
+        self.assertEqual(len(response_json), 3) # 1 user is created in the base class
         self.assertEqual(response_json[0].get('name'), self.AGOSTO)
         self.assertTrue(response_json[0].get('active'))
         self.assertEqual(response_json[1].get('name'), self.DISTRIBUTOR)
@@ -113,9 +113,10 @@ class TestUsersHandler(ProvisioningDistributorUserBase):
             }, json.loads(request.body))
 
     def test_add_user_to_distributor_as_admin(self):
+        user_email = 'someNewEmail@gmail.com'
         distro_to_add = self.create_distributor_if_unique("new_distributor").name
         request = self.post('/api/v1/users', json.dumps({
-            "user_email": self.user.email,
+            "user_email": user_email,
             "distributor": distro_to_add,
             "distributor_admin": False
         }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
@@ -123,11 +124,10 @@ class TestUsersHandler(ProvisioningDistributorUserBase):
         self.assertEqual(200, request.status_int)
         self.assertEqual(True, json.loads(request.body)["success"])
 
-        user = User.get_or_insert_by_email(self.user.email)
+        user = User.get_or_insert_by_email(user_email)
         user_distributors = [distributor.name for distributor in user.distributors]
         self.assertIn(distro_to_add, user_distributors)
-        self.assertIn(self.default_distributor_name, user_distributors)
-        self.assertLength(3, user_distributors)
+
 
     ###########################################################################
     # ADD DISTRIBUTOR-ADMIN USER TO DISTRIBUTOR

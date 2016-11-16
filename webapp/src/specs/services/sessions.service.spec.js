@@ -1,6 +1,7 @@
 import mocks from 'angular-mocks';
 let module = angular.mock.module
 let inject = angular.mock.inject
+import jwt_decode from 'jwt-decode'
 
 
 describe('SessionsService', function () {
@@ -30,26 +31,9 @@ describe('SessionsService', function () {
   });
 
   return describe('.login', function () {
-    let expectedCredentials = {
-      access_token: 'foobar_access_token',
-      authuser: 'foobar_authuser',
-      client_id: 'foobar_client_id',
-      code: 'foobar_code',
-      id_token: 'foobar_id_token',
-      scope: 'foobar_scope',
-      session_state: 'foobar_session_state',
-      state: 'foobar_state',
-      status: 'foobar_status',
-      email: 'foobar_email',
-      password: 'foobar_password'
-    };
     let deferred = undefined;
     let result = undefined;
-    let expectedCallbackResponse = {
-      user: {
-        key: '2837488f70g98708g9af678f6ga7df'
-      }
-    };
+
 
     beforeEach(() => deferred = q.defer());
 
@@ -59,15 +43,19 @@ describe('SessionsService', function () {
     });
 
     return it('logs in to Stormpath and sets identity', function () {
-      deferred.resolve(expectedCallbackResponse);
-      $httpBackend.expectPOST('/login', expectedCredentials).respond(expectedCallbackResponse);
-      let identityResponse = {email: "dwight.schrute@agosto.com"};
-      $httpBackend.expectGET('/api/v1/identity').respond(identityResponse);
-      result = SessionsService.login(expectedCredentials);
-      $httpBackend.flush();
-      return result.then(data => {
-        return expect(SessionsService.getUserKey()).toEqual(expectedCallbackResponse.user.key);
+      let expectedCallbackResponse = {
+        data: {
+          token: 'eyJleHAiOjQ2MjQyMTAyNzMsImlhdCI6MTQ3OTI1MDI3MywiYWxnIjoiSFMyNTYifQ.eyJpc19sb2dnZWRfaW4iOnRydWUsImtleSI6ImFoMWtaWFotYzJ0NWEybDBMV1JwYzNCc1lYa3RaR1YyYVdObExXbHVkSElqQ3hJRVZYTmxjaUlaWkdGdWFXVnNMblJsY201NVlXdEFZV2R2YzNSdkxtTnZiUXciLCJpc19hZG1pbiI6dHJ1ZSwiZGlzdHJpYnV0b3JzIjpbIk1pZmZsaW4iLCJEdW5kZXIiLCJTY3JhbnRvbiJdLCJlbWFpbCI6ImRhbmllbC50ZXJueWFrQGFnb3N0by5jb20iLCJkaXN0cmlidXRvcnNfYXNfYWRtaW4iOlsiTWlmZmxpbiIsIkR1bmRlciIsIlNjcmFudG9uIl19.HBspomnaabOvV4j0jPv6NNUMWoUa2PptTmExQv9kaC0'
+        }
+      };
+      $httpBackend.expectGET('/api/v1/login').respond(expectedCallbackResponse);
+      result = SessionsService.login({
+        data: {
+          token: '2lk34jl3k4j2l34jjkl2433k4'
+        }
       });
+      expect(SessionsService.getUserKey()).toEqual(jwt_decode(expectedCallbackResponse.data.token.key));
+
     });
   });
 });

@@ -2,7 +2,7 @@ import jwt_decode from 'jwt-decode'
 
 export default class SessionsService {
 
-  constructor($http, $log, StorageService, IdentityService, Restangular, $q) {
+  constructor($http, $log, StorageService, IdentityService, Restangular, $q, sweet) {
     'ngInject';
     this.$http = $http
     this.$log = $log
@@ -84,7 +84,7 @@ export default class SessionsService {
       this.setUserKey(data['key']);
     })
     return promise.catch((res) => {
-      console.log(res)
+      sweet.show('Oops...', "We couldn't log you in :(. Please try again or contact support", 'error');
     })
 
 
