@@ -497,11 +497,11 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
                             chrome_domain)
                     registration_request_event.put()
                     deferred.defer(register_device,
-                                   device_urlsafe_key=key.urlsafe(),
-                                   device_mac_address=device_mac_address,
+                                   urlsafe_key=key.urlsafe(),
+                                   mac_address=device_mac_address,
                                    gcm_registration_id=gcm_registration_id,
                                    correlation_id=correlation_id,
-                                   chrome_domain=chrome_domain,
+                                   domain_name=chrome_domain,
                                    _queue='directory-api',
                                    _countdown=60)
                     device_uri = self.request.app.router.build(None,
