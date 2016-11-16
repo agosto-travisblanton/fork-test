@@ -16,7 +16,7 @@ class LoginHandlerTest(ProvisioningDistributorUserBase):
     def setUp(self):
         super(LoginHandlerTest, self).setUp()
 
-    @mock.patch('handlers.jwt_handler.verify_google_token')
+    @mock.patch('handlers.login_handler.verify_google_token')
     def test_issues_new_jwt_after_valid_google_token(self, verify_google_token):
         verify_google_token.return_value = self.some_user
         self.assertTrue(User.query(User.email == self.some_user["email"]).fetch() == [])
@@ -33,7 +33,7 @@ class LoginHandlerTest(ProvisioningDistributorUserBase):
         user_entity = User.query(User.email == self.some_user["email"]).fetch()[0]
         self.assertEqual(user_entity.email, self.some_user["email"])
 
-    @mock.patch('handlers.jwt_handler.verify_google_token')
+    @mock.patch('handlers.login_handler.verify_google_token')
     def test_returns_forbidden_when_invalid_google_token(self, verify_google_token):
         verify_google_token.return_value = None
         self.assertTrue(User.query(User.email == self.some_user["email"]).fetch() == [])
