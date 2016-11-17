@@ -130,7 +130,7 @@ describe('skykitProvisioning module and configuration', function () {
 
 
   return describe('Restangular configuration', function () {
-    it('sets the base URL', () => expect(RestangularProvider.setBaseUrl).toHaveBeenCalledWith('/api/v1'));
+    it('sets the base URL', () => expect(RestangularProvider.setBaseUrl).toHaveBeenCalledWith('/internal/v1'));
 
     it('adds a response interceptor', function () {
       expect(RestangularProvider.addResponseInterceptor).toHaveBeenCalled();

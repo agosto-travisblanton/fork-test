@@ -362,7 +362,7 @@ export function routes($stateProvider, $urlRouterProvider, RestangularProvider) 
 
   $urlRouterProvider.otherwise('/sign_in');
 
-  RestangularProvider.setBaseUrl('/api/v1');
+  RestangularProvider.setBaseUrl('/internal/v1');
 
   RestangularProvider.addResponseInterceptor(function (data, operation, resourceType, url, response, deferred) {
     let result = data;

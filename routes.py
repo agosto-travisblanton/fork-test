@@ -337,17 +337,17 @@ application = WSGIApplication(
         # DOMAINS
         ############################################################
 
-        Route(r'/api/v1/domains',
+        Route(r'/internal/v1/domains',
               handler='handlers.domains_handler.DomainsHandler',
               name='domains',
               methods=['GET', 'POST']
               ),
-        Route(r'/api/v1/domains/<domain_key>',
+        Route(r'/internal/v1/domains/<domain_key>',
               handler='handlers.domains_handler.DomainsHandler',
               name='manage-domain',
               methods=['GET', 'PUT', 'DELETE']
               ),
-        Route(r'/api/v1/domains/<domain_key>/directory_api',
+        Route(r'/internal/v1/domains/<domain_key>/directory_api',
               handler='handlers.domains_handler.DomainsHandler',
               name='directory-api-ping',
               handler_method='ping_directory_api',
