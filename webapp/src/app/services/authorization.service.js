@@ -1,8 +1,9 @@
 export default class AuthorizationService {
 
-  constructor(SessionsService, $q) {
+  constructor(SessionsService, $q, $window) {
     'ngInject';
     this.$q = $q
+    this.$window = $window
     this.SessionsService = SessionsService
   }
 
@@ -15,7 +16,8 @@ export default class AuthorizationService {
         deferred.resolve(true);
       } else {
         this.SessionsService.removeUserInfo();
-        window.location.replace("/#/redirect")
+        console.log("here")
+        this.$window.location.href = "#/redirect"
       }
     } else {
       deferred.reject(["authError", 'sign_in']);
@@ -47,7 +49,8 @@ export default class AuthorizationService {
     if (userKey) {
       if (!userJWT) {
         this.SessionsService.removeUserInfo();
-        window.location.replace("/#/redirect")
+        console.log("here too")
+        this.$window.location.href = "#/redirect"
       }
     }
 
