@@ -43,12 +43,8 @@ class TestMain(SQLBaseTest, WebTest):
                                     active=True)
 
         self.domain_key = self.domain.put()
-        self.headers = {
-
-            'Authorization': config.API_TOKEN,
-            'X-Provisioning-Distributor': self.distributor_key.urlsafe()
-        }
-
+        self.headers = self.JWT_DEFUALT_HEADER
+        self.headers['X-Provisioning-Distributor'] = self.distributor_key.urlsafe()
         self.load_tenant()
 
     def test_multi_device_by_date_api(self):
