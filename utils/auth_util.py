@@ -75,12 +75,6 @@ def requires_auth(f):
         api_token = self.request.headers.get('Authorization')
         self.is_unmanaged_device = api_token == config.UNMANAGED_API_TOKEN
 
-        if api_token and not self.is_unmanaged_device:
-            return json_response(self.response, {
-                "message": "you must redirect",
-            }, status_code=302)
-
-
         ################################################
         # DO THE ACTUAL TOKEN VALIDATION
         ################################################
