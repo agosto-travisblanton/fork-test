@@ -1,10 +1,10 @@
 import json
 
 from google.appengine.ext import ndb
-from webapp2 import RequestHandler
 from models import Distributor, DistributorEntityGroup, Domain, DistributorUser, User
 from restler.serializers import json_response
-from decorators import has_admin_user_key, requires_auth
+from decorators import has_admin_user_key
+from utils.auth_util import requires_auth
 from strategy import DISTRIBUTOR_STRATEGY, DOMAIN_STRATEGY
 from extended_session_request_handler import ExtendedSessionRequestHandler
 
