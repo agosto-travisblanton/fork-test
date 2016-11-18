@@ -4,9 +4,8 @@ import logging
 from google.appengine.ext import ndb
 
 from app_config import config
-from utils.auth_util import requires_auth
 from models import User
-from proofplay.database_calls import get_tenant_names_for_distributor
+from utils.tenant_util import get_tenant_names_for_distributor
 from restler.serializers import json_response
 
 

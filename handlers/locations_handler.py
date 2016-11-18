@@ -5,7 +5,7 @@ import re
 from google.appengine.ext import ndb
 from webapp2 import RequestHandler
 
-from decorators import requires_auth
+from utils.auth_util import requires_auth
 from models import Location, Tenant
 from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response

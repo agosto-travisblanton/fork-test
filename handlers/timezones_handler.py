@@ -1,6 +1,6 @@
 from webapp2 import RequestHandler
 
-from decorators import requires_auth
+from utils.auth_util import requires_auth
 from restler.serializers import json_response
 from utils.timezone_util import TimezoneUtil
 from extended_session_request_handler import ExtendedSessionRequestHandler

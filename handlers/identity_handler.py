@@ -15,7 +15,7 @@ class IdentityHandler(ExtendedSessionRequestHandler):
             if user:
                 user_entity = User.get_by_email(user["email"])
                 if not user_entity:
-                    user_entity = User.insert_user(user["name"], user["email"])
+                    user_entity = User.get_or_insert_by_email(user["email"])
                 self.user_entity = user_entity
 
                 return json_response(self.response, {

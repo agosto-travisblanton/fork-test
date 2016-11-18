@@ -7,7 +7,8 @@ from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
 from app_config import config
-from decorators import requires_auth, requires_registration_token, requires_unmanaged_registration_token
+from utils.auth_util import requires_auth
+from decorators import requires_registration_token, requires_unmanaged_registration_token
 from device_commands_handler import DeviceCommandsHandler
 from device_message_processor import post_unmanaged_device_info, change_intent
 from extended_session_request_handler import ExtendedSessionRequestHandler

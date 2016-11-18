@@ -8,7 +8,7 @@ from google.appengine.ext import ndb
 from google.net.proto.ProtocolBuffer import ProtocolBufferDecodeError
 
 from app_config import config
-from decorators import requires_auth
+from utils.auth_util import requires_auth
 from device_message_processor import change_intent
 from extended_session_request_handler import ExtendedSessionRequestHandler
 

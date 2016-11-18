@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 from webapp2 import RequestHandler
 
 from app_config import config
-from decorators import requires_auth
+from utils.auth_util import requires_auth
 from integrations.directory_api.chrome_os_devices_api import ChromeOsDevicesApi
 from integrations.directory_api.organization_units_api import OrganizationUnitsApi
 from integrations.directory_api.users_api import UsersApi

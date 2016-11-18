@@ -6,20 +6,20 @@ from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
 from app_config import config
-from decorators import requires_auth
+from utils.auth_util import requires_auth
 from extended_session_request_handler import ExtendedSessionRequestHandler
 from integrations.content_manager.content_manager_api import ContentManagerApi
 from integrations.directory_api.organization_units_api import OrganizationUnitsApi
 from integrations.directory_api.users_api import UsersApi
 from model_entities.domain_model import Domain
-from models import IntegrationEventLog
-from models import Tenant
-from proofplay.database_calls import get_tenant_list_from_distributor_key
+from models import IntegrationEventLog, Tenant, TenantEntityGroup
+from utils.tenant_util import get_tenant_names_for_distributor, get_tenant_list_from_distributor_key
 from restler.serializers import json_response
 from strategy import TENANT_STRATEGY
 from utils.iterable_util import delimited_string_to_list
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>'
+
 
 
 class TenantsHandler(ExtendedSessionRequestHandler):

@@ -3,7 +3,8 @@ from webapp2 import RequestHandler
 import logging
 import httplib
 from app_config import config
-from decorators import has_admin_user_key, requires_auth
+from decorators import has_admin_user_key
+from utils.auth_util import requires_auth
 from models import IntegrationEventLog
 from ndb_mixins import PagingListHandlerMixin, KeyValidatorMixin
 from restler.serializers import json_response

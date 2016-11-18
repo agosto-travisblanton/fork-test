@@ -1,11 +1,10 @@
 import json
 
 from google.appengine.ext import ndb
-from decorators import requires_auth, has_distributor_admin_user_key
+from decorators import has_distributor_admin_user_key
+from utils.auth_util import requires_auth
 from strategy import DISTRIBUTOR_STRATEGY
-from agar.sessions import SessionRequestHandler
 from models import User, Distributor, DistributorUser
-from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
 from extended_session_request_handler import ExtendedSessionRequestHandler
 
