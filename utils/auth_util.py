@@ -75,15 +75,16 @@ def requires_auth(f):
         api_token = self.request.headers.get('Authorization')
         self.is_unmanaged_device = api_token == config.UNMANAGED_API_TOKEN
 
+        if api_token and not self.is_unmanaged_device:
+            return json_response(self.response, {
+                "message": "you must redirect",
+            }, status_code=302)
+
 
         ################################################
         # DO THE ACTUAL TOKEN VALIDATION
         ################################################
         token = self.request.headers.get('JWT')
-
-        if self.is_unmanaged_device and not token:
-            # ONLY ALLOW CERTAIN ROUTES HERE
-            return f(self, *args, **kwargs)
 
         if token and token != '':
             string_token = token.encode('ascii', 'ignore')
@@ -99,8 +100,7 @@ def requires_auth(f):
             "message": "Authentication is required to access this resource",
             "OAUTH_CLIENT_ID": config.OAUTH_CLIENT_ID,
             'BROWSER_API_KEY': config.PUBLIC_API_SERVER_KEY,
-            'version': os.environ['CURRENT_VERSION_ID'],
-
+            'version': os.environ['CURRENT_VERSION_ID']
         }, status_code=httplib.FORBIDDEN)
 
     return decorated

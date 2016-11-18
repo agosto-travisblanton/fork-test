@@ -1,61 +1,63 @@
-import {app} from './app'
+import {app} from "./app";
+import {DeviceDetailsCommandsCtrl} from "./device/device-detail-command";
+import {DeviceDetailsCtrl} from "./device/device-details.controller";
+import {DevicesListingCtrl} from "./device/devices-listing.controller";
+import {AdminCtrl} from "./admin/admin-controller";
+import {AuthenticationCtrl} from "./authentication/authentication-controller";
+import {AppController} from "./app/app-controller";
+import {DistributorSelectorCtrl} from "./distributor/distributor-selector-controller";
+import {DistributorsCtrl} from "./distributor/distributors-controller";
+import {DomainsCtrl} from "./domain/domains.controller";
+import {DomainDetailsCtrl} from "./domain/domain-details.controller";
+import {ProofOfPlayMultiLocationCtrl} from "./proof/multi-location.controller";
+import {ProofOfPlayMultiDisplayCtrl} from "./proof/multi-display.controller";
+import {ProofOfPlayMultiResourceCtrl} from "./proof/multi-resource.controller";
+import {ProofOfPlayCtrl} from "./proof/proof-of-play.controller";
+import ImageService from "./services/image.service";
+import AdminService from "./services/admin.service";
+import AuthorizationService from "./services/authorization.service";
+import CommandsService from "./services/commands.service";
+import DateManipulationService from "./services/datemanipulation.service";
+import DevicesService from "./services/devices.service";
+import DistributorsService from "./services/distributors.service";
+import DomainsService from "./services/domains.service";
+import IdentityService from "./services/identity.service";
+import IntegrationEvents from "./services/integration-events.service";
+import LocationsService from "./services/locations.service";
+import ProgressBarService from "./services/progressbar.service";
+import ProofPlayService from "./services/proofplay.service";
+import SessionsService from "./services/sessions.service";
+import StorageService from "./services/storage.service";
+import TenantsService from "./services/tenants.service";
+import TimezonesService from "./services/timezones.service";
+import ToastsService from "./services/toasts.service";
+import VersionsService from "./services/versions.service";
+import {TenantLogsCtrl} from "./tenant/tenant-logs.controller";
+import {TenantOverlaysCtrl} from "./tenant/tenant-overlays.controller";
+import {TenantAddCtrl} from "./tenant/tenant-add.controller";
+import {TenantDetailsCtrl} from "./tenant/tenant-details.controller";
+import {TenantLocationCtrl} from "./tenant/tenant-location.controller";
+import {TenantLocationsCtrl} from "./tenant/tenant-locations.controller";
+import {TenantManagedDevicesCtrl} from "./tenant/tenant-managed-devices.controller";
+import {TenantUnmanagedDevicesCtrl} from "./tenant/tenant-unmanaged-devices.controller";
+import {TenantsCtrl} from "./tenant/tenants.controller";
+import {WelcomeCtrl} from "./welcome/welcome-controller";
+import {routes} from "./app-routes";
+import {appRun} from "./app-run";
+import {toastrConfig, breadcrumbProvider} from "./app-config";
+import {RedirectCtrl} from "./redirect/redirect.controller";
 // Device
-import {DeviceDetailsCommandsCtrl} from './device/device-detail-command'
-import {DeviceDetailsCtrl} from './device/device-details.controller'
-import {DevicesListingCtrl} from './device/devices-listing.controller'
 // Admin
-import {AdminCtrl} from './admin/admin-controller'
 // Authentication
-import {AuthenticationCtrl} from './authentication/authentication-controller'
 // App
-import {AppController} from './app/app-controller'
 // Distributors
-import {DistributorSelectorCtrl} from './distributor/distributor-selector-controller'
-import {DistributorsCtrl} from './distributor/distributors-controller'
 // Domains
-import {DomainsCtrl} from './domain/domains.controller'
-import {DomainDetailsCtrl} from './domain/domain-details.controller'
 // ProofPlay
-import {ProofOfPlayMultiLocationCtrl} from './proof/multi-location.controller'
-import {ProofOfPlayMultiDisplayCtrl} from './proof/multi-display.controller'
-import {ProofOfPlayMultiResourceCtrl} from './proof/multi-resource.controller'
-import {ProofOfPlayCtrl} from './proof/proof-of-play.controller'
 // Services
-import ImageService from './services/image.service'
-import AdminService from './services/admin.service'
-import AuthorizationService from './services/authorization.service'
-import CommandsService from './services/commands.service'
-import DateManipulationService from './services/datemanipulation.service'
-import DevicesService from './services/devices.service'
-import DistributorsService from './services/distributors.service'
-import DomainsService from './services/domains.service'
-import IdentityService from './services/identity.service'
-import IntegrationEvents from './services/integration-events.service'
-import LocationsService from './services/locations.service'
-import ProgressBarService from './services/progressbar.service'
-import ProofPlayService from './services/proofplay.service'
-import SessionsService from './services/sessions.service'
-import StorageService from './services/storage.service'
-import TenantsService from './services/tenants.service'
-import TimezonesService from './services/timezones.service'
-import ToastsService from './services/toasts.service'
-import VersionsService from './services/versions.service'
 // Tenant
-import {TenantLogsCtrl} from './tenant/tenant-logs.controller'
-import {TenantOverlaysCtrl} from './tenant/tenant-overlays.controller'
-import {TenantAddCtrl} from './tenant/tenant-add.controller'
-import {TenantDetailsCtrl} from './tenant/tenant-details.controller'
-import {TenantLocationCtrl} from './tenant/tenant-location.controller'
-import {TenantLocationsCtrl} from './tenant/tenant-locations.controller'
-import {TenantManagedDevicesCtrl} from './tenant/tenant-managed-devices.controller'
-import {TenantUnmanagedDevicesCtrl} from './tenant/tenant-unmanaged-devices.controller'
-import {TenantsCtrl} from './tenant/tenants.controller'
 // Welcome
-import {WelcomeCtrl} from './welcome/welcome-controller'
 // Config
-import {routes} from './app-routes'
-import {appRun} from './app-run';
-import {toastrConfig, breadcrumbProvider} from './app-config'
+// Redirect
 
 
 app
@@ -112,12 +114,27 @@ app
   .controller("TenantsCtrl", TenantsCtrl)
   // Welcome
   .controller("WelcomeCtrl", WelcomeCtrl)
+  // Redirect
+  .controller("RedirectCtrl", RedirectCtrl)
   // appRun Block
   .run(appRun)
   // Config
   .config(routes)
   .config(toastrConfig)
   .config(breadcrumbProvider)
+
+app.config(function (RestangularProvider) {
+
+  // add a response interceptor
+  RestangularProvider.setErrorInterceptor(function (response) {
+    console.log(response)
+    if (response.status === 302 || (response.status === 403 && response.data.message === "Authentication is required to access this resource")) {
+      window.location.href = "/#/redirect"
+    }
+    return response
+  })
+
+})
 
 // Request Interceptor
 app.service('RequestInterceptor', function (StorageService, $location) {
@@ -131,7 +148,6 @@ app.service('RequestInterceptor', function (StorageService, $location) {
         'Accept': 'application/json',
         'JWT': StorageService.get('JWT'),
         'oAuth': StorageService.get('oAuth'),
-        'Authorization': $location.host().indexOf('provisioning-gamestop') > -1 ? gs : prod,
         'X-Provisioning-User': StorageService.get('userKey'),
         'X-Provisioning-User-Identifier': StorageService.get('userEmail'),
         'X-Provisioning-Distributor': StorageService.get('currentDistributorKey')
