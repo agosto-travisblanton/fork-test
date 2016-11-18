@@ -9,8 +9,14 @@ export default class AuthorizationService {
   authenticated() {
     let deferred = this.$q.defer();
     let userKey = this.SessionsService.getUserKey();
+    let userJWT = this.SessionsService.getJWT();
     if (userKey) {
-      deferred.resolve(true);
+      if (userKey && userJWT) {
+        deferred.resolve(true);
+      } else {
+        this.SessionsService.removeUserInfo();
+        window.location.replace("/#/redirect")
+      }
     } else {
       deferred.reject(["authError", 'sign_in']);
     }
@@ -37,6 +43,14 @@ export default class AuthorizationService {
       hasAtLeastOneDistributorAdmin = true;
     }
     let userKey = this.SessionsService.getUserKey();
+    let userJWT = this.SessionsService.getJWT();
+    if (userKey) {
+      if (!userJWT) {
+        this.SessionsService.removeUserInfo();
+        window.location.replace("/#/redirect")
+      }
+    }
+
     if (!userKey) {
       deferred.reject('sign_in');
     } else if (!admin && !hasAtLeastOneDistributorAdmin) {

@@ -13,6 +13,10 @@ export default class SessionsService {
     this.uriBase = 'v1/sessions';
   }
 
+  setJWT(JWT){
+    return this.StorageService.set("JWT", JWT)
+  }
+
   setDistributors(distributors) {
     return this.StorageService.set('distributors', distributors);
   }
@@ -69,6 +73,10 @@ export default class SessionsService {
     return this.StorageService.get('isAdmin');
   }
 
+  getJWT() {
+    return this.StorageService.get("JWT")
+  }
+
   login(credentials) {
     // request interceptor checks this
     this.StorageService.set('oAuth', credentials.id_token)
@@ -76,7 +84,7 @@ export default class SessionsService {
     let promise = this.$http({url: '/api/v1/login', method: 'GET'})
     return promise.then((res) => {
       let data = jwt_decode(res.data.token);
-      this.StorageService.set("JWT", res.data.token)
+      this.setJWT(res.data.token)
       this.setDistributors(data['distributors']);
       this.setDistributorsAsAdmin(data['distributors_as_admin']);
       this.setIsAdmin(data['is_admin']);
