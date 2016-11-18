@@ -101,7 +101,7 @@ describe('DistributorsService', function () {
       return result = DistributorsService.getByKey(distributorKey);
     });
 
-    it('obtains Restangular service for distributors', () => expect(Restangular.oneUrl).toHaveBeenCalledWith(DistributorsService.DISTRIBUTOR_SERVICE, `api/v1/distributors/${distributorKey}`));
+    it('obtains Restangular service for distributors', () => expect(Restangular.oneUrl).toHaveBeenCalledWith(DistributorsService.DISTRIBUTOR_SERVICE, `internal/v1/distributors/${distributorKey}`));
 
     it('obtains the distributor from the Restangular service', () => expect(distributorRestangularService.get).toHaveBeenCalled());
 
@@ -166,7 +166,7 @@ describe('DistributorsService', function () {
       return result = DistributorsService.getDomainsByKey(distributorKey);
     });
 
-    it('obtains Restangular service for distributor domains', () => expect(Restangular.oneUrl).toHaveBeenCalledWith(DistributorsService.DISTRIBUTOR_SERVICE, `api/v1/distributors/${distributorKey}/domains`));
+    it('obtains Restangular service for distributor domains', () => expect(Restangular.oneUrl).toHaveBeenCalledWith(DistributorsService.DISTRIBUTOR_SERVICE, `internal/v1/distributors/${distributorKey}/domains`));
 
     it('obtains the distributor domains from the Restangular service', () => expect(distributorRestangularService.get).toHaveBeenCalled());
 

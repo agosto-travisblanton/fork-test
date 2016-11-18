@@ -273,7 +273,7 @@ def send_mock_data(to_send, integration=False):
     else:
         first_part = "http://localhost:8080"
 
-    url = first_part + "/proofplay/api/v1/post_new_program_play"
+    url = first_part + "/proofplay/internal/v1/post_new_program_play"
 
     headers = {
         'Content-type': 'application/json',

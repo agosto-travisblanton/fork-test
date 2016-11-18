@@ -69,7 +69,7 @@ describe('DomainsService', function () {
       spyOn(Restangular, 'one').and.returnValue(domainRestangularService);
       spyOn(domainRestangularService, 'get').and.returnValue(promise);
       let actual = DomainsService.getDomainByKey(domainKey);
-      expect(Restangular.one).toHaveBeenCalledWith('domains', `/internal/v1/domains/${domainKey}`);
+      expect(Restangular.one).toHaveBeenCalledWith('domains', `${domainKey}`);
       expect(domainRestangularService.get).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })

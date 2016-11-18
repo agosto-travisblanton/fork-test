@@ -10,16 +10,17 @@ from app_config import config
 import json
 
 
-class TestPlayerCommandEventsHandler(BaseTest, WebTest):
+class TestCommandEventsHandler(BaseTest, WebTest):
     APPLICATION = application
     INTENT = 'skykit.com/skdchromeapp/reset'
     GCM_REGISTRATION_ID = 'APA91bH0sONxgUSSUtERv-SGZHYvThi3jRv_p4ASYdTTLjgLntaZhyL9ti8aE-SWZm8ju1z0stjziWLvVdRt0'
     DEVICE_URLSAFE_KEY = 'kljlkjlkjlkjlkjlkjljlkj'
 
     def setUp(self):
-        super(TestPlayerCommandEventsHandler, self).setUp()
+        super(TestCommandEventsHandler, self).setUp()
         self.event = PlayerCommandEvent.create(device_urlsafe_key=self.DEVICE_URLSAFE_KEY,
-                                               payload=self.INTENT, gcm_registration_id=self.GCM_REGISTRATION_ID)
+                                               payload=self.INTENT,
+                                               gcm_registration_id=self.GCM_REGISTRATION_ID)
         self.headers = {
             'Authorization': config.API_TOKEN
         }
@@ -48,29 +49,6 @@ class TestPlayerCommandEventsHandler(BaseTest, WebTest):
         self.assertEqual(response_json["events"][2]['payload'], 'payload-24')
         self.assertTrue(response_json["next_cursor"])
         self.assertFalse(response_json["prev_cursor"])
-
-    def test_put_no_authorization_header_returns_forbidden(self):
-        event_key = self.event.put()
-        uri = build_uri('manage-event', params_dict={'urlsafe_event_key': event_key.urlsafe()})
-        request_body = {}
-        response = self.put(uri, params=request_body, headers=self.bad_authorization_header)
-        self.assertForbidden(response)
-
-    def test_put_http_status_no_content(self):
-        event_key = self.event.put()
-        uri = build_uri('manage-event', params_dict={'urlsafe_event_key': event_key.urlsafe()})
-        request_body = {}
-        response = self.put(uri, params=request_body, headers=self.headers)
-        self.assertEqual('204 No Content', response.status)
-
-    def test_put_updates_player_has_confirmed(self):
-        event_key = self.event.put()
-        uri = build_uri('manage-event', params_dict={'urlsafe_event_key': event_key.urlsafe()})
-        request_body = {}
-        self.assertFalse(self.event.player_has_confirmed)
-        self.put(uri, params=request_body, headers=self.headers)
-        updated_event = event_key.get()
-        self.assertTrue(updated_event.player_has_confirmed)
 
     def __build_command_events(self, device_urlsafe_key, number_of_events):
         for i in range(number_of_events):

@@ -22,11 +22,11 @@ export default class TenantsService {
       top_right,
       top_left,
     }
-    return this.Restangular.oneUrl('overlay', `/api/v1/overlay/tenant/${tenant_urlsafe_key}`).customPOST(payload);
+    return this.Restangular.oneUrl('overlay', `/internal/v1/overlay/tenant/${tenant_urlsafe_key}`).customPOST(payload);
   }
 
   overlayApplyTenant(tenant_urlsafe_key) {
-    return this.Restangular.oneUrl('overlay', `/api/v1/overlay/tenant/${tenant_urlsafe_key}/apply`).post();
+    return this.Restangular.oneUrl('overlay', `/internal/v1/overlay/tenant/${tenant_urlsafe_key}/apply`).post();
   }
 
   searchAllTenantsByName(tenant_name, allDistributors) {
@@ -42,13 +42,13 @@ export default class TenantsService {
   }
 
   fetchAllTenantsPaginated(page_size, offset) {
-    let url = `api/v1/tenants/paginated/${page_size}/${offset}`;
+    let url = `internal/v1/tenants/paginated/${page_size}/${offset}`;
     let promise = this.Restangular.oneUrl('tenants', url).get();
     return promise;
   }
 
   getTenantByKey(tenantKey) {
-    let url = `api/v1/tenants/${tenantKey}`;
+    let url = `internal/v1/tenants/${tenantKey}`;
     let promise = this.Restangular.oneUrl('tenants', url).get();
     return promise;
   }

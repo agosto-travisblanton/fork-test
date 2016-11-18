@@ -16,7 +16,7 @@ basedir = path.abspath(path.dirname(__file__))
 from google.appengine.ext import deferred
 from webapp2 import Route, WSGIApplication
 
-BASE_URI = r'/proofplay/api/v1'
+BASE_URI = r'/proofplay/internal/v1'
 
 application = WSGIApplication([
 

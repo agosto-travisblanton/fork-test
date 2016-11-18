@@ -8,7 +8,8 @@ from strategy import CHROME_OS_DEVICE_STRATEGY
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
-class ChromeDeviceManagementHandler(RequestHandler):
+class DeviceHandler(RequestHandler):
+
     def get_device_by_parameters(self):
         impersonation_email = self.request.get('impersonationEmail')
         device_mac_address = self.request.get('macAddress')

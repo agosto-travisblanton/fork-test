@@ -12,7 +12,7 @@ export default class AdminService {
       admin_email
     };
 
-    let promise = this.Restangular.oneUrl(this.DISTRIBUTOR_SERVICE, '/api/v1/distributors').customPOST(payload);
+    let promise = this.Restangular.oneUrl(this.DISTRIBUTOR_SERVICE, '/internal/v1/distributors').customPOST(payload);
     return promise;
   }
 
@@ -23,17 +23,17 @@ export default class AdminService {
       distributor_admin: distributorAdmin
     };
 
-    let promise = this.Restangular.oneUrl(this.USER_SERVICE, "/api/v1/users").customPOST(payload);
+    let promise = this.Restangular.oneUrl(this.USER_SERVICE, "/internal/v1/users").customPOST(payload);
     return promise;
   }
 
   getUsersOfDistributor(distributorKey) {
-    let promise = this.Restangular.oneUrl(this.DISTRIBUTOR_SERVICE, `/api/v1/analytics/distributors/${distributorKey}/users`).get();
+    let promise = this.Restangular.oneUrl(this.DISTRIBUTOR_SERVICE, `/internal/v1/analytics/distributors/${distributorKey}/users`).get();
     return promise;
   }
 
   getAllDistributors() {
-    let promise = this.Restangular.oneUrl(this.DISTRIBUTOR_SERVICE, "/api/v1/distributors").get();
+    let promise = this.Restangular.oneUrl(this.DISTRIBUTOR_SERVICE, "/internal/v1/distributors").get();
     return promise;
   }
 }

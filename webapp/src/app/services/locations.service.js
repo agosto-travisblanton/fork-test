@@ -20,19 +20,19 @@ export default class LocationsService {
   }
 
   getLocationsByTenantKey(tenantKey) {
-    let promise = this.Restangular.oneUrl('tenants', `api/v1/tenants/${tenantKey}/locations`).get();
+    let promise = this.Restangular.oneUrl('tenants', `internal/v1/tenants/${tenantKey}/locations`).get();
     return promise;
   }
 
   getLocationsByTenantKeyPaginated(tenantKey, prev, next) {
     prev = prev === undefined || null ? null : prev;
     next = next === undefined || null ? null : next;
-    let promise = this.Restangular.oneUrl('tenants', `api/v1/tenants/${tenantKey}/${prev}/${next}/locations`).get();
+    let promise = this.Restangular.oneUrl('tenants', `internal/v1/tenants/${tenantKey}/${prev}/${next}/locations`).get();
     return promise;
   }
 
   getLocationByKey(locationKey) {
-    let promise = this.Restangular.oneUrl('locations', `api/v1/locations/${locationKey}`).get();
+    let promise = this.Restangular.oneUrl('locations', `internal/v1/locations/${locationKey}`).get();
     return promise;
   }
 }

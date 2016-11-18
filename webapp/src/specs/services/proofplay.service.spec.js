@@ -48,7 +48,7 @@ describe('ProofPlayService', function () {
     });
 
 
-    it('sets @uriBase variable', () => expect(ProofPlayService.uriBase).toEqual('proofplay/api/v1'));
+    it('sets @uriBase variable', () => expect(ProofPlayService.uriBase).toEqual('proofplay/internal/v1'));
 
     it('sets @cachedResources variable to null', () => expect(ProofPlayService.cachedResources).toBeFalsy());
 
@@ -67,7 +67,7 @@ describe('ProofPlayService', function () {
         allResources = allResources + "|" + each;
       }
 
-      return expect(window.open).toHaveBeenCalledWith(`proofplay/api/v1/multi_resource_by_date/${start_date}/${end_date}/${allResources}/${tenants[0]}/${cookie_token}`, '_blank');
+      return expect(window.open).toHaveBeenCalledWith(`proofplay/internal/v1/multi_resource_by_date/${start_date}/${end_date}/${allResources}/${tenants[0]}/${cookie_token}`, '_blank');
     });
 
 
@@ -87,7 +87,7 @@ describe('ProofPlayService', function () {
       }
 
 
-      return expect(window.open).toHaveBeenCalledWith(`proofplay/api/v1/multi_resource_by_device/${start_date}/${end_date}/${allResources}/${tenants[0]}/${cookie_token}`, '_blank');
+      return expect(window.open).toHaveBeenCalledWith(`proofplay/internal/v1/multi_resource_by_device/${start_date}/${end_date}/${allResources}/${tenants[0]}/${cookie_token}`, '_blank');
     });
 
 
@@ -107,7 +107,7 @@ describe('ProofPlayService', function () {
       }
 
 
-      return expect(window.open).toHaveBeenCalledWith(`proofplay/api/v1/multi_device_summarized/${start_date}/${end_date}/${allDevices}/${tenants[0]}/${cookie_token}`, '_blank');
+      return expect(window.open).toHaveBeenCalledWith(`proofplay/internal/v1/multi_device_summarized/${start_date}/${end_date}/${allDevices}/${tenants[0]}/${cookie_token}`, '_blank');
     });
 
     it('sets tenant and downloadCSVForMultipleDevicesByDate', function () {
@@ -126,7 +126,7 @@ describe('ProofPlayService', function () {
       }
 
 
-      return expect(window.open).toHaveBeenCalledWith(`proofplay/api/v1/multi_device_by_date/${start_date}/${end_date}/${allDevices}/${tenants[0]}/${cookie_token}`, '_blank');
+      return expect(window.open).toHaveBeenCalledWith(`proofplay/internal/v1/multi_device_by_date/${start_date}/${end_date}/${allDevices}/${tenants[0]}/${cookie_token}`, '_blank');
     });
 
     it('sets tenant and downloadCSVForMultipleLocationsByDevice', function () {
@@ -145,7 +145,7 @@ describe('ProofPlayService', function () {
       }
 
 
-      return expect(window.open).toHaveBeenCalledWith(`proofplay/api/v1/multi_location_by_device/${start_date}/${end_date}/${allLocations}/${tenants[0]}/${cookie_token}`, '_blank');
+      return expect(window.open).toHaveBeenCalledWith(`proofplay/internal/v1/multi_location_by_device/${start_date}/${end_date}/${allLocations}/${tenants[0]}/${cookie_token}`, '_blank');
     });
 
 
@@ -164,7 +164,7 @@ describe('ProofPlayService', function () {
         allLocations = allLocations + "|" + each;
       }
 
-      expect(window.open).toHaveBeenCalledWith(`proofplay/api/v1/multi_location_summarized/${start_date}/${end_date}/${allLocations}/${tenants[0]}/${cookie_token}`, '_blank');
+      expect(window.open).toHaveBeenCalledWith(`proofplay/internal/v1/multi_location_summarized/${start_date}/${end_date}/${allLocations}/${tenants[0]}/${cookie_token}`, '_blank');
 
       it('gets all tenants', function () {
         let to_respond = {
@@ -172,7 +172,7 @@ describe('ProofPlayService', function () {
             tenants: ["one", "two"]
           }
         };
-        $httpBackend.expectGET("proofplay/api/v1/retrieve_my_tenants").respond(to_respond);
+        $httpBackend.expectGET("proofplay/internal/v1/retrieve_my_tenants").respond(to_respond);
         ProofPlayService.getAllTenants()
           .then(data => expect(angular.equals(data.data.tenants, to_respond.data.tenants)));
 
@@ -188,7 +188,7 @@ describe('ProofPlayService', function () {
         };
 
         let chosen_tenant = "some-tenant";
-        $httpBackend.expectGET(`proofplay/api/v1/retrieve_all_displays/${chosen_tenant}`).respond(to_respond);
+        $httpBackend.expectGET(`proofplay/internal/v1/retrieve_all_displays/${chosen_tenant}`).respond(to_respond);
 
         ProofPlayService.getAllDisplays(chosen_tenant)
           .then(data => expect(angular.equals(data.data.displays, to_respond.data.displays)));
@@ -205,7 +205,7 @@ describe('ProofPlayService', function () {
 
         let chosen_tenant = "some-tenant";
 
-        $httpBackend.expectGET(`proofplay/api/v1/retrieve_all_locations/${chosen_tenant}`).respond(to_respond);
+        $httpBackend.expectGET(`proofplay/internal/v1/retrieve_all_locations/${chosen_tenant}`).respond(to_respond);
 
         ProofPlayService.getAllLocations(chosen_tenant)
           .then(data => expect(angular.equals(data.data.locations, to_respond.data.locations)));

@@ -52,7 +52,7 @@ class TestUsersHandler(ProvisioningDistributorUserBase):
     # ADD REGULAR USER TO DISTRIBUTOR
     ###########################################################################
     def test_add_user_to_distributor_as_no_user(self):
-        request = self.post('/api/v1/users', json.dumps({
+        request = self.post('/internal/v1/users', json.dumps({
             "user_email": self.user.email,
             "distributor": "asdf",
             "distributor_admin": False
@@ -60,7 +60,7 @@ class TestUsersHandler(ProvisioningDistributorUserBase):
         self.assertEqual(403, request.status_int)
 
     def test_add_user_to_distributor_as_unprivileged_user(self):
-        request = self.post('/api/v1/users', json.dumps({
+        request = self.post('/internal/v1/users', json.dumps({
             "user_email": self.user.email,
             "distributor": "asdf",
             "distributor_admin": False
@@ -70,7 +70,7 @@ class TestUsersHandler(ProvisioningDistributorUserBase):
     def test_add_user_to_distributor_of_distributor_admin_as_distributor_admin(self):
         distributor_name_of_distributor_admin = self.distributor_admin_user.distributors_as_admin[0].name
         new_user = self.create_user(email="new@gmail.com", distributor_name="a new distributor")
-        request = self.post('/api/v1/users', json.dumps({
+        request = self.post('/internal/v1/users', json.dumps({
             "user_email": new_user.email,
             "distributor": distributor_name_of_distributor_admin,
             "distributor_admin": False
@@ -83,7 +83,7 @@ class TestUsersHandler(ProvisioningDistributorUserBase):
         self.assertLength(2, user_distributors)
 
     def test_add_user_to_different_distributor_as_distributor_admin(self):
-        request = self.post('/api/v1/users', json.dumps({
+        request = self.post('/internal/v1/users', json.dumps({
             "user_email": self.user.email,
             "distributor": "default_distro0",
             "distributor_admin": False
@@ -91,7 +91,7 @@ class TestUsersHandler(ProvisioningDistributorUserBase):
         self.assertEqual(403, request.status_int)
 
     def test_add_user_to_distributor_that_does_not_exist_as_admin(self):
-        request = self.post('/api/v1/users', json.dumps({
+        request = self.post('/internal/v1/users', json.dumps({
             "user_email": self.user.email,
             "distributor": "asdf",
             "distributor_admin": False
@@ -100,7 +100,7 @@ class TestUsersHandler(ProvisioningDistributorUserBase):
         self.assertEqual('Not a valid distributor', json.loads(request.body)["message"])
 
     def test_add_user_to_distributor_that_already_is_linked_as_admin(self):
-        request = self.post('/api/v1/users', json.dumps({
+        request = self.post('/internal/v1/users', json.dumps({
             "user_email": self.user.email,
             "distributor": self.default_distributor_name,
             "distributor_admin": False
@@ -114,7 +114,7 @@ class TestUsersHandler(ProvisioningDistributorUserBase):
 
     def test_add_user_to_distributor_as_admin(self):
         distro_to_add = self.create_distributor_if_unique("new_distributor").name
-        request = self.post('/api/v1/users', json.dumps({
+        request = self.post('/internal/v1/users', json.dumps({
             "user_email": self.user.email,
             "distributor": distro_to_add,
             "distributor_admin": False
@@ -136,7 +136,7 @@ class TestUsersHandler(ProvisioningDistributorUserBase):
         distro_to_add = self.distributor_admin_user.distributors_as_admin[0].name
         new_user = self.create_user(email="new@gmail.com", distributor_name="another new distributor")
 
-        request = self.post('/api/v1/users', json.dumps({
+        request = self.post('/internal/v1/users', json.dumps({
             "user_email": new_user.email,
             "distributor": distro_to_add,
             "distributor_admin": True
@@ -152,7 +152,7 @@ class TestUsersHandler(ProvisioningDistributorUserBase):
     def test_add_user_as_distributor_admin_to_distributor_as_platform_admin(self):
         new_user = self.create_user(email="new@gmail.com", distributor_name="a new distributor")
         distributor_name_of_distributor_admin = self.distributor_admin_user.distributors_as_admin[0].name
-        request = self.post('/api/v1/users', json.dumps({
+        request = self.post('/internal/v1/users', json.dumps({
             "user_email": new_user.email,
             "distributor": distributor_name_of_distributor_admin,
             "distributor_admin": True
@@ -167,7 +167,7 @@ class TestUsersHandler(ProvisioningDistributorUserBase):
 
     def test_add_user_as_distributor_admin_to_different_distributor_as_distributor_admin(self):
         default_distributor = "default_distro0"
-        request = self.post('/api/v1/users', json.dumps({
+        request = self.post('/internal/v1/users', json.dumps({
             "user_email": self.user.email,
             "distributor": default_distributor,
             "distributor_admin": True

@@ -16,7 +16,7 @@ export default class ProofPlayService {
     this.$state = $state
     this.ToastsService = ToastsService
     this.makeHTTPRequest = this.makeHTTPRequest.bind(this);
-    this.uriBase = 'proofplay/api/v1';
+    this.uriBase = 'proofplay/internal/v1';
   }
 
   makeHTTPURL(where_to_go, tenant) {
@@ -159,7 +159,7 @@ export default class ProofPlayService {
       return (resource.indexOf(query) === 0);
     };
   }
-  
+
   querySearch(resources, searchText) {
     if (searchText) {
       return resources.filter(this.createFilterFor(searchText));
