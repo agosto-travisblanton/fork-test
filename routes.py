@@ -133,16 +133,50 @@ application = WSGIApplication(
               ),
 
         ############################################################
-        # DEVICES
+        # DEVICES (Internal only)
         ############################################################
 
         Route(r'/internal/v1/devices/<device_urlsafe_key>',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='device-delete',
+              name='internal-device-delete',
               handler_method='delete',
               methods=['DELETE']
               ),
 
+        Route(r'/internal/v1/devices/<device_urlsafe_key>',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='internal-device-get',
+              handler_method='get',
+              methods=['GET']
+              ),
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='internal-device-put',
+              handler_method='put',
+              methods=['PUT']
+              ),
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>/panel-sleep',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='internal-panel-sleep',
+              handler_method='update_panel_sleep',
+              methods=['PUT']
+              ),
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>/controls-mode',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='internal-controls-mode',
+              handler_method='update_controls_mode',
+              methods=['PUT']
+              ),
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>/sleep-controller',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='internal-sleep-controller',
+              handler_method='update_sleep_controller',
+              methods=['PUT']
+              ),
 
         ############################################################
         # VERSION
@@ -211,24 +245,11 @@ application = WSGIApplication(
 
         Route(r'/internal/v1/devices/<prev_cursor_str>/<next_cursor_str>/<device_urlsafe_key>/issues',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='device-issues',
+              name='internal-device-issues',
               handler_method='get_latest_issues',
               methods=['GET']
               ),
 
-        Route(r'/internal/v1/devices/<device_urlsafe_key>/panel-sleep',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='panel_sleep',
-              handler_method='panel_sleep',
-              methods=['PUT']
-              ),
-
-        Route(r'/internal/v1/devices/<device_urlsafe_key>/controls-mode',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='controls_mode',
-              handler_method='controls_mode',
-              methods=['PUT']
-              ),
 
         Route(r'/internal/v1/devices/<device_urlsafe_key>/commands/reset',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
