@@ -1,5 +1,5 @@
 <div class="admin-container">
-  <div flex-xs flex-gt-xs="30">
+  <div flex-xs flex-gt-xs="40">
     <md-card>
       <md-card-title>
         <md-card-title-text>
@@ -48,7 +48,7 @@
       </md-card-content>
     </md-card>
   </div>
-  <div flex-xs flex-gt-xs="30">
+  <div flex-xs flex-gt-xs="40">
     <md-card>
       <md-card-title>
         <md-card-title-text>
@@ -58,7 +58,7 @@
       <md-card-content>
         <md-list ng-if="!vm.loadingUsersOfDistributor">
           <md-list-item ng-repeat="item in vm.usersOfDistributor | orderBy:'item' track by $index">
-            <p class="user-email-ellipsis">{{$index + 1}}. {{ item.email }}</p>
+            <p class="user-email-ellipsis">{{$index + 1}}. {{item.platform_admin  ? "(Platform Admin)" : ''}} {{ (item.distributor_admin && !item.platform_admin)  ? "(MO Admin)": ''}} {{ item.email }}</p>
 
           </md-list-item>
         </md-list>
