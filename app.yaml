@@ -1,3 +1,10 @@
+runtime: python
+env: flex
+entrypoint: gunicorn -b :$PORT routes:application
+
+runtime_config:
+  python_version: 2
+
 application: skykit-display-device-int  # DO NOT CHANGE THIS!  To deploy to other environments, use the command line
 version: snapshot
 runtime: python27

@@ -9,6 +9,7 @@ setup()
 import os
 from provisioning_env import (
     on_continuous_integration_server,
+    on_daniel_server,
     on_development_server,
     on_gamestop_server,
     on_integration_server,
@@ -111,6 +112,8 @@ app_CLIENT_ID = _CLIENT_ID()
 def _OAUTH_CLIENT_ID():
     if on_development_server or not on_server:
         return '390010375778-gidaqujfhgkqrc5lat9t890mhc0nhutt.apps.googleusercontent.com'
+    elif on_daniel_server:
+        return '409468753265-qj90pk3l6kgori18bvph4839vt56fs3i.apps.googleusercontent.com'
     elif on_integration_server:
         return '390010375778-gidaqujfhgkqrc5lat9t890mhc0nhutt.apps.googleusercontent.com'
     elif on_continuous_integration_server:

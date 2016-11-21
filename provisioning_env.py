@@ -11,6 +11,8 @@ on_qa_server = on_server and appid.lower().endswith('-qa')
 
 on_stage_server = on_server and appid.lower().endswith('-stage')
 
+on_daniel_server = on_server and appid.lower().endswith('-danielternyak')
+
 on_gamestop_server = on_server and appid.lower().endswith('-gamestop')
 
 on_production_server = (on_server
@@ -19,3 +21,4 @@ on_production_server = (on_server
                         and not on_qa_server
                         and not on_stage_server
                         and not on_gamestop_server)
+
