@@ -14,9 +14,10 @@ from models import Tenant, Distributor, Domain
 from proofplay.database_calls import insert_new_location_or_get_existing, insert_new_device_or_get_existing
 from app_config import config
 import time
+from utils.auth_util import generate_token
+from tests.provisioning_base_test import ProvisioningBaseTest
 
-
-class TestMain(SQLBaseTest, WebTest):
+class TestMain(SQLBaseTest, ProvisioningBaseTest):
     APPLICATION = application
     ADMIN_EMAIL = "foo{0}@bar.com"
     API_KEY = "SOME_KEY_{0}"
@@ -43,8 +44,18 @@ class TestMain(SQLBaseTest, WebTest):
                                     active=True)
 
         self.domain_key = self.domain.put()
-        self.headers = self.JWT_DEFUALT_HEADER
-        self.headers['X-Provisioning-Distributor'] = self.distributor_key.urlsafe()
+
+        self.user = self.create_user(email='dwight.schrute@demo.agosto.com',
+                                     distributor_name=self.DISTRIBUTOR_NAME)
+
+        self.user_key = self.user.key
+
+        self.headers = {
+            'Authorization': config.API_TOKEN,
+            'JWT': str(generate_token(self.user)),
+            'X-Provisioning-User': self.user_key.urlsafe(),
+            'X-Provisioning-Distributor': self.distributor_key.urlsafe()
+        }
         self.load_tenant()
 
     def test_multi_device_by_date_api(self):
