@@ -55,7 +55,7 @@ export default class TenantsService {
 
   delete(tenant) {
     if (tenant.key !== undefined) {
-      let promise = this.Restangular.one("tenants", tenant.key).remove();
+      let promise = this.Restangular.one('tenants', tenant.key).remove();
       return promise;
     }
   }

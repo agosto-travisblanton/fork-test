@@ -266,7 +266,7 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                    _queue='directory-api',
                                    _countdown=60)
                     device_uri = self.request.app.router.build(None,
-                                                               'device-get',
+                                                               'api-device-get',
                                                                None,
                                                                {'device_urlsafe_key': key.urlsafe()})
                     self.response.headers['Location'] = device_uri
@@ -299,136 +299,14 @@ class DeviceHandler(ExtendedSessionRequestHandler):
             return self.response.set_status(status, message)
         else:
             request_json = json.loads(self.request.body)
-            location_urlsafe_key = request_json.get('locationKey')
-            location = None
-            if location_urlsafe_key:
-                try:
-                    location = ndb.Key(urlsafe=location_urlsafe_key).get()
-                    device.location_key = location.key
-                except Exception, e:
-                    logging.exception(e)
-            check_for_content_interval_minutes = request_json.get('checkContentInterval')
-            if check_for_content_interval_minutes is not None and check_for_content_interval_minutes > -1:
-                if device.check_for_content_interval_minutes != check_for_content_interval_minutes:
-                    device.check_for_content_interval_minutes = check_for_content_interval_minutes
-                    user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
-                    if user_identifier is None or user_identifier == '':
-                        user_identifier = 'system'
-                    change_intent(
-                        gcm_registration_id=device.gcm_registration_id,
-                        payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
-                        device_urlsafe_key=device_urlsafe_key,
-                        host=self.request.host_url,
-                        user_identifier=user_identifier)
-            customer_display_name = request_json.get('customerDisplayName')
-            if customer_display_name:
-                device.customer_display_name = customer_display_name
-            customer_display_code = request_json.get('customerDisplayCode')
-            if customer_display_code:
-                if device.customer_display_code != customer_display_code:
-                    if ChromeOsDevice.is_customer_display_code_unique(
-                            customer_display_code=customer_display_code,
-                            tenant_key=device.tenant_key):
-                        device.customer_display_code = customer_display_code
-                    else:
-                        status = httplib.CONFLICT
-                        message = "Conflict. Customer display code \"{0}\" is already assigned for tenant.".format(
-                            customer_display_code)
-                        self.response.set_status(status, message)
-                        return
-            notes = request_json.get('notes')
-            if notes:
-                device.notes = notes
             gcm_registration_id = request_json.get('gcmRegistrationId')
             if gcm_registration_id:
                 device.gcm_registration_id = gcm_registration_id
-            panel_model = request_json.get('panelModelNumber')
-            if panel_model:
-                device.panel_model = panel_model
-            else:
-                device.panel_model = None
-            panel_input = request_json.get('panelSerialInput')
-            if panel_input:
-                device.panel_input = panel_input
-            else:
-                device.panel_input = None
-            tenant_code = request_json.get('tenantCode')
-            if tenant_code:
-                tenant = Tenant.find_by_tenant_code(tenant_code)
-                if tenant:
-                    if tenant.key != device.tenant_key:
-                        device.tenant_key = tenant.key
-                        device.put()
-                        if device.is_unmanaged_device:
-                            post_unmanaged_device_info(gcm_registration_id=device.gcm_registration_id,
-                                                       device_urlsafe_key=device.key.urlsafe(),
-                                                       host=self.request.host_url)
-                        else:
-                            deferred.defer(ContentManagerApi().update_device,
-                                           device_urlsafe_key=device.key.urlsafe(),
-                                           _queue='content-server',
-                                           _countdown=5)
-                else:
-                    status = httplib.BAD_REQUEST
-                    message = "Attempt to update an invalid tenant code: \"{0}\".".format(
-                        tenant_code)
-                    self.response.set_status(status, message)
-                    return
-
-            proof_of_play_logging = request_json.get('proofOfPlayLogging')
-            if str(proof_of_play_logging).lower() == 'true' or str(proof_of_play_logging).lower() == 'false':
-                device.proof_of_play_logging = bool(proof_of_play_logging)
-            timezone = request_json.get('timezone')
-            if timezone:
-                device.timezone = timezone
-                device.timezone_offset = TimezoneUtil.get_timezone_offset(timezone)
-            overlay_status = request_json.get('overlayStatus')
-            if overlay_status != None:
-                device.overlays_available = overlay_status
-            controls_mode = request_json.get('controlsMode')
-            if controls_mode != None:
-                device.controls_mode = controls_mode
-            orientation_mode = request_json.get('orientationMode')
-            if orientation_mode != None:
-                if orientation_mode.lower() in ["0", "90", "180", "270"]:
-                    device.orientation_mode = orientation_mode.lower()
-            sleep_controller = request_json.get('sleepController')
-            if sleep_controller != None:
-                if sleep_controller.lower() in ["chrome-default", "rs232"]:
-                    device.sleep_controller = sleep_controller.lower()
-
-            device.put()
-
-            # adjust this object with values you want to spy on to do a gcm_update on when they are True
-            gcm_update_on_changed_if_true = [
-                controls_mode,
-                overlay_status,
-                orientation_mode,
-                location,
-                panel_input,
-                panel_model,
-                customer_display_code,
-                customer_display_name,
-                proof_of_play_logging,
-                timezone,
-                sleep_controller
-            ]
-
-            changes_to_device = [e for e in gcm_update_on_changed_if_true if e != None]
-
-            if len(changes_to_device) > 0:
-                change_intent(
-                    gcm_registration_id=device.gcm_registration_id,
-                    payload=config.PLAYER_UPDATE_DEVICE_REPRESENTATION_COMMAND,
-                    device_urlsafe_key=device.key.urlsafe(),
-                    host=self.request.host_url,
-                    user_identifier='system (device update)'
-                )
-
-            if not device.is_unmanaged_device:
-                deferred.defer(update_chrome_os_device,
-                               device_urlsafe_key=device.key.urlsafe(),
-                               _queue='directory-api')
+                device.put()
+            mac_address = request_json.get('macAddress')
+            if mac_address:
+                device.mac_address = mac_address
+                device.put()
             self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
 

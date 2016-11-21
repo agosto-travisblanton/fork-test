@@ -42,7 +42,7 @@ application = WSGIApplication(
         # Player API - POST new device registration
         Route(r'/api/v1/devices',
               handler='handlers.api.player.device_handler.DeviceHandler',
-              name='device-registration',
+              name='api-device-registration',
               handler_method='post',
               methods=['POST']
               ),
@@ -50,7 +50,7 @@ application = WSGIApplication(
         # Player API - GET device by parameter
         Route(r'/api/v1/devices',
               handler='handlers.api.player.device_handler.DeviceHandler',
-              name='device-by-parameter',
+              name='api-device-by-parameter',
               handler_method='get_device_by_parameter',
               methods=['GET']
               ),
@@ -58,7 +58,7 @@ application = WSGIApplication(
         # Player API - GET device by key
         Route(r'/api/v1/devices/<device_urlsafe_key>',
               handler='handlers.api.player.device_handler.DeviceHandler',
-              name='device-get',
+              name='api-device-get',
               handler_method='get',
               methods=['GET']
               ),
@@ -66,7 +66,7 @@ application = WSGIApplication(
         # Player API - PUT device by key
         Route(r'/api/v1/devices/<device_urlsafe_key>',
               handler='handlers.api.player.device_handler.DeviceHandler',
-              name='device-put',
+              name='api-device-put',
               handler_method='put',
               methods=['PUT']
               ),
@@ -133,15 +133,8 @@ application = WSGIApplication(
               ),
 
         ############################################################
-        # DEVICES (Internal only)
+        # DEVICES (Internal UI only)
         ############################################################
-
-        Route(r'/internal/v1/devices/<device_urlsafe_key>',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='internal-device-delete',
-              handler_method='delete',
-              methods=['DELETE']
-              ),
 
         Route(r'/internal/v1/devices/<device_urlsafe_key>',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
@@ -178,17 +171,23 @@ application = WSGIApplication(
               methods=['PUT']
               ),
 
+        Route(r'/internal/v1/devices/<device_urlsafe_key>',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='internal-device-delete',
+              handler_method='delete',
+              methods=['DELETE']
+              ),
+
         ############################################################
         # VERSION
         ############################################################
 
-        Route(
-            r'/internal/v1/versions',
-            handler='handlers.versions_handler.VersionsHandler',
-            name='version-retrieval',
-            handler_method='get',
-            methods=['GET']
-        ),
+        Route(r'/internal/v1/versions',
+              handler='handlers.versions_handler.VersionsHandler',
+              name='version-retrieval',
+              handler_method='get',
+              methods=['GET']
+              ),
 
         ############################################################
         # LOGIN
@@ -215,32 +214,32 @@ application = WSGIApplication(
 
         Route(r'/internal/v1/locations/<location_urlsafe_key>',
               handler='handlers.locations_handler.LocationsHandler',
-              name='manage-location',
+              name='internal-manage-location',
               methods=['GET', 'PUT', 'DELETE']
               ),
 
         Route(r'/internal/v1/locations',
               handler='handlers.locations_handler.LocationsHandler',
-              name='location-create',
+              name='internal-location-create',
               methods=['POST']
               ),
 
         Route(r'/internal/v1/tenants/<tenant_urlsafe_key>/<prev_cursor>/<next_cursor>/locations',
               handler='handlers.locations_handler.LocationsHandler',
-              name='get_locations_by_tenant_paginated',
+              name='internal-get-locations-by-tenant-paginated',
               handler_method='get_locations_by_tenant_paginated',
               methods=['GET']
               ),
 
         Route(r'/internal/v1/tenants/<tenant_urlsafe_key>/locations',
               handler='handlers.locations_handler.LocationsHandler',
-              name='locations-list-retrieval',
+              name='internal-locations-list',
               handler_method='get_locations_by_tenant',
               methods=['GET']
               ),
 
         ############################################################
-        # DEVICE (ADDITONAL DEVICE ROUTES UNDER DISTRIBUTOR/TENANT)
+        # DEVICE (ADDITIONAL DEVICE ROUTES UNDER DISTRIBUTOR/TENANT)
         ############################################################
 
         Route(r'/internal/v1/devices/<prev_cursor_str>/<next_cursor_str>/<device_urlsafe_key>/issues',
@@ -249,7 +248,6 @@ application = WSGIApplication(
               handler_method='get_latest_issues',
               methods=['GET']
               ),
-
 
         Route(r'/internal/v1/devices/<device_urlsafe_key>/commands/reset',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
@@ -384,21 +382,15 @@ application = WSGIApplication(
               ),
 
         ############################################################
-        # OTHER
+        # GET, POST, PUT, DELETE
         ############################################################
 
-        Route(r'/internal/v1/tenants/paginated/<page_size>/<offset>',
-              handler='handlers.tenants_handler.TenantsHandler',
-              name='get_tenants_paginated',
-              handler_method='get_tenants_paginated',
-              methods=['GET']
-              ),
-
-        Route(r'/internal/v1/tenants',
-              handler='handlers.tenants_handler.TenantsHandler',
-              name='tenants',
-              methods=['GET', 'POST']
-              ),
+        Route(
+            r'/internal/v1/tenants',
+            handler='handlers.tenants_handler.TenantsHandler',
+            name='tenants',
+            methods=['GET', 'POST']
+        ),
 
         Route(
             r'/internal/v1/tenants/<tenant_key>',
@@ -406,6 +398,15 @@ application = WSGIApplication(
             name='manage-tenant',
             methods=['GET', 'PUT', 'DELETE']
         ),
+
+        Route(
+            r'/internal/v1/tenants/paginated/<page_size>/<offset>',
+            handler='handlers.tenants_handler.TenantsHandler',
+            name='get_tenants_paginated',
+            handler_method='get_tenants_paginated',
+            methods=['GET']
+        ),
+
 
         ############################################################
         # USERS
@@ -642,7 +643,7 @@ application = WSGIApplication(
 
 if on_development_server or on_integration_server or on_qa_server:
     dev_routes = [
-        Route(r'/api/v1/seed/<user_first>/<user_last>',
+        Route(r'/internal/v1/seed/<user_first>/<user_last>',
               handler="handlers.dev_handlers.SeedScript",
               name="Seed",
               methods=["GET"]

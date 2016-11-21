@@ -96,10 +96,10 @@ class TestDeviceHandler(BaseTest, WebTest):
         self.unmanaged_api_token_authorization_header = {
             'Authorization': config.UNMANAGED_API_TOKEN
         }
-        self.uri = build_uri('device-registration',
+        self.uri = build_uri('api-device-registration',
                              params_dict={'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
 
-        self.uri_unmanaged = build_uri('device-registration',
+        self.uri_unmanaged = build_uri('api-device-registration',
                                        params_dict={'device_urlsafe_key': self.unmanaged_device_key.urlsafe()})
 
         self.empty_header = {}
@@ -340,6 +340,21 @@ class TestDeviceHandler(BaseTest, WebTest):
         self.assertEqual(response_json['macAddress'], new_mac_address)
 
     ##################################################################################################################
+    # GET /api/v1/devices/<device_urlsafe_key>
+    ##################################################################################################################
+
+    def test_get_managed_device_by_key_no_authorization_header_returns_forbidden(self):
+        uri = build_uri('api-device-get', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        response = self.get(uri, headers=self.empty_header)
+        self.assertForbidden(response)
+
+    def test_get_managed_device_by_key_http_status_ok(self):
+        request_parameters = {}
+        uri = build_uri('api-device-get', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
+        self.assertOK(response)
+
+    ##################################################################################################################
     # GET /api/v1/devices/<device_urlsafe_key>/pairing
     ##################################################################################################################
 
@@ -419,13 +434,13 @@ class TestDeviceHandler(BaseTest, WebTest):
         self.unmanaged_device.pairing_code = self.PAIRING_CODE
         self.unmanaged_device.put()
         request_parameters = {'pairingCode': self.PAIRING_CODE}
-        uri = build_uri('device-by-parameter')
+        uri = build_uri('api-device-by-parameter')
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertOK(response)
 
     def test_get_device_by_pairing_code_returns_not_found_for_non_existent_code(self):
         request_parameters = {'pairingCode': self.PAIRING_CODE}
-        uri = build_uri('device-by-parameter')
+        uri = build_uri('api-device-by-parameter')
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertTrue('Bad response: 404 Unable to find device by pairing code: {0}'.format(
@@ -435,7 +450,7 @@ class TestDeviceHandler(BaseTest, WebTest):
         self.unmanaged_device.pairing_code = self.PAIRING_CODE
         self.unmanaged_device.put()
         request_parameters = {'pairingCode': self.PAIRING_CODE}
-        uri = build_uri('device-by-parameter')
+        uri = build_uri('api-device-by-parameter')
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
         self.assertEqual(response_json['pairingCode'], self.PAIRING_CODE)
@@ -451,7 +466,7 @@ class TestDeviceHandler(BaseTest, WebTest):
         device.archived = True
         device.put()
         request_parameters = {'pairingCode': self.PAIRING_CODE}
-        uri = build_uri('device-by-parameter')
+        uri = build_uri('api-device-by-parameter')
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertTrue("Unable to find device by pairing code: {0}".format(self.PAIRING_CODE) in
@@ -469,7 +484,7 @@ class TestDeviceHandler(BaseTest, WebTest):
         device_2.pairing_code = self.PAIRING_CODE
         device_2.put()
         request_parameters = {'pairingCode': self.PAIRING_CODE}
-        uri = build_uri('device-by-parameter')
+        uri = build_uri('api-device-by-parameter')
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
         self.assertEqual(response_json['pairingCode'], self.PAIRING_CODE)
@@ -485,27 +500,27 @@ class TestDeviceHandler(BaseTest, WebTest):
                                                  mac_address=self.MAC_ADDRESS)
         device.put()
         request_parameters = {'gcmRegistrationId': self.GCM_REGISTRATION_ID, 'macAddress': self.MAC_ADDRESS}
-        uri = build_uri('device-by-parameter')
+        uri = build_uri('api-device-by-parameter')
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertOK(response)
 
     def test_get_device_by_gcm_registration_id_and_mac_returns_http_status_bad_request_with_missing_mac(self):
         request_parameters = {'gcmRegistrationId': self.GCM_REGISTRATION_ID}
-        uri = build_uri('device-by-parameter')
+        uri = build_uri('api-device-by-parameter')
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertTrue('Bad response: 400 Bad Request' in context.exception.message)
 
     def test_get_device_by_gcm_registration_id_and_mac_returns_http_status_bad_request_with_missing_gcm(self):
         request_parameters = {'macAddress': self.MAC_ADDRESS}
-        uri = build_uri('device-by-parameter')
+        uri = build_uri('api-device-by-parameter')
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertTrue('Bad response: 400 Bad Request' in context.exception.message)
 
     def test_get_device_by_returns_http_status_bad_request_with_missing_parameters(self):
         request_parameters = {}
-        uri = build_uri('device-by-parameter')
+        uri = build_uri('api-device-by-parameter')
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertTrue('Bad response: 400 Bad Request' in context.exception.message)
@@ -515,7 +530,7 @@ class TestDeviceHandler(BaseTest, WebTest):
                                                  mac_address=self.MAC_ADDRESS)
         device.put()
         request_parameters = {'gcmRegistrationId': 'foobar', 'macAddress': self.MAC_ADDRESS}
-        uri = build_uri('device-by-parameter')
+        uri = build_uri('api-device-by-parameter')
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertOK(response)
 
@@ -525,7 +540,7 @@ class TestDeviceHandler(BaseTest, WebTest):
                                                  mac_address=self.MAC_ADDRESS)
         device.put()
         request_parameters = {'gcmRegistrationId': gcm_registration_id, 'macAddress': self.MAC_ADDRESS}
-        uri = build_uri('device-by-parameter')
+        uri = build_uri('api-device-by-parameter')
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
         self.assertEqual(response_json['gcmRegistrationId'], device.gcm_registration_id)
@@ -541,7 +556,7 @@ class TestDeviceHandler(BaseTest, WebTest):
         device.archived = True
         device.put()
         request_parameters = {'gcmRegistrationId': gcm_registration_id, 'macAddress': mac_address}
-        uri = build_uri('device-by-parameter')
+        uri = build_uri('api-device-by-parameter')
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         error_message = '404 Unable to find device by GCM registration ID: {0} or MAC address: {1}'.format(
@@ -560,7 +575,7 @@ class TestDeviceHandler(BaseTest, WebTest):
         device.put()
         request_parameters = {'macAddress': mac_address,
                               'gcmRegistrationId': gcm_registration_id}
-        uri = build_uri('device-by-parameter')
+        uri = build_uri('api-device-by-parameter')
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         error_message = '404 Unable to find device by GCM registration ID: {0} or MAC address: {1}'.format(
@@ -577,7 +592,7 @@ class TestDeviceHandler(BaseTest, WebTest):
             mac_address=mac_address)
         device.put()
         request_parameters = {'macAddress': mac_address, 'gcmRegistrationId': gcm_registration_id}
-        uri = build_uri('device-by-parameter')
+        uri = build_uri('api-device-by-parameter')
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
         self.assertEqual(response_json['macAddress'], mac_address)
@@ -593,7 +608,7 @@ class TestDeviceHandler(BaseTest, WebTest):
         self.assertTrue(ChromeOsDevice.get_unmanaged_device_by_mac_address(mac_address))
         self.assertFalse(rogue.archived)
         request_parameters = {'macAddress': mac_address, 'gcmRegistrationId': gcm_registration_id_2}
-        uri = build_uri('device-by-parameter')
+        uri = build_uri('api-device-by-parameter')
         with self.assertRaises(AppError) as context:
             self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertTrue("Bad response: 404 Rogue unmanaged device with MAC address: {0} no longer exists.".format(
@@ -612,13 +627,57 @@ class TestDeviceHandler(BaseTest, WebTest):
         self.assertIsNotNone(unmanaged_device)
         self.assertFalse(unmanaged_device.archived)
         request_parameters = {'macAddress': mac_address, 'gcmRegistrationId': gcm_registration_id_2}
-        uri = build_uri('device-by-parameter')
+        uri = build_uri('api-device-by-parameter')
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         device = unmanaged_device_key.get()
         self.assertIsNotNone(device)
         self.assertFalse(device.archived)
         response_json = json.loads(response.body)
         self.assertEqual(response_json['macAddress'], mac_address)
+
+    ##################################################################################################################
+    # PUT updates for GCM and Mac
+    ##################################################################################################################
+    def test_put_no_authorization_header_returns_forbidden(self):
+        request_body = {'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'macAddress': self.MAC_ADDRESS}
+        uri = build_uri('api-device-put', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        response = self.put(uri, params=request_body, headers=self.empty_header)
+        self.assertForbidden(response)
+
+    def test_put_http_status_no_content(self):
+        request_body = {'gcmRegistrationId': self.GCM_REGISTRATION_ID,
+                        'macAddress': self.MAC_ADDRESS}
+        uri = build_uri('api-device-put', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        response = self.put(uri, params=json.dumps(request_body),
+                            headers=self.api_token_authorization_header)
+        self.assertEqual(httplib.NO_CONTENT, response.status_int)
+
+    def test_put_returns_not_found_for_archived_device(self):
+        archived_device = ChromeOsDevice.create_managed(
+            tenant_key=self.tenant_key,
+            gcm_registration_id=self.GCM_REGISTRATION_ID,
+            device_id='3444-55550',
+            mac_address='9931231321444')
+        archived_device.archived = True
+        archived_device_key = archived_device.put()
+        request_body = {}
+        uri = build_uri('api-device-put', params_dict={'device_urlsafe_key': archived_device_key.urlsafe()})
+        with self.assertRaises(AppError) as context:
+            self.app.put(uri, params=json.dumps(request_body),
+                         headers=self.api_token_authorization_header)
+        self.assertTrue('Bad response: 404 Device with key: {0} archived.'.format(archived_device_key.urlsafe())
+                        in context.exception.message)
+
+    def test_put_updates_expected_properties(self):
+        mac_address = 'new mac'
+        gcm_registration_id = 'new gcm'
+        request_body = {'gcmRegistrationId': gcm_registration_id, 'macAddress': mac_address}
+        uri = build_uri('api-device-put', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.app.put(uri, json.dumps(request_body), headers=self.api_token_authorization_header)
+        updated_display = self.managed_device_key.get()
+        self.assertEqual(mac_address, updated_display.mac_address)
+        self.assertEqual(gcm_registration_id, updated_display.gcm_registration_id)
 
     ##################################################################################################################
     # PUT /api/v1/devices/<device_urlsafe_key>/heartbeat

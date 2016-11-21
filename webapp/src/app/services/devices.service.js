@@ -17,7 +17,8 @@ export default class DevicesService {
       controlsMode
     };
 
-    let promise = this.Restangular.oneUrl(this.SERVICE_NAME, `/internal/v1/devices/${deviceKey}/controls-mode`).customPUT(payload);
+    let promise = this.Restangular.oneUrl(this.SERVICE_NAME,
+      `/internal/v1/devices/${deviceKey}/controls-mode`).customPUT(payload);
     return promise;
   }
 
@@ -312,7 +313,8 @@ export default class DevicesService {
   /////////////////////////////////////////////////////////////////////////
   searchDevicesByPartialSerial(distributorKey, partial_serial, unmanaged) {
     if (distributorKey !== undefined) {
-      let url = `/internal/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_serial=${partial_serial}`;
+      let url =
+        `/internal/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_serial=${partial_serial}`;
       let promise = this.Restangular.oneUrl(this.SERVICE_NAME, url).get();
       return promise;
     }
@@ -320,7 +322,8 @@ export default class DevicesService {
 
   searchDevicesByPartialMac(distributorKey, partial_mac, unmanaged) {
     if (distributorKey !== undefined) {
-      let url = `/internal/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_mac=${partial_mac}`;
+      let url =
+        `/internal/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_mac=${partial_mac}`;
       let promise = this.Restangular.oneUrl(this.SERVICE_NAME, url).get();
       return promise;
     }
@@ -328,7 +331,8 @@ export default class DevicesService {
 
   searchDistributorDevicesByPartialGCMid(distributorKey, partial_gcmid, unmanaged) {
     if (distributorKey !== undefined) {
-      let url = `/internal/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_gcmid=${partial_gcmid}`;
+      let url =
+        `/internal/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_gcmid=${partial_gcmid}`;
       let promise = this.Restangular.oneUrl(this.SERVICE_NAME, url).get();
       return promise;
     }
@@ -503,7 +507,8 @@ export default class DevicesService {
   }
 
   makeDevicesByDistributorURL(distributorKey, prev, next, unmanaged) {
-    let url = `/internal/v1/distributors/${distributorKey}/devices?unmanaged=${unmanaged}&next_cursor=${next}&prev_cursor=${prev}`;
+    let url =
+      `/internal/v1/distributors/${distributorKey}/devices?unmanaged=${unmanaged}&next_cursor=${next}&prev_cursor=${prev}`;
     return url
   }
 

@@ -12,7 +12,8 @@ export default class CommandsService {
       panelSleep
     };
 
-    let promise = this.Restangular.oneUrl(this.SERVICE_NAME, `internal/v1/devices/${key}/panel-sleep`).customPUT(payload);
+    let promise = this.Restangular.oneUrl(this.SERVICE_NAME,
+      `internal/v1/devices/${key}/panel-sleep`).customPUT(payload);
     return promise;
   }
 
@@ -22,17 +23,20 @@ export default class CommandsService {
   }
 
   contentDelete(key) {
-    let promise = this.Restangular.oneUrl(this.SERVICE_NAME, `internal/v1/devices/${key}/commands/content-delete`).post();
+    let promise = this.Restangular.oneUrl(this.SERVICE_NAME,
+      `internal/v1/devices/${key}/commands/content-delete`).post();
     return promise;
   }
 
   contentUpdate(key) {
-    let promise = this.Restangular.oneUrl(this.SERVICE_NAME, `internal/v1/devices/${key}/commands/content-update`).post();
+    let promise = this.Restangular.oneUrl(this.SERVICE_NAME,
+      `internal/v1/devices/${key}/commands/content-update`).post();
     return promise;
   }
 
   updateDevice(key) {
-    let promise = this.Restangular.oneUrl(this.SERVICE_NAME, `internal/v1/devices/${key}/commands/refresh-device-representation`).post();
+    let promise = this.Restangular.oneUrl(this.SERVICE_NAME,
+      `internal/v1/devices/${key}/commands/refresh-device-representation`).post();
     return promise;
   }
 
@@ -65,7 +69,8 @@ export default class CommandsService {
     let payload = {
       volume
     };
-    let promise = this.Restangular.oneUrl(this.SERVICE_NAME, `internal/v1/devices/${key}`).customPOST(payload, 'commands/volume');
+    let promise = this.Restangular.oneUrl(this.SERVICE_NAME,
+      `internal/v1/devices/${key}`).customPOST(payload, 'commands/volume');
     return promise;
   }
 
@@ -73,7 +78,8 @@ export default class CommandsService {
     let payload = {
       command
     };
-    let promise = this.Restangular.oneUrl(this.SERVICE_NAME, `internal/v1/devices/${key}`).customPOST(payload, 'commands/custom');
+    let promise = this.Restangular.oneUrl(this.SERVICE_NAME,
+      `internal/v1/devices/${key}`).customPOST(payload, 'commands/custom');
     return promise;
   }
 }

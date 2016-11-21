@@ -28,7 +28,8 @@ export default class AdminService {
   }
 
   getUsersOfDistributor(distributorKey) {
-    let promise = this.Restangular.oneUrl(this.DISTRIBUTOR_SERVICE, `/internal/v1/analytics/distributors/${distributorKey}/users`).get();
+    let promise = this.Restangular.oneUrl(this.DISTRIBUTOR_SERVICE,
+      `/internal/v1/analytics/distributors/${distributorKey}/users`).get();
     return promise;
   }
 
