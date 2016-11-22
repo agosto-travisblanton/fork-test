@@ -41,7 +41,7 @@ class TestCommandEventsHandler(ProvisioningDistributorUserBase):
             'prev_cursor_str': 'null',
             'next_cursor_str': 'null'
         })
-        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFUALT_HEADER)
+        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFAULT_HEADER)
         response_json = json.loads(response.body)
 
         self.assertLength(25, response_json["events"])

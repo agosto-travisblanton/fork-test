@@ -5,7 +5,7 @@ import mock
 from models import User
 from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 from routes import application
-
+import httplib
 
 class LoginHandlerTest(ProvisioningDistributorUserBase):
     some_user = {
@@ -46,4 +46,4 @@ class LoginHandlerTest(ProvisioningDistributorUserBase):
                 headers={"oAuth": '2342342334fddadf'}
             )
 
-            self.assertEqual(res.status_code, 403)
+            self.assertEqual(res.status_code, httplib.FORBIDDEN)

@@ -17,8 +17,6 @@ class LoginHandler(SessionRequestHandler, KeyValidatorMixin):
             valid_token = verify_google_token(string_token)
             if valid_token:
                 user_entity = User.get_or_insert_by_email(valid_token["email"])
-                if not user_entity:
-                    user_entity = User.get_or_insert_by_email(valid_token["email"])
                 our_token = generate_token(user_entity)
 
                 return json_response(self.response, {

@@ -51,7 +51,7 @@ class TestLocationsHandler(ProvisioningDistributorUserBase):
                                         customer_location_name=self.CUSTOMER_LOCATION_NAME,
                                         customer_location_code=self.CUSTOMER_LOCATION_CODE)
         self.location_key = self.location.put()
-        self.headers = self.JWT_DEFUALT_HEADER
+        self.headers = self.JWT_DEFAULT_HEADER
 
     ##################################################################################################################
     # get_locations_by_tenant

@@ -39,12 +39,6 @@ def verify_our_token(token):
 
 
 def generate_token(user, expiration=HUNDRED_YEARS):
-    # session_distributor = self.session.get('distributor')
-    # distributors = user.distributors
-    # if not session_distributor and len(distributors) == 1:
-    #     session_distributor = distributors[0].name
-    # 'distributor': session_distributor
-
     distributor_names = [distributor.name for distributor in user.distributors]
     distributors_as_admin = [each_distributor.name for each_distributor in user.distributors_as_admin]
 
@@ -68,14 +62,6 @@ def requires_auth(f):
     @wraps(f)
     def decorated(self, *args, **kwargs):
         ################################################
-        # SET UNMANAGED DEVICE
-        # USED IN SEVERAL HANDLERS
-        ################################################
-        self.is_unmanaged_device = False
-        api_token = self.request.headers.get('Authorization')
-        self.is_unmanaged_device = api_token == config.UNMANAGED_API_TOKEN
-
-        ################################################
         # DO THE ACTUAL TOKEN VALIDATION
         ################################################
         token = self.request.headers.get('JWT')
@@ -84,10 +70,7 @@ def requires_auth(f):
             string_token = token.encode('ascii', 'ignore')
             user = verify_our_token(string_token)
             if user:
-                user_entity = User.get_by_email(user["email"])
-                if not user_entity:
-                    user_entity = User.get_or_insert_by_email(user["email"])
-                self.user_entity = user_entity
+                self.user_entity = User.get_or_insert_by_email(user["email"])
                 return f(self, *args, **kwargs)
 
         return json_response(self.response, {
