@@ -16,7 +16,6 @@ export default class AuthorizationService {
         deferred.resolve(true);
       } else {
         this.SessionsService.removeUserInfo();
-        console.log("here")
         this.$window.location.href = "#/redirect"
       }
     } else {
@@ -49,7 +48,6 @@ export default class AuthorizationService {
     if (userKey) {
       if (!userJWT) {
         this.SessionsService.removeUserInfo();
-        console.log("here too")
         this.$window.location.href = "#/redirect"
       }
     }
