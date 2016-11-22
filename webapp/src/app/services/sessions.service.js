@@ -81,7 +81,7 @@ export default class SessionsService {
     // request interceptor checks this
     this.StorageService.set('oAuth', credentials.id_token)
 
-    let promise = this.$http({url: '/api/v1/login', method: 'GET'})
+    let promise = this.$http({url: '/internal/v1/login', method: 'GET'})
     return promise.then((res) => {
       let data = jwt_decode(res.data.token);
       this.setJWT(res.data.token)
