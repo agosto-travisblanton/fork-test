@@ -132,7 +132,7 @@ class TestTenantModel(BaseTest):
         self.assertEqual(tenant_created.proof_of_play_url, config.DEFAULT_PROOF_OF_PLAY_URL)
 
     def test_create_can_override_default_proof_of_play_url(self):
-        proof_of_play_url = 'https://skykit-provisioning-FOOBAR.appspot.com/proofplay/internal/v1/post_new_program_play'
+        proof_of_play_url = 'https://skykit-provisioning-FOOBAR.appspot.com/api/internal/v1/post_new_program_play'
         tenant = Tenant.create(tenant_code=self.TENANT_CODE,
                                name='FOOBAR_TENANT',
                                admin_email=self.ADMIN_EMAIL,

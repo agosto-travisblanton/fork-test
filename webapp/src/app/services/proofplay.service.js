@@ -16,7 +16,7 @@ export default class ProofPlayService {
     this.$state = $state
     this.ToastsService = ToastsService
     this.makeHTTPRequest = this.makeHTTPRequest.bind(this);
-    this.uriBase = 'proofplay/internal/v1';
+    this.uriBase = 'proofplay/api/v1';
   }
 
   makeHTTPURL(where_to_go, tenant) {

@@ -3,14 +3,12 @@ import json
 import logging
 
 from datetime import datetime
-from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
 from app_config import config
 from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from device_message_processor import post_unmanaged_device_info, change_intent
 from extended_session_request_handler import ExtendedSessionRequestHandler
-from integrations.content_manager.content_manager_api import ContentManagerApi
 from model_entities.integration_events_log_model import IntegrationEventLog
 from models import ChromeOsDevice, Tenant, DeviceIssueLog
 from restler.serializers import json_response
@@ -20,7 +18,6 @@ from utils.timezone_util import TimezoneUtil
 from workflow.refresh_device import refresh_device
 from workflow.refresh_device_by_mac_address import refresh_device_by_mac_address
 from workflow.register_device import register_device
-from workflow.update_chrome_os_device import update_chrome_os_device
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
@@ -61,7 +58,7 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                 query_results = ChromeOsDevice.get_by_mac_address(device_mac_address)
                 if len(query_results) == 1:
                     if ChromeOsDevice.is_rogue_unmanaged_device(device_mac_address):
-                        self.delete(query_results[0].key.urlsafe())
+                        self.__archive(query_results[0])
                         error_message = "Rogue unmanaged device with MAC address: {0} no longer exists.".format(
                             device_mac_address)
                         self.response.set_status(httplib.NOT_FOUND, error_message)
@@ -590,30 +587,15 @@ class DeviceHandler(ExtendedSessionRequestHandler):
             return self.response.set_status(status, message)
         return json_response(self.response, device, strategy=DEVICE_PAIRING_CODE_STRATEGY)
 
-    @requires_api_token
-    def delete(self, device_urlsafe_key):
-        status = httplib.NO_CONTENT
-        message = None
-        device = self.validate_and_get(urlsafe_key=device_urlsafe_key,
-                                       kind_cls=ChromeOsDevice,
-                                       abort_on_not_found=False)
-        if device is None:
-            status = httplib.NOT_FOUND
-            message = 'Unrecognized device with key: {0}'.format(device_urlsafe_key)
-        elif device.archived:
-            status = httplib.NOT_FOUND
-            message = 'Device with key: {0} archived.'.format(device_urlsafe_key)
-        else:
-            user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
-            if user_identifier is None or user_identifier == '':
-                user_identifier = 'system'
-            device.archived = True
-            device.put()
-            change_intent(
-                gcm_registration_id=device.gcm_registration_id,
-                payload=config.PLAYER_RESET_COMMAND,
-                device_urlsafe_key=device_urlsafe_key,
-                host=self.request.host_url,
-                user_identifier=user_identifier)
-            self.response.headers.pop('Content-Type', None)
-        self.response.set_status(status, message)
+    def __archive(self, device):
+        user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
+        if user_identifier is None or user_identifier == '':
+            user_identifier = 'system'
+        device.archived = True
+        device.put()
+        change_intent(
+            gcm_registration_id=device.gcm_registration_id,
+            payload=config.PLAYER_RESET_COMMAND,
+            device_urlsafe_key=device.key.urlsafe(),
+            host=self.request.host_url,
+            user_identifier=user_identifier)
