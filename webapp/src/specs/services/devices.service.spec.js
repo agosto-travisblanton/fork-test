@@ -38,7 +38,7 @@ describe('DevicesService', function () {
       let tenantKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFud';
       let actual = DevicesService.getDevicesByTenant(tenantKey, null, null);
       return actual.then(() => {
-        expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/tenants/null/null/${tenantKey}/devices?unmanaged=false`);
+        expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/internal/v1/tenants/null/null/${tenantKey}/devices?unmanaged=false`);
         return expect(actual).toBe(promise);
       });
     })
@@ -56,7 +56,7 @@ describe('DevicesService', function () {
       let tenantKey = 'ah1kZXZ-c2t5a2l0LWRpc3BsYXktZGV2aWNlLWludHI7CxIRVGVuYW50RW50aXR5R3JvdXAiEXRlbmFud';
       let actual = DevicesService.getUnmanagedDevicesByTenant(tenantKey, null, null);
       return actual.then(() => {
-        expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/tenants/null/null/${tenantKey}/devices?unmanaged=true`);
+        expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/internal/v1/tenants/null/null/${tenantKey}/devices?unmanaged=true`);
         return expect(actual).toBe(promise);
       });
     })
@@ -75,7 +75,7 @@ describe('DevicesService', function () {
       let actual = DevicesService.getDevicesByDistributor(distributorKey, null, null);
       return actual.then(() => {
         expect(Restangular.oneUrl).toHaveBeenCalledWith('devices',
-          `/api/v1/distributors/null/null/${distributorKey}/devices?unmanaged=false`);
+          `/internal/v1/distributors/null/null/${distributorKey}/devices?unmanaged=false`);
         return expect(actual).toBe(promise);
       });
     })
@@ -94,7 +94,7 @@ describe('DevicesService', function () {
       let actual = DevicesService.getUnmanagedDevicesByDistributor(distributorKey, null, null);
       return actual.then(() => {
         expect(Restangular.oneUrl).toHaveBeenCalledWith('devices',
-          `/api/v1/distributors/null/null/${distributorKey}/devices?unmanaged=true`);
+          `/internal/v1/distributors/null/null/${distributorKey}/devices?unmanaged=true`);
         return expect(actual).toBe(promise);
       });
     })
@@ -110,7 +110,7 @@ describe('DevicesService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
       spyOn(deviceRestangularService, 'get').and.returnValue(promise);
       let actual = DevicesService.getDeviceByKey(deviceKey);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `api/v1/devices/${deviceKey}`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `internal/v1/devices/${deviceKey}`);
       expect(deviceRestangularService.get).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
@@ -148,7 +148,7 @@ describe('DevicesService', function () {
       spyOn(deviceRestangularService, 'get').and.returnValue(promise);
       let actual = DevicesService.getIssuesByKey(deviceKey, epochStart, epochEnd);
       expect(Restangular.oneUrl).toHaveBeenCalledWith('devices',
-        `/api/v1/devices/null/null/${deviceKey}/issues?start=${epochStart}&end=${epochEnd}`);
+        `/internal/v1/devices/null/null/${deviceKey}/issues?start=${epochStart}&end=${epochEnd}`);
       expect(deviceRestangularService.get).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
@@ -164,7 +164,7 @@ describe('DevicesService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
       spyOn(deviceRestangularService, 'get').and.returnValue(promise);
       let actual = DevicesService.getCommandEventsByKey(deviceKey);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/player-command-events/null/null/${deviceKey}`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/internal/v1/player-command-events/null/null/${deviceKey}`);
       expect(deviceRestangularService.get).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
@@ -183,7 +183,7 @@ describe('DevicesService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
       spyOn(deviceRestangularService, 'get').and.returnValue(promise);
       let actual = DevicesService.searchDevicesByPartialMacGlobally( partialMac, unmanaged);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/devices/analytics/search-global?unmanaged=${unmanaged}&partial_mac=${partialMac}`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/internal/v1/devices/analytics/search-global?unmanaged=${unmanaged}&partial_mac=${partialMac}`);
       expect(deviceRestangularService.get).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
@@ -201,7 +201,7 @@ describe('DevicesService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
       spyOn(deviceRestangularService, 'get').and.returnValue(promise);
       let actual = DevicesService.searchDevicesByPartialSerialGlobally( partialSerial, unmanaged);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/devices/analytics/search-global?unmanaged=${unmanaged}&partial_serial=${partialSerial}`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/internal/v1/devices/analytics/search-global?unmanaged=${unmanaged}&partial_serial=${partialSerial}`);
       expect(deviceRestangularService.get).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
@@ -219,7 +219,7 @@ describe('DevicesService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
       spyOn(deviceRestangularService, 'get').and.returnValue(promise);
       let request = DevicesService.searchDistributorDevicesByPartialGCMidGlobally( partialGCMid, unmanaged);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/devices/analytics/search-global?unmanaged=${unmanaged}&partial_gcmid=${partialGCMid}`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/internal/v1/devices/analytics/search-global?unmanaged=${unmanaged}&partial_gcmid=${partialGCMid}`);
       expect(deviceRestangularService.get).toHaveBeenCalled();
       return expect(request).toBe(promise);
     })
@@ -238,7 +238,7 @@ describe('DevicesService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
       spyOn(deviceRestangularService, 'get').and.returnValue(promise);
       let actual = DevicesService.searchDevicesByPartialMac(distributorKey, partialMac, unmanaged);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_mac=${partialMac}`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/internal/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_mac=${partialMac}`);
       expect(deviceRestangularService.get).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
@@ -256,7 +256,7 @@ describe('DevicesService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
       spyOn(deviceRestangularService, 'get').and.returnValue(promise);
       let actual = DevicesService.searchDevicesByPartialSerial(distributorKey, partialSerial, unmanaged);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_serial=${partialSerial}`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/internal/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_serial=${partialSerial}`);
       expect(deviceRestangularService.get).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
@@ -274,7 +274,7 @@ describe('DevicesService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
       spyOn(deviceRestangularService, 'get').and.returnValue(promise);
       let request = DevicesService.searchDistributorDevicesByPartialGCMid(distributorKey, partialGCMid, unmanaged);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_gcmid=${partialGCMid}`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/internal/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_gcmid=${partialGCMid}`);
       expect(deviceRestangularService.get).toHaveBeenCalled();
       return expect(request).toBe(promise);
     })
@@ -293,7 +293,7 @@ describe('DevicesService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
       spyOn(deviceRestangularService, 'get').and.returnValue(promise);
       let actual = DevicesService.searchDevicesByPartialMacByTenant(tenantKey, partialMac, unmanaged);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/tenants/search/${tenantKey}/devices?unmanaged=${unmanaged}&partial_mac=${partialMac}`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/internal/v1/tenants/search/${tenantKey}/devices?unmanaged=${unmanaged}&partial_mac=${partialMac}`);
       expect(deviceRestangularService.get).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
@@ -311,7 +311,7 @@ describe('DevicesService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(deviceRestangularService);
       spyOn(deviceRestangularService, 'get').and.returnValue(promise);
       let actual = DevicesService.searchDevicesByPartialSerialByTenant(tenantKey, partialSerial, unmanaged);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/tenants/search/${tenantKey}/devices?unmanaged=${unmanaged}&partial_serial=${partialSerial}`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/internal/v1/tenants/search/${tenantKey}/devices?unmanaged=${unmanaged}&partial_serial=${partialSerial}`);
       expect(deviceRestangularService.get).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
@@ -334,7 +334,7 @@ describe('DevicesService', function () {
       let top_left = 'angela'
 
       let search = DevicesService.saveOverlaySettings(device_urlsafe_key, bottom_right, bottom_left, top_right, top_left);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('overlay', `/api/v1/overlay/device/${device_urlsafe_key}`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('overlay', `/internal/v1/overlay/device/${device_urlsafe_key}`);
       expect(deviceRestangularService.customPOST).toHaveBeenCalled();
       return expect(search).toBe(promise);
     })
@@ -353,7 +353,7 @@ describe('DevicesService', function () {
       let controlsMode = 'invisible';
 
       let search = DevicesService.adjustControlsMode(deviceUrlsafeKey, controlsMode);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/api/v1/devices/${deviceUrlsafeKey}/controls-mode`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `/internal/v1/devices/${deviceUrlsafeKey}/controls-mode`);
       expect(deviceRestangularService.customPUT).toHaveBeenCalled();
       return expect(search).toBe(promise);
     })

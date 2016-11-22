@@ -235,7 +235,7 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
     ###########################################################################
     def test_create_new_distributor_as_admin(self):
         distro_to_add = "new"
-        r = self.post('/api/v1/distributors', json.dumps({
+        r = self.post('/internal/v1/distributors', json.dumps({
             "admin_email": self.user.email,
             "distributor": distro_to_add,
         }), headers=self.admin_header)
@@ -251,7 +251,7 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
     def test_create_same_distributor_as_admin(self):
         self.test_create_new_distributor_as_admin()
         distro_to_add = "new"
-        r = self.post('/api/v1/distributors', json.dumps({
+        r = self.post('/internal/v1/distributors', json.dumps({
             "admin_email": self.user.email,
             "distributor": distro_to_add,
         }), headers=self.admin_header)
@@ -260,7 +260,7 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
 
     def test_create_new_distributor_as_distributor_admin(self):
         distro_to_add = "new"
-        r = self.post('/api/v1/distributors', json.dumps({
+        r = self.post('/internal/v1/distributors', json.dumps({
             "admin_email": self.user.email,
             "distributor": distro_to_add,
         }), headers={"X-Provisioning-User": self.distributor_admin_user.key.urlsafe()})
@@ -273,7 +273,7 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
     def test_get_users_of_distributor_multiple(self):
         self.create_user_of_distributor(self.user, self.agosto, role=1)
         self.create_user_of_distributor(self.admin_user, self.agosto)
-        url = '/api/v1/analytics/distributors/{}/users'.format(self.agosto_key.urlsafe())
+        url = '/internal/v1/analytics/distributors/{}/users'.format(self.agosto_key.urlsafe())
         request = self.get(url, headers=self.JWT_DEFUALT_HEADER)
         request_json = json.loads(request.body)
         self.assertEqual(200, request.status_int)

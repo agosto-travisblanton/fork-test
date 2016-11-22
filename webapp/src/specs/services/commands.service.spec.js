@@ -34,7 +34,7 @@ describe('CommandsService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(commandsRestangularService);
       spyOn(commandsRestangularService, 'customPUT').and.returnValue(promise);
       let actual = CommandsService.panelSleep(key, 'someValue');
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `api/v1/devices/${key}/panel-sleep`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `internal/v1/devices/${key}/panel-sleep`);
       expect(commandsRestangularService.customPUT).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
@@ -49,7 +49,7 @@ describe('CommandsService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(commandsRestangularService);
       spyOn(commandsRestangularService, 'post').and.returnValue(promise);
       let actual = CommandsService.reset(key);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `api/v1/devices/${key}/commands/reset`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `internal/v1/devices/${key}/commands/reset`);
       expect(commandsRestangularService.post).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
@@ -64,7 +64,7 @@ describe('CommandsService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(commandsRestangularService);
       spyOn(commandsRestangularService, 'post').and.returnValue(promise);
       let actual = CommandsService.powerOn(key);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `api/v1/devices/${key}/commands/power-on`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `internal/v1/devices/${key}/commands/power-on`);
       expect(commandsRestangularService.post).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
@@ -79,7 +79,7 @@ describe('CommandsService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(commandsRestangularService);
       spyOn(commandsRestangularService, 'post').and.returnValue(promise);
       let actual = CommandsService.powerOff(key);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `api/v1/devices/${key}/commands/power-off`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `internal/v1/devices/${key}/commands/power-off`);
       expect(commandsRestangularService.post).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
@@ -94,7 +94,7 @@ describe('CommandsService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(commandsRestangularService);
       spyOn(commandsRestangularService, 'post').and.returnValue(promise);
       let actual = CommandsService.toggleDiagnostics(key);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `api/v1/devices/${key}/commands/diagnostics`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `internal/v1/devices/${key}/commands/diagnostics`);
       expect(commandsRestangularService.post).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
@@ -109,7 +109,7 @@ describe('CommandsService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(commandsRestangularService);
       spyOn(commandsRestangularService, 'post').and.returnValue(promise);
       let actual = CommandsService.restart(key);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `api/v1/devices/${key}/commands/restart`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `internal/v1/devices/${key}/commands/restart`);
       expect(commandsRestangularService.post).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
@@ -124,7 +124,7 @@ describe('CommandsService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(commandsRestangularService);
       spyOn(commandsRestangularService, 'post').and.returnValue(promise);
       let actual = CommandsService.postLog(key);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `api/v1/devices/${key}/commands/post-log`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `internal/v1/devices/${key}/commands/post-log`);
       expect(commandsRestangularService.post).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
@@ -139,7 +139,7 @@ describe('CommandsService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(commandsRestangularService);
       spyOn(commandsRestangularService, 'post').and.returnValue(promise);
       let actual = CommandsService.contentDelete(key);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `api/v1/devices/${key}/commands/content-delete`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `internal/v1/devices/${key}/commands/content-delete`);
       expect(commandsRestangularService.post).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
@@ -158,7 +158,7 @@ describe('CommandsService', function () {
         volume
       };
       let actual = CommandsService.volume(key, volume);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `api/v1/devices/${key}`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `internal/v1/devices/${key}`);
       expect(commandsRestangularService.customPOST).toHaveBeenCalledWith(payload, 'commands/volume');
       return expect(actual).toBe(promise);
     })
@@ -177,7 +177,7 @@ describe('CommandsService', function () {
         command: update_something
       };
       let actual = CommandsService.custom(key, update_something);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `api/v1/devices/${key}`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('devices', `internal/v1/devices/${key}`);
       expect(commandsRestangularService.customPOST).toHaveBeenCalledWith(payload, 'commands/custom');
       return expect(actual).toBe(promise);
     })

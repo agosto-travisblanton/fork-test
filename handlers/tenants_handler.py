@@ -51,7 +51,6 @@ class TenantsHandler(ExtendedSessionRequestHandler):
 
     @requires_auth
     def get(self, tenant_key=None):
-        distributor_urlsafe_key = self.request.headers.get('X-Provisioning-Distributor')
         tenant = self.validate_and_get(tenant_key, Tenant, abort_on_not_found=False)
         if not tenant:
             tenant_name_search = self.request.get("tenant_name")
@@ -72,16 +71,13 @@ class TenantsHandler(ExtendedSessionRequestHandler):
                     return
 
             elif tenant_name_search:
-                result = Tenant.find_by_partial_name(tenant_name_search, distributor_urlsafe_key)
+                distributor_key = self.request.headers.get('X-Provisioning-Distributor')
+                result = Tenant.find_by_partial_name(tenant_name_search, distributor_key)
             else:
                 distributor_key = self.request.headers.get('X-Provisioning-Distributor')
                 result = get_tenant_list_from_distributor_key(distributor_key=distributor_key)
 
         else:
-            # Todo: Move this to a one-time migration / data entered during new entity creation
-            if tenant.proof_of_play_url == None:
-                tenant.proof_of_play_url = config.DEFAULT_PROOF_OF_PLAY_URL
-                tenant.put()
             result = tenant
 
         json_response(self.response, result, strategy=TENANT_STRATEGY)
@@ -227,44 +223,32 @@ class TenantsHandler(ExtendedSessionRequestHandler):
 
     @requires_auth
     def put(self, tenant_key):
-        status = 204
+        status = httplib.NO_CONTENT
         error_message = None
         key = ndb.Key(urlsafe=tenant_key)
         tenant = key.get()
         request_json = json.loads(self.request.body)
         name = request_json.get('name')
         if name is None or name == '':
-            status = 400
+            status = httplib.BAD_REQUEST
             error_message = 'The name parameter is invalid.'
         else:
             tenant.name = name
-        tenant_code = request_json.get('tenant_code')
-        if tenant_code is None or tenant_code == '':
-            status = 400
-            error_message = 'The tenant code parameter is invalid.'
-        else:
-            tenant.tenant_code = tenant_code.strip().lower()
-        admin_email = request_json.get('admin_email')
-        if admin_email is None or admin_email == '':
-            status = 400
-            error_message = 'The admin email parameter is invalid.'
-        else:
-            tenant.admin_email = admin_email.strip().lower()
         content_server_url = request_json.get('content_server_url')
         if content_server_url is None or content_server_url == '':
-            status = 400
+            status = httplib.BAD_REQUEST
             error_message = 'The content server url parameter is invalid.'
         else:
             tenant.content_server_url = content_server_url.strip().lower()
         content_manager_base_url = request_json.get('content_manager_base_url')
         if content_manager_base_url is None or content_manager_base_url == '':
-            status = 400
+            status = httplib.BAD_REQUEST
             error_message = 'The content manager base url parameter is invalid.'
         else:
             tenant.content_manager_base_url = content_manager_base_url.strip().lower()
         default_timezone = request_json.get('default_timezone')
         if default_timezone is None or default_timezone == '':
-            status = 400
+            status = httplib.BAD_REQUEST
             error_message = 'The default timezone parameter is invalid.'
         else:
             tenant.default_timezone = default_timezone
@@ -292,9 +276,9 @@ class TenantsHandler(ExtendedSessionRequestHandler):
         if domain_key:
             tenant.domain_key = domain_key
         else:
-            status = 400
+            status = httplib.BAD_REQUEST
             error_message = 'Error resolving domain from domain key.'
-        if status == 204:
+        if status == httplib.NO_CONTENT:
             tenant.put()
             self.response.headers.pop('Content-Type', None)
             self.response.set_status(status)
@@ -309,7 +293,7 @@ class TenantsHandler(ExtendedSessionRequestHandler):
             tenant.active = False
             tenant.put()
         self.response.headers.pop('Content-Type', None)
-        self.response.set_status(204)
+        self.response.set_status(httplib.NO_CONTENT)
 
     @staticmethod
     def create_tenant_organization_unit_in_chrome_device_management(domain, tenant, correlation_id):

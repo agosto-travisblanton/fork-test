@@ -26,7 +26,7 @@ describe('ImageService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(imageRestangularService);
       spyOn(imageRestangularService, 'getList').and.returnValue(promise);
       let actual = ImageService.getImages(tenant.key);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('image', `/api/v1/image/tenant/${tenant.key}`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('image', `/internal/v1/image/tenant/${tenant.key}`);
       expect(imageRestangularService.getList).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
@@ -43,7 +43,7 @@ describe('ImageService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(imageRestangularService);
       spyOn(imageRestangularService, 'remove').and.returnValue(promise);
       let actual = ImageService.deleteImage(key);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('image', `/api/v1/image/${key}`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('image', `/internal/v1/image/${key}`);
       expect(imageRestangularService.remove).toHaveBeenCalled();
       expect(actual).toBe(promise);
     })
@@ -62,7 +62,7 @@ describe('ImageService', function () {
   //     spyOn(Restangular, 'oneUrl').and.returnValue(imageRestangularService);
   //     spyOn(imageRestangularService, 'customPOST').and.returnValue(promise);
   //     let search = ImageService.saveImage(tenant.key, svg_rep, name);
-  //     expect(Restangular.oneUrl).toHaveBeenCalledWith('image', `/api/v1/image/tenant/${tenant.key}`);
+  //     expect(Restangular.oneUrl).toHaveBeenCalledWith('image', `/internal/v1/image/tenant/${tenant.key}`);
   //     expect(imageRestangularService.customPOST).toHaveBeenCalled();
   //     return expect(search).toBe(promise)
   //   })

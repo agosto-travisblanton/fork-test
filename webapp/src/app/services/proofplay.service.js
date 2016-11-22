@@ -159,7 +159,7 @@ export default class ProofPlayService {
       return (resource.indexOf(query) === 0);
     };
   }
-  
+
   querySearch(resources, searchText) {
     if (searchText) {
       return resources.filter(this.createFilterFor(searchText));

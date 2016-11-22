@@ -940,7 +940,9 @@ class Tenant(ndb.Model):
         prev_cursor = None
 
         if not prev_cursor_str and not next_cursor_str:
-            objects, next_cursor, more = Location.query(Location.tenant_key == tenant_key).order(
+            objects, next_cursor, more = Location.query(
+                ndb.AND(Location.tenant_key == tenant_key,
+                        Location.active == True)).order(
                 Location.customer_location_name).order(Location.key).fetch_page(
                 page_size=fetch_size
             )
@@ -1052,13 +1054,18 @@ class Location(ndb.Model):
     @classmethod
     def find_by_customer_location_code(cls, customer_location_code):
         if customer_location_code:
-            key = Location.query(Location.customer_location_code == customer_location_code).get(keys_only=True)
+            key = Location.query(ndb.AND(
+                Location.customer_location_code == customer_location_code,
+                Location.active == True)).get(keys_only=True)
             if key:
                 return key.get()
 
     @classmethod
     def find_by_partial_location_name(cls, partial_name, tenant_key):
-        all_locations = Location.query(Location.tenant_key == tenant_key).fetch()
+        all_locations = Location.query(
+            ndb.AND(
+                Location.tenant_key == tenant_key,
+                Location.active == True)).fetch()
         return [item for item in all_locations if partial_name.lower() in item.customer_location_name.lower()]
 
     @classmethod

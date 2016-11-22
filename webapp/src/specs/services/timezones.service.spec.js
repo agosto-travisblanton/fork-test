@@ -25,7 +25,7 @@ describe('TimezonesService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(timezonesRestangularService);
       spyOn(timezonesRestangularService, 'get').and.returnValue(promise);
       let actual = TimezonesService.getUsTimezones(promise);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('timezones', 'api/v1/timezones/us');
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('timezones', 'internal/v1/timezones/us');
       expect(timezonesRestangularService.get).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })

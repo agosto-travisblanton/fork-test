@@ -71,7 +71,7 @@ describe('LocationsService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(locationRestangularService);
       spyOn(locationRestangularService, 'get').and.returnValue(promise);
       let actual = LocationsService.getLocationsByTenantKey(tenantKey);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('tenants', `api/v1/tenants/${tenantKey}/locations`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('tenants', `internal/v1/tenants/${tenantKey}/locations`);
       expect(locationRestangularService.get).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     });
@@ -88,7 +88,7 @@ describe('LocationsService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(locationRestangularService);
       spyOn(locationRestangularService, 'get').and.returnValue(promise);
       let actual = LocationsService.getLocationsByTenantKeyPaginated(tenantKey);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('tenants', `api/v1/tenants/${tenantKey}/null/null/locations`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('tenants', `internal/v1/tenants/${tenantKey}/null/null/locations`);
       expect(locationRestangularService.get).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     });
@@ -104,7 +104,7 @@ describe('LocationsService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(locationRestangularService);
       spyOn(locationRestangularService, 'get').and.returnValue(promise);
       let actual = LocationsService.getLocationByKey(locationKey);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('locations', `api/v1/locations/${locationKey}`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('locations', `internal/v1/locations/${locationKey}`);
       expect(locationRestangularService.get).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })

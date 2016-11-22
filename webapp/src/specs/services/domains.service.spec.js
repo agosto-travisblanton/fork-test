@@ -66,10 +66,10 @@ describe('DomainsService', function () {
         get() {
         }
       };
-      spyOn(Restangular, 'oneUrl').and.returnValue(domainRestangularService);
+      spyOn(Restangular, 'one').and.returnValue(domainRestangularService);
       spyOn(domainRestangularService, 'get').and.returnValue(promise);
       let actual = DomainsService.getDomainByKey(domainKey);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('domains', `api/v1/domains/${domainKey}`);
+      expect(Restangular.one).toHaveBeenCalledWith('domains', `${domainKey}`);
       expect(domainRestangularService.get).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })
@@ -85,7 +85,7 @@ describe('DomainsService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(domainRestangularService);
       spyOn(domainRestangularService, 'get').and.returnValue(promise);
       let actual = DomainsService.getDirectoryApiConnectivityInformation(domainKey);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('domains', `api/v1/domains/${domainKey}/directory_api`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('domains', `/internal/v1/domains/${domainKey}/directory_api`);
       expect(domainRestangularService.get).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })

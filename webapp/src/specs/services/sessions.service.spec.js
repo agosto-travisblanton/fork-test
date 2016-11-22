@@ -45,7 +45,7 @@ describe('SessionsService', function () {
     });
 
     it('exchanges oAuth for JWT', function () {
-      $httpBackend.when('GET', '/api/v1/login').respond(() => expectedCallbackResponse);
+      $httpBackend.when('GET', '/internal/v1/login').respond(() => expectedCallbackResponse);
       let result = SessionsService.login({
         id_token: '2lk34jl3k4j2l34jjkl2433k4'
       });

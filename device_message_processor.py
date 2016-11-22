@@ -17,7 +17,7 @@ def change_intent(gcm_registration_id, payload, device_urlsafe_key, host, user_i
             gcm_registration_id=gcm_registration_id,
             user_identifier=user_identifier)
     event_key = player_command_event.put()
-    confirmation_uri = "{0}{1}".format(host, build_uri('manage-event',
+    confirmation_uri = "{0}{1}".format(host, build_uri('player-confirmation',
                                                        params_dict={'urlsafe_event_key': event_key.urlsafe()}))
     data_dictionary = {"intent": payload,
                        "confirmation": confirmation_uri}

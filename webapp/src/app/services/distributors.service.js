@@ -30,7 +30,7 @@ export default class DistributorsService {
   }
 
   getByKey(key) {
-    let promise = this.Restangular.oneUrl(this.DISTRIBUTOR_SERVICE, `api/v1/distributors/${key}`).get();
+    let promise = this.Restangular.oneUrl(this.DISTRIBUTOR_SERVICE, `internal/v1/distributors/${key}`).get();
     return promise;
   }
 
@@ -47,7 +47,7 @@ export default class DistributorsService {
   }
 
   getDomainsByKey(key) {
-    let promise = this.Restangular.oneUrl(this.DISTRIBUTOR_SERVICE, `api/v1/distributors/${key}/domains`).get();
+    let promise = this.Restangular.oneUrl(this.DISTRIBUTOR_SERVICE, `internal/v1/distributors/${key}/domains`).get();
     return promise;
   }
 
