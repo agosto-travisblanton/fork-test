@@ -36,22 +36,164 @@ application = WSGIApplication(
               ),
 
         ############################################################
+        # API (external endpoints)
+        ############################################################
+
+        # Player API - POST new device registration
+        Route(r'/api/v1/devices',
+              handler='handlers.api.player.device_handler.DeviceHandler',
+              name='api-device-registration',
+              handler_method='post',
+              methods=['POST']
+              ),
+
+        # Player API - GET device by parameter
+        Route(r'/api/v1/devices',
+              handler='handlers.api.player.device_handler.DeviceHandler',
+              name='api-device-by-parameter',
+              handler_method='get_device_by_parameter',
+              methods=['GET']
+              ),
+
+        # Player API - GET device by key
+        Route(r'/api/v1/devices/<device_urlsafe_key>',
+              handler='handlers.api.player.device_handler.DeviceHandler',
+              name='api-device-get',
+              handler_method='get',
+              methods=['GET']
+              ),
+
+        # Player API - PUT device by key
+        Route(r'/api/v1/devices/<device_urlsafe_key>',
+              handler='handlers.api.player.device_handler.DeviceHandler',
+              name='api-device-put',
+              handler_method='put',
+              methods=['PUT']
+              ),
+
+        # Player API - PUT heartbeat
+        Route(r'/api/v1/devices/<device_urlsafe_key>/heartbeat',
+              handler='handlers.api.player.device_handler.DeviceHandler',
+              name='device-heartbeat',
+              handler_method='heartbeat',
+              methods=['PUT']
+              ),
+
+        # API - GET device pairing code
+        Route(r'/api/v1/devices/<device_urlsafe_key>/pairing',
+              handler='handlers.api.player.device_handler.DeviceHandler',
+              name='device-pairing-code',
+              handler_method='get_pairing_code',
+              methods=['GET']
+              ),
+
+        # Player API - PUT to confirm receiving a command
+        Route(r'/api/v1/player-command-events/<urlsafe_event_key>',
+              handler='handlers.api.player.command_handler.CommandHandler',
+              name='player-confirmation',
+              handler_method='player_confirmation',
+              methods=['PUT']
+              ),
+
+        # CM route secured by shared_secret
+        Route(r'/api/v1/content-manager/devices/<device_urlsafe_key>',
+              handler='handlers.api.content_manager.device_handler.DeviceHandler',
+              name='update-content-manager',
+              methods=['PUT']
+              ),
+
+        # CM route secured by shared_secret - apparently CM used this to send change content requests
+        Route(r'/api/v1/devices/<device_urlsafe_key>/commands',
+              handler='handlers.device_commands_handler.DeviceCommandsHandler',
+              name='device-commands',
+              ),
+
+        # report API
+        Route(r'/api/reports/v1/chrome_os_device',
+              handler='handlers.api.reports.device_handler.DeviceHandler',
+              name='report-device-by-parameter',
+              handler_method='get_device_by_parameters',
+              methods=['GET']
+              ),
+
+        # report API - returns device list
+        Route(r'/api/reports/v1/chrome_os_devices',
+              handler='handlers.api.reports.device_handler.DeviceHandler',
+              name='report-device-list',
+              handler_method='get_device_list',
+              methods=['GET']
+              ),
+
+        # report API - returns device count
+        Route(r'/api/reports/v1/chrome_os_devices/count',
+              handler='handlers.api.reports.device_handler.DeviceHandler',
+              name='report-device-count',
+              handler_method='get_devices_count',
+              methods=['GET']
+              ),
+
+        ############################################################
+        # DEVICES (Internal UI only)
+        ############################################################
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='internal-device-get',
+              handler_method='get',
+              methods=['GET']
+              ),
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='internal-device-put',
+              handler_method='put',
+              methods=['PUT']
+              ),
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>/panel-sleep',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='internal-panel-sleep',
+              handler_method='update_panel_sleep',
+              methods=['PUT']
+              ),
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>/controls-mode',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='internal-controls-mode',
+              handler_method='update_controls_mode',
+              methods=['PUT']
+              ),
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>/sleep-controller',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='internal-sleep-controller',
+              handler_method='update_sleep_controller',
+              methods=['PUT']
+              ),
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>',
+              handler='handlers.device_resource_handler.DeviceResourceHandler',
+              name='internal-device-delete',
+              handler_method='delete',
+              methods=['DELETE']
+              ),
+
+        ############################################################
         # VERSION
         ############################################################
 
-        Route(
-            r'/api/v1/versions',
-            handler='handlers.versions_handler.VersionsHandler',
-            name='version-retrieval',
-            handler_method='get',
-            methods=['GET']
-        ),
+        Route(r'/internal/v1/versions',
+              handler='handlers.versions_handler.VersionsHandler',
+              name='version-retrieval',
+              handler_method='get',
+              methods=['GET']
+              ),
 
         ############################################################
         # LOGIN
         ############################################################
 
-        Route(r'/api/v1/identity',
+        Route(r'/internal/v1/identity',
               handler='handlers.identity_handler.IdentityHandler',
               name='identity'
               ),
@@ -70,229 +212,214 @@ application = WSGIApplication(
         # LOCATIONS
         ############################################################
 
-        Route(r'/api/v1/locations/<location_urlsafe_key>',
+        Route(r'/internal/v1/locations/<location_urlsafe_key>',
               handler='handlers.locations_handler.LocationsHandler',
-              name='manage-location',
+              name='internal-manage-location',
               methods=['GET', 'PUT', 'DELETE']
               ),
-        Route(r'/api/v1/locations',
+
+        Route(r'/internal/v1/locations',
               handler='handlers.locations_handler.LocationsHandler',
-              name='location-create',
+              name='internal-location-create',
               methods=['POST']
               ),
-        Route(r'/api/v1/tenants/<tenant_urlsafe_key>/<prev_cursor>/<next_cursor>/locations',
+
+        Route(r'/internal/v1/tenants/<tenant_urlsafe_key>/<prev_cursor>/<next_cursor>/locations',
               handler='handlers.locations_handler.LocationsHandler',
-              name='get_locations_by_tenant_paginated',
+              name='internal-get-locations-by-tenant-paginated',
               handler_method='get_locations_by_tenant_paginated',
               methods=['GET']
               ),
-        Route(r'/api/v1/tenants/<tenant_urlsafe_key>/locations',
+
+        Route(r'/internal/v1/tenants/<tenant_urlsafe_key>/locations',
               handler='handlers.locations_handler.LocationsHandler',
-              name='locations-list-retrieval',
+              name='internal-locations-list',
               handler_method='get_locations_by_tenant',
               methods=['GET']
               ),
 
         ############################################################
-        # DEVICE (ADDITONAL DEVICE ROUTES UNDER DISTRIBUTOR/TENANT)
+        # DEVICE (ADDITIONAL DEVICE ROUTES UNDER DISTRIBUTOR/TENANT)
         ############################################################
 
-        Route(r'/api/v1/devices/<device_urlsafe_key>/heartbeat',
+        Route(r'/internal/v1/devices/<prev_cursor_str>/<next_cursor_str>/<device_urlsafe_key>/issues',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='devices-heartbeat',
-              handler_method='heartbeat',
-              methods=['PUT']
-              ),
-        Route(r'/api/v1/devices',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='devices-retrieval',
-              handler_method='get_device_by_parameter',
-              methods=['GET']
-              ),
-        Route(r'/api/v1/devices',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='device-creator',
-              handler_method='post',
-              methods=['POST']
-              ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='device',
-              methods=['GET', 'PUT', 'DELETE']
-              ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>/pairing',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='device-pairing-code',
-              handler_method='get_pairing_code',
-              methods=['GET']
-              ),
-        Route(r'/api/v1/devices/<prev_cursor_str>/<next_cursor_str>/<device_urlsafe_key>/issues',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='device-issues',
+              name='internal-device-issues',
               handler_method='get_latest_issues',
               methods=['GET']
               ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>/panel-sleep',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='panel_sleep',
-              handler_method='panel_sleep',
-              methods=['PUT']
-              ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>/controls-mode',
-              handler='handlers.device_resource_handler.DeviceResourceHandler',
-              name='controls_mode',
-              handler_method='controls_mode',
-              methods=['PUT']
-              ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>/commands',
-              handler='handlers.device_commands_handler.DeviceCommandsHandler',
-              name='device-commands',
-              ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/reset',
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>/commands/reset',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
               name='device-reset-command',
               handler_method='reset',
               methods=['POST']
               ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/volume',
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>/commands/volume',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
               name='device-volume-command',
               handler_method='volume',
               methods=['POST']
               ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/custom',
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>/commands/custom',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
               name='device-custom-command',
               handler_method='custom',
               methods=['POST']
               ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/power-on',
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>/commands/power-on',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
               name='device-power-on-command',
               handler_method='power_on',
               methods=['POST']
               ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/power-off',
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>/commands/power-off',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
               name='device-power-off-command',
               handler_method='power_off',
               methods=['POST']
               ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/content-delete',
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>/commands/content-delete',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
               name='device-delete-content-command',
               handler_method='content_delete',
               methods=['POST']
               ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/content-update',
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>/commands/content-update',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
               name='device-update-content-command',
               handler_method='content_update',
               methods=['POST']
               ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/refresh-device-representation',
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>/commands/refresh-device-representation',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
               name='refresh-device-representation-command',
               handler_method='refresh_device_representation',
               methods=['POST']
               ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/diagnostics',
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>/commands/diagnostics',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
               name='device-diagnostics-toggle-command',
               handler_method='diagnostics_toggle',
               methods=['POST']
               ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/restart',
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>/commands/restart',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
               name='device-restart-command',
               handler_method='restart',
               methods=['POST']
               ),
-        Route(r'/api/v1/devices/<device_urlsafe_key>/commands/post-log',
+
+        Route(r'/internal/v1/devices/<device_urlsafe_key>/commands/post-log',
               handler='handlers.device_commands_handler.DeviceCommandsHandler',
               name='device-post-log-command',
               handler_method='post_log',
               methods=['POST']
               ),
-        Route(r'/api/v1/devices/analytics/search-global',
+
+        Route(r'/internal/v1/devices/analytics/search-global',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='search_for_device_globally',
               handler_method='search_for_device_globally',
               methods=['GET']
               ),
+
         ############################################################
         # (DISTRIBUTOR) DEVICE ROUTES
         ############################################################
         # PAGINATED DEVICE LIST
         ############################################################
-        Route(r'/api/v1/distributors/<distributor_urlsafe_key>/devices',
+
+        Route(r'/internal/v1/distributors/<distributor_urlsafe_key>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='devices-by-distributor',
               handler_method='get_devices_by_distributor',
               methods=['GET']
               ),
+
         ############################################################
         # SEARCH
         ############################################################
-        Route(r'/api/v1/distributors/search/<distributor_urlsafe_key>/devices',
+
+        Route(r'/internal/v1/distributors/search/<distributor_urlsafe_key>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='search_for_device',
               handler_method='search_for_device',
               methods=['GET']
               ),
+
         ############################################################
         # TENANT ROUTES
         ############################################################
         # PAGINATED TENANT DEVICE LIST
         ############################################################
-        Route(r'/api/v1/tenants/<tenant_urlsafe_key>/devices',
+
+        Route(r'/internal/v1/tenants/<tenant_urlsafe_key>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='devices-by-tenant',
               handler_method='get_devices_by_tenant',
               methods=['GET']
               ),
+
         ############################################################
         # SEARCH
         ############################################################
-        Route(r'/api/v1/tenants/search/<tenant_urlsafe_key>/devices',
+
+        Route(r'/internal/v1/tenants/search/<tenant_urlsafe_key>/devices',
               handler='handlers.device_resource_handler.DeviceResourceHandler',
               name='search_for_device_by_tenant',
               handler_method='search_for_device_by_tenant',
               methods=['GET']
               ),
-        ############################################################
-        # OTHER
-        ############################################################
-        Route(r'/api/v1/tenants/paginated/<page_size>/<offset>',
-              handler='handlers.tenants_handler.TenantsHandler',
-              name='get_tenants_paginated',
-              handler_method='get_tenants_paginated',
-              methods=['GET', 'POST']
-              ),
 
-        Route(r'/api/v1/tenants',
-              handler='handlers.tenants_handler.TenantsHandler',
-              name='tenants',
-              methods=['GET', 'POST']
-              ),
+        ############################################################
+        # GET, POST, PUT, DELETE
+        ############################################################
 
         Route(
-            r'/api/v1/tenants/<tenant_key>',
+            r'/internal/v1/tenants',
+            handler='handlers.tenants_handler.TenantsHandler',
+            name='tenants',
+            methods=['GET', 'POST']
+        ),
+
+        Route(
+            r'/internal/v1/tenants/<tenant_key>',
             handler='handlers.tenants_handler.TenantsHandler',
             name='manage-tenant',
             methods=['GET', 'PUT', 'DELETE']
         ),
 
+        Route(
+            r'/internal/v1/tenants/paginated/<page_size>/<offset>',
+            handler='handlers.tenants_handler.TenantsHandler',
+            name='get_tenants_paginated',
+            handler_method='get_tenants_paginated',
+            methods=['GET']
+        ),
+
+
         ############################################################
         # USERS
         ############################################################
+
         Route(
-            r'/api/v1/users',
+            r'/internal/v1/users',
             handler='handlers.users_handler.UsersHandler',
             methods=['POST']
         ),
+
         Route(
-            r'/api/v1/users/<user_urlsafe_key>/distributors',
+            r'/internal/v1/users/<user_urlsafe_key>/distributors',
             handler='handlers.users_handler.UsersHandler',
             handler_method='get_list_by_user',
             name='get-distributors-by-user',
@@ -303,30 +430,32 @@ application = WSGIApplication(
         # DISTRIBUTORS
         ############################################################
 
-        Route(r'/api/v1/distributors',
+        Route(r'/internal/v1/distributors',
               handler='handlers.distributors_handler.DistributorsHandler',
               name='distributors',
               handler_method='get_list',
               methods=['GET']
               ),
-        Route(r'/api/v1/distributors',
+
+        Route(r'/internal/v1/distributors',
               handler='handlers.distributors_handler.DistributorsHandler',
               name='distributor-creator',
               methods=['POST']
               ),
-        Route(r'/api/v1/analytics/distributors/<distributor_key>/users',
+
+        Route(r'/internal/v1/analytics/distributors/<distributor_key>/users',
               handler='handlers.distributors_handler.DistributorsHandler',
               handler_method='get_users',
               methods=['GET']
               ),
 
-        Route(r'/api/v1/distributors/<distributor_key>',
+        Route(r'/internal/v1/distributors/<distributor_key>',
               handler='handlers.distributors_handler.DistributorsHandler',
               name='manage-distributor',
               methods=['GET', 'PUT', 'DELETE']
               ),
 
-        Route(r'/api/v1/distributors/<distributor_key>/domains',
+        Route(r'/internal/v1/distributors/<distributor_key>/domains',
               handler='handlers.distributors_handler.DistributorsHandler',
               name='distributor-domains',
               handler_method='get_domains',
@@ -337,17 +466,19 @@ application = WSGIApplication(
         # DOMAINS
         ############################################################
 
-        Route(r'/api/v1/domains',
+        Route(r'/internal/v1/domains',
               handler='handlers.domains_handler.DomainsHandler',
               name='domains',
               methods=['GET', 'POST']
               ),
-        Route(r'/api/v1/domains/<domain_key>',
+
+        Route(r'/internal/v1/domains/<domain_key>',
               handler='handlers.domains_handler.DomainsHandler',
               name='manage-domain',
               methods=['GET', 'PUT', 'DELETE']
               ),
-        Route(r'/api/v1/domains/<domain_key>/directory_api',
+
+        Route(r'/internal/v1/domains/<domain_key>/directory_api',
               handler='handlers.domains_handler.DomainsHandler',
               name='directory-api-ping',
               handler_method='ping_directory_api',
@@ -358,21 +489,21 @@ application = WSGIApplication(
         # OVERLAY
         ############################################################
 
-        Route(r'/api/v1/overlay/device/<device_urlsafe_key>',
+        Route(r'/internal/v1/overlay/device/<device_urlsafe_key>',
               handler='handlers.overlay_handler.OverlayHandler',
               name='post-overlay',
               handler_method='post',
               methods=['POST'],
               ),
 
-        Route(r'/api/v1/overlay/tenant/<tenant_urlsafe_key>',
+        Route(r'/internal/v1/overlay/tenant/<tenant_urlsafe_key>',
               handler='handlers.overlay_handler.OverlayHandler',
               name='post_tenant_overlay',
               handler_method='post_tenant_overlay',
               methods=['POST'],
               ),
 
-        Route(r'/api/v1/overlay/tenant/<tenant_urlsafe_key>/apply',
+        Route(r'/internal/v1/overlay/tenant/<tenant_urlsafe_key>/apply',
               handler='handlers.overlay_handler.OverlayHandler',
               name='tenant_apply_overlay_to_devices',
               handler_method='tenant_apply_overlay_to_devices',
@@ -382,21 +513,22 @@ application = WSGIApplication(
         ############################################################
         # IMAGE
         ############################################################
-        Route(r'/api/v1/image/<image_urlsafe_key>',
+
+        Route(r'/internal/v1/image/<image_urlsafe_key>',
               handler='handlers.image_handler.ImageHandler',
               name='delete_image',
               handler_method='delete_image',
               methods=['DELETE'],
               ),
 
-        Route(r'/api/v1/image/<image_urlsafe_key>',
+        Route(r'/internal/v1/image/<image_urlsafe_key>',
               handler='handlers.image_handler.ImageHandler',
               name='get_image_by_key',
               handler_method='get_image_by_key',
               methods=['GET'],
               ),
 
-        Route(r'/api/v1/image/tenant/<tenant_urlsafe_key>',
+        Route(r'/internal/v1/image/tenant/<tenant_urlsafe_key>',
               handler='handlers.image_handler.ImageHandler',
               name='manage-image',
               methods=['POST', 'GET'],
@@ -406,7 +538,8 @@ application = WSGIApplication(
         # DEVICE MONITORING
         ############################################################
 
-        Route(r'/api/v1/monitor/devices',
+        # Route gets called as chron job (chron.yaml) every 4 minutes
+        Route(r'/internal/v1/monitor/devices',
               handler='handlers.monitor_devices_handler.MonitorDevicesHandler',
               name='monitor-devices',
               handler_method='last_contact_check',
@@ -417,15 +550,8 @@ application = WSGIApplication(
         # PLAYER COMMAND EVENTS
         ############################################################
 
-        Route(r'/api/v1/player-command-events/<urlsafe_event_key>',
-              handler='handlers.player_command_events_handler.PlayerCommandEventsHandler',
-              name='manage-event',
-              handler_method='command_confirmation',
-              methods=['PUT']
-              ),
-
-        Route(r'/api/v1/player-command-events/<prev_cursor_str>/<next_cursor_str>/<device_urlsafe_key>',
-              handler='handlers.player_command_events_handler.PlayerCommandEventsHandler',
+        Route(r'/internal/v1/player-command-events/<prev_cursor_str>/<next_cursor_str>/<device_urlsafe_key>',
+              handler='handlers.command_events_handler.CommandEventsHandler',
               name='player-command-events',
               handler_method='get_player_command_events',
               methods=['GET']
@@ -435,21 +561,21 @@ application = WSGIApplication(
         # TIMEZONES
         ############################################################
 
-        Route(r'/api/v1/timezones/us',
+        Route(r'/internal/v1/timezones/us',
               handler='handlers.timezones_handler.TimezonesHandler',
               name='us-timezones',
               handler_method='get_us_timezones',
               methods=['GET']
               ),
 
-        Route(r'/api/v1/timezones/all',
+        Route(r'/internal/v1/timezones/all',
               handler='handlers.timezones_handler.TimezonesHandler',
               name='all-timezones',
               handler_method='get_all_common_timezones',
               methods=['GET']
               ),
 
-        Route(r'/api/v1/timezones/custom',
+        Route(r'/internal/v1/timezones/custom',
               handler='handlers.timezones_handler.TimezonesHandler',
               name='custom-timezones',
               handler_method='get_custom_timezones',
@@ -460,19 +586,21 @@ application = WSGIApplication(
         # INTEGRATION EVENTS LOG
         ############################################################
 
-        Route(r'/api/v1/integrations_events',
+        Route(r'/internal/v1/integrations_events',
               handler='handlers.integration_events_log_handler.IntegrationEventsLogHandler',
               name='integration-events-list',
               handler_method='get_by_event_category',
               methods=['GET']
               ),
-        Route(r'/api/v1/integration_events/enrollment',
+
+        Route(r'/internal/v1/integration_events/enrollment',
               handler='handlers.integration_events_log_handler.IntegrationEventsLogHandler',
               name='enrollment-events-list',
               handler_method='get_enrollment_events',
               methods=['GET']
               ),
-        Route(r'/api/v1/integration_events/tenant_create',
+
+        Route(r'/internal/v1/integration_events/tenant_create',
               handler='handlers.integration_events_log_handler.IntegrationEventsLogHandler',
               name='get_tenant_create_events',
               handler_method='get_tenant_create_events',
@@ -480,60 +608,27 @@ application = WSGIApplication(
               ),
 
         ############################################################
-        # REPORT API
-        ############################################################
-
-        Route(r'/api/reports/v1/chrome_os_device',
-              handler='handlers.reports.chrome_device_management_handler.ChromeDeviceManagementHandler',
-              name='chrome-os-device',
-              handler_method='get_device_by_parameters',
-              methods=['GET']
-              ),
-
-        Route(r'/api/reports/v1/chrome_os_devices',
-              handler='handlers.reports.chrome_device_management_handler.ChromeDeviceManagementHandler',
-              name='chrome-os-devices',
-              handler_method='get_device_list',
-              methods=['GET']
-              ),
-
-        Route(r'/api/reports/v1/chrome_os_devices/count',
-              handler='handlers.reports.chrome_device_management_handler.ChromeDeviceManagementHandler',
-              name='chrome-os-devices-count',
-              handler_method='get_devices_count',
-              methods=['GET']
-              ),
-
-        ############################################################
         # Tenant OU
         ############################################################
-        Route(r'/api/v1/tenant_organizational_unit',
+
+        Route(r'/internal/v1/tenant_organizational_unit',
               handler='handlers.tenant_organization_units_handler.TenantOrganizationUnitsHandler',
               name='organization-unit-by-path',
               handler_method='get_by_ou_path',
               methods=['GET']
               ),
-        Route(r'/api/v1/tenant_organizational_units',
+
+        Route(r'/internal/v1/tenant_organizational_units',
               handler='handlers.tenant_organization_units_handler.TenantOrganizationUnitsHandler',
               name='organization-units-list',
               handler_method='get_ou_list',
               methods=['GET']
               ),
 
-        ############################################################
-        # /content-manager/ routes secured by shared_secret
-        ############################################################
-        Route(r'/api/v1/content-manager/devices/<device_urlsafe_key>',
-              handler='handlers.content_manager.device_handler.DeviceHandler',
-              name='update-content-manager',
-              methods=['PUT']
-              ),
 
         ############################################################
         # /dev/ routes secured by admin:required
         ############################################################
-
-
 
         Route(
             r'/dev/versions',
@@ -548,7 +643,7 @@ application = WSGIApplication(
 
 if on_development_server or on_integration_server or on_qa_server:
     dev_routes = [
-        Route(r'/api/v1/seed/<user_first>/<user_last>',
+        Route(r'/internal/v1/seed/<user_first>/<user_last>',
               handler="handlers.dev_handlers.SeedScript",
               name="Seed",
               methods=["GET"]

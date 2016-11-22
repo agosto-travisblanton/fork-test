@@ -19,19 +19,19 @@ export default  class DomainsService {
     return promise;
   }
 
-  getDomainByKey(domainKey) {
-    let promise = this.Restangular.oneUrl('domains', `api/v1/domains/${domainKey}`).get();
+  getDomainByKey(key) {
+    let promise = this.Restangular.one('domains', key).get();
     return promise;
   }
 
-  getDirectoryApiConnectivityInformation(domainKey) {
-    let promise = this.Restangular.oneUrl('domains', `api/v1/domains/${domainKey}/directory_api`).get();
+  getDirectoryApiConnectivityInformation(key) {
+    let promise = this.Restangular.oneUrl('domains', `/internal/v1/domains/${key}/directory_api`).get();
     return promise;
   }
 
   delete(domain) {
     if (domain.key !== undefined) {
-      let promise = this.Restangular.one("domains", domain.key).remove();
+      let promise = this.Restangular.one('domains', domain.key).remove();
       return promise;
     }
   }

@@ -86,7 +86,7 @@ describe('TenantsService', function () {
       spyOn(Restangular, 'oneUrl').and.returnValue(tenantRestangularService);
       spyOn(tenantRestangularService, 'get').and.returnValue(promise);
       let actual = TenantsService.getTenantByKey(tenantKey);
-      expect(Restangular.oneUrl).toHaveBeenCalledWith('tenants', `api/v1/tenants/${tenantKey}`);
+      expect(Restangular.oneUrl).toHaveBeenCalledWith('tenants', `internal/v1/tenants/${tenantKey}`);
       expect(tenantRestangularService.get).toHaveBeenCalled();
       return expect(actual).toBe(promise);
     })

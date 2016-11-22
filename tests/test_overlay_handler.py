@@ -58,7 +58,7 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
 
         # ensure get chromeosdevice does not yet respond with overlays
         uri = application.router.build(None,
-                                       'device',
+                                       'internal-device-get',
                                        None,
                                        {'device_urlsafe_key': self.device_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
@@ -71,7 +71,7 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
 
         # check if device get returns newly created overlay
         uri = application.router.build(None,
-                                       'device',
+                                       'internal-device-get',
                                        None,
                                        {'device_urlsafe_key': self.device_key.urlsafe()})
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
@@ -143,7 +143,7 @@ class OverlayHandlerTest(ProvisioningDistributorUserBase):
 
         # grab any device to see that it matches the tenant
         uri = application.router.build(None,
-                                       'device',
+                                       'internal-device-get',
                                        None,
                                        {'device_urlsafe_key': self.device_key.urlsafe()})
         response = self.app.get(uri, params={}, headers=self.api_token_authorization_header)

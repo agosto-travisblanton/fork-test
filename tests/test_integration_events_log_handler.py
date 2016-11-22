@@ -73,7 +73,7 @@ class TestIntegrationEventsLogHandler(ProvisioningBaseTest):
             device_urlsafe_key=self.DEVICE_KEY,
             details=
             'Device resource uri '
-            '/api/v1/devices/ahVzfnNreWtpdC1wcm92aXNpb25pbmdyGwsSDkNocm9tZU9zRGV2aWNlGICAgOCZsP0JDA returned '
+            '/internal/v1/devices/ahVzfnNreWtpdC1wcm92aXNpb25pbmdyGwsSDkNocm9tZU9zRGV2aWNlGICAgOCZsP0JDA returned '
             'in response Location header.'
         )
         self.registration_event_2.put()
