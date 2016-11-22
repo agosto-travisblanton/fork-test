@@ -62,7 +62,7 @@ describe('SessionsService', function () {
       deferred.resolve(expectedCallbackResponse);
       $httpBackend.expectPOST('/login', expectedCredentials).respond(expectedCallbackResponse);
       let identityResponse = {email: "dwight.schrute@agosto.com"};
-      $httpBackend.expectGET('/api/v1/identity').respond(identityResponse);
+      $httpBackend.expectGET('/internal/v1/identity').respond(identityResponse);
       result = SessionsService.login(expectedCredentials);
       $httpBackend.flush();
       return result.then(data => {

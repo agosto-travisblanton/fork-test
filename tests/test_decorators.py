@@ -9,7 +9,7 @@ from agar.test import BaseTest, WebTest
 
 class TestDecorators(BaseTest, WebTest):
     APPLICATION = WSGIApplication(
-        [Route(r'/api/v1/bogus', handler='handlers.bogus_handler.BogusHandler', name='bogus')]
+        [Route(r'/internal/v1/bogus', handler='handlers.bogus_handler.BogusHandler', name='bogus')]
     )
 
     def setUp(self):
@@ -26,14 +26,14 @@ class TestDecorators(BaseTest, WebTest):
         headers = {
             'Authorization': config.API_TOKEN
         }
-        response = self.app.get('/api/v1/bogus', params={}, headers=headers)
+        response = self.app.get('/internal/v1/bogus', params={}, headers=headers)
         self.assertOK(response)
 
     def testUnmanagedDeviceCreateTokenRequired_AuthorizationSuccessful(self):
         headers = {
             'Authorization': config.UNMANAGED_API_TOKEN
         }
-        response = self.app.get('/api/v1/bogus', params={}, headers=headers)
+        response = self.app.get('/internal/v1/bogus', params={}, headers=headers)
         self.assertOK(response)
 
     def testApiTokenRequired_IncorrectAuthorizationHeader_AuthorizationUnsuccessful(self):
@@ -41,13 +41,13 @@ class TestDecorators(BaseTest, WebTest):
             'Authorization': 'sdfjahsdkjhfalskjdhfaiusyduifyasdyfaosdyfaiusydfiuasyoduifyas'
         }
         with self.assertRaises(AppError) as cm:
-            self.app.get('/api/v1/bogus', params={}, headers=headers)
+            self.app.get('/internal/v1/bogus', params={}, headers=headers)
         self.assertTrue('403 Forbidden' in cm.exception.message)
 
     def testApiTokenRequired_NoAuthorizationHeader_AuthorizationUnsuccessful(self):
         headers = {}
         with self.assertRaises(AppError) as cm:
-            self.app.get('/api/v1/bogus', params={}, headers=headers)
+            self.app.get('/internal/v1/bogus', params={}, headers=headers)
         self.assertTrue('403 Forbidden' in cm.exception.message)
 
     ##################################################################################################################
@@ -58,14 +58,14 @@ class TestDecorators(BaseTest, WebTest):
         headers = {
             'Authorization': config.UNMANAGED_REGISTRATION_TOKEN
         }
-        response = self.app.post('/api/v1/bogus', params={}, headers=headers)
+        response = self.app.post('/internal/v1/bogus', params={}, headers=headers)
         self.assertOK(response)
 
     def testRequiresRegistrationToken_Managed_AuthorizationSuccessful(self):
         headers = {
             'Authorization': config.API_TOKEN
         }
-        response = self.app.post('/api/v1/bogus', params={}, headers=headers)
+        response = self.app.post('/internal/v1/bogus', params={}, headers=headers)
         self.assertOK(response)
 
     ##################################################################################################################
@@ -76,7 +76,7 @@ class TestDecorators(BaseTest, WebTest):
         headers = {
             'Authorization': config.UNMANAGED_REGISTRATION_TOKEN
         }
-        response = self.app.put('/api/v1/bogus', params={}, headers=headers)
+        response = self.app.put('/internal/v1/bogus', params={}, headers=headers)
         self.assertOK(response)
 
     def testRequiresUnmanagedRegistrationTokenOnly_AuthorizationUnsuccessful(self):
@@ -84,5 +84,5 @@ class TestDecorators(BaseTest, WebTest):
             'Authorization': 'sdfjahsdkjhfalskjdhfaiusyduifyasdyfaosdyfaiusydfiuasyoduifyas'
         }
         with self.assertRaises(AppError) as cm:
-            self.app.put('/api/v1/bogus', params={}, headers=headers)
+            self.app.put('/internal/v1/bogus', params={}, headers=headers)
         self.assertTrue('403 Forbidden' in cm.exception.message)

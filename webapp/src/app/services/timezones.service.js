@@ -5,17 +5,17 @@ export default class TimezonesService {
   }
 
   getUsTimezones() {
-    let promise = this.Restangular.oneUrl('timezones', 'api/v1/timezones/us').get();
+    let promise = this.Restangular.oneUrl('timezones', 'internal/v1/timezones/us').get();
     return promise;
   }
 
   getAllTimezones() {
-    let promise = this.Restangular.oneUrl('timezones', 'api/v1/timezones/all').get();
+    let promise = this.Restangular.oneUrl('timezones', 'internal/v1/timezones/all').get();
     return promise;
   }
 
   getCustomTimezones() {
-    let promise = this.Restangular.oneUrl('timezones', 'api/v1/timezones/custom').get();
+    let promise = this.Restangular.oneUrl('timezones', 'internal/v1/timezones/custom').get();
     return promise;
   }
 }
