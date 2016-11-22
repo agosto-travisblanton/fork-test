@@ -37,19 +37,18 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             device.timezone_offset = TimezoneUtil.get_timezone_offset(device.timezone)
         else:
             device.timezone_offset = TimezoneUtil.get_timezone_offset(config.DEFAULT_TIMEZONE)
-        if self.is_unmanaged_device is False:
-            if not device.device_id:
-                deferred.defer(refresh_device_by_mac_address,
-                               device_urlsafe_key=device_urlsafe_key,
-                               device_mac_address=device.mac_address,
-                               device_has_previous_directory_api_info=False,
-                               _queue='directory-api',
-                               _countdown=5)
-            else:
-                deferred.defer(refresh_device,
-                               device_urlsafe_key=device_urlsafe_key,
-                               _queue='directory-api',
-                               _countdown=5)
+        if not device.device_id:
+            deferred.defer(refresh_device_by_mac_address,
+                           device_urlsafe_key=device_urlsafe_key,
+                           device_mac_address=device.mac_address,
+                           device_has_previous_directory_api_info=False,
+                           _queue='directory-api',
+                           _countdown=5)
+        else:
+            deferred.defer(refresh_device,
+                           device_urlsafe_key=device_urlsafe_key,
+                           _queue='directory-api',
+                           _countdown=5)
         return json_response(self.response, device, strategy=CHROME_OS_DEVICE_STRATEGY)
 
     @requires_auth
