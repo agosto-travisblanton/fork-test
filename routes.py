@@ -195,17 +195,11 @@ application = WSGIApplication(
 
         Route(r'/internal/v1/identity',
               handler='handlers.identity_handler.IdentityHandler',
-              name='identity'
+              name='identity',
               ),
-
-        Route(r'/login',
+        Route(r'/internal/v1/login',
               handler='handlers.login_handler.LoginHandler',
               name='login',
-              ),
-
-        Route(r'/logout',
-              handler='handlers.logout_handler.LogoutHandler',
-              name='logout',
               ),
 
         ############################################################
@@ -643,7 +637,7 @@ application = WSGIApplication(
 
 if on_development_server or on_integration_server or on_qa_server:
     dev_routes = [
-        Route(r'/internal/v1/seed/<user_first>/<user_last>',
+        Route(r'/api/v1/seed/<user_first>/<user_last>',
               handler="handlers.dev_handlers.SeedScript",
               name="Seed",
               methods=["GET"]

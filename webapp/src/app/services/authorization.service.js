@@ -1,16 +1,23 @@
 export default class AuthorizationService {
 
-  constructor(SessionsService, $q) {
+  constructor(SessionsService, $q, $window) {
     'ngInject';
     this.$q = $q
+    this.$window = $window
     this.SessionsService = SessionsService
   }
 
   authenticated() {
     let deferred = this.$q.defer();
     let userKey = this.SessionsService.getUserKey();
+    let userJWT = this.SessionsService.getJWT();
     if (userKey) {
-      deferred.resolve(true);
+      if (userKey && userJWT) {
+        deferred.resolve(true);
+      } else {
+        this.SessionsService.removeUserInfo();
+        this.$window.location.href = "#/redirect"
+      }
     } else {
       deferred.reject(["authError", 'sign_in']);
     }
@@ -37,6 +44,14 @@ export default class AuthorizationService {
       hasAtLeastOneDistributorAdmin = true;
     }
     let userKey = this.SessionsService.getUserKey();
+    let userJWT = this.SessionsService.getJWT();
+    if (userKey) {
+      if (!userJWT) {
+        this.SessionsService.removeUserInfo();
+        this.$window.location.href = "#/redirect"
+      }
+    }
+
     if (!userKey) {
       deferred.reject('sign_in');
     } else if (!admin && !hasAtLeastOneDistributorAdmin) {

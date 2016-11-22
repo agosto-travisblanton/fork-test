@@ -5,15 +5,16 @@ from datetime import datetime, timedelta
 from app_config import config
 from env_setup import setup_test_paths
 from model_entities.integration_events_log_model import IntegrationEventLog
-from tests.provisioning_base_test import ProvisioningBaseTest
+from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 from utils.web_util import build_uri
+from utils.auth_util import generate_token
 
 setup_test_paths()
 
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
-class TestIntegrationEventsLogHandler(ProvisioningBaseTest):
+class TestIntegrationEventsLogHandler(ProvisioningDistributorUserBase):
     REGISTRATION = 'Registration'
     PLAYER = 'Player'
     PROVISIONING = 'Provisioning'
@@ -37,17 +38,16 @@ class TestIntegrationEventsLogHandler(ProvisioningBaseTest):
         self.distributor_admin = self.create_distributor_admin(email='distributor.admin@agosto.com',
                                                                distributor_name='Agosto')
         self.distributor_admin_header = {
-            'X-Provisioning-User': self.distributor_admin.key.urlsafe()
+            'X-Provisioning-User': self.distributor_admin.key.urlsafe(),
+            'JWT': str(generate_token(self.distributor_admin))
         }
         self.platform_admin = self.create_platform_admin(email='platform.admin@agosto.com',
                                                          distributor_name='Agosto')
         self.platform_admin_header = {
-            'X-Provisioning-User': self.platform_admin.key.urlsafe()
-        }
-        self.api_token_authorization_header = {
-            'Authorization': config.API_TOKEN
-        }
+            'X-Provisioning-User': self.platform_admin.key.urlsafe(),
+            'JWT': str(generate_token(self.platform_admin))
 
+        }
         timestamp = datetime.utcnow()
 
         self.registration_event_1 = IntegrationEventLog.create(

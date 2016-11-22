@@ -13,9 +13,10 @@ from models import Distributor, Domain, Tenant, Location
 from routes import application
 from app_config import config
 from webtest import AppError
+from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
 
-class TestLocationsHandler(BaseTest, WebTest):
+class TestLocationsHandler(ProvisioningDistributorUserBase):
     APPLICATION = application
     DISTRIBUTOR_NAME = 'agosto'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
@@ -50,9 +51,7 @@ class TestLocationsHandler(BaseTest, WebTest):
                                         customer_location_name=self.CUSTOMER_LOCATION_NAME,
                                         customer_location_code=self.CUSTOMER_LOCATION_CODE)
         self.location_key = self.location.put()
-        self.headers = {
-            'Authorization': config.API_TOKEN,
-        }
+        self.headers = self.JWT_DEFAULT_HEADER
 
     ##################################################################################################################
     # get_locations_by_tenant

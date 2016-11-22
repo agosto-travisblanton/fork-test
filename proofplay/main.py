@@ -1,24 +1,25 @@
 # main.py
-from webapp2 import RequestHandler
-from database_calls import *
-from data_processing import *
-import logging
-import json
-from google.appengine.ext import deferred
-from alembic import command
-import os
 import datetime
+import json
+import logging
+import os
 
-from proofplay_config import config
-from routes_proofplay import basedir
+from alembic import command
+from google.appengine.ext import deferred
+from webapp2 import RequestHandler
+
+from data_processing import *
+from database_calls import *
 from decorators import (
     has_tenant_in_distributor_header,
     has_distributor_key,
     has_tenant_in_distributor_param,
     requires_api_token
 )
-
 from dev.generate_mock_data import generate_mock_data
+from proofplay_config import config
+from routes_proofplay import basedir
+from utils.tenant_util import get_tenant_names_for_distributor
 
 
 ####################################################################################

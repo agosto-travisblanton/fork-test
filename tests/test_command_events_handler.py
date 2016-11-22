@@ -8,9 +8,10 @@ from routes import application
 from utils.web_util import build_uri
 from app_config import config
 import json
+from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
 
-class TestCommandEventsHandler(BaseTest, WebTest):
+class TestCommandEventsHandler(ProvisioningDistributorUserBase):
     APPLICATION = application
     INTENT = 'skykit.com/skdchromeapp/reset'
     GCM_REGISTRATION_ID = 'APA91bH0sONxgUSSUtERv-SGZHYvThi3jRv_p4ASYdTTLjgLntaZhyL9ti8aE-SWZm8ju1z0stjziWLvVdRt0'
@@ -40,7 +41,7 @@ class TestCommandEventsHandler(BaseTest, WebTest):
             'prev_cursor_str': 'null',
             'next_cursor_str': 'null'
         })
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFAULT_HEADER)
         response_json = json.loads(response.body)
 
         self.assertLength(25, response_json["events"])

@@ -8,13 +8,15 @@ from agar.test import BaseTest, WebTest
 from app_config import config
 from env_setup import setup_test_paths
 from mockito import when, any as any_matcher
-from models import ChromeOsDevice, Tenant, Distributor, Domain, DeviceIssueLog, Location
+from models import ChromeOsDevice, Tenant, Distributor, Domain, DeviceIssueLog, Location, User
 from routes import application
 from utils.timezone_util import TimezoneUtil
 from utils.web_util import build_uri
 from webtest import AppError
+from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
 setup_test_paths()
+from utils.auth_util import generate_token
 
 
 class TestDeviceResourceHandler(BaseTest, WebTest):
@@ -40,8 +42,10 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
     def setUp(self):
         super(TestDeviceResourceHandler, self).setUp()
+        self.user = User.get_or_insert_by_email('donal@trump.gov')
         self.valid_authorization_header = {
-            'Authorization': config.API_TOKEN
+            'Authorization': config.API_TOKEN,
+            'JWT': str(generate_token(self.user))
         }
         self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
                                               active=True)
@@ -81,12 +85,17 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
             device_id=self.DEVICE_ID,
             mac_address=self.MAC_ADDRESS)
         self.managed_device_key = self.managed_device.put()
+
         self.unmanaged_registration_token_authorization_header = {
             'Authorization': config.UNMANAGED_REGISTRATION_TOKEN
         }
+
         self.api_token_authorization_header = {
-            'Authorization': config.API_TOKEN
+            'Authorization': config.API_TOKEN,
+            'JWT': str(generate_token(self.user))
+
         }
+
         self.unmanaged_api_token_authorization_header = {
             'Authorization': config.UNMANAGED_API_TOKEN
         }
