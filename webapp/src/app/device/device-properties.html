@@ -401,11 +401,7 @@
                   ng-options="c.id for c in deviceDetailsCtrl.panelInputs | filter:{parentId: deviceDetailsCtrl.currentDevice.panelModel.id}">
                 </select>
               </div>
-              <div class="col-sm-2"
-                   tooltips
-                   tooltip-class="tooltip-custom-large"
-                   tooltip-side="top"
-                   tooltip-template-url="webapp/src/app/tooltip/panel-sleep-toggle.html">
+              <div class="col-sm-2">
                 <label>Panel sleep</label>
                 <md-switch class="md-switch device-properties-switch"
                            ng-model="deviceDetailsCtrl.currentDevice.panelSleep"
