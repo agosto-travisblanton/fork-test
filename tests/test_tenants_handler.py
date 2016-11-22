@@ -374,27 +374,6 @@ class TestTenantsHandler(ProvisioningDistributorUserBase):
         self.app.put_json(uri, entity_body, headers=self.headers)
         self.assertEqual(expected.content_server_url, valid_url)
 
-    def test_put_email_gets_trimmed_lowercase(self):
-        invalid_email = ' FOO@bar.com  '
-        valid_email = 'foo@bar.com'
-        tenant_keys = self.load_tenants()
-        uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': tenant_keys[0].urlsafe()})
-        expected = tenant_keys[0].get()
-        entity_body = {
-            'name': 'foobar',
-            'tenant_code': 'acme',
-            'admin_email': invalid_email,
-            'content_server_url': 'https://skykit-contentmanager-int.appspot.com',
-            'content_manager_base_url': 'https://skykit-contentmanager-int.appspot.com/content',
-            'content_server_api_key': 'some key',
-            'domain_key': self.domain_key.urlsafe(),
-            'proof_of_play_logging': False,
-            'default_timezone': 'America/Denver',
-            'active': True
-        }
-        self.app.put_json(uri, entity_body, headers=self.headers)
-        self.assertEqual(expected.admin_email, valid_email)
-
     def test_put_returns_bad_request_status_for_blank_content_server_url(self):
         tenant_keys = self.load_tenants()
         uri = application.router.build(None, 'manage-tenant', None, {'tenant_key': tenant_keys[0].urlsafe()})

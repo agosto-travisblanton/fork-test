@@ -29,25 +29,25 @@ describe('AdminService', function () {
 
     it('.makeDistributor', function () {
       AdminService.makeDistributor('distributor', 'admin@gmail.com');
-      return expect(Restangular.oneUrl).toHaveBeenCalledWith(AdminService.DISTRIBUTOR_SERVICE, "/api/v1/distributors");
+      return expect(Restangular.oneUrl).toHaveBeenCalledWith(AdminService.DISTRIBUTOR_SERVICE, "/internal/v1/distributors");
     });
 
 
     it('.addUserToDistributor', function () {
       AdminService.addUserToDistributor('admin@gmail.com', 'distributor', true);
-      return expect(Restangular.oneUrl).toHaveBeenCalledWith(AdminService.USER_SERVICE, '/api/v1/users');
+      return expect(Restangular.oneUrl).toHaveBeenCalledWith(AdminService.USER_SERVICE, '/internal/v1/users');
     });
 
 
     it('.getUsersOfDistributor', function () {
       let distributorKey = 'distributorKey';
       AdminService.getUsersOfDistributor(distributorKey);
-      return expect(Restangular.oneUrl).toHaveBeenCalledWith(AdminService.DISTRIBUTOR_SERVICE, `/api/v1/analytics/distributors/${distributorKey}/users`);
+      return expect(Restangular.oneUrl).toHaveBeenCalledWith(AdminService.DISTRIBUTOR_SERVICE, `/internal/v1/analytics/distributors/${distributorKey}/users`);
     });
 
     return it('.getUsersOfDistributor', function () {
       AdminService.getAllDistributors();
-      return expect(Restangular.oneUrl).toHaveBeenCalledWith(AdminService.DISTRIBUTOR_SERVICE, "/api/v1/distributors");
+      return expect(Restangular.oneUrl).toHaveBeenCalledWith(AdminService.DISTRIBUTOR_SERVICE, "/internal/v1/distributors");
     });
   });
 });

@@ -94,7 +94,7 @@ class TestDomainsHandler(ProvisioningDistributorUserBase):
                         'active': True,
                         'impersonation_admin_email_address': self.IMPERSONATION_EMAIL}
         with self.assertRaises(AppError) as context:
-            self.app.post('/api/v1/domains', json.dumps(request_body), headers=headers)
+            self.app.post('/internal/v1/domains', json.dumps(request_body), headers=headers)
         self.assertTrue('Bad response: 400 The distributor_key parameter is invalid.'
                         in context.exception.message)
 
@@ -104,7 +104,7 @@ class TestDomainsHandler(ProvisioningDistributorUserBase):
                         'impersonation_admin_email_address': self.IMPERSONATION_EMAIL,
                         'distributor_key': self.distributor_key.urlsafe()}
         with self.assertRaises(AppError) as context:
-            self.app.post('/api/v1/domains', json.dumps(request_body), headers=self.headers)
+            self.app.post('/internal/v1/domains', json.dumps(request_body), headers=self.headers)
         self.assertTrue('Bad response: 400 The name parameter is invalid.'
                         in context.exception.message)
 
@@ -114,7 +114,7 @@ class TestDomainsHandler(ProvisioningDistributorUserBase):
                         'impersonation_admin_email_address': self.IMPERSONATION_EMAIL,
                         'distributor_key': self.distributor_key.urlsafe()}
         with self.assertRaises(AppError) as context:
-            self.app.post('/api/v1/domains', json.dumps(request_body), headers=self.headers)
+            self.app.post('/internal/v1/domains', json.dumps(request_body), headers=self.headers)
         self.assertTrue('Bad response: 400 The active parameter is invalid.'
                         in context.exception.message)
 
@@ -124,13 +124,13 @@ class TestDomainsHandler(ProvisioningDistributorUserBase):
                         'impersonation_admin_email_address': None,
                         'distributor_key': self.distributor_key.urlsafe()}
         with self.assertRaises(AppError) as context:
-            self.app.post('/api/v1/domains', json.dumps(request_body), headers=self.headers)
+            self.app.post('/internal/v1/domains', json.dumps(request_body), headers=self.headers)
         self.assertTrue('Bad response: 400 The impersonation_admin_email_address parameter is invalid.'
                         in context.exception.message)
 
     def test_post_fails_without_request_body(self):
         with self.assertRaises(AppError) as context:
-            self.app.post('/api/v1/domains', {}, headers=self.headers)
+            self.app.post('/internal/v1/domains', {}, headers=self.headers)
         self.assertTrue('Bad response: 400 Did not receive request body.'
                         in context.exception.message)
 

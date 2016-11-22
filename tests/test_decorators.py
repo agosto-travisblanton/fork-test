@@ -5,13 +5,12 @@ setup_test_paths()
 from webtest import AppError
 from webapp2 import WSGIApplication, Route
 from app_config import config
-from agar.test import BaseTest, WebTest
 from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
 
 class TestDecorators(ProvisioningDistributorUserBase):
     APPLICATION = WSGIApplication(
-        [Route(r'/api/v1/bogus', handler='handlers.bogus_handler.BogusHandler', name='bogus')]
+        [Route(r'/internal/v1/bogus', handler='handlers.bogus_handler.BogusHandler', name='bogus')]
     )
 
     def setUp(self):
@@ -26,14 +25,14 @@ class TestDecorators(ProvisioningDistributorUserBase):
 
     def testApiTokenRequired_AuthorizationSuccessful(self):
         headers = self.JWT_DEFUALT_HEADER
-        response = self.app.get('/api/v1/bogus', params={}, headers=headers)
+        response = self.app.get('/internal/v1/bogus', params={}, headers=headers)
         self.assertOK(response)
 
     def testUnmanagedDeviceCreateTokenRequired_AuthorizationSuccessful(self):
         headers = self.JWT_DEFUALT_HEADER
         headers['Authorization'] = config.UNMANAGED_API_TOKEN
 
-        response = self.app.get('/api/v1/bogus', params={}, headers=headers)
+        response = self.app.get('/internal/v1/bogus', params={}, headers=headers)
         self.assertOK(response)
 
     def testApiTokenRequired_IncorrectAuthorizationHeader_AuthorizationUnsuccessful(self):
@@ -41,13 +40,13 @@ class TestDecorators(ProvisioningDistributorUserBase):
         headers['JWT'] = 'sdfjahsdkjhfalskjdhfaiusyduifyasdyfaosdyfaiusydfiuasyoduifyas'
 
         with self.assertRaises(AppError) as cm:
-            self.app.get('/api/v1/bogus', params={}, headers=headers)
+            self.app.get('/internal/v1/bogus', params={}, headers=headers)
         self.assertTrue('403 Forbidden' in cm.exception.message)
 
     def testApiTokenRequired_NoAuthorizationHeader_AuthorizationUnsuccessful(self):
         headers = {}
         with self.assertRaises(AppError) as cm:
-            self.app.get('/api/v1/bogus', params={}, headers=headers)
+            self.app.get('/internal/v1/bogus', params={}, headers=headers)
         self.assertTrue('403 Forbidden' in cm.exception.message)
 
     ##################################################################################################################
@@ -58,14 +57,14 @@ class TestDecorators(ProvisioningDistributorUserBase):
         headers = {
             'Authorization': config.UNMANAGED_REGISTRATION_TOKEN
         }
-        response = self.app.post('/api/v1/bogus', params={}, headers=headers)
+        response = self.app.post('/internal/v1/bogus', params={}, headers=headers)
         self.assertOK(response)
 
     def testRequiresRegistrationToken_Managed_AuthorizationSuccessful(self):
         headers = {
             'Authorization': config.API_TOKEN
         }
-        response = self.app.post('/api/v1/bogus', params={}, headers=headers)
+        response = self.app.post('/internal/v1/bogus', params={}, headers=headers)
         self.assertOK(response)
 
     ##################################################################################################################
@@ -76,7 +75,7 @@ class TestDecorators(ProvisioningDistributorUserBase):
         headers = {
             'Authorization': config.UNMANAGED_REGISTRATION_TOKEN
         }
-        response = self.app.put('/api/v1/bogus', params={}, headers=headers)
+        response = self.app.put('/internal/v1/bogus', params={}, headers=headers)
         self.assertOK(response)
 
     def testRequiresUnmanagedRegistrationTokenOnly_AuthorizationUnsuccessful(self):
@@ -84,5 +83,5 @@ class TestDecorators(ProvisioningDistributorUserBase):
             'Authorization': 'sdfjahsdkjhfalskjdhfaiusyduifyasdyfaosdyfaiusydfiuasyoduifyas'
         }
         with self.assertRaises(AppError) as cm:
-            self.app.put('/api/v1/bogus', params={}, headers=headers)
+            self.app.put('/internal/v1/bogus', params={}, headers=headers)
         self.assertTrue('403 Forbidden' in cm.exception.message)

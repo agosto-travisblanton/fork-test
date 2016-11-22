@@ -1,10 +1,11 @@
 import json
-import logging
-from models import ChromeOsDevice
+
 from decorators import requires_cm_key
 from extended_session_request_handler import ExtendedSessionRequestHandler
+from models import ChromeOsDevice
 from restler.serializers import json_response
 from strategy import CHROME_OS_DEVICE_STRATEGY
+
 
 class DeviceHandler(ExtendedSessionRequestHandler):
 

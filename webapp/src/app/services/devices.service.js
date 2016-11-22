@@ -17,17 +17,18 @@ export default class DevicesService {
       controlsMode
     };
 
-    let promise = this.Restangular.oneUrl(this.SERVICE_NAME, `/api/v1/devices/${deviceKey}/controls-mode`).customPUT(payload);
+    let promise = this.Restangular.oneUrl(this.SERVICE_NAME,
+      `/internal/v1/devices/${deviceKey}/controls-mode`).customPUT(payload);
     return promise;
   }
 
   getDeviceByMacAddress(macAddress) {
-    let url = `api/v1/devices?mac_address=${macAddress}`;
-    return this.Restangular.oneUrl('api/v1/devices', url).get();
+    let url = `internal/v1/devices?mac_address=${macAddress}`;
+    return this.Restangular.oneUrl('internal/v1/devices', url).get();
   }
 
   getDeviceByKey(deviceKey) {
-    let url = `api/v1/devices/${deviceKey}`;
+    let url = `internal/v1/devices/${deviceKey}`;
     let promise = this.Restangular.oneUrl(this.SERVICE_NAME, url).get();
     return promise;
   }
@@ -251,7 +252,7 @@ export default class DevicesService {
   getIssuesByKey(deviceKey, startEpoch, endEpoch, prev, next) {
     prev = prev === undefined || null ? null : prev;
     next = next === undefined || null ? null : next;
-    let url = `/api/v1/devices/${prev}/${next}/${deviceKey}/issues?start=${startEpoch}&end=${endEpoch}`;
+    let url = `/internal/v1/devices/${prev}/${next}/${deviceKey}/issues?start=${startEpoch}&end=${endEpoch}`;
     let promise = this.Restangular.oneUrl(this.SERVICE_NAME, url).get();
     return promise;
   }
@@ -259,7 +260,7 @@ export default class DevicesService {
   getCommandEventsByKey(deviceKey, prev, next) {
     prev = prev === undefined || null ? null : prev;
     next = next === undefined || null ? null : next;
-    let url = `/api/v1/player-command-events/${prev}/${next}/${deviceKey}`;
+    let url = `/internal/v1/player-command-events/${prev}/${next}/${deviceKey}`;
     let promise = this.Restangular.oneUrl(this.SERVICE_NAME, url).get();
     return promise;
   }
@@ -284,7 +285,7 @@ export default class DevicesService {
 
   searchDevicesByPartialSerialByTenant(tenantKey, partial_serial, unmanaged) {
     if (tenantKey !== undefined) {
-      let url = `/api/v1/tenants/search/${tenantKey}/devices?unmanaged=${unmanaged}&partial_serial=${partial_serial}`;
+      let url = `/internal/v1/tenants/search/${tenantKey}/devices?unmanaged=${unmanaged}&partial_serial=${partial_serial}`;
       let promise = this.Restangular.oneUrl(this.SERVICE_NAME, url).get();
       return promise;
     }
@@ -292,7 +293,7 @@ export default class DevicesService {
 
   searchDevicesByPartialMacByTenant(tenantKey, partial_mac, unmanaged) {
     if (tenantKey !== undefined) {
-      let url = `/api/v1/tenants/search/${tenantKey}/devices?unmanaged=${unmanaged}&partial_mac=${partial_mac}`;
+      let url = `/internal/v1/tenants/search/${tenantKey}/devices?unmanaged=${unmanaged}&partial_mac=${partial_mac}`;
       let promise = this.Restangular.oneUrl(this.SERVICE_NAME, url).get();
       return promise;
     }
@@ -300,7 +301,7 @@ export default class DevicesService {
 
   searchDistributorDevicesByPartialGCMidByTenant(tenantKey, partial_gcmid, unmanaged) {
     if (tenantKey !== undefined) {
-      let url = `/api/v1/tenants/search/${tenantKey}/devices?unmanaged=${unmanaged}&partial_gcmid=${partial_gcmid}`;
+      let url = `/internal/v1/tenants/search/${tenantKey}/devices?unmanaged=${unmanaged}&partial_gcmid=${partial_gcmid}`;
       let promise = this.Restangular.oneUrl(this.SERVICE_NAME, url).get();
       return promise;
     }
@@ -312,7 +313,8 @@ export default class DevicesService {
   /////////////////////////////////////////////////////////////////////////
   searchDevicesByPartialSerial(distributorKey, partial_serial, unmanaged) {
     if (distributorKey !== undefined) {
-      let url = `/api/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_serial=${partial_serial}`;
+      let url =
+        `/internal/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_serial=${partial_serial}`;
       let promise = this.Restangular.oneUrl(this.SERVICE_NAME, url).get();
       return promise;
     }
@@ -320,7 +322,8 @@ export default class DevicesService {
 
   searchDevicesByPartialMac(distributorKey, partial_mac, unmanaged) {
     if (distributorKey !== undefined) {
-      let url = `/api/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_mac=${partial_mac}`;
+      let url =
+        `/internal/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_mac=${partial_mac}`;
       let promise = this.Restangular.oneUrl(this.SERVICE_NAME, url).get();
       return promise;
     }
@@ -328,7 +331,8 @@ export default class DevicesService {
 
   searchDistributorDevicesByPartialGCMid(distributorKey, partial_gcmid, unmanaged) {
     if (distributorKey !== undefined) {
-      let url = `/api/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_gcmid=${partial_gcmid}`;
+      let url =
+        `/internal/v1/distributors/search/${distributorKey}/devices?unmanaged=${unmanaged}&partial_gcmid=${partial_gcmid}`;
       let promise = this.Restangular.oneUrl(this.SERVICE_NAME, url).get();
       return promise;
     }
@@ -338,21 +342,21 @@ export default class DevicesService {
   // SEARCH DEVICES GLOBALLY
   /////////////////////////////////////////////////////////////////////////
   searchDevicesByPartialSerialGlobally(partial_serial, unmanaged) {
-    let url = `/api/v1/devices/analytics/search-global?unmanaged=${unmanaged}&partial_serial=${partial_serial}`;
+    let url = `/internal/v1/devices/analytics/search-global?unmanaged=${unmanaged}&partial_serial=${partial_serial}`;
     let promise = this.Restangular.oneUrl("devices", url).get();
     return promise;
 
   }
 
   searchDevicesByPartialMacGlobally(partial_mac, unmanaged) {
-    let url = `/api/v1/devices/analytics/search-global?unmanaged=${unmanaged}&partial_mac=${partial_mac}`;
+    let url = `/internal/v1/devices/analytics/search-global?unmanaged=${unmanaged}&partial_mac=${partial_mac}`;
     let promise = this.Restangular.oneUrl("devices", url).get();
     return promise;
 
   }
 
   searchDistributorDevicesByPartialGCMidGlobally(partial_gcmid, unmanaged) {
-    let url = `/api/v1/devices/analytics/search-global?unmanaged=${unmanaged}&partial_gcmid=${partial_gcmid}`;
+    let url = `/internal/v1/devices/analytics/search-global?unmanaged=${unmanaged}&partial_gcmid=${partial_gcmid}`;
     let promise = this.Restangular.oneUrl("devices", url).get();
     return promise;
   }
@@ -396,7 +400,7 @@ export default class DevicesService {
       top_left,
     }
 
-    return this.Restangular.oneUrl('overlay', `/api/v1/overlay/device/${device_urlsafe_key}`).customPOST(payload);
+    return this.Restangular.oneUrl('overlay', `/internal/v1/overlay/device/${device_urlsafe_key}`).customPOST(payload);
   }
 
   delete(deviceKey) {
@@ -503,12 +507,13 @@ export default class DevicesService {
   }
 
   makeDevicesByDistributorURL(distributorKey, prev, next, unmanaged) {
-    let url = `/api/v1/distributors/${distributorKey}/devices?unmanaged=${unmanaged}&next_cursor=${next}&prev_cursor=${prev}`;
+    let url =
+      `/internal/v1/distributors/${distributorKey}/devices?unmanaged=${unmanaged}&next_cursor=${next}&prev_cursor=${prev}`;
     return url
   }
 
   makeDevicesByTenantURL(tenantKey, prev, next, unmanaged) {
-    let url = `/api/v1/tenants/${tenantKey}/devices?unmanaged=${unmanaged}&next_cursor=${next}&prev_cursor=${prev}`;
+    let url = `/internal/v1/tenants/${tenantKey}/devices?unmanaged=${unmanaged}&next_cursor=${next}&prev_cursor=${prev}`;
     return url
   }
 }

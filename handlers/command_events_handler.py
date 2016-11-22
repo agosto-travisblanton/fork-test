@@ -1,8 +1,6 @@
 import logging
-from webapp2 import RequestHandler
 from utils.auth_util import requires_auth
 from models import PlayerCommandEvent
-from ndb_mixins import KeyValidatorMixin
 from restler.serializers import json_response
 from strategy import PLAYER_COMMAND_EVENT_STRATEGY
 from datetime import datetime
@@ -11,7 +9,7 @@ from extended_session_request_handler import ExtendedSessionRequestHandler
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
-class PlayerCommandEventsHandler(ExtendedSessionRequestHandler):
+class CommandEventsHandler(ExtendedSessionRequestHandler):
     @requires_auth
     def command_confirmation(self, urlsafe_event_key):
         try:
