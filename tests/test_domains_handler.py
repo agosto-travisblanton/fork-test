@@ -35,7 +35,7 @@ class TestDomainsHandler(ProvisioningDistributorUserBase):
                                              active=False)
         self.inactive_domain_key = self.inactive_domain.put()
 
-        self.headers = self.JWT_DEFUALT_HEADER
+        self.headers = self.JWT_DEFAULT_HEADER
         self.headers['X-Provisioning-Distributor'] = self.distributor_key.urlsafe()
 
         self.bad_authorization_header = {
@@ -86,7 +86,7 @@ class TestDomainsHandler(ProvisioningDistributorUserBase):
         self.assertTrue(self.FORBIDDEN in context.exception.message)
 
     def test_post_fails_without_distributor_key(self):
-        headers = self.JWT_DEFUALT_HEADER
+        headers = self.JWT_DEFAULT_HEADER
         headers['X-Provisioning-Distributor'] = ''
 
 

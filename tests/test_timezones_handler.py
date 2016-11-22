@@ -21,7 +21,7 @@ class TestTimezonesHandler(ProvisioningDistributorUserBase):
         self.distributor = Distributor.create(name=self.DISTRIBUTOR_NAME,
                                               active=True)
         self.distributor_key = self.distributor.put()
-        self.headers = self.JWT_DEFUALT_HEADER
+        self.headers = self.JWT_DEFAULT_HEADER
 
 
         self.bad_authorization_header = {

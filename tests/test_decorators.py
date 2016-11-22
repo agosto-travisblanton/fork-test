@@ -24,19 +24,19 @@ class TestDecorators(ProvisioningDistributorUserBase):
     ##################################################################################################################
 
     def testApiTokenRequired_AuthorizationSuccessful(self):
-        headers = self.JWT_DEFUALT_HEADER
+        headers = self.JWT_DEFAULT_HEADER
         response = self.app.get('/internal/v1/bogus', params={}, headers=headers)
         self.assertOK(response)
 
     def testUnmanagedDeviceCreateTokenRequired_AuthorizationSuccessful(self):
-        headers = self.JWT_DEFUALT_HEADER
+        headers = self.JWT_DEFAULT_HEADER
         headers['Authorization'] = config.UNMANAGED_API_TOKEN
 
         response = self.app.get('/internal/v1/bogus', params={}, headers=headers)
         self.assertOK(response)
 
     def testApiTokenRequired_IncorrectAuthorizationHeader_AuthorizationUnsuccessful(self):
-        headers = self.JWT_DEFUALT_HEADER
+        headers = self.JWT_DEFAULT_HEADER
         headers['JWT'] = 'sdfjahsdkjhfalskjdhfaiusyduifyasdyfaosdyfaiusydfiuasyoduifyas'
 
         with self.assertRaises(AppError) as cm:

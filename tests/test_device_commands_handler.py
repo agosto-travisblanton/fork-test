@@ -54,7 +54,7 @@ class TestDeviceCommandsHandler(ProvisioningDistributorUserBase):
                                                               mac_address=self.MAC_ADDRESS)
 
         self.chrome_os_device_key = self.chrome_os_device.put()
-        self.valid_authorization_header = self.JWT_DEFUALT_HEADER
+        self.valid_authorization_header = self.JWT_DEFAULT_HEADER
         self.bad_authorization_header = {}
         self.some_intent = 'https://skykit-display-int.appspot.com/40289e504f09422c85d23a629a45be3d'
         self.post_uri = application.router.build(None,

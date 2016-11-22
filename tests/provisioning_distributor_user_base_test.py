@@ -113,7 +113,7 @@ class ProvisioningDistributorUserBase(ProvisioningBaseTest):
             'X-Provisioning-Distributor': self.distributor_key.urlsafe()
         }
 
-        self.JWT_DEFUALT_HEADER = {
+        self.JWT_DEFAULT_HEADER = {
             'Authorization': config.API_TOKEN,
             'JWT': str(generate_token(self.user)),
             'X-Provisioning-User': self.user_key.urlsafe(),
