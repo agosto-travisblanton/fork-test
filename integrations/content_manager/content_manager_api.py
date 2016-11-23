@@ -16,6 +16,7 @@ __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
 class ContentManagerApi(KeyValidatorMixin, object):
+
     def create_device(self, device_urlsafe_key, correlation_id, gcm_registration_id=None, retry=0):
         if retry < 5:
             chrome_os_device = self.get_or_except(device_urlsafe_key, ChromeOsDevice)
@@ -53,9 +54,9 @@ class ContentManagerApi(KeyValidatorMixin, object):
                 cm_create_device_request.details = 'Request url: {0} for call to CM.'.format(url)
                 cm_create_device_request.put()
 
-                cm_request_success = self.new_device_request(
+                cm_request_success = self.new_device_post(
                     url=url,
-                    payload=json.dumps(cms_payload),
+                    cms_payload=cms_payload,
                     device_urlsafe_key=device_urlsafe_key,
                     chrome_os_device=chrome_os_device,
                     tenant=tenant,
@@ -65,7 +66,7 @@ class ContentManagerApi(KeyValidatorMixin, object):
                 )
 
                 if not cm_request_success:
-                    # exponential backoff
+                    # exponential back off
                     time.sleep((retry + 1) * (retry + 1))
                     return self.create_device(device_urlsafe_key, correlation_id, gcm_registration_id, retry=retry + 1)
                 else:
@@ -152,23 +153,26 @@ class ContentManagerApi(KeyValidatorMixin, object):
     @staticmethod
     def create_tenant(tenant, correlation_id):
         headers = {'Content-Type': 'application/json', 'Authorization': config.CONTENT_MANAGER_API_SERVER_KEY}
-        payload = {
+        cms_payload = {
             "tenant_name": tenant.name,
             "tenant_code": tenant.tenant_code,
             "admin_email": tenant.admin_email
         }
         url = "{content_manager_base_url}/provisioning/v1/tenants".format(
             content_manager_base_url=tenant.content_manager_base_url)
+
         http_client = HttpClient()
         http_client.set_default_fetch_deadline(limit_in_seconds=60)
-        http_client_response = http_client.post(HttpClientRequest(
-            url=url, payload=(json.dumps(payload)), headers=headers))
+        http_client_request = HttpClientRequest(url=url, payload=(json.dumps(cms_payload)), headers=headers)
+        http_client_response = http_client.post(http_client_request)
+
         if http_client_response.status_code == httplib.CREATED:
             details = 'Tenant created in Content Manager: url={0}, admin_email={1}, tenant_code={2}'.format(
                 url, tenant.admin_email, tenant.tenant_code)
+            workflow_step = 'Response from Content Manager for create_tenant request (201 Created)'
             IntegrationEventLog.create(event_category='Tenant Creation',
                                        component_name='Content Manager',
-                                       workflow_step='ContentManager: Created',
+                                       workflow_step=workflow_step,
                                        tenant_code=tenant.tenant_code,
                                        details=details,
                                        correlation_identifier=correlation_id).put()
@@ -176,9 +180,10 @@ class ContentManagerApi(KeyValidatorMixin, object):
         else:
             error_message = 'Failed to create tenant {0} in Content Manager. Status code: {1}'.format(
                 tenant.name, http_client_response.status_code)
+            workflow_step = 'Response from Content Manager for create_tenant request (Failed)'
             IntegrationEventLog.create(event_category='Tenant Creation',
                                        component_name='Content Manager',
-                                       workflow_step='ContentManager: Not Created',
+                                       workflow_step=workflow_step,
                                        tenant_code=tenant.tenant_code,
                                        details=error_message,
                                        correlation_identifier=correlation_id).put()
@@ -186,13 +191,14 @@ class ContentManagerApi(KeyValidatorMixin, object):
             return False
 
     @staticmethod
-    def new_device_request(url, payload, device_urlsafe_key, chrome_os_device, tenant, correlation_id,
-                           gcm_registration_id=None, retry=0):
+    def new_device_post(url, cms_payload, device_urlsafe_key, chrome_os_device, tenant, correlation_id,
+                        gcm_registration_id=None, retry=0):
         headers = {'Content-Type': 'application/json', 'Authorization': config.CONTENT_MANAGER_API_SERVER_KEY}
-
-        http_client_request = HttpClientRequest(url=url, payload=payload, headers=headers)
-        http_client_response = HttpClient().post(http_client_request)
-        log_info = 'ContentManagerApi.new_device_request: http_status={0}, url={1}, device_key={2}, \
+        http_client = HttpClient()
+        http_client.set_default_fetch_deadline(limit_in_seconds=60)
+        http_client_request = HttpClientRequest(url=url, payload=(json.dumps(cms_payload)), headers=headers)
+        http_client_response = http_client.post(http_client_request)
+        log_info = 'ContentManagerApi.new_device_post: http_status={0}, url={1}, device_key={2}, \
                             api_key={3}, tenant_code={4}, SN={5}'.format(
             http_client_response.status_code, url, device_urlsafe_key, chrome_os_device.api_key, tenant.tenant_code,
             chrome_os_device.serial_number)
@@ -230,7 +236,7 @@ class ContentManagerApi(KeyValidatorMixin, object):
         else:
             workflow_step = 'Response from Content Manager for create_device request (Failed)'
             if retry != 0:
-                workflow_step = "Retry: {}; ".format(retry) + workflow_step
+                workflow_step = "Retry {0}: {1}".format(retry, workflow_step)
             cm_create_device_event_failure = IntegrationEventLog.create(
                 event_category='Registration',
                 component_name='Content Manager',
