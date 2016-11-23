@@ -58,30 +58,30 @@ class TestContentManagerApi(BaseTest):
         self.device.content_manager_display_name = self.CONTENT_MANAGER_DISPLAY_NAME
         self.device_key = self.device.put()
 
-    ##################################################################################################################
-    # create_tenant
-    ##################################################################################################################
-
-    def test_create_tenant_success(self):
-        when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(
-            HttpClientResponse(status_code=httplib.CREATED))
-        result = self.content_manager_api.create_tenant(tenant=self.tenant, correlation_id=self.CORRELATION_ID)
-        self.assertTrue(result)
-        events = IntegrationEventLog.query(
-            ndb.AND(IntegrationEventLog.event_category == 'Tenant Creation',
-                    IntegrationEventLog.correlation_identifier == self.CORRELATION_ID)).fetch()
-        self.assertEqual(events[0].workflow_step,
-                         'Response from Content Manager for create_tenant request (201 Created)')
-
-    def test_create_tenant_failure(self):
-        when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(
-            HttpClientResponse(status_code=httplib.BAD_REQUEST))
-        result = self.content_manager_api.create_tenant(tenant=self.tenant, correlation_id=self.CORRELATION_ID)
-        self.assertFalse(result)
-        events = IntegrationEventLog.query(
-            ndb.AND(IntegrationEventLog.event_category == 'Tenant Creation',
-                    IntegrationEventLog.correlation_identifier == self.CORRELATION_ID)).fetch()
-        self.assertEqual(events[0].workflow_step, 'Response from Content Manager for create_tenant request (Failed)')
+    # ##################################################################################################################
+    # # create_tenant
+    # ##################################################################################################################
+    #
+    # def test_create_tenant_success(self):
+    #     when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(
+    #         status_code=httplib.CREATED))
+    #     result = self.content_manager_api.create_tenant(tenant=self.tenant, correlation_id=self.CORRELATION_ID)
+    #     self.assertTrue(result)
+    #     events = IntegrationEventLog.query(
+    #         ndb.AND(IntegrationEventLog.event_category == 'Tenant Creation',
+    #                 IntegrationEventLog.correlation_identifier == self.CORRELATION_ID)).fetch()
+    #     self.assertEqual(events[0].workflow_step,
+    #                      'Response from Content Manager for create_tenant request (201 Created)')
+    #
+    # def test_create_tenant_failure(self):
+    #     when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(
+    #         status_code=httplib.BAD_REQUEST))
+    #     result = self.content_manager_api.create_tenant(tenant=self.tenant, correlation_id=self.CORRELATION_ID)
+    #     self.assertFalse(result)
+    #     events = IntegrationEventLog.query(
+    #         ndb.AND(IntegrationEventLog.event_category == 'Tenant Creation',
+    #                 IntegrationEventLog.correlation_identifier == self.CORRELATION_ID)).fetch()
+    #     self.assertEqual(events[0].workflow_step, 'Response from Content Manager for create_tenant request (Failed)')
 
     ##################################################################################################################
     # create_device
@@ -90,8 +90,9 @@ class TestContentManagerApi(BaseTest):
     def test_create_device_success_creates_expected_event_logging(self):
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(
             status_code=httplib.CREATED))
-        self.content_manager_api.create_device(device_urlsafe_key=self.device_key.urlsafe(),
-                                               correlation_id=self.CORRELATION_ID)
+        result = self.content_manager_api.create_device(device_urlsafe_key=self.device_key.urlsafe(),
+                                                        correlation_id=self.CORRELATION_ID)
+        self.assertTrue(result)
         events = IntegrationEventLog.query(
             ndb.AND(IntegrationEventLog.event_category == 'Registration',
                     IntegrationEventLog.correlation_identifier == self.CORRELATION_ID)).fetch()
@@ -102,8 +103,9 @@ class TestContentManagerApi(BaseTest):
     def test_create_device_failure_creates_expected_retry_event_logging(self):
         when(HttpClient).post(any_matcher(HttpClientRequest)).thenReturn(HttpClientResponse(
             status_code=httplib.BAD_REQUEST))
-        self.content_manager_api.create_device(device_urlsafe_key=self.device_key.urlsafe(),
-                                               correlation_id=self.CORRELATION_ID)
+        result = self.content_manager_api.create_device(device_urlsafe_key=self.device_key.urlsafe(),
+                                                        correlation_id=self.CORRELATION_ID)
+        self.assertFalse(result)
         events = IntegrationEventLog.query(
             ndb.AND(IntegrationEventLog.event_category == 'Registration',
                     IntegrationEventLog.correlation_identifier == self.CORRELATION_ID)).fetch()
