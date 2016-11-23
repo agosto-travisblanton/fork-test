@@ -280,3 +280,5 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
         self.assertEqual(3, len(request_json))
         self.assertTrue(len([d for d in request_json if d["email"] == self.user.email]) == 1)
         self.assertTrue(len([d for d in request_json if d["email"] == self.admin_user.email]) == 1)
+
+        self.assertEqual(([d for d in request_json if d["email"] == self.admin_user.email][0]["platform_admin"]), True)

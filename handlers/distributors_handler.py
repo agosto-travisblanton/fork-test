@@ -36,7 +36,8 @@ class DistributorsHandler(ExtendedSessionRequestHandler):
             filtered_data_about_user = [
                 {
                     "email": each.user_key.get().email,
-                    "distributor_admin": each.role.get().role == 1 if each.role else False
+                    "distributor_admin": each.role.get().role == 1 if each.role else False,
+                    "platform_admin": each.user_key.get().is_administrator
                 } for each in all_users_of_distributor if each.user_key.get()]
         else:
             filtered_data_about_user = []
