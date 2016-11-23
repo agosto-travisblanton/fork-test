@@ -359,6 +359,15 @@ export function routes($stateProvider, $urlRouterProvider, RestangularProvider) 
       label: 'Admin'
     }
   });
+  $stateProvider.state("redirect", {
+    url: "/redirect",
+    templateUrl: "app/redirect/redirect.html",
+    controller: "RedirectCtrl",
+    controllerAs: 'vm',
+    ncyBreadcrumb: {
+      label: 'Redirect'
+    }
+  });
 
   $urlRouterProvider.otherwise('/sign_in');
 

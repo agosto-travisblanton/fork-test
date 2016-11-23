@@ -8,7 +8,7 @@ from google.appengine.ext import ndb
 from google.net.proto.ProtocolBuffer import ProtocolBufferDecodeError
 
 from app_config import config
-from decorators import requires_api_token
+from utils.auth_util import requires_auth
 from device_message_processor import change_intent
 from extended_session_request_handler import ExtendedSessionRequestHandler
 
@@ -16,7 +16,7 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>. Bob MacNeal <bob
 
 
 class DeviceCommandsHandler(ExtendedSessionRequestHandler):
-    @requires_api_token
+    @requires_auth
     def post(self, device_urlsafe_key):
         method_name = inspect.stack()[0][3]
         request_json = json.loads(self.request.body)
@@ -38,7 +38,7 @@ class DeviceCommandsHandler(ExtendedSessionRequestHandler):
                     user_identifier=user_identifier)
         self.response.set_status(status, message)
 
-    @requires_api_token
+    @requires_auth
     def reset(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
@@ -53,7 +53,7 @@ class DeviceCommandsHandler(ExtendedSessionRequestHandler):
                 user_identifier=user_identifier)
         self.response.set_status(status, message)
 
-    @requires_api_token
+    @requires_auth
     def volume(self, device_urlsafe_key):
         request_json = json.loads(self.request.body)
         volume = request_json.get('volume')
@@ -74,7 +74,7 @@ class DeviceCommandsHandler(ExtendedSessionRequestHandler):
                               user_identifier=user_identifier)
         self.response.set_status(status, message)
 
-    @requires_api_token
+    @requires_auth
     def custom(self, device_urlsafe_key):
         request_json = json.loads(self.request.body)
         intent = request_json.get('command')
@@ -94,7 +94,7 @@ class DeviceCommandsHandler(ExtendedSessionRequestHandler):
                               user_identifier=user_identifier)
         self.response.set_status(status, message)
 
-    @requires_api_token
+    @requires_auth
     def power_on(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
@@ -109,7 +109,7 @@ class DeviceCommandsHandler(ExtendedSessionRequestHandler):
                 user_identifier=user_identifier)
         self.response.set_status(status, message)
 
-    @requires_api_token
+    @requires_auth
     def power_off(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
@@ -124,7 +124,7 @@ class DeviceCommandsHandler(ExtendedSessionRequestHandler):
                 user_identifier=user_identifier)
         self.response.set_status(status, message)
 
-    @requires_api_token
+    @requires_auth
     def content_delete(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
@@ -139,7 +139,7 @@ class DeviceCommandsHandler(ExtendedSessionRequestHandler):
                 user_identifier=user_identifier)
         self.response.set_status(status, message)
 
-    @requires_api_token
+    @requires_auth
     def content_update(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
@@ -154,7 +154,7 @@ class DeviceCommandsHandler(ExtendedSessionRequestHandler):
                 user_identifier=user_identifier)
         self.response.set_status(status, message)
 
-    @requires_api_token
+    @requires_auth
     def refresh_device_representation(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
@@ -169,7 +169,7 @@ class DeviceCommandsHandler(ExtendedSessionRequestHandler):
                 user_identifier=user_identifier)
         self.response.set_status(status, message)
 
-    @requires_api_token
+    @requires_auth
     def diagnostics_toggle(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
@@ -184,7 +184,7 @@ class DeviceCommandsHandler(ExtendedSessionRequestHandler):
                 user_identifier=user_identifier)
         self.response.set_status(status, message)
 
-    @requires_api_token
+    @requires_auth
     def restart(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
@@ -200,7 +200,7 @@ class DeviceCommandsHandler(ExtendedSessionRequestHandler):
         self.response.set_status(status, message)
 
 
-    @requires_api_token
+    @requires_auth
     def post_log(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:

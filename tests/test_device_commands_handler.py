@@ -13,9 +13,9 @@ from routes import application
 import device_message_processor
 from mockito import when, any as any_matcher
 from webtest import AppError
+from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
-
-class TestDeviceCommandsHandler(BaseTest, WebTest):
+class TestDeviceCommandsHandler(ProvisioningDistributorUserBase):
     APPLICATION = application
     NAME = 'foobar tenant'
     ADMIN_EMAIL = 'foo@bar.com'
@@ -54,9 +54,7 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
                                                               mac_address=self.MAC_ADDRESS)
 
         self.chrome_os_device_key = self.chrome_os_device.put()
-        self.valid_authorization_header = {
-            'Authorization': config.API_TOKEN
-        }
+        self.valid_authorization_header = self.JWT_DEFAULT_HEADER
         self.bad_authorization_header = {}
         self.some_intent = 'https://skykit-display-int.appspot.com/40289e504f09422c85d23a629a45be3d'
         self.post_uri = application.router.build(None,

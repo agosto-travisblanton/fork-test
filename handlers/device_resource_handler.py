@@ -7,21 +7,17 @@ from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
 from app_config import config
-from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
 from device_commands_handler import DeviceCommandsHandler
 from device_message_processor import post_unmanaged_device_info, change_intent
 from extended_session_request_handler import ExtendedSessionRequestHandler
 from integrations.content_manager.content_manager_api import ContentManagerApi
-from model_entities.integration_events_log_model import IntegrationEventLog
-from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup, DeviceIssueLog
+from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup
 from restler.serializers import json_response
-from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_PAIRING_CODE_STRATEGY, DEVICE_ISSUE_LOG_STRATEGY, \
-    CHROME_OS_DEVICES_LIST_VIEW_STRATEGY
-from utils.email_notify import EmailNotify
+from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_ISSUE_LOG_STRATEGY, CHROME_OS_DEVICES_LIST_VIEW_STRATEGY
+from utils.auth_util import requires_auth
 from utils.timezone_util import TimezoneUtil
 from workflow.refresh_device import refresh_device
 from workflow.refresh_device_by_mac_address import refresh_device_by_mac_address
-from workflow.register_device import register_device
 from workflow.update_chrome_os_device import update_chrome_os_device
 
 __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob.macneal@agosto.com>'
@@ -29,7 +25,7 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>, Bob MacNeal <bob
 
 class DeviceResourceHandler(ExtendedSessionRequestHandler):
 
-    @requires_api_token
+    @requires_auth
     def get(self, device_urlsafe_key):
         device = self.validate_and_get(device_urlsafe_key, ChromeOsDevice, abort_on_not_found=True,
                                        use_app_engine_memcache=False)
@@ -41,22 +37,21 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             device.timezone_offset = TimezoneUtil.get_timezone_offset(device.timezone)
         else:
             device.timezone_offset = TimezoneUtil.get_timezone_offset(config.DEFAULT_TIMEZONE)
-        if self.is_unmanaged_device is False:
-            if not device.device_id:
-                deferred.defer(refresh_device_by_mac_address,
-                               device_urlsafe_key=device_urlsafe_key,
-                               device_mac_address=device.mac_address,
-                               device_has_previous_directory_api_info=False,
-                               _queue='directory-api',
-                               _countdown=5)
-            else:
-                deferred.defer(refresh_device,
-                               device_urlsafe_key=device_urlsafe_key,
-                               _queue='directory-api',
-                               _countdown=5)
+        if not device.device_id:
+            deferred.defer(refresh_device_by_mac_address,
+                           device_urlsafe_key=device_urlsafe_key,
+                           device_mac_address=device.mac_address,
+                           device_has_previous_directory_api_info=False,
+                           _queue='directory-api',
+                           _countdown=5)
+        else:
+            deferred.defer(refresh_device,
+                           device_urlsafe_key=device_urlsafe_key,
+                           _queue='directory-api',
+                           _countdown=5)
         return json_response(self.response, device, strategy=CHROME_OS_DEVICE_STRATEGY)
 
-    @requires_api_token
+    @requires_auth
     def put(self, device_urlsafe_key):
         status = httplib.NO_CONTENT
         message = None
@@ -200,7 +195,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
 
-    @requires_api_token
+    @requires_auth
     def delete(self, device_urlsafe_key):
         status = httplib.NO_CONTENT
         message = None
@@ -228,7 +223,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             self.response.headers.pop('Content-Type', None)
         self.response.set_status(status, message)
 
-    @requires_api_token
+    @requires_auth
     def get_latest_issues(self, device_urlsafe_key, prev_cursor_str, next_cursor_str):
         start_epoch = int(self.request.params['start'])
         end_epoch = int(self.request.params['end'])
@@ -245,7 +240,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             "next": paginated_results["next_cursor"]
         }, strategy=DEVICE_ISSUE_LOG_STRATEGY)
 
-    @requires_api_token
+    @requires_auth
     def update_controls_mode(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
@@ -269,7 +264,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
 
         self.response.set_status(status, message)
 
-    @requires_api_token
+    @requires_auth
     def update_panel_sleep(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
@@ -293,7 +288,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
 
         self.response.set_status(status, message)
 
-    @requires_api_token
+    @requires_auth
     def update_sleep_controller(self, device_urlsafe_key):
         status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
         if device:
@@ -310,7 +305,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
     ############################################################################################
     # TENANTS VIEW
     ############################################################################################
-    @requires_api_token
+    @requires_auth
     def search_for_device_by_tenant(self, tenant_urlsafe_key):
         unmanaged = self.request.get("unmanaged") == "true"
         partial_gcmid = self.request.get("partial_gcmid")
@@ -352,7 +347,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             },
         )
 
-    @requires_api_token
+    @requires_auth
     def get_devices_by_tenant(self, tenant_urlsafe_key):
         tenant_key = ndb.Key(urlsafe=tenant_urlsafe_key)
         next_cursor = self.request.get("next_cursor")
@@ -382,7 +377,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
     ############################################################################################
     # (DISTRIBUTOR) DEVICES VIEW
     ############################################################################################
-    @requires_api_token
+    @requires_auth
     def get_devices_by_distributor(self, distributor_urlsafe_key):
         next_cursor = self.request.get("next_cursor")
         prev_cursor = self.request.get("prev_cursor")
@@ -416,7 +411,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             strategy=CHROME_OS_DEVICES_LIST_VIEW_STRATEGY
         )
 
-    @requires_api_token
+    @requires_auth
     def search_for_device(self, distributor_urlsafe_key):
         unmanaged = self.request.get("unmanaged") == "true"
         partial_gcmid = self.request.get("partial_gcmid")
@@ -457,7 +452,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
             },
         )
 
-    @requires_api_token
+    @requires_auth
     def search_for_device_globally(self):
         unmanaged = self.request.get("unmanaged") == "true"
         partial_gcmid = self.request.get("partial_gcmid")
@@ -536,4 +531,3 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
         tenant_list = filter(lambda x: x.active is True, tenant_list)
         domain_tenant_list = filter(lambda x: x.domain_key in domain_keys, tenant_list)
         return domain_tenant_list
-

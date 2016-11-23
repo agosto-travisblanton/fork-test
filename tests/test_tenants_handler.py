@@ -11,9 +11,10 @@ from models import Tenant, TENANT_ENTITY_GROUP_NAME, Distributor, Domain, Chrome
 from routes import application
 from mockito import when, any as any_matcher, verify
 from app_config import config
+from utils.auth_util import generate_token
+from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
-
-class TestTenantsHandler(BaseTest, WebTest):
+class TestTenantsHandler(ProvisioningDistributorUserBase):
     APPLICATION = application
     ADMIN_EMAIL = "foo{0}@bar.com"
     API_KEY = "SOME_KEY_{0}"
@@ -38,6 +39,7 @@ class TestTenantsHandler(BaseTest, WebTest):
                                     active=True)
         self.domain_key = self.domain.put()
         self.headers = {
+            'JWT': str(generate_token(self.user)),
             'Authorization': config.API_TOKEN,
             'X-Provisioning-Distributor': self.distributor_key.urlsafe()
         }

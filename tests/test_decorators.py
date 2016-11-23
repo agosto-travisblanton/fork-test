@@ -1,13 +1,14 @@
 from env_setup import setup_test_paths
+
 setup_test_paths()
 
 from webtest import AppError
 from webapp2 import WSGIApplication, Route
 from app_config import config
-from agar.test import BaseTest, WebTest
+from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
 
-class TestDecorators(BaseTest, WebTest):
+class TestDecorators(ProvisioningDistributorUserBase):
     APPLICATION = WSGIApplication(
         [Route(r'/internal/v1/bogus', handler='handlers.bogus_handler.BogusHandler', name='bogus')]
     )
@@ -23,23 +24,21 @@ class TestDecorators(BaseTest, WebTest):
     ##################################################################################################################
 
     def testApiTokenRequired_AuthorizationSuccessful(self):
-        headers = {
-            'Authorization': config.API_TOKEN
-        }
+        headers = self.JWT_DEFAULT_HEADER
         response = self.app.get('/internal/v1/bogus', params={}, headers=headers)
         self.assertOK(response)
 
     def testUnmanagedDeviceCreateTokenRequired_AuthorizationSuccessful(self):
-        headers = {
-            'Authorization': config.UNMANAGED_API_TOKEN
-        }
+        headers = self.JWT_DEFAULT_HEADER
+        headers['Authorization'] = config.UNMANAGED_API_TOKEN
+
         response = self.app.get('/internal/v1/bogus', params={}, headers=headers)
         self.assertOK(response)
 
     def testApiTokenRequired_IncorrectAuthorizationHeader_AuthorizationUnsuccessful(self):
-        headers = {
-            'Authorization': 'sdfjahsdkjhfalskjdhfaiusyduifyasdyfaosdyfaiusydfiuasyoduifyas'
-        }
+        headers = self.JWT_DEFAULT_HEADER
+        headers['JWT'] = 'sdfjahsdkjhfalskjdhfaiusyduifyasdyfaosdyfaiusydfiuasyoduifyas'
+
         with self.assertRaises(AppError) as cm:
             self.app.get('/internal/v1/bogus', params={}, headers=headers)
         self.assertTrue('403 Forbidden' in cm.exception.message)

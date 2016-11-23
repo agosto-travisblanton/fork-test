@@ -1,72 +1,49 @@
-from datetime import datetime
+import json
+from webtest import AppError
 
-from agar.sessions import SessionStore
-import stormpath_api
-from provisioning_base_test import ProvisioningBaseTest
-from utils.web_util import build_uri
-from mock import patch
+import mock
+from models import User
+from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
+from routes import application
+import httplib
 
+class LoginHandlerTest(ProvisioningDistributorUserBase):
+    some_user = {
+        "email": "one@gmail.com",
+        "name": "Sam Smith"
+    }
 
-class LoginHandlerTest(ProvisioningBaseTest):
     def setUp(self):
         super(LoginHandlerTest, self).setUp()
-        self.user = self.create_user(email='dwight.schrute@demo.agosto.com')
-        self.identity = self.get(build_uri('identity')).json
 
-    def test_login_authed_user(self):
-        params = {
-            'email': self.user.email,
-            'password': 'letmein',
-        }
+    @mock.patch('handlers.login_handler.verify_google_token')
+    def test_issues_new_jwt_after_valid_google_token(self, verify_google_token):
+        verify_google_token.return_value = self.some_user
+        self.assertTrue(User.query(User.email == self.some_user["email"]).fetch() == [])
 
-        timestamp = datetime.now()
-        uri = build_uri('login')
+        uri = application.router.build(None, 'login', None, {})
 
-        with patch.object(stormpath_api, 'cloud_login', return_value=self.user):
-            resp = self.app.post_json(uri, params)
-        self.assertOK(resp)
-        self.assertTrue("Successful Login" in resp)
-        self.assertGreaterEqual(self.user.last_login, timestamp)
+        res = self.app.get(
+            uri,
+            headers={"oAuth": '2342342334fddadf'},
+        )
 
-        session = SessionStore(self.app).get_session()
-        self.assertEqual(session.get('user_key'), self.user.key.urlsafe())
-        self.assertEqual(session.get('distributor'), self.user.distributors[0].name)
-        self.assertEqual(self.identity['STATE'], session.get('state'))
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(json.loads(res.body.decode("utf-8"))["token"])
+        user_entity = User.query(User.email == self.some_user["email"]).fetch()[0]
+        self.assertEqual(user_entity.email, self.some_user["email"])
 
-    def test_login_invalid_user(self):
-        params = {
-            'email': 'housekeeping',
-            'password': 'whatever',
-        }
+    @mock.patch('handlers.login_handler.verify_google_token')
+    def test_returns_forbidden_when_invalid_google_token(self, verify_google_token):
+        verify_google_token.return_value = None
+        self.assertTrue(User.query(User.email == self.some_user["email"]).fetch() == [])
 
-        uri = build_uri('login')
-        with patch.object(stormpath_api, 'cloud_login', return_value=None):
-            resp = self.app.post_json(uri, params, expect_errors=True)
-        self.assertBadRequest(resp)
-        self.assertTrue('Login Failed' in resp)
+        uri = application.router.build(None, 'login', None, {})
 
-        session = SessionStore(self.app).get_session()
-        self.assertNotIn('user_key', session)
-        self.assertNotIn('distributor', session)
+        with self.assertRaises(AppError) as context:
+            res = self.app.get(
+                uri,
+                headers={"oAuth": '2342342334fddadf'}
+            )
 
-    def test_login_missing_data(self):
-        params = {
-            'password': 'letmein',
-        }
-        resp = self.app.post_json(build_uri('login'), params, expect_errors=True)
-        self.assertBadRequest(resp)
-        self.assertTrue('Login Failed' in resp)
-
-        params = {
-            'email': self.user.email,
-        }
-        resp = self.app.post_json(build_uri('login'), params, expect_errors=True)
-        self.assertBadRequest(resp)
-        self.assertTrue('Login Failed' in resp)
-
-        params = {
-            'code': 'blah',
-        }
-        resp = self.app.post_json(build_uri('login'), params, expect_errors=True)
-        self.assertBadRequest(resp)
-        self.assertTrue('Login Failed' in resp)
+            self.assertEqual(res.status_code, httplib.FORBIDDEN)
