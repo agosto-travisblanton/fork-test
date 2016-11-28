@@ -24,6 +24,11 @@ indexes:
   properties:
   - name: active
   - name: tenant_key
+
+- kind: Location
+  properties:
+  - name: active
+  - name: tenant_key
   - name: customer_location_code
 
 - kind: IntegrationEventLog
