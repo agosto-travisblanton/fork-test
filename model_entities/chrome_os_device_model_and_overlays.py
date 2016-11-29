@@ -1,16 +1,16 @@
 import logging
 import uuid
-
 from datetime import datetime
+
 from google.appengine.datastore.datastore_query import Cursor
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
+from restler.decorators import ae_ndb_serializer
 
 import ndb_json
 from app_config import config
 from domain_model import Domain
 from entity_groups import TenantEntityGroup
-from restler.decorators import ae_ndb_serializer
 from utils.timezone_util import TimezoneUtil
 
 
@@ -220,7 +220,8 @@ class ChromeOsDevice(ndb.Model):
     def get_by_serial_number(cls, serial_number):
         if serial_number:
             results = ChromeOsDevice.query(ChromeOsDevice.serial_number == serial_number).fetch(keys_only=True)
-            return results[0].get() if results else  None  # there should never be multiple multiple serials in this query
+            return results[
+                0].get() if results else  None  # there should never be multiple multiple serials in this query
         else:
             return None
 
@@ -819,7 +820,7 @@ class Tenant(ndb.Model):
                 ndb.AND(DeviceIssueLog.created <= end)
             ).order(
                 -DeviceIssueLog.created
-            ).fetch_page(fetch_size)
+            ).fetch_page(fetch_size, keys_only=True)
 
             prev_cursor = None
             next_cursor = next_cursor.urlsafe() if more else None

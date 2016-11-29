@@ -11,12 +11,12 @@
               <div class="col-md-8 col-md-offset-2" style="margin-top: -1.5em">
                 <md-input-container>
                   <button type="submit"
-                             tooltips
-                             tooltip-side="left"
-                             tooltip-template="Revert your Device Overlay to your Tenant Overlay Configuration."
-                             class="md-button md-raised"
-                             ng-click="deviceDetailsCtrl.revertToTenantOverlay($event)"
-                             ng-disabled="vm.overlayChanged || vm.loading">
+                          tooltips
+                          tooltip-side="left"
+                          tooltip-template="Revert your Device Overlay to your Tenant Overlay Configuration."
+                          class="md-button md-raised"
+                          ng-click="deviceDetailsCtrl.revertToTenantOverlay($event)"
+                          ng-disabled="vm.overlayChanged || vm.loading">
 
                     REVERT
                   </button>
@@ -128,14 +128,22 @@
             </div>
           </div>
           <div class="col-md-12">
-            <md-card-actions layout="row" layout-align="end center">
-              <md-button type="submit"
-                         class="md-raised md-primary"
-                         ng-click="deviceDetailsCtrl.submitOverlaySettings(overlayForm)"
-                         ng-disabled="!deviceDetailsCtrl.overlayChanged || overlayForm.$invalid">
-                <i class="fa fa-fw fa-save"></i>
-                SYNC
-              </md-button>
+
+            <md-card-actions layout="row">
+              <div class="col-md-9">
+                  <p>Navigate to the <a href="{{deviceDetailsCtrl.tenantOverlayUrl}}">
+                    Tenant Overlay View
+                  </a> to upload a Logo</p>
+                </div>
+              <div class="col-md-3" style="float: right;">
+                <md-button type="submit"
+                           class="md-raised md-primary"
+                           ng-click="deviceDetailsCtrl.submitOverlaySettings(overlayForm)"
+                           ng-disabled="!deviceDetailsCtrl.overlayChanged || overlayForm.$invalid">
+                  <i class="fa fa-fw fa-save"></i>
+                  SYNC
+                </md-button>
+              </div>
             </md-card-actions>
           </div>
         </div>

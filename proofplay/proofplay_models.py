@@ -6,6 +6,14 @@ from sqlalchemy.orm import relationship
 Base = declarative_base()
 
 
+class ChromeOsDevice(Base):
+    __tablename__ = "chrome_os_device"
+
+    id = Column(Integer, primary_key=True)
+    device_name = Column(String(255), nullable=False)
+
+
+
 class ProgramPlayEvent(Base):
     __tablename__ = "program_play_event"
 
