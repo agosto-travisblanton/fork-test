@@ -45,7 +45,7 @@ Then, start up the backend:
 (venv)$ python manage.py serve dispatch.yaml
 ```
 
-Finally, run a migration to setup tables/schema via hitting `localhost:8080/proofplay/api/v1/seed/<number_of_days_back_to_post>/<number_of_times_a_day>`
+Finally, run a migration to setup tables/schema via hitting `localhost:8080/proofplay/api/v1/0730578567129494/make_migration`
 
 ### Run Back-End
 Make sure your virtualenv is activated and has the requirements installed before this step.
