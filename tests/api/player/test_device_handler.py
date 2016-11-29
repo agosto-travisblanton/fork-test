@@ -739,6 +739,21 @@ class TestDeviceHandler(BaseTest, WebTest):
         self.assertNotEqual(updated_heartbeat.program, self.PROGRAM)
         self.assertEqual(updated_heartbeat.program, 'Chronicles of Narnia')
 
+    def test_put_heartbeat_updates_content_properties(self):
+        self.__initialize_heartbeat_info()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'contentKind': 'Video',
+                        'contentName': 'Programming 101',
+                        'contentId': 'Pro-101',
+                        }
+        uri = build_uri('device-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        updated_heartbeat = self.managed_device_key.get()
+        self.assertEqual(updated_heartbeat.content_kind, 'Video')
+        self.assertEqual(updated_heartbeat.content_name, 'Programming 101')
+        self.assertEqual(updated_heartbeat.content_id, 'Pro-101')
+
     def test_put_heartbeat_updates_program_id(self):
         self.__initialize_heartbeat_info()
         request_body = {'storage': self.STORAGE_UTILIZATION,
@@ -775,7 +790,6 @@ class TestDeviceHandler(BaseTest, WebTest):
                         'memory': self.MEMORY_UTILIZATION,
                         'program': self.PROGRAM,
                         'programId': self.PROGRAM_ID,
-                        'playListId': self.PLAYLIST_ID,
                         'playlist': self.PLAYLIST,
                         'playlistId': 'new playlist id',
                         'lastError': self.LAST_ERROR,
@@ -785,6 +799,49 @@ class TestDeviceHandler(BaseTest, WebTest):
         updated_heartbeat = self.managed_device_key.get()
         self.assertNotEqual(updated_heartbeat.playlist_id, self.PLAYLIST_ID)
         self.assertEqual(updated_heartbeat.playlist_id, 'new playlist id')
+
+    def test_put_heartbeat_playlist_change_creates_playlist_change_event(self):
+        self.__initialize_heartbeat_info()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': self.PROGRAM,
+                        'programId': self.PROGRAM_ID,
+                        'playlist': 'Tuesday Playlist',
+                        'playListId': self.PLAYLIST_ID,
+                        'lastError': self.LAST_ERROR,
+                        }
+        uri = build_uri('device-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        issues = DeviceIssueLog.get_all_by_device_key(self.managed_device.key)
+        self.assertEqual(issues[1].category, config.DEVICE_ISSUE_PLAYLIST_CHANGE)
+
+    def test_put_heartbeat_program_change_creates_program_change_event(self):
+        self.__initialize_heartbeat_info()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'program': 'Tuesday Program',
+                        'programId': self.PROGRAM_ID,
+                        'playlist': self.PLAYLIST,
+                        'playListId': self.PLAYLIST_ID,
+                        'lastError': self.LAST_ERROR,
+                        }
+        uri = build_uri('device-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        issues = DeviceIssueLog.get_all_by_device_key(self.managed_device.key)
+        self.assertEqual(issues[1].category, config.DEVICE_ISSUE_PROGRAM_CHANGE)
+
+    def test_put_heartbeat_content_change_creates_content_change_event(self):
+        self.__initialize_heartbeat_info()
+        request_body = {'storage': self.STORAGE_UTILIZATION,
+                        'memory': self.MEMORY_UTILIZATION,
+                        'contentKind': 'Video',
+                        'contentName': 'Programming 101',
+                        'contentId': 'Pro-101'
+                        }
+        uri = build_uri('device-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
+        self.put(uri, params=json.dumps(request_body), headers=self.api_token_authorization_header)
+        issues = DeviceIssueLog.get_all_by_device_key(self.managed_device.key)
+        self.assertEqual(issues[1].category, config.DEVICE_ISSUE_CONTENT_CHANGE)
 
     def test_put_heartbeat_updates_last_error(self):
         self.__initialize_heartbeat_info()
@@ -881,13 +938,10 @@ class TestDeviceHandler(BaseTest, WebTest):
                                       up=False,
                                       storage_utilization=self.STORAGE_UTILIZATION,
                                       memory_utilization=self.MEMORY_UTILIZATION,
-                                      program=self.PROGRAM,
                                       resolved=False)
         issue.put()
         request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
-                        'program': self.PROGRAM,
-                        'programId': self.PROGRAM_ID,
                         'lastError': self.LAST_ERROR,
                         }
         uri = build_uri('device-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
@@ -907,13 +961,10 @@ class TestDeviceHandler(BaseTest, WebTest):
                                       up=True,
                                       storage_utilization=self.STORAGE_UTILIZATION,
                                       memory_utilization=config.MEMORY_UTILIZATION_THRESHOLD + 1,
-                                      program=self.PROGRAM,
                                       resolved=False)
         issue.put()
         request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
-                        'program': self.PROGRAM,
-                        'programId': self.PROGRAM_ID,
                         'lastError': self.LAST_ERROR,
                         }
         uri = build_uri('device-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
@@ -933,13 +984,10 @@ class TestDeviceHandler(BaseTest, WebTest):
                                       up=True,
                                       storage_utilization=config.STORAGE_UTILIZATION_THRESHOLD + 1,
                                       memory_utilization=self.MEMORY_UTILIZATION,
-                                      program=self.PROGRAM,
                                       resolved=False)
         issue.put()
         request_body = {'storage': self.STORAGE_UTILIZATION,
                         'memory': self.MEMORY_UTILIZATION,
-                        'program': self.PROGRAM,
-                        'programId': self.PROGRAM_ID,
                         'lastError': self.LAST_ERROR,
                         }
         uri = build_uri('device-heartbeat', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe()})
