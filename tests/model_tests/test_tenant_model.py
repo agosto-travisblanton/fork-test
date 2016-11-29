@@ -399,14 +399,14 @@ class TestTenantModel(BaseTest):
 
         devices = Tenant.find_issues_paginated(start, end, device_1, prev_cursor_str=None,
                                                next_cursor_str=None)
-        self.assertLength(25, devices["objects"])
+        self.assertLength(10, devices["objects"])
         self.assertTrue(devices["next_cursor"])
         self.assertFalse(devices["prev_cursor"])
 
         next_devices = Tenant.find_issues_paginated(start, end, device_1, prev_cursor_str=None,
                                                     next_cursor_str=devices["next_cursor"])
 
-        self.assertLength(25, next_devices["objects"])
+        self.assertLength(10, next_devices["objects"])
         self.assertTrue(next_devices["next_cursor"])
         self.assertTrue(next_devices["prev_cursor"])
 
