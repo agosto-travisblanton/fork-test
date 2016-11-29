@@ -382,21 +382,51 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                 if device.memory_utilization != memory:
                     device.memory_utilization = memory
 
-            if program:
+            if program or program_id:
+                program_change = False
                 if device.program != program:
+                    program_change = True
                     device.program = program
-
-            if program_id:
                 if device.program_id != program_id:
                     device.program_id = program_id
+                    program_change = True
+                if program_change:
+                    new_log_entry = DeviceIssueLog.create(device_key=device.key,
+                                                          category=config.DEVICE_ISSUE_PROGRAM_CHANGE,
+                                                          up=True,
+                                                          storage_utilization=storage,
+                                                          memory_utilization=memory,
+                                                          program=program,
+                                                          program_id=program_id,
+                                                          playlist=playlist,
+                                                          playlist_id=playlist_id,
+                                                          last_error=last_error,
+                                                          resolved=True,
+                                                          resolved_datetime=utc_now)
+                    new_log_entry.put()
 
-            if playlist:
+            if playlist or playlist_id:
+                playlist_change = False
                 if device.playlist != playlist:
+                    playlist_change = True
                     device.playlist = playlist
-
-            if playlist_id:
                 if device.playlist_id != playlist_id:
+                    playlist_change = True
                     device.playlist_id = playlist_id
+                if playlist_change:
+                    new_log_entry = DeviceIssueLog.create(device_key=device.key,
+                                                          category=config.DEVICE_ISSUE_PROGRAM_CHANGE,
+                                                          up=True,
+                                                          storage_utilization=storage,
+                                                          memory_utilization=memory,
+                                                          program=program,
+                                                          program_id=program_id,
+                                                          playlist=playlist,
+                                                          playlist_id=playlist_id,
+                                                          last_error=last_error,
+                                                          resolved=True,
+                                                          resolved_datetime=utc_now)
+                    new_log_entry.put()
 
             if last_error:
                 if device.last_error != last_error:
