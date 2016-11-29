@@ -136,7 +136,7 @@ export default class ProofPlayService {
       allLocations = allLocations + "|" + each;
     }
 
-    this.$window.open(this.origin + "/" + this.uriBase + "/" + this.uriBase + '/multi_location_by_device/' + start_date + '/' + end_date + '/' + allLocations + '/' +
+    this.$window.open(this.origin + "/" + this.uriBase + '/multi_location_by_device/' + start_date + '/' + end_date + '/' + allLocations + '/' +
       tenant + "/" + this.SessionsService.getCurrentDistributorKey()
       , '_blank');
     return true;
