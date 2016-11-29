@@ -807,7 +807,7 @@ class Tenant(ndb.Model):
 
     ################################################
     @classmethod
-    def find_issues_paginated(cls, start, end, device, fetch_size=25, prev_cursor_str=None,
+    def find_issues_paginated(cls, start, end, device, fetch_size=10, prev_cursor_str=None,
                               next_cursor_str=None):
         objects = None
         next_cursor = None
@@ -871,7 +871,7 @@ class Tenant(ndb.Model):
         return to_return
 
     @classmethod
-    def find_devices_paginated(cls, tenant_keys, fetch_size=25, unmanaged=False, prev_cursor_str=None,
+    def find_devices_paginated(cls, tenant_keys, fetch_size=10, unmanaged=False, prev_cursor_str=None,
                                next_cursor_str=None):
         objects = None
         next_cursor = None
@@ -942,7 +942,7 @@ class Tenant(ndb.Model):
     @classmethod
     def find_locations_of_tenant_paginated(cls,
                                            tenant_key,
-                                           fetch_size=25,
+                                           fetch_size=10,
                                            prev_cursor_str=None,
                                            next_cursor_str=None):
         objects = None
