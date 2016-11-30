@@ -355,6 +355,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                       program_id=program_id,
                                                       playlist=playlist,
                                                       playlist_id=playlist_id,
+                                                      content_kind=content_kind,
+                                                      content_name=content_name,
+                                                      content_id=content_id,
                                                       last_error=last_error,
                                                       resolved=True,
                                                       resolved_datetime=utc_now)
@@ -406,6 +409,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                           program_id=program_id,
                                                           playlist=playlist,
                                                           playlist_id=playlist_id,
+                                                          content_kind=content_kind,
+                                                          content_name=content_name,
+                                                          content_id=content_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -429,6 +435,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                           program_id=program_id,
                                                           playlist=playlist,
                                                           playlist_id=playlist_id,
+                                                          content_kind=content_kind,
+                                                          content_name=content_name,
+                                                          content_id=content_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -452,6 +461,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                           program_id=program_id,
                                                           playlist=playlist,
                                                           playlist_id=playlist_id,
+                                                          content_kind=content_kind,
+                                                          content_name=content_name,
+                                                          content_id=content_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -472,6 +484,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                           program_id=program_id,
                                                           playlist=playlist,
                                                           playlist_id=playlist_id,
+                                                          content_kind=content_kind,
+                                                          content_name=content_name,
+                                                          content_id=content_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -494,6 +509,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                           program_id=program_id,
                                                           playlist=playlist,
                                                           playlist_id=playlist_id,
+                                                          content_kind=content_kind,
+                                                          content_name=content_name,
+                                                          content_id=content_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -511,6 +529,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                           program_id=program_id,
                                                           playlist=playlist,
                                                           playlist_id=playlist_id,
+                                                          content_kind=content_kind,
+                                                          content_name=content_name,
+                                                          content_id=content_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -528,6 +549,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                           program_id=program_id,
                                                           playlist=playlist,
                                                           playlist_id=playlist_id,
+                                                          content_kind=content_kind,
+                                                          content_name=content_name,
+                                                          content_id=content_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -545,6 +569,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                           program_id=program_id,
                                                           playlist=playlist,
                                                           playlist_id=playlist_id,
+                                                          content_kind=content_kind,
+                                                          content_name=content_name,
+                                                          content_id=content_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -567,6 +594,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                       program_id=program_id,
                                                       playlist=playlist,
                                                       playlist_id=playlist_id,
+                                                      content_kind=content_kind,
+                                                      content_name=content_name,
+                                                      content_id=content_id,
                                                       last_error=last_error,
                                                       resolved=True,
                                                       resolved_datetime=utc_now)
@@ -584,6 +614,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                       program_id=program_id,
                                                       playlist=playlist,
                                                       playlist_id=playlist_id,
+                                                      content_kind=content_kind,
+                                                      content_name=content_name,
+                                                      content_id=content_id,
                                                       last_error=last_error,
                                                       resolved=True,
                                                       resolved_datetime=utc_now)
@@ -601,6 +634,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                       program_id=program_id,
                                                       playlist=playlist,
                                                       playlist_id=playlist_id,
+                                                      content_kind=content_kind,
+                                                      content_name=content_name,
+                                                      content_id=content_id,
                                                       last_error=last_error,
                                                       resolved=True,
                                                       resolved_datetime=utc_now)

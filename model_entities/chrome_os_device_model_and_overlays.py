@@ -325,6 +325,9 @@ class DeviceIssueLog(ndb.Model):
     playlist_id = ndb.StringProperty(required=False, indexed=True)
     storage_utilization = ndb.IntegerProperty(default=0, required=True, indexed=True)
     memory_utilization = ndb.IntegerProperty(default=0, required=True, indexed=True)
+    content_kind = ndb.StringProperty(required=False, indexed=True)
+    content_name = ndb.StringProperty(required=False, indexed=True)
+    content_id = ndb.StringProperty(required=False, indexed=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
     level = ndb.IntegerProperty(default=0, required=True, indexed=True)
@@ -338,25 +341,34 @@ class DeviceIssueLog(ndb.Model):
                device_key,
                category,
                up=True,
-               storage_utilization=0,
-               memory_utilization=0,
+               storage_utilization=None,
+               memory_utilization=None,
                program=None,
                program_id=None,
                last_error=None,
                playlist=None,
                playlist_id=None,
+               content_kind=None,
+               content_name=None,
+               content_id=None,
                resolved=False,
                resolved_datetime=None):
-        if storage_utilization != 0:
+        if storage_utilization:
             try:
                 storage_utilization = int(storage_utilization)
             except ValueError, e:
+                storage_utilization = 0
                 logging.debug('ValueError trying to convert storage_utilization to int: '.format(e.message))
-        if memory_utilization != 0:
+        else:
+            storage_utilization = 0
+        if memory_utilization:
             try:
                 memory_utilization = int(memory_utilization)
             except ValueError, e:
+                memory_utilization = 0
                 logging.debug('ValueError trying to convert memory_utilization to int: '.format(e.message))
+        else:
+            memory_utilization = 0
         if category in [config.DEVICE_ISSUE_MEMORY_HIGH, config.DEVICE_ISSUE_STORAGE_LOW]:
             level = 1
             level_descriptor = 'Warning'
@@ -376,6 +388,9 @@ class DeviceIssueLog(ndb.Model):
                    last_error=last_error,
                    playlist=playlist,
                    playlist_id=playlist_id,
+                   content_kind=content_kind,
+                   content_name=content_name,
+                   content_id=content_id,
                    resolved=resolved,
                    resolved_datetime=resolved_datetime,
                    level=level,
