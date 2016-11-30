@@ -39,16 +39,17 @@ class Device(Base):
     model = Column(String(255), unique=False, nullable=False)
     os = Column(String(255), unique=False, nullable=False)
     platform_version = Column(String(255), unique=False, nullable=False)
-
     model = Column(String(255), unique=False, nullable=False)
     os = Column(String(255), unique=False, nullable=False)
     os_version = Column(String(255), unique=False, nullable=False)
     firmware_version = Column(String(255), unique=False, nullable=False)
     etag = Column(String(255), unique=False, nullable=False)
+
     # fixme
     # name = Column(String(255), unique=False, nullable=False)
     # fixme
-    loggly_link = Column(String(255), unique=False, nullable=False)
+    # loggly_link = Column(String(255), unique=False, nullable=False)
+
     is_unmanaged_device = Column(Boolean, default=True, nullable=False)
     pairing_code = Column(String(255), unique=False, nullable=False)
     panel_model = Column(String(255), unique=False, nullable=False)
