@@ -14,6 +14,9 @@ for device in devices:
                                   program_id='Program Id #1213',
                                   playlist='Some Playlist',
                                   playlist_id='Playlist Id #1234',
+                                  content_kind='Video',
+                                  content_name='Programing 101',
+                                  content_id='P101',
                                   last_error=None,
                                   resolved=False)
     issue.put()
@@ -28,6 +31,9 @@ for device in devices:
                                   program_id='Program Id #1213',
                                   playlist='Some Playlist',
                                   playlist_id='Playlist Id #1234',
+                                  content_kind='Video',
+                                  content_name='Programing 101',
+                                  content_id='P101',
                                   last_error=None,
                                   resolved=False)
     issue.put()
@@ -42,6 +48,9 @@ for device in devices:
                                   program_id='Program Id #1213',
                                   playlist='Some Playlist',
                                   playlist_id='Playlist Id #1234',
+                                  content_kind='Video',
+                                  content_name='Programing 101',
+                                  content_id='P101',
                                   last_error=None,
                                   resolved=False)
     issue.put()
@@ -56,6 +65,9 @@ for device in devices:
                                   program_id='Program Id #1213',
                                   playlist='Some Playlist',
                                   playlist_id='Playlist Id #1234',
+                                  content_kind='Video',
+                                  content_name='Programing 101',
+                                  content_id='P101',
                                   last_error=None,
                                   resolved=True)
     issue.put()
@@ -70,6 +82,9 @@ for device in devices:
                                   program_id='Program Id #1213',
                                   playlist='Some Playlist',
                                   playlist_id='Playlist Id #1234',
+                                  content_kind='Video',
+                                  content_name='Programing 101',
+                                  content_id='P101',
                                   last_error=None,
                                   resolved=True)
     issue.put()
