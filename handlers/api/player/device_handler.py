@@ -340,6 +340,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
             os_version = request_json.get('osVersion')
             playlist = request_json.get('playlist')
             playlist_id = request_json.get('playlistId')
+            content_kind = request_json.get('contentKind')
+            content_name = request_json.get('contentName')
+            content_id = request_json.get('contentId')
             utc_now = datetime.utcnow()
 
             if DeviceIssueLog.device_not_reported_yet(device_key=device.key):
@@ -352,6 +355,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                       program_id=program_id,
                                                       playlist=playlist,
                                                       playlist_id=playlist_id,
+                                                      content_kind=content_kind,
+                                                      content_name=content_name,
+                                                      content_id=content_id,
                                                       last_error=last_error,
                                                       resolved=True,
                                                       resolved_datetime=utc_now)
@@ -382,21 +388,86 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                 if device.memory_utilization != memory:
                     device.memory_utilization = memory
 
-            if program:
-                if device.program != program:
-                    device.program = program
+            if content_name or content_kind or content_id:
+                content_change = False
+                if device.content_name != content_name:
+                    content_change = True
+                    device.content_name = content_name
+                if device.content_kind != content_kind:
+                    content_change = True
+                    device.content_kind = content_kind
+                if device.content_id != content_id:
+                    content_change = True
+                    device.content_id = content_id
+                if content_change:
+                    new_log_entry = DeviceIssueLog.create(device_key=device.key,
+                                                          category=config.DEVICE_ISSUE_CONTENT_CHANGE,
+                                                          up=True,
+                                                          storage_utilization=storage,
+                                                          memory_utilization=memory,
+                                                          program=program,
+                                                          program_id=program_id,
+                                                          playlist=playlist,
+                                                          playlist_id=playlist_id,
+                                                          content_kind=content_kind,
+                                                          content_name=content_name,
+                                                          content_id=content_id,
+                                                          last_error=last_error,
+                                                          resolved=True,
+                                                          resolved_datetime=utc_now)
+                    new_log_entry.put()
 
-            if program_id:
+            if program or program_id:
+                program_change = False
+                if device.program != program:
+                    program_change = True
+                    device.program = program
                 if device.program_id != program_id:
                     device.program_id = program_id
+                    program_change = True
+                if program_change:
+                    new_log_entry = DeviceIssueLog.create(device_key=device.key,
+                                                          category=config.DEVICE_ISSUE_PROGRAM_CHANGE,
+                                                          up=True,
+                                                          storage_utilization=storage,
+                                                          memory_utilization=memory,
+                                                          program=program,
+                                                          program_id=program_id,
+                                                          playlist=playlist,
+                                                          playlist_id=playlist_id,
+                                                          content_kind=content_kind,
+                                                          content_name=content_name,
+                                                          content_id=content_id,
+                                                          last_error=last_error,
+                                                          resolved=True,
+                                                          resolved_datetime=utc_now)
+                    new_log_entry.put()
 
-            if playlist:
+            if playlist or playlist_id:
+                playlist_change = False
                 if device.playlist != playlist:
+                    playlist_change = True
                     device.playlist = playlist
-
-            if playlist_id:
                 if device.playlist_id != playlist_id:
+                    playlist_change = True
                     device.playlist_id = playlist_id
+                if playlist_change:
+                    new_log_entry = DeviceIssueLog.create(device_key=device.key,
+                                                          category=config.DEVICE_ISSUE_PLAYLIST_CHANGE,
+                                                          up=True,
+                                                          storage_utilization=storage,
+                                                          memory_utilization=memory,
+                                                          program=program,
+                                                          program_id=program_id,
+                                                          playlist=playlist,
+                                                          playlist_id=playlist_id,
+                                                          content_kind=content_kind,
+                                                          content_name=content_name,
+                                                          content_id=content_id,
+                                                          last_error=last_error,
+                                                          resolved=True,
+                                                          resolved_datetime=utc_now)
+                    new_log_entry.put()
 
             if last_error:
                 if device.last_error != last_error:
@@ -413,6 +484,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                           program_id=program_id,
                                                           playlist=playlist,
                                                           playlist_id=playlist_id,
+                                                          content_kind=content_kind,
+                                                          content_name=content_name,
+                                                          content_id=content_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -435,6 +509,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                           program_id=program_id,
                                                           playlist=playlist,
                                                           playlist_id=playlist_id,
+                                                          content_kind=content_kind,
+                                                          content_name=content_name,
+                                                          content_id=content_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -452,6 +529,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                           program_id=program_id,
                                                           playlist=playlist,
                                                           playlist_id=playlist_id,
+                                                          content_kind=content_kind,
+                                                          content_name=content_name,
+                                                          content_id=content_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -469,6 +549,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                           program_id=program_id,
                                                           playlist=playlist,
                                                           playlist_id=playlist_id,
+                                                          content_kind=content_kind,
+                                                          content_name=content_name,
+                                                          content_id=content_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -486,6 +569,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                           program_id=program_id,
                                                           playlist=playlist,
                                                           playlist_id=playlist_id,
+                                                          content_kind=content_kind,
+                                                          content_name=content_name,
+                                                          content_id=content_id,
                                                           last_error=last_error,
                                                           resolved=True,
                                                           resolved_datetime=utc_now)
@@ -508,6 +594,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                       program_id=program_id,
                                                       playlist=playlist,
                                                       playlist_id=playlist_id,
+                                                      content_kind=content_kind,
+                                                      content_name=content_name,
+                                                      content_id=content_id,
                                                       last_error=last_error,
                                                       resolved=True,
                                                       resolved_datetime=utc_now)
@@ -525,6 +614,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                       program_id=program_id,
                                                       playlist=playlist,
                                                       playlist_id=playlist_id,
+                                                      content_kind=content_kind,
+                                                      content_name=content_name,
+                                                      content_id=content_id,
                                                       last_error=last_error,
                                                       resolved=True,
                                                       resolved_datetime=utc_now)
@@ -542,6 +634,9 @@ class DeviceHandler(ExtendedSessionRequestHandler):
                                                       program_id=program_id,
                                                       playlist=playlist,
                                                       playlist_id=playlist_id,
+                                                      content_kind=content_kind,
+                                                      content_name=content_name,
+                                                      content_id=content_id,
                                                       last_error=last_error,
                                                       resolved=True,
                                                       resolved_datetime=utc_now)
