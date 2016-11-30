@@ -1,16 +1,16 @@
 import logging
 import uuid
-
 from datetime import datetime
+
 from google.appengine.datastore.datastore_query import Cursor
 from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
+from restler.decorators import ae_ndb_serializer
 
 import ndb_json
 from app_config import config
 from domain_model import Domain
 from entity_groups import TenantEntityGroup
-from restler.decorators import ae_ndb_serializer
 from utils.timezone_util import TimezoneUtil
 
 
@@ -211,16 +211,17 @@ class ChromeOsDevice(ndb.Model):
     def get_by_gcm_registration_id(cls, gcm_registration_id):
         if gcm_registration_id:
             results = ChromeOsDevice.query(ChromeOsDevice.gcm_registration_id == gcm_registration_id,
-                                           ndb.AND(ChromeOsDevice.archived == False)).fetch()
-            return results
+                                           ndb.AND(ChromeOsDevice.archived == False)).fetch(keys_only=True)
+            return [result.get() for result in results]
         else:
             return None
 
     @classmethod
     def get_by_serial_number(cls, serial_number):
         if serial_number:
-            results = ChromeOsDevice.query(ChromeOsDevice.serial_number == serial_number).fetch()
-            return results[0] if results else  None  # there should never be multiple multiple serials in this query
+            results = ChromeOsDevice.query(ChromeOsDevice.serial_number == serial_number).fetch(keys_only=True)
+            return results[
+                0].get() if results else  None  # there should never be multiple multiple serials in this query
         else:
             return None
 
@@ -230,8 +231,8 @@ class ChromeOsDevice(ndb.Model):
             results = ChromeOsDevice.query(
                 ndb.OR(ChromeOsDevice.mac_address == mac_address,
                        ChromeOsDevice.ethernet_mac_address == mac_address),
-                ndb.AND(ChromeOsDevice.archived == False)).fetch()
-            return results
+                ndb.AND(ChromeOsDevice.archived == False)).fetch(keys_only=True)
+            return [result.get() for result in results]
         else:
             return None
 
@@ -239,8 +240,8 @@ class ChromeOsDevice(ndb.Model):
     def get_by_pairing_code(cls, pairing_code):
         if pairing_code:
             results = ChromeOsDevice.query(ChromeOsDevice.pairing_code == pairing_code,
-                                           ndb.AND(ChromeOsDevice.archived == False)).fetch()
-            return results
+                                           ndb.AND(ChromeOsDevice.archived == False)).fetch(keys_only=True)
+            return [result.get() for result in results]
         else:
             return None
 
@@ -661,18 +662,18 @@ class Tenant(ndb.Model):
 
     @classmethod
     def find_by_tenant_code(cls, tenant_code):
-        tenant_entity = Tenant.query(Tenant.tenant_code == tenant_code, Tenant.active == True).fetch()
+        tenant_entity = Tenant.query(Tenant.tenant_code == tenant_code, Tenant.active == True).fetch(keys_only=True)
         if tenant_entity:
-            return tenant_entity[0]
+            return tenant_entity[0].get()
         else:
             return None
 
     @classmethod
     def find_by_organization_unit_path(cls, organization_unit_path):
         tenant = Tenant.query(Tenant.organization_unit_path == organization_unit_path,
-                              Tenant.active == True).fetch()
+                              Tenant.active == True).fetch(keys_only=True)
         if tenant:
-            return tenant[0]
+            return tenant[0].get()
         else:
             organization_unit_path_components = organization_unit_path.split('/')
             last_index = len(organization_unit_path_components) - 1
@@ -700,21 +701,24 @@ class Tenant(ndb.Model):
     @classmethod
     def find_devices(cls, tenant_key, unmanaged=False):
         if tenant_key:
-            return ChromeOsDevice.query(
+            q = ChromeOsDevice.query(
                 ndb.AND(ChromeOsDevice.archived == False,
                         ChromeOsDevice.tenant_key == tenant_key,
                         ChromeOsDevice.is_unmanaged_device == unmanaged)
-            ).fetch()
+            ).fetch(keys_only=True)
+
+            return [each.get() for each in q]
 
     @classmethod
     def find_devices_with_partial_serial(cls, tenant_keys, unmanaged, partial_serial):
         q = ChromeOsDevice.query(ChromeOsDevice.archived == False).filter(
             ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
-            ChromeOsDevice.is_unmanaged_device == unmanaged).fetch()
+            ChromeOsDevice.is_unmanaged_device == unmanaged).fetch(keys_only=True)
 
         to_return = []
 
         for item in q:
+            item = item.get()
             if item.serial_number and partial_serial in item.serial_number:
                 to_return.append(item)
 
@@ -724,11 +728,13 @@ class Tenant(ndb.Model):
     def find_devices_with_partial_mac(cls, tenant_keys, unmanaged, partial_mac):
         q = ChromeOsDevice.query(ChromeOsDevice.archived == False). \
             filter(ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
-            ChromeOsDevice.is_unmanaged_device == unmanaged).fetch()
+            ChromeOsDevice.is_unmanaged_device == unmanaged).fetch(keys_only=True)
 
         filtered_results = []
 
         for item in q:
+            item = item.get()
+
             appended_already = False
             if item.ethernet_mac_address:
                 if partial_mac in item.ethernet_mac_address:
@@ -746,13 +752,13 @@ class Tenant(ndb.Model):
     def find_devices_with_partial_gcmid(cls, tenant_keys, unmanaged, partial_gcmid):
         q = ChromeOsDevice.query(ChromeOsDevice.archived == False).filter(
             ChromeOsDevice.tenant_key.IN(tenant_keys)).filter(
-            ChromeOsDevice.is_unmanaged_device == unmanaged).fetch()
+            ChromeOsDevice.is_unmanaged_device == unmanaged).fetch(keys_only=True)
 
         filtered_devices = []
 
         for item in q:
-            if (item.gcm_registration_id and partial_gcmid in item.gcm_registration_id) or (
-                        item.gcm_registration_id and item.gcm_registration_id == partial_gcmid):
+            item = item.get()
+            if item.gcm_registration_id and partial_gcmid in item.gcm_registration_id:
                 filtered_devices.append(item)
 
         return filtered_devices
@@ -801,7 +807,7 @@ class Tenant(ndb.Model):
 
     ################################################
     @classmethod
-    def find_issues_paginated(cls, start, end, device, fetch_size=25, prev_cursor_str=None,
+    def find_issues_paginated(cls, start, end, device, fetch_size=10, prev_cursor_str=None,
                               next_cursor_str=None):
         objects = None
         next_cursor = None
@@ -814,7 +820,7 @@ class Tenant(ndb.Model):
                 ndb.AND(DeviceIssueLog.created <= end)
             ).order(
                 -DeviceIssueLog.created
-            ).fetch_page(fetch_size)
+            ).fetch_page(fetch_size, keys_only=True)
 
             prev_cursor = None
             next_cursor = next_cursor.urlsafe() if more else None
@@ -829,6 +835,7 @@ class Tenant(ndb.Model):
                 -DeviceIssueLog.created
             ).fetch_page(
                 page_size=fetch_size,
+                keys_only=True,
                 start_cursor=cursor
             )
 
@@ -845,6 +852,7 @@ class Tenant(ndb.Model):
                 DeviceIssueLog.created
             ).fetch_page(
                 page_size=fetch_size,
+                keys_only=True,
                 start_cursor=cursor.reversed()
             )
 
@@ -855,7 +863,7 @@ class Tenant(ndb.Model):
             prev_cursor = prev.urlsafe() if more else None
 
         to_return = {
-            'objects': objects or [],
+            'objects': [obj.get() for obj in objects] or [],
             'next_cursor': next_cursor,
             'prev_cursor': prev_cursor,
         }
@@ -863,7 +871,7 @@ class Tenant(ndb.Model):
         return to_return
 
     @classmethod
-    def find_devices_paginated(cls, tenant_keys, fetch_size=25, unmanaged=False, prev_cursor_str=None,
+    def find_devices_paginated(cls, tenant_keys, fetch_size=10, unmanaged=False, prev_cursor_str=None,
                                next_cursor_str=None):
         objects = None
         next_cursor = None
@@ -884,7 +892,7 @@ class Tenant(ndb.Model):
                     ChromeOsDevice.tenant_key.IN(tenant_keys),
                     ChromeOsDevice.is_unmanaged_device == unmanaged)).order(-ChromeOsDevice.created).order(
                 ChromeOsDevice.key).fetch_page(
-                page_size=fetch_size)
+                page_size=fetch_size, keys_only=True)
 
             prev_cursor = None
             next_cursor = next_cursor.urlsafe() if more else None
@@ -898,6 +906,7 @@ class Tenant(ndb.Model):
                     ChromeOsDevice.is_unmanaged_device == unmanaged)).order(-ChromeOsDevice.created).order(
                 ChromeOsDevice.key).fetch_page(
                 page_size=fetch_size,
+                keys_only=True,
                 start_cursor=cursor
             )
 
@@ -913,6 +922,7 @@ class Tenant(ndb.Model):
                     ChromeOsDevice.is_unmanaged_device == unmanaged)).order(ChromeOsDevice.created).order(
                 -ChromeOsDevice.key).fetch_page(
                 page_size=fetch_size,
+                keys_only=True,
                 start_cursor=cursor.reversed()
             )
 
@@ -921,7 +931,7 @@ class Tenant(ndb.Model):
             prev_cursor = prev.urlsafe() if more else None
 
         to_return = {
-            'objects': objects or [],
+            'objects': [obj.get() for obj in objects] or [],
             'next_cursor': next_cursor,
             'prev_cursor': prev_cursor,
 
@@ -932,7 +942,7 @@ class Tenant(ndb.Model):
     @classmethod
     def find_locations_of_tenant_paginated(cls,
                                            tenant_key,
-                                           fetch_size=25,
+                                           fetch_size=10,
                                            prev_cursor_str=None,
                                            next_cursor_str=None):
         objects = None

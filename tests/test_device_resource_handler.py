@@ -790,7 +790,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         response_json = json.loads(response.body)
-        self.assertLength(25, response_json["devices"])
+        self.assertLength(10, response_json["devices"])
 
         next_uri = application.router.build(None, 'devices-by-tenant', None,
                                             {'tenant_urlsafe_key': self.tenant_key.urlsafe()})
@@ -800,7 +800,7 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
 
         next_response = self.app.get(next_uri, params=next_params, headers=self.api_token_authorization_header)
         next_response_json = json.loads(next_response.body)
-        self.assertLength(25, next_response_json["devices"])
+        self.assertLength(10, next_response_json["devices"])
         self.assertTrue(next_response_json["prev_cursor"])
 
     def test_get_filter_unmanaged_devices_by_tenant_entity_body_json(self):

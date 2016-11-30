@@ -8,10 +8,8 @@ from utils.web_util import build_uri
 
 setup_test_paths()
 
-from agar.test import BaseTest, WebTest
 from models import Distributor, Domain, Tenant, Location
 from routes import application
-from app_config import config
 from webtest import AppError
 from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
@@ -154,7 +152,7 @@ class TestLocationsHandler(ProvisioningDistributorUserBase):
                                         'next_cursor': 'null'})
         response = self.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
-        self.assertEqual(len(response_json["locations"]), 25)
+        self.assertEqual(len(response_json["locations"]), 10)
 
         next_uri = application.router.build(None, 'internal-get-locations-by-tenant-paginated', None,
                                             {'tenant_urlsafe_key': tenant_key.urlsafe(), 'prev_cursor': 'null',
@@ -162,7 +160,7 @@ class TestLocationsHandler(ProvisioningDistributorUserBase):
 
         next_response = self.get(next_uri, params=request_parameters, headers=self.headers)
         next_response_json = json.loads(next_response.body)
-        self.assertEqual(len(next_response_json["locations"]), 25)
+        self.assertEqual(len(next_response_json["locations"]), 10)
 
         prev_uri = application.router.build(None, 'internal-get-locations-by-tenant-paginated', None,
                                             {'tenant_urlsafe_key': tenant_key.urlsafe(),
@@ -171,7 +169,7 @@ class TestLocationsHandler(ProvisioningDistributorUserBase):
 
         prev_response = self.get(prev_uri, params=request_parameters, headers=self.headers)
         prev_response_json = json.loads(prev_response.body)
-        self.assertEqual(len(prev_response_json["locations"]), 25)
+        self.assertEqual(len(prev_response_json["locations"]), 10)
 
     ##################################################################################################################
     # post

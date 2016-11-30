@@ -48,17 +48,17 @@ class TestLocationModel(BaseTest):
         r = Tenant.find_locations_of_tenant_paginated(self.tenant_key, prev_cursor_str=None, next_cursor_str=None)
         self.assertTrue(r["next_cursor"])
         self.assertFalse(r["prev_cursor"])
-        self.assertEqual(len(r["objects"]), 25)
+        self.assertEqual(len(r["objects"]), 10)
 
         new_r = Tenant.find_locations_of_tenant_paginated(self.tenant_key, prev_cursor_str=None, next_cursor_str=r["next_cursor"])
         self.assertTrue(new_r["next_cursor"])
         self.assertTrue(new_r["prev_cursor"])
-        self.assertEqual(len(new_r["objects"]), 25)
+        self.assertEqual(len(new_r["objects"]), 10)
 
         prev_r = Tenant.find_locations_of_tenant_paginated(self.tenant_key, prev_cursor_str=new_r["prev_cursor"], next_cursor_str=None)
         self.assertTrue(prev_r["next_cursor"])
         self.assertFalse(prev_r["prev_cursor"])
-        self.assertEqual(len(prev_r["objects"]), 25)
+        self.assertEqual(len(prev_r["objects"]), 10)
 
     def load_tenant_locations(self, number_of_locations, tenant_key):
         for x in range(number_of_locations):

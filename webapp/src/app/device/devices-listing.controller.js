@@ -1,4 +1,12 @@
-function DevicesListingCtrl($stateParams, $log, DevicesService, $state, SessionsService, ProgressBarService, sweet) {
+function DevicesListingCtrl($stateParams,
+                            $q,
+                            debounce,
+                            $log,
+                            DevicesService,
+                            $state,
+                            SessionsService,
+                            ProgressBarService,
+                            sweet) {
   "ngInject";
   let vm = this;
   vm.distributorKey = undefined;
@@ -13,6 +21,7 @@ function DevicesListingCtrl($stateParams, $log, DevicesService, $state, Sessions
   vm.disabled = true;
   vm.macDevices = {};
   vm.gcmidDevices = {};
+  vm.throttledSearch = null;
 
   ////////////////////////////////////////////////////////////////////////////
   // Unmanaged
@@ -114,6 +123,7 @@ function DevicesListingCtrl($stateParams, $log, DevicesService, $state, Sessions
 
 
   vm.searchDevices = function (unmanaged, partial) {
+    let deferred = $q.defer()
     let button;
     if (unmanaged) {
       button = vm.unmanagedSelectedButton;
@@ -124,44 +134,55 @@ function DevicesListingCtrl($stateParams, $log, DevicesService, $state, Sessions
     let byTenant = false;
     let tenantKey = null;
 
-    return DevicesService.searchDevices(partial, button, byTenant, tenantKey, vm.distributorKey, unmanaged)
-      .then(function (response) {
-        let devicesToReturn;
-        if (response.success) {
-          let devices = response.devices;
-          if (button === "Serial Number") {
-            if (unmanaged) {
-              vm.unmanagedSerialDevices = devices[1]
+    if (vm.throttledSearch) {
+      vm.throttledSearch.cancel();
+    }
+
+    vm.throttledSearch = debounce(750, function () {
+      DevicesService.searchDevices(partial, button, byTenant, tenantKey, vm.distributorKey, unmanaged)
+        .then(function (response) {
+          let devicesToReturn;
+          if (response.success) {
+            let devices = response.devices;
+            if (button === "Serial Number") {
+              if (unmanaged) {
+                vm.unmanagedSerialDevices = devices[1]
+              } else {
+                vm.serialDevices = devices[1]
+              }
+              devicesToReturn = devices[0]
+            } else if (button === "MAC") {
+              if (unmanaged) {
+                vm.unmanagedMacDevices = devices[1]
+              } else {
+                vm.macDevices = devices[1]
+              }
+              devicesToReturn = devices[0]
             } else {
-              vm.serialDevices = devices[1]
+              if (unmanaged) {
+                vm.unmanagedGCMidDevices = devices[1]
+              } else {
+                vm.gcmidDevices = devices[1]
+              }
+              devicesToReturn = devices[0]
             }
-            devicesToReturn = devices[0]
-          } else if (button === "MAC") {
             if (unmanaged) {
-              vm.unmanagedMacDevices = devices[1]
+              vm.devicesToMatchOnUnmanaged = devicesToReturn
             } else {
-              vm.macDevices = devices[1]
+              vm.devicesToMatchOnManaged = devicesToReturn
             }
-            devicesToReturn = devices[0]
+            deferred.resolve(devicesToReturn)
           } else {
-            if (unmanaged) {
-              vm.unmanagedGCMidDevices = devices[1]
-            } else {
-              vm.gcmidDevices = devices[1]
-            }
-            devicesToReturn = devices[0]
+            deferred.resolve([])
           }
-          if (unmanaged) {
-            vm.devicesToMatchOnUnmanaged = devicesToReturn
-          } else {
-            vm.devicesToMatchOnManaged = devicesToReturn
-          }
-          return devicesToReturn;
-        } else {
-          return []
-        }
-      })
-  };
+        })
+    })
+
+    vm.throttledSearch();
+
+    return deferred.promise
+
+  }
 
   vm.getManagedDevices = function (key, prev, next) {
     ProgressBarService.start();
