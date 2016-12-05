@@ -124,6 +124,19 @@ indexes:
   - name: tenant_key
   - name: customer_location_name
 
+- kind: Location
+  properties:
+  - name: tenant_key
+  - name: customer_location_name
+
+- kind: Location
+  properties:
+  - name: tenant_key
+  - name: customer_location_name
+    direction: desc
+  - name: __key__
+    direction: desc
+
 - kind: PlayerCommandEvent
   properties:
   - name: device_urlsafe_key
