@@ -102,9 +102,11 @@ application = WSGIApplication(
               methods=['PUT']
               ),
 
-        # CM route secured by shared_secret - apparently CM used this to send change content requests
+        # CM route used to send change content requests to the Player via Provisioning
         Route(r'/api/v1/devices/<device_urlsafe_key>/commands',
-              handler='handlers.device_commands_handler.DeviceCommandsHandler',
+              handler='handlers.api.content_manager.device_commands_handler.DeviceCommandsHandler',
+              handler_method='post',
+              methods=['POST'],
               name='device-commands',
               ),
 
