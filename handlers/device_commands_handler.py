@@ -12,28 +12,6 @@ __author__ = 'Christopher Bartling <chris.bartling@agosto.com>. Bob MacNeal <bob
 
 class DeviceCommandsHandler(ExtendedSessionRequestHandler):
 
-    # @requires_auth
-    # def post(self, device_urlsafe_key):
-    #     method_name = inspect.stack()[0][3]
-    #     request_json = json.loads(self.request.body)
-    #     intent = request_json.get('intent')
-    #     if intent is None or intent == '':
-    #         status = 400
-    #         message = 'DeviceCommandsHandler.{0}: Invalid intent.'.format(method_name)
-    #     else:
-    #         status, message, device = resolve_device(device_urlsafe_key)
-    #         if device:
-    #             user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
-    #             if user_identifier is None or user_identifier == '':
-    #                 user_identifier = 'system'
-    #             change_intent(
-    #                 gcm_registration_id=device.gcm_registration_id,
-    #                 payload=intent,
-    #                 device_urlsafe_key=device_urlsafe_key,
-    #                 host=self.request.host_url,
-    #                 user_identifier=user_identifier)
-    #     self.response.set_status(status, message)
-
     @requires_auth
     def reset(self, device_urlsafe_key):
         status, message, device = resolve_device(device_urlsafe_key)
