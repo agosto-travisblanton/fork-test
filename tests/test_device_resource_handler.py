@@ -13,7 +13,6 @@ from routes import application
 from utils.timezone_util import TimezoneUtil
 from utils.web_util import build_uri
 from webtest import AppError
-from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
 setup_test_paths()
 from utils.auth_util import generate_token
@@ -638,8 +637,9 @@ class TestDeviceResourceHandler(BaseTest, WebTest):
         end_epoch = int((end - datetime(1970, 1, 1)).total_seconds())
         request_parameters = {}
         uri = build_uri('internal-device-issues', params_dict={'device_urlsafe_key': self.managed_device_key.urlsafe(),
-                                                      'start': start_epoch, 'end': end_epoch, 'next_cursor_str': 'null',
-                                                      'prev_cursor_str': 'null'
+                                                               'start': start_epoch, 'end': end_epoch,
+                                                               'next_cursor_str': 'null',
+                                                               'prev_cursor_str': 'null'
                                                                })
         response = self.app.get(uri, params=request_parameters, headers=self.api_token_authorization_header)
         self.assertOK(response)

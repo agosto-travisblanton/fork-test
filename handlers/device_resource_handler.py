@@ -7,7 +7,6 @@ from google.appengine.ext import ndb
 from google.appengine.ext.deferred import deferred
 
 from app_config import config
-from device_commands_handler import DeviceCommandsHandler
 from device_message_processor import post_unmanaged_device_info, change_intent
 from extended_session_request_handler import ExtendedSessionRequestHandler
 from integrations.content_manager.content_manager_api import ContentManagerApi
@@ -15,6 +14,7 @@ from models import ChromeOsDevice, Tenant, Domain, TenantEntityGroup
 from restler.serializers import json_response
 from strategy import CHROME_OS_DEVICE_STRATEGY, DEVICE_ISSUE_LOG_STRATEGY, CHROME_OS_DEVICES_LIST_VIEW_STRATEGY
 from utils.auth_util import requires_auth
+from utils.device_util import resolve_device
 from utils.timezone_util import TimezoneUtil
 from workflow.refresh_device import refresh_device
 from workflow.refresh_device_by_mac_address import refresh_device_by_mac_address
@@ -242,7 +242,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
 
     @requires_auth
     def update_controls_mode(self, device_urlsafe_key):
-        status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
+        status, message, device = resolve_device(device_urlsafe_key)
         if device:
             user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
             if user_identifier is None or user_identifier == '':
@@ -266,7 +266,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
 
     @requires_auth
     def update_panel_sleep(self, device_urlsafe_key):
-        status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
+        status, message, device = resolve_device(device_urlsafe_key)
         if device:
             user_identifier = self.request.headers.get('X-Provisioning-User-Identifier')
             if user_identifier is None or user_identifier == '':
@@ -290,7 +290,7 @@ class DeviceResourceHandler(ExtendedSessionRequestHandler):
 
     @requires_auth
     def update_sleep_controller(self, device_urlsafe_key):
-        status, message, device = DeviceCommandsHandler.resolve_device(device_urlsafe_key)
+        status, message, device = resolve_device(device_urlsafe_key)
         if device:
             request_json = json.loads(self.request.body)
             sleep_controller = request_json.get('sleepController')
