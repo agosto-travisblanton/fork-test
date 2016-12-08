@@ -70,8 +70,7 @@
                 <th>Category</th>
                 <th>Memory</th>
                 <th>Storage</th>
-                <th>Playlist</th>
-                <th>Program</th>
+                <th>Content</th>
                 <th>Event created</th>
                 <th>Last updated</th>
                 <th></th>
@@ -90,8 +89,7 @@
                 <td>{{ item.category }}</td>
                 <td>{{ item.memoryUtilization }}%</td>
                 <td>{{ item.storageUtilization }}%</td>
-                <td>{{ item.playlist }}</td>
-                <td>{{ item.program }}</td>
+                <td>{{ item.contentKind }} {{item.contentId}} {{item.contentName}}</td>
                 <td>{{ item.created }}</td>
                 <td>{{ item.updated }}</td>
                 <td class="issue-{{ item.levelDescriptor}}-text">

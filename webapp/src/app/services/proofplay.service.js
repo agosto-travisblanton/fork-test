@@ -16,6 +16,10 @@ export default class ProofPlayService {
     this.$state = $state
     this.ToastsService = ToastsService
     this.makeHTTPRequest = this.makeHTTPRequest.bind(this);
+    this.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
+    if (this.origin === "http://localhost:3000") {
+      this.origin = "http://localhost:8080"
+    }
     this.uriBase = 'proofplay/api/v1';
   }
 
@@ -72,7 +76,7 @@ export default class ProofPlayService {
       allResources = allResources + "|" + each;
     }
 
-    this.$window.open(this.uriBase + '/multi_resource_by_date/' + start_date + '/' + end_date + '/' + allResources + '/' +
+    this.$window.open(this.origin + "/" + this.uriBase + '/multi_resource_by_date/' + start_date + '/' + end_date + '/' + allResources + '/' +
       tenant + "/" + this.SessionsService.getCurrentDistributorKey()
 
       , '_blank');
@@ -88,7 +92,7 @@ export default class ProofPlayService {
       allResources = allResources + "|" + each;
     }
 
-    this.$window.open(this.uriBase + '/multi_resource_by_device/' + start_date + '/' + end_date + '/' + allResources + '/' +
+    this.$window.open(this.origin + "/" + this.uriBase + '/multi_resource_by_device/' + start_date + '/' + end_date + '/' + allResources + '/' +
       tenant + "/" + this.SessionsService.getCurrentDistributorKey()
       , '_blank');
     return true;
@@ -103,7 +107,7 @@ export default class ProofPlayService {
       allDevices = allDevices + "|" + each;
     }
 
-    this.$window.open(this.uriBase + '/multi_device_summarized/' + start_date + '/' + end_date + '/' + allDevices + '/' +
+    this.$window.open(this.origin + "/" + this.uriBase + '/multi_device_summarized/' + start_date + '/' + end_date + '/' + allDevices + '/' +
       tenant + "/" + this.SessionsService.getCurrentDistributorKey()
       , '_blank');
     return true;
@@ -118,7 +122,7 @@ export default class ProofPlayService {
       allDevices = allDevices + "|" + each;
     }
 
-    this.$window.open(this.uriBase + '/multi_device_by_date/' + start_date + '/' + end_date + '/' + allDevices + '/' +
+    this.$window.open(this.origin + "/" + this.uriBase + '/multi_device_by_date/' + start_date + '/' + end_date + '/' + allDevices + '/' +
       tenant + "/" + this.SessionsService.getCurrentDistributorKey()
       , '_blank');
     return true;
@@ -132,7 +136,7 @@ export default class ProofPlayService {
       allLocations = allLocations + "|" + each;
     }
 
-    this.$window.open(this.uriBase + '/multi_location_by_device/' + start_date + '/' + end_date + '/' + allLocations + '/' +
+    this.$window.open(this.origin + "/" + this.uriBase + '/multi_location_by_device/' + start_date + '/' + end_date + '/' + allLocations + '/' +
       tenant + "/" + this.SessionsService.getCurrentDistributorKey()
       , '_blank');
     return true;
@@ -146,7 +150,7 @@ export default class ProofPlayService {
       allLocations = allLocations + "|" + each;
     }
 
-    this.$window.open(this.uriBase + '/multi_location_summarized/' + start_date + '/' + end_date + '/' + allLocations + '/' +
+    this.$window.open(this.origin + "/" + this.uriBase + '/multi_location_summarized/' + start_date + '/' + end_date + '/' + allLocations + '/' +
       tenant + "/" + this.SessionsService.getCurrentDistributorKey()
       , '_blank');
     return true;
@@ -159,7 +163,7 @@ export default class ProofPlayService {
       return (resource.indexOf(query) === 0);
     };
   }
-  
+
   querySearch(resources, searchText) {
     if (searchText) {
       return resources.filter(this.createFilterFor(searchText));

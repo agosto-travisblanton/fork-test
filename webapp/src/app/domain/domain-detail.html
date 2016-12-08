@@ -63,18 +63,20 @@
                     <label for="impersonationEmail" style="white-space: nowrap;">Impersonation Email</label>
                     <div
                       ng-class="{ 'has-error' : domainForm.impersonationEmail.$invalid && !domainForm.impersonationEmail.$pristine}">
-                      <input type="email"
-                             class="form-control"
-                             id="impersonationEmail"
-                             name="impersonationEmail"
-                             ng-model="domainDetailsCtrl.currentDomain.impersonation_admin_email_address"
-                             style="width:320px"
-                             tooltips
-                             tooltip-side="right"
-                             tooltip-size="large"
-                             tooltip-hide-trigger="mouseleave click"
-                             tooltip-template-url="webapp/src/app/tooltip/domains/impersonation-email.html"
-                             required>
+                      <input
+                        pattern=".{1,}@[_a-z0-9A-Z]+(\.[a-z0-9A-Z]+)+"
+                        type="email"
+                        class="form-control"
+                        id="impersonationEmail"
+                        name="impersonationEmail"
+                        ng-model="domainDetailsCtrl.currentDomain.impersonation_admin_email_address"
+                        style="width:320px"
+                        tooltips
+                        tooltip-side="right"
+                        tooltip-size="large"
+                        tooltip-hide-trigger="mouseleave click"
+                        tooltip-template-url="webapp/src/app/tooltip/domains/impersonation-email.html"
+                        required>
                     </div>
                     <div
                       ng-show="domainForm.impersonationEmail.$error.required && !domainForm.impersonationEmail.$pristine"

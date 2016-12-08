@@ -8,13 +8,14 @@ from models import Distributor, DistributorUser
 from routes import application
 from app_config import config
 from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
-
+from utils.auth_util import generate_token
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>, Christopher Bartling <chris.bartling@agosto.com>'
 
 
 class TestDistributorsHandler(ProvisioningDistributorUserBase):
     def setUp(self):
         super(TestDistributorsHandler, self).setUp()
+        self.admin_header = {"X-Provisioning-User": self.admin_user.key.urlsafe(), "JWT": str(generate_token(self.admin_user))}
 
     ##################################################################################################################
     # get
@@ -22,13 +23,13 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
     def test_get_by_key_returns_ok_status(self):
         request_parameters = {}
         uri = application.router.build(None, 'manage-distributor', None, {'distributor_key': self.agosto_key.urlsafe()})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFAULT_HEADER)
         self.assertOK(response)
 
     def test_get_by_key_returns_distributor_representation(self):
         request_parameters = {}
         uri = application.router.build(None, 'manage-distributor', None, {'distributor_key': self.agosto_key.urlsafe()})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFAULT_HEADER)
         response_json = json.loads(response.body)
         expected = self.agosto_key.get()
         self.assertEqual(response_json.get('key'), expected.key.urlsafe())
@@ -43,7 +44,7 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
         request_parameters = {}
         uri = application.router.build(None, 'manage-distributor', None,
                                        {'distributor_key': self.inactive_distributor_key.urlsafe()})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFAULT_HEADER)
         response_json = json.loads(response.body)
         expected = self.inactive_distributor_key.get()
         self.assertEqual(response_json.get('key'), expected.key.urlsafe())
@@ -56,13 +57,13 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
     def test_get_list_returns_ok_status(self):
         request_parameters = {}
         uri = application.router.build(None, 'distributors', None, {})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFAULT_HEADER)
         self.assertOK(response)
 
     def test_get_list_returns_active_distributors(self):
         request_parameters = {}
         uri = application.router.build(None, 'distributors', None, {})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFAULT_HEADER)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 2)
         self.assertEqual(response_json[0].get('name'), self.AGOSTO)
@@ -80,7 +81,7 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
     def test_get_list_by_name_returns_agosto(self):
         request_parameters = {'distributorName': self.AGOSTO}
         uri = application.router.build(None, 'distributors', None, {})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFAULT_HEADER)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 1)
         self.assertEqual(response_json[0].get('name'), self.AGOSTO)
@@ -88,7 +89,7 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
     def test_get_list_by_name_returns_tierney(self):
         request_parameters = {'distributorName': self.DISTRIBUTOR}
         uri = application.router.build(None, 'distributors', None, {})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFAULT_HEADER)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 1)
         self.assertEqual(response_json[0].get('name'), self.DISTRIBUTOR)
@@ -96,7 +97,7 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
     def test_get_list_by_name_returns_inactive(self):
         request_parameters = {'distributorName': self.INACTIVE_DISTRIBUTOR}
         uri = application.router.build(None, 'distributors', None, {})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFAULT_HEADER)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 1)
         self.assertEqual(response_json[0].get('name'), self.INACTIVE_DISTRIBUTOR)
@@ -110,7 +111,7 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
             'name': self.AGOSTO,
             'active': True
         }
-        response = self.app.put_json(uri, entity_body, headers=self.headers)
+        response = self.app.put_json(uri, entity_body, headers=self.JWT_DEFAULT_HEADER)
         self.assertEqual('204 No Content', response.status)
 
     def test_put_updates_active_property(self):
@@ -123,7 +124,7 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
             'name': self.AGOSTO,
             'active': active
         }
-        self.app.put_json(uri, entity_body, headers=self.headers)
+        self.app.put_json(uri, entity_body, headers=self.JWT_DEFAULT_HEADER)
         self.assertEqual(expected.name, self.AGOSTO)
         self.assertEqual(expected.active, active)
 
@@ -138,7 +139,7 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
             'name': new_name,
             'active': active
         }
-        self.app.put_json(uri, entity_body, headers=self.headers)
+        self.app.put_json(uri, entity_body, headers=self.JWT_DEFAULT_HEADER)
         self.assertEqual(expected.name, new_name)
         self.assertEqual(expected.active, active)
 
@@ -156,22 +157,22 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
         url_safe_distributor_key = self.distributor_key.urlsafe()
         uri = application.router.build(None, 'manage-distributor', None,
                                        {'distributor_key': url_safe_distributor_key})
-        response = self.app.delete(uri, headers=self.headers)
+        response = self.app.delete(uri, headers=self.JWT_DEFAULT_HEADER)
         self.assertEqual(204, response.status_int)
 
     def test_delete_soft_deletes_distributor(self):
         url_safe_distributor_key = self.distributor_key.urlsafe()
         request_parameters = {}
         uri = application.router.build(None, 'manage-distributor', None, {'distributor_key': url_safe_distributor_key})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFAULT_HEADER)
         response_json = json.loads(response.body)
         self.assertIsNotNone(response_json)
 
         uri = application.router.build(None, 'manage-distributor', None, {'distributor_key': url_safe_distributor_key})
-        self.app.delete(uri, headers=self.headers)
+        self.app.delete(uri, headers=self.JWT_DEFAULT_HEADER)
 
         uri = application.router.build(None, 'manage-distributor', None, {'distributor_key': url_safe_distributor_key})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFAULT_HEADER)
         response_json = json.loads(response.body)
         self.assertEqual(response_json.get('active'), False)
 
@@ -191,14 +192,14 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
         request_parameters = {}
         uri = application.router.build(None, 'distributor-domains', None,
                                        {'distributor_key': self.agosto_key.urlsafe()})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFAULT_HEADER)
         self.assertOK(response)
 
     def test_get_domains_returns_only_active_domains_associated_with_agosto(self):
         request_parameters = {}
         uri = application.router.build(None, 'distributor-domains', None,
                                        {'distributor_key': self.agosto_key.urlsafe()})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFAULT_HEADER)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 3)
 
@@ -206,7 +207,7 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
         request_parameters = {}
         uri = application.router.build(None, 'distributor-domains', None,
                                        {'distributor_key': self.agosto_key.urlsafe()})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFAULT_HEADER)
         response_json = json.loads(response.body)
         self.assertEqual(response_json[0].get('name'), self.CHROME_DEVICE_DOMAIN_DEFAULT)
         self.assertEqual(response_json[0].get('impersonation_admin_email_address'), self.IMPERSONATION_EMAIL)
@@ -217,7 +218,7 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
         request_parameters = {}
         uri = application.router.build(None, 'distributor-domains', None,
                                        {'distributor_key': self.distributor_key.urlsafe()})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFAULT_HEADER)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 0)
 
@@ -225,7 +226,7 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
         request_parameters = {}
         uri = application.router.build(None, 'distributor-domains', None,
                                        {'distributor_key': self.inactive_distributor_key.urlsafe()})
-        response = self.app.get(uri, params=request_parameters, headers=self.headers)
+        response = self.app.get(uri, params=request_parameters, headers=self.JWT_DEFAULT_HEADER)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 0)
 
@@ -234,10 +235,10 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
     ###########################################################################
     def test_create_new_distributor_as_admin(self):
         distro_to_add = "new"
-        r = self.post('/api/v1/distributors', json.dumps({
+        r = self.post('/internal/v1/distributors', json.dumps({
             "admin_email": self.user.email,
             "distributor": distro_to_add,
-        }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
+        }), headers=self.admin_header)
 
         self.assertEqual(200, r.status_int)
         self.assertTrue(json.loads(r.body)["success"])
@@ -250,16 +251,16 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
     def test_create_same_distributor_as_admin(self):
         self.test_create_new_distributor_as_admin()
         distro_to_add = "new"
-        r = self.post('/api/v1/distributors', json.dumps({
+        r = self.post('/internal/v1/distributors', json.dumps({
             "admin_email": self.user.email,
             "distributor": distro_to_add,
-        }), headers={"X-Provisioning-User": self.admin_user.key.urlsafe()})
+        }), headers=self.admin_header)
 
         self.assertEqual(409, r.status_int)
 
     def test_create_new_distributor_as_distributor_admin(self):
         distro_to_add = "new"
-        r = self.post('/api/v1/distributors', json.dumps({
+        r = self.post('/internal/v1/distributors', json.dumps({
             "admin_email": self.user.email,
             "distributor": distro_to_add,
         }), headers={"X-Provisioning-User": self.distributor_admin_user.key.urlsafe()})
@@ -272,10 +273,12 @@ class TestDistributorsHandler(ProvisioningDistributorUserBase):
     def test_get_users_of_distributor_multiple(self):
         self.create_user_of_distributor(self.user, self.agosto, role=1)
         self.create_user_of_distributor(self.admin_user, self.agosto)
-        url = '/api/v1/analytics/distributors/{}/users'.format(self.agosto_key.urlsafe())
-        request = self.get(url, headers=self.headers)
+        url = '/internal/v1/analytics/distributors/{}/users'.format(self.agosto_key.urlsafe())
+        request = self.get(url, headers=self.JWT_DEFAULT_HEADER)
         request_json = json.loads(request.body)
         self.assertEqual(200, request.status_int)
         self.assertEqual(3, len(request_json))
         self.assertTrue(len([d for d in request_json if d["email"] == self.user.email]) == 1)
         self.assertTrue(len([d for d in request_json if d["email"] == self.admin_user.email]) == 1)
+
+        self.assertEqual(([d for d in request_json if d["email"] == self.admin_user.email][0]["platform_admin"]), True)

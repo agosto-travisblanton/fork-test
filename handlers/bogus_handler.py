@@ -1,11 +1,10 @@
-from webapp2 import RequestHandler
+from decorators import requires_registration_token, requires_unmanaged_registration_token
+from utils.auth_util import requires_auth
+from extended_session_request_handler import ExtendedSessionRequestHandler
 
-from decorators import requires_api_token, requires_registration_token, requires_unmanaged_registration_token
+class BogusHandler(ExtendedSessionRequestHandler):
 
-
-class BogusHandler(RequestHandler):
-
-    @requires_api_token
+    @requires_auth
     def get(self):
         pass
 

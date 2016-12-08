@@ -1,21 +1,18 @@
-import httplib
-
 from env_setup import setup_test_paths
-from handlers.device_commands_handler import DeviceCommandsHandler
 
 setup_test_paths()
 
 import json
-from agar.test import BaseTest, WebTest
 from app_config import config
 from models import ChromeOsDevice, Tenant, Distributor, Domain
 from routes import application
 import device_message_processor
 from mockito import when, any as any_matcher
 from webtest import AppError
+from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
 
-class TestDeviceCommandsHandler(BaseTest, WebTest):
+class TestDeviceCommandsHandler(ProvisioningDistributorUserBase):
     APPLICATION = application
     NAME = 'foobar tenant'
     ADMIN_EMAIL = 'foo@bar.com'
@@ -54,65 +51,9 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
                                                               mac_address=self.MAC_ADDRESS)
 
         self.chrome_os_device_key = self.chrome_os_device.put()
-        self.valid_authorization_header = {
-            'Authorization': config.API_TOKEN
-        }
+        self.valid_authorization_header = self.JWT_DEFAULT_HEADER
         self.bad_authorization_header = {}
         self.some_intent = 'https://skykit-display-int.appspot.com/40289e504f09422c85d23a629a45be3d'
-        self.post_uri = application.router.build(None,
-                                                 'device-commands',
-                                                 None,
-                                                 {'device_urlsafe_key': self.chrome_os_device_key.urlsafe()})
-
-    ##################################################################################################################
-    # post
-    ##################################################################################################################
-
-    def test_post_intent_returns_ok_status(self):
-        request_body = {'intent': self.some_intent}
-        when(device_message_processor).change_intent(any_matcher(str), any_matcher(str), any_matcher(str),
-                                                     any_matcher(str)).thenReturn(None)
-        response = self.app.post(self.post_uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        self.assertOK(response)
-
-    def test_post_no_authorization_header_returns_forbidden(self):
-        request_body = {'intent': self.some_intent}
-        with self.assertRaises(AppError) as context:
-            self.app.post(self.post_uri, json.dumps(request_body), headers=self.bad_authorization_header)
-        self.assertTrue('403 Forbidden' in context.exception.message)
-
-    def test_post_none_intent_returns_bad_request(self):
-        request_body = {}
-        with self.assertRaises(AppError) as context:
-            self.app.post(self.post_uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        message = '400 DeviceCommandsHandler.post: Invalid intent.'
-        self.assertTrue(message in context.exception.message)
-
-    def test_post_empty_string_intent_returns_bad_request(self):
-        request_body = {'intent': ''}
-        with self.assertRaises(AppError) as context:
-            self.app.post(self.post_uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        message = '400 DeviceCommandsHandler.post: Invalid intent.'
-        self.assertTrue(message in context.exception.message)
-
-    def test_post_wrong_payload_returns_bad_request(self):
-        request_body = {'wrong_intent': self.some_intent}
-        with self.assertRaises(AppError) as context:
-            self.app.post(self.post_uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        message = '400 DeviceCommandsHandler.post: Invalid intent.'
-        self.assertTrue(message in context.exception.message)
-
-    def test_post_corrupted_key_returns_invalid_urlsafe_string_error(self):
-        request_body = {'intent': self.some_intent}
-        corrupted_key = 'corrupted key'
-        uri = application.router.build(None,
-                                       'device-commands',
-                                       None,
-                                       {'device_urlsafe_key': corrupted_key})
-        with self.assertRaises(AppError) as context:
-            self.app.post(uri, json.dumps(request_body), headers=self.valid_authorization_header)
-        message = 'Bad response: 400 Invalid urlsafe string (Protocol Buffer Decode Error): corrupted'
-        self.assertTrue(message in context.exception.message)
 
     ##################################################################################################################
     # reset
@@ -560,27 +501,3 @@ class TestDeviceCommandsHandler(BaseTest, WebTest):
         message = 'Bad response: 404 post_log method not executed because device unresolvable with ' \
                   'urlsafe key: {0}'.format(key)
         self.assertTrue(message in context.exception.message)
-
-    ##################################################################################################################
-    # resolve_device
-    ##################################################################################################################
-
-    def test_resolve_device_with_valid_device_key_returns_ok(self):
-        status, message, device = DeviceCommandsHandler.resolve_device(self.chrome_os_device_key.urlsafe())
-        self.assertEqual(status, httplib.OK)
-        self.assertEqual(message, 'OK')
-        self.assertEqual(device, self.chrome_os_device)
-
-    def test_resolve_device_with_environmentally_invalid_device_key_returns_bad_request(self):
-        environmentally_invalid_key = 'ahtzfnNreWtpdC1kaXNwbGF5LWRldmljZS1pbnRyGwsSDkNocm9tZU9zRGV2aWNlGICAgIDepYUKDA'
-        status, message, device = DeviceCommandsHandler.resolve_device(environmentally_invalid_key)
-        self.assertEqual(status, httplib.BAD_REQUEST)
-        self.assertIsNone(device)
-
-    def test_resolve_device_with_invalid_device_key_string_returns_bad_request(self):
-        invalid_key = 'invalid key'
-        status, message, device = DeviceCommandsHandler.resolve_device(invalid_key)
-        expected_message = 'Invalid input (Type Error). Incorrect padding in urlsafe key'
-        self.assertEqual(status, httplib.BAD_REQUEST)
-        self.assertEqual(message, expected_message)
-        self.assertIsNone(device)

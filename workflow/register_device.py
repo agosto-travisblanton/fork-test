@@ -17,8 +17,12 @@ from workflow.update_chrome_os_device import update_chrome_os_device
 __author__ = 'Bob MacNeal <bob.macneal@agosto.com>'
 
 
-def register_device(urlsafe_key=None, mac_address=None, gcm_registration_id=None,
-                    correlation_id=None, domain_name=None, page_token=None):
+def register_device(urlsafe_key=None,
+                    mac_address=None,
+                    gcm_registration_id=None,
+                    correlation_id=None,
+                    domain_name=None,
+                    page_token=None):
     """
     A function that is meant to be run asynchronously to fetch information about the device entity
     with ChromeOsDevice information from Directory API using the device's MAC address to match.
@@ -191,10 +195,11 @@ def register_device(urlsafe_key=None, mac_address=None, gcm_registration_id=None
                 device_not_found_event.details = 'Calling register_device with new page token.'
                 device.put()
                 deferred.defer(register_device,
-                               device_urlsafe_key=urlsafe_key,
-                               device_mac_address=mac_address,
+                               urlsafe_key=urlsafe_key,
+                               mac_address=mac_address,
                                gcm_registration_id=gcm_registration_id,
                                correlation_id=correlation_id,
+                               domain_name=domain_name,
                                page_token=new_page_token)
     else:
         api_response_event.details = 'No devices returned from Chrome Directory API.'

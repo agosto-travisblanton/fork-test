@@ -5,7 +5,6 @@ from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
-
 class ProgramPlayEvent(Base):
     __tablename__ = "program_play_event"
 

@@ -132,7 +132,7 @@ class TestTenantModel(BaseTest):
         self.assertEqual(tenant_created.proof_of_play_url, config.DEFAULT_PROOF_OF_PLAY_URL)
 
     def test_create_can_override_default_proof_of_play_url(self):
-        proof_of_play_url = 'https://skykit-provisioning-FOOBAR.appspot.com/proofplay/api/v1/post_new_program_play'
+        proof_of_play_url = 'https://skykit-provisioning-FOOBAR.appspot.com/api/internal/v1/post_new_program_play'
         tenant = Tenant.create(tenant_code=self.TENANT_CODE,
                                name='FOOBAR_TENANT',
                                admin_email=self.ADMIN_EMAIL,
@@ -399,14 +399,14 @@ class TestTenantModel(BaseTest):
 
         devices = Tenant.find_issues_paginated(start, end, device_1, prev_cursor_str=None,
                                                next_cursor_str=None)
-        self.assertLength(25, devices["objects"])
+        self.assertLength(10, devices["objects"])
         self.assertTrue(devices["next_cursor"])
         self.assertFalse(devices["prev_cursor"])
 
         next_devices = Tenant.find_issues_paginated(start, end, device_1, prev_cursor_str=None,
                                                     next_cursor_str=devices["next_cursor"])
 
-        self.assertLength(25, next_devices["objects"])
+        self.assertLength(10, next_devices["objects"])
         self.assertTrue(next_devices["next_cursor"])
         self.assertTrue(next_devices["prev_cursor"])
 

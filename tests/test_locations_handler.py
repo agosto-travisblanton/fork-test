@@ -1,19 +1,20 @@
+import httplib
 import json
 
 from google.appengine.ext import ndb
 
 from env_setup import setup_test_paths
+from utils.web_util import build_uri
 
 setup_test_paths()
 
-from agar.test import BaseTest, WebTest
 from models import Distributor, Domain, Tenant, Location
 from routes import application
-from app_config import config
 from webtest import AppError
+from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 
 
-class TestLocationsHandler(BaseTest, WebTest):
+class TestLocationsHandler(ProvisioningDistributorUserBase):
     APPLICATION = application
     DISTRIBUTOR_NAME = 'agosto'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
@@ -48,9 +49,7 @@ class TestLocationsHandler(BaseTest, WebTest):
                                         customer_location_name=self.CUSTOMER_LOCATION_NAME,
                                         customer_location_code=self.CUSTOMER_LOCATION_CODE)
         self.location_key = self.location.put()
-        self.headers = {
-            'Authorization': config.API_TOKEN,
-        }
+        self.headers = self.JWT_DEFAULT_HEADER
 
     ##################################################################################################################
     # get_locations_by_tenant
@@ -67,8 +66,7 @@ class TestLocationsHandler(BaseTest, WebTest):
         number_of_locations = 3
         self.load_tenant_locations(number_of_locations, tenant_key)
         request_parameters = {}
-        uri = application.router.build(None, 'locations-list-retrieval', None,
-                                       {'tenant_urlsafe_key': tenant_key.urlsafe()})
+        uri = build_uri('internal-locations-list', params_dict={'tenant_urlsafe_key': tenant_key.urlsafe()})
         response = self.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), number_of_locations)
@@ -77,6 +75,28 @@ class TestLocationsHandler(BaseTest, WebTest):
             self.assertEqual(response_json[x].get('customerLocationCode'), 'store_{0}'.format(x))
             self.assertTrue(response_json[x].get('active'))
 
+    def test_get_locations_by_tenant_returns_active_locations_only(self):
+        tenant = Tenant.create(tenant_code='Inactive_inc',
+                               name='Inactive, Inc.',
+                               admin_email=self.ADMIN_EMAIL,
+                               content_server_url=self.CONTENT_SERVER_URL,
+                               content_manager_base_url=self.CONTENT_MANAGER_BASE_URL,
+                               domain_key=self.domain_key,
+                               active=True)
+        tenant_key = tenant.put()
+        customer_location_name = 'Inactive Store'
+        customer_location_code = 'inactive_store'
+        location = Location.create(tenant_key=tenant_key,
+                                   customer_location_name=customer_location_name,
+                                   customer_location_code=customer_location_code,
+                                   )
+        location.active = False
+        location.put()
+        request_parameters = {}
+        uri = build_uri('internal-locations-list', params_dict={'tenant_urlsafe_key': tenant_key.urlsafe()})
+        response = self.get(uri, params=request_parameters, headers=self.headers)
+        response_json = json.loads(response.body)
+        self.assertEqual(len(response_json), 0)
 
     ##################################################################################################################
     # get_locations_by_tenant (search)
@@ -93,8 +113,7 @@ class TestLocationsHandler(BaseTest, WebTest):
         number_of_locations = 3
         self.load_tenant_locations(number_of_locations, tenant_key)
         request_parameters = {'customer_location_name': 'Store #2'}
-        uri = application.router.build(None, 'locations-list-retrieval', None,
-                                       {'tenant_urlsafe_key': tenant_key.urlsafe()})
+        uri = build_uri('internal-locations-list', params_dict={'tenant_urlsafe_key': tenant_key.urlsafe()})
         response = self.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), 1)
@@ -111,12 +130,10 @@ class TestLocationsHandler(BaseTest, WebTest):
         number_of_locations = 3
         self.load_tenant_locations(number_of_locations, tenant_key)
         request_parameters = {'customer_location_name': 'Store '}
-        uri = application.router.build(None, 'locations-list-retrieval', None,
-                                       {'tenant_urlsafe_key': tenant_key.urlsafe()})
+        uri = build_uri('internal-locations-list', params_dict={'tenant_urlsafe_key': tenant_key.urlsafe()})
         response = self.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
         self.assertEqual(len(response_json), number_of_locations)
-
 
     def test_get_locations_by_tenant_returns_location_list_paginated(self):
         tenant = Tenant.create(tenant_code='acme_inc',
@@ -130,29 +147,29 @@ class TestLocationsHandler(BaseTest, WebTest):
         number_of_locations = 101
         self.load_tenant_locations(number_of_locations, tenant_key)
         request_parameters = {}
-        uri = application.router.build(None, 'get_locations_by_tenant_paginated', None,
+        uri = application.router.build(None, 'internal-get-locations-by-tenant-paginated', None,
                                        {'tenant_urlsafe_key': tenant_key.urlsafe(), 'prev_cursor': 'null',
                                         'next_cursor': 'null'})
         response = self.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
-        self.assertEqual(len(response_json["locations"]), 25)
+        self.assertEqual(len(response_json["locations"]), 10)
 
-        next_uri = application.router.build(None, 'get_locations_by_tenant_paginated', None,
+        next_uri = application.router.build(None, 'internal-get-locations-by-tenant-paginated', None,
                                             {'tenant_urlsafe_key': tenant_key.urlsafe(), 'prev_cursor': 'null',
                                              'next_cursor': response_json["next_cursor"]})
 
         next_response = self.get(next_uri, params=request_parameters, headers=self.headers)
         next_response_json = json.loads(next_response.body)
-        self.assertEqual(len(next_response_json["locations"]), 25)
+        self.assertEqual(len(next_response_json["locations"]), 10)
 
-        prev_uri = application.router.build(None, 'get_locations_by_tenant_paginated', None,
+        prev_uri = application.router.build(None, 'internal-get-locations-by-tenant-paginated', None,
                                             {'tenant_urlsafe_key': tenant_key.urlsafe(),
                                              'prev_cursor': next_response_json["prev_cursor"],
                                              'next_cursor': 'null'})
 
         prev_response = self.get(prev_uri, params=request_parameters, headers=self.headers)
         prev_response_json = json.loads(prev_response.body)
-        self.assertEqual(len(prev_response_json["locations"]), 25)
+        self.assertEqual(len(prev_response_json["locations"]), 10)
 
     ##################################################################################################################
     # post
@@ -171,9 +188,9 @@ class TestLocationsHandler(BaseTest, WebTest):
                               'longitude': -93.258133,
                               'dma': 'some dma code'
                               }
-        uri = application.router.build(None, 'location-create', None, {})
+        uri = application.router.build(None, 'internal-location-create', None, {})
         response = self.app.post_json(uri, params=request_parameters, headers=self.headers)
-        self.assertEqual(201, response.status_int)
+        self.assertEqual(httplib.CREATED, response.status_int)
 
     def test_post_returns_bad_response_for_missing_tenant_key(self):
         request_parameters = {'tenantKey': '',
@@ -189,7 +206,7 @@ class TestLocationsHandler(BaseTest, WebTest):
                               'longitude': -93.258133,
                               'dma': 'some dma code'
                               }
-        uri = application.router.build(None, 'location-create', None, {})
+        uri = application.router.build(None, 'internal-location-create', None, {})
         with self.assertRaises(AppError) as context:
             self.app.post_json(uri, params=request_parameters, headers=self.headers)
         self.assertTrue('Bad response: 400 The tenant key parameter is invalid.'
@@ -208,7 +225,7 @@ class TestLocationsHandler(BaseTest, WebTest):
                               'longitude': -93.258133,
                               'dma': 'some dma code'
                               }
-        uri = application.router.build(None, 'location-create', None, {})
+        uri = application.router.build(None, 'internal-location-create', None, {})
         with self.assertRaises(AppError) as context:
             self.app.post_json(uri, params=request_parameters, headers=self.headers)
         self.assertTrue('Bad response: 400 The customer location name parameter is invalid.'
@@ -227,7 +244,7 @@ class TestLocationsHandler(BaseTest, WebTest):
                               'longitude': -93.258133,
                               'dma': 'some dma code'
                               }
-        uri = application.router.build(None, 'location-create', None, {})
+        uri = application.router.build(None, 'internal-location-create', None, {})
         with self.assertRaises(AppError) as context:
             self.app.post_json(uri, params=request_parameters, headers=self.headers)
         self.assertTrue('Bad response: 400 The customer location code parameter is invalid.'
@@ -246,7 +263,7 @@ class TestLocationsHandler(BaseTest, WebTest):
                               'longitude': -93.258133,
                               'dma': 'some dma code'
                               }
-        uri = application.router.build(None, 'location-create', None, {})
+        uri = application.router.build(None, 'internal-location-create', None, {})
         with self.assertRaises(AppError) as context:
             self.app.post_json(uri, params=request_parameters, headers=self.headers)
         self.assertTrue('Bad response: 400 The active parameter is invalid.'
@@ -269,7 +286,7 @@ class TestLocationsHandler(BaseTest, WebTest):
                               'longitude': -93.258133,
                               'dma': 'some dma code'
                               }
-        uri = application.router.build(None, 'location-create', None, {})
+        uri = application.router.build(None, 'internal-location-create', None, {})
         with self.assertRaises(AppError) as context:
             self.app.post_json(uri, params=request_parameters, headers=self.headers)
         error_message = "Bad response: 409 Conflict. Customer location code \"{0}\" is already assigned for tenant.".format(
@@ -281,7 +298,7 @@ class TestLocationsHandler(BaseTest, WebTest):
     ##################################################################################################################
     def test_get_location_representation(self):
         request_parameters = {}
-        uri = application.router.build(None, 'manage-location', None,
+        uri = application.router.build(None, 'internal-manage-location', None,
                                        {'location_urlsafe_key': self.location_key.urlsafe()})
         response = self.get(uri, params=request_parameters, headers=self.headers)
         response_json = json.loads(response.body)
@@ -293,7 +310,7 @@ class TestLocationsHandler(BaseTest, WebTest):
     # put
     ##################################################################################################################
     def test_put_returns_no_content_status(self):
-        uri = application.router.build(None, 'manage-location', None,
+        uri = application.router.build(None, 'internal-manage-location', None,
                                        {'location_urlsafe_key': self.location_key.urlsafe()})
         customer_location_name = 'Acme, Inc.'
         entity_body = {
@@ -303,10 +320,10 @@ class TestLocationsHandler(BaseTest, WebTest):
             'longitude': -93.27
         }
         response = self.app.put_json(uri, entity_body, headers=self.headers)
-        self.assertEqual(204, response.status_int)
+        self.assertEqual(httplib.NO_CONTENT, response.status_int)
 
     def test_put_updates_selected_properties(self):
-        uri = application.router.build(None, 'manage-location', None,
+        uri = application.router.build(None, 'internal-manage-location', None,
                                        {'location_urlsafe_key': self.location_key.urlsafe()})
         customer_location_name = 'Acme, Inc.'
         entity_body = {

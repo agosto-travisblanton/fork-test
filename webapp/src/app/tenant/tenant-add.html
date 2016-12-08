@@ -48,13 +48,15 @@
                  ng-class="{ 'has-error' : tenantForm.adminEmail.$invalid && !tenantForm.adminEmail.$pristine }">
               <div class="col-sm-4">
                 <label>Admin email</label>
-                <input type="email"
-                       required
-                       class="form-control"
-                       name="adminEmail"
-                       id="adminEmail"
-                       placeholder="Enter a valid admin email"
-                       ng-model="tenantAddCtrl.currentTenant.admin_email">
+                <input
+                  type="email"
+                  pattern=".{1,}@[_a-z0-9A-Z]+(\.[a-z0-9A-Z]+)+"
+                  required
+                  class="form-control"
+                  name="adminEmail"
+                  id="adminEmail"
+                  placeholder="Enter a valid admin email"
+                  ng-model="tenantAddCtrl.currentTenant.admin_email">
               </div>
               <div class="col-sm-5 margin-top-15">
                 <p

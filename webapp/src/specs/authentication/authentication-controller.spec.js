@@ -209,7 +209,6 @@ describe('AuthenticationCtrl', function () {
     beforeEach(function () {
 
       spyOn(ProgressBarService, 'complete');
-      spyOn(SessionsService, 'setIdentity');
       spyOn($state, 'go').and.callFake(function (name) {
       });
       return controller.loginSuccess(response);

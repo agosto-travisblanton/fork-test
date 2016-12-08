@@ -18,9 +18,9 @@ class UserTest(BaseTest):
         self.assertIsNone(user)
 
     def test_update_or_create_with_api_account(self):
-        account = MockStormpathResponse('dwight.schrute@demo.agosto.com')
+        account = MockStormpathResponse('donald.schrute@demo.agosto.com')
 
-        user = User.get_by_email('dwight.schrute@demo.agosto.com')
+        user = User.get_by_email('donald.schrute@demo.agosto.com')
         self.assertIsNone(user)
 
         user = User.update_or_create_with_api_account(account)

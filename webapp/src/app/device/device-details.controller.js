@@ -24,6 +24,8 @@ function DeviceDetailsCtrl($log,
   const vm = this;
   vm.tenantKey = $stateParams.tenantKey;
   vm.tenantUrl = `/#/tenants/${vm.tenantKey}/details`
+  vm.tenantOverlayUrl = `/#/tenants/${vm.tenantKey}/overlays`
+
   vm.deviceKey = $stateParams.deviceKey;
   vm.fromDevices = $stateParams.fromDevices === "true";
   vm.currentDevice = {};
@@ -36,8 +38,9 @@ function DeviceDetailsCtrl($log,
   [vm.startTime, vm.endTime] = DateManipulationService.createFormattedStartAndEndDateFromToday(30);
   vm.enrollmentEvents = [];
   vm.logoChange = false;
-  vm.controlsModeOptions = ["visible", "invisible", "disabled"]
-  vm.orientationOptions = ["0", "90", "180", "270"]
+  vm.controlsModeOptions = ["visible", "invisible", "disabled"];
+  vm.orientationOptions = ["0", "90", "180", "270"];
+  vm.sleepControllerOptions = ["chrome-default", "rs232"];
   vm.overlayChanged = false;
 
 
@@ -73,42 +76,51 @@ function DeviceDetailsCtrl($log,
     let tenantPromise = TenantsService.getTenantByKey($stateParams.tenantKey);
     tenantPromise.then(function (tenant) {
       let currentTenantOverlays = tenant.overlays;
-      delete currentTenantOverlays.key;
+      if (currentTenantOverlays) {
+        delete currentTenantOverlays.key;
 
-      for (let key in currentTenantOverlays) {
-        if (currentTenantOverlays[key]["type"] === "logo") {
-          currentTenantOverlays[key]["image_key"] = currentTenantOverlays[key]["imageKey"]["key"]
-        } else {
-          currentTenantOverlays[key]["image_key"] = null;
+        for (let key in currentTenantOverlays) {
+          if (currentTenantOverlays[key]["type"] === "logo") {
+            currentTenantOverlays[key]["image_key"] = currentTenantOverlays[key]["imageKey"]["key"]
+          } else {
+            currentTenantOverlays[key]["image_key"] = null;
+          }
         }
-      }
-      ;
+        ;
 
-      let promise = DevicesService.saveOverlaySettings(
-        vm.deviceKey,
-        currentTenantOverlays.bottom_left,
-        currentTenantOverlays.bottom_right,
-        currentTenantOverlays.top_right,
-        currentTenantOverlays.top_left
-      );
+        let promise = DevicesService.saveOverlaySettings(
+          vm.deviceKey,
+          currentTenantOverlays.bottom_left,
+          currentTenantOverlays.bottom_right,
+          currentTenantOverlays.top_right,
+          currentTenantOverlays.top_left
+        );
 
-      promise.then((res) => {
-        let devicePromise = DevicesService.getDeviceByKey(vm.deviceKey);
-        devicePromise.then((currentDevice) => {
-          vm.currentDevice.overlays = currentDevice.overlays;
-          vm.currentDeviceCopy.overlays = angular.copy(vm.currentDevice.overlays)
-          vm.loadingOverlays = false;
+        promise.then((res) => {
+          let devicePromise = DevicesService.getDeviceByKey(vm.deviceKey);
+          devicePromise.then((currentDevice) => {
+            vm.currentDevice.overlays = currentDevice.overlays;
+            vm.currentDeviceCopy.overlays = angular.copy(vm.currentDevice.overlays)
+            vm.loadingOverlays = false;
+            ProgressBarService.complete();
+            ToastsService.showSuccessToast('We saved your update.');
+          })
+        });
+
+        promise.catch((res) => {
           ProgressBarService.complete();
-          ToastsService.showSuccessToast('We saved your update.');
+          ToastsService.showErrorToast('Something went wrong');
         })
-      });
-
-      promise.catch((res) => {
+      } else {
+        vm.loadingOverlays = false;
         ProgressBarService.complete();
-        ToastsService.showErrorToast('Something went wrong');
-      })
-    });
-  };
+        return sweet.show('Oops...', 'Your tenant does not have overlays enabled. ' +
+          'Please enable overlays for your tenant before attempting to revert device overlay to tenant settings.', 'error');
+
+      }
+    })
+  }
+
 
   vm.adjustControlsMode = () => {
     let controlsMode = vm.currentDevice.controlsMode;

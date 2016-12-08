@@ -27,8 +27,9 @@ basedir = path.abspath(path.dirname(__file__))
 ##############################################################################
 # APPLICATION SETTINGS
 ##############################################################################
-
 app_APP_ROOT = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+# SECRET_KEY used for signing JWTs
+app_JWT_SECRET_KEY = '4jlklk3jlkdsmn,mnlaks400295925jo5434lk534lk345lkm354m,vc.m,vlxlkjo0afjdkslsfadkdd40gkgs'
 
 
 def _APP_NAME():
@@ -328,9 +329,15 @@ app_DEVICE_ISSUE_STORAGE_LOW = 'Storage available low'
 
 app_DEVICE_ISSUE_STORAGE_NORMAL = 'Storage normal'
 
+app_DEVICE_ISSUE_PROGRAM_CHANGE = 'Program change'
+
+app_DEVICE_ISSUE_PLAYLIST_CHANGE = 'Playlist change'
+
+app_DEVICE_ISSUE_CONTENT_CHANGE = 'Content change'
+
 app_STORAGE_UTILIZATION_THRESHOLD = 90
 
-app_MEMORY_UTILIZATION_THRESHOLD = 90
+app_MEMORY_UTILIZATION_THRESHOLD = 98
 
 app_LATEST_DEVICE_ISSUES_FETCH_COUNT = 250
 

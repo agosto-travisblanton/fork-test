@@ -64,6 +64,17 @@ DEVICE_PAIRING_CODE_STRATEGY += [
     {'macAddress': lambda o, field_name, context: o.mac_address}
 ]
 
+CHROME_OS_DEVICES_LIST_VIEW_STRATEGY = ModelStrategy(ChromeOsDevice).include('tenant_key',
+                                                                             macAddress='mac_address',
+                                                                             serialNumber='serial_number',
+                                                                             created='created')
+CHROME_OS_DEVICES_LIST_VIEW_STRATEGY += [
+    {'tenantCode': lambda o, field_name, context: o.tenant_key.get().tenant_code if o.tenant_key is not None else None},
+    {'key': lambda o, field_name, context: o.key.urlsafe()},
+    {'tenantKey': lambda o, field_name, context: o.tenant_key.urlsafe() if o.tenant_key is not None else None},
+    {'up': lambda o, field_name, context: o.up},
+
+]
 
 CHROME_OS_DEVICE_STRATEGY = ModelStrategy(ChromeOsDevice)
 CHROME_OS_DEVICE_STRATEGY += [
@@ -137,13 +148,17 @@ CHROME_OS_DEVICE_STRATEGY += [
     {'programId': lambda o, field_name, context: o.program_id},
     {'playlist': lambda o, field_name, context: o.playlist},
     {'playlistId': lambda o, field_name, context: o.playlist_id},
+    {'contentKind': lambda o, field_name, context: o.content_kind},
+    {'contentName': lambda o, field_name, context: o.content_name},
+    {'contentId': lambda o, field_name, context: o.content_id},
     {'lastError': lambda o, field_name, context: o.last_error},
     {'archived': lambda o, field_name, context: o.archived},
     {'controlsMode': lambda o, field_name, context: o.controls_mode},
     {'overlayStatus': lambda o, field_name,
                              context: o.overlays_available},
     {'overlays': lambda o, field_name, context: o.overlays_as_dict if o.overlays_available else None},
-    {'orientationMode': lambda o, field_name, context: o.orientation_mode}
+    {'orientationMode': lambda o, field_name, context: o.orientation_mode},
+    {'sleepController': lambda o, field_name, context: o.sleep_controller}
 
 ]
 
@@ -179,6 +194,9 @@ DEVICE_ISSUE_LOG_STRATEGY += [
     {'lastError': lambda o, field_name, context: o.last_error},
     {'playlist': lambda o, field_name, context: o.playlist},
     {'playlistId': lambda o, field_name, context: o.playlist_id},
+    {'contentKind': lambda o, field_name, context: o.content_kind},
+    {'contentName': lambda o, field_name, context: o.content_name},
+    {'contentId': lambda o, field_name, context: o.content_id},
     {'created': lambda o, field_name, context: o.created},
     {'updated': lambda o, field_name, context: o.updated},
     {'level': lambda o, field_name, context: o.level},

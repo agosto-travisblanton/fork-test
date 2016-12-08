@@ -7,11 +7,7 @@ from data_processing import (
     transform_db_data_to_by_location_then_resource
 )
 import datetime
-from models import Domain, Tenant, TenantEntityGroup
-from google.appengine.ext import ndb
 from proofplay_config import config
-import logging
-import time
 
 
 def unique_tenant_resource_identifier(resource_identifier, tenant_code):
@@ -380,29 +376,3 @@ def get_raw_program_record_data_by_location(start_date, end_date, customer_locat
     return from_db
 
 
-####################################################################################
-# DataStore Related
-####################################################################################
-def tenant_code_from_urlsafe_key(urlsafe_key):
-    tenant_key = ndb.Key(urlsafe=urlsafe_key)
-    if tenant_key:
-        return tenant_key.get().tenant_code
-    return None
-
-
-def get_tenant_list_from_distributor_key(distributor_key):
-    distributor = ndb.Key(urlsafe=distributor_key)
-    domain_keys = Domain.query(Domain.distributor_key == distributor).fetch(100, keys_only=True)
-    tenant_list = Tenant.query(ancestor=TenantEntityGroup.singleton().key)
-    tenant_list = filter(lambda x: x.active, tenant_list)
-    result = filter(lambda x: x.domain_key in domain_keys, tenant_list)
-    sorted_result = sorted(result, key=lambda k: k.tenant_code)
-    return sorted_result
-
-
-def get_tenant_names_for_distributor(distributor_key):
-    return [
-        result.tenant_code.encode('ascii', 'ignore')
-        for result in
-        get_tenant_list_from_distributor_key(distributor_key)
-        ]

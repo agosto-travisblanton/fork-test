@@ -17,6 +17,8 @@ libraries:
   version: "1.3"
 - name: webapp2
   version: latest
+- name: MySQLdb
+  version: "latest"
 
 handlers:
 

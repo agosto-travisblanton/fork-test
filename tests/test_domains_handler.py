@@ -5,13 +5,13 @@ from webtest import AppError
 setup_test_paths()
 
 import json
-from tests.provisioning_base_test import ProvisioningBaseTest
+from provisioning_distributor_user_base_test import ProvisioningDistributorUserBase
 from routes import application
 from models import Distributor, Domain
 from app_config import config
 
 
-class TestDomainsHandler(ProvisioningBaseTest):
+class TestDomainsHandler(ProvisioningDistributorUserBase):
     APPLICATION = application
     DISTRIBUTOR_NAME = 'agosto'
     CHROME_DEVICE_DOMAIN = 'dev.agosto.com'
@@ -34,10 +34,10 @@ class TestDomainsHandler(ProvisioningBaseTest):
                                              impersonation_admin_email_address=self.IMPERSONATION_EMAIL,
                                              active=False)
         self.inactive_domain_key = self.inactive_domain.put()
-        self.headers = {
-            'Authorization': config.API_TOKEN,
-            'X-Provisioning-Distributor': self.distributor_key.urlsafe()
-        }
+
+        self.headers = self.JWT_DEFAULT_HEADER
+        self.headers['X-Provisioning-Distributor'] = self.distributor_key.urlsafe()
+
         self.bad_authorization_header = {
             'Authorization': 'Forget about it!',
             'X-Provisioning-Distributor': self.distributor_key.urlsafe()
@@ -86,16 +86,15 @@ class TestDomainsHandler(ProvisioningBaseTest):
         self.assertTrue(self.FORBIDDEN in context.exception.message)
 
     def test_post_fails_without_distributor_key(self):
-        headers = {
-            'Authorization': config.API_TOKEN,
-            'X-Provisioning-Distributor': ''
-        }
+        headers = self.JWT_DEFAULT_HEADER
+        headers['X-Provisioning-Distributor'] = ''
+
 
         request_body = {'name': 'dev3.agosto.com',
                         'active': True,
                         'impersonation_admin_email_address': self.IMPERSONATION_EMAIL}
         with self.assertRaises(AppError) as context:
-            self.app.post('/api/v1/domains', json.dumps(request_body), headers=headers)
+            self.app.post('/internal/v1/domains', json.dumps(request_body), headers=headers)
         self.assertTrue('Bad response: 400 The distributor_key parameter is invalid.'
                         in context.exception.message)
 
@@ -105,7 +104,7 @@ class TestDomainsHandler(ProvisioningBaseTest):
                         'impersonation_admin_email_address': self.IMPERSONATION_EMAIL,
                         'distributor_key': self.distributor_key.urlsafe()}
         with self.assertRaises(AppError) as context:
-            self.app.post('/api/v1/domains', json.dumps(request_body), headers=self.headers)
+            self.app.post('/internal/v1/domains', json.dumps(request_body), headers=self.headers)
         self.assertTrue('Bad response: 400 The name parameter is invalid.'
                         in context.exception.message)
 
@@ -115,7 +114,7 @@ class TestDomainsHandler(ProvisioningBaseTest):
                         'impersonation_admin_email_address': self.IMPERSONATION_EMAIL,
                         'distributor_key': self.distributor_key.urlsafe()}
         with self.assertRaises(AppError) as context:
-            self.app.post('/api/v1/domains', json.dumps(request_body), headers=self.headers)
+            self.app.post('/internal/v1/domains', json.dumps(request_body), headers=self.headers)
         self.assertTrue('Bad response: 400 The active parameter is invalid.'
                         in context.exception.message)
 
@@ -125,13 +124,13 @@ class TestDomainsHandler(ProvisioningBaseTest):
                         'impersonation_admin_email_address': None,
                         'distributor_key': self.distributor_key.urlsafe()}
         with self.assertRaises(AppError) as context:
-            self.app.post('/api/v1/domains', json.dumps(request_body), headers=self.headers)
+            self.app.post('/internal/v1/domains', json.dumps(request_body), headers=self.headers)
         self.assertTrue('Bad response: 400 The impersonation_admin_email_address parameter is invalid.'
                         in context.exception.message)
 
     def test_post_fails_without_request_body(self):
         with self.assertRaises(AppError) as context:
-            self.app.post('/api/v1/domains', {}, headers=self.headers)
+            self.app.post('/internal/v1/domains', {}, headers=self.headers)
         self.assertTrue('Bad response: 400 Did not receive request body.'
                         in context.exception.message)
 

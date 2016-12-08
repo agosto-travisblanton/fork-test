@@ -450,4 +450,3 @@ class TestChromeOsDeviceModel(BaseTest):
                                                mac_address=self.MAC_ADDRESS)
         impersonation_email = Tenant.get_impersonation_email(urlsafe_tenant_key=device.tenant_key.urlsafe())
         self.assertEqual(impersonation_email, self.IMPERSONATION_EMAIL)
-

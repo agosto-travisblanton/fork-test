@@ -359,16 +359,22 @@ export function routes($stateProvider, $urlRouterProvider, RestangularProvider) 
       label: 'Admin'
     }
   });
+  $stateProvider.state("redirect", {
+    url: "/redirect",
+    templateUrl: "app/redirect/redirect.html",
+    controller: "RedirectCtrl",
+    controllerAs: 'vm',
+    ncyBreadcrumb: {
+      label: 'Redirect'
+    }
+  });
 
   $urlRouterProvider.otherwise('/sign_in');
 
-  RestangularProvider.setBaseUrl('/api/v1');
+  RestangularProvider.setBaseUrl('/internal/v1');
 
   RestangularProvider.addResponseInterceptor(function (data, operation, resourceType, url, response, deferred) {
     let result = data;
-    // Uncomment this for pagination support when using PagingListHandlerMixin on the Python side.
-    //    if resourceType == 'devices' and operation = 'getList' and url == '/api/v1/devices'
-    //      result = data.objects
     return result;
   });
 

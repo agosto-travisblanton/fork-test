@@ -29,25 +29,11 @@ describe('SessionsService', function () {
     return it('sets @currentUserKey variable to undefined', () => expect(SessionsService.currentUserKey).toBeUndefined());
   });
 
-  return describe('.login', function () {
-    let expectedCredentials = {
-      access_token: 'foobar_access_token',
-      authuser: 'foobar_authuser',
-      client_id: 'foobar_client_id',
-      code: 'foobar_code',
-      id_token: 'foobar_id_token',
-      scope: 'foobar_scope',
-      session_state: 'foobar_session_state',
-      state: 'foobar_state',
-      status: 'foobar_status',
-      email: 'foobar_email',
-      password: 'foobar_password'
-    };
+  describe('.login', function () {
     let deferred = undefined;
-    let result = undefined;
     let expectedCallbackResponse = {
-      user: {
-        key: '2837488f70g98708g9af678f6ga7df'
+      data: {
+        token: 'eyJleHAiOjQ2MjQyMTAyNzMsImlhdCI6MTQ3OTI1MDI3MywiYWxnIjoiSFMyNTYifQ.eyJpc19sb2dnZWRfaW4iOnRydWUsImtleSI6ImFoMWtaWFotYzJ0NWEybDBMV1JwYzNCc1lYa3RaR1YyYVdObExXbHVkSElqQ3hJRVZYTmxjaUlaWkdGdWFXVnNMblJsY201NVlXdEFZV2R2YzNSdkxtTnZiUXciLCJpc19hZG1pbiI6dHJ1ZSwiZGlzdHJpYnV0b3JzIjpbIk1pZmZsaW4iLCJEdW5kZXIiLCJTY3JhbnRvbiJdLCJlbWFpbCI6ImRhbmllbC50ZXJueWFrQGFnb3N0by5jb20iLCJkaXN0cmlidXRvcnNfYXNfYWRtaW4iOlsiTWlmZmxpbiIsIkR1bmRlciIsIlNjcmFudG9uIl19.HBspomnaabOvV4j0jPv6NNUMWoUa2PptTmExQv9kaC0'
       }
     };
 
@@ -58,16 +44,17 @@ describe('SessionsService', function () {
       return $httpBackend.verifyNoOutstandingRequest();
     });
 
-    return it('logs in to Stormpath and sets identity', function () {
-      deferred.resolve(expectedCallbackResponse);
-      $httpBackend.expectPOST('/login', expectedCredentials).respond(expectedCallbackResponse);
-      let identityResponse = {email: "dwight.schrute@agosto.com"};
-      $httpBackend.expectGET('/api/v1/identity').respond(identityResponse);
-      result = SessionsService.login(expectedCredentials);
-      $httpBackend.flush();
-      return result.then(data => {
-        return expect(SessionsService.getUserKey()).toEqual(expectedCallbackResponse.user.key);
+    it('exchanges oAuth for JWT', function () {
+      $httpBackend.when('GET', '/internal/v1/login').respond(() => expectedCallbackResponse);
+      let result = SessionsService.login({
+        id_token: '2lk34jl3k4j2l34jjkl2433k4'
       });
+
+      $httpBackend.flush();
+      result.then(() => {
+        expect(SessionsService.getIsAdmin()).toBeTruthy()
+        expect(SessionsService.getUserEmail()).toEqual('daniel.ternyak@agosto.com')
+      })
     });
   });
 });

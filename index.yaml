@@ -20,11 +20,6 @@ indexes:
   - name: posted
     direction: desc
 
-- kind: Location
-  properties:
-  - name: tenant_key
-  - name: customer_location_code
-
 - kind: IntegrationEventLog
   properties:
   - name: event_category
@@ -119,12 +114,13 @@ indexes:
 
 - kind: Location
   properties:
+  - name: active
   - name: tenant_key
-  - name: __key__
-    direction: desc
+  - name: customer_location_code
 
 - kind: Location
   properties:
+  - name: active
   - name: tenant_key
   - name: customer_location_name
 
@@ -132,8 +128,6 @@ indexes:
   properties:
   - name: tenant_key
   - name: customer_location_name
-  - name: __key__
-    direction: desc
 
 - kind: Location
   properties:
