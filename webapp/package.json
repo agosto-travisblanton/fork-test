@@ -11,7 +11,7 @@
     "angular-cookies": "^1.5.7",
     "angular-debounce": "^1.0.3",
     "angular-h-sweetalert": "^1.4.7",
-    "angular-material": "^1.1.1",
+    "angular-material": "^1.1.0",
     "angular-sanitize": "^1.5.7",
     "angular-toastr": "^1.7.0",
     "angular-tooltips": "^1.1.4",
